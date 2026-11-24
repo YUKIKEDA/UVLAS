@@ -1514,6 +1514,7 @@ $EndElements
     bool wrong_dimension = false;
     bool wrong_chart = false;
     bool version = false;
+    bool wrong_sidecar_geometry = false;
     bool physical = false;
     bool thickness_shift = false;
     bool material_shift = false;
@@ -1521,9 +1522,13 @@ $EndElements
     bool conversion = false;
     bool distance_short = false;
     bool normal_short = false;
+    bool conversion_shifted_reference = false;
     bool pcomp = false;
     bool reversed = false;
     bool wrong_layer_material = false;
+    bool shifted_reference = false;
+    bool case_millimetres = false;
+    bool wrong_thickness_units = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1552,6 +1557,11 @@ $EndElements
         is_gmsh = true;
         lexical = true;
         wrong_chart = true;
+    }
+    SECTION("An authenticated Gmsh sidecar must name its declaring geometry") {
+        is_gmsh = true;
+        lexical = true;
+        wrong_sidecar_geometry = true;
     }
     SECTION("A physical tag cannot be resolved in a different dimension") {
         is_gmsh = true;
@@ -1628,6 +1638,28 @@ $EndElements
         reversed = true;
         wrong_layer_material = true;
     }
+    SECTION("The authenticated targets use the shifted Case reference") {
+        is_gmsh = true;
+        physical = true;
+        shifted_reference = true;
+    }
+    SECTION("The physical Case can express the same thickness in millimetres") {
+        is_gmsh = true;
+        physical = true;
+        case_millimetres = true;
+    }
+    SECTION("The qualification uses the Case units for the thickness match") {
+        is_gmsh = true;
+        physical = true;
+        case_millimetres = true;
+        wrong_thickness_units = true;
+    }
+    SECTION("Gmsh conversion bounds use the translated Case reference") {
+        is_gmsh = true;
+        physical = true;
+        conversion = true;
+        conversion_shifted_reference = true;
+    }
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1635,7 +1667,7 @@ $EndElements
     const auto empty = nlohmann::json::array();
     nlohmann::json sidecar = {
         {"schema", is_gmsh ? "uvlas.gmsh-sidecar/1" : "uvlas.nastran-sidecar/1"},
-        {"geometry", "2"},
+        {"geometry", wrong_sidecar_geometry ? "999" : "2"},
         {"shells", empty},
         {"supports", empty},
         {"joints", empty}};
@@ -1666,7 +1698,7 @@ $EndElements
             sidecar["schema"] = "uvlas.gmsh-sidecar/2";
         } else if (wrong_chart) {
             sidecar["shells"][0]["faces"][0]["chart"]["vertices"][1][0]["denominator"] = "0";
-        } else if (lexical) {
+        } else if (lexical && !wrong_sidecar_geometry) {
             sidecar["include"] = "unread.json";
         }
         if (budget_repeat) {
@@ -1758,11 +1790,18 @@ $EndElements
                                   : "MAT1,6,1.0000000000000000001");
     }
     auto config = fixture::root("coupled_transient");
-    config.field("model")
-        .field("geometry")
-        .elements[0]
-        .field("thickness")
-        .set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    auto& case_geometry = config.field("model").field("geometry").elements[0];
+    case_geometry.field("thickness")
+        .set("values",
+             fixture::json(case_millimetres && !wrong_thickness_units ? "[250,250,250,250]"
+                                                                      : "[0.25,0.25,0.25,0.25]"));
+    if (case_millimetres) {
+        config.field("units").set("length", fixture::json(R"("mm")"));
+        case_geometry.set("reference_length", fixture::json("1000"));
+    }
+    if (shifted_reference) {
+        case_geometry.field("frame").set("origin", fixture::json("[0,0,1]"));
+    }
     if (pcomp) {
         auto orthotropic = fixture::fragment("Material.orthotropic3d");
         orthotropic.set("id", fixture::json(R"("2")"));
@@ -1796,6 +1835,9 @@ $EndElements
         reference.set("reference_length", fixture::json("1000"));
         reference.field("thickness").set("values", fixture::json("[250,250,250,250]"));
         reference.set("degree", fixture::json("[2,0]"));
+        if (conversion_shifted_reference) {
+            reference.field("frame").set("origin", fixture::json("[0,0,50]"));
+        }
         reference.set(
             "coefficients",
             fixture::json(
@@ -1848,9 +1890,15 @@ $EndElements
             CHECK(diagnostic.reason == rd::LeafReferenceFailure::Sidecar);
             CHECK(diagnostic.pointer() == "/model/geometry/1/sidecar");
             REQUIRE(diagnostic.sidecar);
-            CHECK(diagnostic.sidecar->reason == (version       ? rd::MeshSidecarFailure::Schema
-                                                 : wrong_chart ? rd::MeshSidecarFailure::Scalar
-                                                               : rd::MeshSidecarFailure::Key));
+            if (wrong_sidecar_geometry) {
+                CHECK(diagnostic.sidecar->reason == rd::MeshSidecarFailure::CaseReference);
+                CHECK(diagnostic.sidecar->target_namespace == io::SchemaNamespace::Geometry);
+                CHECK(diagnostic.sidecar->target == 2);
+            } else {
+                CHECK(diagnostic.sidecar->reason == (version       ? rd::MeshSidecarFailure::Schema
+                                                     : wrong_chart ? rd::MeshSidecarFailure::Scalar
+                                                                   : rd::MeshSidecarFailure::Key));
+            }
         }
         return result;
     }(); // The graph now owns the exact source bytes. All input files have been removed.
@@ -1907,71 +1955,40 @@ $EndElements
     CHECK(faces[1].sidecar_row == 1);
     if (physical) {
         using namespace uvlas::structure;
-        partition_test::Fixture pg_input;
-        for (auto& value : pg_input.heights) {
-            value = pg_input.r("1", "4");
-        }
-        pg_input.layers.clear();
-        if (pcomp) {
-            pg_input.zeta[1] = pg_input.r(reversed ? "1" : "-1", "2");
-            pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[1]});
-            pg_input.layers.push_back({core::LayerId{2}, pg_input.zeta[1], pg_input.zeta[2]});
-        } else {
-            pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[2]});
-        }
-        const auto unit = pg_input.r("1");
-        const std::array origin{pg_input.r("0"), pg_input.r("0"), pg_input.r("0")};
-        const std::array axes{pg_input.r("1"), pg_input.r("0"), pg_input.r("0"),
-                              pg_input.r("0"), pg_input.r("1"), pg_input.r("0"),
-                              pg_input.r("0"), pg_input.r("0"), pg_input.r("1")};
         const PgReferenceLimits pg_limits{
             partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
-        if (conversion) {
-            const auto linear = pg_input.r("1", "10");
-            const auto quadratic = pg_input.r("-1", "10");
-            const std::array terms{ExactInputTerm{{1, 0}, linear},
-                                   ExactInputTerm{{2, 0}, quadratic}};
-            const auto height =
-                fixture::take(ExactChartPolynomial::make(terms, pg_limits.algebra, plan));
-            const auto graph_zero = pg_input.r("0");
-            pg_input.graph = fixture::take(PgGraph::prepare(
-                {graph_zero, unit, graph_zero, height, 1, PgGraphConvention::Version1},
-                {pg_limits.algebra, 4, {}}, plan));
-        }
         core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
-        auto coefficients = fixture::take(PgCoefficientDictionary::prepare(
-            pg_input.chart_graph(), {partition_test::exact_limits(), 2000, 20'000'000, 100'000, {}},
-            workspace, plan));
-        auto partition = fixture::take(PgIntegrationPartition::prepare(
-            pg_input.request(), partition_test::limits(), workspace, plan));
-        PgReferenceInputs initial{std::move(pg_input.chart_graph()), std::move(coefficients),
-                                  std::move(partition)};
-        const auto pg = fixture::take(PgReferenceGeometry::prepare(
-            std::move(initial), {axes, origin, unit}, pg_limits, plan));
+        const auto exact = partition_test::exact_limits();
+        const rd::CasePgReferenceLimits reference_limits{{exact, 64, {}},
+                                                         {exact, 2000, 20'000'000, 100'000, {}},
+                                                         partition_test::limits(),
+                                                         pg_limits,
+                                                         100'000,
+                                                         {}};
+        std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
+        si_caps.fill(fixture::budget);
+        const io::SiLimits si_limits{si_caps, exact};
+        const auto catalog = fixture::take(io::make_si_catalog(schema, si_limits, plan, nullptr));
+        std::vector<io::SiRequirementRow> requirements;
+        for (std::uint64_t i = 0; i < fixture::take(catalog.size()); ++i) {
+            const auto entry = fixture::take(catalog.entry(i));
+            requirements.push_back({entry.key,
+                                    {io::SiDecimalInput{"1"}, entry.recipe.dimensions},
+                                    io::SiDecimalInput{"1e-25"},
+                                    io::SiDecimalInput{"1e-25"}});
+        }
+        const auto request =
+            fixture::take(io::make_si_request(catalog, requirements, si_limits, plan, nullptr));
+        const auto si = fixture::take(
+            io::convert_case_to_si(schema, catalog, request, si_limits, plan, nullptr));
         const rd::ExternalSidecarPgLimits qualification{
             {pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
         rd::ExternalSidecarPgDiagnostic failure;
         if (conversion) {
-            std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
-            si_caps.fill(fixture::budget);
-            const io::SiLimits si_limits{si_caps, pg_limits.algebra};
-            const auto catalog =
-                fixture::take(io::make_si_catalog(schema, si_limits, plan, nullptr));
-            std::vector<io::SiRequirementRow> requirements;
-            for (std::uint64_t i = 0; i < fixture::take(catalog.size()); ++i) {
-                const auto entry = fixture::take(catalog.entry(i));
-                requirements.push_back({entry.key,
-                                        {io::SiDecimalInput{"1"}, entry.recipe.dimensions},
-                                        io::SiDecimalInput{"1e-25"},
-                                        io::SiDecimalInput{"1e-25"}});
-            }
-            const auto request =
-                fixture::take(io::make_si_request(catalog, requirements, si_limits, plan, nullptr));
-            const auto si = fixture::take(
-                io::convert_case_to_si(schema, catalog, request, si_limits, plan, nullptr));
             const auto admitted = rd::certify_external_sidecar_pg_bounds(
-                si, *result, rd::MeshShellId{1}, pg, qualification, 200'000, plan, {}, &failure);
-            if (distance_short || normal_short) {
+                si, *result, rd::MeshShellId{1}, reference_limits, qualification, 200'000,
+                workspace, plan, {}, &failure);
+            if (distance_short || normal_short || conversion_shifted_reference) {
                 REQUIRE_FALSE(admitted);
                 CHECK(admitted.error().code == core::FailureCode::PrecisionUnresolved);
                 REQUIRE(failure.binding);
@@ -1980,22 +1997,34 @@ $EndElements
                 return;
             }
             REQUIRE(admitted);
-            CHECK(admitted->distance_budget_metres == pg_input.r("13", "500"));
-            REQUIRE(admitted->observations.size() == 1);
-            CHECK(admitted->observations.values()[0].id == core::ObservationId{1});
+            partition_test::Fixture oracle;
+            CHECK(admitted->match.distance_budget_metres == oracle.r("13", "500"));
+            REQUIRE(admitted->match.observations.size() == 1);
+            CHECK(admitted->match.observations.values()[0].id == core::ObservationId{1});
             std::visit(
                 [&](const auto& original) {
                     const auto view = original.view();
                     REQUIRE(view);
                     REQUIRE(view->faces.size() == 2);
-                    const auto interior_distance = pg_input.r("1", "40");
+                    const auto interior_distance = oracle.r("1", "40");
                     for (const auto& face : view->faces) {
                         CHECK(fixture::take(face.distance_upper_metres.compare(
                                   interior_distance, pg_limits.algebra, plan)) !=
                               std::strong_ordering::less);
                     }
                 },
-                admitted->geometry);
+                admitted->match.geometry);
+            // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
+            std::stop_source stop;
+            REQUIRE(stop.request_stop());
+            auto stopped_geometry = qualification;
+            stopped_geometry.geometry.arithmetic.cancellation = stop.get_token();
+            const auto cancelled = rd::certify_external_sidecar_pg_bounds(
+                si, *result, rd::MeshShellId{1}, reference_limits, stopped_geometry, 200'000,
+                workspace, plan, {}, &failure);
+            REQUIRE_FALSE(cancelled);
+            CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+            CHECK_FALSE(failure.binding);
             return;
         }
         std::optional<rd::NastranLaminateCards> quantities;
@@ -2012,11 +2041,9 @@ $EndElements
             quantities.emplace(fixture::take(
                 rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
         }
-        const io::SiUnits case_units{io::SiLengthUnit::Metre, io::SiMassUnit::Kilogram,
-                                     io::SiTimeUnit::Second, io::SiAngleUnit::Radian};
         const auto qualified = rd::qualify_external_sidecar_planar_pg(
-            schema, *result, rd::MeshShellId{1}, pg, case_units,
-            quantities ? &*quantities : nullptr, qualification, plan, {}, &failure);
+            si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr, reference_limits,
+            qualification, workspace, plan, {}, &failure);
         if (wrong_layer_material) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == core::FailureCode::InvalidInput);
@@ -2027,11 +2054,13 @@ $EndElements
             } else {
                 FAIL("Missing mapped material disagreement");
             }
-        } else if (material_shift || thickness_shift) {
+        } else if (material_shift || thickness_shift || shifted_reference ||
+                   wrong_thickness_units) {
             REQUIRE_FALSE(qualified);
-            CHECK(qualified.error().code == (chart_shift ? core::FailureCode::GeometryInvalid
-                                                         : core::FailureCode::InvalidInput));
-            if (chart_shift) {
+            CHECK(qualified.error().code == (chart_shift || shifted_reference
+                                                 ? core::FailureCode::GeometryInvalid
+                                                 : core::FailureCode::InvalidInput));
+            if (chart_shift || shifted_reference) {
                 CHECK(failure.geometry.has_value());
                 CHECK_FALSE(failure.quantity.has_value());
             } else if (const auto& mismatch = failure.quantity) {
@@ -2048,29 +2077,41 @@ $EndElements
             }
         } else {
             REQUIRE(qualified);
-            CHECK(qualified->thickness_compared);
-            CHECK(qualified->materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
+            CHECK(qualified->match.thickness_compared);
+            CHECK(qualified->match.materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
             if (pcomp) {
-                REQUIRE_FALSE(qualified->laminate[reversed ? 0U : 1U]);
-                if (const auto& matched = qualified->laminate[reversed ? 1U : 0U]) {
+                REQUIRE_FALSE(qualified->match.laminate[reversed ? 0U : 1U]);
+                if (const auto& matched = qualified->match.laminate[reversed ? 1U : 0U]) {
+                    partition_test::Fixture oracle;
                     const auto plies = matched->layers.values();
                     REQUIRE(plies.size() == 2);
                     CHECK(plies.front().material.id == rd::NastranMaterialId{reversed ? 9U : 6U});
                     CHECK(plies.front().ply_thickness_metres ==
-                          pg_input.r(reversed ? "3" : "1", "16"));
+                          oracle.r(reversed ? "3" : "1", "16"));
                     CHECK(plies.back().material.id == rd::NastranMaterialId{reversed ? 6U : 9U});
-                    CHECK(matched->pg == fixture::take(pg.identity()));
+                    CHECK(matched->pg == fixture::take(qualified->reference.identity()));
                 } else {
                     FAIL("Missing exact PCOMP layer comparison");
                 }
             }
-            CHECK(qualified->pg == rd::MeshGeometryId{1});
-            if (const auto admitted = qualified->geometry.view()) {
+            CHECK(qualified->match.pg == rd::MeshGeometryId{1});
+            if (const auto admitted = qualified->match.geometry.view()) {
                 CHECK(admitted->faces.size() == 2);
                 CHECK(admitted->faces.front().element == 702);
             } else {
                 FAIL("Missing owned geometric correspondence");
             }
+            // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
+            std::stop_source stop;
+            REQUIRE(stop.request_stop());
+            auto stopped_geometry = qualification;
+            stopped_geometry.geometry.arithmetic.cancellation = stop.get_token();
+            const auto cancelled = rd::qualify_external_sidecar_planar_pg(
+                si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr,
+                reference_limits, stopped_geometry, workspace, plan, {}, &failure);
+            REQUIRE_FALSE(cancelled);
+            CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+            CHECK_FALSE(failure.binding);
         }
     }
     auto boundary = binding;

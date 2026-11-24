@@ -50,6 +50,7 @@ struct AcquiredRootSnapshot {
     RootSnapshotLocation location;
     ReferenceFileSnapshot file;
     core::PlannedBuffer<char> declaration_pointer;
+    std::optional<std::uint64_t> declaring_mesh_geometry{};
 
     [[nodiscard]] std::string_view pointer() const& noexcept;
     [[nodiscard]] std::string_view pointer() const&& = delete;

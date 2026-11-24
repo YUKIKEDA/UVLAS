@@ -26,6 +26,7 @@ struct Row {
     SourceDigest digest;
     Range spelling, path, hex, pointer;
     std::uint64_t node;
+    std::optional<std::uint64_t> declaring_mesh_geometry;
 };
 struct Stop {
     core::Failure failure;
@@ -230,6 +231,7 @@ struct Capture {
     SourceDigest digest;
     std::string_view spelling, path, hex;
     std::uint64_t pointer;
+    std::optional<std::uint64_t> declaring_mesh_geometry;
 };
 Capture capture(Context& c, std::uint64_t node) {
     const auto id = c.field(node, "source_id");
@@ -246,6 +248,13 @@ Capture capture(Context& c, std::uint64_t node) {
     }
     if (!found)
         c.fail(DeclarationReason::UnsupportedRole, core::FailureCode::Unsupported);
+    std::optional<std::uint64_t> declaring_mesh_geometry;
+    if (*found == ReferenceRole::NastranSidecar || *found == ReferenceRole::GmshSidecar) {
+        const auto parent = c.node(node).parent;
+        if (!parent)
+            c.fail(DeclarationReason::InvalidOwner, core::FailureCode::InvalidInput);
+        declaring_mesh_geometry = c.node(c.field(*parent, "id")).unsigned_value;
+    }
     const auto digest = c.string(hex);
     if (digest.size() != 64)
         c.fail(DeclarationReason::InvalidOwner, core::FailureCode::InvalidInput);
@@ -268,7 +277,8 @@ Capture capture(Context& c, std::uint64_t node) {
             c.string(id),
             c.string(path),
             digest,
-            c.pointer(node)};
+            c.pointer(node),
+            declaring_mesh_geometry};
 }
 // Parent metadata makes the traversal bounded without recursive or dynamically allocated frames.
 // Object keys are looked up in descriptor order; source JSON order is never an ordering key.
@@ -436,7 +446,8 @@ core::Result<DeclaredReferenceView> DeclaredReferences::entry(core::Index index)
                                  view(d, row->path),
                                  view(d, row->hex),
                                  row->node,
-                                 view(d, row->pointer)};
+                                 view(d, row->pointer),
+                                 row->declaring_mesh_geometry};
 }
 core::Result<DeclarationMemoryReport> DeclaredReferences::memory_report() const noexcept {
     if (!data_.size())
@@ -517,8 +528,9 @@ collect_case_file_references(const SchemaCase& source, const DeclarationLimits& 
                 c.pointer(v.node, d.text.values().data() + at, v.pointer);
             at = c.add(at, v.pointer);
             c.step(sizeof(Row));
-            d.rows.values()[static_cast<std::size_t>(row++)] =
-                Row{SourceId{v.id}, v.role, v.digest, spelling, path, hex, pointer, v.node};
+            d.rows.values()[static_cast<std::size_t>(row++)] = Row{
+                SourceId{v.id},           v.role, v.digest, spelling, path, hex, pointer, v.node,
+                v.declaring_mesh_geometry};
         });
         c.current.reset();
         c.step(sizeof(ReferenceDeclarationData));
