@@ -509,6 +509,31 @@ template <class ReadFace>
     return {patch, std::move(faces), math.info()};
 }
 
+[[nodiscard]] const GmshNode& find_gmsh_node(ReferenceArithmetic& math,
+                                             const Diagnostic& diagnostic, const GmshMeshView& mesh,
+                                             std::uint64_t element, std::uint64_t id) {
+    const auto node = std::ranges::lower_bound(
+        mesh.nodes, id,
+        [&](std::uint64_t a, std::uint64_t b) {
+            math.visit(1);
+            return a < b;
+        },
+        &GmshNode::tag);
+    if (node == mesh.nodes.end() || node->tag != id) {
+        diagnostic.reject(Code::InvalidInput, Reason::Source, element, {}, id);
+    }
+    return *node;
+}
+
+[[nodiscard]] Position gmsh_coordinates(ReferenceArithmetic& math, const GmshMeshView& mesh,
+                                        const GmshNode& node, const Rational& unit) {
+    Position position;
+    for (std::size_t k = 0; k < position.size(); ++k) {
+        position[k] = math.mul(decimal(math, mesh.text(node.coordinates[k])), unit);
+    }
+    return position;
+}
+
 [[nodiscard]] Face gmsh_face(ReferenceArithmetic& math, const Diagnostic& diagnostic,
                              const GmshMeshView& mesh, const GmshElement& element,
                              const Rational& unit) {
@@ -517,21 +542,12 @@ template <class ReadFace>
     result.tag = element.tag;
     result.count = ordered.size();
     for (std::size_t j = 0; j < result.count; ++j) {
-        const auto node = std::ranges::lower_bound(
-            mesh.nodes, ordered[j],
-            [&](std::uint64_t a, std::uint64_t b) {
-                math.visit(1);
-                return a < b;
-            },
-            &GmshNode::tag);
-        if (node == mesh.nodes.end() || node->tag != ordered[j]) {
-            diagnostic.reject(Code::InvalidInput, Reason::Source, element.tag, {}, ordered[j]);
-        }
+        const auto& node = find_gmsh_node(math, diagnostic, mesh, element.tag, ordered[j]);
         auto& out = result.corners[j];
-        out.tag = node->tag;
-        for (std::size_t k = 0; k < out.grid_metres.size(); ++k) {
-            out.grid_metres[k] = math.mul(decimal(math, mesh.text(node->coordinates[k])), unit);
-            out.offsets[k] = node->coordinates[k].offset;
+        out.tag = node.tag;
+        out.grid_metres = gmsh_coordinates(math, mesh, node, unit);
+        for (std::size_t k = 0; k < out.offsets.size(); ++k) {
+            out.offsets[k] = node.coordinates[k].offset;
         }
     }
     return result;
@@ -681,8 +697,8 @@ struct PgSurfaceBound {
     bool curved;
 };
 
-[[nodiscard]] m::Interval coordinate_range(std::span<const NastranPgBoundCorner> ring,
-                                           const Rational Point::* coordinate, m::Work& work) {
+[[nodiscard]] m::Interval coordinate_range(const auto ring, const Rational Point::* coordinate,
+                                           m::Work& work) {
     auto range = directed::number(ring.front().chart.*coordinate, work);
     for (const auto& corner : ring.subspan(1)) {
         const auto value = directed::number(corner.chart.*coordinate, work);
@@ -755,8 +771,45 @@ struct PgSurfaceBound {
     const auto ss = hessian_term(2, 0, ds, ds);
     const auto st = hessian_term(1, 1, ds, dt);
     const auto tt = hessian_term(0, 2, dt, dt);
+    // The interpolation weights have mean (s,t). Their two coordinate
+    // variances are at most width^2/4; Taylor contributes the other factor 1/2.
     const auto error = m::scale(m::add(m::add(ss, tt, work), m::scale(st, 1), work), -3);
     return m::multiply(directed::number(surface.frame.length_metres, work), error, work);
+}
+
+[[nodiscard]] Rational distance_bound(const PgSurfaceBound& surface, const auto ring,
+                                      std::span<const IntervalPosition> corners,
+                                      const IntervalPosition& shift, const m::Interval& s,
+                                      const m::Interval& t, ReferenceArithmetic& math,
+                                      m::Work& work) {
+    // Both corner interpolants use the same nonnegative weights on the whole face.
+    m::Bound distance;
+    for (std::size_t i = 0; i < ring.size(); ++i) {
+        IntervalPosition residual;
+        const auto& chart = ring[i].chart;
+        auto height = m::Interval{};
+        if (surface.curved) {
+            height = height_partial(surface.graph, directed::number(chart.s, work),
+                                    directed::number(chart.t, work), 0, 0, true, work);
+            height = m::multiply(directed::number(surface.frame.length_metres, work), height, work);
+        }
+        for (std::size_t k = 0; k < residual.size(); ++k) {
+            const auto actual = m::add(corners[i][k], shift[k], work);
+            auto expected = directed::number(surface.affine.coordinate(math, chart, k), work);
+            if (surface.curved) {
+                const auto direction = directed::number(surface.frame.rotation[3 * k + 2], work);
+                expected = m::add(expected, m::multiply(direction, height, work), work);
+            }
+            residual[k] = m::subtract(actual, expected, work);
+        }
+        auto corner = upper_norm(residual, work);
+        if (m::compare(corner, distance) > 0) {
+            distance = std::move(corner);
+        }
+    }
+    if (surface.curved)
+        distance = m::add({{}, distance}, interpolation_error(surface, s, t, work), work).upper;
+    return directed::retain(distance, math.leaf_limits, math.plan, work);
 }
 
 void fill_bounds(const NastranShellCards& deck_owner, const NastranShellView& deck,
@@ -849,44 +902,22 @@ void fill_bounds(const NastranShellCards& deck_owner, const NastranShellView& de
         offset = directed::number(metres, work);
         row.nastran_offset = NastranReferenceOffset{std::move(metres), field->field.position.byte};
     }
-    // Both corner interpolants use the same nonnegative weights on the whole face.
-    m::Bound distance;
-    for (std::size_t i = 0; i < row.count; ++i) {
-        IntervalPosition residual;
-        const auto& chart = row.corners[i].chart;
-        auto height = m::Interval{};
-        if (surface.curved) {
-            height = height_partial(surface.graph, directed::number(chart.s, work),
-                                    directed::number(chart.t, work), 0, 0, true, work);
-            height = m::multiply(directed::number(surface.frame.length_metres, work), height, work);
-        }
-        for (std::size_t k = 0; k < residual.size(); ++k) {
-            const auto actual = m::add(corners[i][k], m::multiply(offset, normal[k], work), work);
-            auto expected = directed::number(surface.affine.coordinate(math, chart, k), work);
-            if (surface.curved) {
-                const auto direction = directed::number(surface.frame.rotation[3 * k + 2], work);
-                expected = m::add(expected, m::multiply(direction, height, work), work);
-            }
-            residual[k] = m::subtract(actual, expected, work);
-        }
-        auto corner = upper_norm(residual, work);
-        if (m::compare(corner, distance) > 0) {
-            distance = std::move(corner);
-        }
+    IntervalPosition shift;
+    for (std::size_t k = 0; k < shift.size(); ++k) {
+        shift[k] = m::multiply(offset, normal[k], work);
     }
-    if (surface.curved)
-        distance = m::add({{}, distance}, interpolation_error(surface, s, t, work), work).upper;
-    row.distance_upper_metres = directed::retain(distance, math.leaf_limits, math.plan, work);
+    row.distance_upper_metres =
+        distance_bound(surface, row.ring(), corners, shift, s, t, math, work);
 }
 
 void validate_bound_correspondence(ReferenceArithmetic& math, const Diagnostic& diagnostic,
-                                   const NastranPgFaceBound& row,
-                                   std::span<const NastranPgFaceBound> previous) {
+                                   const auto& row, const auto previous,
+                                   std::optional<std::uint64_t> element_byte = {}) {
     for (const auto& other : previous) {
         math.visit(1);
         if (row.element == other.element) {
             diagnostic.reject(Code::InvalidInput, Reason::Selection, row.element, {}, {},
-                              row.element_field.byte);
+                              element_byte);
         }
         for (const auto& corner : row.ring()) {
             for (const auto& old : other.ring()) {
@@ -894,11 +925,136 @@ void validate_bound_correspondence(ReferenceArithmetic& math, const Diagnostic& 
                                         math.compare(corner.chart.t, old.chart.t) == 0;
                 if ((corner.node == old.node) != same_chart) {
                     diagnostic.reject(Code::GeometryInvalid, Reason::SourceOrder, row.element,
-                                      other.element, corner.node, row.element_field.byte);
+                                      other.element, corner.node, element_byte);
                 }
             }
         }
     }
+}
+
+[[nodiscard]] bool bounded_pg_is_curved(ReferenceArithmetic& math, const Diagnostic& diagnostic,
+                                        const structure::PgGraphView& graph) {
+    bool curved = false;
+    for (const auto& term : graph.height.terms()) {
+        math.visit(1);
+        const auto degree = term.powers.first + term.powers.second;
+        if (degree > 4) {
+            diagnostic.reject(Code::Unsupported, Reason::CurvedPatch);
+        }
+        curved = curved || degree > 1;
+    }
+    return curved;
+}
+
+[[nodiscard]] Rational source_si_scale(ReferenceArithmetic& math, SiLengthUnit units) {
+    const SiUnits system{units, SiMassUnit::Kilogram, SiTimeUnit::Second, SiAngleUnit::Radian};
+    const SiRecipeView scale{SiDecimalView{1, "1", 0}, {}, system, {{1, 0, 0, 0}}, 0};
+    math.charge();
+    return partition_take(materialize_rational(scale, math.leaf_limits, math.plan));
+}
+
+[[nodiscard]] IntervalPosition source_normal(const GmshPgFaceBound& face,
+                                             const IntervalPosition& pg_normal,
+                                             ReferenceArithmetic& math, m::Work& work,
+                                             const Diagnostic& diagnostic) {
+    IntervalPosition hull;
+    m::Bound projected_lower;
+    // For a bilinear map the cross product of its derivatives is affine.
+    // At each parameter corner, next-current crossed with previous-current
+    // gives that cross product with the original ring orientation.
+    const std::size_t count = face.count;
+    const auto checks = count == 3 ? std::size_t{1} : count;
+    for (std::size_t i = 0; i < checks; ++i) {
+        const auto& here = face.corners[i];
+        const auto next =
+            vector_sub(math, face.corners[(i + 1) % count].position_metres, here.position_metres);
+        const auto previous = vector_sub(
+            math, face.corners[(i + count - 1) % count].position_metres, here.position_metres);
+        auto normal = to_interval(vector_cross(math, next, previous), work);
+        if (face.winding == ExternalPgWinding::Reversed) {
+            for (auto& component : normal) {
+                component = m::subtract({}, component, work);
+            }
+        }
+        const auto projected = dot(normal, pg_normal, work);
+        if (projected.lower.mantissa <= 0) {
+            diagnostic.reject(
+                projected.upper.mantissa <= 0 ? Code::GeometryInvalid : Code::PrecisionUnresolved,
+                Reason::SourceWinding, face.element, {}, here.node, here.source_bytes.front());
+        }
+        if (i == 0) {
+            hull = std::move(normal);
+            projected_lower = projected.lower;
+        } else {
+            for (std::size_t k = 0; k < hull.size(); ++k) {
+                if (m::compare(normal[k].lower, hull[k].lower) < 0) {
+                    hull[k].lower = normal[k].lower;
+                }
+                if (m::compare(normal[k].upper, hull[k].upper) > 0) {
+                    hull[k].upper = normal[k].upper;
+                }
+            }
+            if (m::compare(projected.lower, projected_lower) < 0) {
+                projected_lower = projected.lower;
+            }
+        }
+    }
+    // Every PG normal being compared has unit length. Its positive projection
+    // bounds the source cross-product length below on the entire parameter cell.
+    const auto squared = directed::norm_squared(hull, work);
+    auto length = m::square_root(
+        {squared.lower.mantissa > 0 ? squared.lower : m::Bound{}, squared.upper}, work);
+    if (m::compare(projected_lower, length.lower) > 0) {
+        length.lower = std::move(projected_lower);
+    }
+    return {m::divide(hull[0], length, work), m::divide(hull[1], length, work),
+            m::divide(hull[2], length, work)};
+}
+
+void store_gmsh_corners(const GmshMeshView& mesh, const GmshElement& element, const Rational& unit,
+                        const ExternalPgFace& declared, ReferenceArithmetic& math,
+                        const Diagnostic& diagnostic, GmshPgFaceBound& row) {
+    const auto ordered = element.connectivity();
+    if (element.tag != declared.element || ordered.size() != declared.corners.size()) {
+        diagnostic.reject(Code::InvalidInput, Reason::Selection, declared.element);
+    }
+    row.element = element.tag;
+    row.entity = element.entity;
+    row.winding = declared.winding;
+    row.count = static_cast<std::uint8_t>(ordered.size());
+    for (std::size_t i = 0; i < ordered.size(); ++i) {
+        const auto& node = find_gmsh_node(math, diagnostic, mesh, element.tag, ordered[i]);
+        const auto& corner = declared.corners[i];
+        if (corner.node != node.tag) {
+            diagnostic.reject(Code::InvalidInput, Reason::SourceOrder, element.tag, {}, node.tag,
+                              node.coordinates.front().offset);
+        }
+        auto& out = row.corners[i];
+        out.node = node.tag;
+        out.chart = copy(math, corner.point);
+        out.position_metres = gmsh_coordinates(math, mesh, node, unit);
+        for (std::size_t k = 0; k < out.source_bytes.size(); ++k) {
+            out.source_bytes[k] = node.coordinates[k].offset;
+        }
+    }
+}
+
+void measure_gmsh_face(const PgSurfaceBound& surface, ReferenceArithmetic& math, m::Work& work,
+                       const Diagnostic& diagnostic, GmshPgFaceBound& row) {
+    const auto s = surface.curved ? coordinate_range(row.ring(), &Point::s, work) : m::Interval{};
+    const auto t = surface.curved ? coordinate_range(row.ring(), &Point::t, work) : m::Interval{};
+    const auto pg_normal =
+        surface.curved ? curved_pg_normal(surface, s, t, work) : surface.affine_normal;
+    const auto normal = source_normal(row, pg_normal, math, work, diagnostic);
+    const auto normal_upper = upper_norm(directed::subtract(normal, pg_normal, work), work);
+    row.normal_chord_upper = directed::retain(normal_upper, math.leaf_limits, math.plan, work);
+
+    std::array<IntervalPosition, 4> positions;
+    for (std::size_t i = 0; i < row.count; ++i) {
+        positions[i] = to_interval(row.corners[i].position_metres, work);
+    }
+    row.distance_upper_metres =
+        distance_bound(surface, row.ring(), positions, {}, s, t, math, work);
 }
 
 } // namespace
@@ -1013,7 +1169,7 @@ std::optional<NastranPlanarPgBoundView> NastranPlanarPgBounds::view() const& noe
 
 core::Result<NastranPlanarPgBounds> NastranPlanarPgBounds::prepare(
     const structure::PgReferenceGeometry& pg, const NastranShellCards& deck, SiLengthUnit units,
-    std::span<const ExternalPgFace> charts, const NastranPgBoundLimits& limits,
+    std::span<const ExternalPgFace> charts, const ExternalPgBoundLimits& limits,
     core::ResourcePlan& plan, std::optional<ExternalPgDiagnostic>* slot) noexcept {
     if (slot) {
         slot->reset();
@@ -1035,15 +1191,7 @@ core::Result<NastranPlanarPgBounds> NastranPlanarPgBounds::prepare(
             }
             const auto owner = partition_take(pg.source());
             const auto graph = partition_take(owner.graph.view());
-            bool curved = false;
-            for (const auto& term : graph.height.terms()) {
-                math.visit(1);
-                const auto degree = term.powers.first + term.powers.second;
-                if (degree > 4) {
-                    diagnostic.reject(Code::Unsupported, Reason::CurvedPatch);
-                }
-                curved = curved || degree > 1;
-            }
+            const bool curved = bounded_pg_is_curved(math, diagnostic, graph);
             const auto patch = partition_take(pg.identity());
             const auto triangles = partition_take(owner.partition.triangles());
             const auto vertices = partition_take(owner.partition.vertices());
@@ -1057,11 +1205,7 @@ core::Result<NastranPlanarPgBounds> NastranPlanarPgBounds::prepare(
             const auto pq = vector_cross(math, affine.tangent_s, affine.tangent_t);
             const auto affine_normal = directed::normalized(to_interval(pq, work), work);
             const PgSurfaceBound surface{affine, graph, frame, affine_normal, curved};
-            const SiUnits system{units, SiMassUnit::Kilogram, SiTimeUnit::Second,
-                                 SiAngleUnit::Radian};
-            const SiRecipeView scale{SiDecimalView{1, "1", 0}, {}, system, {{1, 0, 0, 0}}, 0};
-            math.charge();
-            const auto unit = partition_take(materialize_rational(scale, math.leaf_limits, plan));
+            const auto unit = source_si_scale(math, units);
             auto faces = partition_take(
                 plan.allocate<NastranPgFaceBound>(geom::partition_index(charts.size()), operation));
             Rational total;
@@ -1080,7 +1224,8 @@ core::Result<NastranPlanarPgBounds> NastranPlanarPgBounds::prepare(
                 fill_bounds(deck, *input, shell, units, unit, chart, surface, math, work,
                             diagnostic, row);
                 const auto previous = faces.values().first(i);
-                validate_bound_correspondence(math, diagnostic, row, previous);
+                validate_bound_correspondence(math, diagnostic, row, previous,
+                                              row.element_field.byte);
                 validate_chart_row(math, diagnostic, row, previous, triangles, vertices, total);
             }
             validate_chart_coverage(math, diagnostic, triangles, total);
@@ -1101,4 +1246,99 @@ core::Result<NastranPlanarPgBounds> NastranPlanarPgBounds::prepare(
         }
     });
 }
+GmshPgBounds::GmshPgBounds(RootSnapshotLocation source, SourceDigest digest, SiLengthUnit units,
+                           structure::PgReferenceIdentity patch,
+                           core::PlannedBuffer<GmshPgFaceBound>&& faces,
+                           structure::PgReferenceCallInfo chart_work,
+                           std::uint64_t directed_work) noexcept
+    : source_(source),
+      digest_(digest),
+      units_(units),
+      patch_(patch),
+      faces_(std::move(faces)),
+      chart_work_(chart_work),
+      directed_work_(directed_work) {}
+
+std::optional<GmshPgBoundView> GmshPgBounds::view() const& noexcept {
+    if (faces_.size() == 0) {
+        return std::nullopt;
+    }
+    return GmshPgBoundView{source_,         digest_,     units_,        patch_,
+                           faces_.values(), chart_work_, directed_work_};
+}
+
+core::Result<GmshPgBounds>
+GmshPgBounds::prepare(const structure::PgReferenceGeometry& pg, const GmshMesh& mesh,
+                      const GmshSurfaceTopology& topology, SiLengthUnit units,
+                      std::span<const ExternalPgFace> charts, const ExternalPgBoundLimits& limits,
+                      core::ResourcePlan& plan,
+                      std::optional<ExternalPgDiagnostic>* slot) noexcept {
+    if (slot) {
+        slot->reset();
+    }
+    const Diagnostic diagnostic{slot};
+    return geom::partition_entry([&]() -> core::Result<GmshPgBounds> {
+        try {
+            ReferenceArithmetic math{limits.region.arithmetic, plan};
+            math.cancel();
+            const auto input = mesh.view();
+            const auto selected = topology.view();
+            if (!input || !selected) {
+                diagnostic.reject(Code::InvalidInput, Reason::Source);
+            }
+            if (!equal_source(input->location, selected->source.location) ||
+                input->digest != selected->source.digest) {
+                diagnostic.reject(Code::StaleGeneration, Reason::Source);
+            }
+            if (charts.empty() || selected->faces.size() != charts.size()) {
+                diagnostic.reject(Code::InvalidInput, Reason::Selection);
+            }
+            if (charts.size() > limits.region.maximum_faces) {
+                partition_fail(Code::ResourceExceeded);
+            }
+            const auto owner = partition_take(pg.source());
+            const auto graph = partition_take(owner.graph.view());
+            const bool curved = bounded_pg_is_curved(math, diagnostic, graph);
+            const auto patch = partition_take(pg.identity());
+            const auto triangles = partition_take(owner.partition.triangles());
+            const auto vertices = partition_take(owner.partition.vertices());
+            // Own all source positions, chart points and two retained bounds per face.
+            const auto slots = geom::partition_add(
+                geom::reference_live_rationals,
+                geom::partition_mul(gmsh_rationals_per_face + 2, charts.size()));
+            math.admit(slots);
+            const auto frame = partition_take(pg.frame());
+            const auto affine = mid_surface(math, graph, frame);
+            m::Work work{0, limits.maximum_directed_work, limits.region.arithmetic.cancellation};
+            const auto pq = vector_cross(math, affine.tangent_s, affine.tangent_t);
+            const auto affine_normal = directed::normalized(to_interval(pq, work), work);
+            const PgSurfaceBound surface{affine, graph, frame, affine_normal, curved};
+            const auto unit = source_si_scale(math, units);
+            auto faces = partition_take(
+                plan.allocate<GmshPgFaceBound>(geom::partition_index(charts.size()), operation));
+            Rational total;
+            for (std::size_t i = 0; i < charts.size(); ++i) {
+                math.visit(1);
+                const auto& element = selected->faces[i].element;
+                auto& row = faces.values()[i];
+                store_gmsh_corners(*input, element, unit, charts[i], math, diagnostic, row);
+                const auto previous = faces.values().first(i);
+                validate_bound_correspondence(math, diagnostic, row, previous);
+                validate_chart_row(math, diagnostic, row, previous, triangles, vertices, total);
+                measure_gmsh_face(surface, math, work, diagnostic, row);
+            }
+            validate_chart_coverage(math, diagnostic, triangles, total);
+            math.cancel();
+            return GmshPgBounds{input->location,  input->digest, units,    patch,
+                                std::move(faces), math.info(),   work.used};
+        } catch (const m::ArithmeticFailure& failure) {
+            partition_fail(failure.code);
+        } catch (const std::overflow_error&) {
+            partition_fail(Code::PrecisionUnresolved);
+        } catch (const std::range_error&) {
+            partition_fail(Code::PrecisionUnresolved);
+        }
+    });
+}
+
 } // namespace uvlas::io::detail
