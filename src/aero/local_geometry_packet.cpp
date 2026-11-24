@@ -113,23 +113,25 @@ class LocalPacketEngine {
         const auto& data = *input.owner;
         const auto& facet = data.facets.values()[static_cast<std::size_t>(input.facet)];
         const auto& support = input.query.support;
+        constexpr std::array projection{ProjectionFeature::Edge01, ProjectionFeature::Edge12,
+                                        ProjectionFeature::Edge20};
+        const bool on =
+            relation.plane == PlaneSide::On && relation.projection != ProjectionFeature::Outside;
+        std::optional<std::variant<PointId, EdgeId, FacetId>> member;
         if (alias) {
             const auto* edge = std::get_if<EdgeSupportStorage>(&support);
-            constexpr std::array projection{ProjectionFeature::Edge01, ProjectionFeature::Edge12,
-                                            ProjectionFeature::Edge20};
-            if (edge != nullptr && relation.plane == PlaneSide::On) {
+            if (edge != nullptr && on) {
                 for (std::size_t i = 0; i < facet.edges.size(); ++i) {
                     const auto id =
                         data.edges.values()[static_cast<std::size_t>(facet.edges[i])].id;
                     if (id == alias->value() && relation.projection == projection[i])
-                        return VerifiedIncidence{EdgeId{edge->id}};
+                        member = EdgeId{edge->id};
                 }
             }
-            return std::unexpected(packet_failure(core::FailureCode::GeometryInvalid, data.context,
-                                                  QueryId{input.query.id}));
-        }
-        std::optional<std::variant<PointId, EdgeId, FacetId>> member;
-        if (const auto* point = std::get_if<PointSupportStorage>(&support)) {
+            if (!member)
+                return std::unexpected(packet_failure(core::FailureCode::GeometryInvalid,
+                                                      data.context, QueryId{input.query.id}));
+        } else if (const auto* point = std::get_if<PointSupportStorage>(&support)) {
             for (const auto index : facet.points)
                 if (data.points.values()[static_cast<std::size_t>(index)].id == point->id)
                     member = PointId{point->id};
@@ -141,14 +143,10 @@ class LocalPacketEngine {
             if (facet.id == face->id)
                 member = FacetId{face->id};
         }
-        const bool on =
-            relation.plane == PlaneSide::On && relation.projection != ProjectionFeature::Outside;
         if (bound && on) {
             if (relation.projection == ProjectionFeature::Face)
                 return BoundInterior{};
             const auto* origin = std::get_if<QuadOrigin>(&facet.origin);
-            constexpr std::array projection{ProjectionFeature::Edge01, ProjectionFeature::Edge12,
-                                            ProjectionFeature::Edge20};
             if (origin != nullptr) {
                 const auto diagonal =
                     data.quads.values()[static_cast<std::size_t>(origin->source)].diagonal;
@@ -550,10 +548,9 @@ prepare_bound_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& q
 }
 AeroResult<LocalGeometryPacket>
 prepare_aliased_midpoint_packet(const GlobalContactState& contact, const ResolvedQuery& query,
-                                FacetId target, EdgeId raw_alias, bool bound,
-                                LocalAccuracy accuracy, const GeometryLimits& limits,
-                                LocalPacketWorkspace& workspace, core::ResourcePlan& plan,
-                                const std::stop_token& stop) noexcept {
+                                FacetId target, bool bound, LocalAccuracy accuracy,
+                                const GeometryLimits& limits, LocalPacketWorkspace& workspace,
+                                core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
     const auto checked = contact.geometry();
     if (!checked)
         return std::unexpected(checked.error().origin);
@@ -567,16 +564,15 @@ prepare_aliased_midpoint_packet(const GlobalContactState& contact, const Resolve
     if (!expression)
         return std::unexpected(expression.error());
     const auto* edge = std::get_if<SourceEdgePoint>(&expression->definition);
-    if (edge == nullptr || edge->edge == raw_alias)
+    if (edge == nullptr)
         return std::unexpected(
             packet_failure(core::FailureCode::InvalidInput, context, expression->id));
-    const auto relationship = contact.uvlm_load_edge(raw_alias, limits.max_steps - 1, stop);
+    const auto relationship =
+        contact.facet_edge_alias(target, edge->edge, limits.max_steps - 1, stop);
     if (!relationship)
         return std::unexpected(relationship.error().origin);
-    if (relationship->edge != edge->edge)
-        return std::unexpected(
-            packet_failure(core::FailureCode::GeometryInvalid, context, raw_alias));
+    const auto [alias, used_steps] = *relationship;
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop, bound, raw_alias, 1 + relationship->used_steps);
+                                      stop, bound, alias, 1 + used_steps);
 }
 } // namespace uvlas::aero::detail

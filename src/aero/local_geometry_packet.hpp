@@ -197,7 +197,7 @@ prepare_bound_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, 
 /// topology, then require the exact material midpoint and matching local edge.
 [[nodiscard]] AeroResult<LocalGeometryPacket>
 prepare_aliased_midpoint_packet(const GlobalContactState&, const ResolvedQuery&, FacetId,
-                                EdgeId raw_alias, bool bound, LocalAccuracy, const GeometryLimits&,
+                                bool bound, LocalAccuracy, const GeometryLimits&,
                                 LocalPacketWorkspace&, core::ResourcePlan&,
                                 const std::stop_token&) noexcept;
 
