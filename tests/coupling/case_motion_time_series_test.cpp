@@ -174,6 +174,21 @@ TEST_CASE("Typed Motion owns polynomial jets and a common exact coefficient of p
     rejected(c::prepare_case_motion_time_series(si, motion_field(si), {zero, end}, stamp, workspace,
                                                 capped, plan),
              core::FailureCode::ResourceExceeded);
+
+    capped.maximum_exact_numbers = 16;
+    CHECK(c::prepare_case_motion_time_series(si, motion_field(si), {zero, end}, stamp, workspace,
+                                             capped, plan));
+
+    auto radians_input = input;
+    radians_input.field("units").set("angle", a::string("rad"));
+    const auto radians_case = checked_case(radians_input);
+    const auto radians = take(c::prepare_case_motion_time_series(
+        radians_case, motion_field(radians_case), {zero, end}, stamp, workspace, limits, plan));
+    const auto radians_jet = take(c::evaluate_case_motion_time_series(
+        radians, radians, {stamp, t, Value}, workspace, limits, plan));
+    CHECK(radians_jet.rotation_pi_power() == 0);
+    exact(radians_jet.rotation_coefficient(0, Value), 90);
+    exact(radians_jet.rotation_coefficient(1, Value), 45, 1, -1);
 }
 
 TEST_CASE("Typed Motion PCHIP preserves both accelerations and a shared physical query",
