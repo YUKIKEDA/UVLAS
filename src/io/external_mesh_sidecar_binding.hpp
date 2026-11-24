@@ -61,6 +61,10 @@ public:
         return faces_.values();
     }
     [[nodiscard]] std::span<const BoundExternalFace> faces() const&& = delete;
+    [[nodiscard]] const NastranSupportCards* nastran_supports() const& noexcept {
+        return supports_ ? &*supports_ : nullptr;
+    }
+    [[nodiscard]] const NastranSupportCards* nastran_supports() const&& = delete;
     [[nodiscard]] std::uint64_t work() const noexcept {
         return work_;
     }
@@ -69,17 +73,19 @@ private:
     friend struct ExternalMeshSidecarBindingFactory;
 
     ExternalMeshSidecarBinding(ParsedMeshSidecar&& sidecar, Source&& source,
-                               core::PlannedBuffer<BoundExternalFace>&& faces,
-                               std::uint64_t work) noexcept
+                               core::PlannedBuffer<BoundExternalFace>&& faces, std::uint64_t work,
+                               std::optional<NastranSupportCards>&& supports) noexcept
         : sidecar_(std::move(sidecar)),
           source_(std::move(source)),
           faces_(std::move(faces)),
-          work_(work) {}
+          work_(work),
+          supports_(std::move(supports)) {}
 
     ParsedMeshSidecar sidecar_;
     Source source_;
     core::PlannedBuffer<BoundExternalFace> faces_;
     std::uint64_t work_;
+    std::optional<NastranSupportCards> supports_;
 };
 
 // Resolve identity and tag correspondence. Chart coverage and qualification of physical

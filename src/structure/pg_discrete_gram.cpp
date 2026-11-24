@@ -76,11 +76,46 @@ struct Interval {
     return {root, root + (same ? 0 : 1)};
 }
 
+[[nodiscard]] RankWide multiply_endpoint(IntegerWork& work, const RankWide& left,
+                                         const RankWide& right) {
+    using DoubleWord = boost::multiprecision::double_limb_type;
+    constexpr auto limb_bits = std::numeric_limits<RankWord>::digits;
+    static_assert(std::numeric_limits<DoubleWord>::digits == 2 * limb_bits);
+    const auto& a = left.backend();
+    const auto& b = right.backend();
+    work.charge(partition_mul(a.size(), b.size()));
+    const auto size = a.size() + b.size();
+    if (size > 8192 / limb_bits)
+        partition_fail(core::FailureCode::ResourceExceeded);
+
+    RankWide product;
+    auto& target = product.backend();
+    target.resize(size, size);
+    const std::span<RankWord> output{target.limbs(), size};
+    const std::span<const RankWord> lhs{a.limbs(), a.size()}, rhs{b.limbs(), b.size()};
+    std::ranges::fill(output, RankWord{0});
+    for (std::size_t i = 0; i < lhs.size(); ++i) {
+        DoubleWord carry = 0;
+        for (std::size_t j = 0; j < rhs.size(); ++j) {
+            // A limb product plus an existing limb and carry fits in two limbs.
+            const DoubleWord word =
+                static_cast<DoubleWord>(lhs[i]) * rhs[j] + output[i + j] + carry;
+            output[i + j] = static_cast<RankWord>(word);
+            carry = word >> limb_bits;
+        }
+        output[i + rhs.size()] = static_cast<RankWord>(carry);
+    }
+    target.normalize();
+    target.sign(a.sign() != b.sign());
+    return product;
+}
+
 /// Multiply an arbitrary interval by a nonnegative interval on the same grids.
 [[nodiscard]] Interval with_positive(IntegerWork& work, const Interval& value,
                                      const Interval& positive) {
-    return {rank_product(work, value.lower, value.lower < 0 ? positive.upper : positive.lower),
-            rank_product(work, value.upper, value.upper < 0 ? positive.lower : positive.upper)};
+    return {
+        multiply_endpoint(work, value.lower, value.lower < 0 ? positive.upper : positive.lower),
+        multiply_endpoint(work, value.upper, value.upper < 0 ? positive.lower : positive.upper)};
 }
 
 [[nodiscard]] Interval interval_product(IntegerWork& work, const Interval& left,
@@ -91,15 +126,16 @@ struct Interval {
         return with_positive(work, right, left);
     if (left.upper <= 0) {
         const auto& minimum = right.upper <= 0 ? left.upper : left.lower;
-        return {rank_product(work, minimum, right.upper),
-                rank_product(work, left.lower, right.lower)};
+        return {multiply_endpoint(work, minimum, right.upper),
+                multiply_endpoint(work, left.lower, right.lower)};
     }
     if (right.upper <= 0)
-        return {rank_product(work, left.upper, right.lower),
-                rank_product(work, left.lower, right.lower)};
-    const std::array endpoints{
-        rank_product(work, left.lower, right.lower), rank_product(work, left.lower, right.upper),
-        rank_product(work, left.upper, right.lower), rank_product(work, left.upper, right.upper)};
+        return {multiply_endpoint(work, left.upper, right.lower),
+                multiply_endpoint(work, left.lower, right.lower)};
+    const std::array endpoints{multiply_endpoint(work, left.lower, right.lower),
+                               multiply_endpoint(work, left.lower, right.upper),
+                               multiply_endpoint(work, left.upper, right.lower),
+                               multiply_endpoint(work, left.upper, right.upper)};
     const auto bounds = std::ranges::minmax_element(endpoints);
     return {*bounds.min, *bounds.max};
 }

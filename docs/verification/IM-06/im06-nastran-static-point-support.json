@@ -1,0 +1,34 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-static-point-support",
+  "ids": [
+    "FD-03",
+    "FD-05",
+    "IO4-03",
+    "R-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "b9c066b41d9aa38a7f094c1d8985c33f4bfc7acd",
+  "claimed_state": "認証デッキの静止並進支持を、同じCaseの平面PG中心面上の元GRID角と、拘束方向の部分空間について照合する。",
+  "checks": {
+    "windows_debug_targets_passed": 5,
+    "windows_release_targets_passed": 5,
+    "gcc_asan_ubsan_targets_passed": 5,
+    "static_point_support_assertions": 92,
+    "excluded_component_guard_mutations_detected": 1
+  },
+  "artifacts": {
+    "CMakeLists.txt": "337742470b3fda5119218d37bc7b8c5a96d9dad2440c7aab9347ad00495a38b9",
+    "docs/specs/foundation/case-schema-fields.md": "4325a13a77499aa9ab4a9d300f55320839d301c0e916d03378ad7bd27d47cfa9",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/nastran-static-point-support.md": "7e6e1d9a5400a452fa9341074c1c0ac067d8d36c6e3d99a788b2b9d081734057",
+    "src/coupling/case_nastran_static_point_support.cpp": "315dd26182017645a136e5027715dd0af3bbba15c426c79b7c84b0658d86e5b4",
+    "src/coupling/case_nastran_static_point_support.hpp": "281bd118ed6e26893e2e9324b93c8f5c88d670fe0035550d6ce7ac941d1cbcab",
+    "src/io/external_mesh_sidecar_binding.cpp": "8e76dc399740ff0a54b78e260c68d0f23ddb3e7cef89912517b4568b2aa31e24",
+    "src/io/external_mesh_sidecar_binding.hpp": "e89905dde3b22f357d2da7e5d80fa80cb165774c4064e8ff8d5d02415562ce8c",
+    "src/io/nastran_support_selection.hpp": "259617eceb78171cd2a588145e7c8d56cbab9f7d10f9470a7927f99c62f74e83",
+    "tests/io/external_shell_cross_format_test.cpp": "82ae1bc68151aefe35b613eb967b8a7763462d9f693f77361e2ccabce0d9fefd"
+  }
+}

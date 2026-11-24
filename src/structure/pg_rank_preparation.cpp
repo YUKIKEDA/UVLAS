@@ -639,11 +639,15 @@ PgRankMonomialPowers::common_sum(ReferenceArithmetic& math, std::span<const PgRa
     if (steps > math.limits.maximum_scalar_operations - math.scalar_operations)
         return std::nullopt;
 
+    ExactPowers previous{-1, -1};
     std::size_t max_u = 0, max_v = 0;
     std::uint64_t numerator_bits = 0, coefficient_denominator_bits = 1;
     for (std::size_t i = 0; i < indices.size(); ++i) {
         math.cancel();
         const auto powers = rows[indices[i]].powers;
+        if (std::tie(powers.first, powers.second) <= std::tie(previous.first, previous.second))
+            return std::nullopt;
+        previous = powers;
         max_u = std::max(max_u, static_cast<std::size_t>(powers.first));
         max_v = std::max(max_v, static_cast<std::size_t>(powers.second));
         numerator_bits = std::max(numerator_bits, rank_bits(coefficients[i].numerator));
@@ -680,19 +684,48 @@ PgRankMonomialPowers::common_sum(ReferenceArithmetic& math, std::span<const PgRa
     }
     const auto& u = ExactFactory::value(u_.coordinate).backend();
     const auto& v = ExactFactory::value(v_.coordinate).backend();
+    // Consume the canonical rows in descending (a,b), grouping by outer degree.
+    // Each Horner accumulator homogenizes just the consumed suffix, so the old
+    // common-denominator width bound also covers all partial accumulators.
     Integer sum = 0;
-    for (std::size_t i = 0; i < indices.size(); ++i) {
+    auto i = indices.size();
+    std::size_t outer_degree = max_u;
+    while (i != 0) {
         math.cancel();
-        const auto powers = rows[indices[i]].powers;
-        const auto a = static_cast<std::size_t>(powers.first);
-        const auto b = static_cast<std::size_t>(powers.second);
-        Integer scaled = u_num_.power(u.num(), a) * v_num_.power(v.num(), b);
-        scaled *= u_den_.power(u.denom(), max_u - a);
-        scaled *= v_den_.power(v.denom(), max_v - b);
-        scaled *= Integer{coefficients[i].numerator};
-        scaled *= coefficient_denominator / Integer{coefficients[i].denominator};
-        sum += scaled;
+        const auto outer = rows[indices[i - 1]].powers.first;
+        const auto a = static_cast<std::size_t>(outer);
+        const auto max_inner = static_cast<std::size_t>(rows[indices[i - 1]].powers.second);
+        auto inner_degree = max_inner;
+        Integer inner = 0;
+        do {
+            --i;
+            math.cancel();
+            const auto b = static_cast<std::size_t>(rows[indices[i]].powers.second);
+            if (b < inner_degree)
+                inner *= v_num_.power(v.num(), inner_degree - b);
+            Integer coefficient{coefficients[i].numerator};
+            if (coefficients[i].denominator != 1)
+                coefficient *= coefficient_denominator / Integer{coefficients[i].denominator};
+            else if (coefficient_denominator != 1)
+                coefficient *= coefficient_denominator;
+            if (b < max_inner)
+                coefficient *= v_den_.power(v.denom(), max_inner - b);
+            inner += coefficient;
+            inner_degree = b;
+        } while (i != 0 && rows[indices[i - 1]].powers.first == outer);
+        if (inner_degree != 0)
+            inner *= v_num_.power(v.num(), inner_degree);
+        if (max_inner < max_v)
+            inner *= v_den_.power(v.denom(), max_v - max_inner);
+        if (a < outer_degree)
+            sum *= u_num_.power(u.num(), outer_degree - a);
+        if (a < max_u)
+            inner *= u_den_.power(u.denom(), max_u - a);
+        sum += inner;
+        outer_degree = a;
     }
+    if (outer_degree != 0)
+        sum *= u_num_.power(u.num(), outer_degree);
     if (sum == 0)
         return ExactRational{};
     Integer den = coefficient_denominator * u_den_.power(u.denom(), max_u);
