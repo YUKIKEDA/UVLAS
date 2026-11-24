@@ -66,6 +66,7 @@ struct NastranBulkView {
     std::span<const NastranBulkCard> cards;
     std::span<const NastranBulkLexeme> fields;
     std::uint64_t work;
+    std::string_view declaration_pointer;
 
     [[nodiscard]] std::string_view text(NastranBulkLexeme) const noexcept;
     // The card dictionary selects the field's type. The spelling and source position
@@ -91,6 +92,11 @@ public:
     [[nodiscard]] static core::Result<NastranBulkDeck>
     prepare(AcquiredRootSnapshot&&, NastranBulkLimits, core::ResourcePlan&, const std::stop_token&,
             std::optional<NastranBulkDiagnostic>* = nullptr) noexcept;
+    // The borrowed source remains unchanged. Admit one independent owned copy
+    // together with the lexical buffers before allocating either.
+    [[nodiscard]] static core::Result<NastranBulkDeck>
+    prepare(const AcquiredRootSnapshot&, NastranBulkLimits, core::ResourcePlan&,
+            const std::stop_token&, std::optional<NastranBulkDiagnostic>* = nullptr) noexcept;
     [[nodiscard]] std::optional<NastranBulkView> view() const& noexcept;
     [[nodiscard]] std::optional<NastranBulkView> view() const&& = delete;
 

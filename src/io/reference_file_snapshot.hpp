@@ -118,6 +118,7 @@ public:
 
 private:
     friend class CheckpointChunk;
+    friend class NastranBulkDeck;
     friend core::Result<ReferenceFileSnapshot>
     read_reference_file(ReferenceFileReader&, const SourceDigest&, ReferenceFileLimits,
                         core::ResourcePlan&, const std::stop_token&,
