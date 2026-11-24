@@ -1,0 +1,74 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pg-aero-projection-budget-review",
+  "ids": [
+    "AE-02",
+    "SH-D02",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "1a2763897541196ce34277e55b16d08ae6456c69",
+  "input_baseline": "99b749c09240d9fe94532d6f12c914a7e27aa6d7",
+  "claimed_state": "Apply the position, velocity and tangent caps locally while charging only completed work against the common budget.",
+  "verification": {
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "structure.pg_conditioning"
+    ],
+    "msvc": "Windows x64 MSVC 19.51 Release. Both scoped CTests passed (11.93 s and 30.60 s). Focused attachment passed 2587 assertions with seed 23.",
+    "oracle": "Count input high/low word inspections plus one per output and its matrix contraction terms. Test limit invariance with a fixed parent budget on both boundary and material tangent routes.",
+    "mutation": "Restoring only the original pg_aero_attachment.cpp charging behavior failed at the enlarged per-action caps with ResourceExceeded, exit 42. Byte-identical corrected source rebuilt and passed 2587 assertions."
+  },
+  "sources": {
+    "include/uvlas/structure/pg_volume_position.hpp": "ab999e8d87260bae158a03566ed983f7387c546243a87f207609bf81c846d39c",
+    "src/coupling/pg_aero_attachment.cpp": "fa3b5dbfee29f19b386e2c54c844f8d61058c1c1913397ad48334fcf9e0f14f2",
+    "src/structure/pg_volume_position.cpp": "f9c5d62619dae33bc406d21e4524b3c63af495294eec7a64c3413306f5d6ecae",
+    "tests/coupling/case_uniform_flow_test.cpp": "97676c43d53f596da53e3e5918895e26e990812aa4024e56fe75c249038786e6",
+    "tests/structure/pg_conditioning_test.cpp": "a336cd77eaec1a3c0d2c17638b0a195150fcd858d9c067868141b3b2fd73d9a0",
+    "docs/specs/structure/pg-volume-position-contract.md": "dfe235ba43570c8189e44c9012b1a127a359e30ee4689d162d8ae5a554b5feb9"
+  },
+  "source_records": [
+    {
+      "id": "include/uvlas/structure/pg_volume_position.hpp",
+      "hint": "include/uvlas/structure/pg_volume_position.hpp",
+      "sha256": "ab999e8d87260bae158a03566ed983f7387c546243a87f207609bf81c846d39c"
+    },
+    {
+      "id": "src/coupling/pg_aero_attachment.cpp",
+      "hint": "src/coupling/pg_aero_attachment.cpp",
+      "sha256": "fa3b5dbfee29f19b386e2c54c844f8d61058c1c1913397ad48334fcf9e0f14f2"
+    },
+    {
+      "id": "src/structure/pg_volume_position.cpp",
+      "hint": "src/structure/pg_volume_position.cpp",
+      "sha256": "f9c5d62619dae33bc406d21e4524b3c63af495294eec7a64c3413306f5d6ecae"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "97676c43d53f596da53e3e5918895e26e990812aa4024e56fe75c249038786e6"
+    },
+    {
+      "id": "tests/structure/pg_conditioning_test.cpp",
+      "hint": "tests/structure/pg_conditioning_test.cpp",
+      "sha256": "a336cd77eaec1a3c0d2c17638b0a195150fcd858d9c067868141b3b2fd73d9a0"
+    },
+    {
+      "id": "docs/specs/structure/pg-volume-position-contract.md",
+      "hint": "docs/specs/structure/pg-volume-position-contract.md",
+      "sha256": "dfe235ba43570c8189e44c9012b1a127a359e30ee4689d162d8ae5a554b5feb9"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/pg-aero-work-v1/projection-budget-review.md": "bf0a7449176cbeca491b6ab035cd687c00a993e538d1f4d8b2bf90135cc2a9f4"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/pg-aero-work-v1/projection-budget-review.md",
+      "hint": "docs/verification/IM-03/pg-aero-work-v1/projection-budget-review.md",
+      "sha256": "bf0a7449176cbeca491b6ab035cd687c00a993e538d1f4d8b2bf90135cc2a9f4"
+    }
+  ]
+}

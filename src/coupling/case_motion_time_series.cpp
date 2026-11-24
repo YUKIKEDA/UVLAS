@@ -28,7 +28,8 @@ template <class T>
 T take(core::Result<T> result) {
     if (!result)
         throw result.error();
-    return std::move(*result);
+    if constexpr (!std::is_void_v<T>)
+        return std::move(*result);
 }
 
 template <class T, class Function>
@@ -275,6 +276,89 @@ BoundaryPolicy read_outside(const io::SiCase& source, const s::TimeSeriesPchip& 
     return p::RejectBoundary{};
 }
 
+p::BitBound bit_shape(View value, const Call& call) {
+    const auto cap = call.curve.arithmetic.input_bits;
+    const auto bits = [&](std::span<const std::uint32_t> words) -> std::uint64_t {
+        if (words.empty())
+            return 0;
+        if (words.size() - 1 > cap / 32)
+            call.fail(Code::ResourceExceeded);
+        const auto preceding = std::uint64_t{32} * (words.size() - 1);
+        const auto leading = static_cast<std::uint64_t>(std::bit_width(words.back()));
+        if (leading > cap - preceding)
+            call.fail(Code::ResourceExceeded);
+        return preceding + leading;
+    };
+    return {bits(value.numerator), bits(value.denominator)};
+}
+
+// For each source phase, the first occurrence strictly after begin is enough to
+// decide whether any occurrence lies in the open interval, even over many periods.
+template <class Arithmetic, class Value>
+Value next_periodic_knot(Arithmetic& math, Value begin, Value knot, Value period) {
+    using enum p::RationalOp;
+    const auto offset = take(math.binary(Subtract, begin, knot));
+    const auto quotient = take(math.binary(Divide, offset, period));
+    const auto whole = take(math.floor(quotient));
+    const auto one = take(math.integer(1));
+    const auto next = take(math.binary(Add, whole, one));
+    const auto shift = take(math.binary(Multiply, next, period));
+    return take(math.binary(Add, knot, shift));
+}
+
+bool interior_motion_knot(const p::BoundaryRequest& window, View knot, Call& call) {
+    call.operation();
+    const auto* periodic = std::get_if<p::PeriodicBoundary>(&window.policy);
+    p::Counter forecast{call.curve.arithmetic, call.details};
+    const auto a = take(forecast.input(bit_shape(window.begin, call)));
+    const auto b = take(forecast.input(bit_shape(window.end, call)));
+    const auto t = take(forecast.input(bit_shape(knot, call)));
+    if (periodic) {
+        const auto period = take(forecast.input(bit_shape(periodic->period, call)));
+        take(forecast.compare(next_periodic_knot(forecast, a, t, period), b));
+    } else {
+        take(forecast.compare(a, t));
+        take(forecast.compare(t, b));
+    }
+    const auto admission = take(forecast.finish());
+    call.steps(admission.reserved_steps());
+    auto arena =
+        take(p::Workspace::create(admission, call.memory, call.details, call.cancellation));
+    auto math = take(arena.begin(call.cancellation, call.details));
+    const auto begin = take(math.input(window.begin));
+    const auto end = take(math.input(window.end));
+    const auto time = take(math.input(knot));
+    if (periodic) {
+        const auto period = take(math.input(periodic->period));
+        return take(math.compare(next_periodic_knot(math, begin, time, period), end)) < 0;
+    }
+    return take(math.compare(begin, time)) < 0 && take(math.compare(time, end)) < 0;
+}
+
+void check_c2(const p::PchipCurveReady& curve, p::CurveWorkspace& workspace, Call& call) {
+    try {
+        const auto input = take(curve.input());
+        const auto expected = take(curve.retain_input());
+        auto knots = input.samples.times;
+        if (std::holds_alternative<p::PeriodicBoundary>(input.boundary.policy))
+            knots = knots.first(knots.size() - 1); // The last knot repeats the first seam.
+        else if (std::holds_alternative<p::RejectBoundary>(input.boundary.policy))
+            knots = knots.subspan(1, knots.size() - 2);
+        for (const auto knot : knots) {
+            if (!interior_motion_knot(input.boundary, knot, call))
+                continue;
+            const p::PchipQuery query{knot, p::JetOrder::Second, p::RequestedSide::Automatic};
+            const auto admission = take(p::forecast_pchip_evaluation(
+                curve, expected, query, call.curve, call.cancellation, call.details));
+            static_cast<void>(take(p::evaluate_pchip_curve(curve, expected, query, workspace,
+                                                           call.reserve(admission), call.memory,
+                                                           call.cancellation, call.details)));
+        }
+    } catch (const core::Failure& failure) {
+        throw core::Failure{failure.code, preparation, failure.details};
+    }
+}
+
 Series prepare_series(const io::SiCase& source, const TypedSeries& series,
                       io::SchemaDimension dimension, std::int16_t pi_power,
                       CaseMotionTimeWindow window, std::span<const View> events, Stamp stamp,
@@ -338,8 +422,12 @@ Series prepare_series(const io::SiCase& source, const TypedSeries& series,
                     stamp};
                 const auto admission = take(p::forecast_pchip_prepare(
                     request, call.curve, call.cancellation, call.details));
-                return take(p::prepare_pchip_curve(request, workspace, call.reserve(admission),
-                                                   call.memory, call.cancellation, call.details));
+                auto curve =
+                    take(p::prepare_pchip_curve(request, workspace, call.reserve(admission),
+                                                call.memory, call.cancellation, call.details));
+                if (window.continuity == CaseMotionContinuity::ContinuousC2)
+                    check_c2(curve, workspace, call);
+                return curve;
             } else {
                 call.fail(Code::Unsupported);
             }
@@ -411,6 +499,7 @@ struct Owner {
     Stamp stamp{p::PchipIssuerId{0}, p::PchipInputGeneration{0}};
     std::int16_t pi_power{};
     Rational begin, end;
+    CaseMotionContinuity continuity = CaseMotionContinuity::PiecewiseC2;
     WordsAndViews events;
     Series translation, rotation;
 };
@@ -426,6 +515,7 @@ struct SnapshotOwner {
     std::uint64_t declaration_ordinal{};
     Stamp stamp{p::PchipIssuerId{0}, p::PchipInputGeneration{0}};
     std::int16_t pi_power{};
+    CaseMotionContinuity continuity = CaseMotionContinuity::PiecewiseC2;
     Words begin, end;
     WordsAndViews events;
     RecordedSeries translation, rotation;
@@ -593,6 +683,7 @@ struct Builder {
         result.declaration_ordinal = owner.declaration_ordinal;
         result.stamp = owner.stamp;
         result.pi_power = owner.pi_power;
+        result.continuity = owner.continuity;
         result.begin = capture_words(owner.begin, call);
         result.end = capture_words(owner.end, call);
         result.events = copy_events(owner.events, call);
@@ -612,7 +703,8 @@ struct Builder {
         const auto& live = current.owner_.values().front();
         if (!live.declaration || !same_source(saved.source, live.declaration->source()) ||
             saved.declaration_ordinal != live.declaration_ordinal || saved.stamp != live.stamp ||
-            saved.pi_power != live.pi_power || saved.events.size() != live.events.views.size())
+            saved.pi_power != live.pi_power || saved.continuity != live.continuity ||
+            saved.events.size() != live.events.views.size())
             call.fail(Code::StaleGeneration);
         check_recipe_count(live, limits, call);
         const auto begin = capture_words(live.begin, call);
@@ -627,6 +719,7 @@ struct Builder {
         result.declaration_ordinal = live.declaration_ordinal;
         result.stamp = live.stamp;
         result.pi_power = live.pi_power;
+        result.continuity = live.continuity;
         result.begin = call.clone(live.begin);
         result.end = call.clone(live.end);
         result.events = copy_events(live.events, call);
@@ -651,7 +744,9 @@ struct Builder {
         count = call.sum(count, motion.events.size());
         if (count > limits.maximum_exact_numbers)
             call.fail(Code::ResourceExceeded);
-        if (call.compare(window.begin, window.end) > 0)
+        if ((window.continuity != CaseMotionContinuity::PiecewiseC2 &&
+             window.continuity != CaseMotionContinuity::ContinuousC2) ||
+            call.compare(window.begin, window.end) > 0)
             call.fail(Code::InvalidInput);
         auto storage = call.allocate<Owner>(1);
         auto& owner = storage.values().front();
@@ -661,6 +756,7 @@ struct Builder {
         owner.pi_power = pi_power;
         owner.begin = call.clone(window.begin);
         owner.end = call.clone(window.end);
+        owner.continuity = window.continuity;
         owner.events = call.allocate_words(motion.events.size());
         for (core::Index i = 0; std::cmp_less(i, motion.events.size()); ++i) {
             const auto event = call.read(source, take(motion.events.at(i)), seconds, 0);
@@ -685,7 +781,7 @@ struct Builder {
             call.fail(Code::InvalidInput);
         const auto& actual = prepared.owner_.values().front();
         const auto& expected = current.owner_.values().front();
-        bind(actual, expected, request.stamp, call);
+        const auto& declaration = bind(actual, expected, request.stamp, call);
         if (call.compare(request.time, actual.begin) < 0 ||
             call.compare(request.time, actual.end) > 0)
             call.fail(Code::InvalidInput);
@@ -695,19 +791,23 @@ struct Builder {
         auto rotation = evaluate_series(actual.rotation, expected.rotation, request,
                                         rational_view(instant), workspace, call);
         call.stop();
-        return CaseMotionTimeJet{std::move(translation), std::move(rotation), std::move(instant),
-                                 actual.pi_power,        request.order,       request.side};
+        return CaseMotionTimeJet{
+            std::move(translation), std::move(rotation), std::move(instant), declaration,
+            request.stamp,          actual.pi_power,     request.order,      request.side};
     }
 
 private:
-    static void bind(const Owner& actual, const Owner& expected, Stamp stamp, Call& call) {
+    static const io::SiQuantityKey& bind(const Owner& actual, const Owner& expected, Stamp stamp,
+                                         Call& call) {
         if (stamp != actual.stamp || stamp != expected.stamp ||
-            actual.pi_power != expected.pi_power || !actual.declaration || !expected.declaration ||
+            actual.pi_power != expected.pi_power || actual.continuity != expected.continuity ||
+            !actual.declaration || !expected.declaration ||
             actual.declaration_ordinal != expected.declaration_ordinal ||
             !same_source(actual.declaration->source(), expected.declaration->source()))
             call.fail(Code::StaleGeneration);
+        const auto& declaration = *actual.declaration;
         if (&actual == &expected)
-            return;
+            return declaration;
         if (call.compare(actual.begin, expected.begin) != 0 ||
             call.compare(actual.end, expected.end) != 0 ||
             actual.events.views.size() != expected.events.views.size())
@@ -723,6 +823,7 @@ private:
                 !std::ranges::equal(left.denominator, right.denominator))
                 call.fail(Code::StaleGeneration);
         }
+        return declaration;
     }
 
     static CaseMotionTimeJet::SeriesJet evaluate_series(const Series& actual, const Series& current,
@@ -776,6 +877,7 @@ core::Result<CaseMotionTimeSnapshotView> CaseMotionTimeSnapshot::view() const& n
                                       fields.declaration_ordinal,
                                       fields.stamp,
                                       fields.pi_power,
+                                      fields.continuity,
                                       motion_time_detail::rational_view(fields.begin),
                                       motion_time_detail::rational_view(fields.end),
                                       fields.events.views.values(),
@@ -807,11 +909,15 @@ std::span<const p::RationalView> CaseMotionTimeSeries::events() const& noexcept 
 }
 
 CaseMotionTimeJet::CaseMotionTimeJet(SeriesJet translation, SeriesJet rotation,
-                                     io::detail::SiRationalWords time, std::int16_t pi_power,
-                                     p::JetOrder order, p::RequestedSide side) noexcept
+                                     io::detail::SiRationalWords time,
+                                     io::SiQuantityKey declaration, p::PchipInputStamp stamp,
+                                     std::int16_t pi_power, p::JetOrder order,
+                                     p::RequestedSide side) noexcept
     : translation_(std::move(translation)),
       rotation_(std::move(rotation)),
       time_(std::move(time)),
+      declaration_(std::move(declaration)),
+      stamp_(stamp),
       pi_power_(pi_power),
       order_(order),
       side_(side) {}

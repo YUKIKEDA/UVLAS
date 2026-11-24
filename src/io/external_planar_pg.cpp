@@ -309,6 +309,80 @@ rectangular(ReferenceArithmetic& math, const Diagnostic& diag, const NastranCoor
     return sum;
 }
 
+[[nodiscard]] bool same_chart_point(ReferenceArithmetic& math, const Point& a, const Point& b) {
+    return math.compare(a.s, b.s) == 0 && math.compare(a.t, b.t) == 0;
+}
+
+// The common PG partition supplies nonoverlapping atomic exterior segments.
+// An original free edge can span more than one such segment.
+[[nodiscard]] bool on_pg_boundary(ReferenceArithmetic& math, const Point& a, const Point& b,
+                                  std::span<const structure::PgPartitionEdge> edges,
+                                  std::span<const Point> vertices) {
+    const auto axis = math.compare(a.s, b.s) != 0 ? &Point::s : &Point::t;
+    const auto less = [&](const Rational& x, const Rational& y) { return math.compare(x, y) < 0; };
+    const auto [lower, upper] = std::minmax(a.*axis, b.*axis, less);
+    Rational covered;
+    for (const auto& edge : edges) {
+        math.visit(1);
+        if (!edge.external) {
+            continue;
+        }
+        const auto& first = vertices[static_cast<std::size_t>(edge.vertices[0])];
+        const auto& second = vertices[static_cast<std::size_t>(edge.vertices[1])];
+        if (orient(math, a, b, first).sign() != 0 || orient(math, a, b, second).sign() != 0) {
+            continue;
+        }
+        const auto [start, end] = std::minmax(first.*axis, second.*axis, less);
+        const auto& lo = std::max(lower, start, less);
+        const auto& hi = std::min(upper, end, less);
+        if (less(lo, hi)) {
+            covered = math.add(covered, math.sub(hi, lo));
+        }
+    }
+    return math.compare(covered, math.sub(upper, lower)) == 0;
+}
+
+void validate_edge_incidence(ReferenceArithmetic& math, const Diagnostic& diagnostic,
+                             const auto faces, std::span<const structure::PgPartitionEdge> edges,
+                             std::span<const Point> vertices) {
+    for (const auto& face : faces) {
+        const auto ring = face.ring(); // Original source order, before any PG winding reversal.
+        for (std::size_t i = 0; i < ring.size(); ++i) {
+            math.visit(1);
+            const auto& a = ring[i];
+            const auto& b = ring[(i + 1) % ring.size()];
+            bool matched = false;
+            for (const auto& other : faces) {
+                if (&face == &other) {
+                    continue;
+                }
+                const auto opposite = other.ring();
+                for (std::size_t j = 0; j < opposite.size(); ++j) {
+                    math.visit(1);
+                    const auto& c = opposite[j];
+                    const auto& d = opposite[(j + 1) % opposite.size()];
+                    if (a.node == c.node && b.node == d.node) {
+                        diagnostic.reject(Code::GeometryInvalid, Reason::EdgeIncidence,
+                                          face.element, other.element, a.node);
+                    }
+                    if (a.node == d.node && b.node == c.node) {
+                        if (matched || !same_chart_point(math, a.chart, d.chart) ||
+                            !same_chart_point(math, b.chart, c.chart)) {
+                            diagnostic.reject(Code::GeometryInvalid, Reason::EdgeIncidence,
+                                              face.element, other.element, a.node);
+                        }
+                        matched = true;
+                    }
+                }
+            }
+            if (!matched && !on_pg_boundary(math, a.chart, b.chart, edges, vertices)) {
+                diagnostic.reject(Code::GeometryInvalid, Reason::EdgeIncidence, face.element, {},
+                                  a.node);
+            }
+        }
+    }
+}
+
 struct AffineMidSurface {
     Position origin, tangent_s, tangent_t;
 
@@ -505,6 +579,8 @@ template <class ReadFace>
                            total);
     }
     validate_chart_coverage(math, diagnostic, triangles, total);
+    validate_edge_incidence(math, diagnostic, faces.values(),
+                            partition_take(owner.partition.edges()), vertices);
     math.cancel();
     return {patch, std::move(faces), math.info()};
 }
@@ -1084,6 +1160,8 @@ core::Result<NastranPlanarPgBounds> NastranPlanarPgBounds::prepare(
                 validate_chart_row(math, diagnostic, row, previous, triangles, vertices, total);
             }
             validate_chart_coverage(math, diagnostic, triangles, total);
+            validate_edge_incidence(math, diagnostic, faces.values(),
+                                    partition_take(owner.partition.edges()), vertices);
             math.cancel();
             return NastranPlanarPgBounds{input->input.bulk.location,
                                          input->input.bulk.digest,
