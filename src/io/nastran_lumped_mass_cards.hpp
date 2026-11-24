@@ -48,7 +48,7 @@ enum class NastranLumpedMassFailure : std::uint8_t {
 };
 
 struct NastranLumpedMassDiagnostic {
-    NastranLumpedMassFailure reason;
+    NastranLumpedMassFailure reason = NastranLumpedMassFailure::Input;
     NastranBulkPosition position;
 };
 
