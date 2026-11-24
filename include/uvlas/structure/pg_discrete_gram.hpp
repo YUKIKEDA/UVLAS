@@ -13,7 +13,7 @@ struct PgDiscreteVolumePoint {
 
 /// Exact immutable snapshot supporting the finite-rule qualification.
 struct PgOwnedDiscreteVolumePoint {
-    core::Index volume;
+    core::Index volume{};
     ExactRational u, v, depth, weight;
 };
 
@@ -50,7 +50,7 @@ struct PgDiscreteGramGrid {
 
 struct PgDiscreteGramLimits {
     PgReferenceLimits arithmetic;
-    std::uint64_t maximum_integer_steps;
+    std::uint64_t maximum_integer_steps = 0;
 };
 
 struct PgDiscreteGramInfo {

@@ -1607,6 +1607,7 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     auto raw = basis_terms(*take(basis.rank()), columns, setup);
     auto weight = f.r("1", std::to_string(curved_rule_weight_denominator));
     std::vector<PgDiscreteVolumePoint> points;
+    points.reserve(rule.size());
     for (const auto& p : rule)
         points.push_back({{p.volume, p.u, p.v, p.depth}, weight});
     const PgDiscreteGramGrid grid{352, 272};
@@ -1624,10 +1625,10 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     check_failure(prepare(points, grid, stop, empty), core::FailureCode::Cancelled);
     check_failure(prepare(points, grid, caps, empty), core::FailureCode::ResourceExceeded);
     check_failure(prepare(points, {271, 272}, caps, empty), core::FailureCode::InvalidInput);
-    check_failure(
-        prepare(std::span{points}.subspan(curved_rule_planar_count * curved_rule_depth_count), grid,
-                caps, empty),
-        core::FailureCode::InvalidInput);
+    check_failure(prepare(std::span{points}.subspan(static_cast<std::size_t>(
+                              curved_rule_planar_count * curved_rule_depth_count)),
+                          grid, caps, empty),
+                  core::FailureCode::InvalidInput);
     CHECK(empty.allocated_bytes() == 0);
     REQUIRE(basis.size());
 
@@ -1722,6 +1723,7 @@ TEST_CASE("PG irrational curved samples enclose signed Gram entries",
     const auto layers = take(partition.layers());
     const auto third = f.r("1", "3"), half = f.r("1", "2");
     std::vector<PgDiscreteVolumePoint> points;
+    points.reserve(volumes.size());
     std::vector<std::vector<Term>> raw = basis_terms(*take(basis.rank()), 3, setup);
     const std::array<std::pair<std::size_t, std::size_t>, 2> checks{{{0, 0}, {1, 2}}};
     std::array<std::array<Q, 2>, checks.size()> bounds{};
