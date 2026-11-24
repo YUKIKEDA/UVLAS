@@ -1465,8 +1465,9 @@ struct NonpenetrationBuilder {
         if (pullback != nullptr) {
             const auto before = work.used;
             const auto face = [&](std::size_t i) { return bound[i].panel.face; };
-            auto transpose = linearize_native(CirculationSense::Transpose, face, influence.values(),
-                                              objective.values(), pullback->request, memory, work);
+            auto transpose =
+                linearize_native(CirculationSense::Transpose, face, influence.values(),
+                                 objective.values(), pullback->request, memory, rounding, work);
             transpose.steps_ = work.used - before;
             pullback->transpose.emplace(std::move(transpose));
         }
@@ -2022,7 +2023,7 @@ struct NonpenetrationBuilder {
         const auto face = [&](std::size_t i) { return face_at(primal.rows.values(), i); };
         auto transpose =
             linearize_native(CirculationSense::Transpose, face, primal.influence.values(),
-                             loads.gamma.values(), implicit.request, memory, work);
+                             loads.gamma.values(), implicit.request, memory, rounding, work);
         transpose.steps_ = work.used - before;
         implicit.transpose.emplace(std::move(transpose));
         implicit.rows =
@@ -2953,6 +2954,15 @@ struct NonpenetrationBuilder {
     linearize_native(CirculationSense sense, FaceAt face_at, std::span<const p::Interval> native,
                      std::span<const p::Interval> right, const DiscreteCirculationRequest& request,
                      core::ResourcePlan& memory, p::Work& work) {
+        a::LocalRootScratch rounding;
+        return linearize_native(sense, face_at, native, right, request, memory, rounding, work);
+    }
+
+    template <class FaceAt>
+    static DiscreteCirculationLinearization
+    linearize_native(CirculationSense sense, FaceAt face_at, std::span<const p::Interval> native,
+                     std::span<const p::Interval> right, const DiscreteCirculationRequest& request,
+                     core::ResourcePlan& memory, a::LocalRootScratch& rounding, p::Work& work) {
         const auto order = right.size();
         const bool transposed = sense == CirculationSense::Transpose;
         const auto coefficient = [&](std::size_t row, std::size_t column) -> const p::Interval& {
@@ -2961,7 +2971,6 @@ struct NonpenetrationBuilder {
         auto [matrix, rhs] = dense_inputs(order, memory);
         auto rows = allocate<std::optional<CirculationLinearRow>>(memory, order);
         auto retained = allocate<p::Interval>(memory, order);
-        a::LocalRootScratch rounding;
         for (std::size_t i = 0; i < order; ++i) {
             rhs.values()[i] = project_binary64(right[i], request.rhs_absolute, rounding, work);
             for (std::size_t j = 0; j < order; ++j)
