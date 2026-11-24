@@ -3742,7 +3742,8 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     input.field("units").set("time", string("s"));
     input.field("units").set("length", string("m"));
     input.field("units").set("angle", string("deg"));
-    input.field("analysis").set("intervals", parse(one_step));
+    input.field("analysis")
+        .set("intervals", parse(R"([{"start":0,"end":1,"step":0.1,"restart":"initial"}])"));
     auto& motion =
         input.field("model").field("aero_surfaces").elements[0].field("attachment").field("motion");
     motion.set("origin", parse(R"({"origin":[0,0,0],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
@@ -3777,16 +3778,19 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
         geometry_caps,
         contact_caps,
         UINT64_C(10000000000)};
-    const auto prepare = [&](const JsonToken& json) {
-        const auto si = materialize(json, io::SourceId{79});
+    const auto selected_attachment = [](const io::SiCase& si) {
         const auto top = take(take(si.source_case()).get().root());
         const auto attached =
             take(top.model.record().aero_surfaces.at(0)).record().attachment.record();
         const auto* selected = std::get_if<io::schema::AeroAttachmentPrescribed>(&attached);
         if (selected == nullptr)
             FAIL("Missing checked prescribed attachment");
-        return take(cf::prepare_prescribed_aero_attachment(si, *selected, {begin, end}, stamp,
-                                                           curves, caps.motion, memory));
+        return *selected;
+    };
+    const auto prepare = [&](const JsonToken& json) {
+        const auto si = materialize(json, io::SourceId{79});
+        return take(cf::prepare_prescribed_aero_attachment(
+            si, selected_attachment(si), {begin, end}, stamp, curves, caps.motion, memory));
     };
     const auto attachment = prepare(input);
     const auto current = prepare(input);
@@ -3847,7 +3851,24 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
             *geometry_work, *global, cap, plan);
     };
     const cf::PrescribedAeroReference model{topology, original, moving, rows};
-    const auto state = take(run(current, at, model, caps, memory));
+    a::UniformFlowWorkspace flow_workspace;
+    const cf::CaseClockedPrescribedLimits clock_caps{
+        {{limits, 1, 10}, gust_limits}, caps.motion, budget};
+    const auto prepare_clocked = [&](const JsonToken& json) {
+        const auto si = materialize(json, io::SourceId{79});
+        return take(cf::prepare_case_clocked_prescribed_inputs(
+            si, selected_attachment(si), stamp, flow_workspace, curves, clock_caps, memory));
+    };
+    const auto clock = prepare_clocked(input);
+    const auto current_clock = prepare_clocked(input);
+    const auto run_clocked = [&](const cf::CaseClockedPrescribedInputs& live,
+                                 cf::CaseFlowClockQuery query) {
+        return cf::evaluate_case_clocked_prescribed_attachment(
+            clock, live, query, model, projection, curves, *geometry_work, *global,
+            clock_caps.flow.clock_and_wake, caps, memory);
+    };
+    const auto state = take(run_clocked(current_clock, {stamp, 0, 1, side}));
+    reject(run_clocked(current_clock, {stamp, 0, 2, side}), core::FailureCode::StaleGeneration);
     const auto& sampled = take(state.motion()).get();
     const auto& instant = take(sampled.time()).get();
     exact(instant.time(), exact_instant);
@@ -3894,7 +3915,6 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     near(Rat{xy.numerator[2]} / denom, irrational / 4);
 
     const auto zero_flow = source(R"({"kind":"constant","value":[0,0,0]})", one_step);
-    a::UniformFlowWorkspace flow_workspace;
     const auto ambient = import(zero_flow, io::SourceId{81}, flow_workspace);
     const auto ambient_current = import(zero_flow, io::SourceId{82}, flow_workspace);
     const std::array budgets{budget_rows[0], budget_rows[1], budget_rows[2]};
@@ -3955,6 +3975,8 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
         .set("coefficients", parse("[[0,0,0],[2,0,0]]"));
     const auto changed = prepare(changed_input);
     reject(run(changed, at, model, caps, memory), core::FailureCode::StaleGeneration);
+    const auto changed_clock = prepare_clocked(changed_input);
+    reject(run_clocked(changed_clock, {stamp, 0, 1, side}), core::FailureCode::StaleGeneration);
     auto no_work = caps;
     no_work.work = 0;
     core::ResourcePlan refused{0};

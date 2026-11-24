@@ -50,6 +50,10 @@ struct Builder;
 struct Trial;
 } // namespace aero_attachment_detail
 
+namespace case_clock_detail {
+struct Builder;
+} // namespace case_clock_detail
+
 class PrescribedAeroAttachment {
 public:
     PrescribedAeroAttachment(PrescribedAeroAttachment&&) noexcept = default;
