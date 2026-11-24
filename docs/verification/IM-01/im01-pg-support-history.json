@@ -1,0 +1,73 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-support-history",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-04",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "source_commit": "9df5cc1a13094ff7a32647a5474e0ba163c7b608",
+  "claimed_state": "元行へ写した実PG支持の値・速度から、共通区間の全係数と片側加速度を同じ固定チャートで検証した。",
+  "environment": {
+    "windows_compiler": "MSVC 19.51.36260",
+    "linux_compiler": "GCC 14.2.0",
+    "linux_sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "ctest": "structure.pg_support_history",
+    "assertions_per_configuration": 12161,
+    "elapsed_seconds": {
+      "msvc_release": 0.73,
+      "msvc_debug": 4.44,
+      "gcc14_asan_ubsan": 9.72
+    },
+    "independent_profile": {
+      "intervals": 4,
+      "source_knot_counts": [
+        3,
+        5
+      ],
+      "work_bits": 262144
+    },
+    "mutation_test_source_commit": "b6677bc0ed870a0f58f93a6cbb3c9659084f68da",
+    "mutations": [
+      {
+        "change": "check only constant coefficient",
+        "mutated_source_sha256": "3f92887c625b2dabb2ccf1438c28a7a42a90c9558aa5fd88e54d1edc294df7b9",
+        "failed_assertion_index": 4
+      },
+      {
+        "change": "old dual subtract of event and combined external budgets",
+        "mutated_source_sha256": "d026e389f22bff058b303b51792fec00a39c1987e9e394d8a04ef45752c99d0d",
+        "failed_assertion_index": 29,
+        "failure": "ResourceExceeded"
+      }
+    ]
+  },
+  "sources": {
+    "docs/specs/structure/structural-adopted-specification.md": "5e2e8ae0229fbdbf9cbb1a35dee1be9b5ea867611e3c9e1de42c5a554d00e325",
+    "docs/specs/structure/connection-adopted-specification.md": "dbe318730a5024f9095e10f4ad1bbe5c70d2033f4e8ae812edb466a5ef5f7056",
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+    "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
+    "include/uvlas/structure/pg_sparse_chart.hpp": "3b84772247707611b84e7e8697bc6da9cf8b4e956c02cfcb0a141aeb7ca34a34",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-support-history.md": "dddf232be9a623a4643d8256f4c2216dbbf662d000b8a70103b23830b7cecbb9",
+    "docs/specs/structure/pg-chart-support-history-contract.md": "df0dc9974e018f8fb1492a2cf8c13b2a8be524d7614b8bc1a0bcb86369e88f99",
+    "include/uvlas/structure/pg_support_history.hpp": "cd3eea3bca96bf5ea1bd1d1d16c2a1a008a81396654a3a977c5f13f2a4aee96d",
+    "src/structure/pg_support_history.cpp": "cb19f67bbfd8a928f01cb68d5365087893cf3f66f1d81decc39db3a8ee382a5a",
+    "tests/structure/pg_support_history_test.cpp": "f0bed62e7b3ee65cfea4888bb83a5bc5dabca593b62099f1b1ab2cfe0592ead2"
+  }
+}
