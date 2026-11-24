@@ -292,6 +292,47 @@ TEST_CASE("PBEAM preserves the full allowed station count without assuming decla
     CHECK(excess_plan.allocated_bytes() == 0);
 }
 
+TEST_CASE("PBEAM end-A torsion rejects exact negatives but preserves blank and zero fields",
+          "[IO4-03][negative][verification]") {
+    constexpr std::string_view prefix = "PBEAM,90,6,2.9,3.5,5.97,,";
+    const auto deck = [&](std::string_view j) {
+        return std::string{beam_source} + std::string{prefix} + std::string{j} + "\n";
+    };
+    for (const std::string_view j : {"-1.0", "-1.0D-999", "-1.0,BOGUS"}) {
+        CAPTURE(j);
+        const auto source = deck(j);
+        const auto input = parents(source);
+        core::ResourcePlan plan{memory};
+        std::optional<NastranPbeamDiagnostic> diagnostic;
+        const auto rejected = NastranPbeamCards::prepare(input.materials, input.beams,
+                                                         property_limits, plan, {}, &diagnostic);
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == InvalidInput);
+        const auto error = take(diagnostic);
+        CHECK(error.reason == Reason::InvalidField);
+        CHECK(error.position == NastranBulkPosition{beam_source.size() + prefix.size(), 6, 26});
+    }
+
+    for (const std::string_view j : {"", "0.0", "-0.0D-999"}) {
+        CAPTURE(j);
+        const auto input = parents(deck(j));
+        core::ResourcePlan plan{memory};
+        const auto parsed = take(
+            NastranPbeamCards::prepare(input.materials, input.beams, property_limits, plan, {}));
+        const auto view = take(parsed.view());
+        REQUIRE(view.properties.size() == 1);
+        const auto& torsion = view.properties[0].end_a.torsion;
+        if (j.empty()) {
+            CHECK_FALSE(torsion);
+        } else {
+            const auto value = take(torsion);
+            const auto source = take(input.materials.view());
+            CHECK(source.input.input.bulk.text(value.field) == j);
+            CHECK(value.value.decimal() == (j == "0.0" ? "0.0" : "-0.0e-999"));
+        }
+    }
+}
+
 TEST_CASE("PBEAM diagnoses invalid section fields, unsupported station modes and references",
           "[IO4-03][negative][verification]") {
     struct FailureCase {
