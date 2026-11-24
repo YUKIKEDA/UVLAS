@@ -1,0 +1,40 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-native-row-replay-owned-v1",
+  "ids": [
+    "IM-03",
+    "UW-D03",
+    "UW-D07",
+    "N4-03",
+    "N4-05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "source_commit": "d6e0e6ad72c5c70488c2de4ac64c50ffcb0d0fbd",
+  "claimed_state": "An independently retained contact keeps the same qualified current geometry and topology. Requalified owned collocation queries reproduce all coefficient intervals, native retained words, and original residual enclosures on two M2/N4 cases under the same pivoted dense LU.",
+  "verification": {
+    "scope": "Contact re-ownership and fresh resolved query ownership within the replay witness. Two real fixed-chart M2/N4 cases. Production derivative entry and full-grid storage remain separate.",
+    "windows": "MSVC Release 4/4, 4935 plus 126 plus 573 per shape",
+    "linux": "GCC 14 Release 4/4, same checks; targeted clang-tidy",
+    "bytes": "MSVC replay interval row 2304 and cumulative 9245200; GCC row 2560 and cumulative 9335600. Contact ownership charge precedes this cumulative measurement.",
+    "commands": [
+      "ctest --test-dir out/issue166-build -C Release -V -R '^(aero\\.global_geometry(_resources)?|coupling\\.finite_wing_drag_refinement\\.fw_v0[12]\\.m2n4)$' -j 3",
+      "ctest --test-dir build -V -R '^(aero\\.global_geometry(_resources)?|coupling\\.finite_wing_drag_refinement\\.fw_v0[12]\\.m2n4)$' -j 3",
+      "clang-tidy on the affected implementation and representative test commands",
+      "just trace-check"
+    ]
+  },
+  "sources": {
+    "src/aero/global_geometry.cpp": "ac384bbae3e038b69c1397d983925f8ec14caedb7f10c7e0b7e57e77862d9118",
+    "src/aero/global_geometry.hpp": "691e527f313dacebecbd1874431820d99c22b6804ec9d376a24cb0550ba23fdf",
+    "src/aero/global_geometry_storage.hpp": "a950fcc1711bd25c864627c6de243b23070b6e68d28f42fb96ebf33633d300fc",
+    "src/coupling/discrete_nonpenetration.cpp": "5fed2b8aa9e9ed58ddabcb9c6051b8c4f67af3b71c7fcdb7b65296ef7974ddef",
+    "tests/aero/global_geometry_test.cpp": "f03bc3b385f99303a2e2fc71d9b61fb2ef82af0b9d00072c06c4f14928cd7193",
+    "tests/aero/global_geometry_resources_test.cpp": "087b0e50e2f005a0b5c9e56caffc9ba8fab04463990dd6a730bcb2c86fa6a9b0",
+    "tests/coupling/finite_wing_steady_test.cpp": "b7ca1e07f9126fed19570826c6c679198cf3516db12293310462f2dfd35c296c"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/finite-wing-native-row-replay-owned-v1/verification.md": "c40da9e881088d3be25c9b8d6f08a0d07d1b06a59ebd049c4eadbf4daffec3e2",
+    "tests/aero/fixtures/finite-wing-drag-refinement-v1.json": "29b7cf5fd5301a0b4ebfc684e81b9cf70a90fa7305f34451a88e9da5cbd15878"
+  }
+}

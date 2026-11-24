@@ -62,8 +62,9 @@ template <class T>
 T take(core::Result<T> value, const std::source_location at = std::source_location::current()) {
     if (!value) {
         INFO(at.file_name() << ':' << at.line());
-        if (value.error().details.resources) {
-            const auto& usage = *value.error().details.resources;
+        const auto& resources = value.error().details.resources;
+        if (resources) {
+            const auto& usage = *resources;
             INFO("Resource kind " << static_cast<int>(usage.kind) << ", required " << usage.required
                                   << ", observed " << usage.observed);
             FAIL("Unexpected case-flow failure " << static_cast<int>(value.error().code));
@@ -1884,7 +1885,8 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         reject(solved.row(1), core::FailureCode::InvalidInput);
         const std::array tangent_rhs{cf::CirculationLinearRhs{row.face, a::SingleWord{.125}}};
         const auto tangent = take(cf::solve_discrete_circulation_linearization(
-            solved, cf::CirculationSense::Tangent, tangent_rhs, request, 100000, memory));
+            solved, cf::CirculationSense::Tangent, tangent_rhs, request, solve_limits.steps,
+            memory));
         const Rat expected_tangent{Big{"167540106538491744036640792288003354"},
                                    Big{"1000000000000000000000000000000000000"}};
         CHECK(abs(solution_word(tangent.solution(), 0) - expected_tangent) <= rational_word(1e-15));
@@ -3081,13 +3083,14 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     };
     const auto first = collocate(a::QueryId{1}, {.75, .5, 0.});
     const auto second = collocate(a::QueryId{2}, {.625, 2.375, 0.});
-    const auto rows = [&](const a::ResolvedQuery& second_query) {
+    const auto rows = [&](const a::ResolvedQuery& first_query,
+                          const a::ResolvedQuery& second_query) {
         const std::array frame{coordinates(1, 0, 0), coordinates(0, 1, 0)};
         // The input may arrive in a different order than the qualified physical face order.
         return std::array{
             cf::DiscreteCollocation{a::FacetId{202}, second_query, frame, coordinates(0, 0, .75),
                                     a::SingleWord{9}, a::SingleWord{0}},
-            cf::DiscreteCollocation{a::FacetId{200}, first, frame, coordinates(0, 0, .5),
+            cf::DiscreteCollocation{a::FacetId{200}, first_query, frame, coordinates(0, 0, .5),
                                     a::SingleWord{7}, a::SingleWord{0}}};
     };
     a::SharedP1Workspace shared;
@@ -3110,8 +3113,16 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
                             circulation_context(geometry.context())};
     const auto request = circulation_request(scales, 2, ls::Norm::L2);
     const auto solve = [&](const a::ResolvedQuery& query) {
-        const auto collocations = rows(query);
-        const cf::DiscreteNonpenetrationInput input{contact,
+        const auto qualified = take_global(contact.retain_checked(memory));
+        const auto fresh_query = [&](const a::ResolvedQuery& original) {
+            return test_geometry::take(a::resolve_query(
+                geometry, test_geometry::take(original.definition()), geometry.context(),
+                test_geometry::limits(), *geometry_work, memory));
+        };
+        const auto owned_first = fresh_query(first);
+        const auto owned_second = fresh_query(query);
+        const auto collocations = rows(owned_first, owned_second);
+        const cf::DiscreteNonpenetrationInput input{qualified,
                                                     collocations,
                                                     {},
                                                     {core::AcceptedStateId{2}, {}},
@@ -3135,7 +3146,7 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
         residual_small(original.original_residual, rational_word(1e-13) * residual_scales[i]);
     }
 
-    constexpr std::uint64_t linearization_steps = 100000;
+    const auto linearization_steps = solve_limits.steps;
     std::array forcing{
         cf::CirculationLinearRhs{fixture.faces[0].id, a::DoubleWord{-.125, 0x1p-57}},
         cf::CirculationLinearRhs{fixture.faces[1].id, a::DoubleWord{.1875, -0x1p-58}}};
@@ -3244,6 +3255,11 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
                solved, tangent_sense, forcing, tangent_request, linearization_steps, no_space),
            core::FailureCode::ResourceExceeded);
 
+    // There are no live input row/query objects from solve() here. The old
+    // algebra-only cap does not admit exact row replay from the owned input.
+    reject(cf::solve_discrete_circulation_linearization(solved, tangent_sense, forcing,
+                                                        tangent_request, 100000, memory),
+           core::FailureCode::ResourceExceeded);
     const auto tangent = take(linearize(tangent_sense, forcing, tangent_request));
     const auto transpose = take(linearize(transpose_sense, seed, transpose_request));
     CHECK(tangent.sense() == tangent_sense);
@@ -3294,7 +3310,7 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     }
 
     // A uniform-velocity direction is shared across these two nonsymmetric rows.
-    const auto two_collocations = rows(second);
+    const auto two_collocations = rows(first, second);
     const cf::DiscreteNonpenetrationInput pullback_input{
         contact, two_collocations,           {}, {core::AcceptedStateId{2}, {}}, {7, 11},
         stamp,   p::RequestedSide::Automatic};
@@ -4100,7 +4116,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
            core::FailureCode::StaleGeneration);
     const auto birth = take(first(transport_clock, newest, at_trailing_edge, release.epoch, born));
     const auto birth_row = take(birth.row(0));
-    REQUIRE(birth_row.direction);
+    if (!birth_row.direction)
+        FAIL("The birth row must retain its direction");
     CHECK(birth_row.release == release);
     residual_expected(birth_row.residual[0], Rat{8});
     residual_expected(birth_row.residual[1], Rat{0});
@@ -4111,7 +4128,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto trial_row = take(trial_velocity.row(0));
     CHECK(parent_row.owner == release.point);
     near(center(parent_row.velocity[2]), 1.024661130622405660);
-    REQUIRE(parent_row.direction);
+    if (!parent_row.direction)
+        FAIL("The parent row must retain its direction");
     near(center((*parent_row.direction)[2]), -.064175653096249599);
     near(center(birth_row.residual[2]), -1.559233165679606171);
     near(center((*birth_row.direction)[2]), -.000440026076076997);
@@ -4385,10 +4403,13 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     auto evaluated_velocity = cf::evaluate_discrete_free_wake_velocity(
         with_owned_history, flow, historical_probe, nullptr, {}, extended_velocity_limits, shared,
         *local, *kernel, extended_velocity_memory);
-    if (!evaluated_velocity && evaluated_velocity.error().details.resources) {
-        const auto& observed = *evaluated_velocity.error().details.resources;
-        INFO("Resource demand " << observed.required << ", usage " << observed.observed);
-        REQUIRE(evaluated_velocity);
+    if (!evaluated_velocity) {
+        const auto& resources = evaluated_velocity.error().details.resources;
+        if (resources) {
+            const auto& observed = *resources;
+            INFO("Resource demand " << observed.required << ", usage " << observed.observed);
+            REQUIRE(evaluated_velocity);
+        }
     }
     const auto growing_velocity = take(std::move(evaluated_velocity));
     CHECK(take(growing_velocity.row(0)).owner == far_up);

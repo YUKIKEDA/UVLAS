@@ -1,0 +1,37 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-circulation-streamed-rows-v1",
+  "ids": [
+    "IM-03",
+    "V-AERO",
+    "N4-03",
+    "N4-05",
+    "N4-06",
+    "UW-D01",
+    "UW-D03",
+    "UW-D06"
+  ],
+  "package": "IM-03",
+  "source_commit": "e6fdcca2e3f3ad97089123ea855b22185971ac54",
+  "claimed_state": "Native circulation owns its checked linear row data and streams each original interval row for pivoted dense primal, tangent, and transpose solves. Retained solutions and original residuals match the old dense-interval path in two frozen cases.",
+  "verification": {
+    "comparison_commit": "5de3e4ac03076ac29b074fce89d6ac0371218e81",
+    "production_commit": "61c3035f318d5f61931cb409c6b41b228071dda2",
+    "scope": "Two frozen finite-wing geometries, native row ordering, parent ownership lifetime and work admission. Full-scale capacity remains outside this result.",
+    "windows": "MSVC Release 7/7; MSVC Debug two focused cases, 956 assertions",
+    "linux": "GCC 14 Release 7/7, misplaced transpose mutation rejected; product and finite-wing clang-tidy",
+    "retest": "Test-only source commit e6fdcca2 repeats coupling.case_uniform_flow on both Release toolchains, 29 cases and 13626 assertions each",
+    "bytes": "One 2304 B MSVC or 2560 B GCC native interval row in M2/N4; 108 GiB lower bound on separate cumulative full-size action reservations"
+  },
+  "sources": {
+    "src/coupling/discrete_nonpenetration.cpp": "b4806d2b166adc3a4223271423b29951a9149f27023497085f4f9d7b0d3dcbb4",
+    "src/coupling/discrete_nonpenetration.hpp": "4ef8859e43d94d56bc3f65cbb4ff43e63d9356985cb637e37963ec8058836381",
+    "src/aero/p1_shared_action.cpp": "5cf28b046de437cb847c5fa3a92ed8e3896754075bc915282e7983251a8ac455",
+    "tests/coupling/case_uniform_flow_test.cpp": "d1983cb7e36e1ec5477e0adaf165a1c96a6e367e9ed386c01de92cb9d12fbc5f",
+    "tests/coupling/finite_wing_steady_test.cpp": "c8ba2c4332b5f71fbdcbed8bfa82f915b9d594f90f4ad30e560573abed9783de"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/finite-wing-circulation-streamed-rows-v1/verification.md": "73e8fe980be8f8b3a9d14f017c9d251a80e04722e3b09dde16ac1c67ef12cb11",
+    "tests/aero/fixtures/finite-wing-drag-refinement-v1.json": "29b7cf5fd5301a0b4ebfc684e81b9cf70a90fa7305f34451a88e9da5cbd15878"
+  }
+}

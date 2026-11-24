@@ -206,6 +206,10 @@ public:
     [[nodiscard]] GlobalResult<std::reference_wrapper<const OwnedGeometry>>
     geometry() const&& = delete;
     [[nodiscard]] core::Result<PreparedTopologyOwner> reference_topology() const noexcept;
+    /// Retain both qualified immutable geometry owners without rechecking contacts.
+    /// The plan covers the new owner record. The original work report is retained.
+    [[nodiscard]] GlobalResult<GlobalContactState>
+    retain_checked(core::ResourcePlan&, const std::stop_token& = {}) const noexcept;
     /// Inspect the fixed quad of a source facet. A wake's L edge uses quad vertices 0→1.
     [[nodiscard]] GlobalResult<UvlmQuad> uvlm_quad(FacetId, std::uint64_t max_steps,
                                                    const std::stop_token& = {}) const noexcept;

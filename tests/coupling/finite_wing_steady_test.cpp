@@ -1364,6 +1364,42 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
         const auto loads = take(
             cf::solve_discrete_circulation_loads(input, write_loads, std::move(flow), caps, request,
                                                  *geometry_work, shared, *local, *kernel, memory));
+        if (count == 8 && sample == 1) {
+            core::ResourcePlan replay_memory{UINT64_C(2000000000)};
+            const auto retained_contact = take_global(contact.retain_checked(replay_memory));
+            const auto contact_bytes = replay_memory.allocated_bytes();
+            const cf::DiscreteNonpenetrationInput replay_input{
+                retained_contact, rows, wake, input.history, trial, stamp, input.flow_side};
+            const auto evidence = take(cf::verify_discrete_circulation_row_replay(
+                replay_input, loads.primal(), caps, request, shared, *local, *kernel,
+                replay_memory));
+            CHECK(evidence.rows == count);
+            CHECK(evidence.coefficients == count * count);
+            CHECK(evidence.replay_row_bytes > 0);
+            CHECK(evidence.reference_dense_bytes == evidence.replay_row_bytes * count);
+            CHECK(evidence.allocated_bytes == replay_memory.allocated_bytes() - contact_bytes);
+            CHECK(evidence.used_steps > 0);
+            std::cout << "Native coefficient replay, row bytes=" << evidence.replay_row_bytes
+                      << ", dense bytes=" << evidence.reference_dense_bytes
+                      << ", cumulative replay payload bytes=" << evidence.allocated_bytes
+                      << ", used steps=" << evidence.used_steps << '\n';
+
+            core::ResourcePlan insufficient{0};
+            const auto denied = cf::verify_discrete_circulation_row_replay(
+                input, loads.primal(), caps, request, shared, *local, *kernel, insufficient);
+            if (denied)
+                FAIL("The row replay must admit its payload before assembly");
+            CHECK(denied.error().code == core::FailureCode::ResourceExceeded);
+            CHECK(insufficient.allocated_bytes() == 0);
+            auto changed = request;
+            changed.rhs_generation = core::RhsGeneration{9};
+            const auto stale = cf::verify_discrete_circulation_row_replay(
+                input, loads.primal(), caps, changed, shared, *local, *kernel, insufficient);
+            if (stale)
+                FAIL("A different RHS generation must not qualify a replay");
+            CHECK(stale.error().code == core::FailureCode::StaleGeneration);
+            CHECK(insufficient.allocated_bytes() == 0);
+        }
         const auto tolerance = rational_word(2e-10);
         for (std::size_t k = 0; k < count; ++k) {
             const auto held = words(loads.primal().solution(), k);
