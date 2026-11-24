@@ -737,7 +737,8 @@ uvlas_add_test(structure.pg_discrete_gram
 target_include_directories(uvlas_test_structure_pg_discrete_gram
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 if(UVLAS_SANITIZERS AND NOT MSVC)
-    set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 420)
+    # The curved trace and reference cache reuse the expensive certified Gram fixture.
+    set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 540)
 endif()
 
 uvlas_add_test(structure.pg_prepared_patch
