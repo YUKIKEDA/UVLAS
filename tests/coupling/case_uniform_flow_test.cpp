@@ -1,5 +1,6 @@
 #include "aero/geometry_snapshot_fixture.hpp"
 #include "coupling/case_flow_clock.hpp"
+#include "coupling/case_known_flow.hpp"
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
@@ -458,7 +459,8 @@ Rat rational_word(double word) {
     return Rat{significand} * two_power(exponent - 53);
 }
 
-void within(const io::SiEnclosure& enclosure, const Rat& actual, const Rat& allowed) {
+void within(const io::SiEnclosure& enclosure, const Rat& actual, const Rat& allowed,
+            const Rat& reference_uncertainty = Rat{0}) {
     std::visit(
         [&](const auto& result) {
             REQUIRE(result.exponent2 > -4096);
@@ -472,12 +474,236 @@ void within(const io::SiEnclosure& enclosure, const Rat& actual, const Rat& allo
             }();
             const auto radius = rational_word(result.radius) * two_power(result.exponent2);
             CHECK(radius >= 0);
-            CHECK(abs(c * two_power(result.exponent2) - actual) <= radius);
+            CHECK(abs(c * two_power(result.exponent2) - actual) <= radius + reference_uncertainty);
             CHECK(radius <= allowed);
         },
         enclosure);
 }
 } // namespace
+
+namespace {
+JsonToken gust_case(std::string_view units, std::string_view amplitude) {
+    auto input = source(R"({"kind":"constant","value":[1,2,3]})", one_step);
+    input.field("units").set("length", string("m"));
+    input.field("units").set("time", string("s"));
+    input.field("units").set("angle", string(units));
+    auto gust = parse(
+        R"({"kind":"sine","amplitude":{"kind":"constant","value":[0]},"direction":[0,3,4],"wavevector":[90,0,0],"angular_frequency":90,"phase":45,"origin":[1,0,0],"time_origin":0.5})");
+    gust.set("amplitude", parse(amplitude));
+    input.field("flow").set("gust", std::move(gust));
+    return input;
+}
+
+const cf::CaseKnownFlowLimits gust_limits{limits, 2048, 10000};
+
+cf::CaseKnownFlowReady prepare_gust(const JsonToken& input, io::SourceId id,
+                                    a::UniformFlowWorkspace& work, core::ResourcePlan& memory) {
+    const auto si = materialize(input, id);
+    return take(cf::prepare_case_known_flow(si, stamp, {}, work, gust_limits, memory));
+}
+
+cf::CaseKnownFlowProjection gust_projection(core::Precision precision, const Number& absolute) {
+    const static Number unit{1}, zero{0};
+    const cf::CaseFlowComponentBudget per_component{unit.view(), absolute.view(), zero.view()};
+    std::array<cf::CaseFlowComponentBudget, 3> vector{per_component, per_component, per_component};
+    std::array<cf::CaseFlowComponentBudget, 9> matrix{per_component, per_component, per_component,
+                                                      per_component, per_component, per_component,
+                                                      per_component, per_component, per_component};
+    return {precision, vector, vector, matrix};
+}
+
+Rat oracle(const char* signed_digits) {
+    Big power{1};
+    for (int i = 0; i < 64; ++i)
+        power *= 10;
+    return Rat{Big{signed_digits}} / power;
+}
+} // namespace
+
+TEST_CASE("Typed analytic gust encloses the SI velocity and both physical partials",
+          "[AE-07][IO4-01][N4-02][N4-03][property][verification][negative]") {
+    constexpr std::string_view polynomial =
+        R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[2],[3]]})";
+    const auto input = gust_case("deg", polynomial);
+    a::UniformFlowWorkspace work;
+    core::ResourcePlan memory{budget};
+    const auto field = prepare_gust(input, io::SourceId{51}, work, memory);
+    const auto current = prepare_gust(input, io::SourceId{52}, work, memory);
+    const auto saved = take(cf::snapshot_case_known_flow(field, work, gust_limits, memory));
+    const auto restored =
+        take(cf::restore_case_known_flow(saved, current, work, gust_limits, memory));
+    const Number t{1, 2}, x{1}, z{0}, x90{3, 2}, tolerance{1, 1000000000};
+    const cf::CaseKnownFlowQuery query{{stamp, t.view()}, {x.view(), z.view(), z.view()}};
+    const auto projection = gust_projection(core::Precision::TwoWord, tolerance);
+    const auto result = take(cf::evaluate_case_known_flow(restored, current, query, projection,
+                                                          work, gust_limits, memory));
+    CHECK(take(result.stamp()) == stamp);
+    exact(take(result.time()), t);
+    exact(take(result.position(0)), x);
+    exact(take(result.position(1)), z);
+    exact(take(result.position(2)), z);
+    CHECK(result.requested_side() == p::RequestedSide::Automatic);
+    CHECK(result.interval_steps() <= gust_limits.interval_steps);
+
+    // Independent closed values from sin(45 deg)=cos(45 deg)=sqrt(2)/2 and e=(0,3/5,4/5).
+    const std::array<std::array<const char*, 3>, 2> digits{{
+        {"34849242404917498012417731604201829824981554691457954768355137249",
+         "-10597213363973567357618176679931359210599716990829841012608209295",
+         "23325135425331422796833375197818641917726763869222373671198326937"},
+        {"49798989873223330683223642138935773099975406255277273024473516332",
+         "-14129617818631423143490902239908478947466289321106454683477612393",
+         "31100180567108563729111166930424855890302351825629831561597769249"},
+    }};
+    const Rat oracle_error = two_power(-205);
+    const Rat allowed = two_power(-98);
+    within(take(result.velocity(0)), Rat{1}, Rat{0});
+    within(take(result.time_partial(0)), Rat{0}, Rat{0});
+    for (std::size_t i = 0; i < 3; ++i) {
+        for (std::size_t j = 0; j < 3; ++j) {
+            if (i == 0 || j != 0)
+                within(take(result.spatial_partial(i, j)), Rat{0}, Rat{0});
+        }
+    }
+    for (std::size_t i = 0; i < digits.size(); ++i) {
+        const auto component = i + 1;
+        const auto& values = digits[i];
+        within(take(result.velocity(component)), oracle(values[0]), allowed, oracle_error);
+        within(take(result.time_partial(component)), oracle(values[1]), allowed, oracle_error);
+        within(take(result.spatial_partial(component, 0)), oracle(values[2]), allowed,
+               oracle_error);
+    }
+
+    const cf::CaseKnownFlowQuery cardinal{{stamp, t.view()}, {x90.view(), z.view(), z.view()}};
+    const auto binary = gust_projection(core::Precision::Binary64, tolerance);
+    const auto exact_cardinal = take(cf::evaluate_case_known_flow(
+        restored, current, cardinal, binary, work, gust_limits, memory));
+    CHECK(std::holds_alternative<io::ScaledBinary64>(take(exact_cardinal.velocity(1))));
+    within(take(exact_cardinal.velocity(1)), Rat{41} / 10, two_power(-49));
+    within(take(exact_cardinal.velocity(2)), Rat{29} / 5, two_power(-49));
+    within(take(exact_cardinal.spatial_partial(1, 0)), Rat{0}, Rat{0});
+    within(take(exact_cardinal.time_partial(1)), Rat{9} / 5, two_power(-49));
+
+    const auto exact_demand = gust_projection(core::Precision::TwoWord, z);
+    reject(cf::evaluate_case_known_flow(field, current, query, exact_demand, work, gust_limits,
+                                        memory),
+           core::FailureCode::PrecisionUnresolved);
+    auto small = gust_limits;
+    small.interval_steps = result.interval_steps() - 1;
+    reject(cf::evaluate_case_known_flow(restored, current, query, projection, work, small, memory),
+           core::FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 declares request_stop non-const.
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    reject(cf::evaluate_case_known_flow(field, current, query, projection, work, gust_limits,
+                                        memory, stop.get_token()),
+           core::FailureCode::Cancelled);
+
+    auto changed = input;
+    changed.field("flow").field("gust").set("phase", parse("45.000000000000000000001"));
+    const auto changed_phase = prepare_gust(changed, io::SourceId{53}, work, memory);
+    core::ResourcePlan rejected{budget};
+    reject(cf::restore_case_known_flow(saved, changed_phase, work, gust_limits, rejected),
+           core::FailureCode::StaleGeneration);
+    reject(cf::evaluate_case_known_flow(field, changed_phase, query, projection, work, gust_limits,
+                                        rejected),
+           core::FailureCode::StaleGeneration);
+    CHECK(rejected.allocated_bytes() == 0);
+    changed.field("flow").field("gust").set("direction", parse("[1,3,4]"));
+    const auto skew = materialize(changed, io::SourceId{54});
+    reject(cf::prepare_case_known_flow(skew, stamp, {}, work, gust_limits, rejected),
+           core::FailureCode::InvalidInput);
+}
+
+TEST_CASE("A typed gust restores PCHIP amplitude and checks the current knot content",
+          "[AE-07][IO4-01][N4-03][N4-09][verification][negative]") {
+    auto input = gust_case(
+        "rad",
+        R"({"kind":"pchip","times":[0,0.5,1],"values":[[1],[2],[5]],"outside":{"kind":"reject"}})");
+    input.field("analysis")
+        .set(
+            "intervals",
+            parse(
+                R"([{"start":0,"end":0.5,"step":0.5,"restart":"initial"},{"start":0.5,"end":1,"step":0.5,"restart":"event"}])"));
+    input.field("flow").set("events", parse("[0.5]"));
+    auto& gust = input.field("flow").field("gust");
+    gust.set("wavevector", parse("[2,0,0]"));
+    gust.set("angular_frequency", parse("3"));
+    gust.set("phase", parse("0"));
+    a::UniformFlowWorkspace work;
+    core::ResourcePlan memory{budget};
+    const auto field = prepare_gust(input, io::SourceId{55}, work, memory);
+    const auto current = prepare_gust(input, io::SourceId{56}, work, memory);
+    const auto saved = take(cf::snapshot_case_known_flow(field, work, gust_limits, memory));
+    const auto restored =
+        take(cf::restore_case_known_flow(saved, current, work, gust_limits, memory));
+    const Number t{1, 2}, x{1}, z{0}, tolerance{1, 1000000000};
+    const auto projection = gust_projection(core::Precision::TwoWord, tolerance);
+    for (const auto side : {p::RequestedSide::Left, p::RequestedSide::Right}) {
+        const cf::CaseKnownFlowQuery query{{stamp, t.view(), side}, {x.view(), z.view(), z.view()}};
+        const auto result = take(cf::evaluate_case_known_flow(restored, current, query, projection,
+                                                              work, gust_limits, memory));
+        CHECK(result.requested_side() == side);
+        const auto radius = two_power(-98);
+        within(take(result.velocity(1)), Rat{2}, Rat{0});
+        within(take(result.velocity(2)), Rat{3}, Rat{0});
+        within(take(result.spatial_partial(1, 0)), Rat{12} / 5, radius);
+        within(take(result.spatial_partial(2, 0)), Rat{16} / 5, radius);
+        within(take(result.time_partial(1)), Rat{-18} / 5, radius);
+        within(take(result.time_partial(2)), Rat{-24} / 5, radius);
+    }
+    auto changed = input;
+    changed.field("flow").field("gust").field("amplitude").field("values").elements[2].elements[0] =
+        parse("6");
+    const auto changed_samples = prepare_gust(changed, io::SourceId{57}, work, memory);
+    const cf::CaseKnownFlowQuery query{{stamp, t.view()}, {x.view(), z.view(), z.view()}};
+    reject(cf::evaluate_case_known_flow(restored, changed_samples, query, projection, work,
+                                        gust_limits, memory),
+           core::FailureCode::StaleGeneration);
+    reject(cf::restore_case_known_flow(saved, changed_samples, work, gust_limits, memory),
+           core::FailureCode::StaleGeneration);
+}
+
+TEST_CASE("Known flow uses SI offsets and returns zero spatial partials without a gust",
+          "[AE-07][IO4-01][N4-03][verification][negative]") {
+    auto input = gust_case("deg", R"({"kind":"constant","value":[1]})");
+    input.field("units").set("length", string("ft"));
+    input.field("units").set("time", string("min"));
+    auto& gust = input.field("flow").field("gust");
+    gust.set("phase", parse("0"));
+    gust.set("angular_frequency", parse("0"));
+    gust.set("direction", parse("[0,0,-2]"));
+    a::UniformFlowWorkspace work;
+    core::ResourcePlan memory{budget};
+    const auto field = prepare_gust(input, io::SourceId{58}, work, memory);
+    const Number zero{0}, tolerance{1, 1000000000};
+    const cf::CaseKnownFlowQuery query{{stamp, zero.view()},
+                                       {zero.view(), zero.view(), zero.view()}};
+    const auto projection = gust_projection(core::Precision::TwoWord, tolerance);
+    // At x=0 the spatial phase is -90 degrees relative to the one-foot origin.
+    const auto sample = take(
+        cf::evaluate_case_known_flow(field, field, query, projection, work, gust_limits, memory));
+    const auto radius = two_power(-98);
+    within(take(sample.velocity(0)), Rat{127} / 25000, radius);
+    within(take(sample.velocity(1)), Rat{127} / 12500, radius);
+    within(take(sample.velocity(2)), Rat{127} / 6250, radius);
+    within(take(sample.time_partial(2)), Rat{0}, Rat{0});
+    // The mixed-unit reciprocal conversion can surround zero by a narrow interval.
+    within(take(sample.spatial_partial(2, 0)), Rat{0}, radius);
+
+    input.field("flow").set("gust", parse(R"({"kind":"none"})"));
+    const auto ambient = prepare_gust(input, io::SourceId{59}, work, memory);
+    const auto baseline = take(cf::evaluate_case_known_flow(ambient, ambient, query, projection,
+                                                            work, gust_limits, memory));
+    within(take(baseline.velocity(2)), Rat{381} / 25000, radius);
+    for (std::size_t i = 0; i < 3; ++i) {
+        within(take(baseline.time_partial(i)), Rat{0}, Rat{0});
+        for (std::size_t j = 0; j < 3; ++j)
+            within(take(baseline.spatial_partial(i, j)), Rat{0}, Rat{0});
+    }
+    reject(
+        cf::evaluate_case_known_flow(ambient, field, query, projection, work, gust_limits, memory),
+        core::FailureCode::StaleGeneration);
+}
 
 TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient flow",
           "[AE-07][UW-D02][UW-D08][IO4-01][N4-02][N4-03][N4-06][verification][negative]") {
