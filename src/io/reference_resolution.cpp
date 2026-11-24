@@ -268,7 +268,7 @@ private:
     core::Result<void> authenticate(Vertex&, const DependencyEdge&, std::string_view) noexcept;
     core::Result<core::PlannedBuffer<char>> copy_text(std::string_view) noexcept;
     [[nodiscard]] core::Result<std::string_view> original_path(core::Index) const noexcept;
-    core::Result<std::reference_wrapper<const NormalizedReferencePath>>
+    [[nodiscard]] core::Result<std::reference_wrapper<const NormalizedReferencePath>>
         normalized_path(core::Index) const noexcept;
     std::unexpected<core::Failure> reject(core::Failure, const DependencyEdge&, SourceId,
                                           std::string_view) noexcept;
