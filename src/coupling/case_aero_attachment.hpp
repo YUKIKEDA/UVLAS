@@ -41,6 +41,10 @@ struct Builder;
 struct Trial;
 } // namespace aero_attachment_detail
 
+namespace case_clock_detail {
+struct Builder;
+} // namespace case_clock_detail
+
 class PrescribedAeroAttachment {
 public:
     PrescribedAeroAttachment(PrescribedAeroAttachment&&) noexcept = default;
@@ -50,6 +54,7 @@ public:
 
 private:
     friend struct aero_attachment_detail::Builder;
+    friend struct case_clock_detail::Builder;
     explicit PrescribedAeroAttachment(CaseMotionReady&& motion) noexcept
         : motion_(std::move(motion)) {}
     CaseMotionReady motion_;

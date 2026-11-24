@@ -1,7 +1,7 @@
 #pragma once
 
+#include "case_aero_attachment.hpp"
 #include "case_known_flow.hpp"
-#include "case_motion.hpp"
 #include "io/si_exact_words.hpp"
 
 namespace uvlas::coupling::detail {
@@ -239,16 +239,16 @@ private:
     friend struct case_clock_detail::Builder;
     CaseClockedPrescribedInputs(case_clock_detail::Grid&& grid, CaseKnownFlowReady&& ambient,
                                 std::optional<CasePrescribedWakeReady>&& prescribed,
-                                CaseMotionReady&& motion) noexcept
+                                PrescribedAeroAttachment&& attachment) noexcept
         : grid_(std::move(grid)),
           ambient_(std::move(ambient)),
           prescribed_(std::move(prescribed)),
-          motion_(std::move(motion)) {}
+          attachment_(std::move(attachment)) {}
 
     case_clock_detail::Grid grid_;
     CaseKnownFlowReady ambient_;
     std::optional<CasePrescribedWakeReady> prescribed_;
-    CaseMotionReady motion_;
+    PrescribedAeroAttachment attachment_;
 };
 
 struct CaseClockedPrescribedSample {
@@ -262,10 +262,10 @@ struct CaseClockedPrescribedSample {
 };
 
 [[nodiscard]] core::Result<CaseClockedPrescribedInputs> prepare_case_clocked_prescribed_inputs(
-    const io::SiCase&, CaseMotionField, aero::detail::pchip::PchipInputStamp,
-    aero::detail::UniformFlowWorkspace&, aero::detail::pchip::CurveWorkspace&,
-    const CaseClockedPrescribedLimits&, core::ResourcePlan&, const std::stop_token& = {},
-    core::FailureDetails = {}) noexcept;
+    const io::SiCase&, const io::schema::AeroAttachmentPrescribed&,
+    aero::detail::pchip::PchipInputStamp, aero::detail::UniformFlowWorkspace&,
+    aero::detail::pchip::CurveWorkspace&, const CaseClockedPrescribedLimits&, core::ResourcePlan&,
+    const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
 [[nodiscard]] core::Result<CaseClockedPrescribedSample> evaluate_case_clocked_prescribed_inputs(
     const CaseClockedPrescribedInputs&, const CaseClockedPrescribedInputs& current,
@@ -275,5 +275,13 @@ struct CaseClockedPrescribedSample {
     aero::detail::UniformFlowWorkspace&, aero::detail::pchip::CurveWorkspace&,
     const CaseClockedPrescribedLimits&, core::ResourcePlan&, const std::stop_token& = {},
     core::FailureDetails = {}) noexcept;
+
+/// Bind an actual attachment trial to the exact time and side of a checked clock node.
+[[nodiscard]] core::Result<PrescribedAeroTrial> evaluate_case_clocked_prescribed_attachment(
+    const CaseClockedPrescribedInputs&, const CaseClockedPrescribedInputs& current,
+    CaseFlowClockQuery, const PrescribedAeroReference&, const PrescribedAeroProjection&,
+    aero::detail::pchip::CurveWorkspace&, aero::detail::GeometryWorkspace&,
+    aero::detail::GlobalWorkspace&, const CaseFlowClockLimits&, const PrescribedAeroLimits&,
+    core::ResourcePlan&, const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
 } // namespace uvlas::coupling::detail

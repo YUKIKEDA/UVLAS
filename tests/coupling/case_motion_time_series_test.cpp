@@ -85,13 +85,17 @@ io::SiCase checked_case(const a::JsonToken& input) {
     return take(io::convert_case_to_si(*checked, catalog, request, bounds, plan, nullptr));
 }
 
-c::CaseMotionField motion_field(const io::SiCase& source) {
+io::schema::AeroAttachmentPrescribed attachment_field(const io::SiCase& source) {
     const auto root = take(take(source.source_case()).get().root());
     const auto model = root.model.record();
     const auto object = take(model.aero_surfaces.at(0)).record().attachment.record();
     if (const auto* motion = std::get_if<io::schema::AeroAttachmentPrescribed>(&object))
-        return motion->motion;
+        return *motion;
     FAIL("Missing prescribed attachment");
+}
+
+c::CaseMotionField motion_field(const io::SiCase& source) {
+    return attachment_field(source).motion;
 }
 
 a::JsonToken& motion_json(a::JsonToken& root) {
@@ -330,8 +334,9 @@ TEST_CASE("Clocked prescribed inputs share one exact node and event side",
         budget};
     const auto prepare = [&](const a::JsonToken& json, const c::CaseClockedPrescribedLimits& caps) {
         const auto source = checked_case(json);
-        return c::prepare_case_clocked_prescribed_inputs(
-            source, motion_field(source), stamp, flow_workspace, motion_workspace, caps, memory);
+        return c::prepare_case_clocked_prescribed_inputs(source, attachment_field(source), stamp,
+                                                         flow_workspace, motion_workspace, caps,
+                                                         memory);
     };
     const std::array<std::uint32_t, 1> one_word{1};
     const std::array<std::uint32_t, 2> denominator{0, 1U << 12U};

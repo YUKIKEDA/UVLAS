@@ -415,19 +415,19 @@ struct Builder {
     }
 
     static CaseClockedPrescribedInputs
-    make(const io::SiCase& source, CaseMotionField motion_field, p::PchipInputStamp stamp,
-         a::UniformFlowWorkspace& flow_workspace, p::CurveWorkspace& motion_workspace,
-         const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
-         const std::stop_token& stop, core::FailureDetails details) {
+    make(const io::SiCase& source, const s::AeroAttachmentPrescribed& attachment,
+         p::PchipInputStamp stamp, a::UniformFlowWorkspace& flow_workspace,
+         p::CurveWorkspace& motion_workspace, const CaseClockedPrescribedLimits& limits,
+         core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details) {
         const auto& clock = limits.flow.clock_and_wake;
         auto grid = make_grid(source, stamp, clock, memory, stop, details);
         const auto intervals = grid.intervals.values();
         auto flow = take(prepare_case_known_flow(source, stamp, {}, flow_workspace,
                                                  limits.flow.ambient, memory, stop, details));
-        auto motion = take(prepare_case_motion(
-            source, motion_field, {intervals.front().begin, intervals.back().end}, stamp,
+        auto moving = take(prepare_prescribed_aero_attachment(
+            source, attachment, {intervals.front().begin, intervals.back().end}, stamp,
             motion_workspace, limits.motion, memory, stop, details));
-        const auto motion_inputs = motion_field.record();
+        const auto motion_inputs = attachment.motion.record();
         const auto root = take(take(source.source_case()).get().root());
         // Grid and ambient preparation already qualified these variants.
         const auto ambient = std::get<s::FlowKnown>(root.flow.record());
@@ -459,7 +459,7 @@ struct Builder {
             events.check(prescribed->velocity.record());
         }
         check_stop(stop, prepare, details);
-        return {std::move(grid), std::move(flow), std::move(transport), std::move(motion)};
+        return {std::move(grid), std::move(flow), std::move(transport), std::move(moving)};
     }
 
     static CaseClockedPrescribedSample
@@ -478,8 +478,9 @@ struct Builder {
             fail(InvalidInput, evaluate, details);
         const auto& instant = node.time(address.step);
         auto motion = take(evaluate_case_motion(
-            field.motion_, current.motion_, {address.stamp, instant, motion_order, address.side},
-            motion_projection, motion_workspace, limits.motion, memory, stop, details));
+            field.attachment_.motion_, current.attachment_.motion_,
+            {address.stamp, instant, motion_order, address.side}, motion_projection,
+            motion_workspace, limits.motion, memory, stop, details));
         const auto words = take(io::detail::copy_rational_words(instant, memory, stop));
         const CaseUniformFlowQuery time{address.stamp, rational_view(words), address.side};
         auto flow = take(evaluate_case_known_flow(field.ambient_, current.ambient_,
@@ -498,6 +499,24 @@ struct Builder {
         return {field.grid_.source, address,         node.interval.restart,
                 std::move(step),    std::move(flow), std::move(transport),
                 std::move(motion)};
+    }
+
+    static PrescribedAeroTrial
+    attachment(const CaseClockedPrescribedInputs& field, const CaseClockedPrescribedInputs& current,
+               CaseFlowClockQuery address, const PrescribedAeroReference& reference,
+               const PrescribedAeroProjection& projection, p::CurveWorkspace& motion,
+               a::GeometryWorkspace& geometry, a::GlobalWorkspace& contact,
+               const CaseFlowClockLimits& clock_limits, const PrescribedAeroLimits& limits,
+               core::ResourcePlan& memory, const std::stop_token& stop,
+               core::FailureDetails details) {
+        const auto node =
+            locate(field.grid_, current.grid_, address, clock_limits, memory, stop, details);
+        if (field.prescribed_.has_value() != current.prescribed_.has_value())
+            fail(StaleGeneration, evaluate, details);
+        return take(evaluate_prescribed_aero_attachment(
+            field.attachment_, current.attachment_, reference,
+            {address.stamp, node.time(address.step), p::JetOrder::First, address.side}, projection,
+            motion, geometry, contact, limits, memory, stop, details));
     }
 };
 } // namespace case_clock_detail
@@ -598,12 +617,13 @@ core::Result<CaseClockedKnownFlowSample> evaluate_case_clocked_known_flows(
 }
 
 core::Result<CaseClockedPrescribedInputs> prepare_case_clocked_prescribed_inputs(
-    const io::SiCase& source, CaseMotionField motion, p::PchipInputStamp stamp,
-    a::UniformFlowWorkspace& flow_workspace, p::CurveWorkspace& motion_workspace,
-    const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
-    const std::stop_token& stop, core::FailureDetails details) noexcept {
+    const io::SiCase& source, const s::AeroAttachmentPrescribed& attachment,
+    p::PchipInputStamp stamp, a::UniformFlowWorkspace& flow_workspace,
+    p::CurveWorkspace& motion_workspace, const CaseClockedPrescribedLimits& limits,
+    core::ResourcePlan& memory, const std::stop_token& stop,
+    core::FailureDetails details) noexcept {
     return guarded<CaseClockedPrescribedInputs>(prepare, details, [&] {
-        return case_clock_detail::Builder::make(source, motion, stamp, flow_workspace,
+        return case_clock_detail::Builder::make(source, attachment, stamp, flow_workspace,
                                                 motion_workspace, limits, memory, stop, details);
     });
 }
@@ -620,6 +640,21 @@ core::Result<CaseClockedPrescribedSample> evaluate_case_clocked_prescribed_input
         return case_clock_detail::Builder::sample(field, current, address, position, ambient, wake,
                                                   motion_order, motion, flow_workspace,
                                                   motion_workspace, limits, memory, stop, details);
+    });
+}
+
+core::Result<PrescribedAeroTrial> evaluate_case_clocked_prescribed_attachment(
+    const CaseClockedPrescribedInputs& field, const CaseClockedPrescribedInputs& current,
+    CaseFlowClockQuery address, const PrescribedAeroReference& reference,
+    const PrescribedAeroProjection& projection, p::CurveWorkspace& motion,
+    a::GeometryWorkspace& geometry, a::GlobalWorkspace& contact,
+    const CaseFlowClockLimits& clock_limits, const PrescribedAeroLimits& limits,
+    core::ResourcePlan& memory, const std::stop_token& stop,
+    core::FailureDetails details) noexcept {
+    return guarded<PrescribedAeroTrial>(evaluate, details, [&] {
+        return case_clock_detail::Builder::attachment(field, current, address, reference,
+                                                      projection, motion, geometry, contact,
+                                                      clock_limits, limits, memory, stop, details);
     });
 }
 
