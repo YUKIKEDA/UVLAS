@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-rigid-link-cards",
+  "ids": [
+    "IO4-03"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "ce231e85495dd82c9f77da28464126d178261c41",
+  "scope": "Capture RBE2 GRID references, dependent component mask and declared thermal fields",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 1
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 1,
+      "clang_tidy": "21.1.1 PASS on the parser and integration test"
+    },
+    "mutation": "Reading TREF from the ALPHA slot caused the independent field checks to fail."
+  },
+  "tested_target_registration": {
+    "commit": "ce231e85495dd82c9f77da28464126d178261c41",
+    "CMakeLists.txt": "60f426e9772be19348d6ba17f9838cbc205e229895c10c1e97a0db1bfae4b2ff",
+    "tests/CMakeLists.txt": "55145baacf22aa63534eefcf1a63a80b57f62aa9ea8032f6f4238c2f2db10c7a"
+  },
+  "sources": {
+    "src/io/nastran_rigid_link_cards.cpp": "c3a44f5e768cf50deac3cb5a9aa9f317517bfbf741011e5c55267b957bfc7d28",
+    "src/io/nastran_rigid_link_cards.hpp": "0ba7203cd3d17d9064f7f2531149f13a849f57f06749ced4907a92d0259406eb",
+    "tests/io/nastran_shell_cards_test.cpp": "638d4aee6c2b4c2def7ca8cc23d63a1cbd81efbae6945f601046d9f4252170b0"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-rigid-link-cards.md": "8a5045551cd5beb00592cf7672293c323415b7fbf83381322c655e283818ca09"
+  }
+}
