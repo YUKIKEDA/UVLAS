@@ -62,7 +62,7 @@ GmshMesh read_mesh(std::string_view bytes) {
     core::ResourcePlan plan{memory};
     constexpr RootSnapshotLocation location{
         {{SourceId{19}, 27, {}}, 1, 1}, SourceId{81}, ReferenceRole::GmshMesh, 5};
-    AcquiredRootSnapshot source{
+    const AcquiredRootSnapshot source{
         location,
         take(read_reference_file(reader, source_digest(raw),
                                  {bytes.size(), bytes.size() + 1, 3, bytes.size()}, plan, {},
