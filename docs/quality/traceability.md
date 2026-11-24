@@ -123,7 +123,7 @@
 | N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 132 | 51 | 2 |
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 0 | 0 | 0 |
 | N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 105 | 19 | 0 |
-| N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 187 | 52 | 0 |
+| N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 189 | 52 | 0 |
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 98 | 7 | 1 |
 | N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 184 | 70 | 1 |
 | N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 87 | 44 | 1 |
@@ -139,10 +139,10 @@
 | QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 6 | 0 |
 | QA-10 | [quality-plan.md:100](../quality/quality-plan.md) | 0 | 0 | 0 |
 | SH-D01 | [main-shell-adopted-specification.md:11](../specs/structure/main-shell-adopted-specification.md) | 7 | 2 | 0 |
-| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 9 | 5 | 0 |
+| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 11 | 5 | 0 |
 | SH-D03 | [main-shell-adopted-specification.md:13](../specs/structure/main-shell-adopted-specification.md) | 50 | 38 | 0 |
 | SH-D04 | [main-shell-adopted-specification.md:14](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
-| SH-D05 | [main-shell-adopted-specification.md:15](../specs/structure/main-shell-adopted-specification.md) | 8 | 5 | 0 |
+| SH-D05 | [main-shell-adopted-specification.md:15](../specs/structure/main-shell-adopted-specification.md) | 10 | 5 | 0 |
 | SH-D06 | [main-shell-adopted-specification.md:16](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
 | SH-D07 | [main-shell-adopted-specification.md:17](../specs/structure/main-shell-adopted-specification.md) | 29 | 16 | 0 |
 | SH-D08 | [main-shell-adopted-specification.md:18](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
