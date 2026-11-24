@@ -1560,6 +1560,8 @@ $EndElements
         VariableThickness
     };
     Axes axes = Axes::None;
+    bool shell_set = false;
+    bool late_axis_mismatch = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1766,6 +1768,16 @@ $EndElements
         corners = Corners::Fraction;
     }
 
+    SECTION("One deck prepares every declared Shell in first occurrence order") {
+        physical = true;
+        shell_set = true;
+    }
+    SECTION("A later Shell mismatch leaves both inputs available for the same preparation") {
+        physical = true;
+        shell_set = true;
+        late_axis_mismatch = true;
+    }
+
     const bool corner_claim = corners != Corners::None;
     const bool axis_pcomp = axes != Axes::None && axes != Axes::VariableThickness;
     const bool two_axis_layers = axes == Axes::Quarter || axes == Axes::Difference;
@@ -1864,6 +1876,15 @@ $EndElements
                 sidecar["shells"][0]["chart"]["orientation"] = "reversed";
             }
         }
+        if (shell_set) {
+            auto square = chart(false);
+            square["vertices"].push_back(nlohmann::json::array({zero, one}));
+            sidecar["shells"] = nlohmann::json::array({
+                {{"element", "900"}, {"shell", "2"}, {"chart", chart(true)}},
+                {{"element", "701"}, {"shell", "1"}, {"chart", std::move(square)}},
+                {{"element", "901"}, {"shell", "2"}, {"chart", chart(false)}},
+            });
+        }
         sidecar["materials"] = nlohmann::json::array({{{"mid", "6"}, {"material", "1"}}});
         if (corners == Corners::MixedMaterial) {
             sidecar["materials"].push_back({{"mid", "9"}, {"material", "1"}});
@@ -1929,6 +1950,20 @@ $EndElements
         replace_group("$Elements\n3 4 501 999\n", "$Elements\n4 4 501 999\n");
         replace_group("2 17 2 2\n702 10 40 99\n701 10 20 40\n",
                       "2 17 2 1\n702 10 40 99\n2 19 2 1\n701 10 20 40\n");
+    }
+    if (shell_set) {
+        constexpr std::string_view original = "PSHELL,90,6,0.25\n";
+        const auto property = source_text.find(original);
+        REQUIRE(property != std::string::npos);
+        source_text.replace(property, original.size(), "PCOMP,90,-.125,,,,,,\n,6,.25\n");
+        constexpr std::string_view triangles = "CTRIA3,701,90,10,20,40\nCTRIA3,702,90,10,40,99\n";
+        const auto face = source_text.find(triangles);
+        REQUIRE(face != std::string::npos);
+        source_text.replace(face, triangles.size(),
+                            "GRID,110,,0.0,0.0,1.0\nGRID,120,,1.0,0.0,1.0\n"
+                            "GRID,140,,1.0,1.0,1.0\nGRID,199,,0.0,1.0,1.0\n"
+                            "CTRIA3,900,90,110,140,199,0\nCQUAD4,701,90,10,20,40,99,0\n"
+                            "CTRIA3,901,90,110,120,140,0\n");
     }
     if (axis_pcomp) {
         constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
@@ -2174,6 +2209,28 @@ $EndElements
     declare_path(external.field(is_gmsh ? "mesh" : "deck"), "external.dat", hex(source_text));
     declare_path(external.field("sidecar"), "sidecar.json", hex(sidecar_text));
     config.field("model").field("geometry").elements.push_back(std::move(external));
+    if (shell_set) {
+        auto& model = config.field("model");
+        auto second_pg = model.field("geometry").elements.front();
+        second_pg.set("id", fixture::json(R"("3")"));
+        second_pg.field("frame").set("origin", fixture::json("[0,0,1]"));
+        model.field("geometry").elements.push_back(std::move(second_pg));
+
+        auto& shells = model.field("shells").elements;
+        auto& first_layer = shells.front().field("layers").elements.front();
+        first_layer.set(
+            "axis",
+            fixture::json(
+                R"({"kind":"projected","direction":{"kind":"constant","value":[1,0,0]},"angle":{"kind":"constant","value":[0]}})"));
+        auto second_shell = shells.front();
+        second_shell.set("id", fixture::json(R"("2")"));
+        second_shell.set("geometry", fixture::json(R"("3")"));
+        second_shell.field("layers").elements.front().set("id", fixture::json(R"("2")"));
+        if (late_axis_mismatch) {
+            first_layer.field("axis").field("direction").set("value", fixture::json("[0,1,0]"));
+        }
+        shells.push_back(std::move(second_shell));
+    }
 
     const rd::MeshSidecarBindingLimits binding{
         {limits().document,
@@ -2259,28 +2316,30 @@ $EndElements
     }
 
     REQUIRE(result);
-    REQUIRE(result->faces().size() == (quad ? 1U : 2U));
+    REQUIRE(result->faces().size() == (shell_set ? 3U : (quad ? 1U : 2U)));
     CHECK_FALSE(diagnostic);
     CHECK(result->sidecar().source().source == io::SourceId{2});
     CHECK(result->sidecar().geometry() == rd::MeshGeometryId{2});
     const auto faces = result->faces();
-    CHECK(faces[0].element == (quad ? 701U : 702U));
-    CHECK(faces[0].pg == rd::MeshGeometryId{1});
-    CHECK(faces[0].shell == rd::MeshShellId{1});
-    CHECK(faces[0].sidecar_row == 0);
-    if (quad) {
-        const auto native_ring = axes == Axes::Reversed
-                                     ? std::array<std::uint64_t, 4>{10, 99, 40, 20}
-                                     : std::array<std::uint64_t, 4>{10, 20, 40, 99};
-        CHECK(faces[0].nodes == native_ring);
-    } else {
-        CHECK(faces[0].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 99, 40, 0}
-                                          : std::array<std::uint64_t, 4>{10, 40, 99, 0}));
-        CHECK(faces[1].element == 701);
-        CHECK(faces[1].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 40, 20, 0}
-                                          : std::array<std::uint64_t, 4>{10, 20, 40, 0}));
-        CHECK(faces[1].sidecar_node != faces[0].sidecar_node);
-        CHECK(faces[1].sidecar_row == 1);
+    if (!shell_set) {
+        CHECK(faces[0].element == (quad ? 701U : 702U));
+        CHECK(faces[0].pg == rd::MeshGeometryId{1});
+        CHECK(faces[0].shell == rd::MeshShellId{1});
+        CHECK(faces[0].sidecar_row == 0);
+        if (quad) {
+            const auto native_ring = axes == Axes::Reversed
+                                         ? std::array<std::uint64_t, 4>{10, 99, 40, 20}
+                                         : std::array<std::uint64_t, 4>{10, 20, 40, 99};
+            CHECK(faces[0].nodes == native_ring);
+        } else {
+            CHECK(faces[0].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 99, 40, 0}
+                                              : std::array<std::uint64_t, 4>{10, 40, 99, 0}));
+            CHECK(faces[1].element == 701);
+            CHECK(faces[1].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 40, 20, 0}
+                                              : std::array<std::uint64_t, 4>{10, 20, 40, 0}));
+            CHECK(faces[1].sidecar_node != faces[0].sidecar_node);
+            CHECK(faces[1].sidecar_row == 1);
+        }
     }
     if (physical) {
         using namespace uvlas::structure;
@@ -2297,12 +2356,12 @@ $EndElements
         const rd::ExternalSidecarPgLimits qualification{
             {pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
         rd::ExternalSidecarPgDiagnostic failure;
-        const auto si = [&] {
+        const auto to_si = [&](const io::SchemaCase& typed_case) {
             std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
             si_caps.fill(fixture::budget);
             const io::SiLimits si_limits{si_caps, pg_limits.algebra};
             const auto catalog =
-                fixture::take(io::make_si_catalog(schema, si_limits, plan, nullptr));
+                fixture::take(io::make_si_catalog(typed_case, si_limits, plan, nullptr));
             std::vector<io::SiRequirementRow> requirements;
             for (std::uint64_t i = 0; i < fixture::take(catalog.size()); ++i) {
                 const auto entry = fixture::take(catalog.entry(i));
@@ -2314,8 +2373,9 @@ $EndElements
             const auto request =
                 fixture::take(io::make_si_request(catalog, requirements, si_limits, plan, nullptr));
             return fixture::take(
-                io::convert_case_to_si(schema, catalog, request, si_limits, plan, nullptr));
-        }();
+                io::convert_case_to_si(typed_case, catalog, request, si_limits, plan, nullptr));
+        };
+        const auto si = to_si(schema);
         if (conversion) {
             const auto prepared = uvlas::coupling::detail::prepare_case_external_pg_bounds(
                 si, *result, rd::MeshShellId{1}, preparation, qualification, 200'000, workspace,
@@ -2368,6 +2428,116 @@ $EndElements
                 rd::NastranIsotropicShellCards::prepare(std::move(cards), {32, 32'000}, plan, {}));
             quantities.emplace(fixture::take(
                 rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
+        }
+        if (shell_set) {
+            using uvlas::coupling::detail::CaseNastranPgSetDiagnostic;
+            using uvlas::coupling::detail::CaseNastranPgSetLimits;
+            using uvlas::coupling::detail::CaseNastranPlanarPgSet;
+            using uvlas::coupling::detail::prepare_case_nastran_planar_pg;
+            const auto* native_quantities = quantities ? &*quantities : nullptr;
+            REQUIRE(native_quantities != nullptr);
+            const CaseNastranPgSetLimits batch_limits{2, 5, 2};
+            CaseNastranPgSetDiagnostic batch_diagnostic;
+            const auto prepared = CaseNastranPlanarPgSet::prepare(
+                si, *result, *native_quantities, preparation, qualification, batch_limits,
+                workspace, plan, &batch_diagnostic);
+            CHECK(faces[0].shell == rd::MeshShellId{2});
+            CHECK(faces[1].shell == rd::MeshShellId{1});
+            CHECK(faces[2].shell == rd::MeshShellId{2});
+            if (late_axis_mismatch) {
+                REQUIRE_FALSE(prepared);
+                CHECK(prepared.error().code == core::FailureCode::InvalidInput);
+                CHECK(batch_diagnostic.shell == rd::MeshShellId{1});
+                CHECK(batch_diagnostic.first_declaration == faces[1].sidecar_node);
+                if (const auto& mismatch = batch_diagnostic.member.material_axes) {
+                    CHECK(mismatch->reason == rd::NastranPgAxisFailure::Difference);
+                    CHECK(mismatch->element == 701);
+                    CHECK(mismatch->layer == core::LayerId{1});
+                } else {
+                    FAIL("Missing rejected Shell provenance");
+                }
+                const auto first_again = prepare_case_nastran_planar_pg(
+                    si, *result, rd::MeshShellId{2}, *native_quantities, preparation, qualification,
+                    2, workspace, plan);
+                REQUIRE(first_again);
+                CHECK(first_again->match().material_axes.matches.size() == 2);
+                const auto again = CaseNastranPlanarPgSet::prepare(
+                    si, *result, *native_quantities, preparation, qualification, batch_limits,
+                    workspace, plan, &batch_diagnostic);
+                REQUIRE_FALSE(again);
+                CHECK(again.error().code == prepared.error().code);
+                CHECK(batch_diagnostic.shell == rd::MeshShellId{1});
+                return;
+            }
+            REQUIRE(prepared);
+            REQUIRE(prepared->size() == 2);
+            CHECK_FALSE(batch_diagnostic.shell);
+            CHECK_FALSE(batch_diagnostic.member.material_axes);
+            const auto& first = fixture::take(prepared->at(0)).get();
+            const auto& second = fixture::take(prepared->at(1)).get();
+            CHECK(first.match().planar.shell == rd::MeshShellId{2});
+            CHECK(second.match().planar.shell == rd::MeshShellId{1});
+            CHECK(first.match().planar.pg == rd::MeshGeometryId{3});
+            CHECK(second.match().planar.pg == rd::MeshGeometryId{1});
+            CHECK(first.match().material_axes.deck_digest ==
+                  second.match().material_axes.deck_digest);
+            CHECK(first.match().material_axes.sidecar_digest ==
+                  second.match().material_axes.sidecar_digest);
+            CHECK(first.match().material_axes.pg == fixture::take(first.reference().identity()));
+            CHECK(second.match().material_axes.pg == fixture::take(second.reference().identity()));
+            const auto first_axes = first.match().material_axes.matches.values();
+            REQUIRE(first_axes.size() == 2);
+            CHECK(first_axes[0].element == 900);
+            CHECK(first_axes[1].element == 901);
+            CHECK(first_axes[0].layer == core::LayerId{2});
+            const auto second_axes = second.match().material_axes.matches.values();
+            REQUIRE(second_axes.size() == 1);
+            CHECK(second_axes.front().element == 701);
+            CHECK(second_axes.front().layer == core::LayerId{1});
+            CHECK_FALSE(prepared->at(-1));
+            CHECK_FALSE(prepared->at(2));
+
+            auto short_limit = batch_limits;
+            --short_limit.maximum_shells;
+            const auto shortages = CaseNastranPlanarPgSet::prepare(
+                si, *result, *native_quantities, preparation, qualification, short_limit, workspace,
+                plan, &batch_diagnostic);
+            REQUIRE_FALSE(shortages);
+            CHECK(shortages.error().code == core::FailureCode::ResourceExceeded);
+            CHECK(batch_diagnostic.shell == rd::MeshShellId{1});
+
+            short_limit = batch_limits;
+            --short_limit.maximum_selection_work;
+            const auto short_work =
+                CaseNastranPlanarPgSet::prepare(si, *result, *native_quantities, preparation,
+                                                qualification, short_limit, workspace, plan);
+            REQUIRE_FALSE(short_work);
+            CHECK(short_work.error().code == core::FailureCode::ResourceExceeded);
+
+            auto foreign = case_copy;
+            fixture::reverse_keys(foreign);
+            const auto foreign_schema = fixture::checked(foreign);
+            const auto foreign_si = to_si(foreign_schema);
+            const auto before_failure = plan.allocated_bytes();
+            const auto stale = CaseNastranPlanarPgSet::prepare(
+                foreign_si, *result, *native_quantities, preparation, qualification, batch_limits,
+                workspace, plan);
+            REQUIRE_FALSE(stale);
+            CHECK(stale.error().code == core::FailureCode::StaleGeneration);
+            CHECK(plan.allocated_bytes() == before_failure);
+
+            // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
+            std::stop_source cancelled;
+            REQUIRE(cancelled.request_stop());
+            auto cancelled_preparation = preparation;
+            cancelled_preparation.cancellation = cancelled.get_token();
+            const auto stopped = CaseNastranPlanarPgSet::prepare(
+                si, *result, *native_quantities, cancelled_preparation, qualification, batch_limits,
+                workspace, plan);
+            REQUIRE_FALSE(stopped);
+            CHECK(stopped.error().code == core::FailureCode::Cancelled);
+            CHECK(plan.allocated_bytes() == before_failure);
+            return;
         }
         if (axes != Axes::None) {
             using uvlas::coupling::detail::prepare_case_nastran_planar_pg;
