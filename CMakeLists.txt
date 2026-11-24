@@ -114,7 +114,7 @@ target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 # Strict input scalars share the core value and failure contracts.
 set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_path.cpp src/io/reference_file_snapshot.cpp src/io/gmsh_mesh.cpp
-    src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp
+    src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp src/io/nastran_beam_cards.cpp
     src/io/nastran_shell_cards.cpp src/io/nastran_isotropic_shell_cards.cpp
     src/io/nastran_laminate_cards.cpp
     src/io/nastran_support_cards.cpp src/io/nastran_lumped_mass_cards.cpp
