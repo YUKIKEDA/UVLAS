@@ -757,6 +757,14 @@ uvlas_add_test(structure.pg_full_trace
 target_include_directories(uvlas_test_structure_pg_full_trace
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 
+uvlas_add_test(structure.pg_support_history
+    LABELS property negative verification V-PG
+    TIMEOUT 120
+    SOURCES structure/pg_support_history_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_support_history
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
