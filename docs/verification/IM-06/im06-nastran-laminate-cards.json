@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-laminate-cards",
+  "ids": [
+    "IO4-01",
+    "IO4-03",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "39642643dc3be3fe9ae0211cb6396ecfbbe81c33",
+  "scope": "MSC Nastran 2022.1 exact MAT8 fields and PCOMP declared bottom-to-top plies, provenance of inherited fields, listed LAM and FT values",
+  "verification": {
+    "ctest_regex": "^io\\.nastran_(laminate_cards|isotropic_shell_cards|shell_cards|coordinate_cards|bulk|number_fields)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 6,
+      "laminate_card_cases": 5,
+      "laminate_card_assertions": 413
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 6,
+      "laminate_card_cases": 5,
+      "laminate_card_assertions": 413,
+      "clang_tidy": "21.1.1 PASS on parser normal/audit and test"
+    }
+  },
+  "reference": {
+    "title": "MSC Nastran 2022.1 Quick Reference Guide",
+    "printed_pages": "2185-2188, 2764-2768",
+    "pdf_sha256": "c0675eed07f664ee985bc0cb3f1e1c00cc138b3a9a0ec1bf538ef345a172fcef"
+  },
+  "tested_target_registration": {
+    "commit": "39642643dc3be3fe9ae0211cb6396ecfbbe81c33",
+    "CMakeLists.txt": "fd349450750ac0d74694ad3767e2fd317ed9f5e10680f96be25d1e01e2dc3834",
+    "tests/CMakeLists.txt": "658ddb7e7490299986bf46b104c4bc0264d3eac58f9aa991ade8d2451b2773a2"
+  },
+  "sources": {
+    "src/io/nastran_laminate_cards.cpp": "b1852d8ec7251025d7dd5a263d3f15a685873243ae5dc803be360e8eb885c7b0",
+    "src/io/nastran_laminate_cards.hpp": "191c9d1007146bf69c288f7ff091bcb8e22f3168ab506f3f14941974f72cf728",
+    "tests/io/nastran_laminate_cards_test.cpp": "3ff8f670b158c63412d062138f3453ceee9b1841d79dbcd5b89173b42020fd29"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-laminate-cards.md": "1e67483b70c7320de1796a7239a0b52bfdb0f724f2ec0568e345ae512d9b31cd"
+  }
+}
