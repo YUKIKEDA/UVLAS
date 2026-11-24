@@ -297,8 +297,7 @@ TEST_CASE("PG nonconforming full trace owns coefficient rows and the original du
     const auto raw = support.original_rows();
     const auto first_slope = std::ranges::find_if(raw, bending_slope);
     REQUIRE(first_slope != raw.end());
-    const auto second_slope =
-        std::ranges::find_if(std::span{first_slope + 1, raw.end()}, bending_slope);
+    const auto second_slope = std::ranges::find_if(first_slope + 1, raw.end(), bending_slope);
     REQUIRE(second_slope != raw.end());
     CHECK(first_slope->overlap == 0);
     CHECK(second_slope->overlap == 1);
