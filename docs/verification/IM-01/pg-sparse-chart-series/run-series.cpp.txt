@@ -1,5 +1,9 @@
 #include "pg_conditioning_test_support.hpp"
 
+#ifdef UVLAS_R02_MEASURE_REUSE
+#include "pg_reference_arithmetic.hpp"
+#endif
+
 #include <array>
 #include <chrono>
 #include <iostream>
@@ -110,6 +114,101 @@ bool unequal_intervals(const std::vector<EdgeRange>& a, const std::vector<EdgeRa
     });
 }
 
+#ifdef UVLAS_R02_MEASURE_REUSE
+Q work(std::span<const PgCartesianExactPosition> a, std::span<const PgCartesianExactPosition> b) {
+    REQUIRE(a.size() == b.size());
+    Q result{0};
+    for (std::size_t i = 0; i < a.size(); ++i)
+        for (std::size_t c = 0; c < 3; ++c)
+            result += q(a[i][c]) * q(b[i][c]);
+    return result;
+}
+
+std::vector<PgCartesianExactPosition> sample(Fixture& f, std::size_t count, std::size_t offset) {
+    std::vector<PgCartesianExactPosition> result(count);
+    for (std::size_t i = 0; i < count; ++i)
+        for (std::size_t c = 0; c < 3; ++c)
+            result[i][c] = f.r(std::to_string(static_cast<int>((i + 2 * c + offset) % 9) - 4));
+    return result;
+}
+
+std::uint64_t external_forecast(const PgReferenceLimits& limits, std::uint64_t live_rationals,
+                                core::ResourcePlan& plan) {
+    detail::ReferenceArithmetic admission{limits, plan};
+    const auto held = admission.external_integer_payload(2 * live_rationals + 1);
+    constexpr std::uint64_t width = detail::IntegerBackend::limb_bits;
+    const auto work_bits = (limits.algebra.maximum_work_bits / width - 2) * width;
+    return take(detail::exact_rational_admission(limits.algebra, work_bits, held))
+        .estimated_external_payload_bytes;
+}
+
+void measure_reuse(std::size_t patches, std::size_t connections, const PgSparseChart& chart,
+                   const PgSparseChartPreparation& prepared, const PgGlobalConstraintInfo& info,
+                   const Phase& preparation, Fixture& fixture, const PgReferenceLimits& limits,
+                   core::Workspace& workspace, core::ResourcePlan& plan) {
+    const auto columns = static_cast<std::size_t>(info.columns);
+    const auto rows = static_cast<std::size_t>(info.rows);
+    const auto independent = sample(fixture, chart.free_columns().size(), 1);
+    const auto force = sample(fixture, columns, 3);
+    const auto identity = take(chart.identity());
+    REQUIRE(independent.size() + prepared.rank == columns);
+    const auto chart_live = detail::reference_live_rationals + prepared.factor_term_capacity +
+                            2 * prepared.work_row_capacity + prepared.pivot_capacity +
+                            3 * (columns + prepared.pivot_capacity);
+    const auto chart_estimate = external_forecast(limits, chart_live, plan);
+    const auto lift_live = detail::reference_live_rationals + 3 * (columns + prepared.rank);
+    const auto transposed_live = detail::reference_live_rationals + 3 * (2 * columns + rows);
+    const auto lift_estimate = external_forecast(limits, lift_live, plan);
+    const auto transposed_estimate = external_forecast(limits, transposed_live, plan);
+    const auto before = take(core::sample_process_memory(core::Operation::PrepareModel));
+
+    auto bytes = plan.allocated_bytes();
+    auto start = Clock::now();
+    const auto lifted = take(chart.lift({identity, independent}, limits, workspace, plan));
+    const auto lift = finish(start, plan, bytes);
+    REQUIRE(lifted.size() == columns);
+
+    bytes = plan.allocated_bytes();
+    start = Clock::now();
+    const auto dual = take(chart.transpose({identity, force}, limits, workspace, plan));
+    const auto transpose = finish(start, plan, bytes);
+    REQUIRE(dual.independent_force.size() == independent.size());
+    REQUIRE(dual.original_multipliers.size() == rows);
+    REQUIRE(take(chart.identity()) == identity);
+
+    const auto& original = chart.original();
+    const auto residual =
+        take(original.residual({original.layout(), lifted.values()}, limits, workspace, plan));
+    REQUIRE(std::ranges::all_of(residual.values(), [](const PgCartesianExactPosition& row) {
+        return std::ranges::all_of(row, [](const auto& x) { return x.sign() == 0; });
+    }));
+    const Q direct = work(lifted.values(), force);
+    REQUIRE(direct != 0);
+    REQUIRE(direct == work(independent, dual.independent_force.values()));
+
+    std::cout << "R02-REUSE {\"patches\":" << patches << ",\"connections\":" << connections
+              << ",\"rank\":" << prepared.rank << ",\"nonzeros\":" << info.nonzeros
+              << ",\"lower_terms\":" << prepared.lower_terms
+              << ",\"upper_terms\":" << prepared.upper_terms
+              << ",\"resident_before_reuse\":" << before.resident_bytes
+              << ",\"chart_live_rationals\":" << chart_live
+              << ",\"chart_estimated_external_bytes\":" << chart_estimate
+              << ",\"lift_live_rationals\":" << lift_live
+              << ",\"lift_estimated_external_bytes\":" << lift_estimate
+              << ",\"transpose_live_rationals\":" << transposed_live
+              << ",\"transpose_estimated_external_bytes\":" << transposed_estimate
+              << ",\"lift_temporary_triples\":" << prepared.rank
+              << ",\"transpose_temporary_triples\":" << columns
+              << ",\"lift_retained_triples\":" << lifted.size()
+              << ",\"transpose_retained_triples\":"
+              << dual.independent_force.size() + dual.original_multipliers.size();
+    write_phase("chart", preparation);
+    write_phase("lift", lift);
+    write_phase("transpose", transpose);
+    std::cout << "}\n";
+}
+#endif
+
 void run(std::size_t patch_count, std::size_t contact_count) {
     const auto start_memory = take(core::sample_process_memory(core::Operation::PrepareModel));
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
@@ -200,6 +299,11 @@ void run(std::size_t patch_count, std::size_t contact_count) {
         REQUIRE(measured.rank > 0);
         REQUIRE(measured.upper_terms >= measured.rank);
         REQUIRE(measured.lower_terms + measured.upper_terms <= measured.factor_term_capacity);
+#ifdef UVLAS_R02_MEASURE_REUSE
+        measure_reuse(patch_count, contact_count, chart, measured, original_info, chart_phase,
+                      fixtures[0], chart_limits.arithmetic, workspace, plan);
+        return;
+#endif
     }
 
     const auto exact_capacity = measured.lower_terms + measured.upper_terms;
