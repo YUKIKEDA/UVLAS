@@ -77,7 +77,8 @@ struct CasePlanes {
 [[nodiscard]] ExternalPgThicknessMatch
 compare_claim(ref::ReferenceArithmetic& math, const CasePlanes& pg, const ExternalPgOwnedFace& face,
               const ExternalPgThicknessClaim& claim, Diagnosis& diagnosis) {
-    if (claim.value_metres.sign() <= 0) {
+    const auto* value = claim.value_metres;
+    if (!value || value->sign() <= 0) {
         diagnosis.fail(Reason::Selection, Code::InvalidInput);
     }
     const auto outward = positive_ring(face);
@@ -102,7 +103,7 @@ compare_claim(ref::ReferenceArithmetic& math, const CasePlanes& pg, const Extern
         for (std::size_t i = 0; i < vertices.size(); ++i) {
             math.visit(1);
             const auto h = plane.evaluate(math, vertices[i].s, vertices[i].t);
-            if (math.compare(h, claim.value_metres) != 0) {
+            if (math.compare(h, *value) != 0) {
                 diagnosis.value.case_triangle = original;
                 diagnosis.value.overlap_vertex = i;
                 diagnosis.fail(Reason::Difference, Code::InvalidInput);
@@ -115,7 +116,7 @@ compare_claim(ref::ReferenceArithmetic& math, const CasePlanes& pg, const Extern
     if (match.pieces == 0) {
         diagnosis.fail(Reason::Source, Code::GeometryInvalid);
     }
-    match.value_metres = math.copy(claim.value_metres);
+    match.value_metres = math.copy(*value);
     return match;
 }
 

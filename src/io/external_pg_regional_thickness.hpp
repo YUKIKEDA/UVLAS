@@ -5,15 +5,16 @@
 namespace uvlas::io::detail {
 
 struct ExternalPgThicknessClaim {
+    ExternalPgThicknessClaim() noexcept = default;
     ExternalPgThicknessClaim(std::uint64_t tag, const structure::ExactRational& metres,
                              std::optional<core::Index> declaration = {},
                              std::optional<NastranBulkPosition> card = {}) noexcept
-        : element(tag), value_metres(metres), sidecar_node(declaration), field(card) {}
+        : element(tag), value_metres(&metres), sidecar_node(declaration), field(card) {}
 
-    std::uint64_t element;
-    const structure::ExactRational& value_metres;
-    std::optional<core::Index> sidecar_node;
-    std::optional<NastranBulkPosition> field;
+    std::uint64_t element{};
+    const structure::ExactRational* value_metres{};
+    std::optional<core::Index> sidecar_node{};
+    std::optional<NastranBulkPosition> field{};
 };
 
 enum class ExternalPgThicknessFailure : std::uint8_t { Source, Selection, Difference };
