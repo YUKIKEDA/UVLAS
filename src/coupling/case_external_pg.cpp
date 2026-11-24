@@ -9,7 +9,7 @@ struct CaseExternalPgFactory {
     template <class Match>
     static CaseExternalPg<Match> make(structure::PgReferenceGeometry&& reference,
                                       Match&& match) noexcept {
-        return CaseExternalPg<Match>{std::move(reference), std::move(match)};
+        return CaseExternalPg<Match>{std::move(reference), std::forward<Match>(match)};
     }
 };
 

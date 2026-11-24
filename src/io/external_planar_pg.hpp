@@ -83,7 +83,7 @@ struct ExternalPgDiagnostic {
 
 struct ExternalPgLimits {
     structure::PgReferenceLimits arithmetic;
-    std::uint64_t maximum_faces;
+    std::uint64_t maximum_faces{};
 };
 
 struct ExternalPlanarPgView {

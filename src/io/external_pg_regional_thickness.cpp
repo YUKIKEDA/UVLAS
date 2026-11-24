@@ -16,7 +16,7 @@ using Reason = ExternalPgThicknessFailure;
 constexpr auto operation = core::Operation::PrepareModel;
 
 struct Diagnosis {
-    std::optional<ExternalPgThicknessDiagnostic>* output;
+    std::optional<ExternalPgThicknessDiagnostic>* output{};
     ExternalPgThicknessDiagnostic value{};
 
     void select(const ExternalPgThicknessClaim& claim) noexcept {
