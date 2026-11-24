@@ -1,0 +1,48 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-cli-gmsh-leaf-validation",
+  "ids": [
+    "IO4-01",
+    "IO4-04",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "62a03265cf3e9a8dd886a0607d898c19601a4baf",
+  "scope": "CLI qualification of authenticated Gmsh mesh leaves in first declaration order and the owned empty graph",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 9
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 8,
+      "clang_tidy": "21.1.1 PASS on four translation units"
+    },
+    "negative_control": {
+      "revision": "ae7ee5e4f9da858799db70eb84da66e5dafba739",
+      "test": "cli.validate",
+      "condition": "Authenticated invalid earlier Gmsh mesh and missing later sidecar",
+      "observed_before": "Failed: diagnosed the later sidecar acquisition",
+      "observed_after": "Pass: diagnosed the earlier mesh format and byte offset"
+    }
+  },
+  "tested_target_registration": {
+    "commit": "62a03265cf3e9a8dd886a0607d898c19601a4baf",
+    "CMakeLists.txt": "3b4e33b29fc2d7041887717c48ef0fb2053f37f53bb255221e57e87e020c930b",
+    "tests/CMakeLists.txt": "3739d6b04e43c6700c0e2a5d101893e89cdf26adfd4100119e0aa0a5f2c2ceb9"
+  },
+  "sources": {
+    "src/app/validate_case.cpp": "b79add2f95846e26d18c1da6fa9f1586ca1518903cef34d2bbcfcc4e9a1dd7fd",
+    "src/io/reference_resolution.cpp": "ae5bf08f77fc2fa9383c311a7bfad276228a27ae6ce95f9ed6bcb638edbc1e16",
+    "src/io/reference_resolution.hpp": "ec1e607fdd3db002404bd3c9e6f89074584e1c0ed9f71ec4fa38a9d8d164ff33",
+    "src/io/reference_root_snapshot.cpp": "f105c73129ec709a09938c65d00b68f9e113a033727800fddaade64c93d6ad0a",
+    "src/io/reference_root_snapshot.hpp": "c7a0db15834b693a92dc7b4da3d9f8ecaed5f5b72ef2a75d80a99c8417fa924c",
+    "tests/io/reference_input_test.cpp": "533396f42bba4db95372a3b77c5a1b7de91b17e19904ecfe40ae5d3ae7b8917d",
+    "tests/check_cli_validate.cmake": "e97d7e392e4c49f86d81c21548eb9861930a96f318750406d691ad5db2916a76"
+  }
+}

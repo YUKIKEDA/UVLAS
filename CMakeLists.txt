@@ -120,7 +120,7 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp src/io/checkpoint_chunk.cpp
     src/io/checkpoint_manifest.cpp src/io/observation_csv.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
-    src/io/reference_input.cpp src/io/reference_root_snapshot.cpp)
+    src/io/reference_input.cpp src/io/reference_root_snapshot.cpp src/io/reference_resolution.cpp)
 target_sources(uvlas_io PRIVATE src/io/result_documents.cpp src/io/resolved_case_document.cpp)
 target_sources(uvlas_io PRIVATE src/io/visualization_series.cpp)
 uvlas_configure_target(uvlas_io)
