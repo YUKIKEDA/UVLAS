@@ -22,7 +22,7 @@
 | 多角形と全積分分割 | 完了 | 被覆を検査した分割と資源計画。 [分割](https://github.com/YUKIKEDA/UVLAS/pull/128)・[資源計画](https://github.com/YUKIKEDA/UVLAS/pull/149) |
 | 局所独立化 | 完了 | 局所rank、基底、写像と来歴を所有する。再利用時にグラフ・領域・活動面積・辞書を照合し、B/T/S/W/Zを全活動行で厳密に再検証する。全12系列を独立参照と照合した。 [準備の検証](../verification/IM-01/pg-rank-bounded-preparation/verification.md)・[再検証と資源](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) |
 | 参照幾何と微分 | 完了 | グラフ・辞書・共通分割を所有する入口から参照Jacobian、可変法線、実法線厚さ、高階・片側微分と物理測度を返す。全活動片の局所正則性を厳密に検査する。 [実装 `09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)・[検証](../verification/IM-01/pg-reference-geometry/verification.md) |
-| 保証付き条件付け | 実装中 | 一定厚と区分一次厚さの平板は、内部格子n=1、2、4で切断領域を含む幾何内積を厳密に積分し、外向き区間を返す。n=1で合同変換を認定した。曲面の保証付き積分と変換候補の製品生成が残る。 [平板内積](../verification/IM-01/pg-flat-gram/verification.md)・[切断領域](../verification/IM-01/pg-flat-gram-cut.md)・[区分一次厚さ](../specs/structure/pg-flat-gram-affine-thickness-contract.md) |
+| 保証付き条件付け | 実装中 | 一定厚と区分一次厚さの平板は、内部格子n=1、2、4で切断領域を含む幾何内積を厳密に積分し、外向き区間を返す。n=1で合同変換を認定した。曲面の保証付き積分と変換候補の製品生成が残る。 [平板内積](../verification/IM-01/pg-flat-gram/verification.md)・[切断領域](../verification/IM-01/pg-flat-gram-cut.md)・[区分一次厚さ](../verification/IM-01/pg-flat-gram-affine-thickness.md) |
 | PreparedPatchと参照作用 | 実装中 | 認定済み基底から参照点の位置、Jacobian、測度、値、物理勾配を取得する。体積点の位置写像と転置は同じ基底値とWorkspaceを使い、Binary64／TwoWordの出力誤差を認定する。層密度と求積を使う質量作用、材料・荷重、界面の参照作用は後続。 [点列評価](../verification/IM-01/pg-conditioned-reference-batch.md)・[体積点の位置写像](../verification/IM-01/pg-volume-position.md) |
 | 全位置traceと拘束 | 残 | 辞書・分割・基底を使い、非整合界面の全厚位置、元拘束、双対量を保持する |
 | 固定pivot疎chart | 残 | 元拘束と疎解法から写像と微分・転置作用を実装し、拘束と仕事を照合する |
