@@ -1,0 +1,163 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-r4-curved-interface",
+  "ids": [
+    "GEO-01",
+    "SH-D02",
+    "SH-D05",
+    "SH-D06",
+    "N4-04",
+    "V-PG"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "9d405c2cb3bb576261a7dac5679254da83d8eca2",
+  "claimed_state": "凍結R4の曲面2パッチについて、分割一致と非整合の全厚接続・固定支持・位置と双対仕事を製品の準備と評価で厳密に照合した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configuration": "Release"
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release"
+    },
+    "boost": "1.92.0",
+    "catch": "3.16.1",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "fixed_cases": [
+      {
+        "elements": [
+          1,
+          1
+        ],
+        "local_columns": [
+          171,
+          173
+        ],
+        "overlap_intervals": 2,
+        "constraint_rank": 116,
+        "free_coordinates": 228,
+        "charged_bytes": {
+          "msvc": {
+            "prepared_patches": 4213934912,
+            "full_trace": 4376827016,
+            "sparse_chart": 4515395528
+          },
+          "gcc14": {
+            "prepared_patches": 4234859136,
+            "full_trace": 4397751240,
+            "sparse_chart": 4536319752
+          }
+        }
+      },
+      {
+        "elements": [
+          1,
+          2
+        ],
+        "local_columns": [
+          171,
+          350
+        ],
+        "overlap_intervals": 4,
+        "constraint_rank": 171,
+        "free_coordinates": 350,
+        "charged_bytes": {
+          "msvc": {
+            "prepared_patches": 8760725040,
+            "full_trace": 9111471208,
+            "sparse_chart": 9607872912
+          },
+          "gcc14": {
+            "prepared_patches": 8815489536,
+            "full_trace": 9166235704,
+            "sparse_chart": 9662637408
+          }
+        }
+      }
+    ],
+    "fixed_rule_points": {
+      "left_n1": 267,
+      "right_n1": 270,
+      "right_n2": 594
+    },
+    "budget": {
+      "resource_plan_bytes": 51539607552,
+      "gram_work_bits": 768,
+      "gram_output_bits": 704,
+      "factor_bits": 768,
+      "candidate_bits": 128,
+      "chart_maximum_value_bits": 65536,
+      "chart_maximum_work_bits": 262144,
+      "factor_storage_bits": 3072,
+      "factor_maximum_limb_steps": 10000000000000
+    },
+    "positive": {
+      "gcc14_release": {
+        "test_cases": 1,
+        "assertions": 286904
+      },
+      "msvc_release": {
+        "test_cases": 1,
+        "assertions": 286904
+      }
+    },
+    "controls": {
+      "msvc_orientation": {
+        "change": "omit_same_outward_boundary_order_rejection",
+        "expected_code": "GeometryInvalid",
+        "failed_assertions": 1,
+        "assertions": 70058,
+        "mutated_source_sha256": "a50d11bfe24be85155c703582e12350f8ae1e01c007d81496b5a3fbb9bce9a3a"
+      }
+    },
+    "clang_tidy_translation_units": 1,
+    "physical_depths_metres": [
+      "-1/40",
+      "1/100",
+      "1/40"
+    ],
+    "points_on_each_boundary": 18
+  },
+  "frozen_references": [
+    {
+      "id": "check_mass_paired_interface",
+      "sha256": "0eb764b84c8ab1e9c215538bbb570d39a8548170a57446c2cae752c81e42f453",
+      "hint": "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_interface.py"
+    },
+    {
+      "id": "mass-paired-interface-result",
+      "sha256": "3b93269d1a04e83dc992fc589d11fae8e8aa2bec0c78802aa39e5e0b4cdb2bb4",
+      "hint": "rd/structure/main-shell/paired-geometry/records/mass-paired-interface-result.json"
+    },
+    {
+      "id": "polynomial_reference_surface",
+      "sha256": "793e5aafa760bcec8deae2b4eca8ac0e13eea36e59530a325a18184b833735fb",
+      "hint": "rd/structure/main-shell/polynomial-trace/experiments/polynomial_reference_surface.py"
+    }
+  ],
+  "sources": {
+    "docs/specs/structure/pg-prepared-patch-contract.md": "e5dd36518774b5328e8169591dfd1bc36f6b810d84c84185b0c71b4b8b240992",
+    "docs/specs/structure/pg-full-trace-contract.md": "982308607307a0a4c18dbc68f912e1d4044f01038d6c8c6db2645e94f189219e",
+    "docs/specs/structure/pg-sparse-chart-contract.md": "56c978310c42685104dfed9c6c12691b085028b235a2bdcec7058cf026ff2c35",
+    "src/structure/pg_discrete_gram.cpp": "957d14724351f9e1f46574153518c5bd70b678dbd850e272f5da5054b56f6044",
+    "src/structure/pg_conditioning.cpp": "3e4d992d6acd9159dc29b1716cc1f9f714828ee9468e4de9b37fb40cb6a5e78d",
+    "src/structure/pg_prepared_patch.cpp": "8989546593021c49a81d8f672f41614669b9011931d0c5d46b32bfea51c3efdb",
+    "src/structure/pg_full_trace.cpp": "01e96752b4730f64745d7368a7b478153eb5f40e1434387369e574f3c5a6e650",
+    "src/structure/pg_global_constraints.cpp": "f9f519952872f59d2d1a57d03fa8c65057baf8649b1b27f64814b66e0cab921c",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "tests/structure/pg_conditioning_test_support.hpp": "6518becda7ae6db712a005924de2f88cc02f5ee95c5742ae63e36bf7e88737d4",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-r4-curved-interface/run-series.cpp.txt": "8e78e02a2815d7af405a7eea020133aff945e3a2af25194feaab9decfdbfebb9",
+    "docs/verification/IM-01/pg-r4-curved-interface/verification.md": "f60ea97290ab4b428ade49cc93b4a9da127074d4647d62be71172b9524c59654"
+  }
+}
