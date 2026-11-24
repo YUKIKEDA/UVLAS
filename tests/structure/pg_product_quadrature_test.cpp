@@ -285,3 +285,51 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
     const auto coarse = volume_bounds(low_gram);
     CHECK((coarse[1] < reference - tail - tolerance || coarse[0] > reference + tail + tolerance));
 }
+
+TEST_CASE("PG common denominator Horner preserves sparse signed polynomial values",
+          "[SH-D07][N4-08][verification][negative]") {
+    using Reuse = detail::PgRankMonomialPowers::Reuse;
+    using Coefficient = detail::RankFraction<detail::RankCell>;
+    constexpr auto field = PgCoefficientField::R;
+    const std::array rows{PgRankRow{field, {0, 0}, {1, 1}}, PgRankRow{field, {0, 0}, {1, 4}},
+                          PgRankRow{field, {0, 0}, {3, 0}}, PgRankRow{field, {0, 0}, {6, 2}},
+                          PgRankRow{field, {0, 0}, {6, 3}}};
+    const std::array<std::uint32_t, rows.size()> indices{0, 1, 2, 3, 4};
+    const std::array coefficients{Coefficient{-3, 5}, Coefficient{7, 6}, Coefficient{9, 10},
+                                  Coefficient{-11, 12}, Coefficient{13, 30}};
+    Fixture fixture;
+    const auto u = fixture.r("-2", "3");
+    const auto v = fixture.r("-3", "7");
+    const Q x{-2, 3}, y{-3, 7};
+    const Q x3 = x * x * x, y2 = y * y;
+    // Expanded rational sum independent of the integer recurrence and its LCM.
+    const Q expected = Q{-3, 5} * x * y + Q{7, 6} * x * y2 * y2 + Q{9, 10} * x3 +
+                       Q{-11, 12} * x3 * x3 * y2 + Q{13, 30} * x3 * x3 * y2 * y;
+    auto limits = query_limits();
+    core::ResourcePlan plan{profile};
+    detail::ReferenceArithmetic math{limits, plan};
+    detail::PgRankMonomialPowers powers{u, v, Reuse::CommonDenominator};
+    const auto value = powers.common_sum(math, rows, indices, coefficients);
+    CHECK(value.transform([](const auto& exact) { return q(exact); }) == expected);
+
+    const ExactRational zero;
+    detail::PgRankMonomialPowers zero_coordinate{u, zero, Reuse::CommonDenominator};
+    const auto only_zero_power = zero_coordinate.common_sum(math, rows, indices, coefficients);
+    const Q expected_with_zero = Q{9, 10} * x3;
+    CHECK(only_zero_power.transform([](const auto& exact) { return q(exact); }) ==
+          expected_with_zero);
+
+    const std::array cancel_rows{PgRankRow{field, {0, 0}, {0, 0}},
+                                 PgRankRow{field, {0, 0}, {1, 0}}};
+    const std::array<std::uint32_t, 2> cancel_indices{0, 1};
+    const std::array cancel_coefficients{Coefficient{10, 3}, Coefficient{5, 1}};
+    const auto cancelled =
+        powers.common_sum(math, cancel_rows, cancel_indices, cancel_coefficients);
+    CHECK(cancelled.transform([](const auto& exact) { return exact.sign(); }) == 0);
+
+    const std::array<std::uint32_t, rows.size()> reversed{4, 3, 2, 1, 0};
+    const auto before = math.info();
+    CHECK_FALSE(powers.common_sum(math, rows, reversed, coefficients).has_value());
+    CHECK(math.info().scalar_operations == before.scalar_operations);
+    CHECK(math.info().allocated_owned_payload_bytes == before.allocated_owned_payload_bytes);
+}

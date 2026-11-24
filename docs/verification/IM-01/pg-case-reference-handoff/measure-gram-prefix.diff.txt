@@ -1,0 +1,59 @@
+diff --git a/src/structure/pg_discrete_gram.cpp b/src/structure/pg_discrete_gram.cpp
+index e3d3790e..66668d39 100644
+--- a/src/structure/pg_discrete_gram.cpp
++++ b/src/structure/pg_discrete_gram.cpp
+@@ -1,6 +1,8 @@
+ #include "pg_conditioning_factor.hpp"
+ #include "pg_reference_arithmetic.hpp"
+
++#include <chrono>
++#include <cstdio>
+ #include <uvlas/structure/pg_discrete_gram.hpp>
+
+ namespace uvlas::structure {
+@@ -365,13 +367,18 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
+             const auto length_cube = math.mul(math.square(length), length);
+             const auto two = math.constant("2");
+             const auto two_length = math.mul(two, length);
++            using Clock = std::chrono::steady_clock;
++            std::array<Clock::duration, 3> elapsed{};
++            std::size_t count{};
+             for (const auto& p : rule.values()) {
++                const auto start = Clock::now();
+                 math.visit(1);
+                 const auto located =
+                     basis.locate(math, PgReferenceVolumePoint{p.volume, p.u, p.v, p.depth});
+                 const auto& geometry = located.reference;
+                 const auto& jacobian =
+                     std::get<PgReferenceVolumeMeasure>(geometry.measure).jacobian;
++                const auto after_geometry = Clock::now();
+                 const auto root = root_bounds(work, geometry.g, bits);
+                 check_slot(root);
+                 ReferenceRadicals field{math, geometry.g};
+@@ -410,7 +417,26 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
+                         terms = numerator_values();
+                     values[i] = evaluate(terms);
+                 }
++                const auto before_outer = Clock::now();
+                 accumulate_sample(work, sums.values(), values, measure);
++                const auto finish = Clock::now();
++                elapsed[0] += after_geometry - start;
++                elapsed[1] += before_outer - after_geometry;
++                elapsed[2] += finish - before_outer;
++                if (++count == 64) {
++                    const auto seconds = [](Clock::duration duration) {
++                        return std::chrono::duration<double>(duration).count();
++                    };
++                    std::fprintf(stderr, "R5_STAGES,%zu,%zu,%.9f,%.9f,%.9f\n",
++                                 count, values.size(), seconds(elapsed[0]),
++                                 seconds(elapsed[1]), seconds(elapsed[2]));
++                    for (const auto& entry : sums.values()) {
++                        const auto lower = entry.lower.str();
++                        const auto upper = entry.upper.str();
++                        std::printf("R5_ENTRY,%s,%s\n", lower.c_str(), upper.c_str());
++                    }
++                    partition_fail(core::FailureCode::Cancelled);
++                }
+                 // fill_product emits all depths consecutively for one volume and (u, v).
+                 if (++depth_slot == depth_group)
+                     depth_slot = 0;
