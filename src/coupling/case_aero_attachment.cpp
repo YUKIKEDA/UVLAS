@@ -174,7 +174,7 @@ struct Builder {
             budget.max_steps = std::min(budget.max_steps, work.limit - work.used);
             auto result = take(a::resolve_query(owner, request, owner.context(), budget,
                                                 coordinates, memory, stop));
-            charge(work, budget.max_steps);
+            charge(work, result.used_steps());
             return result;
         };
         const auto position = [&](const a::OwnedGeometry& owner, const a::ResolvedQuery& point,
@@ -282,7 +282,7 @@ struct Builder {
         geometry_budget.max_steps = std::min(geometry_budget.max_steps, work.limit - work.used);
         const auto geometry =
             take(a::prepare_owned_geometry(candidate, geometry_budget, coordinates, memory, stop));
-        charge(work, geometry_budget.max_steps);
+        charge(work, take(geometry.used_preparation_steps()));
         auto contact_budget = limits.contact;
         contact_budget.max_steps = std::min(contact_budget.max_steps, work.limit - work.used);
         auto contact = take(a::check_global_geometry(reference.topology, geometry, contact_budget,

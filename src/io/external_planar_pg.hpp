@@ -66,6 +66,7 @@ enum class ExternalPgFailure : std::uint8_t {
     Outside,
     Overlap,
     Coverage,
+    EdgeIncidence,
 };
 
 struct ExternalPgDiagnostic {
