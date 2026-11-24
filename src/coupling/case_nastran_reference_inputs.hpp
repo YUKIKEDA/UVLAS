@@ -117,4 +117,33 @@ private:
     core::PlannedBuffer<std::optional<Joint>> joints_;
 };
 
+using CaseNastranMassId = io::detail::MeshCaseId<io::SchemaNamespace::Mass>;
+
+enum class CaseNastranParticleFailure : std::uint8_t { Source, Selection, Kind, Mass, Position };
+
+struct CaseNastranParticleDiagnostic {
+    CaseNastranParticleFailure reason = CaseNastranParticleFailure::Source;
+    std::optional<io::detail::NastranElementId> element;
+    std::optional<io::detail::NastranBulkPosition> field;
+};
+
+struct CaseNastranParticleMass {
+    io::detail::RootSnapshotLocation deck, sidecar;
+    io::SourceDigest deck_digest, sidecar_digest;
+    io::detail::NastranSidecarElementBinding<io::SchemaNamespace::Mass> binding;
+    io::detail::MeshShellId shell;
+    structure::PgReferenceIdentity patch;
+    io::detail::NastranGridId grid;
+    std::uint64_t face;
+    structure::ExactRational mass_kg;
+};
+
+// A particle requires one authenticated CONM2, zero lever and centre inertia, and
+// the same original shell GRID at the Case material point on the midsurface.
+[[nodiscard]] core::Result<CaseNastranParticleMass>
+certify_case_nastran_particle_mass(const io::SiCase&, const CaseNastranReferenceInputs&,
+                                   CaseNastranMassId, const structure::PgReferenceLimits&,
+                                   core::ResourcePlan&,
+                                   CaseNastranParticleDiagnostic* = nullptr) noexcept;
+
 } // namespace uvlas::coupling::detail
