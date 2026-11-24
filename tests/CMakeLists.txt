@@ -949,19 +949,26 @@ if(MSVC)
         TIMEOUT "$<IF:$<CONFIG:Debug>,120,60>")
 endif()
 
-uvlas_add_test(coupling.finite_wing_steady
-    LABELS V-AERO verification
-    SOURCES coupling/finite_wing_steady_test.cpp
-    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
-target_include_directories(uvlas_test_coupling_finite_wing_steady PRIVATE
-    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
-target_compile_definitions(uvlas_test_coupling_finite_wing_steady PRIVATE
-    UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json"
-    UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json")
-# Both wings use all eight product basis probes and a separate load solve.
-# MSVC Release took 40 s locally. Keep extra time for checked fixed-word arithmetic.
-set_tests_properties(coupling.finite_wing_steady PROPERTIES
-    TIMEOUT "$<IF:$<CONFIG:Debug>,480,90>")
+set(finite_wing_shapes fw_v01 fw_v02)
+foreach(wing_index RANGE 0 1)
+    list(GET finite_wing_shapes ${wing_index} wing_shape)
+    set(test_name coupling.finite_wing_steady.${wing_shape})
+    set(target uvlas_test_coupling_finite_wing_steady_${wing_shape})
+    uvlas_add_test(${test_name}
+        LABELS V-AERO verification
+        SOURCES coupling/finite_wing_steady_test.cpp
+        LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+    target_include_directories(${target} PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+    target_compile_definitions(${target} PRIVATE
+        UVLAS_FINITE_WING_INDEX=${wing_index}
+        UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json"
+        UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json"
+        UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json")
+    # Keep all five angles with their shape for the central-slope comparisons.
+    set_tests_properties(${test_name} PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
+endforeach()
 uvlas_add_test(coupling.case_motion
     LABELS V-AERO property negative verification
     SOURCES coupling/case_motion_test.cpp
