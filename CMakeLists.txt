@@ -114,11 +114,12 @@ target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 # Strict input scalars share the core value and failure contracts.
 set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_path.cpp src/io/reference_file_snapshot.cpp src/io/gmsh_mesh.cpp
+    src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
     src/io/si_exact_center.cpp src/io/si_rational_projection.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
     src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp src/io/checkpoint_chunk.cpp
-    src/io/checkpoint_manifest.cpp src/io/observation_csv.cpp)
+    src/io/checkpoint_manifest.cpp src/io/observation_csv.cpp src/io/nastran_number_fields.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
     src/io/reference_input.cpp src/io/reference_root_snapshot.cpp src/io/reference_resolution.cpp)
 target_sources(uvlas_io PRIVATE src/io/result_documents.cpp src/io/resolved_case_document.cpp)

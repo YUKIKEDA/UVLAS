@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-bulk-lex",
+  "ids": [
+    "IO4-01",
+    "IO4-03",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "85adecb74c7f27d944ff6ac14e749fd3bf4821ad",
+  "scope": "Owned lexical records for MSC Nastran 2022.1 Bulk Data from one authenticated snapshot",
+  "verification": {
+    "ctest_regex": "^io\\.(nastran_bulk|gmsh_mesh)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 2,
+      "lexical_cases": 4,
+      "lexical_assertions": 300
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 2,
+      "lexical_cases": 4,
+      "lexical_assertions": 300,
+      "clang_tidy": "21.1.1 PASS on parser normal/audit and test"
+    }
+  },
+  "reference": {
+    "title": "MSC Nastran 2022.1 Linear Static Analysis User Guide",
+    "printed_pages": "51-54",
+    "pdf_sha256": "b2c995afe6aedb09570d16d7bfcbd5c9160151b8b2f1e415be0181c6fe503b1d"
+  },
+  "tested_target_registration": {
+    "commit": "85adecb74c7f27d944ff6ac14e749fd3bf4821ad",
+    "CMakeLists.txt": "43ea2d5d2f9c1fe0a5dad1778ec7d6855e5cbdd4355b2ac37243ea1940077f9b",
+    "tests/CMakeLists.txt": "3d14cfda30f72e73b3c09e668f928b65e303fa8af1ec336a1d0d80edc19de4af"
+  },
+  "sources": {
+    "src/io/nastran_bulk.cpp": "9ba11c3f924fdb5375be029f898498b7c0d08c1f0f9b5614c45153b5f7f3570c",
+    "src/io/nastran_bulk.hpp": "7df41ddf4396d02d944f498ec09151a864f9f53d78155cc11b32ce805a96e69f",
+    "tests/io/nastran_bulk_test.cpp": "bd5f695aade94ea04ddc31286fabaef4997176df72551bb3b63d89d1b9b472ef"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-bulk-lex.md": "2d99a2e71b10d133ac6ab246c48d668cfa57b60f928b0e90226810f2c8a484e6"
+  }
+}
