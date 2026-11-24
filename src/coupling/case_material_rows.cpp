@@ -167,21 +167,27 @@ void qualify_shared_rows(const s::PgPreparedPatch& patch, const CaseMaterialRefe
 
 CaseMaterialRows::CaseMaterialRows(CaseMaterialChartIdentity surface, CaseMaterialSite site,
                                    s::PgProjectedReferenceBatch&& position,
-                                   std::optional<s::PgMaterialTangentReference>&& tangents) noexcept
+                                   std::optional<s::PgMaterialTangentReference>&& tangents,
+                                   std::optional<CaseMaterialLoadKey> original_load) noexcept
     : surface_(surface),
       site_(site),
       position_(std::move(position)),
-      tangents_(std::move(tangents)) {}
+      tangents_(std::move(tangents)),
+      original_load_(original_load) {}
 
 core::Result<CaseMaterialRows>
 CaseMaterialRows::prepare(const CaseMaterialChart& chart, const CaseReferenceSurface& reference,
                           const s::PgPreparedPatch& patch, CaseMaterialSite site,
                           const s::PgPreparedReferenceProjection& projection,
                           double maximum_tangent_row_error, const s::PgReferenceLimits& limits,
-                          core::ResourcePlan& plan) noexcept {
+                          core::ResourcePlan& plan,
+                          std::optional<CaseMaterialLoadKey> original_load) noexcept {
     return run(core::Operation::PrepareModel, [&]() -> core::Result<CaseMaterialRows> {
         pg::ReferenceArithmetic m{limits, plan};
         m.cancel();
+        if (original_load && (!std::holds_alternative<CaseMaterialVertexSite>(site) ||
+                              original_load->local_vertex >= 3))
+            partition_fail(FailureCode::InvalidInput);
         match_reference(chart, patch, m);
         auto selected = partition_take(std::visit(
             [&](const auto& key) -> core::Result<CaseMaterialReferenceSample> {
@@ -215,7 +221,7 @@ CaseMaterialRows::prepare(const CaseMaterialChart& chart, const CaseReferenceSur
         }
         m.cancel();
         return CaseMaterialRows{partition_take(chart.identity()), site, std::move(position),
-                                std::move(tangents)};
+                                std::move(tangents), original_load};
     });
 }
 
@@ -278,7 +284,7 @@ CaseMaterialRows::pullback(s::PgPreparedPatchIdentity patch, s::PgCartesianWords
 }
 
 core::Result<CaseMaterialOriginalEnclosedForce> CaseMaterialRows::pullback_enclosed(
-    s::PgPreparedPatchIdentity patch, const DiscreteLoadVector& force,
+    s::PgPreparedPatchIdentity patch, const DiscreteOriginalLoadContribution& load,
     const s::PgVolumePositionLimits& limits, core::ResourcePlan& plan) const noexcept {
     namespace aero = uvlas::aero::detail;
     namespace interval = aero::p1;
@@ -294,6 +300,12 @@ core::Result<CaseMaterialOriginalEnclosedForce> CaseMaterialRows::pullback_enclo
                     partition_fail(FailureCode::InvalidInput);
                 if (patch != position_.source())
                     partition_fail(FailureCode::StaleGeneration);
+                if (!original_load_)
+                    partition_fail(FailureCode::InvalidInput);
+                if (*original_load_ !=
+                    CaseMaterialLoadKey{load.face, load.facet, load.local_vertex, load.canonical})
+                    partition_fail(FailureCode::StaleGeneration);
+                const auto& force = load.force;
                 if (!std::isfinite(limits.maximum_absolute_error))
                     partition_fail(FailureCode::Nonfinite);
                 if (limits.maximum_absolute_error < 0)

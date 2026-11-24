@@ -1,3 +1,4 @@
+#include "../../src/structure/pg_reference_arithmetic.hpp"
 #include "../structure/pg_partition_test_support.hpp"
 #include "external_pg_regional_thickness.hpp"
 #include "source_digest.hpp"
@@ -314,5 +315,133 @@ TEST_CASE("Original quadrilateral thickness must agree as a bilinear field",
         CHECK(nodal->values[i].value_metres == *source_fields[i].value_metres);
         CHECK(nodal->values[i].field == source_fields[i].field);
     }
+}
+
+[[nodiscard]] ExternalPlanarPg two_quads(const PgReferenceGeometry& reference,
+                                         partition_test::Fixture& inputs,
+                                         const PgReferenceLimits& arithmetic,
+                                         core::ResourcePlan& plan) {
+    constexpr std::string_view mesh = R"msh($MeshFormat
+4.1 0 8
+$EndMeshFormat
+$Nodes
+1 6 1 6
+2 17 0 6
+1 2 3 4 5 6
+0 0 0
+0.5 0 0
+1 0 0
+0 1 0
+0.5 1 0
+1 1 0
+$EndNodes
+$Elements
+1 2 19 20
+2 17 3 2
+19 1 2 5 4
+20 2 3 6 5
+$EndElements
+)msh";
+    const auto msh = source(mesh, plan);
+    constexpr std::array<std::uint64_t, 2> tags{19, 20};
+    const auto topology =
+        take(GmshSurfaceTopology::prepare(msh, tags, {8, 16, 16, 4, 32'000}, plan, {}));
+    const auto& corners = inputs.domain;
+    const PgPartitionPoint bottom{inputs.r("1", "2"), inputs.r("0")};
+    const PgPartitionPoint top{inputs.r("1", "2"), inputs.r("1")};
+    const std::array<ExternalPgCorner, 4> left{
+        {{1, corners[0]}, {2, bottom}, {5, top}, {4, corners[3]}}};
+    const std::array<ExternalPgCorner, 4> right{
+        {{2, bottom}, {3, corners[1]}, {6, corners[2]}, {5, top}}};
+    const std::array faces{ExternalPgFace{19, ExternalPgWinding::Forward, left},
+                           ExternalPgFace{20, ExternalPgWinding::Forward, right}};
+    return take(ExternalPlanarPg::prepare(reference, msh, topology, SiLengthUnit::Metre, faces,
+                                          {arithmetic, 2}, plan));
+}
+
+[[nodiscard]] std::uint64_t required_estimate(const ExactLimits& limits, std::uint64_t retained) {
+    using Limb = boost::multiprecision::limb_type;
+    constexpr auto width = std::numeric_limits<Limb>::digits;
+    const auto limbs = limits.maximum_work_bits / width;
+    const auto live = structure::detail::reference_live_rationals + retained;
+    // A held rational consists of two integer components. The algebra also
+    // reserves an integer slot for add/sub and a separate leaf workspace.
+    const auto held = (2 * live + 1) * 4 * limbs * sizeof(Limb);
+    return take(structure::detail::exact_rational_admission(limits, (limbs - 2) * width, held))
+        .estimated_external_payload_bytes;
+}
+
+TEST_CASE("Staged thickness memory admits the whole face batch before generation",
+          "[FD-03][IO4-03][IO4-04][N4-02][integration][verification][negative]") {
+    core::ResourcePlan plan{partition_test::cap};
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    auto limited = arithmetic;
+    // One homogeneous PSHELL region plus the four original corners of one face.
+    const auto budget = required_estimate(arithmetic.algebra, 1 + 4);
+    limited.algebra.external_memory = ExactEstimateAdmission{budget};
+    const auto admitted = admit_external_pg_thickness_inputs(limited, 1, 1, plan);
+    REQUIRE(admitted);
+    CHECK(std::get<ExactEstimateAdmission>(admitted->external_memory).bytes < budget);
+    const auto before = plan.allocated_bytes();
+    const auto excess = admit_external_pg_thickness_inputs(limited, 1, 2, plan);
+    REQUIRE_FALSE(excess);
+    CHECK(excess.error().code == Code::ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before);
+    limited.algebra.external_memory = ExactEstimateAdmission{budget - 1};
+    const auto shortage = admit_external_pg_thickness_inputs(limited, 1, 1, plan);
+    REQUIRE_FALSE(shortage);
+    CHECK(shortage.error().code == Code::ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before);
+}
+
+TEST_CASE("Whole-face thickness comparison charges inputs and reported copies together",
+          "[FD-03][IO4-03][IO4-04][N4-02][integration][verification][negative]") {
+    partition_test::Fixture input;
+    core::ResourcePlan plan{partition_test::cap};
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const auto reference = pg(input, false, arithmetic, plan);
+    const auto evidence = two_quads(reference, input, arithmetic, plan);
+    const std::array values{input.r("1"), input.r("1"), input.r("1"), input.r("1"),
+                            input.r("1"), input.r("1"), input.r("1"), input.r("1")};
+    const std::array<ExternalPgCornerThicknessClaim, 4> left{
+        {{1, &values[0]}, {2, &values[1]}, {5, &values[2]}, {4, &values[3]}}};
+    const std::array<ExternalPgCornerThicknessClaim, 4> right{
+        {{2, &values[4]}, {3, &values[5]}, {6, &values[6]}, {5, &values[7]}}};
+    const std::array claims{ExternalPgThicknessClaim{19, left},
+                            ExternalPgThicknessClaim{20, right}};
+    const auto first = std::span{claims}.first(1);
+    // Four staged inputs and four independent copies coexist with the chart-area result.
+    const auto budget = required_estimate(arithmetic.algebra, 4 + 4 + 1);
+    auto limited = arithmetic;
+    limited.algebra.external_memory = ExactEstimateAdmission{budget};
+    const auto admitted =
+        compare_external_pg_regional_thickness(evidence, reference, first, {limited, 2, 4}, plan);
+    REQUIRE(admitted);
+    REQUIRE(admitted->matches.size() == 1);
+    CHECK(
+        std::get<ExternalPgNodalThickness>(admitted->matches.values().front().value_metres).count ==
+        4);
+    // The shared budget still rejects two faces, even though it could admit both
+    // if the owned copies were omitted from the estimate.
+    limited.algebra.external_memory =
+        ExactEstimateAdmission{required_estimate(arithmetic.algebra, std::uint64_t{2} * (4 + 1))};
+    REQUIRE(
+        compare_external_pg_regional_thickness(evidence, reference, first, {limited, 2, 4}, plan));
+    const auto before = plan.allocated_bytes();
+    const auto excess =
+        compare_external_pg_regional_thickness(evidence, reference, claims, {limited, 2, 4}, plan);
+    REQUIRE_FALSE(excess);
+    CHECK(excess.error().code == Code::ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before);
+    limited.algebra.external_memory = ExactEstimateAdmission{budget - 1};
+    const auto shortage =
+        compare_external_pg_regional_thickness(evidence, reference, first, {limited, 2, 4}, plan);
+    REQUIRE_FALSE(shortage);
+    CHECK(shortage.error().code == Code::ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before);
+    const auto again = compare_external_pg_regional_thickness(evidence, reference, claims,
+                                                              {arithmetic, 2, 4}, plan);
+    REQUIRE(again);
+    CHECK(again->matches.size() == 2);
 }
 } // namespace

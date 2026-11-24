@@ -1463,6 +1463,7 @@ $EndElements
     bool wrong_dimension = false;
     bool wrong_chart = false;
     bool version = false;
+    bool wrong_sidecar_geometry = false;
     bool physical = false;
     bool thickness_shift = false;
     bool material_shift = false;
@@ -1471,6 +1472,7 @@ $EndElements
     bool conversion = false;
     bool distance_short = false;
     bool normal_short = false;
+    bool conversion_shifted_reference = false;
     bool pcomp = false;
     enum class PcompRegion : std::uint8_t { None, Paired, WrongTotal, WrongInterface, Mixed };
     PcompRegion pcomp_region = PcompRegion::None;
@@ -1511,6 +1513,8 @@ $EndElements
     bool late_axis_mismatch = false;
     bool native_cards = false;
     bool thermal_link = false;
+    bool case_millimetres = false;
+    bool wrong_thickness_units = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1539,6 +1543,11 @@ $EndElements
         is_gmsh = true;
         lexical = true;
         wrong_chart = true;
+    }
+    SECTION("An authenticated Gmsh sidecar must name its declaring geometry") {
+        is_gmsh = true;
+        lexical = true;
+        wrong_sidecar_geometry = true;
     }
     SECTION("A physical tag cannot be resolved in a different dimension") {
         is_gmsh = true;
@@ -1768,6 +1777,23 @@ $EndElements
     }
     const bool separate_pcomp =
         pcomp_region != PcompRegion::None && pcomp_region != PcompRegion::Mixed;
+    SECTION("A planar Case expressed in millimetres keeps the declared physical thickness") {
+        is_gmsh = true;
+        physical = true;
+        case_millimetres = true;
+    }
+    SECTION("A millimetre planar Case cannot compare its raw number as metres") {
+        is_gmsh = true;
+        physical = true;
+        case_millimetres = true;
+        wrong_thickness_units = true;
+    }
+    SECTION("Gmsh conversion bounds use the translated Case reference") {
+        is_gmsh = true;
+        physical = true;
+        conversion = true;
+        conversion_shifted_reference = true;
+    }
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1775,7 +1801,7 @@ $EndElements
     const auto empty = nlohmann::json::array();
     nlohmann::json sidecar = {
         {"schema", is_gmsh ? "uvlas.gmsh-sidecar/1" : "uvlas.nastran-sidecar/1"},
-        {"geometry", "2"},
+        {"geometry", wrong_sidecar_geometry ? "999" : "2"},
         {"shells", empty},
         {"supports", empty},
         {"joints", empty}};
@@ -1815,7 +1841,7 @@ $EndElements
             sidecar["schema"] = "uvlas.gmsh-sidecar/2";
         } else if (wrong_chart) {
             sidecar["shells"][0]["faces"][0]["chart"]["vertices"][1][0]["denominator"] = "0";
-        } else if (lexical) {
+        } else if (lexical && !wrong_sidecar_geometry) {
             sidecar["include"] = "unread.json";
         }
         if (budget_repeat) {
@@ -2119,6 +2145,13 @@ $EndElements
             .field("frame")
             .set("origin", fixture::json("[0,0,0.05]"));
     }
+    if (case_millimetres) {
+        config.field("units").set("length", fixture::json(R"("mm")"));
+        auto& reference = config.field("model").field("geometry").elements.front();
+        reference.set("reference_length", fixture::json("1000"));
+        if (!wrong_thickness_units)
+            reference.field("thickness").set("values", fixture::json("[250,250,250,250]"));
+    }
     if (pcomp && pcomp_region != PcompRegion::Mixed) {
         auto orthotropic = fixture::fragment("Material.orthotropic3d");
         orthotropic.set("id", fixture::json(R"("2")"));
@@ -2167,6 +2200,9 @@ $EndElements
         reference.set("reference_length", fixture::json("1000"));
         reference.field("thickness").set("values", fixture::json("[250,250,250,250]"));
         reference.set("degree", fixture::json("[2,0]"));
+        if (conversion_shifted_reference) {
+            reference.field("frame").set("origin", fixture::json("[0,0,50]"));
+        }
         reference.set(
             "coefficients",
             fixture::json(
@@ -2259,9 +2295,15 @@ $EndElements
             CHECK(diagnostic.reason == rd::LeafReferenceFailure::Sidecar);
             CHECK(diagnostic.pointer() == "/model/geometry/1/sidecar");
             REQUIRE(diagnostic.sidecar);
-            CHECK(diagnostic.sidecar->reason == (version       ? rd::MeshSidecarFailure::Schema
-                                                 : wrong_chart ? rd::MeshSidecarFailure::Scalar
-                                                               : rd::MeshSidecarFailure::Key));
+            if (wrong_sidecar_geometry) {
+                CHECK(diagnostic.sidecar->reason == rd::MeshSidecarFailure::CaseReference);
+                CHECK(diagnostic.sidecar->target_namespace == io::SchemaNamespace::Geometry);
+                CHECK(diagnostic.sidecar->target == 2);
+            } else {
+                CHECK(diagnostic.sidecar->reason == (version       ? rd::MeshSidecarFailure::Schema
+                                                     : wrong_chart ? rd::MeshSidecarFailure::Scalar
+                                                                   : rd::MeshSidecarFailure::Key));
+            }
         }
         return result;
     }(); // The graph now owns the exact source bytes. All input files have been removed.
@@ -2369,7 +2411,7 @@ $EndElements
             const auto prepared = uvlas::coupling::detail::prepare_case_external_pg_bounds(
                 si, *result, rd::MeshShellId{1}, preparation, qualification, 200'000, workspace,
                 plan, &failure);
-            if (distance_short || normal_short) {
+            if (distance_short || normal_short || conversion_shifted_reference) {
                 REQUIRE_FALSE(prepared);
                 CHECK(prepared.error().code == core::FailureCode::PrecisionUnresolved);
                 if (const auto& detail = failure.binding) {
@@ -2402,6 +2444,17 @@ $EndElements
                     }
                 },
                 admitted->geometry);
+            // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
+            std::stop_source stop;
+            REQUIRE(stop.request_stop());
+            auto stopped_geometry = qualification;
+            stopped_geometry.geometry.arithmetic.cancellation = stop.get_token();
+            const auto cancelled = uvlas::coupling::detail::prepare_case_external_pg_bounds(
+                si, *result, rd::MeshShellId{1}, preparation, stopped_geometry, 200'000, workspace,
+                plan, &failure);
+            REQUIRE_FALSE(cancelled);
+            CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+            CHECK_FALSE(failure.binding);
             return;
         }
         std::optional<rd::NastranLaminateCards> quantities;
@@ -2821,7 +2874,7 @@ $EndElements
                 FAIL("Missing mapped material disagreement");
             }
         } else if (material_shift || thickness_shift || shared_group_thickness ||
-                   wrong_pshell_thickness || frame_shift) {
+                   wrong_pshell_thickness || frame_shift || wrong_thickness_units) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == ((chart_shift || frame_shift)
                                                  ? core::FailureCode::GeometryInvalid
@@ -2939,6 +2992,17 @@ $EndElements
             } else {
                 FAIL("Missing owned geometric correspondence");
             }
+            // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
+            std::stop_source stop;
+            REQUIRE(stop.request_stop());
+            auto stopped_geometry = qualification;
+            stopped_geometry.geometry.arithmetic.cancellation = stop.get_token();
+            const auto cancelled = uvlas::coupling::detail::prepare_case_external_planar_pg(
+                si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr, preparation,
+                stopped_geometry, workspace, plan, &failure);
+            REQUIRE_FALSE(cancelled);
+            CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+            CHECK_FALSE(failure.binding);
         }
     }
     auto boundary = binding;
