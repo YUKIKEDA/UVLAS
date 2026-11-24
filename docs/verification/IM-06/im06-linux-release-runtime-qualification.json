@@ -1,0 +1,32 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-linux-release-runtime-qualification",
+  "ids": ["FD-03", "IO4-02", "R-06", "V-USE"],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "3a140d7bfbffef797a3fb7b29187dc458e50f53a",
+  "isolated_candidate_commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+  "claimed_state": "実Caseの配布候補と、Linuxでの入力取得に必要なカーネル機能および確保モデルの来歴を検証した。",
+  "checks": {
+    "manylinux_candidate_glibc": "2.28",
+    "candidate_allocation_cases": 4,
+    "candidate_document_cases": 10,
+    "candidate_ownership_cases": 10,
+    "distinct_exception_providers_observed": 3,
+    "same_date_header_variant_detected": true,
+    "openat2_normal_calls_per_entry": 6,
+    "openat2_injected_cli_exit_codes": [2, 2, 2],
+    "openat2_injected_python_failure_code": "Unsupported"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/linux-release-runtime-qualification.md": "342fd62ce4f7b67876e5aad6fafd3659563673e1536975eae828f6245f91b662",
+    "docs/verification/IM-06/linux-release-runtime-qualification/alternate-provider.log": "295b0589b3f9d5b3e0278389d2a2ad0dfe6da5806a819ec86cae99882ffae2e3",
+    "docs/verification/IM-06/linux-release-runtime-qualification/auditwheel.log": "a41807e7768ea877ad9288a28ca66c201c260f440834c621b073c4bee1174b47",
+    "docs/verification/IM-06/linux-release-runtime-qualification/candidate-result.json": "2ae5fdc63c57816efd0c5c4d99c51b1fae5ebdd47a1cca040e48537554429147",
+    "docs/verification/IM-06/linux-release-runtime-qualification/candidate.diff.txt": "d303577fe3bfe46e7cc3c835e4c76331af432ff98b08360f483eb8758ee27749",
+    "docs/verification/IM-06/linux-release-runtime-qualification/openat2.log": "3a3225f5e4d26c367f2d4ac9904579a3e11ad475b21cdca8b2fda247395aa4db",
+    "docs/verification/IM-06/linux-release-runtime-qualification/provider-proof.log": "49ef6fd49780df2c77a24716cbcd7078e6a06eaf7add29971990f9adfbe12455",
+    "docs/verification/IM-06/linux-release-runtime-qualification/qualified-abi.log": "251e71071bf45032dab0dcb1227c5e5fe26ac70d2b014ef4952a456a46506527"
+  }
+}

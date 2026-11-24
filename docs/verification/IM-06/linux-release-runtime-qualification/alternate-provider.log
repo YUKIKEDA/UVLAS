@@ -1,0 +1,20 @@
+/work/alma89-libstdcxx.rpm: digests signatures OK
+aa7fbc266e6a776aadb7d929cbbbdfd33039bd3760d4ee2b2319b0d9dc6135d1  alma89-libstdcxx.rpm
+alma89-libstdcxx.rpm: digests signatures OK
+glibc 2.28
+2f30a0614edfb344f880fccba87b71d8cdf8354d9d99874032cc1595f588eb88  provider-proof
+026f6af6e98d378a0996c00f95ed9a67d9dc66e3e0d304cc1bdc3cb5108a9164  /work/alma89-provider/usr/lib64/libstdc++.so.6
+header_revision=20250110 estimate_bytes=11883
+metadata_vector_growth=852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68
+metadata_exception_runtime=293bb4c062db39e1a44b367dc93646bb372b281b46f294ed9e05f18811f75555
+actual_exception_provider=/work/alma89-provider/usr/lib64/libstdc++.so.6
+       522:	binding file ./provider-proof [0] to /work/alma89-provider/usr/lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+       522:	binding file ./provider-proof [0] to /work/alma89-provider/usr/lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+Candidate artifact provider directory: /lib64
+       524:	binding file qualified-stage/bin/uvlas [0] to /lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+validate: JSON document at byte 10       524:	binding file qualified-stage/bin/uvlas [0] to /lib64/libstdc++.so.6 [0]: normal symbol `_ZNSo3putEc' [GLIBCXX_3.4]
+       526:	binding file /work/qualified-tested/venv/lib/python3.12/site-packages/_uvlas.cpython-312-x86_64-linux-gnu.so [0] to /lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+Candidate artifact provider directory: /work/alma89-provider/usr/lib64
+       529:	binding file qualified-stage/bin/uvlas [0] to /work/alma89-provider/usr/lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+validate: JSON document at byte 10       529:	binding file qualified-stage/bin/uvlas [0] to /work/alma89-provider/usr/lib64/libstdc++.so.6 [0]: normal symbol `_ZNSo3putEc' [GLIBCXX_3.4]
+       533:	binding file /work/qualified-tested/venv/lib/python3.12/site-packages/_uvlas.cpython-312-x86_64-linux-gnu.so [0] to /work/alma89-provider/usr/lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
