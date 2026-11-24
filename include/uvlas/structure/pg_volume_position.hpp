@@ -21,6 +21,8 @@ struct PgVolumePositionLimits {
     std::stop_token cancellation;
 };
 
+class PgBoundaryPositionReference;
+
 /// Reusable owned destination. Its prior words remain valid after any failed
 /// action. Stage writes in a separate exclusive Workspace before publishing.
 class PgVolumePositionResult {
@@ -48,6 +50,23 @@ private:
                                                        const PgVolumePositionLimits&,
                                                        core::Workspace&,
                                                        PgVolumePositionResult&) noexcept;
+    friend core::Result<void>
+    apply_pg_boundary_position(const PgBoundaryPositionReference&, PgVolumePositionDirection,
+                               PgCartesianWords, const PgVolumePositionLimits&, core::Workspace&,
+                               PgVolumePositionResult&) noexcept;
+
+    struct MatrixView {
+        const PgConditioningCertificate& certificate;
+        std::size_t rank, points;
+        std::span<const double> high, low;
+        std::size_t prefix;
+        double maximum_shape_error;
+    };
+
+    [[nodiscard]] core::Result<void> apply(const MatrixView&, PgVolumePositionDirection,
+                                           PgCartesianWords, const PgVolumePositionLimits&,
+                                           core::Workspace&) noexcept;
+
     PgVolumePositionResult(core::Precision, core::Index, core::PlannedBuffer<double>,
                            core::PlannedBuffer<double>) noexcept;
 
