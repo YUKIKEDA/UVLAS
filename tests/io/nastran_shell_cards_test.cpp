@@ -1,3 +1,4 @@
+#include "nastran_lumped_mass_cards.hpp"
 #include "nastran_shell_cards.hpp"
 #include "nastran_support_cards.hpp"
 #include "source_digest.hpp"
@@ -434,6 +435,117 @@ TEST_CASE("Nastran structural supports diagnose invalid references before return
     if (expected_column)
         CHECK(recorded.position.column == *expected_column);
     CHECK(take(parent.view()).bulk.bytes == source);
+}
+
+TEST_CASE("CONM2 retains local offsets, basic centres and named inertia products",
+          "[IO4-03][verification]") {
+    const auto source =
+        "CONM2*,101,17,9,12.5\n*,1.25D+1,-2.0,3.0\n" +
+        fixed("CONM2", {"102", "41", "-1", "2.75", "4.0", "-5.0", "6.0"}, 8, "+M2") +
+        fixed("+M2", {"11.0", "-21.0", "22.0", "31.0", "-32.0", "33.0"}, 8) +
+        "CONM2,103,8,,0.5\nCORD2C,9,0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0\n" + std::string{grids};
+    core::ResourcePlan shell_plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    const auto shell = take(parent.view());
+    core::ResourcePlan plan{memory};
+    auto parsed = take(NastranLumpedMassCards::prepare(parent, {3, 10000}, plan, {}));
+    const auto held = take(parsed.view());
+    CHECK(held.source.digest == shell.input.bulk.digest);
+    CHECK(held.source.location.source == shell.input.bulk.location.source);
+    REQUIRE(held.masses.size() == 3);
+    const auto& framed = held.masses[0];
+    CHECK(framed.id == NastranElementId{101});
+    CHECK(framed.grid == NastranGridId{17});
+    CHECK(shell.input.grids[framed.grid_ordinal].id == framed.grid);
+    const auto& local = std::get<NastranFramedMassOffset>(framed.frame);
+    CHECK(local.frame == NastranCoordinateId{9});
+    CHECK(shell.input.coordinates[local.frame_ordinal].kind == NastranCoordinateKind::Cylindrical);
+    const auto x = take(framed.position[0].supplied);
+    CHECK(x.decimal() == "1.25e+1");
+    CHECK_FALSE(framed.inertia.i11.supplied);
+    CHECK_FALSE(framed.inertia.i11.field);
+    const auto& absolute = held.masses[1];
+    CHECK(std::holds_alternative<NastranBasicMassCentre>(absolute.frame));
+    CHECK(shell.input.bulk.text(take(absolute.frame_field)) == "-1");
+    const auto supplied_mass = take(absolute.mass.supplied);
+    CHECK(supplied_mass.decimal() == "2.75");
+    const auto& i = absolute.inertia;
+    const std::array inertia{&i.i11, &i.i21, &i.i22, &i.i31, &i.i32, &i.i33};
+    const std::array<std::string_view, 6> expected{"11.0", "-21.0", "22.0",
+                                                   "31.0", "-32.0", "33.0"};
+    for (std::size_t n = 0; n < inertia.size(); ++n) {
+        const auto value = take(inertia[n]->supplied);
+        const auto field = take(inertia[n]->field);
+        CHECK(value.decimal() == expected[n]);
+        CHECK(field.position == NastranBulkPosition{source.find(expected[n]), 4, 9 + 8 * n});
+    }
+    const auto& basic = held.masses[2];
+    CHECK(std::holds_alternative<NastranBasicMassOffset>(basic.frame));
+    CHECK(shell.input.bulk.text(take(basic.frame_field)).empty());
+    CHECK_FALSE(basic.position[0].supplied);
+
+    const auto moved = std::move(parsed);
+    // NOLINTNEXTLINE(bugprone-use-after-move): moving invalidates the old mass view.
+    CHECK_FALSE(parsed.view());
+    CHECK(take(moved.view()).masses.size() == 3);
+    core::ResourcePlan exact{plan.allocated_bytes()};
+    CHECK(NastranLumpedMassCards::prepare(parent, {3, held.work}, exact, {}));
+    core::ResourcePlan short_memory{plan.allocated_bytes() - 1};
+    const auto memory_limited =
+        NastranLumpedMassCards::prepare(parent, {3, held.work}, short_memory, {});
+    REQUIRE_FALSE(memory_limited);
+    CHECK(memory_limited.error().code == ResourceExceeded);
+    const auto work_limited = NastranLumpedMassCards::prepare(parent, {3, held.work - 1}, plan, {});
+    REQUIRE_FALSE(work_limited);
+    CHECK(work_limited.error().code == ResourceExceeded);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
+}
+
+TEST_CASE("CONM2 identifies the field that blocks typed mass preparation", "[IO4-03][negative]") {
+    using MassIssue = NastranLumpedMassFailure;
+    std::string_view line;
+    MassIssue expected{};
+    SECTION("unknown GRID") {
+        line = "CONM2,1,99,0,1.0";
+        expected = MassIssue::UnknownGrid;
+    }
+    SECTION("missing mass") {
+        line = "CONM2,1,17,0,";
+        expected = MassIssue::MissingField;
+    }
+    SECTION("unknown coordinate") {
+        line = "CONM2,1,17,99,1.0";
+        expected = MassIssue::UnknownFrame;
+    }
+    SECTION("invalid negative coordinate") {
+        line = "CONM2,1,17,-2,1.0";
+        expected = MassIssue::InvalidField;
+    }
+    SECTION("an integer spelling is not a mass value") {
+        line = "CONM2,1,17,0,10";
+        expected = MassIssue::InvalidField;
+    }
+    SECTION("a word in the reserved first row") {
+        line = "CONM2,1,17,0,1.0,,,,3.0";
+        expected = MassIssue::ExtraField;
+    }
+    SECTION("a word beyond the last inertia slot") {
+        line = "CONM2,1,17,0,1.0,,,,,1.0,,2.0,,,3.0,4.0";
+        expected = MassIssue::ExtraField;
+    }
+    const auto source = std::string{grids} + std::string{line};
+    core::ResourcePlan shell_plan{memory}, mass_plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    std::optional<NastranLumpedMassDiagnostic> diagnostic;
+    const auto result =
+        NastranLumpedMassCards::prepare(parent, {3, 10000}, mass_plan, {}, &diagnostic);
+    REQUIRE_FALSE(result);
+    const auto found = take(diagnostic);
+    CHECK(found.reason == expected);
+    CHECK(found.position.line == 5);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
 }
 
 } // namespace

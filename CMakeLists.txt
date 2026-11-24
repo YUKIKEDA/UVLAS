@@ -117,7 +117,7 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp
     src/io/nastran_shell_cards.cpp src/io/nastran_isotropic_shell_cards.cpp
     src/io/nastran_laminate_cards.cpp
-    src/io/nastran_support_cards.cpp
+    src/io/nastran_support_cards.cpp src/io/nastran_lumped_mass_cards.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
     src/io/si_exact_center.cpp src/io/si_rational_projection.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
