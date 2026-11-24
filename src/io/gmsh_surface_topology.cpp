@@ -23,7 +23,7 @@ struct Abort {
 }
 
 struct Work {
-    std::uint64_t limit;
+    std::uint64_t limit = 0;
     const std::stop_token& stop;
     std::uint64_t used = 0;
 

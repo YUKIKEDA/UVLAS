@@ -22,7 +22,7 @@ struct GmshTopologyEdge {
 };
 
 struct GmshTopologyComponent {
-    std::size_t first_face = 0;
+    std::size_t first_face = 0; // First member ordinal; other members need not be contiguous.
     std::size_t face_count = 0;
     std::size_t boundary_count = 0;
 };
