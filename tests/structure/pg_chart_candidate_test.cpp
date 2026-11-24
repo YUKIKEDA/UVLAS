@@ -295,6 +295,39 @@ TEST_CASE("PG numerical chart keeps the exact sparse pattern and checks original
     precise_forward.maximum_absolute_original_defect = 1e-15;
     precise_reverse.maximum_absolute_original_defect = 1e-15;
     const PgChartRefinement refinement{exact_limits, 3};
+    const auto check_optional_retry = [&](const auto& solve, const auto& defect) {
+        PgChartRefinement one_solve{exact_limits, 0};
+        const auto first = take(solve(one_solve));
+        REQUIRE(defect(first.output) > 0.0);
+        CHECK(first.corrections == 0);
+        auto& limit = one_solve.original_arithmetic;
+        limit.maximum_scalar_operations = first.original_work.scalar_operations;
+        limit.maximum_partition_visits = first.original_work.partition_visits;
+        const auto bounded = take(solve(one_solve));
+        CHECK(defect(bounded.output) == defect(first.output));
+
+        auto optional_retry = one_solve;
+        optional_retry.maximum_corrections = 1;
+        const auto accepted = take(solve(optional_retry));
+        CHECK(accepted.corrections == 0);
+        CHECK(defect(accepted.output) == defect(bounded.output));
+        CHECK(accepted.original_work.scalar_operations == bounded.original_work.scalar_operations);
+        CHECK(accepted.original_work.partition_visits == bounded.original_work.partition_visits);
+
+        REQUIRE(limit.maximum_scalar_operations > 0);
+        --optional_retry.original_arithmetic.maximum_scalar_operations;
+        check_failure(solve(optional_retry), core::FailureCode::ResourceExceeded);
+    };
+    check_optional_retry(
+        [&](const PgChartRefinement& budget) {
+            return candidate.refine_lift({id, r}, {id, c}, request(fwd), budget, workspace, plan);
+        },
+        [](const PgChartCandidateLift& result) { return result.original_residual_upper; });
+    check_optional_retry(
+        [&](const PgChartRefinement& budget) {
+            return candidate.refine_transpose({id, f}, request(rev), budget, workspace, plan);
+        },
+        [](const PgChartCandidateDual& result) { return result.original_balance_upper; });
     const auto refined =
         take(candidate.refine_lift({id, r}, {id, c}, precise_forward, refinement, workspace, plan));
     const auto refined_dual =
