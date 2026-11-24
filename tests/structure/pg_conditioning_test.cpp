@@ -27,9 +27,10 @@ PgReferenceLimits query_limits() {
 PgReferenceBasis make_basis(Fixture& f, const ExactRational& length, core::Workspace& ws,
                             core::ResourcePlan& plan) {
     auto dictionary = take(PgCoefficientDictionary::prepare(
-        *f.graph, {exact_limits(), 2000, 20000000, 100000, {}}, ws, plan));
+        f.chart_graph(), {exact_limits(), 2000, 20000000, 100000, {}}, ws, plan));
     auto partition = take(PgIntegrationPartition::prepare(f.request(), limits(), ws, plan));
-    PgReferenceInputs input{std::move(*f.graph), std::move(dictionary), std::move(partition)};
+    PgReferenceInputs input{std::move(f.chart_graph()), std::move(dictionary),
+                            std::move(partition)};
     std::array<ExactRational, 9> rotation;
     rotation[0] = f.r("1");
     rotation[4] = f.r("1");
@@ -324,9 +325,7 @@ void check_reference_points(Fixture& f, const PgConditioningCertificate& certifi
         core::ResourcePlan empty{0};
         check_failure(certificate.evaluate(query, {-1}, caps, empty),
                       core::FailureCode::InvalidInput);
-        std::stop_source stop;
-        REQUIRE(stop.request_stop());
-        exact.cancellation = stop.get_token();
+        exact.cancellation = requested_stop_token();
         check_failure(certificate.evaluate(query, column, exact, empty),
                       core::FailureCode::Cancelled);
         CHECK(empty.allocated_bytes() == 0);
@@ -482,9 +481,7 @@ TEST_CASE("PG conditioning rejects row-sum excess and honors exact work and byte
     core::ResourcePlan empty{0};
     check_failure(verify(basis, std::span{gram}.first(1), transform, caps, ws, empty),
                   core::FailureCode::InvalidInput);
-    std::stop_source stop;
-    REQUIRE(stop.request_stop());
-    caps.cancellation = stop.get_token();
+    caps.cancellation = requested_stop_token();
     check_failure(verify(basis, gram, transform, caps, ws, empty), core::FailureCode::Cancelled);
     CHECK(empty.allocated_bytes() == 0);
     caps.cancellation = {};
@@ -555,11 +552,8 @@ TEST_CASE("PG analytic Gram rejects unqualified shapes before consuming the refe
     core::Workspace ws{core::PlannedBuffer<std::byte>{}};
     auto basis = make_basis(f, length, ws, setup);
     auto caps = PgFlatGramLimits{query_limits(), no_steps ? 0 : steps};
-    std::stop_source stop;
-    if (cancelled) {
-        REQUIRE(stop.request_stop());
-        caps.arithmetic.cancellation = stop.get_token();
-    }
+    if (cancelled)
+        caps.arithmetic.cancellation = requested_stop_token();
     core::ResourcePlan refused{profile};
     const auto prepare = [](PgReferenceBasis& source, const PgFlatGramLimits& limits,
                             core::Workspace& workspace, core::ResourcePlan& plan) {

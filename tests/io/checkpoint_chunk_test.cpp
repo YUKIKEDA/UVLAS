@@ -111,6 +111,7 @@ TEST_CASE("Recovery rejects corrupt declarations and bytes before allocating a c
     const auto valid = chunk_view(*chunk);
     auto candidate = valid;
     auto expected_error = FailureCode::CheckpointCorrupt;
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() requires a mutable source.
     std::stop_source stop;
     std::array<std::byte, 9> changed{};
     std::ranges::copy(valid.bytes, changed.begin());
@@ -168,6 +169,7 @@ TEST_CASE("Chunk limits admit scalar and empty shapes and reject oversized produ
 
     auto shape = empty;
     auto requested_limits = limits;
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() requires a mutable source.
     std::stop_source cancelled;
     auto expected_error = FailureCode::ResourceExceeded;
     SECTION("element count overflows") {
@@ -222,6 +224,7 @@ TEST_CASE("Chunk hashes and ownership survive a partial final block", "[IO4-06][
     const auto rejected = verified->decode(insufficient, {});
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() requires a mutable source.
     std::stop_source stopped;
     REQUIRE(stopped.request_stop());
     const auto cancelled = verified->decode(plan, stopped.get_token());
