@@ -307,6 +307,7 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             core::PlannedBuffer<Numerators> cached;
             std::size_t depth_group = 1;
             bool use_monomial_powers = false;
+            bool use_mixed_powers = false;
             if (product != nullptr && product->depth.size() > 1) {
                 auto cache_arithmetic = ReferenceArithmetic{limits.arithmetic, plan};
                 const auto cache_rationals = partition_add(live_rationals, partition_mul(rank, 3));
@@ -321,15 +322,21 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                         throw;
                 }
                 if (depth_group > 1) {
-                    cache_arithmetic.leaf_limits = limits.arithmetic.algebra;
-                    try {
-                        cache_arithmetic.admit(partition_add(
-                            cache_rationals, PgRankMonomialPowers::retained_rationals));
-                        math.leaf_limits = cache_arithmetic.leaf_limits;
-                        use_monomial_powers = true;
-                    } catch (const PartitionAbort& unavailable) {
-                        if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
-                            throw;
+                    const auto axis_slots =
+                        partition_add(cache_rationals, PgRankMonomialPowers::retained_rationals);
+                    for (const bool mixed : {true, false}) {
+                        cache_arithmetic.leaf_limits = limits.arithmetic.algebra;
+                        try {
+                            cache_arithmetic.admit(partition_add(
+                                axis_slots, mixed ? PgRankMonomialPowers::retained_mixed : 0));
+                            math.leaf_limits = cache_arithmetic.leaf_limits;
+                            use_monomial_powers = true;
+                            use_mixed_powers = mixed;
+                            break;
+                        } catch (const PartitionAbort& unavailable) {
+                            if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
+                                throw;
+                        }
                     }
                 }
             }
@@ -365,7 +372,7 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 std::optional<PgRankMonomialPowers> monomials;
                 if (depth_slot == 0 && use_monomial_powers &&
                     PgRankMonomialPowers::fits(located.u, located.v, math.leaf_limits))
-                    monomials.emplace(located.u, located.v);
+                    monomials.emplace(located.u, located.v, use_mixed_powers);
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);

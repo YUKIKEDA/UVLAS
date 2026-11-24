@@ -6,6 +6,7 @@
 #include <array>
 #include <bit>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <stdexcept>
 #include <uvlas/structure/pg_rank_preparation.hpp>
@@ -39,8 +40,10 @@ class PgRankMonomialPowers {
 
 public:
     static constexpr std::uint64_t retained_rationals = 2 * (degree - 1);
+    static constexpr std::uint64_t retained_mixed = degree * (degree - 1) / 2;
 
-    PgRankMonomialPowers(const ExactRational& u, const ExactRational& v) noexcept : u_(u), v_(v) {}
+    PgRankMonomialPowers(const ExactRational& u, const ExactRational& v, bool reuse_mixed) noexcept
+        : u_(u), v_(v), reuse_mixed_(reuse_mixed) {}
 
     [[nodiscard]] static bool fits(const ExactRational&, const ExactRational&, const ExactLimits&);
     [[nodiscard]] ExactRational term(ReferenceArithmetic&, const ExactRational&, ExactPowers);
@@ -55,6 +58,8 @@ private:
     };
 
     Axis u_, v_;
+    bool reuse_mixed_;
+    std::array<std::optional<ExactRational>, retained_mixed> mixed_{};
 };
 
 template <class I>

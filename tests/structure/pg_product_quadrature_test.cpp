@@ -1,4 +1,6 @@
 #include "pg_conditioning_test_support.hpp"
+#include "pg_rank_storage.hpp"
+#include "pg_reference_arithmetic.hpp"
 
 #include <algorithm>
 #include <uvlas/structure/pg_discrete_gram.hpp>
@@ -134,6 +136,28 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
         CHECK(product_entries[i].upper == explicit_entries[i].upper);
     }
 
+    // Retain the exact axis powers, with spare capacity for leaf operations,
+    // while excluding the additional array of mixed powers from the estimate.
+    auto axis_limits = limits;
+    const auto held = detail::basis_live_rationals + 16 + 4 * low_gram.rule().size() +
+                      2 * product_entries.size() + 3 * size +
+                      detail::PgRankMonomialPowers::retained_rationals;
+    const auto bytes_per_integer = 4 * (axis_limits.arithmetic.algebra.maximum_work_bits / 8);
+    axis_limits.arithmetic.algebra.external_memory =
+        ExactEstimateAdmission{(2 * (held + 64) + 1) * bytes_per_integer};
+    auto axis_basis = make_curve_basis();
+    core::ResourcePlan axis_plan{profile};
+    const auto axis_gram = take(PgDiscreteGram::prepare_product(
+        std::move(axis_basis), {low, low, depth_pair}, grid, axis_limits, scratch, axis_plan));
+    const auto axis_entries = take(axis_gram.enclosure()).upper_triangle;
+    REQUIRE(axis_entries.size() == product_entries.size());
+    CHECK(low_gram.info().arithmetic.scalar_operations <
+          axis_gram.info().arithmetic.scalar_operations);
+    for (std::size_t i = 0; i < product_entries.size(); ++i) {
+        CHECK(product_entries[i].lower == axis_entries[i].lower);
+        CHECK(product_entries[i].upper == axis_entries[i].upper);
+    }
+
     // A smaller exact value limit leaves room for this geometry and finite rule,
     // but not for every cached power product allowed by the rank dictionary.
     auto narrow_basis = make_curve_basis();
@@ -146,6 +170,8 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
     const auto narrow_entries = take(narrow_gram.enclosure()).upper_triangle;
     REQUIRE(narrow_entries.size() == product_entries.size());
     CHECK(low_gram.info().arithmetic.scalar_operations <
+          narrow_gram.info().arithmetic.scalar_operations);
+    CHECK(axis_gram.info().arithmetic.scalar_operations <
           narrow_gram.info().arithmetic.scalar_operations);
     for (std::size_t i = 0; i < product_entries.size(); ++i) {
         CHECK(product_entries[i].lower == narrow_entries[i].lower);
