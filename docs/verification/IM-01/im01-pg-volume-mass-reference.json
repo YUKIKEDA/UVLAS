@@ -1,0 +1,83 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-volume-mass-reference",
+  "ids": [
+    "SH-D02",
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "92bb79285fd8a09334c73529a642353bcd288833",
+  "claimed_state": "体積点の基底値とJacobianを、Binary64とTwoWordの実際の格納値で成分別に認定した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "boost": "1.92.0",
+      "configurations": [
+        "Debug",
+        "Release"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "boost": "1.92.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "volume_points_per_representation": 2,
+    "conditioned_shape_columns": 109,
+    "independently_checked_shape_components": 436,
+    "independently_checked_measure_components": 4,
+    "windows_debug_affected_ctest_passed": 2,
+    "windows_release_affected_ctest_passed": 2,
+    "windows_reference_geometry_source_commit": "1b3783ad5dc0f633505a43576089841869864650",
+    "windows_conditioning_final_recheck_passed_each_configuration": 1,
+    "linux_sanitizer_direct_test_binaries_passed": 2,
+    "linux_sanitizer_direct_timeout_seconds": 180,
+    "linux_sanitizer_conditioning_cases": 6,
+    "linux_sanitizer_conditioning_assertions": 33269,
+    "linux_sanitizer_geometry_cases": 10,
+    "linux_sanitizer_geometry_assertions": 1710,
+    "clang_tidy_translation_units": 3,
+    "rejected_mutation": {
+      "change": "always select the greater magnitude word at an exact midpoint",
+      "failed_assertions": 4
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-conditioned-reference-batch-contract.md": "15b7d8a4044fbfbe1cb351b04eced857e2ede1eaa8e482e4a42db1f269e14509",
+    "docs/specs/structure/pg-discrete-conditioning-certificate-contract.md": "c30169bc6103ce1e0a5be7e56f5db82b1c4ad0dea64c47c0b9d98ab4e41b10d1",
+    "docs/specs/foundation/precision-contract.md": "d680c2f4a9f2491f87bab282dc594fd8594ab7ffaf8e8bce7551c52d589533f4",
+    "src/structure/pg_conditioning.cpp": "fea8234f5096ef11d465d098f8e2b63c3c179dff5d570818f981795aa4e38431",
+    "src/structure/pg_reference_geometry.cpp": "6460eb186635738a5b1a49031d6db474bd1c0a567b2534acbe8cc681132c1274",
+    "src/structure/exact_polynomial.cpp": "bcb9bc521ddbef820b94286065ae5807fe55c51439984ca281c471c159706017",
+    "tests/structure/pg_partition_test_support.hpp": "33246f600d8b6d95492b35b9cf3b4ee2431296cc2aa73c03e3c538f84e2ba79b",
+    "tests/structure/pg_reference_geometry_test.cpp": "cec5a0bf7ce5af87e10b77fe3d106daebb5b531005296f1dfa7c2ee06327baa3",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-volume-mass-reference-contract.md": "89f7fe68b05c8a6a427be23a7b773f9fe97a45af0615f686e131c3e87a371c23",
+    "include/uvlas/structure/pg_volume_mass_reference.hpp": "c46477b607fd2c52028548886e0c7672aeb810cf0338cd720a9012b3f1192a2a",
+    "src/structure/pg_reference_arithmetic.hpp": "3cc4a012f9f52524e5b431ca6cd48a94f50bc786933b16891835289ad217b412",
+    "src/structure/pg_reference_projection.hpp": "25fd5056d7536fac52ab1f4cff4a3c288ffb1ccc4966c067e2216bba33a88a80",
+    "src/structure/pg_volume_mass_reference.cpp": "812fe72431184045d8c090c0a784d03e18bfaf888f4eb9e84eed5989bda9a010",
+    "tests/structure/pg_conditioning_test.cpp": "c63fbcc22d1a2a74bd8e9efa4c78de22c91a0c2668cc8236142a5c5314e206bc",
+    "docs/verification/IM-01/pg-volume-mass-reference.md": "2c32bbd211d8c58edc111d033d5011e0b734966883b75348556ad3276b99a4eb"
+  }
+}
