@@ -6,6 +6,7 @@
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
+#include "coupling/fixed_bdf2_circulation.hpp"
 #include "coupling/pg_aero_attachment.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "io/si_rational_projection.hpp"
@@ -4349,4 +4350,236 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
         planar_input, std::move(planar_flow), load_limits, shared, *local, *kernel, memory));
     residual_expected(take(planar_residual.row(0)).residual, Rat{127, 12500} - Rat{9, 16},
                       rational_word(1e-15));
+}
+
+TEST_CASE("Fixed case BDF2 circulation feeds loads and the live-history dual pairing",
+          "[AE-02][UW-D06][J1-D01][FD-07][N4-06][verification][negative]") {
+    constexpr auto format = core::Precision::TwoWord;
+    auto model_case = source(R"({"kind":"constant","value":[0,0,1]})",
+                             R"([{"start":0,"end":0.3,"step":0.1,"restart":"initial"}])");
+    model_case.field("units").set("length", string("m"));
+    model_case.field("units").set("time", string("s"));
+    model_case.field("analysis")
+        .field("wake")
+        .set("convection",
+             parse(R"({"kind":"prescribed","velocity":{"kind":"constant","value":[1,0,0]}})"));
+    core::ResourcePlan memory{256ULL * 1024 * 1024};
+    a::UniformFlowWorkspace flow_work;
+    const auto si = materialize(model_case, io::SourceId{1190});
+    const cf::CaseFlowClockLimits clock_limits{limits, 1, 3};
+    const auto clock =
+        take(cf::prepare_case_clocked_flows(si, stamp, flow_work, clock_limits, memory));
+    const auto provider =
+        take(cf::prepare_case_uniform_flow(si, stamp, {}, flow_work, limits, memory));
+    const Number one{1}, zero{0}, tolerance{1, 1000000000};
+    const cf::CaseFlowComponentBudget c{one.view(), tolerance.view(), zero.view()};
+    const std::array components{c, c, c};
+    const cf::CaseFlowProjectionRequest projection{format, components, components, {4096, budget}};
+    const auto side = [](std::size_t i) {
+        return i == 0 ? p::RequestedSide::Right : p::RequestedSide::Automatic;
+    };
+    const auto node = [&](std::size_t i) {
+        return take(cf::evaluate_case_clocked_flows(clock, clock, {stamp, 0, i, side(i)},
+                                                    projection, projection, flow_work, clock_limits,
+                                                    memory));
+    };
+    const auto instant = [](std::size_t i) {
+        return i == 0 ? Number{0} : i == 1 ? Number{1, 10} : Number{1, 5};
+    };
+    const auto flow_at = [&](std::size_t i) {
+        const auto t = instant(i);
+        return take(cf::project_case_uniform_flow(
+            evaluate(provider, provider, flow_work, t, side(i)), projection));
+    };
+
+    ResidualFixture fixture;
+    auto base = fixture.input();
+    base.points = base.points.first(4);
+    base.bindings = base.bindings.first(4);
+    const a::SinglePositions xyz{std::span{fixture.points}.first(12)};
+    base.reference = xyz;
+    base.current = xyz;
+    base.edges = base.edges.first(5);
+    base.faces = base.faces.first(1);
+    base.bands = base.bands.first(1);
+    base.quads = base.quads.first(1);
+    const a::GlobalLimits cap{UINT64_C(5000000000), ls::EstimateAdmission{65536}};
+    auto geometry_work = test_geometry::workspace(memory);
+    auto global = take(a::GlobalWorkspace::create(memory, cap.metadata));
+    const auto reference = test_geometry::take(
+        a::prepare_owned_geometry(base, test_geometry::limits(), *geometry_work, memory));
+    const auto raw_topology = fixture.topology();
+    const a::GlobalTopologyInput roles{
+        raw_topology.roles.first(1), raw_topology.edges.first(5), {}};
+    const auto topology =
+        take_global(a::build_global_topology(reference, roles, cap, *global, memory));
+    const auto contact_at = [&](std::size_t i, const a::GlobalTopology& owner) {
+        auto positions = base;
+        constexpr std::array seconds{0., .1, .2};
+        const auto t = instant(i);
+        positions.context.time = seconds[i];
+        positions.context.current = core::GeometryGeneration{3 + i};
+        positions.exact_time = t.view();
+        const auto geometry = test_geometry::take(
+            a::prepare_owned_geometry(positions, test_geometry::limits(), *geometry_work, memory));
+        return take_global(a::check_global_geometry(owner, geometry, cap, *global, memory));
+    };
+    const auto geometry_at = [&](const a::GlobalContactState& contact) -> const a::OwnedGeometry& {
+        return take_global(contact.geometry()).get();
+    };
+    const auto query_at = [&](const a::GlobalContactState& contact) {
+        const auto& g = geometry_at(contact);
+        return test_geometry::take(
+            a::resolve_query(g, {a::QueryId{880}, a::FreePoint{a::FreeSingle{{.75, .375, 0.}}}},
+                             g.context(), test_geometry::limits(), *geometry_work, memory));
+    };
+    const cf::DiscreteNonpenetrationLimits load_limits{
+        {format, 1e-10},
+        {format, 1e-10, 1e-10},
+        {test_geometry::limits(), {ls::EstimateAdmission{65536}, 1000000000}, UINT64_C(5000000000)},
+        100000,
+        UINT64_C(24000000000)};
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const std::array scales{1.};
+    const std::array<ls::UnitDimensions, 1> gamma{{{2, 0, -1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 1> speed{{{1, 0, -1, 0, 0, 0, 0}}};
+    const auto request_at = [&](std::size_t i, const a::GlobalContactState& contact) {
+        auto setup = circulation_request(
+            {scales, scales, gamma, speed, circulation_context(geometry_at(contact).context())}, 1,
+            ls::Norm::Infinity);
+        setup.rhs_generation = core::RhsGeneration{31 + i};
+        setup.retained_generation = core::NumericalGeneration{41 + i};
+        return setup;
+    };
+    const auto zeros = coordinates(0, 0, 0);
+    const std::array frame{coordinates(1, 0, 0), coordinates(0, 1, 0)};
+    const auto face = fixture.faces[0].id;
+    const auto make_row = [&](const a::ResolvedQuery& query, double normal_velocity) {
+        return cf::DiscreteCollocation{fixture.quads[0].facets[0],
+                                       query,
+                                       frame,
+                                       coordinates(0, 0, normal_velocity),
+                                       a::SingleWord{82},
+                                       a::SingleWord{91}};
+    };
+    const auto history = [&](std::size_t i, const a::GlobalTopology& owner) {
+        const auto contact = contact_at(i, owner);
+        const auto query = query_at(contact);
+        const std::array rows{make_row(query, i == 0 ? .125 : .375)};
+        const cf::DiscreteNonpenetrationInput input{
+            contact, rows, {}, {core::AcceptedStateId{2}, {}}, {50, i}, stamp, side(i)};
+        return take(cf::solve_discrete_circulation(input, flow_at(i), load_limits,
+                                                   request_at(i, contact), shared, *local, *kernel,
+                                                   memory));
+    };
+    const auto earlier = history(0, topology);
+    const auto previous = history(1, topology);
+    const auto t0 = node(0);
+    const auto t1 = node(1);
+    auto skipped = node(2);
+    reject(cf::FixedBdf2Circulation::prepare(std::move(skipped), t0, t1, previous, earlier, 4096,
+                                             10000, memory),
+           core::FailureCode::StaleGeneration);
+    CHECK(skipped.ambient().source().jet.active());
+    reject(
+        cf::FixedBdf2Circulation::prepare(node(2), t1, t0, earlier, previous, 4096, 10000, memory),
+        core::FailureCode::StaleGeneration);
+    const auto other_topology =
+        take_global(a::build_global_topology(reference, roles, cap, *global, memory));
+    const auto foreign_history = history(0, other_topology);
+    reject(cf::FixedBdf2Circulation::prepare(node(2), t1, t0, previous, foreign_history, 4096,
+                                             10000, memory),
+           core::FailureCode::StaleGeneration);
+    auto altered_case = model_case;
+    altered_case.field("analysis").field("intervals").elements[0].set("end", parse("0.4"));
+    const auto edited_si = materialize(altered_case, io::SourceId{1190});
+    auto edited_limits = clock_limits;
+    edited_limits.maximum_steps_per_interval = 4;
+    const auto foreign_clock =
+        take(cf::prepare_case_clocked_flows(edited_si, stamp, flow_work, edited_limits, memory));
+    const auto wrong_case = take(
+        cf::evaluate_case_clocked_flows(foreign_clock, foreign_clock, {stamp, 0, 0, side(0)},
+                                        projection, projection, flow_work, edited_limits, memory));
+    reject(cf::FixedBdf2Circulation::prepare(node(2), t1, wrong_case, previous, earlier, 4096,
+                                             10000, memory),
+           core::FailureCode::StaleGeneration);
+    const auto stencil = take(
+        cf::FixedBdf2Circulation::prepare(node(2), t1, t0, previous, earlier, 4096, 10000, memory));
+
+    const auto contact = contact_at(2, topology);
+    const auto query = query_at(contact);
+    const std::array rows{make_row(query, .75)};
+    const cf::DiscreteNonpenetrationInput input{
+        contact, rows, {}, {core::AcceptedStateId{2}, {}}, {50, 2}, stamp, side(2)};
+    const auto request = request_at(2, contact);
+    const std::array midpoints{cf::EdgeMidpointVelocity{fixture.edges[0].id, zeros},
+                               cf::EdgeMidpointVelocity{fixture.edges[1].id, zeros},
+                               cf::EdgeMidpointVelocity{fixture.edges[2].id, zeros},
+                               cf::EdgeMidpointVelocity{fixture.edges[3].id, zeros}};
+    cf::DiscreteVectorLoadInput load{
+        input.trial_stamp, request.retained_generation, midpoints, {}, a::SingleWord{1.25}, zeros};
+    load.fixed_bdf2 = &stencil;
+    const auto result =
+        take(cf::solve_discrete_circulation_loads(input, load, flow_at(2), load_limits, request,
+                                                  *geometry_work, shared, *local, *kernel, memory));
+    const Rat bdf2 =
+        (3 * solution_word(result.primal().solution(), 0) -
+         4 * solution_word(previous.solution(), 0) + solution_word(earlier.solution(), 0)) *
+        5;
+    REQUIRE(abs(bdf2) > rational_word(.01));
+    REQUIRE(result.bdf2_rate_count() == 1);
+    const auto rate = take(result.bdf2_rate(0));
+    CHECK(rate.face == face);
+    residual_expected(rate.rate, bdf2, rational_word(1e-20));
+    const Rat half_density{5, 8};
+    for (std::size_t i = 0; i < 2; ++i)
+        residual_expected(take(result.facet(i)).force[2], bdf2 * half_density,
+                          rational_word(1e-20));
+
+    const std::array displacements{zeros, zeros, zeros, zeros};
+    const auto unit_z = coordinates(0, 0, 1);
+    const std::array collocation_direction{
+        cf::CirculationCollocationDirection{face, zeros, {zeros, zeros}, unit_z}};
+    const cf::DiscreteCirculationDirection geometry_direction{base.points, displacements,
+                                                              collocation_direction, zeros};
+    const cf::DiscreteImplicitVectorLoadDirection variation{
+        load.stamp, load.circulation, geometry_direction, midpoints, {}};
+    auto tangent = request;
+    tangent.rhs_generation = core::RhsGeneration{52};
+    tangent.retained_generation = core::NumericalGeneration{62};
+    const auto derivative = take(cf::solve_discrete_circulation_implicit_load_direction(
+        input, load, variation, flow_at(2), load_limits, request, tangent, *geometry_work, shared,
+        *local, *kernel, memory));
+    const auto dgamma = solution_word(derivative.tangent().solution(), 0);
+    REQUIRE(abs(dgamma) > rational_word(.01));
+    for (std::size_t i = 0; i < 2; ++i)
+        residual_expected(take(derivative.direction().facet(i)).force[2],
+                          15 * dgamma * half_density, rational_word(1e-20));
+    const auto sample = cf::DiscreteLoadSampleWeights{zeros, zeros};
+    const std::array edge_seeds{sample, sample, sample, sample};
+    const std::array facet_seeds{sample, sample};
+    const cf::DiscreteVectorLoadWeights seeds{
+        load.stamp, load.circulation, edge_seeds, facet_seeds, displacements, unit_z, zeros};
+    const std::array<ls::UnitDimensions, 1> dual_gamma{{{-2, 0, 1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 1> dual_speed{{{-1, 0, 1, 0, 0, 0, 0}}};
+    auto dual_context = request.scales.context;
+    dual_context.cache.matrix = core::NumericalGeneration{70};
+    dual_context.cache.scales = core::ScaleGeneration{71};
+    dual_context.unknown_layout = core::ScopeId{72};
+    dual_context.residual_layout = core::ScopeId{73};
+    auto transpose = circulation_request({scales, scales, dual_speed, dual_gamma, dual_context}, 1,
+                                         ls::Norm::Infinity);
+    transpose.rhs_generation = core::RhsGeneration{74};
+    transpose.retained_generation = core::NumericalGeneration{75};
+    const auto dual = take(cf::solve_discrete_circulation_implicit_load_pullback(
+        input, load, seeds, flow_at(2), load_limits, request, transpose, *geometry_work, shared,
+        *local, *kernel, memory));
+    const auto row_dual = take(dual.collocation(0));
+    WorkEnclosure left, right;
+    left.add(derivative.direction().total_force_direction()[2], unit_z[2]);
+    right.add(row_dual.velocity[2], unit_z[2]);
+    CHECK(abs(left.value) > rational_word(.01));
+    CHECK(abs(left.value - right.value) <= left.radius + right.radius + rational_word(1e-15));
 }

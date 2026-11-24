@@ -451,6 +451,14 @@ GlobalContactState::geometry() const& noexcept {
     return std::cref(*owner);
 }
 
+core::Result<PreparedTopologyOwner> GlobalContactState::reference_topology() const noexcept {
+    const auto state = data_.values();
+    if (state.empty() || !state.front().topology)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput,
+                                             core::Operation::EvaluateAero, context_.diagnostics});
+    return PreparedTopologyOwner{state.front().topology};
+}
+
 GlobalResult<UvlmQuad> GlobalContactState::uvlm_quad(FacetId id, std::uint64_t max_steps,
                                                      const std::stop_token& stop) const noexcept {
     return guarded(context_, [&]() -> GlobalResult<UvlmQuad> {

@@ -160,6 +160,20 @@ private:
     std::shared_ptr<const GlobalTopologyData> data_;
     GeometryContext context_;
 };
+/// An owning provenance token for one immutable, reference-qualified topology.
+class PreparedTopologyOwner {
+public:
+    [[nodiscard]] bool same_owner(const PreparedTopologyOwner& other) const noexcept {
+        return topology_ && topology_ == other.topology_;
+    }
+
+private:
+    friend class GlobalContactState;
+    explicit PreparedTopologyOwner(std::shared_ptr<const GlobalTopologyData> topology) noexcept
+        : topology_(std::move(topology)) {}
+    std::shared_ptr<const GlobalTopologyData> topology_;
+};
+
 /// A complete discrete contact check tied to the retained current snapshot and topology.
 class GlobalContactState {
 public:
@@ -178,6 +192,7 @@ public:
     geometry() const& noexcept;
     [[nodiscard]] GlobalResult<std::reference_wrapper<const OwnedGeometry>>
     geometry() const&& = delete;
+    [[nodiscard]] core::Result<PreparedTopologyOwner> reference_topology() const noexcept;
     /// Inspect the fixed quad of a source facet. A wake's L edge uses quad vertices 0→1.
     [[nodiscard]] GlobalResult<UvlmQuad> uvlm_quad(FacetId, std::uint64_t max_steps,
                                                    const std::stop_token& = {}) const noexcept;

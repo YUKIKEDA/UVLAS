@@ -197,6 +197,11 @@ struct CirculationResidualRow {
     bool includes_wake_quadrature{};
 };
 
+struct CirculationPhysicalSource {
+    aero::detail::GeometryContext geometry;
+    aero::detail::PreparedTopologyOwner topology;
+};
+
 /// Own both the LU-qualified retained words and the independent native residual
 /// check. No physical mapping or continuous wake-integral accuracy is inferred.
 class DiscreteCirculation {
@@ -215,6 +220,10 @@ public:
         return flow_;
     }
     [[nodiscard]] const ProjectedCaseUniformFlow& flow() const&& = delete;
+    [[nodiscard]] const CirculationPhysicalSource& source() const& noexcept {
+        return source_;
+    }
+    [[nodiscard]] const CirculationPhysicalSource& source() const&& = delete;
     [[nodiscard]] std::uint64_t used_steps() const noexcept {
         return steps_;
     }
@@ -224,12 +233,14 @@ private:
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
                         std::optional<aero::detail::P1ActionValue>,
-                        core::PlannedBuffer<aero::detail::p1::Interval>, std::uint64_t) noexcept;
+                        core::PlannedBuffer<aero::detail::p1::Interval>, CirculationPhysicalSource,
+                        std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
     std::optional<aero::detail::P1ActionValue> geometry_owner_;
     core::PlannedBuffer<aero::detail::p1::Interval> influence_;
+    CirculationPhysicalSource source_;
     std::uint64_t steps_;
 };
 
@@ -465,6 +476,8 @@ struct BoundCirculationRate {
     aero::detail::ScalarWords rate; ///< Externally supplied Γdot, m²/s², for this discrete face.
 };
 
+class FixedBdf2Circulation;
+
 struct DiscreteVectorLoadInput {
     DiscreteVectorLoadInput(aero::detail::P1ActionStamp trial,
                             core::NumericalGeneration circulation_generation,
@@ -484,6 +497,7 @@ struct DiscreteVectorLoadInput {
     std::span<const BoundCirculationRate> rates; ///< Ascending physical bound face IDs.
     aero::detail::ScalarWords density;           ///< kg/m³, finite and strictly positive.
     NonpenetrationVector moment_origin;          ///< Reference point in the geometry's SI frame.
+    const FixedBdf2Circulation* fixed_bdf2 = nullptr; ///< Alternative to independent rates.
 };
 
 struct DiscreteCirculatoryLoad {
@@ -504,6 +518,11 @@ struct DiscreteNoncirculatoryLoad {
 struct DiscreteNodalLoad {
     aero::detail::PointId point;
     DiscreteLoadVector force;
+};
+
+struct RetainedBdf2Rate {
+    aero::detail::PhysicalFaceId face{0};
+    aero::detail::ScaledEnclosure rate; ///< Same D_h Gamma used in the load, m²/s².
 };
 
 /// Exact adopted trial identity retained with assembled nodal forces.
@@ -545,6 +564,10 @@ public:
     [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t bdf2_rate_count() const noexcept {
+        return bdf2_rates_.size();
+    }
+    [[nodiscard]] core::Result<RetainedBdf2Rate> bdf2_rate(std::size_t) const noexcept;
     [[nodiscard]] DiscreteLoadSource source() const noexcept {
         return source_;
     }
@@ -559,13 +582,15 @@ private:
                              core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>>,
                              core::PlannedBuffer<std::optional<DiscreteNodalLoad>>,
                              const DiscreteLoadVector& force, const DiscreteLoadVector& moment,
-                             const DiscreteLoadVector& origin, DiscreteLoadSource,
-                             std::uint64_t) noexcept;
+                             const DiscreteLoadVector& origin,
+                             core::PlannedBuffer<std::optional<RetainedBdf2Rate>>,
+                             DiscreteLoadSource, std::uint64_t) noexcept;
     DiscreteCirculation primal_;
     core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges_;
     core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets_;
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points_;
     DiscreteLoadVector force_, moment_, origin_;
+    core::PlannedBuffer<std::optional<RetainedBdf2Rate>> bdf2_rates_;
     DiscreteLoadSource source_;
     std::uint64_t steps_;
 };
@@ -817,7 +842,8 @@ struct LoadCirculationRateCovector {
 };
 
 /// Fixed-chart transpose of the solved load outputs. Point and flow duals
-/// include the response of the retained circulation. Γdot remains independent.
+/// include the response of retained circulation. With fixed BDF2 they include
+/// the current-rate chain while the older solves and step size stay fixed.
 class DiscreteCirculationImplicitLoadVjp {
 public:
     DiscreteCirculationImplicitLoadVjp(DiscreteCirculationImplicitLoadVjp&&) noexcept = default;
