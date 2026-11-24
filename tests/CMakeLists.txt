@@ -969,6 +969,13 @@ uvlas_add_test(coupling.case_pg_support_motion
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_pg_support_motion PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
+add_test(NAME coupling.frozen_case_pg_reference
+    COMMAND "${Python3_EXECUTABLE}" -m tools.qa.vpg_product_reference
+        "$<TARGET_FILE:uvlas_test_coupling_case_pg_support_motion>")
+set_tests_properties(coupling.frozen_case_pg_reference PROPERTIES
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    LABELS "integration;verification;V-PG"
+    TIMEOUT 600)
 
 uvlas_add_test(coupling.case_motion_frame
     LABELS V-AERO property negative verification

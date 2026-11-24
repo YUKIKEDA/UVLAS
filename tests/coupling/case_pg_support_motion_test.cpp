@@ -1,8 +1,11 @@
+#include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "structure/pg_conditioning_test_support.hpp"
 
 #include <algorithm>
+#include <fstream>
+#include <iterator>
 #include <string>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_full_trace.hpp>
@@ -100,9 +103,8 @@ const c::CaseMotionTimeLimits motion_limits{
     100,
     1000};
 
-io::SiCase checked_case(const a::JsonToken& input) {
+io::SiCase checked_case_wire(std::string_view wire) {
     core::ResourcePlan plan{case_budget};
-    const auto wire = input.wire();
     const io::InputLimits syntax{
         1000000, 256,     100000,  100000,
         1000000, 1000000, 1000000, {io::ParserAllocationMode::EstimateAdmission, case_budget}};
@@ -133,6 +135,21 @@ io::SiCase checked_case(const a::JsonToken& input) {
     return take(io::convert_case_to_si(*checked, catalog, request, bounds, plan, nullptr));
 }
 
+io::SiCase checked_case(const a::JsonToken& input) {
+    return checked_case_wire(input.wire());
+}
+
+const c::CasePgReferenceLimits& case_pg_reference_limits() {
+    static const auto exact = partition_test::exact_limits();
+    static const c::CasePgReferenceLimits limits{{exact, 64, {}},
+                                                 {exact, 2000, 20000000, 100000, {}},
+                                                 partition_test::limits(),
+                                                 query_limits(),
+                                                 100000,
+                                                 {}};
+    return limits;
+}
+
 io::schema::AeroAttachmentPrescribed attachment_field(const io::SiCase& source) {
     const auto root = take(take(source.source_case()).get().root());
     const auto model = root.model.record();
@@ -151,6 +168,127 @@ a::JsonToken& motion_json(a::JsonToken& root) {
 }
 
 } // namespace
+
+TEST_CASE("An explicit Case PG shell owns its exact reference geometry in SI",
+          "[V-PG][SH-D02][verification][negative]") {
+    auto input = a::root();
+    input.field("units").set("length", a::string("mm"));
+    auto& model = input.field("model");
+    auto& geometry = model.field("geometry").elements.front();
+    geometry.set("reference_length", a::parse("2000"));
+    geometry.set("frame",
+                 a::parse(R"({"origin":[3000,-4000,5000],"rotation":[[0,0,1],[1,0,0],[0,1,0]]})"));
+    geometry.set(
+        "coefficients",
+        a::parse(R"([{"powers":[0,0],"coefficient":{"numerator":"1","denominator":"4"}}])"));
+    geometry.field("thickness").set("values", a::parse("[50,50,50,50]"));
+    auto& layers = model.field("shells").elements.front().field("layers").elements;
+    auto upper = layers.front();
+    layers.front().set(
+        "interval",
+        a::parse(R"([{"numerator":"-1","denominator":"1"},{"numerator":"0","denominator":"1"}])"));
+    upper.set("id", a::string("9"));
+    upper.set(
+        "interval",
+        a::parse(R"([{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}])"));
+    layers.push_back(std::move(upper));
+
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const auto& limits = case_pg_reference_limits();
+    const auto ready = [&] {
+        const auto si = checked_case(input);
+        return take(c::prepare_case_pg_reference(si, 1, limits, workspace, plan));
+    }();
+    const auto prepared = take(ready.source());
+    const auto layer_data = take(prepared.partition.layers());
+    REQUIRE(layer_data.size() == 2);
+    CHECK(layer_data[0].id == core::LayerId{1});
+    CHECK(layer_data[1].id == core::LayerId{9});
+    CHECK(q(take(ready.frame()).length_metres) == 2);
+    const auto volume = take(prepared.partition.volumes());
+    REQUIRE_FALSE(volume.empty());
+    Fixture values;
+    const auto zero = values.r("0");
+    const auto depth = values.r("1", "2");
+    const auto at = take(ready.evaluate(PgReferenceVolumePoint{0, zero, zero, depth}, std::nullopt,
+                                        limits.geometry, plan));
+    CHECK(q(at.full_thickness_metres) == Q{1} / 20);
+    // x = 3 + 2*(1/4) + zeta/40, y = -4 + 2*s, z = 5 + 2*t.
+    CHECK(q(at.position_metres[0].rational) + q(at.position_metres[0].radical) ==
+          Q{7} / 2 + q(at.zeta) / 40);
+    CHECK(q(at.position_metres[1].rational) == -4 + 2 * q(at.s));
+    CHECK(q(at.position_metres[2].rational) == 5 + 2 * q(at.t));
+
+    const auto identity = take(ready.identity());
+    const auto si = checked_case(input);
+    auto reduced = limits;
+    reduced.maximum_input_work = 1;
+    const auto exhausted = c::prepare_case_pg_reference(si, 1, reduced, workspace, plan);
+    REQUIRE_FALSE(exhausted);
+    CHECK(exhausted.error().code == core::FailureCode::ResourceExceeded);
+    const auto missing = c::prepare_case_pg_reference(si, 77, limits, workspace, plan);
+    REQUIRE_FALSE(missing);
+    CHECK(missing.error().code == core::FailureCode::InvalidInput);
+    CHECK(take(ready.identity()) == identity);
+}
+
+TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
+          "[.frozen-vpg][V-PG][FD-03][SH-D02][verification]") {
+    std::ifstream manifest_file{"manifest.json", std::ios::binary};
+    REQUIRE(manifest_file);
+    const auto manifest = nlohmann::json::parse(manifest_file);
+    const auto& cases = manifest.at("cases");
+    REQUIRE(cases.size() == 34);
+    const auto& limits = case_pg_reference_limits();
+    Fixture sample;
+    const auto third = sample.r("1", "3");
+    const auto half = sample.r("1", "2");
+    std::size_t prepared_shells = 0;
+    for (const auto& entry : cases) {
+        const auto path = entry.at("case").get<std::string>();
+        CAPTURE(path);
+        std::ifstream case_file{path, std::ios::binary};
+        REQUIRE(case_file);
+        const std::string wire{std::istreambuf_iterator<char>{case_file},
+                               std::istreambuf_iterator<char>{}};
+        const auto si = checked_case_wire(wire);
+        const auto& grid = entry.at("n");
+        const auto count = grid.is_array() ? grid.size() : 1;
+        const auto& thickness = entry.at("h");
+        const Q h = q(sample.r(thickness.at("numerator").get<std::string>(),
+                               thickness.at("denominator").get<std::string>()));
+        for (std::size_t shell = 0; shell < count; ++shell) {
+            core::ResourcePlan plan{profile};
+            core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+            const auto result = c::prepare_case_pg_reference(si, shell + 1, limits, workspace, plan);
+            if (!result)
+                UNSCOPED_INFO("Preparation failure " << static_cast<unsigned>(result.error().code));
+            REQUIRE(result);
+            const auto& ready = *result;
+            const auto source = take(ready.source());
+            CHECK(take(source.graph.view()).n ==
+                  (grid.is_array() ? grid.at(shell) : grid).get<core::Index>());
+            const auto volumes = take(source.partition.volumes());
+            const auto triangles = take(source.partition.triangles());
+            REQUIRE_FALSE(volumes.empty());
+            Q area = 0;
+            for (const auto& triangle : triangles)
+                area += q(triangle.twice_area) / 2;
+            CHECK(area == (path.starts_with("r5-") ? Q{4} / 5 : Q{1}));
+            const auto at = take(
+                ready.evaluate(PgReferenceVolumePoint{static_cast<core::Index>(volumes.size() / 2),
+                                                      third, third, half},
+                               std::nullopt, limits.geometry, plan));
+            const auto variable = entry.at("variable").get<bool>();
+            const Q expected = variable ? h * (1 + q(at.s) / 10 + q(at.t) / 20) : h;
+            CHECK(q(at.full_thickness_metres) == expected);
+            CHECK(at.layer == core::LayerId{shell + 1});
+            ++prepared_shells;
+        }
+    }
+    CHECK(prepared_shells == 36);
+}
 
 TEST_CASE("Clocked rigid PG supports preserve original rows and reaction power",
           "[SH-D05][SH-D06][N4-04][AE-07][verification][negative]") {
