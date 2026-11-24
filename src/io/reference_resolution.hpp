@@ -101,6 +101,7 @@ private:
         SourceId id{0};
         ReferenceRole role{};
         SourceDigest digest{};
+        std::optional<std::uint64_t> declaring_mesh_geometry;
         std::optional<NormalizedReferencePath> child_path;
         core::PlannedBuffer<char> original_child_path;
         std::optional<AcquiredRootSnapshot> snapshot;

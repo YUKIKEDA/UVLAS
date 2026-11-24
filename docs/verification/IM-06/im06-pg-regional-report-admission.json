@@ -1,0 +1,29 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-pg-regional-report-admission",
+  "ids": [
+    "FD-03",
+    "IO4-04",
+    "N4-02",
+    "R-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "9dd1f01d19f040b2e335944d03fa6a6a891ae033",
+  "claimed_state": "定数厚さの領域比較結果が所有する厚さとチャート面積を、全対象面について算術見積りへ入れる。",
+  "checks": {
+    "windows_debug_targets_passed": 3,
+    "windows_release_targets_passed": 3,
+    "gcc_asan_ubsan_targets_passed": 3,
+    "regional_assertions": 71,
+    "report_estimate_mutations_detected": 1
+  },
+  "artifacts": {
+    "docs/verification/IM-06/pg-regional-report-admission.md": "58bf84ad84d06c8956263fe372f085a86f5975d2c316d8a42c01e36da3892079",
+    "src/io/external_pg_regional_thickness.cpp": "c05e8720a05c550c786d90c303cb694a4753e5fc5f2ca91cf781d6d09d8cc688",
+    "src/io/external_pg_regional_thickness.hpp": "4ea787c323176c6d3fa703a61d5bf17cd6fe26cbd8737477b9e3fd348f4c9210",
+    "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
+    "tests/io/external_pg_regional_thickness_test.cpp": "19539df668a9e746d5a617d6185928f5d406addefec8be292107a6a6e6d9d837"
+  }
+}

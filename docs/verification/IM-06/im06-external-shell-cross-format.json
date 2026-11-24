@@ -1,0 +1,37 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-external-shell-cross-format",
+  "ids": [
+    "FD-03",
+    "IO4-01",
+    "IO4-03",
+    "IO4-04",
+    "R-05",
+    "V-USE"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "8477e6701b1757470a4c46e696f079e94c03ed65",
+  "claimed_state": "同じSI Caseの平面ShellをNastranとGmshの実参照から準備し、全域幾何・明示厚さ・物理測度を独立式と照合する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "cross_format_assertions": 705
+  },
+  "artifacts": {
+    "docs/requirements/practical-acceptance-plan.md": "050213606ad95a1cab93ece3a0500f5b7444cafcb24f9b5e064f4f0466890c0f",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/external-shell-cross-format.md": "2f41b44f69423f2d12727b204fef039cf82ba170490ddb37c454485631c69d60",
+    "src/coupling/case_external_pg.cpp": "a3774be78e3c763779393f230f417ad8798bffc9ab37c7b08fe0381bed6fea35",
+    "src/coupling/case_external_pg.hpp": "e75e010f185d670ceba920bb800a51c240d9bfc154cc8a16846baf0f476c348a",
+    "src/io/external_mesh_sidecar_pg.cpp": "deae36cd176ec6709ff3752eb1d7f9dcdfdccbc057d1a38735f4a710ddb76e5b",
+    "src/io/external_pg_regional_thickness.cpp": "6b6628da70e1e51d85e63ce157d6c1773e83996801d889545c22a938a72f7863",
+    "src/io/external_planar_pg.cpp": "85b8ec021962d97604616065cdb68fd2a4ca0b459302927f86fe6cfcb4217c10",
+    "src/structure/pg_reference_geometry.cpp": "0e2887e722f0fbd8542a39b6c5000c1a44987a05fd0c6fddff2e879c0d543521",
+    "tests/CMakeLists.txt": "92f5a498ddc55ea89188519681d09379d02f9b0f689ed66d0a620f23b0cec028",
+    "tests/io/external_shell_cross_format_test.cpp": "f570c8b808ad9adb7f89e5c3198eac6c797c6f91a4ea7f624cda25a5c21bbd12",
+    "tests/io/reference_file_test_fixture.hpp": "6c14eafea3b396fa43fc768c1dcae6b4efff0e02b3ccf43cb86b5b2d7bf716de"
+  }
+}

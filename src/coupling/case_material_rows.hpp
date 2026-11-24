@@ -21,6 +21,15 @@ struct CaseMaterialPointKinematics {
     std::optional<structure::PgVolumePositionResult> tangents;
 };
 
+/// Explicit source of one original facet-vertex load. Multiple loads on that vertex share its row.
+struct CaseMaterialLoadKey {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::FacetId facet;
+    std::uint8_t local_vertex{};
+    aero::detail::PointId canonical;
+    bool operator==(const CaseMaterialLoadKey&) const = default;
+};
+
 struct CaseMaterialOriginalForce {
     CaseMaterialChartIdentity surface;
     CaseMaterialSite original_site;
@@ -55,7 +64,8 @@ public:
     prepare(const CaseMaterialChart&, const CaseReferenceSurface&,
             const structure::PgPreparedPatch&, CaseMaterialSite,
             const structure::PgPreparedReferenceProjection&, double maximum_tangent_row_error,
-            const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
+            const structure::PgReferenceLimits&, core::ResourcePlan&,
+            std::optional<CaseMaterialLoadKey> original_load = {}) noexcept;
 
     [[nodiscard]] core::Result<CaseMaterialPointKinematics>
     evaluate(structure::PgPreparedPatchIdentity, structure::PgCartesianWords q,
@@ -70,19 +80,21 @@ public:
              core::ResourcePlan&) const noexcept;
 
     /// Carry the force enclosure from the original aerodynamic contribution through
-    /// the selected vertex row. The caller supplies the resolved original row.
+    /// the vertex row bound to that contribution when the row was prepared.
     [[nodiscard]] core::Result<CaseMaterialOriginalEnclosedForce>
-    pullback_enclosed(structure::PgPreparedPatchIdentity, const DiscreteLoadVector&,
+    pullback_enclosed(structure::PgPreparedPatchIdentity, const DiscreteOriginalLoadContribution&,
                       const structure::PgVolumePositionLimits&, core::ResourcePlan&) const noexcept;
 
 private:
     CaseMaterialRows(CaseMaterialChartIdentity, CaseMaterialSite,
                      structure::PgProjectedReferenceBatch&&,
-                     std::optional<structure::PgMaterialTangentReference>&&) noexcept;
+                     std::optional<structure::PgMaterialTangentReference>&&,
+                     std::optional<CaseMaterialLoadKey>) noexcept;
     CaseMaterialChartIdentity surface_;
     CaseMaterialSite site_;
     structure::PgProjectedReferenceBatch position_;
     std::optional<structure::PgMaterialTangentReference> tangents_;
+    std::optional<CaseMaterialLoadKey> original_load_;
 };
 
 } // namespace uvlas::coupling::detail
