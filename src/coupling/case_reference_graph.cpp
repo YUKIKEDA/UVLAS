@@ -249,12 +249,12 @@ CaseReferenceSurface::evaluate(const ExactRational& chord, const ExactRational& 
         const PgPartitionPoint point{m.copy(chord), m.copy(span)};
         if (!contains(m, data.domain.values(), point))
             partition_fail(FailureCode::GeometryInvalid);
-        std::array<ExactRational, 3> position{
+        const std::array<ExactRational, 3> position{
             m.add(data.x0, m.add(m.mul(data.width, chord), m.mul(data.skew, span))), m.copy(span),
             pg::polynomial_derivative(m, data.height, {0, 0}, chord, span)};
-        std::array<ExactRational, 3> chord_tangent{
+        const std::array<ExactRational, 3> chord_tangent{
             m.copy(data.width), {}, pg::polynomial_derivative(m, data.height, {1, 0}, chord, span)};
-        std::array<ExactRational, 3> span_tangent{
+        const std::array<ExactRational, 3> span_tangent{
             m.copy(data.skew), m.constant("1"),
             pg::polynomial_derivative(m, data.height, {0, 1}, chord, span)};
         const auto world = [&](const auto& chart, bool translate) {
