@@ -43,10 +43,10 @@
 | 大域幾何と後縁所有 | 完了 | 大域接触・不適格の検査、alias運動学、後縁の放出所有。 [#153](https://github.com/YUKIKEDA/UVLAS/pull/153) |
 | 既知流れと指定運動 | 完了 | 一様流・解析突風、指定移流、指定剛体運動を同じ厳密時刻と片側で評価する。全空力取付・構造支持の指定運動と過渡外力の周期節点や絶対イベントを確認し、節点をまたぐ区間を拒否する。離散空力取付では同じ姿勢から点の位置と速度を求める。再開時には保持した時刻表、既知流れ、後流モードと指定移流、選択した運動を現行入力と照合する。 [指定空力取付](../verification/IM-03/clocked-prescribed-aero-attachment-v1/verification.md)・[全イベントの検証](../verification/IM-03/all-motion-clock-events-v1/verification.md)・[型付き再開](../verification/IM-03/clocked-known-input-restore-v1/verification.md) |
 | 循環と全微分 | 実装中 | 接触済みの離散照会点ごとに非一様な既知流れを評価し、実数の非貫通式を解く。同じ試行の原残差を再評価し、位置と既知流れの時刻への接線・転置を独立参照と照合した。PGの物質点写像、幾何と後流輸送も含む時間微分、接触切替え、複素更新が残る。 [非一様流での循環と微分の検証](../verification/IM-03/discrete-known-flow-circulation-v1/verification.md) |
-| 全ベクトル荷重 | 実装中 | 同じ試行の循環と束縛辺の中点ごとの非一様な既知流れから、辺の力、節点力、合力、基準点モーメントを評価する。一つの準備済みPGでは、非貫通の位置・速度・接線を材料点で評価し、正準頂点の力を同じ形状行の転置で構造へ戻した。同一時計区間の固定刻みBDF2は循環の時間微分を三角形の荷重と現在時刻の接線・転置へ渡す。Caseの材料座標対応からの準備、複数PGでの別名とJ1の受理履歴が残る。 [曲面と荷重の双対仕事](../verification/IM-03/pg-aero-work-v1/verification.md)・[中点荷重と微分](../verification/IM-03/discrete-known-flow-loads-v1/verification.md) |
+| 全ベクトル荷重 | 実装中 | 同じ試行の循環と束縛辺の中点ごとの非一様な既知流れから、辺の力、節点力、合力、基準点モーメントを評価する。一つの準備済みPGでは、非貫通の位置・速度・接線を材料点で評価し、正準頂点の力を同じ形状行の転置で構造へ戻した。同一時計区間の固定刻みBDF2は循環の時間微分を三角形の荷重と現在時刻の接線・転置へ渡す。Caseの材料多項式を全パネルで調べ、層の片側を含む実PGの位置・速度・接線を求める。共有辺では面別荷重を保持し、指定した元頂点の形状行の転置で包絡つきの荷重を渡す。全facetから元行を組み立てる接続、支持先をまたぐ拘束後の行と指定項、J1の受理履歴が残る。 [材料写像と元荷重の検証](../verification/IM-03/case-material-physical-v1.md) [曲面と荷重の双対仕事](../verification/IM-03/pg-aero-work-v1/verification.md)・[中点荷重と微分](../verification/IM-03/discrete-known-flow-loads-v1/verification.md) |
 | 後流値・移流・試行 | 実装中 | 自由後流では束縛渦輪、先頭・旧後流、既知流れから粒子速度を評価する。既放出点を同じ物質IDと厳密な三時刻で照合し、自由・指定の固定刻みBDF2で位置残差と接線・転置を検証した。指定移流では候補位置も返す。新生点の放出と台形則、退役、受理済み履歴と一括確定、再開が残る。 [自由後流の粒子速度](../verification/IM-03/discrete-free-wake-velocity-v1/verification.md)・[固定刻みの後流輸送](../verification/IM-03/fixed-wake-transport-v1/verification.md) |
 | J1状態への接続 | 残 | IM-04側とstep契約を共有し、BDF2と新生台形、輸送別の初期微分、受理済み循環の時間微分、全履歴、一回限りの状態確定を検証する。構造追従面の支持応答と、共通時計の型付き入力を含む受理済み履歴のファイル再開を接続する。強連成Newtonの実装はIM-04が担当 |
-| 参照と数値予算 | 一部検証済み | [局所核の独立参照](https://github.com/YUKIKEDA/UVLAS/pull/129)を確認済み。全経路を組み立て、V-AERO・V-MULTIの観測量と数値予算を照合する。参照準備は並行可能 |
+| 参照と数値予算 | 一部検証済み | 局所核に加え、有限翼2形状の非貫通残差と束縛循環第1列を独立参照と照合した。残る列、定常と非定常の荷重、収束、V-AERO・V-MULTIの全観測と数値予算を照合する。 [有限翼の独立参照](../verification/IM-03/finite-wing-case-v1/verification.md) |
 | 費用と終了審査 | 残 | 全履歴の相互作用数、資源、並列時の結果一致とR-03を確認し、パッケージを審査する |
 
 ## IM-06 入出力
