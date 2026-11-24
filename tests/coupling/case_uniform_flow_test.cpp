@@ -3,6 +3,7 @@
 #include "coupling/case_aero_attachment.hpp"
 #include "coupling/case_flow_clock.hpp"
 #include "coupling/case_known_flow.hpp"
+#include "coupling/case_reference_graph.hpp"
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
@@ -187,6 +188,89 @@ void jet(const a::ExactUniformFlowJet& result, const std::array<Number, 3>& velo
     }
 }
 } // namespace
+
+TEST_CASE("Typed thin surface reference owns exact Cartesian position and tangents",
+          "[verification][negative][AE-02][GEO-01][FD-06]") {
+    auto make = [] {
+        auto value = root("aerodynamic_steady");
+        value.field("units").set("length", string("mm"));
+        auto& geometries = value.field("model").field("geometry").elements;
+        geometries.at(0) = parse(R"({
+            "kind":"surface_graph","id":"1",
+            "frame":{"origin":[4000,-2000,3000],"rotation":[[0,-1,0],[1,0,0],[0,0,1]]},
+            "reference_length":2000,
+            "x0":{"numerator":"1","denominator":"3"},
+            "width":{"numerator":"3","denominator":"2"},
+            "skew":{"numerator":"-1","denominator":"4"},
+            "degree":[2,3],
+            "coefficients":[
+                {"powers":[2,1],"coefficient":{"numerator":"1","denominator":"2"}},
+                {"powers":[0,3],"coefficient":{"numerator":"-1","denominator":"3"}}],
+            "domain":[
+                [{"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}],
+                [{"numerator":"1","denominator":"1"},{"numerator":"0","denominator":"1"}],
+                [{"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}],
+                [{"numerator":"1","denominator":"2"},{"numerator":"1","denominator":"2"}],
+                [{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}]],
+            "boundaries":[],"continuity":[]
+        })");
+        return value;
+    };
+    auto input = make();
+    auto& graph = input.field("model").field("geometry").elements.at(0);
+    // The aerodynamic surface references leading/trailing rows of its own graph.
+    auto& boundaries = graph.field("boundaries").elements;
+    const auto example = root("aerodynamic_steady");
+    boundaries =
+        example.field("model").field("geometry").elements.at(0).field("boundaries").elements;
+    constexpr io::SourceId source_id{166};
+    const structure::PgReferenceLimits bounds{exact_limits(), 10000, 1000, {}};
+    core::ResourcePlan memory{budget};
+    const auto ready = [&] {
+        const auto si = materialize(input, source_id);
+        reject(cf::CaseReferenceSurface::prepare(si, 90, bounds, memory),
+               core::FailureCode::InvalidInput);
+        return take(cf::CaseReferenceSurface::prepare(si, 1, bounds, memory));
+    }();
+    const auto identity = take(ready.identity());
+    CHECK(identity.geometry_id == 1);
+    CHECK(identity.source.source.source == source_id);
+    const auto scalar = [&](std::string_view n, std::string_view d = "1") {
+        return take(structure::ExactRational::from_integer_pair(n, d, bounds.algebra, memory));
+    };
+    const auto chord = scalar("1", "4");
+    const auto span = scalar("1", "2");
+    const auto result = take(ready.evaluate(chord, span, bounds, memory));
+    // Independent substitution into X=(4-2η, -2+2(1/3+3ξ/2-η/4),
+    // 3+ξ²η-2η³/3), with both analytic derivatives in the same coordinates.
+    CHECK(result.position[0] == scalar("3"));
+    CHECK(result.position[1] == scalar("-5", "6"));
+    CHECK(result.position[2] == scalar("283", "96"));
+    CHECK(result.chord_tangent[0] == scalar("0"));
+    CHECK(result.chord_tangent[1] == scalar("3"));
+    CHECK(result.chord_tangent[2] == scalar("1", "4"));
+    CHECK(result.span_tangent[0] == scalar("-2"));
+    CHECK(result.span_tangent[1] == scalar("-1", "2"));
+    CHECK(result.span_tangent[2] == scalar("-7", "16"));
+
+    const auto upper = scalar("3", "4");
+    const auto edge = take(ready.evaluate(chord, upper, bounds, memory));
+    CHECK(edge.position[0] == scalar("5", "2"));
+    reject(ready.evaluate(span, upper, bounds, memory), core::FailureCode::GeometryInvalid);
+    const structure::PgReferenceLimits no_visits{exact_limits(), 10000, 0, {}};
+    reject(ready.evaluate(chord, span, no_visits, memory), core::FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() requires a mutable source.
+    std::stop_source stop;
+    static_cast<void>(stop.request_stop());
+    const structure::PgReferenceLimits cancelled{exact_limits(), 10000, 1000, stop.get_token()};
+    reject(ready.evaluate(chord, span, cancelled, memory), core::FailureCode::Cancelled);
+
+    graph.field("frame").set("rotation", parse("[[0,1,0],[1,0,0],[0,0,1]]"));
+    const auto mirrored = materialize(input, source_id);
+    reject(cf::CaseReferenceSurface::prepare(mirrored, 1, bounds, memory),
+           core::FailureCode::GeometryInvalid);
+    CHECK(take(ready.evaluate(chord, span, bounds, memory)).position[2] == scalar("283", "96"));
+}
 
 TEST_CASE("Typed SI constant flow owns full-width signed magnitudes and restores exact velocity",
           "[AE-07][IO4-01][N4-02][N4-03][property]") {
