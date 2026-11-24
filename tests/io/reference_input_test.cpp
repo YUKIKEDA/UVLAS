@@ -1921,7 +1921,6 @@ $EndElements
     CHECK(faces[1].sidecar_row == 1);
     if (physical) {
         using namespace uvlas::structure;
-        partition_test::Fixture pg_input;
         const PgReferenceLimits pg_limits{
             partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
         const uvlas::coupling::detail::CasePgReferenceLimits preparation{
@@ -1970,17 +1969,20 @@ $EndElements
                 return;
             }
             REQUIRE(prepared);
-            const auto* admitted = &prepared->match;
-            CHECK(admitted->distance_budget_metres == pg_input.r("13", "500"));
+            const auto* admitted = &prepared->match();
+            const auto expected_budget = fixture::take(
+                ExactRational::from_integer_pair("13", "500", pg_limits.algebra, plan));
+            CHECK(admitted->distance_budget_metres == expected_budget);
             REQUIRE(admitted->observations.size() == 1);
             CHECK(admitted->observations.values()[0].id == core::ObservationId{1});
             std::visit(
                 [&](const auto& original) {
                     const auto view = original.view();
                     REQUIRE(view);
-                    CHECK(view->patch == fixture::take(prepared->reference.identity()));
+                    CHECK(view->patch == fixture::take(prepared->reference().identity()));
                     REQUIRE(view->faces.size() == 2);
-                    const auto interior_distance = pg_input.r("1", "40");
+                    const auto interior_distance = fixture::take(
+                        ExactRational::from_integer_pair("1", "40", pg_limits.algebra, plan));
                     for (const auto& face : view->faces) {
                         CHECK(fixture::take(face.distance_upper_metres.compare(
                                   interior_distance, pg_limits.algebra, plan)) !=
@@ -2039,7 +2041,7 @@ $EndElements
             }
         } else {
             REQUIRE(qualified);
-            const auto& matched_case = qualified->match;
+            const auto& matched_case = qualified->match();
             CHECK(matched_case.thickness_compared);
             CHECK(matched_case.materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
             if (pcomp) {
@@ -2051,14 +2053,14 @@ $EndElements
                     CHECK(plies.front().ply_thickness_metres ==
                           pg_input.r(reversed ? "3" : "1", "16"));
                     CHECK(plies.back().material.id == rd::NastranMaterialId{reversed ? 6U : 9U});
-                    CHECK(matched->pg == fixture::take(qualified->reference.identity()));
+                    CHECK(matched->pg == fixture::take(qualified->reference().identity()));
                 } else {
                     FAIL("Missing exact PCOMP layer comparison");
                 }
             }
             CHECK(matched_case.pg == rd::MeshGeometryId{1});
             if (const auto admitted = matched_case.geometry.view()) {
-                CHECK(admitted->patch == fixture::take(qualified->reference.identity()));
+                CHECK(admitted->patch == fixture::take(qualified->reference().identity()));
                 CHECK(admitted->faces.size() == 2);
                 CHECK(admitted->faces.front().element == 702);
             } else {

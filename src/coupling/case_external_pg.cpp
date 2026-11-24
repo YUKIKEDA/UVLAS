@@ -5,6 +5,14 @@
 namespace uvlas::coupling::detail {
 namespace imported = io::detail;
 
+struct CaseExternalPgFactory {
+    template <class Match>
+    static CaseExternalPg<Match> make(structure::PgReferenceGeometry&& reference,
+                                      Match&& match) noexcept {
+        return CaseExternalPg<Match>{std::move(reference), std::move(match)};
+    }
+};
+
 core::Result<CaseExternalPg<imported::QualifiedExternalSidecarPg>> prepare_case_external_planar_pg(
     const io::SiCase& si, const imported::ExternalMeshSidecarBinding& bound,
     imported::MeshShellId shell, const imported::NastranLaminateCards* quantities,
@@ -34,8 +42,7 @@ core::Result<CaseExternalPg<imported::QualifiedExternalSidecarPg>> prepare_case_
         reference_limits.cancellation, diagnostic);
     if (!match)
         return std::unexpected(match.error());
-    return CaseExternalPg<imported::QualifiedExternalSidecarPg>{std::move(*reference),
-                                                                std::move(*match)};
+    return CaseExternalPgFactory::make(std::move(*reference), std::move(*match));
 }
 
 core::Result<CaseExternalPg<imported::CertifiedExternalSidecarPgBounds>>
@@ -58,7 +65,6 @@ prepare_case_external_pg_bounds(const io::SiCase& si,
         reference_limits.cancellation, diagnostic);
     if (!match)
         return std::unexpected(match.error());
-    return CaseExternalPg<imported::CertifiedExternalSidecarPgBounds>{std::move(*reference),
-                                                                      std::move(*match)};
+    return CaseExternalPgFactory::make(std::move(*reference), std::move(*match));
 }
 } // namespace uvlas::coupling::detail
