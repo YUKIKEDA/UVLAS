@@ -18,13 +18,19 @@ std::string frozen_interface(core::Index file) {
     return {std::istreambuf_iterator<char>{stream}, std::istreambuf_iterator<char>{}};
 }
 
-cc::CasePgChartLimits chart_limits() {
+cc::CasePgChartLimits chart_limits(core::Index right_n) {
     auto arithmetic = query_limits();
     arithmetic.maximum_scalar_operations = 1'000'000'000;
     arithmetic.maximum_partition_visits = 300'000'000;
     auto chart = arithmetic;
     chart.algebra.maximum_value_bits = 65536;
     chart.algebra.maximum_work_bits = 262144;
+    // The nonmatching layout uses the existing frozen R4 chart capacities.
+    const bool nonmatching = right_n == 2;
+    const auto trace_terms = nonmatching ? 2'000'000U : 120'000U;
+    const PgGlobalConstraintLimits global{chart, 2, 2, nonmatching ? 4096U : 500U, trace_terms};
+    const PgSparseChartLimits sparse{chart, nonmatching ? 384U : 300U, nonmatching ? 1024U : 480U,
+                                     nonmatching ? 100'000U : 70'000U};
     return {case_pg_reference_limits(),
             {profile, steps, 128, {}},
             {768, 704},
@@ -33,17 +39,17 @@ cc::CasePgChartLimits chart_limits() {
             {profile, steps, {}},
             arithmetic,
             {motion_exact_limits(), 10'000, cc::case_motion_frame_interval_scratch_bytes},
-            {chart, 120000},
-            {chart, 2, 2, 500, 120000},
-            {chart, 300, 480, 70000},
-            100000};
+            {chart, trace_terms},
+            global,
+            sparse,
+            100'000};
 }
 
 core::Result<cc::CasePgChart> prepare_fixture(std::string_view wire, core::Index right_n,
                                               core::Workspace& workspace,
                                               core::ResourcePlan& plan) {
     const auto source = checked_case_wire(wire);
-    const auto limits = chart_limits();
+    const auto limits = chart_limits(right_n);
     Fixture f;
     auto selection = core::ResourcePlan{profile};
     const auto nodes = finite_rule(f);
@@ -86,7 +92,7 @@ Q work(std::span<const PgCartesianExactPosition> a, std::span<const PgCartesianE
 
 void verify_rows(const cc::CasePgChart& owner, core::Index n, core::Workspace& workspace,
                  core::ResourcePlan& plan) {
-    const auto limits = chart_limits();
+    const auto limits = chart_limits(n);
     const auto& chart = owner.chart();
     const auto identity = take(chart.identity());
     const auto& original = chart.original();
@@ -161,8 +167,12 @@ void verify_rows(const cc::CasePgChart& owner, core::Index n, core::Workspace& w
     for (std::size_t i = 0; i < size; ++i)
         for (std::size_t d = 0; d < 3; ++d)
             CHECK(q(support_force.values()[i][d]) == reaction[i][d]);
+    const auto measured = take(chart.preparation());
     std::clog << "CASE_PG_ACCEPT," << n << ',' << size << ',' << residual.values().size() << ','
-              << chart.pivots().size() << ',' << plan.allocated_bytes() << '\n';
+              << chart.pivots().size() << ',' << plan.allocated_bytes() << ','
+              << measured.original_nonzeros << ',' << measured.lower_terms << ','
+              << measured.upper_terms << ',' << measured.factor_term_capacity << '\n'
+              << std::flush;
 }
 } // namespace
 
