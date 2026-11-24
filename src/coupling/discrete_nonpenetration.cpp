@@ -1567,11 +1567,12 @@ struct NonpenetrationBuilder {
         auto [matrix, rhs] = dense_inputs(order, memory);
         auto assembly = assemble(input, limits, memory, work, true);
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
-        admit(assembly, input, limits, memory, 2, 2, work);
         const auto row_bytes_before = memory.allocated_bytes();
         auto native_row = allocate<p::Interval>(memory, order);
         const auto row_bytes = memory.allocated_bytes() - row_bytes_before;
         auto data = allocate<CirculationRowData>(memory, order);
+        // Each row uses two forward actions and three adjoints, as in the dense reference.
+        admit(assembly, input, limits, memory, 2, 5, work);
         const auto ambient = ambient_velocity(retained.flow_, work);
         a::LocalRootScratch rounding;
         const auto forward = [&](const a::SharedP1Action& action, const a::P1ActionSource& source) {
