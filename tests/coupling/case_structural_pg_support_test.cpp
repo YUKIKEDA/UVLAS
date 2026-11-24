@@ -300,7 +300,7 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
     REQUIRE(left.rows() == count);
     REQUIRE(right.rows() == count);
     bool unequal_accelerations = false;
-    const auto centre = [](const io::SiEnclosure& x) {
+    const auto centre = [](const io::SiEnclosure& x) -> Dec {
         const auto& w = std::get<io::ScaledTwoWord>(x);
         return ldexp(Dec(w.high) + Dec(w.low), static_cast<int>(w.exponent2));
     };
@@ -343,7 +343,7 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
         return take(numerics::PrecisionBuffer<double>::binary64(std::move(dense),
                                                                 core::NumericalGeneration{78}));
     };
-    const auto exact_dec = [](const ExactRational& value) {
+    const auto exact_dec = [](const ExactRational& value) -> Dec {
         const auto x = q(value);
         return Dec(numerator(x).convert_to<std::string>()) /
                Dec(denominator(x).convert_to<std::string>());
