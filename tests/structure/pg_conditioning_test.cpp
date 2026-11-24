@@ -552,11 +552,8 @@ TEST_CASE("PG analytic Gram rejects unqualified shapes before consuming the refe
     core::Workspace ws{core::PlannedBuffer<std::byte>{}};
     auto basis = make_basis(f, length, ws, setup);
     auto caps = PgFlatGramLimits{query_limits(), no_steps ? 0 : steps};
-    std::stop_source stop;
-    if (cancelled) {
-        REQUIRE(stop.request_stop());
-        caps.arithmetic.cancellation = stop.get_token();
-    }
+    if (cancelled)
+        caps.arithmetic.cancellation = requested_stop_token();
     core::ResourcePlan refused{profile};
     const auto prepare = [](PgReferenceBasis& source, const PgFlatGramLimits& limits,
                             core::Workspace& workspace, core::ResourcePlan& plan) {
