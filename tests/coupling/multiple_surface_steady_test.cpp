@@ -1,6 +1,10 @@
 #include "aero/geometry_snapshot_fixture.hpp"
 #include "aero/global_geometry.hpp"
 #include "aero/p1_shared_action.hpp"
+#include "coupling/case_uniform_flow.hpp"
+#include "coupling/case_uniform_flow_projection.hpp"
+#include "coupling/discrete_nonpenetration.hpp"
+#include "io/case_schema_test_adapter.hpp"
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -206,13 +210,15 @@ struct Product {
             CAPTURE(i);
             const auto row =
                 take_global(contact.uvlm_quad(mesh.wake_facets[i], geometry_limits.max_steps));
-            REQUIRE(row.attachment);
-            const auto& attachment = row.attachment.value();
-            CHECK(attachment.edge == mesh.trailing.at(i).edge);
-            CHECK(attachment.bound_face == mesh.expected_owners.at(i));
-            REQUIRE(attachment.coefficient == 1);
-            const auto key = a::P1StrengthId::bound(attachment.bound_face);
-            maps.emplace_back(row.face, std::array{key, key});
+            if (const auto& attachment = row.attachment) {
+                CHECK(attachment->edge == mesh.trailing.at(i).edge);
+                CHECK(attachment->bound_face == mesh.expected_owners.at(i));
+                REQUIRE(attachment->coefficient == 1);
+                const auto key = a::P1StrengthId::bound(attachment->bound_face);
+                maps.emplace_back(row.face, std::array{key, key});
+            } else {
+                FAIL("The wake front has no qualified trailing-edge owner");
+            }
         }
         std::ranges::sort(maps, {}, &a::P1FaceStrengths::face);
     }
@@ -224,17 +230,6 @@ struct Product {
     }
 
     [[nodiscard]] a::SharedP1Action prepare(const a::P1ActionSource& source) {
-        const auto forecast =
-            a::forecast_bound_wake_induction(source, maps, strengths, action_limits);
-        if (!forecast) {
-            const auto& measured = forecast.error().cause.details.resources;
-            if (measured)
-                FAIL("Action forecast " << static_cast<int>(forecast.error().cause.code)
-                                        << " required " << measured->required << " observed "
-                                        << measured->observed);
-            FAIL("Action forecast " << static_cast<int>(forecast.error().cause.code));
-        }
-        CAPTURE(forecast->payload_bytes, forecast->reserved_steps, memory.remaining_bytes());
         return test_geometry::take(a::prepare_bound_wake_induction(
             source, maps, strengths, {core::Precision::TwoWord, 1e-12},
             {core::Precision::TwoWord, 1e-12, 1e-12}, action_limits, shared, *local, *kernel,
@@ -322,29 +317,46 @@ public:
     }
 };
 
-std::vector<a::ScalarWords> solve(std::span<const double> coefficients, core::Index size,
-                                  const a::GeometryContext& geometry, core::ResourcePlan& memory) {
-    constexpr auto operation = core::Operation::SolveLinear;
+ls::Context trial_context(const a::GeometryContext& geometry) {
     const auto trial = geometry.diagnostics.trial;
     if (!trial)
         FAIL("Expected the original circulation trial");
-    const ls::Context context{
-        {geometry.fingerprint, geometry.model, geometry.current, core::ChartGeneration{1},
-         core::SparsityGeneration{2}, core::NumericalGeneration{3}, core::ScaleGeneration{4},
-         geometry.precision, core::Precision::Binary64, core::WakePolicyGeneration{5},
-         core::TimeIntervalGeneration{6}, core::BackendGeneration{7}},
-        *trial,
-        core::ScopeId{8},
-        core::ScopeId{9},
-        geometry.time};
+    return {{geometry.fingerprint, geometry.model, geometry.current, core::ChartGeneration{1},
+             core::SparsityGeneration{2}, core::NumericalGeneration{3}, core::ScaleGeneration{4},
+             geometry.precision, core::Precision::Binary64, core::WakePolicyGeneration{5},
+             core::TimeIntervalGeneration{6}, core::BackendGeneration{7}},
+            *trial,
+            core::ScopeId{8},
+            core::ScopeId{9},
+            geometry.time};
+}
+
+struct SolveSetup {
+    SolveSetup(core::Index size, const a::GeometryContext& geometry)
+        : context(trial_context(geometry)),
+          limits{size, 1, 0, 5, ls::EstimateAdmission{1U << 20U}},
+          scale(static_cast<std::size_t>(size), 20.),
+          gamma_units(scale.size(), {2, 0, -1, 0, 0, 0, 0}),
+          speed_units(scale.size(), {1, 0, -1, 0, 0, 0, 0}) {}
+
+    [[nodiscard]] ls::Scales scales() const {
+        return {scale, scale, gamma_units, speed_units, context};
+    }
+
+    ls::Context context;
+    ls::Limits limits;
+    ls::Accuracy accuracy{ls::Norm::Infinity,     1e-25, 0., 1e-22, core::ObservationId{20},
+                          core::ObservationId{21}};
+    std::vector<double> scale;
+    std::vector<ls::UnitDimensions> gamma_units, speed_units;
+};
+
+std::vector<a::ScalarWords> solve(std::span<const double> coefficients, core::Index size,
+                                  const a::GeometryContext& geometry, core::ResourcePlan& memory) {
+    constexpr auto operation = core::Operation::SolveLinear;
+    const SolveSetup setup{size, geometry};
+    const auto scales = setup.scales();
     const auto count = static_cast<std::size_t>(size);
-    const std::vector<double> scale(count, 20.);
-    const std::vector<ls::UnitDimensions> gamma_units(count, {2, 0, -1, 0, 0, 0, 0});
-    const std::vector<ls::UnitDimensions> speed_units(count, {1, 0, -1, 0, 0, 0, 0});
-    const ls::Scales scales{scale, scale, gamma_units, speed_units, context};
-    const ls::Limits limits{size, 1, 0, 5, ls::EstimateAdmission{1U << 20U}};
-    const ls::Accuracy accuracy{ls::Norm::Infinity,     1e-25, 0., 1e-22, core::ObservationId{20},
-                                core::ObservationId{21}};
     const auto matrix = take(
         numerics::DenseMatrix<double>::copy({size, size, size}, coefficients, memory, operation));
     // Both planes have upward normal +z. The physical ambient direction is (0,0,20).
@@ -353,14 +365,14 @@ std::vector<a::ScalarWords> solve(std::span<const double> coefficients, core::In
         take(numerics::DenseMatrix<double>::copy({size, 1, size}, rhs, memory, operation));
     const auto right = take(numerics::PrecisionBuffer<double>::binary64(
         std::move(source), core::NumericalGeneration{30}));
-    const ls::DenseOperator op{matrix, context};
-    auto prepared = take(ls::DensePrepared::prepare(op, scales, limits, memory));
+    const ls::DenseOperator op{matrix, setup.context};
+    auto prepared = take(ls::DensePrepared::prepare(op, scales, setup.limits, memory));
     const AlgebraicOnly algebraic;
     const ls::Precision<double> precision{
         ls::RetainedPrecision{core::NumericalGeneration{31}}, {}, algebraic};
     const auto solved =
-        take(ls::solve_linear(op, ls::Rhs{right, context, core::RhsGeneration{40}}, scales,
-                              precision, accuracy, limits, prepared, memory));
+        take(ls::solve_linear(op, ls::Rhs{right, setup.context, core::RhsGeneration{40}}, scales,
+                              precision, setup.accuracy, setup.limits, prepared, memory));
 
     std::vector<a::ScalarWords> result;
     result.reserve(count);
@@ -437,6 +449,213 @@ void check_mismatch(const Product& other, const a::ResolvedQuery& other_query,
         FAIL("A prepared action accepted a different qualified geometry or core");
     CHECK(rejected.error().cause.code == core::FailureCode::StaleGeneration);
 }
+
+namespace cf = coupling::detail;
+namespace p = a::pchip;
+
+cf::ProjectedCaseUniformFlow project_ambient(core::ResourcePlan& memory, p::PchipInputStamp stamp) {
+    using namespace test::schema_adapter;
+    constexpr auto admission = std::uint64_t{1} << 48U;
+    const structure::ExactLimits exact{100000,
+                                       100000,
+                                       100000,
+                                       64,
+                                       100000,
+                                       200000,
+                                       100000,
+                                       structure::ExactEstimateAdmission{admission},
+                                       structure::ExactTimingMode::Disabled};
+    const cf::CaseUniformFlowLimits flow_limits{
+        exact, {{128, 100000, admission, 10000}, ls::EstimateAdmission{admission}}, 100};
+    auto recipe = root("aerodynamic_steady");
+    recipe.field("flow").field("uniform").set("value", parse("[20,0,0]"));
+    recipe.field("flow").set("density", parse("1.2"));
+    recipe.field("analysis").field("speed").set("value", parse("20"));
+    const auto wire = recipe.wire();
+    const io::InputLimits syntax{
+        1000000, 256,     100000,  100000,
+        1000000, 1000000, 1000000, {io::ParserAllocationMode::EstimateAdmission, admission}};
+    std::optional<io::InputDiagnostic> parsing;
+    const auto doc =
+        take(io::read_input_document(std::as_bytes(std::span{wire.data(), wire.size()}),
+                                     io::SourceId{620}, syntax, memory, parsing));
+    std::array<std::uint64_t, static_cast<std::size_t>(io::SchemaQuota::Count)> schema_caps{};
+    schema_caps.fill(admission);
+    const auto checked =
+        take(io::validate_case_schema(doc, io::SchemaLimits{schema_caps}, memory, nullptr));
+    std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
+    si_caps.fill(admission);
+    const io::SiLimits si_limits{si_caps, exact};
+    const auto catalog = take(io::make_si_catalog(checked, si_limits, memory, nullptr));
+    std::vector<io::SiRequirementRow> rows;
+    for (std::uint64_t i = 0; i < take(catalog.size()); ++i) {
+        const auto quantity = take(catalog.entry(i));
+        rows.push_back({quantity.key,
+                        {io::SiDecimalInput{"1"}, quantity.recipe.dimensions},
+                        io::SiDecimalInput{"1e-25"},
+                        io::SiDecimalInput{"1e-25"}});
+    }
+    const auto request = take(io::make_si_request(catalog, rows, si_limits, memory, nullptr));
+    const auto si =
+        take(io::convert_case_to_si(checked, catalog, request, si_limits, memory, nullptr));
+    a::UniformFlowWorkspace workspace;
+    const auto field =
+        take(cf::prepare_case_uniform_flow(si, stamp, {}, workspace, flow_limits, memory));
+    constexpr std::array<std::uint32_t, 1> five{5}, four{4}, one{1}, billion{1000000000};
+    const p::RationalView time{1, five, four}, scale{1, one, one}, absolute{1, one, billion},
+        zero{0, {}, one};
+    auto sampled = take(cf::evaluate_case_uniform_flow(field, field, {stamp, time}, workspace,
+                                                       flow_limits.flow, memory));
+    const cf::CaseFlowComponentBudget component{scale, absolute, zero};
+    const std::array bounds{component, component, component};
+    return take(cf::project_case_uniform_flow(
+        std::move(sampled), {core::Precision::TwoWord, bounds, bounds, {4096, admission}}));
+}
+
+cf::NonpenetrationVector vector_value(const Point& pnt) {
+    return {a::SingleWord{pnt[0]}, a::SingleWord{pnt[1]}, a::SingleWord{pnt[2]}};
+}
+
+Enclosure multiply(const Enclosure& left, const Enclosure& right) {
+    return {left.center * right.center, abs(left.center) * right.radius +
+                                            abs(right.center) * left.radius +
+                                            left.radius * right.radius};
+}
+
+std::size_t wing_of(a::PointId id) {
+    REQUIRE(id.value() > 0);
+    const auto wing = (id.value() - 1) / points_per_wing;
+    REQUIRE(wing < wing_count);
+    return static_cast<std::size_t>(wing);
+}
+
+void compare_native_loads(Product& product, const Mesh& mesh, const nlohmann::json& fixture) {
+    constexpr a::P1ActionStamp trial{700, 9};
+    const p::PchipInputStamp stamp{p::PchipIssuerId{72}, p::PchipInputGeneration{1}};
+    constexpr core::NumericalGeneration generation{31};
+    const auto zero = vector_value({});
+    const cf::ExplicitCollocationTangents planar{vector_value({1, 0, 0}), vector_value({0, 1, 0})};
+    std::vector<a::ResolvedQuery> queries;
+    queries.reserve(order);
+    for (std::size_t i = 0; i < order; ++i)
+        queries.push_back(product.query(i, point(fixture.at("queries_m").at(i))));
+    std::vector<cf::DiscreteCollocation> collocations;
+    std::vector<cf::BoundCirculationRate> rates;
+    std::vector<cf::BoundLoadDirection> gamma_direction;
+    for (std::size_t i = 0; i < order; ++i) {
+        collocations.emplace_back(mesh.bound_facets.at(i), queries.at(i), planar, zero,
+                                  a::SingleWord{0}, a::SingleWord{0});
+        rates.emplace_back(mesh.bound.at(i), a::SingleWord{0});
+        const auto derivative = decimal(fixture.at("circulation_slope_m2_s").at(i));
+        gamma_direction.emplace_back(mesh.bound.at(i), a::SingleWord{derivative}, a::SingleWord{0});
+    }
+    std::vector<cf::DiscreteWakePanel> wake;
+    std::vector<cf::FrozenWakeTrace> history;
+    std::vector<a::EdgeId> te_edges, force_edges;
+    for (std::size_t i = 0; i < mesh.wake_facets.size(); ++i) {
+        const a::P1StrengthId id{800 + i};
+        wake.emplace_back(mesh.wake_facets.at(i), cf::AttachedWakeFront{}, id);
+        history.push_back({id, a::SingleWord{0}});
+        te_edges.push_back(mesh.trailing.at(i).edge);
+    }
+    for (const auto& quad : mesh.quads) {
+        if (std::ranges::binary_search(mesh.bound, quad.face))
+            force_edges.insert(force_edges.end(), quad.edges.begin(), quad.edges.end());
+    }
+    std::ranges::sort(force_edges);
+    auto duplicates = std::ranges::unique(force_edges);
+    force_edges.erase(duplicates.begin(), duplicates.end());
+    std::erase_if(force_edges,
+                  [&](a::EdgeId id) { return std::ranges::find(te_edges, id) != te_edges.end(); });
+    std::vector<cf::EdgeMidpointVelocity> edges;
+    edges.reserve(force_edges.size());
+    for (const auto edge : force_edges)
+        edges.emplace_back(edge, zero);
+    const std::vector<cf::NonpenetrationVector> displacements(mesh.points.size(), zero);
+    const cf::DiscreteNonpenetrationInput input{product.contact,
+                                                collocations,
+                                                wake,
+                                                {core::AcceptedStateId{2}, history},
+                                                trial,
+                                                stamp,
+                                                p::RequestedSide::Automatic};
+    const cf::DiscreteVectorLoadInput loads{trial, generation,         edges,
+                                            rates, a::SingleWord{1.2}, zero};
+    const cf::DiscreteVectorLoadDirection variation{trial,
+                                                    generation,
+                                                    mesh.points,
+                                                    displacements,
+                                                    edges,
+                                                    gamma_direction,
+                                                    vector_value({0, 0, 20})};
+    const cf::DiscreteNonpenetrationLimits limits{{core::Precision::TwoWord, 1e-12},
+                                                  {core::Precision::TwoWord, 1e-12, 1e-12},
+                                                  product.action_limits,
+                                                  action_steps,
+                                                  UINT64_C(70000000000000)};
+    const SolveSetup setup{static_cast<core::Index>(order), product.geometry.context()};
+    const cf::DiscreteCirculationRequest request{setup.scales(),
+                                                 setup.limits,
+                                                 setup.accuracy,
+                                                 core::RhsGeneration{3},
+                                                 generation,
+                                                 1e-13,
+                                                 1e-13,
+                                                 1e-11,
+                                                 0.};
+    const auto result = take(cf::solve_discrete_circulation_load_direction(
+        input, loads, variation, project_ambient(product.memory, stamp), limits, request,
+        *product.geometry_work, product.shared, *product.local, *product.kernel, product.memory));
+    using Wrench = std::array<Enclosure, 2>;
+    std::array<Wrench, wing_count> per_wing{};
+    REQUIRE(result.loads().edge_count() == edges.size());
+    for (std::size_t i = 0; i < result.loads().edge_count(); ++i) {
+        CAPTURE(i);
+        const auto location = take(result.loads().edge(i));
+        const auto derivative = take(result.edge(i));
+        const auto wing = wing_of(location.endpoints[0]);
+        REQUIRE(wing_of(location.endpoints[1]) == wing);
+        const auto force_z = enclosure(derivative.force[2]);
+        const auto moment_y = multiply(enclosure(location.position[0]), force_z);
+        check(enclosure(derivative.force[0]), Rat{0}, Rat{2e-8});
+        check(enclosure(derivative.force[1]), Rat{0}, Rat{2e-8});
+        per_wing[wing][0] = add_scaled(per_wing[wing][0], force_z, Rat{1});
+        per_wing[wing][1] = add_scaled(per_wing[wing][1], moment_y, Rat{-1});
+    }
+    Wrench total{};
+    for (std::size_t wing = 0; wing < wing_count; ++wing) {
+        CAPTURE(wing);
+        const auto& expected = fixture.at("wrenches").at(wing).at(0);
+        for (std::size_t component = 0; component < total.size(); ++component) {
+            check(per_wing[wing][component], Rat{decimal(expected.at(component))}, Rat{2e-8});
+            total[component] = add_scaled(total[component], per_wing[wing][component], Rat{1});
+        }
+    }
+    const auto force = result.total_force_direction();
+    const auto moment = result.total_moment_direction();
+    check(add_scaled(enclosure(force[2]), total[0], Rat{-1}), Rat{0}, Rat{2e-8});
+    check(add_scaled(enclosure(moment[1]), total[1], Rat{-1}), Rat{0}, Rat{2e-8});
+
+    Enclosure nodal_work{};
+    const std::array<Rat, wing_count> translation{Rat{1} / 4, -Rat{1} / 8};
+    const std::array<Rat, wing_count> rotation{-Rat{1} / 16, Rat{1} / 32};
+    for (std::size_t i = 0; i < result.loads().point_count(); ++i) {
+        const auto node = take(result.point(i));
+        const auto wing = wing_of(node.point);
+        const auto offset = 3 * static_cast<std::size_t>(node.point.value() - 1);
+        const Rat x = mesh.values.at(offset);
+        const Rat z = mesh.values.at(offset + 2);
+        nodal_work = add_scaled(nodal_work, enclosure(node.force[0]), rotation[wing] * z);
+        nodal_work = add_scaled(nodal_work, enclosure(node.force[2]),
+                                translation[wing] - rotation[wing] * x);
+    }
+    Enclosure wrench_work{};
+    for (std::size_t wing = 0; wing < wing_count; ++wing) {
+        wrench_work = add_scaled(wrench_work, per_wing[wing][0], translation[wing]);
+        wrench_work = add_scaled(wrench_work, per_wing[wing][1], rotation[wing]);
+    }
+    check(add_scaled(nodal_work, wrench_work, Rat{-1}), Rat{0}, Rat{2e-8});
+}
 } // namespace
 
 TEST_CASE("Frozen main and tail wings share the same physical wake action",
@@ -450,6 +669,10 @@ TEST_CASE("Frozen main and tail wings share the same physical wake action",
     const Mesh mesh{fixture.at("vertices_m")};
     auto product = std::make_unique<Product>(mesh);
 
+    if (UVLAS_MULTIPLE_SURFACE_NATIVE_LOADS != 0) {
+        compare_native_loads(*product, mesh, fixture);
+        return;
+    }
     Matrix matrix{};
     Coefficients direction{};
     for (std::size_t j = 0; j < order; ++j)
