@@ -1,4 +1,5 @@
-#include "external_mesh_sidecar_binding.hpp"
+#include "../structure/pg_partition_test_support.hpp"
+#include "external_mesh_sidecar_pg.hpp"
 #include "gmsh_mesh.hpp"
 #include "nastran_coordinate_cards.hpp"
 #include "reference_declarations_fixture.hpp"
@@ -1458,9 +1459,9 @@ TEST_CASE("Authenticated mesh sidecars bind original faces to existing Case PGs"
 $EndMeshFormat
 $Entities
 0 1 2 0
-11 0 0 0 1 0 0 1 7 0
-17 0 0 0 1 1 0 1 7 0
-18 0 0 0 1 1 0 1 8 0
+11 0 0 0 1000 0 0 1 7 0
+17 0 0 0 1000 1000 0 1 7 0
+18 0 0 0 1000 1000 0 1 8 0
 $EndEntities
 $Nodes
 1 4 10 99
@@ -1470,9 +1471,9 @@ $Nodes
 40
 99
 0 0 0
-1 0 0
-1 1 0
-0 1 0
+1000 0 0
+1000 1000 0
+0 1000 0
 $EndNodes
 $Elements
 3 4 501 999
@@ -1491,14 +1492,13 @@ $EndElements
         "CTRIA3,701,90,10,20,40\nCTRIA3,702,90,10,40,99\n"
         "SPC,42,10,1,0.0\nSPC1,51,36,10,40\nSPCADD,61,42,51\n";
     const auto zero = nlohmann::json{{"numerator", "0"}, {"denominator", "1"}};
-    const auto half = nlohmann::json{{"numerator", "1"}, {"denominator", "2"}};
     const auto one = nlohmann::json{{"numerator", "1"}, {"denominator", "1"}};
     const auto chart = [&](bool upper) {
         nlohmann::json result{{"orientation", "same"}};
         result["vertices"] = nlohmann::json::array(
             {nlohmann::json::array({zero, zero}),
-             upper ? nlohmann::json::array({one, half}) : nlohmann::json::array({one, zero}),
-             upper ? nlohmann::json::array({zero, half}) : nlohmann::json::array({one, half})});
+             upper ? nlohmann::json::array({one, one}) : nlohmann::json::array({one, zero}),
+             upper ? nlohmann::json::array({zero, one}) : nlohmann::json::array({one, one})});
         return result;
     };
 
@@ -1513,6 +1513,10 @@ $EndElements
     bool wrong_dimension = false;
     bool wrong_chart = false;
     bool version = false;
+    bool physical = false;
+    bool thickness_shift = false;
+    bool material_shift = false;
+    bool chart_shift = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1554,6 +1558,28 @@ $EndElements
     SECTION("Matching an incomplete Nastran support component set fails") {
         wrong_components = true;
     }
+    SECTION("Gmsh admitted planes compare 250 mm with one quarter metre") {
+        is_gmsh = true;
+        physical = true;
+    }
+    SECTION("Gmsh exact thickness detects a sub-ulp difference") {
+        is_gmsh = true;
+        physical = true;
+        thickness_shift = true;
+    }
+    SECTION("Gmsh mismatched chart fails before its different thickness") {
+        is_gmsh = true;
+        physical = true;
+        thickness_shift = true;
+        chart_shift = true;
+    }
+    SECTION("Nastran admitted planes compare PSHELL thickness and explicit MAT1 quantities") {
+        physical = true;
+    }
+    SECTION("Nastran MAT1 mismatch reports the original deck field") {
+        physical = true;
+        material_shift = true;
+    }
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1572,7 +1598,7 @@ $EndElements
              {"shell", "1"},
              {"faces", nlohmann::json::array({{{"element", "702"}, {"chart", chart(true)}}})},
              {"material_layers", nlohmann::json::array({{{"layer", "1"}, {"material", "1"}}})},
-             {"full_thickness", 0.25}});
+             {"full_thickness", 250}});
         if (!omitted) {
             auto row = sidecar["shells"][0];
             // Reverse MSH and declaration order for the same selected group.
@@ -1581,6 +1607,10 @@ $EndElements
                                                                                  : "701"},
                                                    {"chart", chart(false)}}});
             sidecar["shells"].push_back(std::move(row));
+        }
+        if (chart_shift) {
+            sidecar["shells"][0]["faces"][0]["chart"]["vertices"][1][1] = {{"numerator", "1"},
+                                                                           {"denominator", "2"}};
         }
         sidecar["supports"].push_back(
             {{"physical", {{"dimension", wrong_dimension ? 0 : 1}, {"tag", 7}}}, {"support", "1"}});
@@ -1623,9 +1653,31 @@ $EndElements
         }
         return text;
     };
-    const auto sidecar_text = sidecar.dump();
-    const auto source_text = is_gmsh ? mesh : bulk;
+    auto sidecar_text = sidecar.dump();
+    if (thickness_shift) {
+        constexpr std::string_view shared = R"("full_thickness":250)";
+        constexpr std::string_view different = R"("full_thickness":250.0000000000000000001)";
+        std::size_t first_position = 0;
+        for (int i = 0; i != 2; ++i) {
+            const auto offset = sidecar_text.find(shared, first_position);
+            REQUIRE(offset != std::string::npos);
+            sidecar_text.replace(offset, shared.size(), different);
+            first_position = offset + different.size();
+        }
+    }
+    std::string source_text{is_gmsh ? mesh : bulk};
+    if (material_shift) {
+        constexpr std::string_view original = "MAT1,6,1.0";
+        const auto offset = source_text.find(original);
+        REQUIRE(offset != std::string::npos);
+        source_text.replace(offset, original.size(), "MAT1,6,1.0000000000000000001");
+    }
     auto config = fixture::root("coupled_transient");
+    config.field("model")
+        .field("geometry")
+        .elements[0]
+        .field("thickness")
+        .set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
     auto external = fixture::fragment(is_gmsh ? "Geometry.gmsh" : "Geometry.nastran");
     if (is_gmsh) {
         external.set("reference", fixture::fragment("ReferenceGeometry.fit"));
@@ -1713,11 +1765,11 @@ $EndElements
     }
 
     REQUIRE(result);
-    REQUIRE(result->faces.size() == 2);
+    REQUIRE(result->faces().size() == 2);
     CHECK_FALSE(diagnostic);
-    CHECK(result->sidecar.source().source == io::SourceId{2});
-    CHECK(result->sidecar.geometry() == rd::MeshGeometryId{2});
-    const auto faces = result->faces.values();
+    CHECK(result->sidecar().source().source == io::SourceId{2});
+    CHECK(result->sidecar().geometry() == rd::MeshGeometryId{2});
+    const auto faces = result->faces();
     CHECK(faces[0].element == 702);
     CHECK(faces[0].pg == rd::MeshGeometryId{1});
     CHECK(faces[0].shell == rd::MeshShellId{1});
@@ -1727,9 +1779,88 @@ $EndElements
     CHECK(faces[1].sidecar_node != faces[0].sidecar_node);
     CHECK(faces[0].sidecar_row == 0);
     CHECK(faces[1].sidecar_row == 1);
+    if (physical) {
+        using namespace uvlas::structure;
+        partition_test::Fixture pg_input;
+        for (auto& value : pg_input.heights) {
+            value = pg_input.r("1", "4");
+        }
+        pg_input.layers.clear();
+        pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[2]});
+        const auto unit = pg_input.r("1");
+        const std::array origin{pg_input.r("0"), pg_input.r("0"), pg_input.r("0")};
+        const std::array axes{pg_input.r("1"), pg_input.r("0"), pg_input.r("0"),
+                              pg_input.r("0"), pg_input.r("1"), pg_input.r("0"),
+                              pg_input.r("0"), pg_input.r("0"), pg_input.r("1")};
+        const PgReferenceLimits pg_limits{
+            partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+        core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+        auto coefficients = fixture::take(PgCoefficientDictionary::prepare(
+            pg_input.chart_graph(), {partition_test::exact_limits(), 2000, 20'000'000, 100'000, {}},
+            workspace, plan));
+        auto partition = fixture::take(PgIntegrationPartition::prepare(
+            pg_input.request(), partition_test::limits(), workspace, plan));
+        PgReferenceInputs initial{std::move(pg_input.chart_graph()), std::move(coefficients),
+                                  std::move(partition)};
+        const auto pg = fixture::take(PgReferenceGeometry::prepare(
+            std::move(initial), {axes, origin, unit}, pg_limits, plan));
+        std::optional<rd::NastranLaminateCards> quantities;
+        if (!is_gmsh) {
+            auto from_snapshot = fixture::take(
+                rd::prepare_referenced_nastran_deck(*graph, fixture::take(schema.identity()),
+                                                    io::SourceId{1}, binding.nastran, plan, {}));
+            auto coordinates = fixture::take(rd::NastranCoordinateCards::prepare(
+                std::move(from_snapshot), binding.coordinates, plan, {}));
+            auto cards = fixture::take(
+                rd::NastranShellCards::prepare(std::move(coordinates), binding.shells, plan, {}));
+            auto isotropic = fixture::take(
+                rd::NastranIsotropicShellCards::prepare(std::move(cards), {32, 32'000}, plan, {}));
+            quantities.emplace(fixture::take(
+                rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
+        }
+        const io::SiUnits case_units{io::SiLengthUnit::Metre, io::SiMassUnit::Kilogram,
+                                     io::SiTimeUnit::Second, io::SiAngleUnit::Radian};
+        const rd::ExternalSidecarPgLimits qualification{
+            {pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
+        rd::ExternalSidecarPgDiagnostic failure;
+        const auto qualified = rd::qualify_external_sidecar_planar_pg(
+            schema, *result, rd::MeshShellId{1}, pg, case_units,
+            quantities ? &*quantities : nullptr, qualification, plan, {}, &failure);
+        if (material_shift || thickness_shift) {
+            REQUIRE_FALSE(qualified);
+            CHECK(qualified.error().code == (chart_shift ? core::FailureCode::GeometryInvalid
+                                                         : core::FailureCode::InvalidInput));
+            if (chart_shift) {
+                CHECK(failure.geometry.has_value());
+                CHECK_FALSE(failure.quantity.has_value());
+            } else if (const auto& mismatch = failure.quantity) {
+                CHECK(mismatch->quantity == (material_shift
+                                                 ? rd::ImportedQuantityField::Young1
+                                                 : rd::ImportedQuantityField::FullThickness));
+                if (material_shift) {
+                    CHECK(mismatch->card_position.has_value());
+                } else {
+                    CHECK(mismatch->vertex == 0);
+                }
+            } else {
+                FAIL("Missing exact quantity mismatch");
+            }
+        } else {
+            REQUIRE(qualified);
+            CHECK(qualified->thickness_compared);
+            CHECK(qualified->materials_compared == (is_gmsh ? 0 : 1));
+            CHECK(qualified->pg == rd::MeshGeometryId{1});
+            if (const auto admitted = qualified->geometry.view()) {
+                CHECK(admitted->faces.size() == 2);
+                CHECK(admitted->faces.front().element == 702);
+            } else {
+                FAIL("Missing owned geometric correspondence");
+            }
+        }
+    }
     auto boundary = binding;
     boundary.faces = 2;
-    boundary.work = result->work;
+    boundary.work = result->work();
     core::ResourcePlan exact{fixture::budget};
     CHECK(rd::bind_external_mesh_sidecar(schema, *graph, rd::MeshGeometryId{2}, boundary, exact, {},
                                          nullptr));

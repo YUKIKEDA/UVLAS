@@ -42,11 +42,44 @@ struct BoundExternalFace {
 
 // Output faces are in sidecar row order, then element-tag order within a Gmsh row.
 // Chart and original field data remain owned and carry no references to the input graph.
-struct ExternalMeshSidecarBinding {
-    ParsedMeshSidecar sidecar;
-    std::variant<GmshMesh, NastranShellCards> source;
-    core::PlannedBuffer<BoundExternalFace> faces;
-    std::uint64_t work;
+class ExternalMeshSidecarBinding {
+public:
+    using Source = std::variant<GmshMesh, NastranShellCards>;
+
+    ExternalMeshSidecarBinding(ExternalMeshSidecarBinding&&) noexcept = default;
+    ExternalMeshSidecarBinding& operator=(ExternalMeshSidecarBinding&&) = delete;
+
+    [[nodiscard]] const ParsedMeshSidecar& sidecar() const& noexcept {
+        return sidecar_;
+    }
+    [[nodiscard]] const ParsedMeshSidecar& sidecar() const&& = delete;
+    [[nodiscard]] const Source& source() const& noexcept {
+        return source_;
+    }
+    [[nodiscard]] const Source& source() const&& = delete;
+    [[nodiscard]] std::span<const BoundExternalFace> faces() const& noexcept {
+        return faces_.values();
+    }
+    [[nodiscard]] std::span<const BoundExternalFace> faces() const&& = delete;
+    [[nodiscard]] std::uint64_t work() const noexcept {
+        return work_;
+    }
+
+private:
+    friend struct ExternalMeshSidecarBindingFactory;
+
+    ExternalMeshSidecarBinding(ParsedMeshSidecar&& sidecar, Source&& source,
+                               core::PlannedBuffer<BoundExternalFace>&& faces,
+                               std::uint64_t work) noexcept
+        : sidecar_(std::move(sidecar)),
+          source_(std::move(source)),
+          faces_(std::move(faces)),
+          work_(work) {}
+
+    ParsedMeshSidecar sidecar_;
+    Source source_;
+    core::PlannedBuffer<BoundExternalFace> faces_;
+    std::uint64_t work_;
 };
 
 // Resolve identity and tag correspondence. Chart coverage and qualification of physical

@@ -5,6 +5,14 @@
 #include <utility>
 
 namespace uvlas::io::detail {
+struct ExternalMeshSidecarBindingFactory {
+    [[nodiscard]] static ExternalMeshSidecarBinding
+    make(ParsedMeshSidecar&& sidecar, ExternalMeshSidecarBinding::Source&& source,
+         core::PlannedBuffer<BoundExternalFace>&& faces, std::uint64_t work) noexcept {
+        return {std::move(sidecar), std::move(source), std::move(faces), work};
+    }
+};
+
 namespace {
 
 using Code = core::FailureCode;
@@ -578,7 +586,8 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
     const auto view = b.require(mesh.view(), Reason::Snapshot);
     const auto& declaration = std::get<GmshSidecar>(sidecar.payload());
     auto faces = gmsh_faces(b, root.model.record(), declaration, view);
-    return {std::move(sidecar), std::move(mesh), std::move(faces), b.work};
+    return ExternalMeshSidecarBindingFactory::make(std::move(sidecar), std::move(mesh),
+                                                   std::move(faces), b.work);
 }
 
 [[nodiscard]] ExternalMeshSidecarBinding bind_nastran(Binding& b, const schema::Case& root,
@@ -624,7 +633,8 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
     const auto view = b.require(shells.view(), Reason::Snapshot);
     auto faces = nastran_faces(b, model, declaration, view);
     nastran_other(b, model, declaration, view.input.bulk);
-    return {std::move(sidecar), std::move(shells), std::move(faces), b.work};
+    return ExternalMeshSidecarBindingFactory::make(std::move(sidecar), std::move(shells),
+                                                   std::move(faces), b.work);
 }
 
 } // namespace

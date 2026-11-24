@@ -55,6 +55,7 @@ struct GmshSidecarShell {
     core::PlannedBuffer<GmshSidecarFace> faces;
     std::optional<core::PlannedBuffer<GmshSidecarLayer>> material_layers;
     std::optional<structure::ExactRational> full_thickness;
+    std::optional<core::Index> full_thickness_node;
     core::Index node{};
 };
 

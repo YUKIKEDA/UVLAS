@@ -299,6 +299,7 @@ template <class Unit, std::size_t N>
     }
     if (const auto thickness = row.find("full_thickness")) {
         out.full_thickness = r.positive(*thickness);
+        out.full_thickness_node = thickness->ordinal().value();
     }
     return out;
 }
