@@ -56,8 +56,8 @@ struct NastranPgMaterialAxes {
 
 // Compare the constant through-depth material triads of selected Nastran faces.
 // The Case owner, already admitted geometry and explicit local thickness proof
-// must all match. A projected Case axis may use equal general rotations when the
-// residual relative rotation is an exact quarter turn. No tolerance is used.
+// must all match. Rational-degree rotations are compared by the exact signed
+// angle between their rational tangent rays. No tolerance is used.
 [[nodiscard]] core::Result<NastranPgMaterialAxes>
 match_nastran_pg_material_axes(const SiCase&, const ExternalMeshSidecarBinding&,
                                const QualifiedExternalSidecarPg&, const NastranPgAxisLimits&,

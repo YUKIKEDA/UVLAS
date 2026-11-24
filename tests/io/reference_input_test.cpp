@@ -1552,6 +1552,11 @@ $EndElements
         Difference,
         Degenerate,
         ResidualAngle,
+        Thirty,
+        Sixty,
+        WrongThirtySign,
+        FortyFive,
+        WrongFortyFiveQuadrant,
         VariableThickness
     };
     Axes axes = Axes::None;
@@ -1731,9 +1736,29 @@ $EndElements
         physical = true;
         axes = Axes::Degenerate;
     }
-    SECTION("An unhandled relative angle does not qualify by approximation") {
+    SECTION("A rational direction cannot realize a fifteen-degree difference here") {
         physical = true;
         axes = Axes::ResidualAngle;
+    }
+    SECTION("Tilted rational directions realize an exact negative thirty degrees") {
+        physical = true;
+        axes = Axes::Thirty;
+    }
+    SECTION("Tilted rational tangents also realize an exact negative sixty degrees") {
+        physical = true;
+        axes = Axes::Sixty;
+    }
+    SECTION("Thirty degrees with the opposite sine sign cannot pass") {
+        physical = true;
+        axes = Axes::WrongThirtySign;
+    }
+    SECTION("Rational planar diagonals make an exact forty-five degrees") {
+        physical = true;
+        axes = Axes::FortyFive;
+    }
+    SECTION("The same squared cosine in the wrong quadrant cannot pass") {
+        physical = true;
+        axes = Axes::WrongFortyFiveQuadrant;
     }
     SECTION("Varying membrane thickness cannot certify one full-depth layer normal") {
         physical = true;
@@ -1744,6 +1769,9 @@ $EndElements
     const bool corner_claim = corners != Corners::None;
     const bool axis_pcomp = axes != Axes::None && axes != Axes::VariableThickness;
     const bool two_axis_layers = axes == Axes::Quarter || axes == Axes::Difference;
+    const bool tilted_axes =
+        axes == Axes::Thirty || axes == Axes::Sixty || axes == Axes::WrongThirtySign;
+    const bool forty_five_axes = axes == Axes::FortyFive || axes == Axes::WrongFortyFiveQuadrant;
     const bool quad = axis_pcomp || (corner_claim && corners != Corners::Absolute);
     SECTION("Distinct PCOMP properties with the same physical layers cover a Case shell") {
         physical = true;
@@ -1906,7 +1934,23 @@ $EndElements
         constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
         const auto property = source_text.find(pshell);
         REQUIRE(property != std::string::npos);
-        if (two_axis_layers) {
+        if (tilted_axes) {
+            const std::string_view layer =
+                axes == Axes::Thirty  ? "PCOMP,90,-.125,,,,,,\n,6,.25,-30.0\n"
+                : axes == Axes::Sixty ? "PCOMP,90,-.125,,,,,,\n,6,.25,-60.0\n"
+                                      : "PCOMP,90,-.125,,,,,,\n,6,.25,30.0\n";
+            source_text.replace(property, pshell.size(), layer);
+            source_text += "CORD2R,12,,1.0,2.0,3.0,1.0,2.0,8.0\n,2.0,3.0,3.0\n";
+            const auto world_grid = [&](std::string_view old_grid, std::string_view new_grid) {
+                const auto index = source_text.find(old_grid);
+                REQUIRE(index != std::string::npos);
+                source_text.replace(index, old_grid.size(), new_grid);
+            };
+            world_grid("GRID,20,,1.0,0.0,0.0\n", "GRID,20,,1.0,0.0,1.0\n");
+            world_grid("GRID,99,,0.0,1.0,0.0\n", "GRID,99,,0.0,1.0,-1.0\n");
+        } else if (forty_five_axes) {
+            source_text.replace(property, pshell.size(), "PCOMP,90,-.125,,,,,,\n,6,.25,30.0\n");
+        } else if (two_axis_layers) {
             source_text.replace(property, pshell.size(),
                                 "PCOMP,90,-.125,,,,,,\n,6,.125,60.0,,6,.125,-30.0\n");
         } else if (axes == Axes::CancelledAngles) {
@@ -1922,10 +1966,12 @@ $EndElements
         const auto position = source_text.find(triangles);
         REQUIRE(position != std::string::npos);
         const std::string_view face =
-            axes == Axes::Reversed          ? "CQUAD4,701,90,10,99,40,20,30.0,0.0\n"
-            : axes == Axes::Mcid            ? "CQUAD4,701,90,10,20,40,99,12,0.0\n"
-            : axes == Axes::CancelledAngles ? "CQUAD4,701,90,10,20,40,99,20.0,0.0\n"
-                                            : "CQUAD4,701,90,10,20,40,99,30.0,0.0\n";
+            axes == Axes::Reversed                 ? "CQUAD4,701,90,10,99,40,20,30.0,0.0\n"
+            : (axes == Axes::Mcid || tilted_axes)  ? "CQUAD4,701,90,10,20,40,99,12,0.0\n"
+            : axes == Axes::CancelledAngles        ? "CQUAD4,701,90,10,20,40,99,20.0,0.0\n"
+            : axes == Axes::FortyFive              ? "CQUAD4,701,90,10,20,40,99,15.0,0.0\n"
+            : axes == Axes::WrongFortyFiveQuadrant ? "CQUAD4,701,90,10,20,40,99,105.0,0.0\n"
+                                                   : "CQUAD4,701,90,10,20,40,99,30.0,0.0\n";
         source_text.replace(position, triangles.size(), face);
     }
     if (corner_claim) {
@@ -2013,6 +2059,14 @@ $EndElements
         .elements[0]
         .field("thickness")
         .set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    if (tilted_axes) {
+        auto& surface = config.field("model").field("geometry").elements[0];
+        surface.set("degree", fixture::json("[1,1]"));
+        surface.set(
+            "coefficients",
+            fixture::json(
+                R"([{"powers":[0,1],"coefficient":{"numerator":"-1","denominator":"1"}},{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"1"}}])"));
+    }
     if (axes != Axes::None) {
         config.field("units").set("angle", fixture::json(R"("deg")"));
         auto& layers = config.field("model").field("shells").elements[0].field("layers").elements;
@@ -2025,6 +2079,9 @@ $EndElements
         } else {
             const std::string_view direction =
                 axes == Axes::Degenerate                               ? "[0,0,1]"
+                : axes == Axes::Sixty                                  ? "[1,0,1]"
+                : tilted_axes                                          ? "[2,1,1]"
+                : forty_five_axes                                      ? "[1,1,0]"
                 : (two_axis_layers || axes == Axes::VariableThickness) ? "[0,1,2]"
                                                                        : "[1,0,2]";
             const std::string_view angle = axes == Axes::CancelledAngles ? "[30]"
@@ -2321,8 +2378,11 @@ $EndElements
             const rd::NastranPgAxisLimits limits{pg_limits, two_axis_layers ? 2U : 1U};
             const auto matched = rd::match_nastran_pg_material_axes(si, *result, qualified->match(),
                                                                     limits, plan, &axis_diagnostic);
-            const bool unsupported = axes == Axes::VariableThickness || axes == Axes::ResidualAngle;
-            if (axes == Axes::Difference || axes == Axes::Degenerate || unsupported) {
+            const bool unsupported = axes == Axes::VariableThickness;
+            const bool disagrees = axes == Axes::Difference || axes == Axes::ResidualAngle ||
+                                   axes == Axes::WrongThirtySign ||
+                                   axes == Axes::WrongFortyFiveQuadrant;
+            if (disagrees || axes == Axes::Degenerate || unsupported) {
                 REQUIRE_FALSE(matched);
                 CHECK(matched.error().code == (unsupported ? core::FailureCode::Unsupported
                                                            : core::FailureCode::InvalidInput));
@@ -2330,11 +2390,9 @@ $EndElements
                     CHECK(failure_detail->element == 701);
                     CHECK(failure_detail->property == rd::NastranPropertyId{90});
                     CHECK(failure_detail->reason ==
-                          (axes == Axes::Difference   ? rd::NastranPgAxisFailure::Difference
+                          (disagrees                  ? rd::NastranPgAxisFailure::Difference
                            : axes == Axes::Degenerate ? rd::NastranPgAxisFailure::CaseAxis
-                           : axes == Axes::ResidualAngle
-                               ? rd::NastranPgAxisFailure::AngleRepresentation
-                               : rd::NastranPgAxisFailure::Thickness));
+                                                      : rd::NastranPgAxisFailure::Thickness));
                     if (axes != Axes::VariableThickness) {
                         CHECK(failure_detail->layer ==
                               core::LayerId{axes == Axes::Difference ? 2U : 1U});
@@ -2359,6 +2417,9 @@ $EndElements
                 CHECK(row.ply_field.has_value() == (axes != Axes::Mcid));
                 CHECK(row.normal[2].sign() > 0);
                 const std::string_view angle = axes == Axes::CancelledAngles ? "30"
+                                               : axes == Axes::Thirty        ? "-30"
+                                               : axes == Axes::Sixty         ? "-60"
+                                               : axes == Axes::FortyFive     ? "45"
                                                : axes == Axes::Reversed      ? "-90"
                                                : axes == Axes::Mcid          ? "0"
                                                                              : "90";
@@ -2367,6 +2428,10 @@ $EndElements
                 if (axes == Axes::Mcid) {
                     CHECK(row.tangent[0].sign() == 0);
                     CHECK(row.tangent[1].sign() > 0);
+                } else if (tilted_axes) {
+                    CHECK(row.tangent[0].sign() > 0);
+                    CHECK(row.tangent[0] == row.tangent[1]);
+                    CHECK(row.tangent[2].sign() == 0);
                 }
                 if (axes == Axes::Quarter) {
                     const auto& upper = records[1];

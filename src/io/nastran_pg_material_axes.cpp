@@ -73,30 +73,62 @@ struct Call {
             math.sub(math.mul(square, direction[2]), math.mul(axial, normal[2]))};
 }
 
-[[nodiscard]] Ray quarter_rotate(ReferenceArithmetic& math, const Ray& tangent, const Ray& normal,
-                                 unsigned quarters) {
-    if (quarters == 0U)
-        return copy_ray(math, tangent);
-    if (quarters == 1U)
-        return cross(math, normal, tangent);
-    if (quarters == 2U)
-        return subtract(math, Ray{}, tangent);
-    return cross(math, tangent, normal);
-}
-
-[[nodiscard]] unsigned quarter_turns(Call& call, const Exact& degrees, const Exact& ninety) {
-    const auto turns = call.math.div(degrees, ninety);
-    if (turns.denominator_bits() != 1)
-        call.fail(Code::Unsupported, Reason::AngleRepresentation);
+[[nodiscard]] std::optional<unsigned> integer_degrees(Call& call, const Exact& degrees) {
+    if (degrees.denominator_bits() != 1)
+        return std::nullopt;
     constexpr std::uint64_t maximum_rank_bits = 8191;
-    if (turns.numerator_bits() > maximum_rank_bits)
+    if (degrees.numerator_bits() > maximum_rank_bits)
         partition_fail(Code::ResourceExceeded);
     constexpr auto limb_bits = std::numeric_limits<geom::RankWord>::digits;
-    call.math.charge(1 + turns.numerator_bits() / limb_bits);
-    const auto fraction = geom::rank_fraction<geom::RankWide>(turns);
-    const geom::RankWide residue = fraction.numerator % 4;
-    const geom::RankWide positive = residue < 0 ? residue + 4 : residue;
+    call.math.charge(1 + degrees.numerator_bits() / limb_bits);
+    const auto fraction = geom::rank_fraction<geom::RankWide>(degrees);
+    const geom::RankWide residue = fraction.numerator % 360;
+    const geom::RankWide positive = residue < 0 ? residue + 360 : residue;
     return positive.convert_to<unsigned>();
+}
+
+[[nodiscard]] std::optional<std::string_view> cosine_square_times_four(unsigned acute) noexcept {
+    switch (acute) {
+    case 0U:
+        return "4";
+    case 30U:
+        return "3";
+    case 45U:
+        return "2";
+    case 60U:
+        return "1";
+    case 90U:
+        return "0";
+    default:
+        return std::nullopt;
+    }
+}
+
+[[nodiscard]] bool agrees_with_rotation(Call& call, const Ray& before, const Ray& after,
+                                        const Ray& normal, const Exact& degrees,
+                                        const Exact& four) {
+    // Two rational tangents have rational cos^2. For a rational turn,
+    // 2 cos(2 theta) is also an algebraic integer, so its rational values are
+    // -2, -1, 0, 1 and 2. Thus only multiples of 30 or 45 degrees can match.
+    const auto residue = integer_degrees(call, degrees);
+    if (!residue)
+        return false;
+    const auto folded = *residue <= 180U ? *residue : 360U - *residue;
+    const auto acute = folded <= 90U ? folded : 180U - folded;
+    const auto square = cosine_square_times_four(acute);
+    if (!square)
+        return false;
+    const auto cosine = dot(call.math, before, after);
+    const int expected_cosine_sign = folded < 90U ? 1 : (folded == 90U ? 0 : -1);
+    if (cosine.sign() != expected_cosine_sign)
+        return false;
+    const int expected_sine_sign = folded == 0U || folded == 180U ? 0 : (*residue < 180U ? 1 : -1);
+    if (dot(call.math, normal, cross(call.math, before, after)).sign() != expected_sine_sign)
+        return false;
+    const auto norm_product =
+        call.math.mul(dot(call.math, before, before), dot(call.math, after, after));
+    return call.math.mul(four, call.math.mul(cosine, cosine)) ==
+           call.math.mul(read_decimal(call.math, *square), norm_product);
 }
 
 [[nodiscard]] const schema::ReferenceFieldConstant& require_constant(
@@ -144,8 +176,7 @@ struct Call {
 }
 
 void check_case_axis(Call& call, const SiCase& si, const schema::Layer& layer, const Ray& tangent,
-                     const Ray& normal, const Exact& degrees, const Exact& one,
-                     const Exact& ninety) {
+                     const Ray& normal, const Exact& degrees, const Exact& one, const Exact& four) {
     const auto axis = layer.axis.record();
     if (const auto* projected = std::get_if<schema::AxisProjected>(&axis)) {
         const auto direction = projected->direction.record();
@@ -158,10 +189,7 @@ void check_case_axis(Call& call, const SiCase& si, const schema::Layer& layer, c
             read_case_component(call, si, require_constant(call, angle), 0, true);
         // Remove the Case rotation on both sides before comparing the rays.
         const auto difference = call.math.sub(degrees, case_angle);
-        if (!same_ray(
-                call.math,
-                quarter_rotate(call.math, tangent, normal, quarter_turns(call, difference, ninety)),
-                ray))
+        if (!agrees_with_rotation(call, tangent, ray, normal, difference, four))
             call.fail(Code::InvalidInput, Reason::Difference);
         return;
     }
@@ -177,9 +205,7 @@ void check_case_axis(Call& call, const SiCase& si, const schema::Layer& layer, c
     if (!right_handed_basis(call.math, basis, one))
         call.fail(Code::InvalidInput, Reason::CaseAxis);
     if (!same_ray(call.math, normal, basis[2]) ||
-        !same_ray(call.math,
-                  quarter_rotate(call.math, tangent, normal, quarter_turns(call, degrees, ninety)),
-                  basis[0]))
+        !agrees_with_rotation(call, tangent, basis[0], normal, degrees, four))
         call.fail(Code::InvalidInput, Reason::Difference);
 }
 
@@ -337,7 +363,7 @@ match_nastran_pg_material_axes(const SiCase& si, const ExternalMeshSidecarBindin
                 call.math.admit();
                 auto output = partition_take(plan.allocate<NastranPgLayerAxis>(count, operation));
                 const auto one = read_decimal(call.math, "1");
-                const auto ninety = read_decimal(call.math, "90");
+                const auto four = read_decimal(call.math, "4");
                 std::size_t next = 0;
                 for (const auto& face : faces) {
                     call.math.visit(1);
@@ -396,7 +422,7 @@ match_nastran_pg_material_axes(const SiCase& si, const ExternalMeshSidecarBindin
                         if (face.winding == ExternalPgWinding::Reversed)
                             degrees = call.math.sub(Exact{}, degrees);
                         check_case_axis(call, si, layer, native_axis.tangent, native_axis.normal,
-                                        degrees, one, ninety);
+                                        degrees, one, four);
                         output.values()[next++] = {face.element,
                                                    property,
                                                    id,
