@@ -3766,8 +3766,13 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     original.exact_time = exact_instant.view();
     auto geometry_work = test_geometry::workspace(memory);
     auto global = take(a::GlobalWorkspace::create(memory, contact_caps.metadata));
+    auto old_words = coordinates0;
+    for (const auto row : {0U, 1U, 2U, 3U, 5U})
+        old_words[3 * row] += 4;
+    auto previously_moved = original;
+    previously_moved.current = a::SinglePositions{old_words};
     const auto reference_geometry = test_geometry::take(
-        a::prepare_owned_geometry(original, geometry_caps, *geometry_work, memory));
+        a::prepare_owned_geometry(previously_moved, geometry_caps, *geometry_work, memory));
     const auto topology = take_global(a::build_global_topology(
         reference_geometry,
         {std::span{fixture.roles}.first<1>(), std::span{fixture.edge_owners}.first<5>(), {}},
@@ -3864,6 +3869,17 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     const auto center = sum_words(value.center()) * two_power(value.exponent());
     near(center, -angular_rate / 2);
 
+    const std::array<double, 18> zero_low{};
+    auto wide_original = original;
+    wide_original.current = a::DoublePositions{coordinates0, zero_low};
+    const auto wide = take(cf::evaluate_prescribed_aero_attachment(
+        attachment, current, {topology, wide_original, moving, rows},
+        {stamp, at, p::JetOrder::First, side},
+        {core::Precision::TwoWord, projection.pose, projection.point}, curves, *geometry_work,
+        *global, caps, memory));
+    const auto wide_row = take(wide.collocation(0));
+    CHECK(std::holds_alternative<a::DoubleWord>(wide_row.velocity[2]));
+    near(sum_words(wide_row.velocity[2]), angular_rate / 4);
     reject(run(current, different, model, caps, memory), core::FailureCode::StaleGeneration);
     const std::array invalid_points{id[0], id[1], id[2], alias};
     reject(run(current, at, {topology, original, invalid_points, rows}, caps, memory),

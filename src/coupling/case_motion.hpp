@@ -27,6 +27,9 @@ struct CaseMotionReferencePoint {
 };
 
 struct CaseMotionProjection {
+    CaseMotionProjection(core::Precision format, std::span<const CaseFlowComponentBudget> budgets,
+                         std::span<const CaseMotionReferencePoint> points = {}) noexcept
+        : representation(format), components(budgets), reference_points(points) {}
     core::Precision representation;
     /// Per derivative order: three world centre components, then nine row-major
     /// rotation components. Each scale uses its component's native units.

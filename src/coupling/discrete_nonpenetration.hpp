@@ -97,10 +97,11 @@ struct DiscreteNonpenetrationLimits {
 };
 
 struct DiscreteNonpenetrationRow {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure residual;           ///< m/s, including the original affine terms.
     aero::detail::ScaledEnclosure circulation_action; ///< A_eff δΓ in m/s.
-    bool includes_wake_quadrature; ///< The finite wake formula carries the existing P1 diagnostic.
+    bool
+        includes_wake_quadrature{}; ///< The finite wake formula carries the existing P1 diagnostic.
 };
 struct NonpenetrationStorage;
 struct NonpenetrationBuilder;
@@ -174,9 +175,9 @@ struct DiscreteCirculationRequest {
 };
 
 struct CirculationResidualRow {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure original_residual; ///< m/s from the native finite expression.
-    bool includes_wake_quadrature;
+    bool includes_wake_quadrature{};
 };
 
 /// Own both the LU-qualified retained words and the independent native residual
@@ -308,7 +309,7 @@ struct DiscreteCirculationDirection {
 };
 
 struct CirculationForcingRow {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure residual_direction; ///< Fixed-circulation δR, in m/s.
 };
 
@@ -782,7 +783,7 @@ private:
     const std::stop_token& = {}) noexcept;
 
 struct LoadCirculationRateCovector {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure rate; ///< Dual to the independent Γdot, s²/m².
 };
 
@@ -1004,15 +1005,15 @@ struct DiscreteFreeWakeLimits {
 struct FreeWakeVelocitySource {
     aero::detail::GeometryContext geometry;
     aero::detail::P1ActionStamp stamp;
-    core::AcceptedStateId parent;
+    core::AcceptedStateId parent{0};
 };
 
 struct FreeWakeVelocityRow {
-    aero::detail::PointId particle;
-    aero::detail::PointId owner;
+    aero::detail::PointId particle{0};
+    aero::detail::PointId owner{0};
     DiscreteLoadVector velocity;
     std::optional<DiscreteLoadVector> direction;
-    bool includes_wake_quadrature;
+    bool includes_wake_quadrature{};
 };
 
 struct FreeWakeStrengthCovector {

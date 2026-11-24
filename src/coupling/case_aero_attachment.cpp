@@ -78,7 +78,7 @@ a::ScalarWords centre(io::SiEnclosure value) {
     return a::DoubleWord{unscale(both.high, both.exponent2), unscale(both.low, both.exponent2)};
 }
 
-void qualify_point(m::Interval value, const io::SiEnclosure& reference,
+void qualify_point(const m::Interval& value, const io::SiEnclosure& reference,
                    const CaseFlowComponentBudget& budget, std::uint64_t bits, m::Work& work) {
     const auto representative = interval(centre(reference), work);
     const auto envelope = std::visit(
@@ -229,10 +229,13 @@ struct Builder {
             prepare_point(moving.size() + i, {row.query, row.material_point});
         }
 
+        auto motion_budget = limits.motion;
+        motion_budget.maximum_interval_work =
+            std::min(motion_budget.maximum_interval_work, work.limit - work.used);
         auto motion = take(
             evaluate_case_motion(prepared.motion_, current.motion_, query,
                                  {projection.representation, projection.pose, requests.values()},
-                                 curves, limits.motion, memory, stop, details));
+                                 curves, motion_budget, memory, stop, details));
         charge(work, motion.interval_work());
         const auto instant = take(motion.time()).get().time();
         if (const auto& expected_time = original.exact_time) {
@@ -252,20 +255,23 @@ struct Builder {
         if (projection.representation == core::Precision::Binary64 && one != nullptr) {
             if (one->words.size() != word_count)
                 reject(InvalidInput);
+            charge(work, word_count);
             std::ranges::copy(one->words, high.values().begin());
         } else if (projection.representation == core::Precision::TwoWord && one == nullptr) {
             const auto& both = std::get<a::DoublePositions>(original.current);
             if (both.high.size() != word_count || both.low.size() != word_count)
                 reject(InvalidInput);
+            charge(work, word_count);
+            charge(work, word_count);
             low = allocate<double>(memory, word_count);
             std::ranges::copy(both.high, high.values().begin());
             std::ranges::copy(both.low, low.values().begin());
         } else {
             reject(PrecisionUnsupported);
         }
-        charge(work, word_count);
         auto point_rows = allocate<PointOrdinal>(memory, original.points.size());
         for (std::size_t i = 0; i < original.points.size(); ++i) {
+            work.step();
             const auto owner = take(base.owner(original.points[i]));
             const auto column = moving_index(moving, owner, work);
             point_rows.values()[i] = {original.points[i], column};
