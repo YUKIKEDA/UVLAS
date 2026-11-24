@@ -890,8 +890,19 @@ void generic_record_checks(SemanticCheck& check, std::uint64_t node) {
                           spelling.substr(8, spelling.size() - 9));
         return;
     }
-    if (family == "PolyTerm" || family == "PgTerm" || family == "MapTerm" || family == "VectorTerm")
+    if (family == "PolyTerm" || family == "PgTerm" || family == "MapTerm" ||
+        family == "VectorTerm" || family == "MaterialMapTerm")
         c.charge(SchemaQuota::PolynomialTerms, 1);
+    if (family == "MaterialMap") {
+        const auto pieces = check.field(node, "pieces");
+        c.current = pieces;
+        check.nonempty(pieces);
+    }
+    if (family == "MaterialMapPiece") {
+        const auto terms = check.field(node, "terms");
+        c.current = terms;
+        check.powers(terms, 4);
+    }
     if (family == "Geometry") {
         const auto kind = check.tag(node);
         if (kind == "pg" || kind == "surface_graph") {
@@ -1952,6 +1963,53 @@ void boundary_index(SemanticCheck& check, std::uint64_t geometry, std::uint64_t 
     if (boundaries)
         check.require(index < check.size(*boundaries));
 }
+struct MaterialCells {
+    std::uint64_t begin;
+    std::uint64_t end;
+};
+
+MaterialCells material_cells(SemanticCheck& check, std::uint64_t piece, std::string_view name) {
+    const auto field = check.field(piece, name);
+    return {check.count(check.at(field, 0)), check.count(check.at(field, 1))};
+}
+
+bool overlap(MaterialCells first, MaterialCells second) noexcept {
+    return first.begin < second.end && second.begin < first.end;
+}
+
+void material_map_coverage(SemanticCheck& check, std::uint64_t surface, std::uint64_t attachment,
+                           std::uint64_t map) {
+    auto& c = check.c;
+    // Surface knot arrays have already been checked for at least two entries.
+    const auto chord = check.size(check.field(surface, "chord")) - 1;
+    const auto span = check.size(check.field(surface, "span")) - 1;
+    const auto host = check.referent(check.field(attachment, "host"));
+    const auto pieces = check.field(map, "pieces");
+    std::uint64_t covered = 0;
+    for (std::uint64_t i = 0; i < check.size(pieces); ++i) {
+        const auto piece = check.at(pieces, i);
+        const auto x = material_cells(check, piece, "chord_cells");
+        const auto y = material_cells(check, piece, "span_cells");
+        c.current = check.field(piece, "chord_cells");
+        check.require(x.begin < x.end && x.end <= chord);
+        c.current = check.field(piece, "span_cells");
+        check.require(y.begin < y.end && y.end <= span);
+        const auto layer_reference = check.field(piece, "layer");
+        c.current = layer_reference;
+        check.require(ancestor_record(check, check.referent(layer_reference), "Shell") == host);
+        c.current = piece;
+        for (std::uint64_t p = 0; p < i; ++p) {
+            const auto prior = check.at(pieces, p);
+            check.require(!overlap(x, material_cells(check, prior, "chord_cells")) ||
+                          !overlap(y, material_cells(check, prior, "span_cells")));
+        }
+        covered = c.add(covered, c.multiply(x.end - x.begin, y.end - y.begin));
+    }
+    c.current = pieces;
+    // Disjoint in-bounds half-open rectangles cover the grid iff their integer areas add up.
+    check.require(covered == c.multiply(chord, span));
+}
+
 void cross_record_checks(SemanticCheck& check, std::uint64_t node) {
     auto& c = check.c;
     c.current = node;
@@ -1960,6 +2018,9 @@ void cross_record_checks(SemanticCheck& check, std::uint64_t node) {
         const auto geometry = check.referent(check.field(node, "geometry"));
         boundary_index(check, geometry, check.count(check.field(node, "leading")));
         boundary_index(check, geometry, check.count(check.field(node, "trailing")));
+        const auto attachment = check.field(node, "attachment");
+        if (const auto map = check.maybe(attachment, "material_map"))
+            material_map_coverage(check, node, attachment, *map);
     }
     if (family == "Continuity") {
         const auto own = ancestor_record(check, node, "Geometry");

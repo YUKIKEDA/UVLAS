@@ -337,3 +337,136 @@ TEST_CASE("Canonical text traversal preserves non-ASCII bytes and embedded zero"
                                                        0, 0xC3, 0xA9, 0xE3, 0x81, 0x82, 0};
     CHECK(actual == expected);
 }
+
+namespace {
+JsonToken material_map_case() {
+    auto value = root("coupled_flutter");
+    auto& surface = value.field("model").field("aero_surfaces").elements.at(0);
+    surface.set("chord", parse("[0,0.5,1]"));
+    surface.field("attachment").set("material_map", parse(R"({
+            "pieces":[
+                {"chord_cells":[0,1],"span_cells":[0,1],"layer":"1","side":"interior","terms":[
+                    {"powers":[0,0],"coefficient":[
+                        {"numerator":"1","denominator":"7"},{"numerator":"0","denominator":"1"},
+                        {"numerator":"-1","denominator":"11"}]},
+                    {"powers":[1,0],"coefficient":[
+                        {"numerator":"1","denominator":"2"},{"numerator":"0","denominator":"1"},
+                        {"numerator":"0","denominator":"1"}]}]},
+                {"chord_cells":[1,2],"span_cells":[0,1],"layer":"1","side":"lower","terms":[]}
+            ]})"));
+    return value;
+}
+
+JsonToken& material_map_pieces(JsonToken& value) {
+    return value.field("model")
+        .field("aero_surfaces")
+        .elements.at(0)
+        .field("attachment")
+        .field("material_map")
+        .field("pieces");
+}
+
+void expect_material_map_rejection(const JsonToken& value, std::string_view path,
+                                   io::SchemaReason reason = io::SchemaReason::InvalidValue) {
+    io::SchemaDiagnostic diagnostic;
+    const auto rejected = validate_cross(value, &diagnostic);
+    REQUIRE_FALSE(rejected);
+    CHECK(rejected.error().code == core::FailureCode::InvalidInput);
+    const auto detail = diagnostic.detail();
+    if (!detail) {
+        FAIL("Material map failure must own its diagnostic");
+        return;
+    }
+    CHECK(detail->reason == reason);
+    CHECK(diagnostic.path() == path);
+}
+} // namespace
+
+TEST_CASE("Structural attachment stores exact material map fields and preserves legacy syntax",
+          "[verification][IO4-01][FD-06][AE-02]") {
+    const auto loaded = validate_cross(material_map_case(), nullptr);
+    REQUIRE(loaded);
+    const auto root_case = loaded->root();
+    REQUIRE(root_case);
+    const auto surface = root_case->model.record().aero_surfaces.at(0);
+    REQUIRE(surface);
+    const auto attachment = surface->record().attachment.record();
+    const auto* structural = std::get_if<io::schema::AeroAttachmentStructural>(&attachment);
+    REQUIRE(structural != nullptr);
+    const auto map = structural->material_map;
+    if (!map) {
+        FAIL("Prepared typed surface must retain its material map");
+        return;
+    }
+    const auto pieces = map->record().pieces;
+    REQUIRE(pieces.size() == 2);
+    const auto first = pieces.at(0);
+    const auto second = pieces.at(1);
+    REQUIRE(first);
+    REQUIRE(second);
+    CHECK(first->record().side.text() == "interior");
+    CHECK(second->record().side.text() == "lower");
+    CHECK(first->record().layer.unsigned_value() == structural->host.unsigned_value());
+    const auto term = first->record().terms.at(0);
+    REQUIRE(term);
+    const auto first_coefficient = term->record().coefficient.at(0);
+    const auto third_coefficient = term->record().coefficient.at(2);
+    REQUIRE(first_coefficient);
+    REQUIRE(third_coefficient);
+    CHECK(first_coefficient->record().numerator.text() == "1");
+    CHECK(first_coefficient->record().denominator.text() == "7");
+    CHECK(third_coefficient->record().numerator.text() == "-1");
+    CHECK(third_coefficient->record().denominator.text() == "11");
+
+    const auto legacy = validate_cross(root("coupled_flutter"), nullptr);
+    REQUIRE(legacy);
+    const auto legacy_root = legacy->root();
+    REQUIRE(legacy_root);
+    const auto legacy_surface = legacy_root->model.record().aero_surfaces.at(0);
+    REQUIRE(legacy_surface);
+    const auto legacy_attachment = legacy_surface->record().attachment.record();
+    const auto* legacy_structural =
+        std::get_if<io::schema::AeroAttachmentStructural>(&legacy_attachment);
+    REQUIRE(legacy_structural != nullptr);
+    CHECK_FALSE(legacy_structural->material_map);
+}
+
+TEST_CASE("Material map rejects misplaced layers gaps overlaps and repeated powers",
+          "[verification][negative][IO4-01][FD-06][AE-02]") {
+    auto value = material_map_case();
+    auto& pieces = material_map_pieces(value).elements;
+    constexpr std::string_view base{"/model/aero_surfaces/0/attachment/material_map/pieces"};
+    SECTION("A missing cell is rejected even with valid individual pieces") {
+        pieces.pop_back();
+        expect_material_map_rejection(value, base);
+    }
+    SECTION("Equal total area cannot hide overlap and a hole") {
+        pieces.at(1).set("chord_cells", parse("[0,1]"));
+        expect_material_map_rejection(value, std::string{base} + "/1");
+    }
+    SECTION("Half-open ranges use cell count rather than knot count") {
+        pieces.at(1).set("chord_cells", parse("[1,3]"));
+        expect_material_map_rejection(value, std::string{base} + "/1/chord_cells");
+    }
+    SECTION("Empty map cannot attach a surface") {
+        pieces.clear();
+        expect_material_map_rejection(value, base, io::SchemaReason::WrongShape);
+    }
+    SECTION("A resolved layer under another shell cannot be used") {
+        auto& shells = value.field("model").field("shells").elements;
+        auto other = shells.at(0);
+        other.set("id", string("2"));
+        other.field("layers").elements.at(0).set("id", string("2"));
+        shells.push_back(std::move(other));
+        pieces.at(0).set("layer", string("2"));
+        expect_material_map_rejection(value, std::string{base} + "/0/layer");
+    }
+    SECTION("Duplicate exponent pairs are invalid even with different coefficients") {
+        pieces.at(0).field("terms").elements.at(1).set("powers", parse("[0,0]"));
+        expect_material_map_rejection(value, std::string{base} + "/0/terms");
+    }
+    SECTION("The total degree is limited even when each exponent separately fits") {
+        pieces.at(0).field("terms").elements.at(1).set("powers", parse("[2,3]"));
+        expect_material_map_rejection(value, std::string{base} + "/0/terms");
+    }
+}

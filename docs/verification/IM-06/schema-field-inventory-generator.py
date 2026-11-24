@@ -2,8 +2,8 @@
 import argparse
 import hashlib
 import json
-from pathlib import Path
 import re
+from pathlib import Path
 
 
 def split_fields(text):
@@ -73,15 +73,18 @@ def main():
     sources[contract.name] = hashlib.sha256(contract.read_bytes()).hexdigest()
     contract_text = contract.read_text(encoding='utf-8')
     assert '`{numerator: Text, denominator: Text}`' in contract_text
-    assert '`{source_id: Id<Source>, path: Text, sha256: Digest, role: Tag{指定role}}`' in contract_text
+    file_reference = (
+        '`{source_id: Id<Source>, path: Text, sha256: Digest, role: Tag{指定role}}`'
+    )
+    assert file_reference in contract_text
     expected['Rational'] = [{'name': key, 'optional': False, 'spelling': 'Text'}
                             for key in ('numerator', 'denominator')]
     expected['FileReference'] = [
         {'name': key, 'optional': False, 'spelling': spelling}
         for key, spelling in [('source_id', 'Id<Source>'), ('path', 'Text'),
                               ('sha256', 'Digest'), ('role', 'Tag{指定role}')]]
-    assert len(expected) == 191, len(expected)
-    assert sum(map(len, expected.values())) == 806
+    assert len(expected) == 194, len(expected)
+    assert sum(map(len, expected.values())) == 815
     result = {'sources': sources, 'records': expected}
     if args.output.exists():
         raise FileExistsError(args.output)
@@ -92,7 +95,7 @@ def main():
         lines = ['#pragma once', '#include <array>', '#include <string_view>',
                  'namespace uvlas::test::schema_field_inventory {',
                  'struct Field { std::string_view record, name, spelling; bool optional; };',
-                 'inline constexpr std::array<Field, 806> fields{{']
+                 'inline constexpr std::array<Field, 815> fields{{']
         for name, fields in expected.items():
             for field in fields:
                 values = ', '.join(json.dumps(value, ensure_ascii=False)

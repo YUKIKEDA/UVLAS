@@ -3,6 +3,7 @@
 #include "coupling/case_aero_attachment.hpp"
 #include "coupling/case_flow_clock.hpp"
 #include "coupling/case_known_flow.hpp"
+#include "coupling/case_reference_graph.hpp"
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
@@ -195,6 +196,89 @@ void jet(const a::ExactUniformFlowJet& result, const std::array<Number, 3>& velo
     }
 }
 } // namespace
+
+TEST_CASE("Typed thin surface reference owns exact Cartesian position and tangents",
+          "[verification][negative][AE-02][GEO-01][FD-06]") {
+    auto make = [] {
+        auto value = root("aerodynamic_steady");
+        value.field("units").set("length", string("mm"));
+        auto& geometries = value.field("model").field("geometry").elements;
+        geometries.at(0) = parse(R"({
+            "kind":"surface_graph","id":"1",
+            "frame":{"origin":[4000,-2000,3000],"rotation":[[0,-1,0],[1,0,0],[0,0,1]]},
+            "reference_length":2000,
+            "x0":{"numerator":"1","denominator":"3"},
+            "width":{"numerator":"3","denominator":"2"},
+            "skew":{"numerator":"-1","denominator":"4"},
+            "degree":[2,3],
+            "coefficients":[
+                {"powers":[2,1],"coefficient":{"numerator":"1","denominator":"2"}},
+                {"powers":[0,3],"coefficient":{"numerator":"-1","denominator":"3"}}],
+            "domain":[
+                [{"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}],
+                [{"numerator":"1","denominator":"1"},{"numerator":"0","denominator":"1"}],
+                [{"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}],
+                [{"numerator":"1","denominator":"2"},{"numerator":"1","denominator":"2"}],
+                [{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}]],
+            "boundaries":[],"continuity":[]
+        })");
+        return value;
+    };
+    auto input = make();
+    auto& graph = input.field("model").field("geometry").elements.at(0);
+    // The aerodynamic surface references leading/trailing rows of its own graph.
+    auto& boundaries = graph.field("boundaries").elements;
+    const auto example = root("aerodynamic_steady");
+    boundaries =
+        example.field("model").field("geometry").elements.at(0).field("boundaries").elements;
+    constexpr io::SourceId source_id{166};
+    const structure::PgReferenceLimits bounds{exact_limits(), 10000, 1000, {}};
+    core::ResourcePlan memory{budget};
+    const auto ready = [&] {
+        const auto si = materialize(input, source_id);
+        reject(cf::CaseReferenceSurface::prepare(si, 90, bounds, memory),
+               core::FailureCode::InvalidInput);
+        return take(cf::CaseReferenceSurface::prepare(si, 1, bounds, memory));
+    }();
+    const auto identity = take(ready.identity());
+    CHECK(identity.geometry_id == 1);
+    CHECK(identity.source.source.source == source_id);
+    const auto scalar = [&](std::string_view n, std::string_view d = "1") {
+        return take(structure::ExactRational::from_integer_pair(n, d, bounds.algebra, memory));
+    };
+    const auto chord = scalar("1", "4");
+    const auto span = scalar("1", "2");
+    const auto result = take(ready.evaluate(chord, span, bounds, memory));
+    // Independent substitution into X=(4-2η, -2+2(1/3+3ξ/2-η/4),
+    // 3+ξ²η-2η³/3), with both analytic derivatives in the same coordinates.
+    CHECK(result.position[0] == scalar("3"));
+    CHECK(result.position[1] == scalar("-5", "6"));
+    CHECK(result.position[2] == scalar("283", "96"));
+    CHECK(result.chord_tangent[0] == scalar("0"));
+    CHECK(result.chord_tangent[1] == scalar("3"));
+    CHECK(result.chord_tangent[2] == scalar("1", "4"));
+    CHECK(result.span_tangent[0] == scalar("-2"));
+    CHECK(result.span_tangent[1] == scalar("-1", "2"));
+    CHECK(result.span_tangent[2] == scalar("-7", "16"));
+
+    const auto upper = scalar("3", "4");
+    const auto edge = take(ready.evaluate(chord, upper, bounds, memory));
+    CHECK(edge.position[0] == scalar("5", "2"));
+    reject(ready.evaluate(span, upper, bounds, memory), core::FailureCode::GeometryInvalid);
+    const structure::PgReferenceLimits no_visits{exact_limits(), 10000, 0, {}};
+    reject(ready.evaluate(chord, span, no_visits, memory), core::FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() requires a mutable source.
+    std::stop_source stop;
+    static_cast<void>(stop.request_stop());
+    const structure::PgReferenceLimits cancelled{exact_limits(), 10000, 1000, stop.get_token()};
+    reject(ready.evaluate(chord, span, cancelled, memory), core::FailureCode::Cancelled);
+
+    graph.field("frame").set("rotation", parse("[[0,1,0],[1,0,0],[0,0,1]]"));
+    const auto mirrored = materialize(input, source_id);
+    reject(cf::CaseReferenceSurface::prepare(mirrored, 1, bounds, memory),
+           core::FailureCode::GeometryInvalid);
+    CHECK(take(ready.evaluate(chord, span, bounds, memory)).position[2] == scalar("283", "96"));
+}
 
 TEST_CASE("Typed SI constant flow owns full-width signed magnitudes and restores exact velocity",
           "[AE-07][IO4-01][N4-02][N4-03][property]") {
@@ -2138,7 +2222,7 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             cf::EdgeMidpointVelocity{a::EdgeId{17}, coordinates(.125, .25, -.125)}};
         const std::array wake_force_edges{midpoint_velocities[0], midpoint_velocities[1],
                                           midpoint_velocities[3]};
-        const cf::DiscreteVectorLoadInput load_input{
+        cf::DiscreteVectorLoadInput load_input{
             input.trial_stamp,
             request.retained_generation,
             has_wake ? std::span<const cf::EdgeMidpointVelocity>{wake_force_edges}
@@ -2146,6 +2230,8 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             std::span{rates}.first(count),
             a::SingleWord{1.25},
             moment_origin};
+        if (mode == LoadCase::AliasedShared)
+            load_input.retention = cf::DiscreteLoadRetention::OriginalRows;
         a::SharedP1Workspace shared;
         auto local = take(a::LocalPacketWorkspace::create(memory));
         auto kernel = take(a::P1Workspace::create(memory));
@@ -2256,6 +2342,44 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             CHECK(abs(nodal_force[axis] - unpack(force[axis])) <= rational_word(1e-24));
             CHECK(abs(nodal_moment[axis] - unpack(moment[axis])) <= rational_word(1e-24));
         }
+        if (mode == LoadCase::AliasedShared) {
+            REQUIRE(result.original_count() == 28);
+            std::array<Rat, 3> original_sum{};
+            std::array<std::array<Rat, 3>, 2> shared_edge_face{};
+            std::array<std::size_t, 2> shared_edge_ends{};
+            for (std::size_t i = 0; i < result.original_count(); ++i) {
+                const auto contribution = take(result.original(i));
+                REQUIRE(contribution.local_vertex < 3);
+                const auto points = test_geometry::take(geometry.facet_points(contribution.facet));
+                CHECK(test_geometry::take(geometry.owner(points[contribution.local_vertex])) ==
+                      contribution.canonical);
+                const auto panel =
+                    contribution.face == fixture.faces[0].id ? std::size_t{0} : std::size_t{1};
+                CHECK(contribution.face == fixture.faces[panel].id);
+                if (contribution.edge == a::EdgeId{12})
+                    ++shared_edge_ends[panel];
+                for (std::size_t axis = 0; axis < original_sum.size(); ++axis) {
+                    const auto actual = unpack(contribution.force[axis]);
+                    original_sum[axis] += actual;
+                    if (contribution.edge == a::EdgeId{12})
+                        shared_edge_face[panel][axis] += actual;
+                }
+                if (!contribution.edge && contribution.facet == a::FacetId{200})
+                    residual_expected(contribution.force[2], exact_force / Rat{3});
+            }
+            CHECK(shared_edge_ends == std::array<std::size_t, 2>{2, 2});
+            // Each side has its own signed contribution before cancellation. The
+            // sum is the independently frozen force on the physical shared edge.
+            CHECK(shared_edge_face[0][0] * shared_edge_face[1][0] < 0);
+            const auto shared_edge = take(result.edge(2)).force;
+            for (std::size_t axis = 0; axis < original_sum.size(); ++axis) {
+                CHECK(abs(original_sum[axis] - unpack(force[axis])) <= rational_word(1e-24));
+                CHECK(abs(shared_edge_face[0][axis] + shared_edge_face[1][axis] -
+                          unpack(shared_edge[axis])) <= rational_word(1e-24));
+            }
+        } else
+            CHECK(result.original_count() == 0);
+        reject(result.original(result.original_count()), core::FailureCode::InvalidInput);
         reject(result.edge(result.edge_count()), core::FailureCode::InvalidInput);
         reject(result.point(result.point_count()), core::FailureCode::InvalidInput);
         reject(result.facet(result.facet_count()), core::FailureCode::InvalidInput);

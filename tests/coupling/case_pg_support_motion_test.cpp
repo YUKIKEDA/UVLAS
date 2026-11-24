@@ -1,9 +1,16 @@
+#include "aero/local_geometry_bounds_private.hpp"
+#include "aero/p1_interval_private.hpp"
+#include "aero/p1_shared_kernel.hpp"
+#include "coupling/case_material_chart.hpp"
+#include "coupling/case_material_reference.hpp"
+#include "coupling/case_material_rows.hpp"
 #include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "structure/pg_conditioning_test_support.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -242,6 +249,362 @@ TEST_CASE("An explicit Case PG shell owns its exact reference geometry in SI",
     REQUIRE_FALSE(stage_stop);
     CHECK(stage_stop.error().code == core::FailureCode::Cancelled);
     CHECK(take(ready.identity()) == identity);
+}
+
+TEST_CASE("Case material chart owns the selected PG and preserves both sides at a shared vertex",
+          "[verification][negative][AE-02][SH-D02][FD-06][V-MULTI]") {
+    auto wire = a::root("coupled_flutter");
+    wire.field("units").set("length", a::string("m"));
+    auto& model = wire.field("model");
+    auto& geometry = model.field("geometry").elements.at(0);
+    geometry.set("reference_length", a::parse("2"));
+    geometry.set("frame", a::parse(R"({"origin":[3,-4,5],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    geometry.set("degree", a::parse("[0,0]"));
+    geometry.set("coefficients", a::parse("[]"));
+    geometry.field("thickness").set("values", a::parse("[0.25,0.25,0.25,0.25]"));
+    auto thin_geometry = a::parse(R"({
+        "kind":"surface_graph","id":"2","reference_length":2,
+        "frame":{"origin":[3.5,-4,4.9375],"rotation":[[1,0,0],[0,1,0],[0,0,1]]},
+        "x0":{"numerator":"0","denominator":"1"},
+        "width":{"numerator":"1","denominator":"2"},
+        "skew":{"numerator":"0","denominator":"1"},
+        "degree":[0,1],"coefficients":[
+          {"powers":[0,1],"coefficient":{"numerator":"1","denominator":"16"}}],
+        "domain":[],"boundaries":[],"continuity":[]})");
+    thin_geometry.set("domain", geometry.field("domain"));
+    thin_geometry.set("boundaries", geometry.field("boundaries"));
+    model.field("geometry").elements.push_back(std::move(thin_geometry));
+    wire.field("numerics").field("patch").set("geometry_error", a::parse("0.000001"));
+    auto& layers = model.field("shells").elements.at(0).field("layers").elements;
+    auto upper_layer = layers.at(0);
+    layers.at(0).set(
+        "interval",
+        a::parse(R"([{"numerator":"-1","denominator":"1"},{"numerator":"0","denominator":"1"}])"));
+    upper_layer.set("id", a::string("9"));
+    upper_layer.set(
+        "interval",
+        a::parse(R"([{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}])"));
+    layers.push_back(std::move(upper_layer));
+    auto& surface = model.field("aero_surfaces").elements.at(0);
+    surface.set("span", a::parse("[0,0.5,1]"));
+    surface.set("geometry", a::string("2"));
+    auto& attachment = surface.field("attachment");
+    auto piece = a::parse(R"({
+        "chord_cells":[0,1],"span_cells":[0,1],"layer":"1","side":"interior","terms":[
+          {"powers":[0,0],"coefficient":[{"numerator":"1","denominator":"4"},
+            {"numerator":"0","denominator":"1"},{"numerator":"-1","denominator":"2"}]},
+          {"powers":[1,0],"coefficient":[{"numerator":"1","denominator":"2"},
+            {"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]},
+          {"powers":[0,1],"coefficient":[{"numerator":"0","denominator":"1"},
+            {"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}]}]})");
+    auto other = piece;
+    other.set("layer", a::string("9"));
+    other.set("span_cells", a::parse("[1,2]"));
+    auto map = a::parse(R"({"pieces":[]})");
+    map.field("pieces").elements = {piece, other};
+    attachment.set("material_map", map);
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const c::CaseMaterialChartLimits limits{case_pg_reference_limits(), query_limits(), 8};
+    const auto [ready, thin] = [&] {
+        const auto si = checked_case(wire);
+        return std::pair{take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan)),
+                         take(c::CaseReferenceSurface::prepare(si, 2, limits.chart, plan))};
+    }();
+    CHECK(take(ready.identity()).shell_id == 1);
+    CHECK(take(ready.identity()).surface_id == 1);
+    const auto left = take(ready.vertex(0, 1, 0, limits.chart, plan));
+    const auto right = take(ready.vertex(0, 1, 1, limits.chart, plan));
+    CHECK(left.material == right.material);
+    CHECK(q(left.material[0]) == Q{3} / 8);
+    CHECK(q(left.material[1]) == Q{1} / 2);
+    CHECK(q(left.material[2]) == 0);
+    CHECK(left.layer == core::LayerId{1});
+    CHECK(right.layer == core::LayerId{9});
+    CHECK(left.side == c::CaseMaterialSide::Upper);
+    CHECK(right.side == c::CaseMaterialSide::Lower);
+    const auto collocation = take(ready.collocation(0, 1, limits.chart, plan));
+    CHECK(q(collocation.aerodynamic[0]) == Q{3} / 4);
+    CHECK(q(collocation.aerodynamic[1]) == Q{3} / 4);
+    CHECK(q(collocation.material[0]) == Q{5} / 8);
+    CHECK(q(collocation.material[2]) == Q{1} / 4);
+    CHECK(q(collocation.chord_tangent[0]) == Q{1} / 2);
+    CHECK(q(collocation.span_tangent[1]) == 1);
+    CHECK(q(collocation.span_tangent[2]) == 1);
+    CHECK(collocation.side == c::CaseMaterialSide::Interior);
+    const auto located =
+        take(c::qualify_case_material_collocation_reference(ready, thin, 0, 1, limits.chart, plan));
+    const auto scalar = [](const PgReferenceScalar& value) {
+        return q(value.rational) + q(value.radical);
+    };
+    CHECK(q(located.reference.g) == 1);
+    CHECK(q(located.reference.s) == Q{5} / 8);
+    CHECK(q(located.reference.t) == Q{3} / 4);
+    CHECK(q(located.reference.zeta) == Q{1} / 4);
+    // The flat support gives X = (3+2s, -4+2t, 5+zeta/8).
+    CHECK(scalar(located.reference.position_metres[0]) == Q{17} / 4);
+    CHECK(scalar(located.reference.position_metres[1]) == Q{-5} / 2);
+    CHECK(scalar(located.reference.position_metres[2]) == Q{161} / 32);
+    if (!located.tangents) {
+        FAIL("The PG collocation must carry its exact tangent pair");
+        return;
+    }
+    CHECK(scalar((*located.tangents)[0][0]) == 1);
+    CHECK(scalar((*located.tangents)[0][1]) == 0);
+    CHECK(scalar((*located.tangents)[0][2]) == 0);
+    CHECK(scalar((*located.tangents)[1][0]) == 0);
+    CHECK(scalar((*located.tangents)[1][1]) == 2);
+    CHECK(scalar((*located.tangents)[1][2]) == Q{1} / 8);
+    const auto left_reference =
+        take(c::qualify_case_material_vertex_reference(ready, thin, 0, 1, 0, limits.chart, plan));
+    const auto right_reference =
+        take(c::qualify_case_material_vertex_reference(ready, thin, 0, 1, 1, limits.chart, plan));
+    CHECK_FALSE(left_reference.tangents);
+    CHECK_FALSE(right_reference.tangents);
+    CHECK(std::get<PgReferenceHorizontalMeasure>(left_reference.reference.measure).side ==
+          PgPartitionFaceSide::Upper);
+    CHECK(std::get<PgReferenceHorizontalMeasure>(right_reference.reference.measure).side ==
+          PgPartitionFaceSide::Lower);
+    CHECK(left_reference.reference.partition_record != right_reference.reference.partition_record);
+    CHECK(scalar(left_reference.reference.position_metres[2]) ==
+          scalar(right_reference.reference.position_metres[2]));
+
+    CHECK(q(take(ready.vertex(1, 2, 1, limits.chart, plan)).aerodynamic[0]) == 1);
+    const auto misplaced = ready.vertex(0, 2, 0, limits.chart, plan);
+    REQUIRE_FALSE(misplaced);
+    CHECK(misplaced.error().code == core::FailureCode::InvalidInput);
+    const auto wrong = [&](core::FailureCode expected) {
+        const auto si = checked_case(wire);
+        const auto failure = c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan);
+        REQUIRE_FALSE(failure);
+        CHECK(failure.error().code == expected);
+    };
+    SECTION("Legacy syntax needs an explicit map at physical preparation") {
+        attachment.erase("material_map");
+        wrong(core::FailureCode::InvalidInput);
+    }
+    SECTION("A constant shift on only one side cannot match the seam") {
+        attachment.field("material_map")
+            .field("pieces")
+            .elements.at(1)
+            .field("terms")
+            .elements.at(0)
+            .field("coefficient")
+            .elements.at(0)
+            .set("numerator", a::string("2"));
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("A point on the wrong layer side cannot qualify") {
+        attachment.field("material_map")
+            .field("pieces")
+            .elements.at(0)
+            .set("side", a::string("upper"));
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("An outside corner proves that the full panel does not fit the support domain") {
+        for (auto& row : attachment.field("material_map").field("pieces").elements) {
+            auto& width = row.field("terms").elements.at(1).field("coefficient").elements.at(0);
+            width.set("numerator", a::string("7"));
+            width.set("denominator", a::string("8"));
+        }
+        // The centre is inside the PG square, while xi=1 maps to s=9/8.
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("A hidden zero Jacobian invalidates the entire panel") {
+        // s = 1/4 + xi/2 - xi^2/2. The derivative vanishes at the panel centre.
+        const auto quadratic = a::parse(R"({"powers":[2,0],"coefficient":[
+          {"numerator":"-1","denominator":"2"},{"numerator":"0","denominator":"1"},
+          {"numerator":"0","denominator":"1"}]})");
+        for (auto& row : attachment.field("material_map").field("pieces").elements)
+            row.field("terms").elements.push_back(quadratic);
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("The conditioned original row carries position velocity and transpose work") {
+        const auto si = checked_case(wire);
+        auto physical = take(c::prepare_case_pg_reference(si, 1, limits.support, workspace, plan));
+        INFO("Case PG physical reference prepared");
+        const auto original = take(physical.source());
+        const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
+        auto rank = take(PgRankPreparation::prepare(original.dictionary, original.partition,
+                                                    rank_limits, workspace, plan));
+        auto basis = take(PgReferenceBasis::prepare(std::move(physical), std::move(rank),
+                                                    rank_limits, workspace, plan));
+        auto gram = take(
+            PgFlatGram::prepare(std::move(basis), 256, {limits.chart, steps}, workspace, plan));
+        auto accepted = take(std::move(gram).generate_and_certify({320, 246}, {profile, steps, {}},
+                                                                  workspace, plan));
+        const auto prepared =
+            take(PgPreparedPatch::prepare(std::move(accepted), limits.chart, workspace, plan));
+        const auto patch_id = take(prepared.info()).identity;
+        constexpr auto max_error = 1e-9;
+        for (const auto precision : {core::Precision::Binary64, core::Precision::TwoWord}) {
+            CAPTURE(static_cast<int>(precision));
+            const PgPreparedReferenceProjection projection{precision, 1e-13, 1e-13,
+                                                           1e-13,     1e-13, 1e-13};
+            const auto rows = take(c::CaseMaterialRows::prepare(
+                ready, thin, prepared, c::CaseMaterialCollocationSite{0, 1}, projection, 1e-13,
+                limits.chart, plan));
+            INFO("Collocation rows prepared");
+            const auto original_vertex = take(c::CaseMaterialRows::prepare(
+                ready, thin, prepared, c::CaseMaterialVertexSite{0, 1, 1}, projection, 1e-13,
+                limits.chart, plan));
+            INFO("Original vertex row prepared");
+            const bool paired = precision == core::Precision::TwoWord;
+            const auto capacity =
+                static_cast<core::Index>(prepared.reference_coordinates().size() * 3);
+            const auto destination =
+                take(PgVolumePositionResult::allocate(capacity, precision, plan));
+            const auto memory = std::max(destination.workspace_bytes(), core::Index{65536});
+            core::Workspace action_workspace{
+                take(plan.allocate<std::byte>(memory, core::Operation::EvaluateStep))};
+            std::vector<double> q_high, q_low, v_high, v_low;
+            const std::array speed{Q{1}, Q{-2}, Q{3}};
+            const auto append = [&](const Q& exact, std::vector<double>& high,
+                                    std::vector<double>& low) {
+                high.push_back(exact.convert_to<double>());
+                if (paired) {
+                    const auto first =
+                        take(ExactRational::from_binary64(high.back(), limits.chart.algebra, plan));
+                    const Q residual = exact - q(first);
+                    low.push_back(residual.convert_to<double>());
+                }
+            };
+            for (std::size_t j = 0; j < prepared.reference_coordinates().size(); ++j)
+                for (std::size_t axis = 0; axis < speed.size(); ++axis) {
+                    append(q(prepared.reference_coordinates()[j][axis]), q_high, q_low);
+                    append(q(prepared.translation()[j]) * speed[axis], v_high, v_low);
+                }
+            const PgCartesianWords q_state{precision, q_high, q_low};
+            const PgCartesianWords v_state{precision, v_high, v_low};
+            const c::CaseMaterialActionLimits apply{steps, max_error, max_error, max_error, {}};
+            const auto position =
+                take(rows.evaluate(patch_id, q_state, v_state, apply, action_workspace, plan));
+            const auto word = [](PgCartesianWords words, std::size_t index) {
+                return words.high[index] + (words.low.empty() ? 0.0 : words.low[index]);
+            };
+            CHECK(std::abs(word(position.position.words(), 0) - 17. / 4.) < max_error);
+            CHECK(std::abs(word(position.position.words(), 1) + 5. / 2.) < max_error);
+            CHECK(std::abs(word(position.position.words(), 2) - 161. / 32.) < max_error);
+            CHECK(std::abs(word(position.velocity.words(), 0) - 1.) < max_error);
+            CHECK(std::abs(word(position.velocity.words(), 1) + 2.) < max_error);
+            CHECK(std::abs(word(position.velocity.words(), 2) - 3.) < max_error);
+            if (!position.tangents) {
+                FAIL("Prepared rows must retain the collocation tangent pair");
+                return;
+            }
+            CHECK(std::abs(word(position.tangents->words(), 0) - 1.) < max_error);
+            CHECK(std::abs(word(position.tangents->words(), 4) - 2.) < max_error);
+            CHECK(std::abs(word(position.tangents->words(), 5) - 1. / 8.) < max_error);
+            const std::array force{0., 0., 2.};
+            const std::array zero{0., 0., 0.};
+            const PgCartesianWords loads{precision, force,
+                                         paired ? std::span<const double>{zero}
+                                                : std::span<const double>{}};
+            const auto back = take(original_vertex.pullback(patch_id, loads, {steps, max_error, {}},
+                                                            action_workspace, plan));
+            CHECK(std::get<c::CaseMaterialVertexSite>(back.original_site).original_span_cell == 1);
+            CHECK(back.surface.shell_id == 1);
+            CHECK(back.patch == patch_id);
+            const auto dual_words = back.force.words();
+            double work = 0;
+            for (std::size_t k = 0; k < dual_words.high.size(); ++k)
+                work += word(dual_words, k) * word(v_state, k);
+            CHECK(std::abs(work - 6.) < max_error);
+            namespace aero = uvlas::aero::detail;
+            namespace interval = aero::p1;
+            constexpr auto force_radius = 0x1p-35;
+            aero::LocalRootScratch enclosure_scratch;
+            const auto zero_force =
+                aero::enclose_p1_value(interval::integer(0), precision, enclosure_scratch);
+            const interval::Interval z_force{aero::decode_p1_word(2. - force_radius).lower,
+                                             aero::decode_p1_word(2. + force_radius).upper};
+            const c::DiscreteLoadVector enclosed_force{
+                zero_force, zero_force,
+                aero::enclose_p1_value(z_force, precision, enclosure_scratch)};
+            const auto enclosed = take(original_vertex.pullback_enclosed(
+                patch_id, enclosed_force, {steps, max_error, {}}, plan));
+            CHECK(enclosed.original_site.original_span_cell == 1);
+            double center_work = 0., work_radius = 0.;
+            const auto scaled = [](const aero::ScaledEnclosure& value) {
+                const auto center = std::visit(
+                    [](const auto& x) {
+                        if constexpr (std::is_same_v<std::remove_cvref_t<decltype(x)>,
+                                                     aero::SingleWord>)
+                            return x.value;
+                        else
+                            return x.high + x.low;
+                    },
+                    value.center());
+                return std::scalbn(center, value.exponent());
+            };
+            for (std::size_t column = 0; column < enclosed.force.size(); ++column) {
+                const auto& row = enclosed.force.values()[column];
+                if (!row) {
+                    FAIL("A structural column force must hold its enclosure");
+                    return;
+                }
+                for (std::size_t axis = 0; axis < row->size(); ++axis) {
+                    const auto& value = (*row)[axis];
+                    const auto motion = word(v_state, 3 * column + axis);
+                    center_work += motion * scaled(value);
+                    work_radius += std::abs(motion) * std::scalbn(value.radius(), value.exponent());
+                }
+            }
+            CHECK(std::abs(center_work - 6.) < max_error);
+            CHECK(work_radius >= 3 * force_radius);
+
+            auto stale = patch_id;
+            stale.bytes.front() ^= std::byte{1};
+            check_failure(original_vertex.pullback(stale, loads, {steps, max_error, {}},
+                                                   action_workspace, plan),
+                          core::FailureCode::StaleGeneration);
+        }
+    }
+
+    SECTION("Matching point position cannot hide an incorrect material tangent") {
+        auto& independent = model.field("geometry").elements.at(1);
+        independent.set("coefficients", a::parse(R"([
+          {"powers":[0,0],"coefficient":{"numerator":"-3","denominator":"64"}},
+          {"powers":[0,1],"coefficient":{"numerator":"1","denominator":"8"}}])"));
+        const auto si = checked_case(wire);
+        const auto new_ready = take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+        const auto new_thin = take(c::CaseReferenceSurface::prepare(si, 2, limits.chart, plan));
+        const auto at_same_position = take(new_thin.evaluate(
+            located.chart.aerodynamic[0], located.chart.aerodynamic[1], limits.chart, plan));
+        CHECK(q(at_same_position.position[2]) == Q{161} / 32);
+        const auto stale = c::qualify_case_material_collocation_reference(ready, new_thin, 0, 1,
+                                                                          limits.chart, plan);
+        REQUIRE_FALSE(stale);
+        CHECK(stale.error().code == core::FailureCode::StaleGeneration);
+        const auto mismatch = c::qualify_case_material_collocation_reference(new_ready, new_thin, 0,
+                                                                             1, limits.chart, plan);
+        REQUIRE_FALSE(mismatch);
+        CHECK(mismatch.error().code == core::FailureCode::GeometryInvalid);
+    }
+    SECTION("The subdivision allowance distinguishes uncertainty from a proved domain") {
+        const auto nonlinear = a::parse(R"([
+          {"powers":[2,0],"coefficient":[{"numerator":"-1","denominator":"2"},
+             {"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]},
+          {"powers":[3,0],"coefficient":[{"numerator":"1","denominator":"3"},
+             {"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]}])");
+        // ds/dxi = (xi-1/2)^2 + 1/64. The degree-six whole-panel Bernstein
+        // coefficients straddle zero, while the two half-panels certify positivity.
+        for (auto& row : attachment.field("material_map").field("pieces").elements) {
+            auto& terms = row.field("terms").elements;
+            terms.at(1).field("coefficient").elements.at(0).set("numerator", a::string("17"));
+            terms.at(1).field("coefficient").elements.at(0).set("denominator", a::string("64"));
+            terms.insert(terms.end(), nonlinear.elements.begin(), nonlinear.elements.end());
+        }
+        const auto si = checked_case(wire);
+        auto no_split = limits;
+        no_split.maximum_subdivisions = 0;
+        const auto unresolved = c::CaseMaterialChart::prepare(si, 1, no_split, workspace, plan);
+        REQUIRE_FALSE(unresolved);
+        CHECK(unresolved.error().code == core::FailureCode::PrecisionUnresolved);
+        const auto proved = take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+        const auto right_mid = take(proved.collocation(0, 1, limits.chart, plan));
+        CHECK(q(right_mid.chord_tangent[0]) == Q{5} / 64);
+    }
 }
 
 TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
