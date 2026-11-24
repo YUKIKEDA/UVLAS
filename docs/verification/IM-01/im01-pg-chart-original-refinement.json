@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-chart-original-refinement",
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-04",
+    "N4-05",
+    "N4-06"
+  ],
+  "source_commit": "94fde16a2d49872bf8065d31791d4c843c085df3",
+  "claimed_state": "一つの疎因子を再利用して元有理CSRで補正し、凍結R-02系列で元行の残差、元力釣合いと保持語の仕事を検証した。",
+  "checks": {
+    "ctest": "structure.pg_chart_candidate",
+    "assertions_per_configuration": 4954,
+    "elapsed_seconds": {
+      "msvc_release": 7.05,
+      "msvc_debug": 33.53,
+      "gcc14_asan_ubsan": 94.12
+    },
+    "clang_tidy_translation_units": 2,
+    "mutation": {
+      "base_commit": "706dfd3a33c2dde0cc11a5bd45598d60b9a9cb57",
+      "change": "omit the low word when converting retained values for the original rational system",
+      "mutated_source_sha256": "4dd683b565b16c4976ee3c69fdd1ae33968d9b9f96219faea622ae8da061792f",
+      "failure_assertion_index": 2483
+    }
+  },
+  "sources": {
+    "include/uvlas/structure/pg_chart_candidate.hpp": "34dce2c28a78da27b593a98cf8c72f6fed3d79b0d731c41f415d49fe89facc9a",
+    "src/structure/pg_chart_candidate.cpp": "4ccf978e1ebaf836d516a93c258ba7fcafa5d79632b6490824882f482c1f08e1",
+    "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
+    "src/structure/pg_reference_projection.hpp": "eacf129a8874d98e451e57ad2a550b186c633aee2bc02782eecbd2500f8af398",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "src/numerics/sparse_solve.cpp": "02ae6fe4e8042369a0bad9880cba9f50e9bef0242a24b28faa7e0bb0df4da8a9",
+    "tests/structure/pg_chart_candidate_test.cpp": "6e28e4f754b3170b5dc16ac693daed1803c9020e676f1e181e8cb50dc24981dd",
+    "docs/verification/IM-01/pg-chart-candidate-series/measure-candidate.cpp.txt": "da07e9d9c7593721761f9f7ebed930a23002b0aed9d7c89aaf6a6f0fa35fca42",
+    "docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt": "78ef8a8e65259b473d0201efe94b7b22fa3d0c2b953a033434310aea34f3f384",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-chart-original-refinement.md": "c13e49d35786f9a624355c975ac463c7245e688ff057a029ffe08352936ad32b",
+    "docs/verification/IM-01/pg-chart-refinement-series/result.json": "439b2f773dd3ab3265e65b78592476f024f551aa5b28f6899ee2336acb561fb9",
+    "docs/specs/structure/pg-chart-original-refinement-contract.md": "46401b26f8d1a05e39397c572781dee76e671c8a69eac7529f021527b238a1f1",
+    "docs/verification/IM-01/pg-chart-refinement-series/measure-refinement.cpp.txt": "f58ee4f2b7ace19e2987c1767c1d0d4adfc2bf9e8f1efd839bf2ddeea297f010",
+    "docs/verification/IM-01/pg-chart-refinement-series/run-series.ps1.txt": "8c530011d92ff77a4db3ed1ade0e5ce8563dab055d0befdac9809120b43fd0d5"
+  }
+}
