@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-shell-cards",
+  "ids": [
+    "IO4-01",
+    "IO4-03",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "6b937f8e00a9ff353dc8cc17d9a4b5b61bdf3eda",
+  "scope": "MSC Nastran 2022.1 CTRIA3 and CQUAD4 ordered connectivity, property and coordinate references, exact material axis, offset and corner thickness fields",
+  "verification": {
+    "ctest_regex": "^io\\.nastran_(shell_cards|coordinate_cards|bulk|number_fields)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 4,
+      "shell_card_cases": 4,
+      "shell_card_assertions": 241
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 4,
+      "shell_card_cases": 4,
+      "shell_card_assertions": 241,
+      "clang_tidy": "21.1.1 PASS on parser normal/audit and test"
+    }
+  },
+  "reference": {
+    "title": "MSC Nastran 2022.1 Quick Reference Guide",
+    "printed_pages": "1609-1611, 1667-1669, 2764-2768, 2901-2902",
+    "pdf_sha256": "c0675eed07f664ee985bc0cb3f1e1c00cc138b3a9a0ec1bf538ef345a172fcef"
+  },
+  "tested_target_registration": {
+    "commit": "6b937f8e00a9ff353dc8cc17d9a4b5b61bdf3eda",
+    "CMakeLists.txt": "f1a34c992e58f251ebc4d4afa07ffbade128ca89a7e25932c3fd51da44c2588a",
+    "tests/CMakeLists.txt": "327a3ae2eb2c0ab33c91ec9ce76a75227afe13135d408c2bbc566ef6c35c7970"
+  },
+  "sources": {
+    "src/io/nastran_shell_cards.cpp": "a48b567d637649309f1fe9fe42fd49e77f6457f50796e91c8475df4aefefab07",
+    "src/io/nastran_shell_cards.hpp": "f26bcdc0893ef972ea27e05db9d4269ba8afd456d9e5b0752bd8b09a52cccd07",
+    "tests/io/nastran_shell_cards_test.cpp": "7f00ca604ce53fb3ed41f5a4b48eff650add7049e1ed7edc8aabe2c198e0ef20"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-shell-cards.md": "28712dd38c09c59bbd266a20ae3844c4ef883c07c86caff7eec8d0dc6866a6f3"
+  }
+}

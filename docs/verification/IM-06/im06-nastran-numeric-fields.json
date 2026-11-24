@@ -1,0 +1,44 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-numeric-fields",
+  "ids": [
+    "IO4-03"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "52c2f46c4b0436cc7eafe5e88886992b24a31487",
+  "scope": "Decode Nastran bulk field integer and real tokens before numeric conversion; expose the same decoding through the authenticated bulk deck view",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 2
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 2,
+      "clang_tidy": "21.1.1 PASS on the numeric reader and both test translation units"
+    },
+    "checks": [
+      "Check full int64 bounds and preserve decimal digits and exponents without binary floating-point conversion",
+      "Decode fields through the same view for small, large, free and continued records, including the original bytes",
+      "Reject blank and malformed required numeric fields and separators that change their type"
+    ],
+    "mutation": "Replacing the uppercase D exponent marker with Q caused both CTest targets to fail. Restoring the source returned both to PASS."
+  },
+  "tested_target_registration": {
+    "commit": "52c2f46c4b0436cc7eafe5e88886992b24a31487",
+    "CMakeLists.txt": "979d325f8a5a8aaeb6e1f5460145a37322bed6f040edcc477eb35309989d2366",
+    "tests/CMakeLists.txt": "4819f4bef3fd5648a77160c76f3a7c32665f4e2803c8af33cc0e1ade98eb6e58"
+  },
+  "sources": {
+    "src/io/nastran_bulk.cpp": "9ba11c3f924fdb5375be029f898498b7c0d08c1f0f9b5614c45153b5f7f3570c",
+    "src/io/nastran_bulk.hpp": "1d62aac4a4d953c3316f3b73e1eea31c2f5f14b84446e943d507c9c8d3086d6d",
+    "src/io/nastran_number_fields.cpp": "24360b0e0e63c29fcaa19482bf2f193913e9753a6fb6f1c1fea0874c235efc96",
+    "src/io/nastran_number_fields.hpp": "4195101ae455ed6069baaa652d071e0edca17d3dd39db9365aa62dde6e3fb03e",
+    "tests/io/nastran_bulk_test.cpp": "ba480dd594efee34f9cd0c579f8c8f2ef6cac29113ca4abdd9bf68cc422273f7",
+    "tests/io/nastran_number_fields_test.cpp": "7902aab2ea01ba0c250e6993e9f85d89ea9c9c2fc8f776cc4a2e0f8101f57907"
+  }
+}

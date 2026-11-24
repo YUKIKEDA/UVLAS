@@ -192,4 +192,13 @@ prepare_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalA
 prepare_bound_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalAccuracy,
                            const GeometryLimits&, LocalPacketWorkspace&, core::ResourcePlan&,
                            const std::stop_token&) noexcept;
+/// This midpoint packet follows a raw facet edge explicitly bound by the
+/// qualified global topology to the query's canonical edge. Check the exact
+/// corresponding local projection while retaining the original query words.
+[[nodiscard]] AeroResult<LocalGeometryPacket>
+prepare_aliased_midpoint_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId,
+                                EdgeId raw_alias, bool bound, LocalAccuracy, const GeometryLimits&,
+                                LocalPacketWorkspace&, core::ResourcePlan&,
+                                const std::stop_token&) noexcept;
+
 } // namespace uvlas::aero::detail
