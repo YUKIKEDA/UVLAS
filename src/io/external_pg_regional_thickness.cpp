@@ -34,8 +34,9 @@ struct Diagnosis {
     }
 };
 
-[[nodiscard]] const ExternalPgOwnedFace&
-resolve_face(ref::ReferenceArithmetic& math, const ExternalPlanarPgView& source, std::uint64_t id,
+template <class View>
+[[nodiscard]] const auto&
+resolve_face(ref::ReferenceArithmetic& math, const View& source, std::uint64_t id,
              std::span<ExternalPgThicknessMatch> previous, const Diagnosis& diagnosis) {
     const auto selected = std::ranges::find_if(source.faces, [&](const auto& face) {
         math.visit(1);
@@ -51,8 +52,8 @@ resolve_face(ref::ReferenceArithmetic& math, const ExternalPlanarPgView& source,
     return *selected;
 }
 
-[[nodiscard]] std::array<const chart::Point*, 4>
-positive_ring(const ExternalPgOwnedFace& face) noexcept {
+template <class Face>
+[[nodiscard]] std::array<const chart::Point*, 4> positive_ring(const Face& face) noexcept {
     const auto count = face.ring().size();
     std::array<const chart::Point*, 4> ring{};
     for (std::size_t i = 0; i < count; ++i) {
@@ -96,8 +97,8 @@ struct CasePlanes {
     std::uint64_t used{};
 };
 
-void validate_claim(const ExternalPgOwnedFace& face, const ExternalPgThicknessClaim& claim,
-                    Diagnosis& diagnosis) {
+template <class Face>
+void validate_claim(const Face& face, const ExternalPgThicknessClaim& claim, Diagnosis& diagnosis) {
     if (claim.value_metres && claim.corners.empty() && claim.value_metres->sign() > 0) {
         return;
     }
@@ -137,10 +138,10 @@ void compare_constant(ref::ReferenceArithmetic& math, const ref::ThicknessPlane&
     }
 }
 
+template <class Face>
 void compare_nodal(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& plane,
-                   const ExternalPgOwnedFace& face,
-                   std::span<const ExternalPgCornerThicknessClaim> claims, core::Index original,
-                   Diagnosis& diagnosis) {
+                   const Face& face, std::span<const ExternalPgCornerThicknessClaim> claims,
+                   core::Index original, Diagnosis& diagnosis) {
     // A Case thickness plane composed with this triangle's affine chart map or
     // this quadrilateral's bilinear chart map has the same shape functions as the
     // source thickness. Equality on a positive-area open subset requires all
@@ -161,10 +162,10 @@ void compare_nodal(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& pl
     }
 }
 
-[[nodiscard]] ExternalPgThicknessMatch compare_claim(ref::ReferenceArithmetic& math, CasePlanes& pg,
-                                                     const ExternalPgOwnedFace& face,
-                                                     const ExternalPgThicknessClaim& claim,
-                                                     Diagnosis& diagnosis) {
+template <class Face>
+[[nodiscard]] ExternalPgThicknessMatch
+compare_claim(ref::ReferenceArithmetic& math, CasePlanes& pg, const Face& face,
+              const ExternalPgThicknessClaim& claim, Diagnosis& diagnosis) {
     validate_claim(face, claim, diagnosis);
     const auto outward = positive_ring(face);
     const auto domain = std::span{outward}.first(face.ring().size());
@@ -211,12 +212,12 @@ void compare_nodal(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& pl
     return match;
 }
 
-} // namespace
-
-core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
-    const ExternalPlanarPg& certified, const structure::PgReferenceGeometry& reference,
-    std::span<const ExternalPgThicknessClaim> claims, const ExternalPgThicknessLimits& limits,
-    core::ResourcePlan& plan, std::optional<ExternalPgThicknessDiagnostic>* output) noexcept {
+template <class Certified>
+core::Result<ExternalPgThicknessReport>
+compare_regions(const Certified& certified, const structure::PgReferenceGeometry& reference,
+                std::span<const ExternalPgThicknessClaim> claims,
+                const ExternalPgThicknessLimits& limits, core::ResourcePlan& plan,
+                std::optional<ExternalPgThicknessDiagnostic>* output) noexcept {
     if (output) {
         output->reset();
     }
@@ -259,6 +260,22 @@ core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
                 return std::unexpected(error.failure);
             }
         });
+}
+
+} // namespace
+
+core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
+    const ExternalPlanarPg& certified, const structure::PgReferenceGeometry& reference,
+    std::span<const ExternalPgThicknessClaim> claims, const ExternalPgThicknessLimits& limits,
+    core::ResourcePlan& plan, std::optional<ExternalPgThicknessDiagnostic>* output) noexcept {
+    return compare_regions(certified, reference, claims, limits, plan, output);
+}
+
+core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
+    const GmshPgBounds& certified, const structure::PgReferenceGeometry& reference,
+    std::span<const ExternalPgThicknessClaim> claims, const ExternalPgThicknessLimits& limits,
+    core::ResourcePlan& plan, std::optional<ExternalPgThicknessDiagnostic>* output) noexcept {
+    return compare_regions(certified, reference, claims, limits, plan, output);
 }
 
 } // namespace uvlas::io::detail

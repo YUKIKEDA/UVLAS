@@ -80,4 +80,37 @@ struct CertifiedExternalSidecarPgBounds {
     std::uint64_t maximum_directed_work, core::ResourcePlan&, const std::stop_token&,
     ExternalSidecarPgDiagnostic* = nullptr) noexcept;
 
+struct GmshPgFaceMembership {
+    GmshKey physical{};
+    std::uint64_t element{};
+    core::Index declaration{};
+};
+
+struct GmshPgConversionEvidence {
+    GmshPgBounds geometry;
+    structure::ExactRational distance_budget_metres;
+    structure::ExactRational normal_budget;
+    core::PlannedBuffer<ExternalPgConversionObservation> observations;
+};
+
+struct PreparedGmshSidecarPg {
+    using Geometry = std::variant<ExternalPlanarPg, GmshPgConversionEvidence>;
+
+    Geometry geometry;
+    MeshShellId shell{0};
+    MeshGeometryId pg{0};
+    RootSnapshotLocation sidecar;
+    SourceDigest sidecar_digest;
+    core::PlannedBuffer<GmshPgFaceMembership> membership;
+    std::optional<ExternalPgThicknessReport> thickness{};
+};
+
+// Use the unique declared conversion budget when present, otherwise exact plane correspondence.
+// A bounded member retains observation IDs for later independent physical verification.
+[[nodiscard]] core::Result<PreparedGmshSidecarPg>
+prepare_gmsh_sidecar_pg(const SiCase&, const ExternalMeshSidecarBinding&, MeshShellId,
+                        const structure::PgReferenceGeometry&, const ExternalSidecarPgLimits&,
+                        std::uint64_t maximum_directed_work, core::ResourcePlan&,
+                        const std::stop_token&, ExternalSidecarPgDiagnostic* = nullptr) noexcept;
+
 } // namespace uvlas::io::detail

@@ -99,6 +99,44 @@ private:
     core::PlannedBuffer<std::optional<Shell>> shells_;
 };
 
+struct CaseGmshPgSetLimits {
+    std::uint64_t maximum_shells{};
+    std::uint64_t maximum_selection_work{};
+    std::uint64_t maximum_directed_work_per_shell{};
+};
+
+struct CaseGmshPgSetDiagnostic {
+    std::optional<io::detail::MeshShellId> shell{};
+    std::optional<core::Index> first_declaration{};
+    io::detail::ExternalSidecarPgDiagnostic member{};
+};
+
+/// Owns all declared Gmsh Shell references from one authenticated correspondence table.
+class CaseGmshPgSet {
+public:
+    using Shell = CaseExternalPg<io::detail::PreparedGmshSidecarPg>;
+
+    [[nodiscard]] static core::Result<CaseGmshPgSet>
+    prepare(const io::SiCase&, const io::detail::ExternalMeshSidecarBinding&,
+            const CasePgReferenceLimits&, const io::detail::ExternalSidecarPgLimits&,
+            const CaseGmshPgSetLimits&, core::Workspace&, core::ResourcePlan&,
+            CaseGmshPgSetDiagnostic* = nullptr) noexcept;
+
+    /// Members are in first declaration order.
+    [[nodiscard]] std::size_t size() const noexcept {
+        return shells_.size();
+    }
+    [[nodiscard]] core::Result<std::reference_wrapper<const Shell>> at(core::Index) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const Shell>>
+        at(core::Index) const&& = delete;
+
+private:
+    explicit CaseGmshPgSet(core::PlannedBuffer<std::optional<Shell>>&& shells) noexcept
+        : shells_(std::move(shells)) {}
+
+    core::PlannedBuffer<std::optional<Shell>> shells_;
+};
+
 /// Prepare the same reference for whole-face bounds against an explicit conversion budget.
 /// The retained observation IDs identify the remaining independent physical checks.
 [[nodiscard]] core::Result<CaseExternalPg<io::detail::CertifiedExternalSidecarPgBounds>>
