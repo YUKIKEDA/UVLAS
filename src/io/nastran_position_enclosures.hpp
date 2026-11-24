@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nastran_shell_cards.hpp"
+#include "nastran_support_cards.hpp"
 
 #include <uvlas/io/si_case.hpp>
 
@@ -28,6 +29,8 @@ enum class NastranPositionFailure : std::uint8_t {
     FrameAxis,
     FramePlane,
     Conversion,
+    SpcTerm,
+    DisplacementAxis,
 };
 
 struct NastranPositionDiagnostic {
@@ -83,6 +86,60 @@ private:
     SourceDigest digest_;
     SiLengthUnit length_unit_;
     core::PlannedBuffer<NastranGridEnclosure> grids_;
+    std::uint64_t work_;
+};
+
+struct NastranSpcDirectionLimits {
+    structure::ExactLimits exact;
+    std::uint64_t maximum_work = 0;
+    std::stop_token stop;
+};
+
+struct NastranSpcDirectionOrigin {
+    NastranSupportOrigin source;
+    NastranSupportSetId set{0};
+    NastranGridId grid{0};
+    NastranCoordinateId cd{0};
+    NastranBulkPosition grid_field, component_field, card;
+    std::optional<NastranBulkPosition> cd_field, motion_field;
+    std::optional<NastranRealField> prescribed_motion;
+};
+
+enum class NastranSpcComponentKind : std::uint8_t { Translation, Rotation };
+
+using NastranComponentAxis = std::array<NastranCartesianInterval, 3>;
+
+struct NastranSpcComponentDirection {
+    NastranSpcComponentKind kind;
+    const NastranComponentAxis& basic;
+};
+
+// One selected source SPC/SPC1 term and GRID, including an existing THRU
+// member. Returns unit directions in basic coordinates for selected DOFs.
+// Term selection does not perform Case Control or assemble constraints.
+class NastranSpcDirections {
+public:
+    NastranSpcDirections(NastranSpcDirections&&) noexcept;
+    NastranSpcDirections& operator=(NastranSpcDirections&&) = delete;
+
+    [[nodiscard]] static core::Result<NastranSpcDirections>
+    prepare(const NastranCoordinateCards&, const NastranSupportCards&, std::size_t term,
+            NastranGridId, const NastranSpcDirectionLimits&, core::ResourcePlan&,
+            std::optional<NastranPositionDiagnostic>* = nullptr) noexcept;
+
+    [[nodiscard]] const NastranSpcDirectionOrigin* origin() const& noexcept;
+    [[nodiscard]] const NastranSpcDirectionOrigin* origin() const&& = delete;
+    [[nodiscard]] std::optional<NastranSpcComponentDirection>
+    direction(unsigned component) const& noexcept;
+    [[nodiscard]] std::optional<NastranSpcComponentDirection> direction(unsigned) const&& = delete;
+    [[nodiscard]] std::uint64_t work() const noexcept;
+
+private:
+    NastranSpcDirections(NastranSpcDirectionOrigin, std::uint8_t,
+                         std::array<NastranComponentAxis, 3>&&, std::uint64_t) noexcept;
+    std::optional<NastranSpcDirectionOrigin> origin_;
+    std::uint8_t components_;
+    std::array<NastranComponentAxis, 3> axes_;
     std::uint64_t work_;
 };
 

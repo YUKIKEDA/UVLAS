@@ -515,4 +515,172 @@ TEST_CASE("Nastran position conversion distinguishes degenerate frames and admis
     CHECK(q(shell_view.grids.front().metres[0].lower) == 4);
 }
 
+constexpr std::string_view spc_fixture =
+    "CORD2R,10,0,100.0,200.0,300.0,101.0,200.0,301.0,101.0,200.0,299.0\n"
+    "CORD2C,20,10,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0\n"
+    "CORD2S,30,0,11.0,21.0,31.0,11.0,21.0,32.0,12.0,21.0,31.0\n"
+    "GRID,1,,0.0,0.0,0.0,10\n"
+    "GRID,2,10,0.0,2.0,3.0,20\n"
+    "GRID,3,,12.0,23.0,33.0,30\n"
+    "GRID,4,,11.0,21.0,35.0,30\n"
+    "GRID,6,20,1.0,30.0,1.0,20\n"
+    "GRID,7,10,0.0,0.0,2.0,20\n"
+    "SPC,10,1,14,0.125\n"
+    "SPC1,20,123,2,THRU,7\n"
+    "SPC,30,3,123456,0.0\n"
+    "SPC,40,4,2,0.0\n";
+
+[[nodiscard]] NastranSpcDirectionLimits spc_limits() noexcept {
+    const auto base = position_limits();
+    return {base.exact, base.maximum_work, {}};
+}
+
+void contains_signed_root(const NastranCartesianInterval& entry, int sign, const Q& squared) {
+    const Q lower = sign > 0 ? q(entry.lower) : -q(entry.upper);
+    const Q upper = sign > 0 ? q(entry.upper) : -q(entry.lower);
+    CHECK(lower > 0);
+    CHECK(lower * lower < squared);
+    CHECK(upper * upper > squared);
+    CHECK(upper - lower < Q("1/10000000000000000000000000000000000000000"));
+}
+
+TEST_CASE("SPC components use the matched GRID CD basis and retain their deck fields",
+          "[IO4-03][IO4-01][N4-02][integration][verification]") {
+    const auto owners = [&] {
+        auto raw = lexical_deck(spc_fixture);
+        core::ResourcePlan plan{position_budget};
+        const auto input = take(NastranCoordinateCards::prepare(std::move(raw), limits, plan, {}));
+        const auto supports = take(NastranSupportCards::prepare(input, {8, 8, 10000}, plan, {}));
+        const auto read = [&](std::size_t term, std::uint64_t grid) {
+            return take(NastranSpcDirections::prepare(input, supports, term, NastranGridId{grid},
+                                                      spc_limits(), plan));
+        };
+        return std::array{read(0, 1), read(1, 2), read(2, 3), read(1, 6)};
+    }();
+
+    using Kind = NastranSpcComponentKind;
+    const auto& rect = owners[0];
+    const auto* source = rect.origin();
+    REQUIRE(source);
+    CHECK(source->set == NastranSupportSetId{10});
+    CHECK(source->source.location.source == SourceId{99});
+    CHECK(source->source.digest == source_digest(std::as_bytes(std::span{spc_fixture})));
+    CHECK(source->cd == NastranCoordinateId{10});
+    CHECK(take(source->cd_field).line == 4);
+    CHECK(source->component_field.line == 10);
+    CHECK(take(source->motion_field).line == 10);
+    if (const auto& value = source->prescribed_motion) {
+        CHECK(value->decimal() == "0.125");
+    } else {
+        FAIL("Missing source SPC value");
+    }
+    CHECK_FALSE(rect.direction(0));
+    CHECK_FALSE(rect.direction(2));
+    CHECK_FALSE(rect.direction(7));
+    CHECK(take(rect.direction(1)).kind == Kind::Translation);
+    CHECK(take(rect.direction(4)).kind == Kind::Rotation);
+    const auto& local_x = take(rect.direction(1)).basic;
+    CHECK(&local_x == &take(rect.direction(4)).basic);
+    contains_signed_root(local_x[0], 1, Q("1/2"));
+    contains(local_x[1], Q{0});
+    contains_signed_root(local_x[2], -1, Q("1/2"));
+
+    const auto& cylinder = owners[1];
+    // Polar azimuth at GRID 2 is +Y in the translated, rotated CD20 frame.
+    const auto& radial = take(cylinder.direction(1)).basic;
+    const auto& tangential = take(cylinder.direction(2)).basic;
+    const auto& axial = take(cylinder.direction(3)).basic;
+    contains(radial[0], Q{0});
+    contains(radial[1], Q{1});
+    contains(radial[2], Q{0});
+    contains_signed_root(tangential[0], -1, Q("1/2"));
+    contains(tangential[1], Q{0});
+    contains_signed_root(tangential[2], 1, Q("1/2"));
+    contains_signed_root(axial[0], 1, Q("1/2"));
+    contains(axial[1], Q{0});
+    contains_signed_root(axial[2], 1, Q("1/2"));
+
+    // In the spherical CD30 frame the relative position is (1,2,2).
+    // The three directions are (1,2,2)/3, (2,4,-5)/(3sqrt(5)), (-2,1,0)/sqrt(5).
+    const auto& sphere = owners[2];
+    const auto& sphere_r = take(sphere.direction(1)).basic;
+    const auto& sphere_theta = take(sphere.direction(2)).basic;
+    const auto& sphere_phi = take(sphere.direction(6)).basic;
+    contains(sphere_r[0], Q("1/3"));
+    contains(sphere_r[1], Q("2/3"));
+    contains(sphere_r[2], Q("2/3"));
+    contains_signed_root(sphere_theta[0], 1, Q("4/45"));
+    contains_signed_root(sphere_theta[1], 1, Q("16/45"));
+    contains_signed_root(sphere_theta[2], -1, Q("5/9"));
+    contains_signed_root(sphere_phi[0], -1, Q("4/5"));
+    contains_signed_root(sphere_phi[1], 1, Q("1/5"));
+    contains(sphere_phi[2], Q{0});
+
+    const auto& shared_cp = take(owners[3].direction(1)).basic;
+    contains_signed_root(shared_cp[0], 1, Q("3/8"));
+    contains(shared_cp[1], Q("1/2"));
+    contains_signed_root(shared_cp[2], -1, Q("3/8"));
+}
+
+TEST_CASE("SPC direction preparation diagnoses polar axes and stale or absent source selections",
+          "[IO4-03][IO4-01][N4-02][integration][negative][verification]") {
+    core::ResourcePlan plan{position_budget};
+    auto raw = lexical_deck(spc_fixture);
+    const auto input = take(NastranCoordinateCards::prepare(std::move(raw), limits, plan, {}));
+    const auto support = take(NastranSupportCards::prepare(input, {8, 8, 10000}, plan, {}));
+    const auto deck = take(input.view());
+    std::optional<NastranPositionDiagnostic> diagnostic;
+    const auto read = [&](std::size_t term, std::uint64_t grid) {
+        return NastranSpcDirections::prepare(input, support, term, NastranGridId{grid},
+                                             spc_limits(), plan, &diagnostic);
+    };
+    const auto pole = read(3, 4);
+    REQUIRE_FALSE(pole);
+    CHECK(pole.error().code == Unsupported);
+    CHECK(take(diagnostic).reason == PositionReason::DisplacementAxis);
+    CHECK(take(diagnostic).position == take(deck.grids[3].displacement_system.field).position);
+    CHECK(take(diagnostic).coordinate == NastranCoordinateId{30});
+
+    const auto unresolved = read(1, 7);
+    REQUIRE_FALSE(unresolved);
+    CHECK(unresolved.error().code == PrecisionUnresolved);
+    CHECK(take(diagnostic).reason == PositionReason::DisplacementAxis);
+    CHECK(take(diagnostic).grid == NastranGridId{7});
+    CHECK(take(diagnostic).position == take(deck.grids[5].displacement_system.field).position);
+
+    const auto missing = read(1, 5);
+    REQUIRE_FALSE(missing);
+    CHECK(missing.error().code == InvalidInput);
+    CHECK(take(diagnostic).reason == PositionReason::Selection);
+    const auto outside = read(0, 2);
+    REQUIRE_FALSE(outside);
+    CHECK(outside.error().code == InvalidInput);
+    CHECK(take(diagnostic).reason == PositionReason::SpcTerm);
+    CHECK(take(diagnostic).position == take(support.view()).terms[0].component_field.position);
+
+    auto changed_raw = lexical_deck(std::string{spc_fixture} + "$ differing source bytes\n");
+    const auto changed =
+        take(NastranCoordinateCards::prepare(std::move(changed_raw), limits, plan, {}));
+    const auto stale = NastranSpcDirections::prepare(changed, support, 0, NastranGridId{1},
+                                                     spc_limits(), plan, &diagnostic);
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == StaleGeneration);
+    CHECK(take(diagnostic).reason == PositionReason::Source);
+
+    auto first = take(read(0, 1));
+    auto exact_work = spc_limits();
+    exact_work.maximum_work = first.work() - 1;
+    auto limited =
+        NastranSpcDirections::prepare(input, support, 0, NastranGridId{1}, exact_work, plan);
+    REQUIRE_FALSE(limited);
+    CHECK(limited.error().code == ResourceExceeded);
+    ++exact_work.maximum_work;
+    REQUIRE(NastranSpcDirections::prepare(input, support, 0, NastranGridId{1}, exact_work, plan));
+    const auto moved = std::move(first);
+    CHECK(moved.origin());
+    CHECK_FALSE(first.origin());
+    CHECK_FALSE(first.direction(1));
+    CHECK(take(input.view()).bulk.bytes == spc_fixture);
+}
+
 } // namespace
