@@ -306,8 +306,8 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             using Numerators = std::array<ExactRational, 3>;
             core::PlannedBuffer<Numerators> cached;
             std::size_t depth_group = 1;
-            bool use_monomial_powers = false;
-            bool use_mixed_powers = false;
+            using PowerReuse = PgRankMonomialPowers::Reuse;
+            std::optional<PowerReuse> power_reuse;
             if (product != nullptr && product->depth.size() > 1) {
                 auto cache_arithmetic = ReferenceArithmetic{limits.arithmetic, plan};
                 const auto cache_rationals = partition_add(live_rationals, partition_mul(rank, 3));
@@ -324,14 +324,20 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 if (depth_group > 1) {
                     const auto axis_slots =
                         partition_add(cache_rationals, PgRankMonomialPowers::retained_rationals);
-                    for (const bool mixed : {true, false}) {
+                    const auto mixed_slots =
+                        partition_add(axis_slots, PgRankMonomialPowers::retained_mixed);
+                    const std::array preferences{
+                        std::pair{
+                            PowerReuse::CommonDenominator,
+                            partition_add(mixed_slots, PgRankMonomialPowers::retained_common)},
+                        std::pair{PowerReuse::Mixed, mixed_slots},
+                        std::pair{PowerReuse::Axis, axis_slots}};
+                    for (const auto& [reuse, slots] : preferences) {
                         cache_arithmetic.leaf_limits = limits.arithmetic.algebra;
                         try {
-                            cache_arithmetic.admit(partition_add(
-                                axis_slots, mixed ? PgRankMonomialPowers::retained_mixed : 0));
+                            cache_arithmetic.admit(slots);
                             math.leaf_limits = cache_arithmetic.leaf_limits;
-                            use_monomial_powers = true;
-                            use_mixed_powers = mixed;
+                            power_reuse = reuse;
                             break;
                         } catch (const PartitionAbort& unavailable) {
                             if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
@@ -370,9 +376,9 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                     return radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
                 };
                 std::optional<PgRankMonomialPowers> monomials;
-                if (depth_slot == 0 && use_monomial_powers &&
+                if (depth_slot == 0 && power_reuse &&
                     PgRankMonomialPowers::fits(located.u, located.v, math.leaf_limits))
-                    monomials.emplace(located.u, located.v, use_mixed_powers);
+                    monomials.emplace(located.u, located.v, *power_reuse);
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);

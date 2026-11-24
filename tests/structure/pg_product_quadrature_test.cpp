@@ -136,13 +136,31 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
         CHECK(product_entries[i].upper == explicit_entries[i].upper);
     }
 
-    // Retain the exact axis powers, with spare capacity for leaf operations,
-    // while excluding the additional array of mixed powers from the estimate.
+    // Admit mixed powers while excluding the integer powers and scratch used
+    // by the common-denominator sum.
     auto axis_limits = limits;
     const auto held = detail::basis_live_rationals + 16 + 4 * low_gram.rule().size() +
                       2 * product_entries.size() + 3 * size +
                       detail::PgRankMonomialPowers::retained_rationals;
     const auto bytes_per_integer = 4 * (axis_limits.arithmetic.algebra.maximum_work_bits / 8);
+    auto mixed_limits = limits;
+    const auto mixed_held = held + detail::PgRankMonomialPowers::retained_mixed;
+    mixed_limits.arithmetic.algebra.external_memory =
+        ExactEstimateAdmission{(2 * (mixed_held + 32) + 1) * bytes_per_integer};
+    auto mixed_basis = make_curve_basis();
+    core::ResourcePlan mixed_plan{profile};
+    const auto mixed_gram = take(PgDiscreteGram::prepare_product(
+        std::move(mixed_basis), {low, low, depth_pair}, grid, mixed_limits, scratch, mixed_plan));
+    const auto mixed_entries = take(mixed_gram.enclosure()).upper_triangle;
+    REQUIRE(mixed_entries.size() == product_entries.size());
+    CHECK(low_gram.info().arithmetic.allocated_owned_payload_bytes <
+          mixed_gram.info().arithmetic.allocated_owned_payload_bytes);
+    for (std::size_t i = 0; i < product_entries.size(); ++i) {
+        CHECK(product_entries[i].lower == mixed_entries[i].lower);
+        CHECK(product_entries[i].upper == mixed_entries[i].upper);
+    }
+
+    // Admit axis powers while excluding the additional array of mixed powers.
     axis_limits.arithmetic.algebra.external_memory =
         ExactEstimateAdmission{(2 * (held + 64) + 1) * bytes_per_integer};
     auto axis_basis = make_curve_basis();
