@@ -1063,6 +1063,7 @@ struct FreeWakeVelocityRow {
     aero::detail::PointId owner{0};
     DiscreteLoadVector velocity;
     std::optional<DiscreteLoadVector> direction;
+    std::uint64_t source_facets{}, far_facets{}, cancelled_analytic_pairs{};
     bool includes_wake_quadrature{};
 };
 
