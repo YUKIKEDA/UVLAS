@@ -3,6 +3,7 @@
 #include "source_digest.hpp"
 
 #include <algorithm>
+#include <compare>
 #include <stdexcept>
 #include <string>
 #include <utility>

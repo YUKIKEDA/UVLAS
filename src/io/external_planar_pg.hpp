@@ -149,7 +149,7 @@ struct NastranPgFaceBound {
 
 struct NastranPgBoundLimits {
     ExternalPgLimits region;
-    std::uint64_t maximum_directed_work;
+    std::uint64_t maximum_directed_work = 0;
 };
 
 struct NastranPlanarPgBoundView {

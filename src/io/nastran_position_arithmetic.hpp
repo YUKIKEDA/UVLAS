@@ -13,7 +13,13 @@ using Code = core::FailureCode;
 using Position = std::array<m::Interval, 3>;
 using FixedInteger = aero::detail::ExactInteger;
 
-[[nodiscard]] inline m::Interval norm_squared(const Position&, m::Work&);
+[[nodiscard]] inline m::Interval norm_squared(const Position& position, m::Work& work) {
+    m::Interval squared;
+    for (const auto& item : position) {
+        squared = m::add(squared, m::multiply(item, item, work), work);
+    }
+    return squared;
+}
 
 [[nodiscard]] inline g::RankFraction<FixedInteger> fixed_fraction(const Rational& source,
                                                                   m::Work& work) {
@@ -86,14 +92,6 @@ using FixedInteger = aero::detail::ExactInteger;
 [[nodiscard]] inline m::Interval number(const Rational& value, m::Work& work) {
     const auto value_fraction = fixed_fraction(value, work);
     return ratio(value_fraction.numerator, value_fraction.denominator, work);
-}
-
-[[nodiscard]] inline m::Interval norm_squared(const Position& position, m::Work& work) {
-    m::Interval squared;
-    for (const auto& item : position) {
-        squared = m::add(squared, m::multiply(item, item, work), work);
-    }
-    return squared;
 }
 
 } // namespace uvlas::io::detail::nastran_directed

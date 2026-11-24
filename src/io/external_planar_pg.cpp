@@ -7,6 +7,9 @@
 
 #include <algorithm>
 #include <compare>
+#include <stdexcept>
+#include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace uvlas::io::detail {
@@ -712,6 +715,9 @@ void fill_bounds(const NastranShellCards& deck_owner, const NastranShellView& de
         throw geom::PartitionAbort{positions.error()};
     }
     const auto position_view = positions->view();
+    if (!position_view) {
+        diagnostic.reject(Code::InvalidInput, Reason::Source, row.element);
+    }
     const auto source = position_view->grids;
     work.used += position_view->work;
     std::array<IntervalPosition, 4> corners;
