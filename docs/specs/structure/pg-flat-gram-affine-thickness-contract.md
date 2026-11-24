@@ -20,12 +20,13 @@ R/P/Cの場番号を $d=0,1,2$ とする。各場はそれぞれ $1,h\zeta,h^2\z
 
 チャート座標の共通分母を $S$ とする。$B$ は全片の局所厚さ係数 $h_0,h_u,h_v$ の共通分母であり、$L_k$ は1から $k$ までの最小公倍数とする。面内の加重モーメントは共通分母 $S^{47}L_{47}L_{46}B^5$ で表す。
 
-辺数を $E$、局所厚さ係数の分子の最大幅を $b$ とし、$operatorname{bits}$ は整数の絶対値のbit数とする。幅は次で照合する。
+辺数を $E$、局所厚さ係数の分子の最大幅を $b$ とし、$\operatorname{bits}$ は整数の絶対値を表すのに必要なビット数とする。次の上界で幅を検査する。
 
 $$
-47[operatorname{bits}(S)+2]+operatorname{bits}(L_{47})+operatorname{bits}(L_{46})
- +lceillog_2 E
-ceil +5[b+operatorname{bits}(B)+2].
+\begin{aligned}
+&47[\operatorname{bits}(S)+2]+\operatorname{bits}(L_{47})+\operatorname{bits}(L_{46})\\
+&\quad +\lceil\log_2(\max(E,1))\rceil+5[b+\operatorname{bits}(B)+2].
+\end{aligned}
 $$
 
 前半は辺を足し合わせた幾何モーメントを抑える。後半は、厚さの整数係数3個の絶対和の冪と残りの $B$ の冪を抑える。8192 bitを超える入力はResourceExceededで返す。列係数と包絡の丸めにも、既存の中間幅と端点幅を適用する。
