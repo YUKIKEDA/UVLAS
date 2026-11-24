@@ -1,0 +1,111 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-vector-load-pullback-v1",
+  "ids": [
+    "UW-D01",
+    "UW-D03",
+    "UW-D05",
+    "UW-D06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "9d5da8c90dd257ff2b319691bf3ccfdbf2f3933a",
+  "claimed_state": "Analytical pullback of finite fixed-chart vector load outputs, including nodal distribution and reference moment, to explicit geometry, midpoint velocity, uniform flow, Γ and Γdot inputs.",
+  "verification": {
+    "msvc": "Windows 11 x64 MSVC 19.51, Ninja Multi-Config. Debug and Release 4/4 each.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2 Release with warnings as errors, 4/4.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "aero.global_geometry",
+      "numerics.dense_solve"
+    ],
+    "catch": "All three configurations: 4 cases 5083 assertions. The vector-load fixture alone: 4145 assertions. Seed 23.",
+    "oracle": "65-digit direct line/area quadrature, differencing the scalar objective after weighting the independent load values. GL72/96 and time-independent perturbation steps 1e-15/1e-18. Changes 4.24e-33 attached wake and 2.12e-34 two-bound case. Work pairing matches across the independent JVP/VJP paths inside their combined outward enclosures.",
+    "mutations": [
+      "Omit nodal-force pullback: 8 failing checks.",
+      "Omit moment-to-force pullback: 8 failing checks.",
+      "Ignore attached wake dual sign: 2 failing checks.",
+      "Omit induced point pullback: 8 failing checks."
+    ],
+    "mutation_environment": "Isolated GCC 14.2 Release. Each mutant exits Catch2 with code 42.",
+    "static": "clang-format 21.1.2 and Windows and Linux clang-tidy 21.1.1 on both modified translation units.",
+    "scope": "Fixed real contact/alias chart, supplied rates and velocities, and explicit load weights for a dimensionless scalar observable. Radius, density, time, moment origin, and inherited wake coefficients are fixed. Derivatives through time stepping, the implicit circulation solve, and PG material mapping remain downstream."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/aero/uvlm-induction-adopted-specification.md": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "docs/verification/IM-03/discrete-vector-loads-v1/reference.py": "36e17415fb6f4126f5e759cb7da93c61246d4d0eb15e564f01e57562a1fb27dc",
+    "docs/verification/IM-03/discrete-vector-load-direction-v1/reference.py": "0473b715c987f35652b953ac9558c91c83ee9273dee5e8267619d4486ea640c1",
+    "src/aero/p1_shared_action.cpp": "d8e2e027445a99d5f1a14995fe11c8a945fb235b6a54bfb65288b44ad5f444ac",
+    "src/aero/p1_shared_action.hpp": "69bc79fee2cc5250b2a6df712c73c0a454c6a33469868c9b36f7bd7afee18deb",
+    "src/coupling/discrete_nonpenetration.cpp": "eb568a624aecebb1101006c19fcfc88be39f6fefe1a36548433604884b3c61d2",
+    "src/coupling/discrete_nonpenetration.hpp": "0f700024d452d2f83684c4050b0396b215a6ad6b27f8e3bff3dae4dc5dfb3519",
+    "tests/coupling/case_uniform_flow_test.cpp": "422fd17b247049d5b5f94cad9190db8296cf5fb9f5eba786ec1372ab758ccdad"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-vector-load-pullback-v1/reference.py": "8c9ac9ae91292446bf3e5780b45ce8616ecdcb7d707c355a6af6a953aa47c97b",
+    "docs/verification/IM-03/discrete-vector-load-pullback-v1/verification.md": "91a81fd89029bcf5109b46fb1224db95acba27443c4f700ece023df63f57ab4f"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "sha256": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-vector-loads-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-vector-loads-v1/reference.py",
+      "sha256": "36e17415fb6f4126f5e759cb7da93c61246d4d0eb15e564f01e57562a1fb27dc"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-vector-load-direction-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-vector-load-direction-v1/reference.py",
+      "sha256": "0473b715c987f35652b953ac9558c91c83ee9273dee5e8267619d4486ea640c1"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "d8e2e027445a99d5f1a14995fe11c8a945fb235b6a54bfb65288b44ad5f444ac"
+    },
+    {
+      "id": "src/aero/p1_shared_action.hpp",
+      "hint": "src/aero/p1_shared_action.hpp",
+      "sha256": "69bc79fee2cc5250b2a6df712c73c0a454c6a33469868c9b36f7bd7afee18deb"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "eb568a624aecebb1101006c19fcfc88be39f6fefe1a36548433604884b3c61d2"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "0f700024d452d2f83684c4050b0396b215a6ad6b27f8e3bff3dae4dc5dfb3519"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "422fd17b247049d5b5f94cad9190db8296cf5fb9f5eba786ec1372ab758ccdad"
+    }
+  ]
+}
