@@ -314,6 +314,18 @@ TEST_CASE("PG irrational curved samples enclose signed Gram entries",
         points.push_back({{static_cast<core::Index>(id), third, third, half}, half});
     }
     REQUIRE(irrational > 0);
+    const auto rank = take(basis.size());
+    REQUIRE(rank == 130);
+    PgDiscreteGramLimits limited{query_limits(), steps};
+    limited.arithmetic.algebra.external_memory =
+        ExactEstimateAdmission{std::uint64_t{32} * 1024 * 1024};
+    core::ResourcePlan rejected_plan{profile};
+    check_failure(PgDiscreteGram::prepare(std::move(basis), points, {224, 152}, limited, scratch,
+                                         rejected_plan),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(rejected_plan.allocated_bytes() == 0);
+    REQUIRE(take(basis.size()) == rank);
+
     auto gram = take(PgDiscreteGram::prepare(std::move(basis), points, {224, 152},
                                              {query_limits(), steps}, scratch, plan));
     const auto entries = take(gram.enclosure()).upper_triangle;
