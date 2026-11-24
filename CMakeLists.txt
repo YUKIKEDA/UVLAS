@@ -171,6 +171,7 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
     src/coupling/case_motion.cpp src/coupling/case_pg_support_motion.cpp
     src/coupling/case_pg_reference.cpp src/coupling/case_external_pg.cpp
     src/coupling/case_pg_chart.cpp
+    src/coupling/case_nastran_reference_inputs.cpp
     src/coupling/case_motion_frame.cpp
     src/coupling/case_motion_time_series.cpp
     src/coupling/case_uniform_flow.cpp

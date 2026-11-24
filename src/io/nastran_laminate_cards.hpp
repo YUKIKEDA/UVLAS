@@ -106,6 +106,10 @@ public:
             const std::stop_token&, std::optional<NastranLaminateDiagnostic>* = nullptr) noexcept;
     [[nodiscard]] std::optional<NastranLaminateView> view() const& noexcept;
     [[nodiscard]] std::optional<NastranLaminateView> view() const&& = delete;
+    [[nodiscard]] const NastranIsotropicShellCards& isotropic() const& noexcept {
+        return input_;
+    }
+    [[nodiscard]] const NastranIsotropicShellCards& isotropic() const&& = delete;
 
 private:
     NastranLaminateCards(NastranIsotropicShellCards&&, core::PlannedBuffer<NastranMat8>&&,
