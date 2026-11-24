@@ -22,7 +22,7 @@
   "artifacts": {
     "CMakeLists.txt": "765b3a369b9d032120440b1f58611be07c2e8b13144e5716a3cc99d7edf261d1",
     "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
-    "docs/verification/IM-06/case-nastran-planar-pg.md": "08d29120f633e5da6ba07873a31d93d77c2651387668229e6c3ac8164aed1125",
+    "docs/verification/IM-06/case-nastran-planar-pg.md": "9d86a20214c4b179830d812114dfa2483db7a52e8b19fd5e61cc36090198f4cd",
     "src/coupling/case_external_pg.cpp": "921e9261998bb07dc28355a517d659b497c327a84d043a385464cc23ae81d3ec",
     "src/coupling/case_external_pg.hpp": "b51b2c686d9b33242a4536e524ac1951d51fd9d37bc871540185b885043b65f1",
     "src/coupling/case_pg_reference.cpp": "7e5d9f5a7e8edc07fa509ff7a0578f36baf8cb5ab46867d18f3b6ae384652044",
