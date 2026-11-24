@@ -91,21 +91,17 @@ template <class Budget>
            rank_product(work, scale, RankWide{2 * cell_index + 1});
 }
 
-template <std::size_t Degree>
-struct CutPolynomial {
-    std::array<RankWide, Degree + 2> terms{};
-
-    template <class Budget>
-    void extend(Budget& work, std::size_t degree, const RankWide& origin, const RankWide& delta) {
-        terms[degree + 1] = rank_product(work, terms[degree], delta);
-        for (auto k = degree; k > 0; --k) {
-            work.charge();
-            terms[k] =
-                rank_product(work, terms[k], origin) + rank_product(work, terms[k - 1], delta);
-        }
-        terms[0] = rank_product(work, terms[0], origin);
+template <class Budget>
+void extend_cut_polynomial(Budget& work, std::span<RankWide> terms, const RankWide& origin,
+                           const RankWide& delta) {
+    const auto degree = terms.size() - 2;
+    terms.back() = rank_product(work, terms[degree], delta);
+    for (auto k = degree; k > 0; --k) {
+        work.charge();
+        terms[k] = rank_product(work, terms[k], origin) + rank_product(work, terms[k - 1], delta);
     }
-};
+    terms.front() = rank_product(work, terms.front(), origin);
+}
 
 template <std::size_t Degree>
 struct CutScale {
@@ -121,18 +117,19 @@ void accumulate_cut_edge(Budget& work, const CutScale<Degree>& scale, std::span<
                          const RankWide& v_delta) {
     if (v_delta == 0)
         return;
-    CutPolynomial<Degree> u{}, uv{};
-    u.terms[0] = 1;
+    std::array<RankWide, Degree + 2> u{}, uv{};
+    u.front() = 1;
     for (std::size_t a = 0; a <= Degree; ++a) {
-        u.extend(work, a, u0, u_delta);
-        work.charge(a + 2);
-        std::ranges::copy(std::span{u.terms}.first(a + 2), uv.terms.begin());
+        auto u_terms = std::span{u}.first(a + 2);
+        extend_cut_polynomial(work, u_terms, u0, u_delta);
+        work.charge(u_terms.size());
+        std::ranges::copy(u_terms, uv.begin());
         for (std::size_t b = 0; b <= Degree - a; ++b) {
             const auto degree = a + b + 1;
             RankWide integral{};
             for (std::size_t k = 0; k <= degree; ++k) {
                 work.charge();
-                integral += rank_product(work, uv.terms[k], scale.integration[k]);
+                integral += rank_product(work, uv[k], scale.integration[k]);
             }
             auto scaled = rank_product(work, integral, v_delta);
             scaled = rank_product(work, scaled, scale.green[a]);
@@ -140,7 +137,7 @@ void accumulate_cut_edge(Budget& work, const CutScale<Degree>& scale, std::span<
             work.charge();
             moments[cut_index(a, b)] += scaled;
             if (b < Degree - a)
-                uv.extend(work, degree, v0, v_delta);
+                extend_cut_polynomial(work, std::span{uv}.first(degree + 2), v0, v_delta);
         }
     }
 }
