@@ -1606,7 +1606,6 @@ struct NonpenetrationBuilder {
             return first.power == second.power && first.mantissa == second.mantissa;
         };
         for (std::size_t i = 0; i < order; ++i) {
-            const auto& item = bound[i];
             auto& owned = data.values()[i];
             if (!owned.query)
                 reject(core::FailureCode::InvalidInput);
