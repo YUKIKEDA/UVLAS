@@ -104,66 +104,80 @@ cc::CasePgChart prepare_r5(std::string_view wire, core::Index n, core::Workspace
     return result;
 }
 
-void verify_projection(const PgProjectedReferenceBatch& projected, std::size_t index,
-                       const cc::CasePgShellReference& shell, const PhysicalPoint& expected,
-                       const Decimal& measure) {
-    REQUIRE(projected.source() == shell.columns().basis);
-    REQUIRE(projected.column_count() == static_cast<std::size_t>(shell.columns().count));
-    const auto cols = projected.column_count();
-    const auto stride = 4 + 4 * cols;
-    REQUIRE(projected.high_words().size() == stride * projected.points().size());
-    REQUIRE(projected.low_words().size() == projected.high_words().size());
-    const auto value = [&](std::size_t col) -> Decimal {
-        const auto i = index * stride + col;
-        return decimal(Q{projected.high_words()[i]} + Q{projected.low_words()[i]});
-    };
-    const Decimal tolerance = decimal(Q{projection_error});
-    for (std::size_t d = 0; d < expected.xyz.size(); ++d)
-        CHECK(abs(value(d) - expected.xyz[d]) <= tolerance);
-    CHECK(value(3) > 0);
-    CHECK(abs(value(3) - measure) <= tolerance);
+Decimal evaluate(const PgReferenceScalar& value, const Decimal& root) {
+    return decimal(value.rational) + decimal(value.radical) * root;
+}
+
+void verify_exact_reference(const PgConditionedReferenceBatch& batch, std::size_t index,
+                            const cc::CasePgShellReference& shell, const PhysicalPoint& expected,
+                            const Decimal& measure) {
+    const auto cols = static_cast<std::size_t>(batch.column_count);
+    REQUIRE(cols == static_cast<std::size_t>(shell.columns().count));
+    REQUIRE(batch.columns.size() == cols * batch.points.size());
+    const auto& reference = batch.points.values()[index];
+    const Decimal root = sqrt(decimal(reference.g));
+    const auto& m = reference.measure;
+    Decimal actual_measure;
+    if (const auto* volume = std::get_if<PgReferenceVolumeMeasure>(&m)) {
+        actual_measure = evaluate(volume->jacobian, root);
+    } else if (const auto* face = std::get_if<PgReferenceHorizontalMeasure>(&m)) {
+        actual_measure = sqrt(evaluate(face->area.squared_norm, root));
+    } else {
+        actual_measure =
+            sqrt(evaluate(std::get<PgReferenceLateralMeasure>(m).area.squared_norm, root));
+    }
+    const Decimal tolerance("1e-70");
+    CHECK(actual_measure > 0);
+    CHECK(abs(actual_measure - measure) <= tolerance);
 
     const auto q0 = shell.patch().reference_coordinates();
     const auto translation = shell.patch().translation();
     REQUIRE(q0.size() == cols);
     REQUIRE(translation.size() == cols);
-    // A check on the actual N/G column order using the adopted affine fields.
-    std::array<Vector, 4> sum{};
-    std::array<Vector, 4> bound{};
-    Vector xyz{};
-    Vector xyz_bound{};
-    Decimal constant = 0, constant_bound = 0;
+    const auto columns = batch.columns.values().subspan(index * cols, cols);
+    using Quadratic = std::array<Q, 2>;
+    Quadratic constant{};
+    std::array<Quadratic, 3> xyz{}, gradient_constant{};
+    std::array<std::array<Quadratic, 3>, 3> gradient_xyz{};
+    const auto accumulate = [](Quadratic& target, const PgReferenceScalar& value, const Q& factor) {
+        target[0] += q(value.rational) * factor;
+        target[1] += q(value.radical) * factor;
+    };
     for (std::size_t i = 0; i < cols; ++i) {
-        const auto tr = decimal(translation[i]);
-        const auto N = value(4 + 4 * i);
-        constant += N * tr;
-        constant_bound += abs(tr);
+        const auto tr = q(translation[i]);
+        const auto& column = columns[i];
+        accumulate(constant, column.value, tr);
         for (std::size_t d = 0; d < 3; ++d) {
-            xyz[d] += N * decimal(q0[i][d]);
-            xyz_bound[d] += abs(decimal(q0[i][d]));
-            const auto G = value(5 + 4 * i + d);
-            sum[3][d] += G * tr;
-            bound[3][d] += abs(tr);
-            for (std::size_t a = 0; a < 3; ++a) {
-                sum[a][d] += G * decimal(q0[i][a]);
-                bound[a][d] += abs(decimal(q0[i][a]));
-            }
+            accumulate(xyz[d], column.value, q(q0[i][d]));
+            const auto& G = column.physical_gradient_per_metre[d];
+            accumulate(gradient_constant[d], G, tr);
+            for (std::size_t a = 0; a < 3; ++a)
+                accumulate(gradient_xyz[a][d], G, q(q0[i][a]));
         }
     }
-    const Decimal independent_rounding("1e-75");
-    CHECK(abs(constant - 1) <= tolerance * constant_bound + independent_rounding);
+    const auto g = q(reference.g);
+    const auto zero = [&g](const Quadratic& value) {
+        // Zero can have nonzero coefficients when the exact radicand is a rational square.
+        if (value[0] == 0 || value[1] == 0)
+            return value[0] == 0 && value[1] == 0;
+        return (value[0] > 0) != (value[1] > 0) && value[0] * value[0] == g * value[1] * value[1];
+    };
+    constant[0] -= 1;
+    CHECK(zero(constant));
     for (std::size_t d = 0; d < 3; ++d) {
-        CHECK(abs(xyz[d] - expected.xyz[d]) <= tolerance * xyz_bound[d] + independent_rounding);
-        CHECK(abs(sum[3][d]) <= tolerance * bound[3][d] + independent_rounding);
+        CHECK(abs(evaluate(reference.position_metres[d], root) - expected.xyz[d]) <= tolerance);
+        xyz[d][0] -= q(reference.position_metres[d].rational);
+        xyz[d][1] -= q(reference.position_metres[d].radical);
+        CHECK(zero(xyz[d]));
+        CHECK(zero(gradient_constant[d]));
         for (std::size_t a = 0; a < 3; ++a) {
-            const Decimal identity = a == d ? 1 : 0;
-            CHECK(abs(sum[a][d] - identity) <= tolerance * bound[a][d] + independent_rounding);
+            gradient_xyz[a][d][0] -= a == d ? 1 : 0;
+            CHECK(zero(gradient_xyz[a][d]));
         }
     }
 }
-
-void verify_handoff(const cc::CasePgChart& ready, const Decimal& h, core::Workspace& workspace,
-                    core::ResourcePlan& plan) {
+void verify_handoff(const cc::CasePgChart& ready, core::Index n, const Decimal& h,
+                    core::Workspace& workspace, core::ResourcePlan& plan) {
     const auto shell = take(ready.shell_reference(numerics::PatchId{1}, 1));
     CHECK(shell.columns().first == 0);
     CHECK(shell.chart_identity() == take(ready.chart().identity()));
@@ -224,50 +238,58 @@ void verify_handoff(const cc::CasePgChart& ready, const Decimal& h, core::Worksp
     check_failure(shell.patch().project_fixed_reference(first, 2, projection, cancelled, none),
                   core::FailureCode::Cancelled);
     CHECK(none.allocated_bytes() == 0);
-    const auto fixed =
-        take(shell.patch().project_fixed_reference(first, 2, projection, limits, plan));
+    if (n == 1 && h == Decimal("0.01"))
+        check_failure(shell.patch().project_fixed_reference(first, 2, projection, limits, plan),
+                      core::FailureCode::PrecisionUnresolved);
+    const auto as_point = [](const PgOwnedDiscreteVolumePoint& node) -> PgReferencePoint {
+        return PgReferenceVolumePoint{node.volume, node.u, node.v, node.depth};
+    };
+    const std::array fixed_queries{as_point(rule[first]), as_point(rule[first + 1])};
+    const auto fixed = take(shell.patch().evaluate_reference(fixed_queries, limits, plan));
     const auto quadrature_reference = take(PgPreparedVolumeReference::prepare(
         shell.patch(), first, 2, volume_projection, limits, plan));
-    CHECK(fixed.first_rule_ordinal() == first);
     CHECK(quadrature_reference.source() == shell.columns().basis);
-    CHECK(quadrature_reference.column_count() == fixed.column_count());
-    REQUIRE(fixed.points().size() == 2);
+    REQUIRE(quadrature_reference.column_count() == fixed.column_count);
+    REQUIRE(fixed.points.size() == 2);
     REQUIRE(quadrature_reference.points().size() == 2);
-    const auto cols = fixed.column_count();
+    const auto cols = quadrature_reference.column_count();
     const auto words = quadrature_reference.words();
-    for (std::size_t i = 0; i < fixed.points().size(); ++i) {
+    for (std::size_t i = 0; i < fixed.points.size(); ++i) {
         const auto& chosen = rule[first + i];
         const auto& volume = volumes[static_cast<std::size_t>(chosen.volume)];
         const auto& triangle = triangles[static_cast<std::size_t>(volume.triangle)];
         const auto xy = barycentric(vertices, triangle, decimal(chosen.u), decimal(chosen.v));
         const auto expected = physical_r5(xy, 2 * decimal(chosen.depth) - 1, h);
-        verify_projection(fixed, i, shell, expected,
-                          expected.volume_density * decimal(triangle.twice_area));
-        CHECK(fixed.points()[i].domain == PgProjectedReferenceDomain::Volume);
-        CHECK(fixed.points()[i].partition_record == chosen.volume);
-        CHECK(fixed.points()[i].layer == core::LayerId{1});
+        verify_exact_reference(fixed, i, shell, expected,
+                               expected.volume_density * decimal(triangle.twice_area));
+        const auto& point_reference = fixed.points.values()[i];
+        REQUIRE(std::holds_alternative<PgReferenceVolumeMeasure>(point_reference.measure));
+        CHECK(point_reference.partition_record == chosen.volume);
+        CHECK(point_reference.layer == core::LayerId{1});
         const auto& physical_point = quadrature_reference.points()[i];
         CHECK(physical_point.rule_ordinal == first + i);
         CHECK(physical_point.reference.partition_record == chosen.volume);
-        CHECK(physical_point.reference.layer == fixed.points()[i].layer);
+        CHECK(physical_point.reference.layer == point_reference.layer);
         CHECK(q(physical_point.weight) == q(chosen.weight));
-        for (std::size_t c_ = 0; c_ <= cols; ++c_) {
-            const auto a_ = i * (1 + cols) + c_;
-            const auto b_ = i * (4 + 4 * cols) + (c_ == 0 ? 3 : 4 * c_);
-            CHECK(words.high[a_] == fixed.high_words()[b_]);
-            CHECK(words.low[a_] == fixed.low_words()[b_]);
+        const Decimal root = sqrt(decimal(point_reference.g));
+        const Decimal tolerance = decimal(Q{projection_error});
+        for (std::size_t c = 0; c <= cols; ++c) {
+            const auto word = i * (1 + cols) + c;
+            const Decimal actual = decimal(Q{words.high[word]} + Q{words.low[word]});
+            const auto& value =
+                c == 0 ? std::get<PgReferenceVolumeMeasure>(point_reference.measure).jacobian
+                       : fixed.columns.values()[i * cols + c - 1].value;
+            CHECK(abs(actual - evaluate(value, root)) <= tolerance);
         }
     }
-
     const auto one_third = f.r("1", "3");
     const auto half = f.r("1", "2");
     const std::array<PgReferencePoint, 3> queries{
         PgReferenceHorizontalPoint{0, one_third, one_third},
         PgReferenceHorizontalPoint{1, one_third, one_third},
         PgReferenceLateralPoint{0, half, half}};
-    const auto surfaces = take(shell.patch().project_reference(queries, projection, limits, plan));
-    REQUIRE(surfaces.points().size() == queries.size());
-    CHECK_FALSE(surfaces.first_rule_ordinal().has_value());
+    const auto surfaces = take(shell.patch().evaluate_reference(queries, limits, plan));
+    REQUIRE(surfaces.points.size() == queries.size());
     const auto faces = take(partition.horizontal_faces());
     REQUIRE(faces.size() >= 2);
     CHECK(faces[0].side != faces[1].side);
@@ -276,14 +298,15 @@ void verify_handoff(const cc::CasePgChart& ready, const Decimal& h, core::Worksp
         const auto& tri = triangles[static_cast<std::size_t>(face.triangle)];
         const auto xy = barycentric(vertices, tri, Decimal(1) / 3, Decimal(1) / 3);
         const bool lower = face.side == PgPartitionFaceSide::Lower;
-        CHECK(surfaces.points()[i].domain ==
-              (lower ? PgProjectedReferenceDomain::Lower : PgProjectedReferenceDomain::Upper));
-        CHECK(surfaces.points()[i].layer == core::LayerId{1});
-        CHECK(surfaces.points()[i].partition_record == static_cast<core::Index>(i));
+        const auto& p = surfaces.points.values()[i];
+        REQUIRE(std::holds_alternative<PgReferenceHorizontalMeasure>(p.measure));
+        CHECK(std::get<PgReferenceHorizontalMeasure>(p.measure).side == face.side);
+        CHECK(p.layer == core::LayerId{1});
+        CHECK(p.partition_record == static_cast<core::Index>(i));
         const auto expected = physical_r5(xy, lower ? Decimal(-1) : Decimal(1), h);
         const auto area_vector = cross(expected.along_s, expected.along_t);
-        verify_projection(surfaces, i, shell, expected,
-                          sqrt(dot(area_vector, area_vector)) * decimal(tri.twice_area));
+        verify_exact_reference(surfaces, i, shell, expected,
+                               sqrt(dot(area_vector, area_vector)) * decimal(tri.twice_area));
     }
     const auto& lateral = take(partition.lateral_faces()).front();
     const auto& edge = edges[static_cast<std::size_t>(lateral.edge)];
@@ -294,9 +317,9 @@ void verify_handoff(const cc::CasePgChart& ready, const Decimal& h, core::Worksp
     for (std::size_t a = 0; a < tangent.size(); ++a)
         tangent[a] = (b_[0] - a_[0]) * expected.along_s[a] + (b_[1] - a_[1]) * expected.along_t[a];
     const auto area_vector = cross(tangent, expected.along_depth);
-    CHECK(surfaces.points()[2].domain == PgProjectedReferenceDomain::Lateral);
-    CHECK(surfaces.points()[2].layer == core::LayerId{1});
-    verify_projection(surfaces, 2, shell, expected, sqrt(dot(area_vector, area_vector)));
+    REQUIRE(std::holds_alternative<PgReferenceLateralMeasure>(surfaces.points.values()[2].measure));
+    CHECK(surfaces.points.values()[2].layer == core::LayerId{1});
+    verify_exact_reference(surfaces, 2, shell, expected, sqrt(dot(area_vector, area_vector)));
 }
 } // namespace
 
@@ -314,7 +337,7 @@ TEST_CASE("R5 crop and taper is handed to reference consumers with its original 
             const auto n = i < 2 ? 1 : 2;
             const auto h = i % 2 == 0 ? Decimal("0.01") : Decimal("0.0001");
             const auto ready = prepare_r5(wire, n, workspace, plan);
-            verify_handoff(ready, h, workspace, plan);
+            verify_handoff(ready, n, h, workspace, plan);
             std::clog << "R5_CASE_HANDOFF_ACCEPT," << i << ',' << n << ','
                       << ready.chart().original().original_rows().size() << ','
                       << ready.chart().pivots().size() << ',' << plan.allocated_bytes() << '\n'
