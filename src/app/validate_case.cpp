@@ -38,11 +38,29 @@ ReferenceInputLimits input_limits() noexcept {
          manifest_cap,
          {io::ParserAllocationMode::EstimateAdmission, payload_cap}},
         io::SchemaLimits{{
-            manifest_cap, case_manifest_max_depth, maximum_nodes, maximum_nodes,
-            case_manifest_max_string_bytes, case_manifest_max_number_bytes, manifest_cap,
-            64 * mib, maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes,
-            maximum_nodes, maximum_nodes, 128, 1024, maximum_nodes, maximum_path, 64 * mib,
-            maximum_work, 4096, 4096,
+            manifest_cap,
+            case_manifest_max_depth,
+            maximum_nodes,
+            maximum_nodes,
+            case_manifest_max_string_bytes,
+            case_manifest_max_number_bytes,
+            manifest_cap,
+            64 * mib,
+            maximum_nodes,
+            maximum_nodes,
+            maximum_nodes,
+            maximum_nodes,
+            maximum_nodes,
+            maximum_nodes,
+            maximum_nodes,
+            128,
+            1024,
+            maximum_nodes,
+            maximum_path,
+            64 * mib,
+            maximum_work,
+            4096,
+            4096,
         }},
     };
 }
@@ -205,8 +223,8 @@ validate_case_file(const std::filesystem::path& path, const std::stop_token& sto
                                         filename.size()};
             return ReferenceInput::from_file(
                 parent, name, io::SourceId{0},
-                {maximum_path, {manifest_cap, manifest_cap + 1, 4096, manifest_cap}}, input_limits(),
-                plan, stop, &diagnostic);
+                {maximum_path, {manifest_cap, manifest_cap + 1, 4096, manifest_cap}},
+                input_limits(), plan, stop, &diagnostic);
         },
         stop);
 }
@@ -216,8 +234,8 @@ validate_case_memory(std::span<const std::byte> bytes,
                      const std::optional<std::filesystem::path>& directory,
                      const std::stop_token& stop) noexcept {
     return validate_case_input(
-        [&](core::ResourcePlan& plan, ReferenceInputDiagnostic& diagnostic)
-            -> core::Result<ReferenceInput> {
+        [&](core::ResourcePlan& plan,
+            ReferenceInputDiagnostic& diagnostic) -> core::Result<ReferenceInput> {
             std::optional<ReadRoot> root;
             if (directory) {
 #if defined(_WIN32) || defined(__linux__)

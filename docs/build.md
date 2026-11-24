@@ -141,6 +141,8 @@ MSH 4.1 ASCII は節とタグを検査し、Nastran の単一ファイル Bulk D
 
 `_uvlas.case_from_dict(document, reference_root=None)` は組み込みの辞書とリスト、文字列キー、JSON に対応する組み込みの値から UTF-8 の入力を作り、同じ検査へ渡す。有限の `float` は binary64 に往復できる最短の十進表記で渡す。入力バイト数と SHA-256 は、キーの挿入順を保って生成した入力の値である。外部参照がある場合は `reference_root` に読み取り元のディレクトリを指定する。呼び出し後に元の辞書やリストを書き換えても、検査済み入力は変わらない。
 
+非公開ランタイムの配置検査に `--case-validation-suite tests/python/test_case_file_operations.py docs/specs/foundation/case-schema-examples.json` を加えると、移設した CLI と新規仮想環境に導入した Python 拡張で、この入口を再検証する。
+
 ## 確認の記録
 
 | 日付 | 環境 | 確認したこと |

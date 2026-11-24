@@ -122,9 +122,8 @@ private:
             invalid();
         }
         std::array<char, 32> buffer{};
-        const auto converted =
-            std::to_chars(buffer.data(), buffer.data() + buffer.size(), number,
-                          std::chars_format::general);
+        const auto converted = std::to_chars(buffer.data(), buffer.data() + buffer.size(), number,
+                                             std::chars_format::general);
         if (converted.ec != std::errc{}) {
             invalid();
         }

@@ -102,8 +102,9 @@ class CaseFileOperations(unittest.TestCase):
             self.assertTrue(file_case.ok)
             self.assertEqual(checked.source_sha256, file_case.value.source_sha256)
             self.assertEqual(checked.source_byte_count, file_case.value.source_byte_count)
+            del file_case
         case["schema"] = "uvlas.invalid/1"
-        self.assert_failure(uvlas.case_from_dict(case), uvlas.FailureCode.InvalidInput)
+        self.assert_failure(uvlas.case_from_dict(case), uvlas.FailureCode.Unsupported)
         self.assertEqual(checked.source_sha256, hashlib.sha256(expected).digest())
         self.assertEqual(checked.source_byte_count, len(expected))
 
@@ -114,16 +115,23 @@ class CaseFileOperations(unittest.TestCase):
         class CustomDictionary(dict):
             pass
 
-        for value in (None, CustomDictionary(), {1: True}, {"x": cycle}, {"x": (1,)},
-                      {"x": "\ud800"}, {"x": float("nan")}, {"x": float("inf")}):
+        for value in (
+            None,
+            CustomDictionary(),
+            {1: True},
+            {"x": cycle},
+            {"x": (1,)},
+            {"x": "\ud800"},
+            {"x": float("nan")},
+            {"x": float("inf")},
+        ):
             with self.subTest(value=repr(value)):
                 self.assert_failure(uvlas.case_from_dict(value), uvlas.FailureCode.InvalidInput)
 
         nested = []
         for _ in range(128):
             nested = [nested]
-        for value in (nested, "あ" * 22_000, 1 << 4_097, [None] * 262_144,
-                      ["x" * 65_536] * 128):
+        for value in (nested, "あ" * 22_000, 1 << 4_097, [None] * 262_144, ["x" * 65_536] * 128):
             with self.subTest(kind=type(value).__name__):
                 self.assert_failure(
                     uvlas.case_from_dict({"x": value}), uvlas.FailureCode.ResourceExceeded
@@ -135,20 +143,30 @@ class CaseFileOperations(unittest.TestCase):
             directory.mkdir()
             resolved = directory / "resolved-case.json"
             resolved.write_bytes(b'{"sample":"verified"}\r\n')
-            provenance = json_bytes({
-                "build": json.loads(cli("--build-info").stdout),
-                "original_case": {
-                    "source_id": "0",
-                    "byte_count": "6",
-                    "sha256": hashlib.sha256(b"source").hexdigest(),
-                },
-                "resolved_case_sha256": hashlib.sha256(resolved.read_bytes()).hexdigest(),
-            })
+            provenance = json_bytes(
+                {
+                    "build": json.loads(cli("--build-info").stdout),
+                    "original_case": {
+                        "source_id": "0",
+                        "byte_count": "6",
+                        "sha256": hashlib.sha256(b"source").hexdigest(),
+                    },
+                    "resolved_case_sha256": hashlib.sha256(resolved.read_bytes()).hexdigest(),
+                }
+            )
             (directory / "provenance.json").write_bytes(provenance)
-            raw = json_bytes({
-                "completed": True, "exit_code": 0, "failure": None, "last_accepted": None,
-                "provenance_sha256": hashlib.sha256(provenance).hexdigest(),
-            }) + b"\r\n"
+            raw = (
+                json_bytes(
+                    {
+                        "completed": True,
+                        "exit_code": 0,
+                        "failure": None,
+                        "last_accepted": None,
+                        "provenance_sha256": hashlib.sha256(provenance).hexdigest(),
+                    }
+                )
+                + b"\r\n"
+            )
             (directory / "status.json").write_bytes(raw)
             output = cli("inspect", directory)
             self.assertEqual(output.returncode, 0, output.stderr)
