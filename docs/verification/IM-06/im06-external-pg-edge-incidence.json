@@ -1,0 +1,46 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-external-pg-edge-incidence",
+  "date": "2026-11-24",
+  "package": "IM-06",
+  "ids": [
+    "IO4-03",
+    "IO4-04",
+    "N4-02",
+    "SH-D02",
+    "R-05"
+  ],
+  "source_commit": "075369be6fba2fba52e7170ad28105c65a0f9d5f",
+  "scope": "Original edge incidence and exact PG exterior coverage in affine correspondence.",
+  "checks": {
+    "windows": {
+      "compiler": "MSVC",
+      "configuration": "Debug",
+      "cases": 5,
+      "assertions": 120
+    },
+    "linux": {
+      "compiler": "GCC 14.2",
+      "configuration": "Debug ASan and UBSan",
+      "cases": 5,
+      "assertions": 120
+    },
+    "omit_unmatched_interior_edge_rejection": {
+      "failed_assertions": 2,
+      "exit": 42
+    },
+    "restored_control": {
+      "cases": 1,
+      "assertions": 15,
+      "exit": 0
+    }
+  },
+  "sources": {
+    "src/io/external_planar_pg.cpp": "6f7a491da496434e74de1bd76a054f70c01e33b12086f587ca961450f7f2fb23",
+    "src/io/external_planar_pg.hpp": "0c10053d4ae27eb13e1247ddd9645bf7aafed28cb8ba06b1246bf7d1e0d637f1",
+    "tests/io/external_planar_pg_test.cpp": "153925a1469214d09991a750e267e68f83ab304d0d42e4472fe02ada84d68613"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/external-pg-edge-incidence.md": "af747efccea84d500e64b4bf93b913105eba90bca65f5ecac9a6eaafc9043de6"
+  }
+}

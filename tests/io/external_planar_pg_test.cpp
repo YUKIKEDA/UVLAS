@@ -452,4 +452,97 @@ TEST_CASE("Nastran ZOFFS moves both components of an oblique planar normal",
     CHECK(point.position_metres[2] == f.r("-1", "5"));
 }
 
+template <class Measure>
+void check_nastran_edge_conformance(Measure measure, Reason slit_reason,
+                                    std::uint64_t slit_element) {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    // This named subset splits the atomic PG bottom edge but not the source edge.
+    f.named.push_back(f.point("0", "0"));
+    f.named.push_back({f.r("1", "4"), f.r("0")});
+    f.names.push_back({"part of bottom", f.named});
+    const auto length = f.r("1");
+    const std::array<ExactRational, 3> origin;
+    const std::array rotation{f.r("1"), f.r("0"), f.r("0"), f.r("0"), f.r("1"),
+                              f.r("0"), f.r("0"), f.r("0"), f.r("1")};
+    const auto target = flat_target(f, {rotation, origin, length}, plan);
+    const PgPartitionPoint a = f.point("0", "0"), b = f.point("1", "0"), c = f.point("1", "1"),
+                           d = f.point("0", "1");
+    const PgPartitionPoint bottom_mid{f.r("1", "2"), f.r("0")};
+    const PgPartitionPoint right_mid{f.r("1"), f.r("1", "2")};
+    const PgPartitionPoint top_mid{f.r("1", "2"), f.r("1")};
+    const PgPartitionPoint left_mid{f.r("0"), f.r("1", "2")};
+    const PgPartitionPoint centre{f.r("1", "2"), f.r("1", "2")};
+    const ExternalPgCorner bl{1, a}, br{3, b}, tr{6, c}, tl{8, d}, bm{2, bottom_mid},
+        rm{5, right_mid}, tm{7, top_mid}, lm{9, left_mid}, cm{4, centre};
+    const auto deck =
+        read_cards("GRID,1,,0.0,0.0,0.0\nGRID,2,,0.5,0.0,0.0\nGRID,3,,1.0,0.0,0.0\n"
+                   "GRID,4,,0.5,0.5,0.0\nGRID,5,,1.0,0.5,0.0\nGRID,6,,1.0,1.0,0.0\n"
+                   "GRID,7,,0.5,1.0,0.0\nGRID,8,,0.0,1.0,0.0\nGRID,9,,0.0,0.5,0.0\n"
+                   "GRID,11,,0.0,0.0,0.0\nGRID,16,,1.0,1.0,0.0\nPSHELL,20\n"
+                   "CTRIA3,101,20,1,3,6\nCTRIA3,102,20,1,6,8\nCTRIA3,103,20,11,16,8\n"
+                   "CTRIA3,104,20,1,8,6\n"
+                   "CQUAD4,201,20,1,2,7,8\nCQUAD4,202,20,2,3,5,4\nCQUAD4,203,20,4,5,6,7\n"
+                   "CQUAD4,204,20,1,2,4,9\nCQUAD4,205,20,9,4,7,8\n",
+                   plan);
+    std::optional<ExternalPgDiagnostic> diagnostic;
+    const auto check = [&](std::span<const ExternalPgFace> charts) {
+        return measure(target, deck, charts, plan, &diagnostic);
+    };
+    const std::array lower_tri{bl, br, tr}, upper_tri{bl, tr, tl};
+    const std::array slit_tri{ExternalPgCorner{11, a}, ExternalPgCorner{16, c}, tl};
+    const std::array backwards_tri{bl, tl, tr};
+    const std::array attached{ExternalPgFace{101, Winding::Forward, lower_tri},
+                              ExternalPgFace{102, Winding::Forward, upper_tri}};
+    const std::array slit{attached[0], ExternalPgFace{103, Winding::Forward, slit_tri}};
+    const std::array reversed_edge{attached[0],
+                                   ExternalPgFace{104, Winding::Reversed, backwards_tri}};
+
+    SECTION("Same coordinates with different GRID tags") {
+        REQUIRE(check(attached));
+        const auto split = check(slit);
+        REQUIRE_FALSE(split);
+        CHECK(split.error().code == Code::GeometryInvalid);
+        CHECK(take(diagnostic).element == slit_element);
+        CHECK(take(diagnostic).reason == slit_reason);
+    }
+    SECTION("Same raw direction after one declared reversal") {
+        const auto wrong_winding = check(reversed_edge);
+        REQUIRE_FALSE(wrong_winding);
+        CHECK(wrong_winding.error().code == Code::GeometryInvalid);
+        CHECK(take(diagnostic).reason == Reason::EdgeIncidence);
+        CHECK(take(diagnostic).other == 104);
+    }
+    SECTION("Interior T-junction") {
+        const std::array left{bl, bm, tm, tl}, right_bottom{bm, br, rm, cm},
+            right_top{cm, rm, tr, tm};
+        const std::array left_bottom{bl, bm, cm, lm}, left_top{lm, cm, tm, tl};
+        const std::array t_junction{ExternalPgFace{201, Winding::Forward, left},
+                                    ExternalPgFace{202, Winding::Forward, right_bottom},
+                                    ExternalPgFace{203, Winding::Forward, right_top}};
+        const std::array conforming{ExternalPgFace{204, Winding::Forward, left_bottom},
+                                    ExternalPgFace{205, Winding::Forward, left_top}, t_junction[1],
+                                    t_junction[2]};
+        REQUIRE(check(conforming));
+        const auto unmatched = check(t_junction);
+        REQUIRE_FALSE(unmatched);
+        CHECK(unmatched.error().code == Code::GeometryInvalid);
+        CHECK(take(diagnostic).reason == Reason::EdgeIncidence);
+        CHECK(take(diagnostic).element == 201);
+        CHECK(take(diagnostic).node == 2);
+    }
+}
+
+TEST_CASE("External planar certification requires source edge incidence across a PG patch",
+          "[IO4-03][IO4-04][SH-D02][N4-02][integration][negative][verification]") {
+    check_nastran_edge_conformance(
+        [](const PgReferenceGeometry& target, const NastranShellCards& deck,
+           std::span<const ExternalPgFace> charts, core::ResourcePlan& plan,
+           std::optional<ExternalPgDiagnostic>* diagnostic) {
+            return ExternalPlanarPg::prepare(target, deck, SiLengthUnit::Metre, charts,
+                                             {reference_limits(), 4}, plan, diagnostic);
+        },
+        Reason::EdgeIncidence, 101);
+}
+
 } // namespace
