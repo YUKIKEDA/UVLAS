@@ -283,10 +283,11 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
     const p::RationalView unit{1, word, word}, null{0, {}, word};
     const c::CaseFlowComponentBudget tolerance{unit, {1, word, denom}, null};
     std::array<c::CaseFlowComponentBudget, 36> pose{};
-    std::array<c::CaseFlowComponentBudget, 9> values{};
+    std::array<c::CaseFlowComponentBudget, 9> row_budgets{};
     pose.fill(tolerance);
-    values.fill(tolerance);
-    const c::CasePgSupportProjection projection{core::Precision::TwoWord, pose, values, values};
+    row_budgets.fill(tolerance);
+    const c::CasePgSupportProjection projection{core::Precision::TwoWord, pose, row_budgets,
+                                                row_budgets};
     const auto query = [&](c::CaseFlowClockQuery node) {
         return c::evaluate_case_structural_pg_support(prepared, current, node, Second, projection,
                                                       motion_workspace, evaluation, memory);
@@ -418,8 +419,8 @@ TEST_CASE("Actual structural Support declarations use the case clock without aer
         REQUIRE(result.original_residual_upper <= primal.maximum_absolute_original_defect);
         const auto retained_coordinate = [&](std::size_t i) {
             const auto& values = result.coordinates.storage();
-            if (const auto* one = std::get_if<numerics::Binary64<double>>(&values))
-                return Dec(one->values.values()[i]);
+            if (const auto* binary = std::get_if<numerics::Binary64<double>>(&values))
+                return Dec(binary->values.values()[i]);
             const auto& two = std::get<numerics::TwoWord<double>>(values);
             return Dec(two.hi.values()[i]) + Dec(two.lo.values()[i]);
         };
