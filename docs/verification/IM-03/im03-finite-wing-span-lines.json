@@ -1,0 +1,47 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-span-lines-v1",
+  "ids": [
+    "IM-03",
+    "A5-02",
+    "V-AERO",
+    "AE-02",
+    "UW-D03",
+    "UW-D05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "source_commit": "6c9a71aa9cc37265369eba4f03d7be2fe56426a3",
+  "claimed_state": "Independent physical edge forces, spanwise line forces and moments, and the finite-grid ideal Trefftz diagnostic agree with the enclosed product edge loads and the retained-circulation Trefftz calculation for two frozen M2/N4 shapes and five incidences. The near/far drag coefficients on that finite grid differ by about 5.4 percent.",
+  "verification": {
+    "windows": "Windows 11、MSVC 14.51 の Release で定常の2件が通過した。各13,447検査、水平42.78秒、上反角5度53.01秒。",
+    "linux": "Linux、GCC 14.2.0 の Release で定常・後流長・コア半径の計6件が通過した。定常は各13,447検査、水平21.44秒、上反角5度29.38秒。clang-tidy は各系列の水平翼構成で通過した。",
+    "build_notes": "Windows の Debug では、最終差分のうち定常専用ヘルパーの属性を加える前の `646706a4` で2形状をコンパイルした。上の実行記録は最終差分で実行した Release を対象とする。",
+    "mutation": "数値条件が同じ先行版 `0f910609` の別複製で、線分配分を点配分に置き換えると水平翼・−2度の帯0で失敗した。補正偶力を外すと厳密解とのモーメント差8を検出した。元の試験は同じ乱数seed 23で13,447検査が通過した。",
+    "commands": [
+      "ctest --test-dir out/issue166-build -C Release -V -R '^coupling\\.finite_wing_steady\\.fw_v0[12]$' -j 2",
+      "ctest --test-dir build -V -R '^coupling\\.finite_wing_(steady|wake_length|core_radius)\\.fw_v0[12]$' -j 2",
+      "clang-tidy --quiet with one compile_commands.json entry per steady, wake_length, and core_radius series (fw_v01)",
+      "python -X utf8 -B docs/verification/IM-03/finite-wing-span-lines-v1/reference.py --output <separate-output>/finite-wing-span-lines-v1.json",
+      "just trace-check"
+    ],
+    "fixture": "Byte-identical regeneration: c0fd74b0182fc6a1069a1de84c29b8fe7aee686ffa6f6e16898ad63d6d7be396.",
+    "scope": "Two frozen M2/N4 grids, five incidences, 32 m finite closed wake, 0.001 m positive core on the near side, and ideal Trefftz midpoint geometry on the far side. The full common limit, refined-section loads, and unsteady acceptance remain separate."
+  },
+  "sources": {
+    "tests/coupling/finite_wing_steady_test.cpp": "42e5e3c49f655f536c6fe4d25e6d81abc89a5f4cc750ff8f50ed87cffd17a550",
+    "docs/verification/IM-03/finite-wing-span-lines-v1/reference.py": "6cdc1161e8e6a011fdf3a642e5bdc5f019730c6c3c5083937c01dadf8869c3a8",
+    "docs/verification/IM-03/finite-wing-polars-v1/reference.py": "89554ba4e854ef78838fa36ef1dcca337ed65e1ffcbd065acd922a365ad32835",
+    "docs/verification/IM-03/finite-wing-steady-v1/reference.py": "7cd47141282ee114900b939405185feacb61fc782a269ca7c8b7d172aa7ead43",
+    "docs/verification/IM-03/finite-wing-case-v1/reference.py": "18d84c7def0ee7a40426a4dcab71e6537b686e9f2addec5c5e972d81a3835950",
+    "rd/aero/avl-reference/spanwise-load-observation-contract.md": "3d1a590132c8f7a38f72a3b36491460e34d9685aab7b57c56ba65798a0e79595",
+    "rd/aero/finite-wing/records/induced-drag-common-limit-protocol.md": "662a9773f3378615a92d07f19fba1c1cf7bb918d0b97fd8650b434c936579c6c",
+    "rd/aero/finite-wing/experiments/trefftz_observations.py": "c69b5085a57476652bde1254683d0ccb89d52427275fb2be03cbe1bd4890776e"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/finite-wing-span-lines-v1/verification.md": "0ba562eb2718e8e1f97917e14ea56593c4738129244677595d19880a12e5b475",
+    "tests/aero/fixtures/finite-wing-span-lines-v1.json": "c0fd74b0182fc6a1069a1de84c29b8fe7aee686ffa6f6e16898ad63d6d7be396",
+    "tests/aero/fixtures/finite-wing-polars-v1.json": "50bf3906dfc16c81eb1eb8bbf53b0c2424cdb4b6d45b5f7db7c4566962146a13",
+    "rd/aero/finite-wing/records/trefftz-midpoint-operator-result.json": "331a99b7020ee04ab46bd4fdb20dff5c2cdf5122e46ba96f39358653fb034e35"
+  }
+}
