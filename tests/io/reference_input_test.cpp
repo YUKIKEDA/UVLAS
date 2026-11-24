@@ -2332,11 +2332,11 @@ $EndElements
             } else {
                 FAIL("Missing whole-face regional thickness evidence");
             }
-            const auto expected_materials = is_gmsh                     ? 0
-                                            : separate_pcomp            ? 4
-                                            : corner_claim              ? 3
-                                            : (pcomp || partial_pshell) ? 2
-                                                                        : 1;
+            const std::uint64_t expected_materials = is_gmsh                     ? 0
+                                                     : separate_pcomp            ? 4
+                                                     : corner_claim              ? 3
+                                                     : (pcomp || partial_pshell) ? 2
+                                                                                 : 1;
             CHECK(matched_case.materials_compared == expected_materials);
             if (pcomp) {
                 const auto sections = matched_case.laminate.values();
