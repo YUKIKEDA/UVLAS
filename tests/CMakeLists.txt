@@ -741,6 +741,17 @@ if(UVLAS_SANITIZERS AND NOT MSVC)
     set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 540)
 endif()
 
+uvlas_add_test(structure.pg_product_quadrature
+    LABELS property negative verification V-PG
+    TIMEOUT 300
+    SOURCES structure/pg_product_quadrature_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_product_quadrature
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_product_quadrature PROPERTIES TIMEOUT 420)
+endif()
+
 uvlas_add_test(structure.pg_prepared_patch
     LABELS property negative verification V-PG
     TIMEOUT 120
