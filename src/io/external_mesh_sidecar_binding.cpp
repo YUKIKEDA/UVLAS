@@ -17,9 +17,9 @@ struct Rejected {
 
 class Binding {
 public:
-    Binding(const MeshSidecarBindingLimits& limits, core::ResourcePlan& plan,
-            const std::stop_token& stop, std::optional<MeshSidecarDiagnostic>* diagnostic) noexcept
-        : limits(limits), plan(plan), stop(stop), diagnostic_(diagnostic) {}
+    Binding(const MeshSidecarBindingLimits& configured, core::ResourcePlan& resources,
+            const std::stop_token& token, std::optional<MeshSidecarDiagnostic>* diagnostic) noexcept
+        : limits(configured), plan(resources), stop(token), diagnostic_(diagnostic) {}
 
     void step() {
         if (stop.stop_requested()) {
@@ -141,7 +141,7 @@ template <class Sequence>
     if (!matches_digest(file.sha256.text(), actual.digest)) {
         b.reject(Reason::Binding);
     }
-    return snapshot;
+    return reference;
 }
 
 [[nodiscard]] ParsedMeshSidecar parse(Binding& b, const AcquiredRootSnapshot& file,
@@ -563,19 +563,19 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
                                                    const ReferencedCase& graph,
                                                    const SchemaIdentity& parent,
                                                    const schema::GeometryGmsh& geometry) {
-    const auto& sidecar_file =
+    const auto sidecar_file =
         authenticated(b, graph, parent, geometry.sidecar.record(), ReferenceRole::GmshSidecar);
-    auto sidecar = parse(b, sidecar_file, MeshGeometryId{geometry.id.unsigned_value()});
+    auto sidecar = parse(b, sidecar_file.get(), MeshGeometryId{geometry.id.unsigned_value()});
     if (sidecar.conversion() &&
         std::holds_alternative<schema::ReferenceGeometryFit>(geometry.reference.record())) {
         b.reject(Reason::Binding);
     }
     check_observations(b, root, sidecar);
-    const auto& mesh_file =
+    const auto mesh_file =
         authenticated(b, graph, parent, geometry.mesh.record(), ReferenceRole::GmshMesh);
-    auto mesh =
-        b.value(GmshMesh::prepare(mesh_file, b.limits.gmsh, b.plan, b.stop), Reason::Snapshot);
-    b.detail.source = sidecar_file.location;
+    auto mesh = b.value(GmshMesh::prepare(mesh_file.get(), b.limits.gmsh, b.plan, b.stop),
+                        Reason::Snapshot);
+    b.detail.source = sidecar_file.get().location;
     const auto view = b.require(mesh.view(), Reason::Snapshot);
     const auto& declaration = std::get<GmshSidecar>(sidecar.payload());
     auto faces = gmsh_faces(b, root.model.record(), declaration, view);
@@ -586,13 +586,13 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
                                                       const ReferencedCase& graph,
                                                       const SchemaIdentity& parent,
                                                       const schema::GeometryNastran& geometry) {
-    const auto& sidecar_file =
+    const auto sidecar_file =
         authenticated(b, graph, parent, geometry.sidecar.record(), ReferenceRole::NastranSidecar);
-    auto sidecar = parse(b, sidecar_file, MeshGeometryId{geometry.id.unsigned_value()});
+    auto sidecar = parse(b, sidecar_file.get(), MeshGeometryId{geometry.id.unsigned_value()});
     check_observations(b, root, sidecar);
-    const auto& deck_file =
+    const auto deck_file =
         authenticated(b, graph, parent, geometry.deck.record(), ReferenceRole::NastranDeck);
-    auto deck = b.value(NastranBulkDeck::prepare(deck_file, b.limits.nastran, b.plan, b.stop),
+    auto deck = b.value(NastranBulkDeck::prepare(deck_file.get(), b.limits.nastran, b.plan, b.stop),
                         Reason::Snapshot);
     auto coordinates = b.value(
         NastranCoordinateCards::prepare(std::move(deck), b.limits.coordinates, b.plan, b.stop),
@@ -603,7 +603,7 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
         auto supports =
             b.value(NastranSupportCards::prepare(coordinates, b.limits.support, b.plan, b.stop),
                     Reason::Snapshot);
-        b.detail.source = sidecar_file.location;
+        b.detail.source = sidecar_file.get().location;
         const auto view = b.require(supports.view(), Reason::Snapshot);
         const auto coordinate = b.require(coordinates.view(), Reason::Snapshot);
         for (const auto& row : declaration.supports.values()) {
@@ -617,11 +617,11 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
         }
         nastran_supports(b, model, declaration, view);
     }
-    b.detail.source = deck_file.location;
+    b.detail.source = deck_file.get().location;
     auto shells =
         b.value(NastranShellCards::prepare(std::move(coordinates), b.limits.shells, b.plan, b.stop),
                 Reason::Snapshot);
-    b.detail.source = sidecar_file.location;
+    b.detail.source = sidecar_file.get().location;
     const auto view = b.require(shells.view(), Reason::Snapshot);
     auto faces = nastran_faces(b, model, declaration, view);
     nastran_other(b, model, declaration, view.input.bulk);
