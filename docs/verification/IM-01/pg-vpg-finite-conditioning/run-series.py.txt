@@ -1,0 +1,241 @@
+"""Run product finite-rule qualification for each independently pinned R4/R5 layout."""
+
+import argparse
+import hashlib
+import json
+import subprocess
+from fractions import Fraction
+from pathlib import Path
+
+CAP = 48 * 2**30
+LIMIT = Fraction(1, 10**20)
+RECORDS = "rd/structure/main-shell/paired-geometry/records/"
+AUDITS = {
+    "paired-reference-r4-audit.json": (
+        "2af9e42f35928cb0d213f126fd481d03703ce6995b3c52e75ea1c8045cd9f0c9"
+    ),
+    "paired-shell-r5-audit.json": (
+        "48e4a9ecbcb3ea0ee6cff0269f71c0567032d9b0ddf6040421aba51f8e222167"
+    ),
+}
+QUALITY = (
+    ("cylinder", ("0.4", "0", "0"), False),
+    ("ellipse", ("0.4", "0.2", "0"), False),
+    ("twist", ("0.4", "0", "0.07"), False),
+    ("saddle", ("0.4", "-0.2", "0.07"), True),
+    ("mixed quartic", ("0.4", "0.2", "0.07", "0.1", "-0.06", "0.025"), True),
+    (
+        "skew mixed quartic",
+        ("0.4", "0.2", "0.07", "0.1", "-0.06", "0.025", "0", "1", "0.2"),
+        True,
+    ),
+)
+THICKNESSES = (Fraction(1, 100), Fraction(1, 10000))
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def frozen_record(root, name, sha):
+    path = RECORDS + name
+    raw = (root / path).read_bytes()
+    if digest(raw) != sha:
+        raise ValueError(f"Frozen hash mismatch: {path}")
+    return json.loads(raw, parse_float=str)
+
+
+def cases(root):
+    checked = {name: frozen_record(root, name, h)["sources"] for name, h in AUDITS.items()}
+    quality_name = "mass-paired-quality-result.json"
+    explicit_name = "mass-paired-coefficient-input-result.json"
+    r5_name = "paired-shell-r5-domain-v2-result.json"
+    r4 = checked["paired-reference-r4-audit.json"]
+    r5 = checked["paired-shell-r5-audit.json"]
+    quality = frozen_record(root, quality_name, r4[RECORDS + quality_name])["records"]
+    explicit = frozen_record(root, explicit_name, r4[RECORDS + explicit_name])["records"]
+    sweep = frozen_record(root, r5_name, r5[RECORDS + r5_name])["records"]
+    if (len(quality), len(explicit), len(sweep)) != (24, 4, 4):
+        raise ValueError("Wrong frozen series size")
+    expected = {}
+    for index, row in enumerate(quality):
+        name, params, tapered = QUALITY[index // 4]
+        if tuple(map(Fraction, row["parameters"])) != tuple(map(Fraction, params)):
+            raise ValueError(f"Unexpected original graph: {index}")
+        if row["variable"] is not tapered:
+            raise ValueError(f"Unexpected original thickness policy: {index}")
+        expected[(name, row["n"], Fraction(row["h"]))] = [quality_name, index]
+    for name, record, rows in (
+        ("explicit coefficients", explicit_name, explicit),
+        ("r5 swept taper", r5_name, sweep),
+    ):
+        for index, row in enumerate(rows):
+            expected[(name, row["n"], Fraction(row["h"]))] = [record, index]
+    for i, (name, _, _) in enumerate(
+        (*QUALITY, ("explicit coefficients", (), True), ("r5 swept taper", (), True))
+    ):
+        grids = (2, 4) if i < 4 else (1, 2)
+        if {key for key in expected if key[0] == name} != {
+            (name, n, h) for n in grids for h in THICKNESSES
+        }:
+            raise ValueError(f"Incomplete layout keys: {name}")
+    return expected
+
+
+def key_fields(field):
+    name, n, h = field[:3]
+    return name, int(n), Fraction(h)
+
+
+def convert(raw, key):
+    rows = {}
+    for line in raw.splitlines():
+        fields = line.split(",")
+        if not fields[0].startswith("VPG_"):
+            continue
+        tag = fields[0]
+        if tag in rows:
+            raise ValueError(f"Repeated {tag}")
+        rows[tag] = fields[1:]
+    if set(rows) != {"VPG_INPUT", "VPG_GRAM", "VPG_ACCEPT"}:
+        raise ValueError(f"Incomplete case qualification: {rows.keys()}")
+    input_row, gram_row, certificate = map(
+        rows.__getitem__, ("VPG_INPUT", "VPG_GRAM", "VPG_ACCEPT")
+    )
+    if any(key_fields(row) != key for row in (input_row, gram_row, certificate)):
+        raise ValueError("Native case key differed from frozen selection")
+    rank, volumes, points, rank_bytes, selection_bytes = map(int, input_row[3:])
+    gram_steps, scalar_ops, partition_visits, gram_bytes, gram_ms = map(int, gram_row[3:])
+    bound = Fraction(certificate[3])
+    (
+        protected,
+        factor_steps,
+        factor_bytes,
+        final_bytes,
+        factor_ms,
+        total_ms,
+        checked,
+        audit,
+        peak,
+    ) = map(int, certificate[4:])
+    if not (
+        0 <= bound <= LIMIT
+        and 0 < protected <= min(rank, 33)
+        and 0 < volumes <= points
+        and checked == 33 * rank
+        and 0 < rank_bytes < gram_bytes < final_bytes <= CAP
+        and peak > 0
+        and 0 < factor_bytes == final_bytes - gram_bytes
+        and 0 < selection_bytes <= audit <= CAP
+        and 0 < gram_steps <= 10**13
+        and 0 < factor_steps <= 10**13
+        and 0 < scalar_ops <= 10**9
+        and 0 < partition_visits <= 300_000_000
+        and 0 <= factor_ms + gram_ms <= total_ms
+    ):
+        raise ValueError("Native accounting or acceptance differs from the frozen limits")
+    return {
+        "rank": rank,
+        "volumes": volumes,
+        "points": points,
+        "protected_rank": protected,
+        "bound": str(bound),
+        "mandatory_exact_comparisons": checked,
+        "gram_steps": gram_steps,
+        "gram_scalar_operations": scalar_ops,
+        "gram_partition_visits": partition_visits,
+        "certificate_steps": factor_steps,
+        "certificate_payload_bytes": factor_bytes,
+        "basis_plan_bytes": rank_bytes,
+        "gram_plan_bytes": gram_bytes,
+        "certificate_plan_bytes": final_bytes,
+        "reference_selection_bytes": selection_bytes,
+        "reference_audit_bytes": audit,
+        "peak_resident_bytes": peak,
+        "gram_milliseconds": gram_ms,
+        "certificate_milliseconds": factor_ms,
+        "whole_preparation_milliseconds": total_ms,
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("root", type=Path)
+    parser.add_argument("binary", type=Path)
+    parser.add_argument("log_directory", type=Path)
+    parser.add_argument("--grid", type=int, choices=(1, 2, 4), action="append")
+    parser.add_argument("--omit-section", action="append", default=[])
+    args = parser.parse_args()
+    expected = cases(args.root)
+    binary = args.binary.resolve(strict=True)
+    log_dir = args.log_directory.resolve()
+    if log_dir.exists() or args.root.resolve() == log_dir:
+        raise ValueError("Supply a new output directory")
+    log_dir.mkdir()
+    roster = [
+        (key, origin)
+        for key, origin in expected.items()
+        if args.grid is None or key[1] in args.grid
+    ]
+    by_section = {f"{key[0]}_n{key[1]}_h{key[2]}": key for key, _ in roster}
+    if len(set(args.omit_section)) != len(args.omit_section) or not all(
+        section in by_section for section in args.omit_section
+    ):
+        raise ValueError("Omitted section differs from selected frozen cases")
+    omissions = {by_section[section] for section in args.omit_section}
+    roster = [(key, origin) for key, origin in roster if key not in omissions]
+    if not roster:
+        raise ValueError("No cases remain")
+    measured = []
+    failures = []
+    for ordinal, (key, origin) in enumerate(roster):
+        name, n, h = key
+        section = f"{name}_n{n}_h{h}"
+        print(f"[{ordinal + 1}/{len(roster)}] {section}", flush=True)
+        log = log_dir / f"case-{ordinal:02d}.log"
+        with log.open("xb") as stream:
+            result = subprocess.run(
+                [str(binary), "--section", section, "--colour-mode", "none"],
+                stdout=stream,
+                stderr=subprocess.STDOUT,
+                check=False,
+            )
+        if result.returncode:
+            failures.append((section, result.returncode))
+            print(f"Recorded nonzero exit; see {log.name}", flush=True)
+            continue
+        try:
+            case = convert(log.read_text(encoding="utf-8"), key)
+        except ValueError as error:
+            failures.append((section, str(error)))
+            print(f"Refused case evidence: {error}", flush=True)
+            continue
+        case.update(
+            shape=name,
+            n=n,
+            thickness=str(h),
+            result=origin[0],
+            record=origin[1],
+            log_sha256=digest(log.read_bytes()),
+        )
+        measured.append(case)
+        print(f"Qualified {section}", flush=True)
+    if failures or len(measured) != len(roster):
+        raise SystemExit(f"Recorded {len(measured)}/{len(roster)}; failed {failures}")
+    document = {
+        "schema": "uvlas.vpg-finite-conditioning/1",
+        "profile_bytes": CAP,
+        "case_scope": args.grid or [1, 2, 4],
+        "omitted_sections": args.omit_section,
+        "native_binary_sha256": digest(binary.read_bytes()),
+        "cases": measured,
+    }
+    temporary = log_dir / "result.json.tmp"
+    output = log_dir / "result.json"
+    with temporary.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write(json.dumps(document, indent=2) + "\n")
+    temporary.replace(output)
+
+
+if __name__ == "__main__":
+    main()
