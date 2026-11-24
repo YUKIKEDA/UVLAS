@@ -276,8 +276,11 @@ void check_frozen_curved_point(const PgReferenceGeometry& ready, const PgReferen
             PgReferenceVolumePoint{static_cast<core::Index>(i), coordinate_u, coordinate_v, depth},
             std::nullopt, limits, plan)));
     }
-    REQUIRE(observed);
-    const auto& point = observed.value();
+    if (!observed) {
+        FAIL("The asymmetric frozen point must lie strictly inside one volume triangle");
+        return;
+    }
+    const auto& point = *observed;
     CHECK(q(point.s) == s);
     CHECK(q(point.t) == t);
     CHECK(q(point.zeta) == Q{1} / 3);
@@ -285,7 +288,7 @@ void check_frozen_curved_point(const PgReferenceGeometry& ready, const PgReferen
     // Frozen R4 interface and R5 share these world-height coefficients, except
     // for the xy term. The formula does not read the Case chart's coefficient list.
     const Q x = r4_interface ? Q((Q{shell} + s) / 2) : s;
-    const Q y = t;
+    const Q& y = t;
     const Q xy_coefficient = r4_interface ? Q{7, 100} : Q{0};
     const Q height = x * x / 5 + y * y / 10 + xy_coefficient * x * y + x * x * x / 30 -
                      y * y * y / 50 + x * x * y * y / 40;
