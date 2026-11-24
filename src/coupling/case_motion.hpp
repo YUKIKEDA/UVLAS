@@ -56,6 +56,31 @@ private:
     motion::m::Interval pi_;
 };
 
+/// Stored exact inputs for this motion recipe. The version identifies the rigid
+/// composition and formula-series rules; each PCHIP archive has its own version.
+struct CaseMotionSnapshotView {
+    std::uint64_t formula_version{};
+    CaseMotionFrameSnapshotView frame;
+    CaseMotionTimeSnapshotView time;
+};
+
+class CaseMotionSnapshot {
+public:
+    CaseMotionSnapshot(CaseMotionSnapshot&&) noexcept = default;
+    CaseMotionSnapshot& operator=(CaseMotionSnapshot&&) noexcept = default;
+    CaseMotionSnapshot(const CaseMotionSnapshot&) = delete;
+    CaseMotionSnapshot& operator=(const CaseMotionSnapshot&) = delete;
+
+    [[nodiscard]] core::Result<CaseMotionSnapshotView> view() const& noexcept;
+    [[nodiscard]] core::Result<CaseMotionSnapshotView> view() const&& = delete;
+
+private:
+    friend struct case_motion_detail::Builder;
+    CaseMotionSnapshot(CaseMotionFrameSnapshot&&, CaseMotionTimeSnapshot&&) noexcept;
+    CaseMotionFrameSnapshot frame_;
+    CaseMotionTimeSnapshot time_;
+};
+
 /// Owns the qualified time and the projected world position/rotation jet.
 class CaseMotionEvaluation {
 public:
@@ -95,6 +120,19 @@ private:
 prepare_case_motion(const io::SiCase&, CaseMotionField, CaseMotionTimeWindow,
                     aero::detail::pchip::PchipInputStamp, aero::detail::pchip::CurveWorkspace&,
                     const CaseMotionLimits&, core::ResourcePlan&, const std::stop_token& = {},
+                    core::FailureDetails = {}) noexcept;
+
+[[nodiscard]] core::Result<CaseMotionSnapshot>
+snapshot_case_motion(const CaseMotionReady&, aero::detail::pchip::CurveWorkspace&,
+                     const CaseMotionLimits&, core::ResourcePlan&, const std::stop_token& = {},
+                     core::FailureDetails = {}) noexcept;
+
+/// Requalify saved inputs against a separately prepared current case. Saved
+/// curves never become active until their actual coefficients have been checked.
+[[nodiscard]] core::Result<CaseMotionReady>
+restore_case_motion(const CaseMotionSnapshotView&, const CaseMotionReady& current,
+                    aero::detail::pchip::CurveWorkspace&, const CaseMotionLimits&,
+                    core::ResourcePlan&, const std::stop_token& = {},
                     core::FailureDetails = {}) noexcept;
 
 [[nodiscard]] core::Result<CaseMotionEvaluation>

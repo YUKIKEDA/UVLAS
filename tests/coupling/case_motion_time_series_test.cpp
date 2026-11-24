@@ -7,6 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 
 namespace {
@@ -562,4 +563,192 @@ TEST_CASE("Prepared Motion projects a rotated Frame and PCHIP side accelerations
                                      {core::Precision::TwoWord, strict}, workspace, motion_limits,
                                      plan),
              core::FailureCode::PrecisionUnresolved);
+}
+
+TEST_CASE("Prescribed Motion restores owned exact inputs and requalifies saved coefficients",
+          "[AE-07][IO4-06][FD-05][FD-06][N4-06][verification][negative]") {
+    auto input = a::root("aerodynamic_prescribed_transient");
+    input.field("units").set("time", a::string("s"));
+    input.field("units").set("length", a::string("m"));
+    input.field("units").set("angle", a::string("deg"));
+    input.field("analysis")
+        .set(
+            "intervals",
+            a::parse(
+                R"([{"start":0,"end":1,"step":1,"restart":"initial"},{"start":1,"end":2,"step":1,"restart":"event"}])"));
+    auto& motion = motion_json(input);
+    motion.set("origin", a::parse(R"({"origin":[3,4,5],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[1,0,0],[3,0,0]],"outside":{"kind":"reject"}})"));
+    motion.set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,2],"coefficients":[[0,0,0],[0,0,90]]})"));
+    motion.set("events", a::parse("[0,1,2]"));
+
+    const c::CaseMotionLimits motion_limits{
+        {exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+        limits,
+        2048,
+        50'000};
+    const auto prepare = [&](p::CurveWorkspace& workspace, core::ResourcePlan& plan) {
+        const auto source = checked_case(input);
+        const auto begin = exact_time("0", plan);
+        const auto end = exact_time("2", plan);
+        return take(c::prepare_case_motion(source, motion_field(source), {begin, end}, stamp,
+                                           workspace, motion_limits, plan));
+    };
+    core::ResourcePlan memory{budget};
+    p::CurveWorkspace workspace;
+    const auto current = prepare(workspace, memory);
+    const auto restored = [&] {
+        const auto archive = [&] {
+            core::ResourcePlan local{budget};
+            p::CurveWorkspace builder;
+            const auto original = prepare(builder, local);
+            return take(c::snapshot_case_motion(original, builder, motion_limits, local));
+        }();
+        const auto saved = take(archive.view());
+        const auto requalify = [&](const c::CaseMotionSnapshotView& record) {
+            return c::restore_case_motion(record, current, workspace, motion_limits, memory);
+        };
+        const std::array<std::uint32_t, 1> one{1}, four{4}, nine{9};
+        const p::RationalView changed_frame{1, four, one}, changed_coefficient{1, nine, one};
+        const auto* pchip = std::get_if<p::PchipSnapshotView>(&saved.time.translation);
+        const auto* formula = std::get_if<c::CaseMotionFormulaSnapshotView>(&saved.time.rotation);
+        if (pchip == nullptr || formula == nullptr)
+            FAIL("Expected a PCHIP translation and polynomial rotation");
+        REQUIRE_FALSE(pchip->coefficients.empty());
+        REQUIRE_FALSE(formula->coefficients.empty());
+        REQUIRE(saved.time.events.size() == 3);
+        REQUIRE(saved.time.pi_power == 1);
+        exact(saved.frame.components[0], 3);
+        exact(saved.time.events[1], 1);
+
+        auto invalid = saved;
+        invalid.formula_version += 1;
+        rejected(requalify(invalid), core::FailureCode::CheckpointIncompatible);
+        invalid = saved;
+        invalid.frame.components[0] = changed_frame;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        const p::RationalView positive{1, one, one}, negative{-1, one, one}, zero{0, {}, one};
+        const std::array rotated{zero, negative, zero, positive, zero, zero, zero, zero, positive};
+        invalid = saved;
+        std::ranges::copy(rotated, invalid.frame.components.begin() + 3);
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        invalid = saved;
+        invalid.time.pi_power = 0;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        const auto nearby = exact_time("1.000000000000000001", memory);
+        const auto nearby_words = take(io::detail::copy_rational_words(nearby, memory, {}));
+        const auto near = nearby_words.view();
+        const p::RationalView distinct_event{near.sign, near.numerator, near.denominator};
+        auto events = std::array{saved.time.events[0], distinct_event, saved.time.events[2]};
+        invalid = saved;
+        invalid.time.events = events;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        invalid = saved;
+        invalid.time.end = distinct_event;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        std::vector<p::RationalView> raw{pchip->input.samples.values.begin(),
+                                         pchip->input.samples.values.end()};
+        REQUIRE_FALSE(raw.empty());
+        raw[0] = changed_coefficient;
+        auto altered = *pchip;
+        altered.input.samples.values = raw;
+        invalid = saved;
+        invalid.time.translation = altered;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        altered = *pchip;
+        altered.input.boundary.policy = p::HoldBoundary{};
+        invalid.time.translation = altered;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        std::vector<p::RationalView> generated{pchip->coefficients.begin(),
+                                               pchip->coefficients.end()};
+        generated[0] = changed_coefficient;
+        altered = *pchip;
+        altered.coefficients = generated;
+        invalid.time.translation = altered;
+        rejected(requalify(invalid), core::FailureCode::InvalidInput);
+        invalid = saved;
+        std::vector<p::RationalView> polynomial{formula->coefficients.begin(),
+                                                formula->coefficients.end()};
+        polynomial[0] = changed_coefficient;
+        auto altered_formula = *formula;
+        altered_formula.coefficients = polynomial;
+        invalid.time.rotation = altered_formula;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        altered_formula = *formula;
+        if (const auto& domain = altered_formula.domain) {
+            auto changed_domain = *domain;
+            changed_domain[3] = changed_frame;
+            altered_formula.domain = changed_domain;
+        } else {
+            FAIL("The saved rotation lost its polynomial domain");
+        }
+        invalid = saved;
+        invalid.time.rotation = altered_formula;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        auto zero_work = motion_limits;
+        zero_work.maximum_interval_work = 0;
+        core::ResourcePlan capped{budget};
+        rejected(c::restore_case_motion(saved, current, workspace, zero_work, capped),
+                 core::FailureCode::ResourceExceeded);
+        CHECK(capped.allocated_bytes() == 0);
+
+        core::ResourcePlan refused{0};
+        rejected(c::restore_case_motion(saved, current, workspace, motion_limits, refused),
+                 core::FailureCode::ResourceExceeded);
+        CHECK(refused.allocated_bytes() == 0);
+        // Kept until all independent corruptions have been refused; these calls may not consume it.
+        return take(requalify(saved));
+    }();
+
+    const auto at = exact_time("1", memory);
+    const std::array<std::uint32_t, 1> one{1};
+    const std::array<std::uint32_t, 3> denominator{0, 0, 1U << 17U};
+    const p::RationalView unit{1, one, one}, absolute{1, one, denominator}, zero{0, {}, one};
+    std::array<c::CaseFlowComponentBudget, 36> budgets{};
+    budgets.fill({unit, absolute, zero});
+    const c::CaseMotionProjection projection{core::Precision::TwoWord, budgets};
+    for (const auto side : {Left, Right}) {
+        const auto evaluate = [&](const c::CaseMotionReady& prepared) {
+            return take(c::evaluate_case_motion(prepared, current, {stamp, at, Second, side},
+                                                projection, workspace, motion_limits, memory));
+        };
+        const auto uninterrupted = evaluate(current);
+        const auto resumed = evaluate(restored);
+        const auto& time = take(resumed.time()).get();
+        exact(time.time(), 1);
+        exact(time.translation(0, First), 4, 3);
+        exact(time.translation(0, Second), side == Left ? 1U : 5U, 3);
+        exact(time.rotation_coefficient(2, First), 1, 2);
+        CHECK(time.rotation_pi_power() == 1);
+        CHECK(time.requested_side() == side);
+        const auto compare = [](core::Result<io::SiEnclosure> a, core::Result<io::SiEnclosure> b) {
+            const auto left = std::get<io::ScaledTwoWord>(take(std::move(a)));
+            const auto right = std::get<io::ScaledTwoWord>(take(std::move(b)));
+            CHECK(std::bit_cast<std::uint64_t>(left.high) ==
+                  std::bit_cast<std::uint64_t>(right.high));
+            CHECK(std::bit_cast<std::uint64_t>(left.low) ==
+                  std::bit_cast<std::uint64_t>(right.low));
+            CHECK(std::bit_cast<std::uint64_t>(left.radius) ==
+                  std::bit_cast<std::uint64_t>(right.radius));
+            CHECK(left.exponent2 == right.exponent2);
+        };
+        for (const auto order : {Value, First, Second}) {
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                compare(resumed.centre(axis, order), uninterrupted.centre(axis, order));
+                for (std::size_t col = 0; col < 3; ++col)
+                    compare(resumed.rotation(axis, col, order),
+                            uninterrupted.rotation(axis, col, order));
+            }
+        }
+    }
 }

@@ -352,6 +352,30 @@ SiRationalWordsView SiRationalWords::view() const& noexcept {
     return {sign_, data.first(numerator_), data.subspan(numerator_)};
 }
 
+core::Result<SiRationalWords> SiRationalWords::clone(core::ResourcePlan& memory,
+                                                     const std::stop_token& stop) const noexcept {
+    const auto cancelled = core::Failure{core::FailureCode::Cancelled, word_operation};
+    if (stop.stop_requested())
+        return std::unexpected(cancelled);
+    const auto original = words_.values();
+    if (original.empty())
+        return SiRationalWords{};
+    // The input has already passed the checked Index allocation in copy_rational_words.
+    auto copy =
+        memory.allocate<std::uint32_t>(static_cast<core::Index>(original.size()), word_operation);
+    if (!copy)
+        return std::unexpected(copy.error());
+    auto contents = copy->values();
+    for (std::size_t i = 0; i < original.size(); ++i) {
+        if (stop.stop_requested())
+            return std::unexpected(cancelled);
+        contents[i] = original[i];
+    }
+    if (stop.stop_requested())
+        return std::unexpected(cancelled);
+    return SiRationalWords{std::move(*copy), numerator_, sign_};
+}
+
 core::Result<SiRationalWords> copy_rational_words(const structure::ExactRational& exact,
                                                   core::ResourcePlan& memory,
                                                   const std::stop_token& stop) noexcept {

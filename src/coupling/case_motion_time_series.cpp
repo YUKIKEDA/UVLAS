@@ -1,6 +1,7 @@
 #include "case_motion_time_series.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -414,7 +415,227 @@ struct Owner {
     Series translation, rotation;
 };
 
+struct RecordedFormula {
+    WordsAndViews coefficients;
+    std::optional<std::array<Words, 4>> domain;
+};
+using RecordedSeries = std::variant<RecordedFormula, p::PchipSnapshot>;
+
+struct SnapshotOwner {
+    std::optional<io::SchemaIdentity> source;
+    std::uint64_t declaration_ordinal{};
+    Stamp stamp{p::PchipIssuerId{0}, p::PchipInputGeneration{0}};
+    std::int16_t pi_power{};
+    Words begin, end;
+    WordsAndViews events;
+    RecordedSeries translation, rotation;
+};
+
+void require_equal_words(View saved, View live, Call& call) {
+    call.steps(1);
+    if (saved.sign != live.sign || saved.numerator.size() != live.numerator.size() ||
+        saved.denominator.size() != live.denominator.size())
+        call.fail(Code::StaleGeneration);
+    call.steps(live.numerator.size());
+    call.steps(live.denominator.size());
+    const auto equal = [&](std::uint32_t left, std::uint32_t right) {
+        call.stop();
+        return left == right;
+    };
+    if (!std::ranges::equal(saved.numerator, live.numerator, equal) ||
+        !std::ranges::equal(saved.denominator, live.denominator, equal))
+        call.fail(Code::StaleGeneration);
+}
+
+Words capture_words(const Rational& source, Call& call) {
+    const auto compute_words = [&](std::uint64_t bits) {
+        if (bits > call.exact.maximum_value_bits)
+            call.fail(Code::ResourceExceeded);
+        return bits / 32 + (bits % 32 != 0 ? 1U : 0U);
+    };
+    call.steps(1);
+    call.steps(compute_words(source.numerator_bits()));
+    call.steps(compute_words(source.denominator_bits()));
+    return call.copy(source);
+}
+
+WordsAndViews copy_events(const WordsAndViews& current, Call& call) {
+    auto out = call.allocate_words(current.views.size());
+    const auto exceeds_value_cap = [&](std::span<const std::uint32_t> limbs) {
+        if (limbs.empty())
+            return false;
+        const auto prefix = static_cast<std::uint64_t>(limbs.size() - 1);
+        const auto cap = call.exact.maximum_value_bits;
+        return prefix > cap / 32U ||
+               static_cast<std::uint64_t>(std::bit_width(limbs.back())) > cap - 32U * prefix;
+    };
+    for (std::size_t i = 0; i < current.views.size(); ++i) {
+        const auto view = current.views.values()[i];
+        call.steps(1);
+        if (exceeds_value_cap(view.numerator) || exceeds_value_cap(view.denominator))
+            call.fail(Code::ResourceExceeded);
+        call.steps(view.numerator.size());
+        call.steps(view.denominator.size());
+        auto& value = out.words.values()[i];
+        value = take(current.words.values()[i].clone(call.memory, call.cancellation));
+        out.views.values()[i] = rational_view(value);
+    }
+    return out;
+}
+
+std::uint64_t retained_recipe_count(const Series& series, Call& call) {
+    if (const auto* formula = std::get_if<FormulaSeries>(&series))
+        return call.sum(formula->coefficients.size(), formula->polynomial ? 4U : 0U);
+    const auto view = take(std::get<p::PchipCurveReady>(series).input());
+    return call.sum(call.sum(view.samples.times.size(), view.samples.values.size()),
+                    std::holds_alternative<p::PeriodicBoundary>(view.boundary.policy) ? 1U : 0U);
+}
+
+RecordedSeries capture_series(const Series& series, p::CurveWorkspace& workspace, Call& call) {
+    if (const auto* actual = std::get_if<FormulaSeries>(&series)) {
+        RecordedFormula result{call.allocate_words(actual->coefficients.size()), {}};
+        const auto data = actual->coefficients.values();
+        for (std::size_t i = 0; i < data.size(); ++i) {
+            auto& words = result.coefficients.words.values()[i];
+            words = capture_words(data[i], call);
+            result.coefficients.views.values()[i] = rational_view(words);
+        }
+        if (const auto& domain = actual->polynomial)
+            result.domain.emplace(
+                std::array{capture_words(domain->origin, call), capture_words(domain->scale, call),
+                           capture_words(domain->begin, call), capture_words(domain->end, call)});
+        return result;
+    }
+    const auto& curve = std::get<p::PchipCurveReady>(series);
+    const auto admission =
+        take(p::forecast_pchip_snapshot(curve, call.curve, call.cancellation, call.details));
+    return take(p::snapshot_pchip_curve(curve, workspace, call.reserve(admission), call.memory,
+                                        call.cancellation, call.details));
+}
+
+core::Result<CaseMotionSeriesSnapshotView> series_view(const RecordedSeries& captured) noexcept {
+    if (const auto* formula = std::get_if<RecordedFormula>(&captured)) {
+        CaseMotionFormulaSnapshotView result{formula->coefficients.views.values(), {}};
+        if (const auto& domain = formula->domain)
+            result.domain.emplace(
+                std::array{rational_view((*domain)[0]), rational_view((*domain)[1]),
+                           rational_view((*domain)[2]), rational_view((*domain)[3])});
+        return result;
+    }
+    const auto curve = std::get<p::PchipSnapshot>(captured).view();
+    if (!curve)
+        return std::unexpected(curve.error());
+    return *curve;
+}
+
+Series restore_series(const CaseMotionSeriesSnapshotView& saved, const Series& current,
+                      p::CurveWorkspace& workspace, Call& call) {
+    if (saved.index() != current.index())
+        call.fail(Code::StaleGeneration);
+    if (const auto* typed = std::get_if<CaseMotionFormulaSnapshotView>(&saved)) {
+        const auto& expected = std::get<FormulaSeries>(current);
+        const auto data = expected.coefficients.values();
+        if (typed->coefficients.size() != data.size() ||
+            typed->domain.has_value() != expected.polynomial.has_value())
+            call.fail(Code::StaleGeneration);
+        const auto equal = [&](View request, const Rational& live) {
+            const auto packed = capture_words(live, call);
+            require_equal_words(request, rational_view(packed), call);
+        };
+        std::optional<SeriesDomain> domain;
+        if (const auto& raw = typed->domain; raw && expected.polynomial) {
+            const auto& live = *expected.polynomial;
+            equal((*raw)[0], live.origin);
+            equal((*raw)[1], live.scale);
+            equal((*raw)[2], live.begin);
+            equal((*raw)[3], live.end);
+            domain.emplace(call.clone(live.origin), call.clone(live.scale), call.clone(live.begin),
+                           call.clone(live.end));
+        }
+        auto coefficients = call.allocate<Rational>(data.size());
+        for (std::size_t i = 0; i < data.size(); ++i) {
+            equal(typed->coefficients[i], data[i]);
+            coefficients.values()[i] = call.clone(data[i]);
+        }
+        return FormulaSeries{std::move(coefficients), std::move(domain)};
+    }
+    const auto& curve = std::get<p::PchipSnapshotView>(saved);
+    const auto live = take(std::get<p::PchipCurveReady>(current).retain_input());
+    const auto admission =
+        take(p::forecast_pchip_restore(curve, live, call.curve, call.cancellation, call.details));
+    return take(p::restore_pchip_curve(curve, live, workspace, call.reserve(admission), call.memory,
+                                       call.cancellation, call.details));
+}
+
 struct Builder {
+    static void check_recipe_count(const Owner& source, const CaseMotionTimeLimits& limits,
+                                   Call& call) {
+        const auto total = call.sum(source.events.views.size(),
+                                    call.sum(retained_recipe_count(source.translation, call),
+                                             retained_recipe_count(source.rotation, call)));
+        if (total > limits.maximum_exact_numbers)
+            call.fail(Code::ResourceExceeded);
+    }
+
+    static CaseMotionTimeSnapshot save(const CaseMotionTimeSeries& requested,
+                                       p::CurveWorkspace& workspace,
+                                       const CaseMotionTimeLimits& limits, Call& call) {
+        call.stop();
+        if (requested.owner_.size() == 0)
+            call.fail(Code::InvalidInput);
+        const auto& owner = requested.owner_.values().front();
+        if (!owner.declaration)
+            call.fail(Code::InvalidInput);
+        check_recipe_count(owner, limits, call);
+        auto record = call.allocate<SnapshotOwner>(1);
+        auto& result = record.values().front();
+        result.source.emplace(owner.declaration->source());
+        result.declaration_ordinal = owner.declaration_ordinal;
+        result.stamp = owner.stamp;
+        result.pi_power = owner.pi_power;
+        result.begin = capture_words(owner.begin, call);
+        result.end = capture_words(owner.end, call);
+        result.events = copy_events(owner.events, call);
+        result.translation = capture_series(owner.translation, workspace, call);
+        result.rotation = capture_series(owner.rotation, workspace, call);
+        call.stop();
+        return CaseMotionTimeSnapshot{std::move(record)};
+    }
+
+    static CaseMotionTimeSeries restore(const CaseMotionTimeSnapshotView& saved,
+                                        const CaseMotionTimeSeries& current,
+                                        p::CurveWorkspace& workspace,
+                                        const CaseMotionTimeLimits& limits, Call& call) {
+        call.stop();
+        if (current.owner_.size() == 0)
+            call.fail(Code::InvalidInput);
+        const auto& live = current.owner_.values().front();
+        if (!live.declaration || !same_source(saved.source, live.declaration->source()) ||
+            saved.declaration_ordinal != live.declaration_ordinal || saved.stamp != live.stamp ||
+            saved.pi_power != live.pi_power || saved.events.size() != live.events.views.size())
+            call.fail(Code::StaleGeneration);
+        check_recipe_count(live, limits, call);
+        const auto begin = capture_words(live.begin, call);
+        const auto end = capture_words(live.end, call);
+        require_equal_words(saved.begin, rational_view(begin), call);
+        require_equal_words(saved.end, rational_view(end), call);
+        for (std::size_t i = 0; i < saved.events.size(); ++i)
+            require_equal_words(saved.events[i], live.events.views.values()[i], call);
+        auto storage = call.allocate<Owner>(1);
+        auto& result = storage.values().front();
+        result.declaration = live.declaration;
+        result.declaration_ordinal = live.declaration_ordinal;
+        result.stamp = live.stamp;
+        result.pi_power = live.pi_power;
+        result.begin = call.clone(live.begin);
+        result.end = call.clone(live.end);
+        result.events = copy_events(live.events, call);
+        result.translation = restore_series(saved.translation, live.translation, workspace, call);
+        result.rotation = restore_series(saved.rotation, live.rotation, workspace, call);
+        call.stop();
+        return CaseMotionTimeSeries{std::move(storage)};
+    }
+
     static CaseMotionTimeSeries prepare(const io::SiCase& source, CaseMotionField field,
                                         CaseMotionTimeWindow window, Stamp stamp,
                                         p::CurveWorkspace& workspace,
@@ -527,6 +748,41 @@ private:
 
 } // namespace motion_time_detail
 
+CaseMotionTimeSnapshot::CaseMotionTimeSnapshot(
+    core::PlannedBuffer<motion_time_detail::SnapshotOwner> owner) noexcept
+    : owner_(std::move(owner)) {}
+CaseMotionTimeSnapshot::CaseMotionTimeSnapshot(CaseMotionTimeSnapshot&&) noexcept = default;
+CaseMotionTimeSnapshot&
+CaseMotionTimeSnapshot::operator=(CaseMotionTimeSnapshot&&) noexcept = default;
+CaseMotionTimeSnapshot::~CaseMotionTimeSnapshot() = default;
+
+core::Result<CaseMotionTimeSnapshotView> CaseMotionTimeSnapshot::view() const& noexcept {
+    const auto records = owner_.values();
+    if (records.empty())
+        return std::unexpected(
+            core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
+    const auto& fields = records.front();
+    const auto translation = motion_time_detail::series_view(fields.translation);
+    if (!translation)
+        return std::unexpected(translation.error());
+    const auto rotation = motion_time_detail::series_view(fields.rotation);
+    if (!rotation)
+        return std::unexpected(rotation.error());
+    const auto& source = fields.source;
+    if (!source)
+        return std::unexpected(
+            core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
+    return CaseMotionTimeSnapshotView{*source,
+                                      fields.declaration_ordinal,
+                                      fields.stamp,
+                                      fields.pi_power,
+                                      motion_time_detail::rational_view(fields.begin),
+                                      motion_time_detail::rational_view(fields.end),
+                                      fields.events.views.values(),
+                                      *translation,
+                                      *rotation};
+}
+
 CaseMotionTimeSeries::CaseMotionTimeSeries(
     core::PlannedBuffer<motion_time_detail::Owner> owner) noexcept
     : owner_(std::move(owner)) {}
@@ -614,6 +870,29 @@ core::Result<CaseMotionTimeSeries> prepare_case_motion_time_series(
     return guarded<CaseMotionTimeSeries>(preparation, details, [&] {
         Call call{limits, plan, stop, preparation, details};
         return Builder::prepare(source, motion, window, stamp, workspace, limits, call);
+    });
+}
+
+core::Result<CaseMotionTimeSnapshot>
+snapshot_case_motion_time_series(const CaseMotionTimeSeries& source, p::CurveWorkspace& workspace,
+                                 const CaseMotionTimeLimits& limits, core::ResourcePlan& plan,
+                                 const std::stop_token& stop,
+                                 core::FailureDetails details) noexcept {
+    using namespace motion_time_detail;
+    return guarded<CaseMotionTimeSnapshot>(preparation, details, [&] {
+        Call call{limits, plan, stop, preparation, details};
+        return Builder::save(source, workspace, limits, call);
+    });
+}
+
+core::Result<CaseMotionTimeSeries> restore_case_motion_time_series(
+    const CaseMotionTimeSnapshotView& saved, const CaseMotionTimeSeries& current,
+    p::CurveWorkspace& workspace, const CaseMotionTimeLimits& limits, core::ResourcePlan& plan,
+    const std::stop_token& stop, core::FailureDetails details) noexcept {
+    using namespace motion_time_detail;
+    return guarded<CaseMotionTimeSeries>(preparation, details, [&] {
+        Call call{limits, plan, stop, preparation, details};
+        return Builder::restore(saved, current, workspace, limits, call);
     });
 }
 
