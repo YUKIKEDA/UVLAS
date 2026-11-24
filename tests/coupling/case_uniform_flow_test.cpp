@@ -1293,6 +1293,29 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     stale.scales.context.cache.matrix = scales.context.cache.matrix;
     reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
     stale = transpose_request;
+    stale.scales.context.cache.scales = scales.context.cache.scales;
+    reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    auto changed_unknown = unknown_scales;
+    changed_unknown.front() *= 2;
+    auto stale_tangent = tangent_request;
+    stale_tangent.scales.unknown = changed_unknown;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+    auto changed_residual = residual_scales;
+    changed_residual.back() *= 2;
+    stale_tangent = tangent_request;
+    stale_tangent.scales.residual = changed_residual;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+    stale_tangent = tangent_request;
+    stale_tangent.scales.unknown_units = velocity_units;
+    reject(linearize(tangent_sense, forcing, stale_tangent), core::FailureCode::StaleGeneration);
+
+    auto fresh_tangent = tangent_request;
+    fresh_tangent.scales.unknown = changed_unknown;
+    fresh_tangent.scales.context.cache.scales = core::ScaleGeneration{38};
+    const auto fresh = take(linearize(tangent_sense, forcing, fresh_tangent));
+    CHECK(fresh.solution().certificate().context().cache.scales == core::ScaleGeneration{38});
+    CHECK(std::ranges::equal(fresh.solution().certificate().unknown_scales(), changed_unknown));
+    stale = transpose_request;
     stale.scales.context.trial = core::TrialId{99};
     reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
     for (const auto primal_layout :
