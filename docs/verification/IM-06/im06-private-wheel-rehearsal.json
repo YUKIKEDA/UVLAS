@@ -15,7 +15,6 @@
   "source_commit": "63df6cc00d7180725370201dca3454ad35073cfd",
   "scope": "Clean MSVC and GCC native Release binaries used for offline CPython 3.12 wheel install, relocated CLI, owned-case and native validation, and runtime dependency inspection. External deck acquisition and diagnostics through the unimplemented mandatory sidecar role.",
   "sources": {
-    "CMakeLists.txt": "9dd5272ea165a32fa18c29757aee73ff49ce63fa528104a512910b4a18ad9621",
     "cmake/PrivateRuntimeImage.cmake": "79b04281cb7b01e1517c1aedfe2f62ba590831867a91185491a3e369f2fe6fe1",
     "cmake/RecordRuntimeArtifactLink.cmake": "729c5a41a02e14ebfce148e1df541a31f7ca7c3925322d58cdd942fa1c7d8ad1",
     "cmake/RuntimeArtifactManifest.cmake": "464e0f8d4402980e22a1f2e3b2dde55dbdec2e9d80b9786557fd7f405597d3c8",
@@ -24,6 +23,12 @@
     "src/io/reference_resolution.cpp": "85b593b2beeb2882972c1cb30ae6ba350b8ffe065768c3496b270246fa5928b1",
     "tests/python/test_ownership.py": "8ab9bcc9fd9903f101c33b273102ee6241d04162d57afed79963728abf1ee703",
     "tools/qa/runtime_artifact_audit.py": "a0b9490bc07a1784e948db7c42c23a3c62f5791de7d5343d6404606c683a34f4"
+  },
+  "sources_at_tested_commit": {
+    "CMakeLists.txt": {
+      "commit": "63df6cc00d7180725370201dca3454ad35073cfd",
+      "sha256": "9dd5272ea165a32fa18c29757aee73ff49ce63fa528104a512910b4a18ad9621"
+    }
   },
   "artifacts": {
     "docs/verification/IM-06/private-wheel-rehearsal-results.json": "67cc6b5216ec908227127683da33fce3d5b45ad518a9db1ebb4b673f02f386ab",

@@ -103,8 +103,8 @@
 | FD-12 | [case-schema-fields.md:330](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 181 | 48 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 13 | 0 |
-| IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 68 | 15 | 0 |
-| IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 23 | 7 | 0 |
+| IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 68 | 16 | 0 |
+| IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 23 | 8 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 17 | 7 | 0 |
 | IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 20 | 5 | 0 |
 | IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 1 | 0 |
@@ -151,7 +151,7 @@
 | QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 7 | 0 |
 | QA-10 | [quality-plan.md:100](../quality/quality-plan.md) | 0 | 0 | 0 |
 | SH-D01 | [main-shell-adopted-specification.md:11](../specs/structure/main-shell-adopted-specification.md) | 7 | 2 | 0 |
-| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 21 | 12 | 0 |
+| SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 21 | 13 | 0 |
 | SH-D03 | [main-shell-adopted-specification.md:13](../specs/structure/main-shell-adopted-specification.md) | 60 | 47 | 0 |
 | SH-D04 | [main-shell-adopted-specification.md:14](../specs/structure/main-shell-adopted-specification.md) | 0 | 0 | 0 |
 | SH-D05 | [main-shell-adopted-specification.md:15](../specs/structure/main-shell-adopted-specification.md) | 16 | 18 | 0 |
@@ -245,6 +245,6 @@
 | R-02 | [implementation-start-review.md:70](../plans/implementation-start-review.md) | 1 | 1 | 0 |
 | R-03 | [implementation-start-review.md:71](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | R-04 | [implementation-start-review.md:72](../plans/implementation-start-review.md) | 0 | 0 | 0 |
-| R-05 | [implementation-start-review.md:73](../plans/implementation-start-review.md) | 3 | 0 | 0 |
+| R-05 | [implementation-start-review.md:73](../plans/implementation-start-review.md) | 3 | 1 | 0 |
 | R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 7 | 0 |
 | R-07 | [implementation-start-review.md:75](../plans/implementation-start-review.md) | 0 | 0 | 0 |
