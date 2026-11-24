@@ -716,6 +716,13 @@ target_include_directories(uvlas_test_structure_pg_conditioning
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 uvlas_enable_allocation_audit(uvlas_test_structure_pg_conditioning)
 uvlas_require_audited_dependencies(uvlas_test_structure_pg_conditioning)
+# The exact curved rule and independent oracle exceed 180 s in these builds.
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_conditioning PROPERTIES TIMEOUT 300)
+elseif(MSVC)
+    set_tests_properties(structure.pg_conditioning PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,300,180>")
+endif()
 
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
