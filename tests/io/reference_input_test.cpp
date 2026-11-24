@@ -1524,6 +1524,8 @@ $EndElements
     bool distance_short = false;
     bool normal_short = false;
     bool pcomp = false;
+    enum class PcompRegion : std::uint8_t { None, Paired, WrongTotal, WrongInterface, Mixed };
+    PcompRegion pcomp_region = PcompRegion::None;
     bool reversed = false;
     bool wrong_layer_material = false;
     bool partial_group = false;
@@ -1694,6 +1696,28 @@ $EndElements
     }
     const bool corner_claim = corners != Corners::None;
     const bool quad = corner_claim && corners != Corners::Absolute;
+    SECTION("Distinct PCOMP properties with the same physical layers cover a Case shell") {
+        physical = true;
+        pcomp = true;
+        pcomp_region = PcompRegion::Paired;
+    }
+    SECTION("PCOMP full thickness disagreement is attached to its own face and property") {
+        physical = true;
+        pcomp = true;
+        pcomp_region = PcompRegion::WrongTotal;
+    }
+    SECTION("Equal local PCOMP totals do not excuse an incompatible layer interface") {
+        physical = true;
+        pcomp = true;
+        pcomp_region = PcompRegion::WrongInterface;
+    }
+    SECTION("PCOMP leaves the adjacent undeclared PSHELL thickness unconstrained") {
+        physical = true;
+        pcomp = true;
+        pcomp_region = PcompRegion::Mixed;
+    }
+    const bool separate_pcomp =
+        pcomp_region != PcompRegion::None && pcomp_region != PcompRegion::Mixed;
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1763,7 +1787,7 @@ $EndElements
         if (corners == Corners::MixedMaterial) {
             sidecar["materials"].push_back({{"mid", "9"}, {"material", "1"}});
         }
-        if (pcomp) {
+        if (pcomp && pcomp_region != PcompRegion::Mixed) {
             sidecar["materials"].push_back(
                 {{"mid", "9"}, {"material", wrong_layer_material ? "1" : "2"}});
         }
@@ -1855,9 +1879,35 @@ $EndElements
         constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
         const auto offset = source_text.find(pshell);
         REQUIRE(offset != std::string::npos);
-        source_text.replace(offset, pshell.size(),
-                            "PCOMP,90,-.125,,,,,,\n,6,.0625,,,9,.1875\n"
-                            "MAT8,9,130.0,9.0,.28\n");
+        if (pcomp_region == PcompRegion::Mixed) {
+            source_text.replace(offset, pshell.size(), "PCOMP,90,-.125,,,,,,\n,6,.25\n");
+        } else {
+            source_text.replace(offset, pshell.size(),
+                                "PCOMP,90,-.125,,,,,,\n,6,.0625,,,9,.1875\n"
+                                "MAT8,9,130.0,9.0,.28\n");
+        }
+        if (pcomp_region != PcompRegion::None) {
+            constexpr std::string_view first = "CTRIA3,701,90";
+            const auto position = source_text.find(first);
+            REQUIRE(position != std::string::npos);
+            source_text.replace(position, first.size(), "CTRIA3,701,92");
+            switch (pcomp_region) {
+            case PcompRegion::Paired:
+                source_text += "PCOMP,92,-.125,,,,,,\n,6,.0625,,,9,.1875\n";
+                break;
+            case PcompRegion::WrongTotal:
+                source_text += "PCOMP,92,-.25,,,,,,\n,6,.125,,,9,.375\n";
+                break;
+            case PcompRegion::WrongInterface:
+                source_text += "PCOMP,92,-.125,,,,,,\n,6,.125,,,9,.125\n";
+                break;
+            case PcompRegion::Mixed:
+                source_text += "PSHELL,92,6\n";
+                break;
+            case PcompRegion::None:
+                break;
+            }
+        }
     }
     if (reversed) {
         constexpr std::array originals{std::string_view{"701,90,10,20,40"},
@@ -1891,7 +1941,7 @@ $EndElements
             .field("frame")
             .set("origin", fixture::json("[0,0,0.05]"));
     }
-    if (pcomp) {
+    if (pcomp && pcomp_region != PcompRegion::Mixed) {
         auto orthotropic = fixture::fragment("Material.orthotropic3d");
         orthotropic.set("id", fixture::json(R"("2")"));
         orthotropic.set("young", fixture::json("[130,9,1]"));
@@ -1921,7 +1971,8 @@ $EndElements
             .field("thickness")
             .set("values", fixture::json("[0.25,0.5,0.5,0.25]"));
     }
-    if (partial_group || shared_group_thickness || partial_pshell) {
+    if (partial_group || shared_group_thickness || partial_pshell ||
+        pcomp_region == PcompRegion::Mixed) {
         config.field("model")
             .field("geometry")
             .elements[0]
@@ -2167,6 +2218,33 @@ $EndElements
             } else {
                 FAIL("Missing property or corner diagnostic");
             }
+        } else if (pcomp_region == PcompRegion::WrongTotal ||
+                   pcomp_region == PcompRegion::WrongInterface) {
+            REQUIRE_FALSE(qualified);
+            CHECK(qualified.error().code == core::FailureCode::InvalidInput);
+            if (const auto& detail = failure.binding) {
+                CHECK(detail->element == 701);
+                CHECK(detail->byte);
+                CHECK(detail->node == faces[1].sidecar_node);
+            } else {
+                FAIL("Missing second property location");
+            }
+            if (pcomp_region == PcompRegion::WrongTotal) {
+                if (const auto& regional = failure.regional_thickness) {
+                    CHECK(regional->reason == rd::ExternalPgThicknessFailure::Difference);
+                    CHECK(regional->element == 701);
+                    CHECK(regional->property == rd::NastranPropertyId{92});
+                    CHECK(regional->case_triangle);
+                } else {
+                    FAIL("Missing local PCOMP thickness mismatch");
+                }
+            } else if (const auto& laminate = failure.laminate) {
+                CHECK(laminate->reason == rd::NastranPcompGeometryFailure::Interface);
+                CHECK(laminate->case_layer);
+                CHECK(laminate->field);
+            } else {
+                FAIL("Missing second PCOMP's layer mismatch");
+            }
         } else if (wrong_layer_material) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == core::FailureCode::InvalidInput);
@@ -2210,58 +2288,82 @@ $EndElements
             REQUIRE(qualified);
             const auto& matched_case = qualified->match();
             CHECK(matched_case.thickness_compared);
-            if (!pcomp) {
-                if (const auto& regional = matched_case.thickness_regions) {
-                    const auto claims = regional->matches.values();
-                    REQUIRE(claims.size() == ((partial_group || partial_pshell || quad) ? 1U : 2U));
-                    CHECK(claims.front().element == (quad ? 701U : 702U));
-                    const auto base = fixture::take(
-                        ExactRational::from_integer_pair("1", "4", pg_limits.algebra, plan));
-                    if (corner_claim) {
-                        const auto* samples =
-                            std::get_if<rd::ExternalPgNodalThickness>(&claims.front().value_metres);
-                        REQUIRE(samples);
-                        CHECK(samples->count == (quad ? 4U : 3U));
-                        CHECK(samples->values[0].node == 10);
-                        CHECK(samples->values[0].value_metres == base);
-                        CHECK(samples->values[0].field);
-                        CHECK_FALSE(samples->values[0].scale_field);
-                        CHECK(samples->values[1].node == (quad ? 20U : 40U));
-                        CHECK(samples->values[1].value_metres ==
-                              fixture::take(ExactRational::from_integer_pair(
-                                  "1", "2", pg_limits.algebra, plan)));
-                        CHECK(samples->values[1].field);
-                        CHECK(samples->values[1].scale_field.has_value() == quad);
-                    } else {
-                        CHECK(std::get<ExactRational>(claims.front().value_metres) == base);
-                    }
-                    if (claims.size() == 2 && is_gmsh) {
-                        CHECK(claims[1].sidecar_node == claims[0].sidecar_node);
-                    }
-                    if (claims.size() == 2 && !is_gmsh && !corner_claim) {
-                        CHECK(claims[1].field == claims[0].field);
-                    }
+            if (const auto& regional = matched_case.thickness_regions) {
+                const auto claims = regional->matches.values();
+                REQUIRE(claims.size() == ((partial_group || partial_pshell || quad ||
+                                           pcomp_region == PcompRegion::Mixed)
+                                              ? 1U
+                                              : 2U));
+                CHECK(claims.front().element == (quad ? 701U : 702U));
+                const auto base = fixture::take(
+                    ExactRational::from_integer_pair("1", "4", pg_limits.algebra, plan));
+                if (corner_claim) {
+                    const auto* samples =
+                        std::get_if<rd::ExternalPgNodalThickness>(&claims.front().value_metres);
+                    REQUIRE(samples);
+                    CHECK(samples->count == (quad ? 4U : 3U));
+                    CHECK(samples->values[0].node == 10);
+                    CHECK(samples->values[0].value_metres == base);
+                    CHECK(samples->values[0].field);
+                    CHECK_FALSE(samples->values[0].scale_field);
+                    CHECK(samples->values[1].node == (quad ? 20U : 40U));
+                    CHECK(samples->values[1].value_metres ==
+                          fixture::take(
+                              ExactRational::from_integer_pair("1", "2", pg_limits.algebra, plan)));
+                    CHECK(samples->values[1].field);
+                    CHECK(samples->values[1].scale_field.has_value() == quad);
                 } else {
-                    FAIL("Missing whole-face regional thickness evidence");
+                    CHECK(std::get<ExactRational>(claims.front().value_metres) == base);
                 }
+                if (claims.size() == 2 && is_gmsh) {
+                    CHECK(claims[1].sidecar_node == claims[0].sidecar_node);
+                }
+                if (claims.size() == 2 && !is_gmsh && !corner_claim) {
+                    CHECK((claims[1].field == claims[0].field) == !separate_pcomp);
+                }
+                if (pcomp) {
+                    CHECK(claims.front().property == rd::NastranPropertyId{90});
+                    if (separate_pcomp) {
+                        REQUIRE(claims.size() == 2);
+                        CHECK(claims[1].element == 701);
+                        CHECK(claims[1].property == rd::NastranPropertyId{92});
+                    }
+                }
+            } else {
+                FAIL("Missing whole-face regional thickness evidence");
             }
-            CHECK(matched_case.materials_compared == (is_gmsh                     ? 0
-                                                      : (pcomp || partial_pshell) ? 2
-                                                      : corner_claim              ? 3
-                                                                                  : 1));
+            const auto expected_materials = is_gmsh                     ? 0
+                                            : separate_pcomp            ? 4
+                                            : corner_claim              ? 3
+                                            : (pcomp || partial_pshell) ? 2
+                                                                        : 1;
+            CHECK(matched_case.materials_compared == expected_materials);
             if (pcomp) {
-                REQUIRE_FALSE(matched_case.laminate[reversed ? 0U : 1U]);
-                if (const auto& matched = matched_case.laminate[reversed ? 1U : 0U]) {
-                    const auto plies = matched->layers.values();
-                    REQUIRE(plies.size() == 2);
-                    CHECK(plies.front().material.id == rd::NastranMaterialId{reversed ? 9U : 6U});
-                    CHECK(plies.front().ply_thickness_metres ==
-                          fixture::take(ExactRational::from_integer_pair(reversed ? "3" : "1", "16",
-                                                                         pg_limits.algebra, plan)));
-                    CHECK(plies.back().material.id == rd::NastranMaterialId{reversed ? 6U : 9U});
-                    CHECK(matched->pg == fixture::take(qualified->reference().identity()));
-                } else {
-                    FAIL("Missing exact PCOMP layer comparison");
+                const auto sections = matched_case.laminate.values();
+                REQUIRE(sections.size() == (separate_pcomp ? 2U : 1U));
+                for (std::size_t i = 0; i < sections.size(); ++i) {
+                    if (const auto& matched = sections[i]) {
+                        CHECK(matched->winding == (reversed ? rd::MeshSidecarOrientation::Reversed
+                                                            : rd::MeshSidecarOrientation::Same));
+                        CHECK(matched->property == rd::NastranPropertyId{i == 0 ? 90U : 92U});
+                        const auto plies = matched->layers.values();
+                        if (pcomp_region == PcompRegion::Mixed) {
+                            REQUIRE(plies.size() == 1);
+                            CHECK(plies.front().material.id == rd::NastranMaterialId{6});
+                        } else {
+                            REQUIRE(plies.size() == 2);
+                            CHECK(plies.front().material.id ==
+                                  rd::NastranMaterialId{reversed ? 9U : 6U});
+                            CHECK(plies.front().ply_thickness_metres ==
+                                  fixture::take(ExactRational::from_integer_pair(
+                                      reversed ? "3" : "1", "16", pg_limits.algebra, plan)));
+                            CHECK(plies.back().material.id ==
+                                  rd::NastranMaterialId{reversed ? 6U : 9U});
+                        }
+                        CHECK(matched->pg == fixture::take(qualified->reference().identity()));
+                    } else {
+                        FAIL("Missing exact PCOMP layer comparison");
+                    }
                 }
             }
             CHECK(matched_case.pg == rd::MeshGeometryId{1});

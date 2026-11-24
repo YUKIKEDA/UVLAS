@@ -28,6 +28,7 @@ struct ExternalPgThicknessClaim {
     std::optional<core::Index> sidecar_node{};
     std::optional<NastranBulkPosition> field{};
     std::span<const ExternalPgCornerThicknessClaim> corners{};
+    std::optional<NastranPropertyId> property{};
 };
 
 enum class ExternalPgThicknessFailure : std::uint8_t { Source, Selection, Difference };
@@ -41,6 +42,7 @@ struct ExternalPgThicknessDiagnostic {
     std::optional<std::size_t> overlap_vertex{};
     std::optional<std::uint64_t> node{};
     std::optional<NastranBulkPosition> scale_field{};
+    std::optional<NastranPropertyId> property{};
 };
 
 struct ExternalPgThicknessLimits {
@@ -74,6 +76,7 @@ struct ExternalPgThicknessMatch {
     std::uint64_t vertices{}; // Vertices of the clipped positive-area polygons.
     std::optional<core::Index> sidecar_node{};
     std::optional<NastranBulkPosition> field{};
+    std::optional<NastranPropertyId> property{};
 };
 
 struct ExternalPgThicknessReport {

@@ -260,18 +260,18 @@ compare_layers(Comparison& check, std::span<const NastranPcompPly> stack,
     return matches;
 }
 
-} // namespace
+enum class ThicknessScope : std::uint8_t { Regional, EntirePatch };
 
-core::Result<NastranPcompGeometryMatch> compare_nastran_pcomp_geometry(
+[[nodiscard]] core::Result<NastranPcompLayerSection> compare_layer_section(
     const NastranLaminateCards& input, std::size_t property_ordinal, SiLengthUnit length,
     MeshSidecarOrientation winding, const structure::PgReferenceGeometry& pg,
     const NastranPcompGeometryLimits& limits, core::ResourcePlan& plan, const std::stop_token& stop,
-    std::optional<NastranPcompGeometryDiagnostic>* diagnostic) noexcept {
+    std::optional<NastranPcompGeometryDiagnostic>* diagnostic, ThicknessScope scope) noexcept {
     if (diagnostic) {
         diagnostic->reset();
     }
     return core::guard_entry(
-        operation, Code::InvalidInput, {}, [&]() -> core::Result<NastranPcompGeometryMatch> {
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<NastranPcompLayerSection> {
             try {
                 Comparison check{limits, plan, stop, diagnostic};
                 check.step();
@@ -293,12 +293,14 @@ core::Result<NastranPcompGeometryMatch> compare_nastran_pcomp_geometry(
                 auto total =
                     full_thickness(check, property, stack, unit, plies.values(), symmetric);
                 check.detail.field = base.id_field.position;
-                check_active_thickness(check, source.partition, total);
+                if (scope == ThicknessScope::EntirePatch) {
+                    check_active_thickness(check, source.partition, total);
+                }
                 auto matches =
                     compare_layers(check, stack, plies.values(), layers, total, center, winding);
                 check.step();
                 const auto& bulk = deck.input.input.input.bulk;
-                return NastranPcompGeometryMatch{
+                return NastranPcompLayerSection{
                     bulk.location,
                     bulk.digest,
                     base.id,
@@ -313,6 +315,29 @@ core::Result<NastranPcompGeometryMatch> compare_nastran_pcomp_geometry(
             } catch (const Stop& error) {
                 return std::unexpected(error.error);
             }
+        });
+}
+
+} // namespace
+
+core::Result<NastranPcompLayerSection> compare_nastran_pcomp_layer_section(
+    const NastranLaminateCards& input, std::size_t property_ordinal, SiLengthUnit length,
+    MeshSidecarOrientation winding, const structure::PgReferenceGeometry& pg,
+    const NastranPcompGeometryLimits& limits, core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<NastranPcompGeometryDiagnostic>* diagnostic) noexcept {
+    return compare_layer_section(input, property_ordinal, length, winding, pg, limits, plan, stop,
+                                 diagnostic, ThicknessScope::Regional);
+}
+
+core::Result<NastranPcompGeometryMatch> compare_nastran_pcomp_geometry(
+    const NastranLaminateCards& input, std::size_t property_ordinal, SiLengthUnit length,
+    MeshSidecarOrientation winding, const structure::PgReferenceGeometry& pg,
+    const NastranPcompGeometryLimits& limits, core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<NastranPcompGeometryDiagnostic>* diagnostic) noexcept {
+    return compare_layer_section(input, property_ordinal, length, winding, pg, limits, plan, stop,
+                                 diagnostic, ThicknessScope::EntirePatch)
+        .transform([](NastranPcompLayerSection&& section) {
+            return NastranPcompGeometryMatch{std::move(section)};
         });
 }
 
