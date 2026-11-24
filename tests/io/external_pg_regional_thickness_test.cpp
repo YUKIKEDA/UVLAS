@@ -424,7 +424,7 @@ TEST_CASE("Whole-face thickness comparison charges inputs and reported copies to
     // The shared budget still rejects two faces, even though it could admit both
     // if the owned copies were omitted from the estimate.
     limited.algebra.external_memory =
-        ExactEstimateAdmission{required_estimate(arithmetic.algebra, 2 * (4 + 1))};
+        ExactEstimateAdmission{required_estimate(arithmetic.algebra, std::uint64_t{2} * (4 + 1))};
     REQUIRE(
         compare_external_pg_regional_thickness(evidence, reference, first, {limited, 2, 4}, plan));
     const auto before = plan.allocated_bytes();
