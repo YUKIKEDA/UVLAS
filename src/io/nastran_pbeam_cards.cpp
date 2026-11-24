@@ -123,6 +123,18 @@ public:
         return value;
     }
 
+    [[nodiscard]] NastranPbeamReal nonnegative_real(std::size_t i) const {
+        const auto value = real(i);
+        if (value) {
+            const auto decimal = value->value.decimal();
+            const auto mantissa = decimal.substr(0, decimal.find('e'));
+            if (mantissa.starts_with('-') &&
+                mantissa.find_first_of(nonzero) != std::string_view::npos)
+                reject(Code::InvalidInput, Reason::InvalidField, value->field.position);
+        }
+        return value;
+    }
+
     [[nodiscard]] bool station_token(std::size_t i) const {
         if (const auto value = supplied(i)) {
             const auto initial = upper(bulk_.text(*value).front());
@@ -203,8 +215,8 @@ FractionKey station_key(const NastranShellReal& value) {
 }
 
 NastranPbeamSection end_a(const Fields& fields) {
-    return {fields.positive_real(2), fields.positive_real(3), fields.positive_real(4),
-            fields.real(5),          fields.real(6),          fields.real(7)};
+    return {fields.positive_real(2), fields.positive_real(3),    fields.positive_real(4),
+            fields.real(5),          fields.nonnegative_real(6), fields.real(7)};
 }
 
 NastranPbeamSection station_section(const Fields& fields, std::size_t start) {
