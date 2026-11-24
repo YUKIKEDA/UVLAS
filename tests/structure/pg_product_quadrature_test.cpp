@@ -114,6 +114,26 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
         CHECK(depth_second == Q("1/6"));
     }
 
+    // Recompute every value from the same nodes through the explicit point path.
+    std::vector<PgDiscreteVolumePoint> explicit_points;
+    explicit_points.reserve(low_gram.rule().size());
+    for (const auto& point : low_gram.rule()) {
+        explicit_points.push_back({{point.volume, point.u, point.v, point.depth}, point.weight});
+    }
+    auto explicit_basis = make_curve_basis();
+    core::ResourcePlan explicit_plan{profile};
+    const auto explicit_gram = take(PgDiscreteGram::prepare(
+        std::move(explicit_basis), explicit_points, grid, limits, scratch, explicit_plan));
+    const auto product_entries = take(low_gram.enclosure()).upper_triangle;
+    const auto explicit_entries = take(explicit_gram.enclosure()).upper_triangle;
+    REQUIRE(product_entries.size() == explicit_entries.size());
+    CHECK(low_gram.info().arithmetic.scalar_operations <
+          explicit_gram.info().arithmetic.scalar_operations);
+    for (std::size_t i = 0; i < product_entries.size(); ++i) {
+        CHECK(product_entries[i].lower == explicit_entries[i].lower);
+        CHECK(product_entries[i].upper == explicit_entries[i].upper);
+    }
+
     // A symmetric five-point Gauss approximation to 42 decimal places.
     // The symmetric coordinates and reconstructed center weight keep the
     // mass and first moment exact for the actual finite rational rule.

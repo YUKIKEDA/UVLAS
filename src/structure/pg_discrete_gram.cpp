@@ -261,10 +261,9 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             const auto source = partition_take(basis.source());
             const auto volumes = partition_take(source.partition.volumes());
             const auto* points = std::get_if<std::span<const PgDiscreteVolumePoint>>(&input);
+            const auto* product = std::get_if<PgVolumeProductRule>(&input);
             const auto size =
-                points != nullptr
-                    ? points->size()
-                    : product_count(std::get<PgVolumeProductRule>(input), volumes.size());
+                points != nullptr ? points->size() : product_count(*product, volumes.size());
             const auto point_count = partition_index(size);
             if (points != nullptr)
                 validate_rule(math, *points, volumes.size());
@@ -278,8 +277,9 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             // The exact rule and both endpoints of every result entry can coexist.
             const auto held_rationals =
                 partition_add(partition_mul(4, size), partition_mul(2, entries));
-            math.admit(partition_add(basis_live_rationals + 16, held_rationals));
-            if (const auto* product = std::get_if<PgVolumeProductRule>(&input)) {
+            const auto live_rationals = partition_add(basis_live_rationals + 16, held_rationals);
+            math.admit(live_rationals);
+            if (product != nullptr) {
                 const auto one = math.constant("1");
                 validate_factor(math, product->radial, one, true);
                 validate_factor(math, product->transverse, one, false);
@@ -295,8 +295,7 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                                         math.copy(p.point.depth), math.copy(p.weight)};
                 }
             } else {
-                fill_product(math, std::get<PgVolumeProductRule>(input),
-                             partition_index(volumes.size()), rule.values());
+                fill_product(math, *product, partition_index(volumes.size()), rule.values());
             }
             auto samples =
                 partition_take(plan.allocate<Interval>(partition_index(rank), partition_operation));
@@ -304,6 +303,23 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 plan.allocate<Interval>(partition_index(entries), partition_operation));
             auto result = partition_take(
                 plan.allocate<PgGramEntry>(partition_index(entries), partition_operation));
+            using Numerators = std::array<ExactRational, 3>;
+            core::PlannedBuffer<Numerators> cached;
+            std::size_t depth_group = 1;
+            if (product != nullptr && product->depth.size() > 1) {
+                auto cache_arithmetic = ReferenceArithmetic{limits.arithmetic, plan};
+                try {
+                    cache_arithmetic.admit(partition_add(live_rationals, partition_mul(rank, 3)));
+                    cached = partition_take(
+                        plan.allocate<Numerators>(partition_index(rank), partition_operation));
+                    math.leaf_limits = cache_arithmetic.leaf_limits;
+                    depth_group = product->depth.size();
+                } catch (const PartitionAbort& unavailable) {
+                    if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
+                        throw;
+                }
+            }
+            std::size_t depth_slot = 0;
             IntegerWork work{math, limits.maximum_integer_steps};
             const auto& length = basis.length_metres();
             const auto length_cube = math.mul(math.square(length), length);
@@ -330,13 +346,21 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);
-                    const auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
-                                                         /*derivatives=*/false);
-                    auto a = math.add(jet[0][0], math.mul(half_z_squared, jet[2][0]));
-                    auto b = math.mul(director_radical, jet[1][0]);
+                    Numerators local;
+                    auto& terms = cached.size() > 0 ? cached.values()[i] : local;
+                    if (depth_slot == 0) {
+                        auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
+                                                       /*derivatives=*/false);
+                        terms = {std::move(jet[0][0]), std::move(jet[1][0]), std::move(jet[2][0])};
+                    }
+                    auto a = math.add(terms[0], math.mul(half_z_squared, terms[2]));
+                    auto b = math.mul(director_radical, terms[1]);
                     values[i] = radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
                 }
                 accumulate_sample(work, sums.values(), values, measure);
+                // fill_product emits all depths consecutively for one volume and (u, v).
+                if (++depth_slot == depth_group)
+                    depth_slot = 0;
             }
             const auto drop = 3 * bits - grid.output_fractional_bits;
             for (std::size_t i = 0; i < entries; ++i) {
