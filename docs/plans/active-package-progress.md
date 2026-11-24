@@ -25,7 +25,7 @@
 | 保証付き条件付け | 完了 | 一定厚・区分一次厚さの平板を厳密に積分する。曲面は所有する正の積則で幾何内積を包絡し、合同変換と必須場を認定する。切断・変厚放物柱面は全130列・34,680点の製品変換を独立な連続内積へ適用し、最大行和誤差が $1.062\times10^{-23}$ 以下。15点則の連続誤差は基準の $10^{-20}$ を超えた。求積次数の適格性は対象形状と分割ごとに確認し、V-PGで実用系列を検証する。 [変換生成](../verification/IM-01/pg-conditioning-generated-transform.md)・[独立連続積分](../verification/IM-01/pg-curved-gram-continuum-v1/verification.md) |
 | PreparedPatchと参照作用 | 完了 | 認定済み基底と物理参照を所有する。体積点、層界面の上下、外周側面で、参照位置、正の測度、形状値、Cartesian 勾配を取得し、成分別の誤差枠で Binary64／TwoWord に射影する。固定則の点・重みを保持し、同じ Workspace で体積位置と転置を作用させる。 [物理参照量の射影](../verification/IM-01/pg-prepared-reference-projection.md) |
 | 全位置traceと拘束 | 完了 | 非整合面を共通細分し、厚さ段差、指定層と部分面、向きを検査する。原拘束と固定支持の指定値を保持し、厳密な重複行の尺度と双対仕事を照合した。時間依存の指定値と複数接続の閉路処理は固定ピボットの疎チャートで扱う。 [全厚拘束の検証](../verification/IM-01/pg-prepared-patch-trace.md) |
-| 固定pivot疎chart | 実装中 | 固定支持、物理拘束ID、元行順で代表を選び、同じ疎因子で位置、接線、転置と元行の反力を計算する。時系列の全係数と片側導関数を元行で検査する。疎数値候補は小規模実接続で成立し、R-02では実空間の元拘束が未達だった。物理Caseの支持と精度の資格を同じ所有チャートへ通す。 [固定チャート](../verification/IM-01/pg-sparse-chart.md)・[実空間の残差](../verification/IM-01/pg-chart-original-defect.md) |
+| 固定pivot疎chart | 実装中 | 固定支持、物理拘束ID、元行順で代表を選び、同じ疎因子で位置、接線、転置と元行の反力を計算する。Caseの全厚固定支持は共通時計で指定運動の片側の位置・速度・加速度を評価し、元行の整合と仕事を確かめた。複数の異なる運動の適合と、R-02の疎数値解に対する実空間の認定が残る。 [Caseの支持](../verification/IM-01/pg-case-structural-support.md)・[実空間の残差](../verification/IM-01/pg-chart-original-defect.md) |
 | 早期R-02 | 完了 | 非整合を含む2・3・4パッチ、接続1・2・4本の系列で、原行の非零数、rank、L/U、準備・再利用の課金と常駐量を測った。4パッチの閉路はrank 248、因子23,503項。実項数ちょうどで同一結果を得て、1項不足で元拘束を保持した。実務規模の性能はA5-06で確認する。 [R-02の計測](../verification/IM-01/pg-sparse-chart-series.md) |
 | 終了審査 | 残 | R5の後退・テーパの全4配置で幾何と独立体積を照合した。V-PGの残る形状・分割・接続の検証を通し、IM-02へ引き渡す。 [R5の参照幾何](../verification/IM-01/pg-r5-swept-taper-reference.md) |
 
