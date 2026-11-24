@@ -100,6 +100,24 @@ core::Result<cc::CasePgChart> prepare_moving(bool coincident, Geometry shape,
                                             motion_workspace, plan);
 }
 
+void verify_outward_jet(const io::SiEnclosure& enclosure, const Q& expected) {
+    const auto* value = std::get_if<io::ScaledTwoWord>(&enclosure);
+    REQUIRE(value != nullptr);
+    REQUIRE(std::isfinite(value->high));
+    REQUIRE(std::isfinite(value->low));
+    REQUIRE((std::isfinite(value->radius) && value->radius >= 0));
+    constexpr std::int64_t exponent_bound = 4096;
+    const auto exponent = value->exponent2;
+    REQUIRE((exponent >= -exponent_bound && exponent <= exponent_bound));
+    I power = 1;
+    power <<= static_cast<unsigned>(exponent < 0 ? -exponent : exponent);
+    const Q scale = exponent < 0 ? Q{1, power} : Q{power};
+    const Q centre = (Q{value->high} + Q{value->low}) * scale;
+    const Q radius = Q{value->radius} * scale;
+    CHECK(abs(expected - centre) <= radius);
+    CHECK(radius <= Q{1, I{1} << 44U});
+}
+
 void compare_position_jets(const cc::CasePgChart& ready, const cc::CaseStructuralSupportSample& jet,
                            core::Workspace& workspace, core::ResourcePlan& plan) {
     const auto* motion = ready.motion();
@@ -112,6 +130,7 @@ void compare_position_jets(const cc::CasePgChart& ready, const cc::CaseStructura
     CHECK(jet.chart() == id);
     REQUIRE(jet.rows() == original.original_rows().size());
     REQUIRE(jet.orders() == 3);
+    REQUIRE(jet.original_rhs().size() == 9 * jet.rows());
     const auto source_count = original.sources().size();
     REQUIRE(source_count == 3);
     CHECK(original.sources()[0].id == PgConstraintId{1});
@@ -156,6 +175,8 @@ void compare_position_jets(const cc::CasePgChart& ready, const cc::CaseStructura
             for (std::size_t axis = 0; axis < 3; ++axis) {
                 const Q reference = order == 0 ? q(declared.prescribed[axis]) : Q{};
                 const Q expected = reference + derivatives[order] * changes[axis] * translation;
+                verify_outward_jet(jet.original_rhs()[3 * (order * jet.rows() + i) + axis],
+                                   expected);
                 CHECK(q(lift.original_rhs.values()[i][axis]) == expected);
                 CHECK(q(c_times_q.values()[i][axis]) == expected);
             }
