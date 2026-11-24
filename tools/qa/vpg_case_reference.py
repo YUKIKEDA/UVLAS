@@ -31,6 +31,8 @@ QUALITY = RECORDS / "mass-paired-quality-result.json"
 EXPLICIT = RECORDS / "mass-paired-coefficient-input-result.json"
 CUT = RECORDS / "paired-shell-r5-domain-v2-result.json"
 CUT_SETUP = EXPERIMENTS / "check_paired_shell_r5_domain_v2.py"
+INTERFACE = RECORDS / "mass-paired-interface-result.json"
+INTERFACE_SETUP = EXPERIMENTS / "check_mass_paired_interface.py"
 PINNED = {
     R4: "2af9e42f35928cb0d213f126fd481d03703ce6995b3c52e75ea1c8045cd9f0c9",
     R5: "48e4a9ecbcb3ea0ee6cff0269f71c0567032d9b0ddf6040421aba51f8e222167",
@@ -208,6 +210,100 @@ def make_case(
     return case
 
 
+def interface_case(
+    template: bytes, left_n: int, right_n: int, h: Fraction, parameters: list[Fraction]
+) -> dict[str, object]:
+    half = Fraction(1, 2)
+    left_chart = (Fraction(0), half, Fraction(0))
+    right_chart = (half, half, Fraction(0))
+    case = make_case(template, left_n, h, False, left_chart, graph(parameters, left_chart), SQUARE)
+    right_case = make_case(
+        template, right_n, h, False, right_chart, graph(parameters, right_chart), SQUARE
+    )
+    model = mapping(case["model"])
+    right_model = mapping(right_case["model"])
+    geometry = array(model["geometry"])
+    left = mapping(geometry[0])
+    array(left["boundaries"]).append(
+        {"name": "interface", "vertices": [wire_point(SQUARE[i]) for i in (1, 2)]}
+    )
+    right = mapping(array(right_model["geometry"])[0])
+    right["id"] = "2"
+    right_boundary = mapping(array(right["boundaries"])[0])
+    right_boundary.update(name="interface", vertices=[wire_point(SQUARE[i]) for i in (3, 0)])
+    geometry.append(right)
+    right_shell = mapping(array(right_model["shells"])[0])
+    right_shell.update(id="2", geometry="2")
+    mapping(array(right_shell["layers"])[0])["id"] = "2"
+    array(model["shells"]).append(right_shell)
+    mapping(mapping(case["numerics"])["patch"])["maximum_partition"] = max(left_n, right_n)
+
+    t = {"powers": [1, 0], "coefficient": rational(Fraction(1))}
+    zeta = {"powers": [0, 1], "coefficient": rational(Fraction(1))}
+    one = {"powers": [0, 0], "coefficient": rational(Fraction(1))}
+    segments = 2 * max(left_n, right_n)
+    maps: list[dict[str, object]] = []
+    for index in range(segments):
+        lo, hi = Fraction(index, segments), Fraction(index + 1, segments)
+        maps.append(
+            {
+                "first_cell": [2 * left_n - 1, index * 2 * left_n // segments],
+                "second_cell": [0, index * 2 * right_n // segments],
+                "domain": [
+                    wire_point((u, Fraction(z))) for u, z in ((lo, -1), (hi, -1), (hi, 1), (lo, 1))
+                ],
+                "first": [[one], [t], [zeta]],
+                "second": [[], [t], [zeta]],
+                "orientation": "reversed",
+            }
+        )
+    model["joints"] = [
+        {
+            "kind": "adhesive",
+            "id": "1",
+            "first": {
+                "target": {"kind": "shell", "id": "1"},
+                "kind": "edge",
+                "geometry": "1",
+                "boundary": 1,
+                "side": "interior",
+            },
+            "second": {
+                "target": {"kind": "shell", "id": "2"},
+                "kind": "edge",
+                "geometry": "2",
+                "boundary": 0,
+                "side": "interior",
+            },
+            "mapping": maps,
+            "split_at_attachment": False,
+        }
+    ]
+    return case
+
+
+def interface_input(source: bytes) -> tuple[list[Fraction], Fraction]:
+    nodes = [
+        node
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "prepare"
+    ]
+    if len(nodes) != 1 or len(nodes[0].args) != 5 or not isinstance(nodes[0].args[1], ast.Tuple):
+        raise ValueError("Ambiguous frozen interface input")
+    parts = nodes[0].args[1].elts
+    if (
+        len(parts) != 8
+        or ast.unparse(parts[6]) != "offset"
+        or Fraction(ast.unparse(parts[7])) != Fraction(1, 2)
+    ):
+        raise ValueError("Unexpected frozen interface chart")
+    return [Fraction(ast.unparse(part)) for part in parts[:6]], Fraction(
+        ast.unparse(nodes[0].args[2])
+    )
+
+
 def bundle() -> dict[Path, bytes]:
     hashes = {path.as_posix(): sha for path, sha in PINNED.items()}
     sources = audited(
@@ -216,6 +312,8 @@ def bundle() -> dict[Path, bytes]:
             *COMMON,
             QUALITY,
             EXPLICIT,
+            INTERFACE,
+            INTERFACE_SETUP,
             EXPERIMENTS / "check_mass_paired_quality.py",
             EXPERIMENTS / "check_mass_paired_coefficient_input.py",
         ),
@@ -270,6 +368,30 @@ def bundle() -> dict[Path, bytes]:
                     "graph_parameters": [rational(x) for x in parameters],
                 }
             )
+    interface_parameters, thickness = interface_input(sources[INTERFACE_SETUP])
+    interfaces = array(record(sources[INTERFACE])["records"])
+    if len(interfaces) != 2:
+        raise ValueError("Unexpected frozen interface series size")
+    for index, item in enumerate(interfaces):
+        partitions = array(mapping(item)["elements"])
+        if partitions != [1, index + 1] or any(type(value) is not int for value in partitions):
+            raise ValueError("Unexpected frozen interface partitions")
+        left_n, right_n = cast("list[int]", partitions)
+        target = Path(f"r4-interface-{index:02d}") / "case.json"
+        data = to_json(interface_case(template, left_n, right_n, thickness, interface_parameters))
+        files[target] = data
+        entries.append(
+            {
+                "case": target.as_posix(),
+                "sha256": digest(data),
+                "result": INTERFACE.as_posix(),
+                "record": index,
+                "n": partitions,
+                "h": rational(thickness),
+                "variable": False,
+                "graph_parameters": [rational(x) for x in interface_parameters],
+            }
+        )
     files[Path("manifest.json")] = to_json(
         {
             "schema": "uvlas.vpg-case-reference/1",
