@@ -2894,26 +2894,29 @@ core::Failure absent() noexcept {
 } // namespace
 core::Result<std::reference_wrapper<const linear::Solution<double>>>
 DiscreteKnownCirculation::solution() const& noexcept {
-    if (data_.values().empty())
+    const auto records = data_.values();
+    if (records.empty())
         return std::unexpected(absent());
-    const auto& primal = data_.values().front().primal;
+    const auto& primal = records.front().primal;
     if (!primal)
         return std::unexpected(absent());
     return std::cref(primal->solution);
 }
 core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
 DiscreteKnownCirculation::linearization() const& noexcept {
-    if (data_.values().empty())
+    const auto records = data_.values();
+    if (records.empty())
         return std::unexpected(absent());
-    const auto& result = data_.values().front().linearization;
+    const auto& result = records.front().linearization;
     if (!result)
         return std::unexpected(absent());
     return std::cref(*result);
 }
 core::Result<CirculationResidualRow> DiscreteKnownCirculation::row(std::size_t i) const noexcept {
-    if (data_.values().empty())
+    const auto records = data_.values();
+    if (records.empty())
         return std::unexpected(absent());
-    const auto& primal = data_.values().front().primal;
+    const auto& primal = records.front().primal;
     if (!primal || i >= primal->rows.size())
         return std::unexpected(absent());
     const auto& row = primal->rows.values()[i];
@@ -2923,53 +2926,59 @@ core::Result<CirculationResidualRow> DiscreteKnownCirculation::row(std::size_t i
 }
 core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
 DiscreteKnownCirculation::flow(std::size_t i) const& noexcept {
-    if (data_.values().empty() || i >= data_.values().front().known.size())
+    const auto records = data_.values();
+    if (records.empty() || i >= records.front().known.size())
         return std::unexpected(absent());
-    const auto& jet = data_.values().front().known.values()[i].jet;
+    const auto& jet = records.front().known.values()[i].jet;
     if (!jet)
         return std::unexpected(absent());
     return std::cref(*jet);
 }
 core::Result<CirculationForcingRow>
 DiscreteKnownCirculation::forcing(std::size_t i) const noexcept {
-    if (data_.values().empty() || i >= data_.values().front().forcing.size())
+    const auto records = data_.values();
+    if (records.empty() || i >= records.front().forcing.size())
         return std::unexpected(absent());
-    const auto& result = data_.values().front().forcing.values()[i];
+    const auto& result = records.front().forcing.values()[i];
     if (!result)
         return std::unexpected(absent());
     return *result;
 }
 core::Result<CirculationPointCovector>
 DiscreteKnownCirculation::point(std::size_t i) const noexcept {
-    if (data_.values().empty() || i >= data_.values().front().points.size())
+    const auto records = data_.values();
+    if (records.empty() || i >= records.front().points.size())
         return std::unexpected(absent());
-    const auto& result = data_.values().front().points.values()[i];
+    const auto& result = records.front().points.values()[i];
     if (!result)
         return std::unexpected(absent());
     return *result;
 }
 core::Result<CirculationCollocationCovector>
 DiscreteKnownCirculation::collocation(std::size_t i) const noexcept {
-    if (data_.values().empty() || i >= data_.values().front().dual_rows.size())
+    const auto records = data_.values();
+    if (records.empty() || i >= records.front().dual_rows.size())
         return std::unexpected(absent());
-    const auto& result = data_.values().front().dual_rows.values()[i];
+    const auto& result = records.front().dual_rows.values()[i];
     if (!result)
         return std::unexpected(absent());
     return *result;
 }
 core::Result<CirculationVectorCovector>
 DiscreteKnownCirculation::uniform_component_dual() const noexcept {
-    if (data_.values().empty())
+    const auto records = data_.values();
+    if (records.empty())
         return std::unexpected(absent());
-    const auto& result = data_.values().front().uniform;
+    const auto& result = records.front().uniform;
     if (!result)
         return std::unexpected(absent());
     return *result;
 }
 core::Result<a::ScaledEnclosure> DiscreteKnownCirculation::flow_time_dual() const noexcept {
-    if (data_.values().empty())
+    const auto records = data_.values();
+    if (records.empty())
         return std::unexpected(absent());
-    const auto& result = data_.values().front().time;
+    const auto& result = records.front().time;
     if (!result)
         return std::unexpected(absent());
     return *result;
