@@ -1942,16 +1942,16 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
 TEST_CASE("Discrete circulation loads keep midpoint and triangle force and moment",
           "[UW-D01][UW-D03][UW-D05][UW-D06][N4-06][verification][negative]") {
     const auto source_case = source(R"({"kind":"constant","value":[0,0,100]})", one_step);
-    a::UniformFlowWorkspace flow_workspace;
-    const auto provider = import(source_case, io::SourceId{120}, flow_workspace);
-    const auto current = import(source_case, io::SourceId{121}, flow_workspace);
+    auto flow_workspace = std::make_unique<a::UniformFlowWorkspace>();
+    const auto provider = import(source_case, io::SourceId{120}, *flow_workspace);
+    const auto current = import(source_case, io::SourceId{121}, *flow_workspace);
     const Number one{1}, zero{0}, absolute{1, 1000000000}, time{5, 4};
     const cf::CaseFlowComponentBudget component{one.view(), absolute.view(), zero.view()};
     const std::array budgets{component, component, component};
     const cf::CaseFlowProjectionRequest projection{
         core::Precision::TwoWord, budgets, budgets, {4096, budget}};
     const auto flow_at = [&] {
-        auto exact = evaluate(provider, current, flow_workspace, time);
+        auto exact = evaluate(provider, current, *flow_workspace, time);
         return take(cf::project_case_uniform_flow(std::move(exact), projection));
     };
     const auto expected = [](const cf::DiscreteLoadVector& value, std::array<double, 3> reference) {
@@ -3865,7 +3865,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
                transport_clock, stages, input, flow, selected, &d, history_direction,
                transport_seeds, short_transport, cap_velocity, shared, *local, *kernel, memory),
            core::FailureCode::ResourceExceeded);
-    std::stop_source cancellation; // NOLINT(misc-const-correctness)
+    // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+    std::stop_source cancellation;
     REQUIRE(cancellation.request_stop());
     reject(cf::evaluate_fixed_free_wake_transport(transport_clock, stages, input, flow, selected,
                                                   &d, history_direction, transport_seeds,
