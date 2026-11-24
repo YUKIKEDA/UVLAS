@@ -1,3 +1,6 @@
+#include "inspect_result.hpp"
+#include "validate_case.hpp"
+
 #include <pybind11/complex.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -920,5 +923,3 @@ PYBIND11_MODULE(_uvlas, module) {
         },
         py::arg("directory").none(false), "Return the verified status document as original bytes.");
 }
-#include "inspect_result.hpp"
-#include "validate_case.hpp"
