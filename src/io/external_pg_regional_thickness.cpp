@@ -169,10 +169,14 @@ core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
                 if (claims.size() > limits.maximum_claims) {
                     partition_fail(Code::ResourceExceeded);
                 }
+                if (!claims.empty()) {
+                    // Each retained report row owns its copied thickness and chart area.
+                    const auto retained = ref::partition_mul(2, claims.size());
+                    math.admit(ref::partition_add(ref::reference_live_rationals, retained));
+                }
                 auto match = partition_take(plan.allocate<ExternalPgThicknessMatch>(
                     ref::partition_index(claims.size()), operation));
                 if (!claims.empty()) {
-                    math.admit();
                     const auto input = partition_take(reference.source());
                     CasePlanes pg{input.partition, plan, limits.case_vertices};
                     for (std::size_t i = 0; i < claims.size(); ++i) {

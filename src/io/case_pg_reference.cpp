@@ -1,6 +1,6 @@
 #include "case_pg_reference.hpp"
 
-#include "structure/pg_partition_common.hpp"
+#include "../structure/pg_partition_common.hpp"
 
 #include <array>
 #include <memory>
@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace uvlas::coupling::detail {
+namespace uvlas::io::detail {
 namespace {
 namespace pg = structure;
 namespace schema = io::schema;
@@ -290,4 +290,4 @@ prepare_case_pg_reference(const io::SiCase& source, std::uint64_t shell_id,
             }
         });
 }
-} // namespace uvlas::coupling::detail
+} // namespace uvlas::io::detail
