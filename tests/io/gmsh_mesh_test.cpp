@@ -366,6 +366,12 @@ TEST_CASE("Gmsh distinguishes inconsistent mesh topology from unsupported sectio
         REQUIRE_FALSE(result);
         CHECK(result.error().code == trial.code);
         CHECK(offset <= bytes.size());
+        core::ResourcePlan proof_plan{10000};
+        std::size_t proof_offset = 0;
+        const auto leaf = prove_gmsh_mesh_leaf(input, quota, proof_plan, {}, &proof_offset);
+        REQUIRE_FALSE(leaf);
+        CHECK(leaf.error().code == trial.code);
+        CHECK(proof_offset == offset);
         CHECK(take_view(input.file.view()).bytes.size() == bytes.size());
     }
 }
@@ -423,4 +429,90 @@ TEST_CASE("Gmsh mesh resource bounds include the saved bytes and both syntax and
     REQUIRE_FALSE(not_mesh);
     CHECK(not_mesh.error().code == InvalidInput);
     CHECK(role_storage.allocated_bytes() == 0);
+}
+
+TEST_CASE("Gmsh leaf proof is bound to the exact authenticated mesh bytes",
+          "[IO4-04][IO4-01][N4-02][verification]") {
+    using namespace uvlas::test_support;
+    const auto proof = [] {
+        constexpr auto digest = fixture_digest();
+        const auto input = snapshot(mesh, &digest);
+        core::ResourcePlan owned{10000};
+        const auto decoded = GmshMesh::prepare(input, limits, owned, {});
+        REQUIRE(decoded);
+        const auto view = take_view(decoded->view());
+        REQUIRE(owned.allocated_bytes() > mesh.size());
+        REQUIRE(view.work > mesh.size());
+
+        const auto record_bytes = owned.allocated_bytes() - mesh.size();
+        auto quota = limits;
+        quota.work = view.work - mesh.size();
+        core::ResourcePlan exact{record_bytes};
+        std::size_t offset = mesh.size();
+        AllocationAudit audit{cpp_backend, AuditThreadDomain::AllThreads};
+        const auto leaf = prove_gmsh_mesh_leaf(input, quota, exact, {}, &offset);
+        const auto usage = audit.finish();
+        REQUIRE(leaf);
+        CHECK(usage.cpp_allocation_attempts == 6);
+        CHECK(exact.allocated_bytes() == record_bytes);
+        CHECK(leaf->work() == quota.work);
+        CHECK(offset == 0);
+
+        core::ResourcePlan short_memory{record_bytes - 1};
+        const auto rejected = prove_gmsh_mesh_leaf(input, quota, short_memory, {});
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == ResourceExceeded);
+        CHECK(short_memory.allocated_bytes() == 0);
+
+        --quota.work;
+        core::ResourcePlan short_work{record_bytes};
+        const auto work_rejected = prove_gmsh_mesh_leaf(input, quota, short_work, {});
+        REQUIRE_FALSE(work_rejected);
+        CHECK(work_rejected.error().code == ResourceExceeded);
+        return *leaf;
+    }();
+    CHECK(proof.location().parent.source.source == SourceId{19});
+    CHECK(proof.location().source == SourceId{81});
+    CHECK(proof.location().role == ReferenceRole::GmshMesh);
+    CHECK(proof.location().declaration_node == 5);
+    CHECK(proof.digest() == fixture_digest());
+    CHECK(proof.byte_count() == mesh.size());
+}
+
+TEST_CASE("Gmsh leaf proof checks content through EOF and never certifies a sidecar",
+          "[IO4-04][IO4-01][negative][verification]") {
+    const auto bytes = std::string{mesh} + "$External\nrelative/other.msh\n$EndExternal\n";
+    auto quota = limits;
+    quota.file_bytes = bytes.size();
+    core::ResourcePlan plan{10000};
+    std::size_t offset = 0;
+    const auto unknown = snapshot(bytes);
+    const auto unsupported = prove_gmsh_mesh_leaf(unknown, quota, plan, {}, &offset);
+    REQUIRE_FALSE(unsupported);
+    CHECK(unsupported.error().code == Unsupported);
+    CHECK(offset == mesh.size());
+    CHECK(plan.allocated_bytes() == 0);
+
+    auto sidecar = snapshot(mesh);
+    sidecar.location.role = ReferenceRole::GmshSidecar;
+    const auto wrong_role = prove_gmsh_mesh_leaf(sidecar, limits, plan, {}, &offset);
+    REQUIRE_FALSE(wrong_role);
+    CHECK(wrong_role.error().code == InvalidInput);
+    CHECK(offset == 0);
+    CHECK(plan.allocated_bytes() == 0);
+
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() requires a mutable source.
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    const auto input = snapshot(mesh);
+    const auto cancelled = prove_gmsh_mesh_leaf(input, limits, plan, stop.get_token(), &offset);
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == Cancelled);
+    CHECK(offset == 0);
+    CHECK(plan.allocated_bytes() == 0);
+
+    const auto label_bytes = edited("wing skin", "../external-looking-name");
+    quota.file_bytes = label_bytes.size();
+    const auto label = snapshot(label_bytes);
+    CHECK(prove_gmsh_mesh_leaf(label, quota, plan, {}));
 }
