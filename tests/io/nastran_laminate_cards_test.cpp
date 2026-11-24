@@ -460,18 +460,18 @@ TEST_CASE("External explicit material fields must agree in exact SI with the cas
                                 comparison_limits(), plan, {}, &diagnostic);
     REQUIRE_FALSE(differing_young);
     CHECK(differing_young.error().code == InvalidInput);
-    REQUIRE(diagnostic);
-    CHECK(diagnostic->quantity == ImportedQuantityField::Young1);
-    CHECK(diagnostic->card_position == changed.input.mat1.front().young->field.position);
+    const auto young_detail = take(diagnostic);
+    CHECK(young_detail.quantity == ImportedQuantityField::Young1);
+    CHECK(young_detail.card_position == take(changed.input.mat1.front().young).field.position);
 
     const auto differing_shear =
         check_imported_material(changed.mat8.front(), case_mat8, deck_units, si,
                                 comparison_limits(), plan, {}, &diagnostic);
     REQUIRE_FALSE(differing_shear);
     CHECK(differing_shear.error().code == InvalidInput);
-    REQUIRE(diagnostic);
-    CHECK(diagnostic->quantity == ImportedQuantityField::Shear13);
-    CHECK(diagnostic->card_position == changed.mat8.front().shear_1z->field.position);
+    const auto shear_detail = take(diagnostic);
+    CHECK(shear_detail.quantity == ImportedQuantityField::Shear13);
+    CHECK(shear_detail.card_position == take(changed.mat8.front().shear_1z).field.position);
 }
 
 TEST_CASE("A declared constant whole-region full thickness compares with every case PG vertex",
@@ -510,12 +510,13 @@ TEST_CASE("A declared constant whole-region full thickness compares with every c
                                          comparison_limits(), plan, {}, &diagnostic);
     REQUIRE_FALSE(disagreement);
     CHECK(disagreement.error().code == InvalidInput);
-    REQUIRE(diagnostic);
-    CHECK(diagnostic->quantity == ImportedQuantityField::FullThickness);
-    CHECK(diagnostic->vertex == static_cast<core::Index>(vertices.values.size() - 1));
+    const auto sidecar_detail = take(diagnostic);
+    CHECK(sidecar_detail.quantity == ImportedQuantityField::FullThickness);
+    CHECK(sidecar_detail.vertex == static_cast<core::Index>(vertices.values.size() - 1));
 
-    const auto pshell = [](std::string_view thick) {
-        const auto deck = std::string{"GRID,1\nGRID,2\nGRID,3\nCTRIA3,50,91,1,2,3\nPSHELL,91,9,"} +
+    const auto pshell = [](std::string_view thick, bool corner = false) {
+        const auto element = corner ? "CTRIA3,50,91,1,2,3,,,\n,,,3.0\n" : "CTRIA3,50,91,1,2,3\n";
+        const auto deck = std::string{"GRID,1\nGRID,2\nGRID,3\n"} + element + "PSHELL,91,9," +
                           std::string{thick} + "\nMAT1,9,1.0\n";
         return material_cards(deck);
     };
@@ -531,9 +532,19 @@ TEST_CASE("A declared constant whole-region full thickness compares with every c
         expected, si.length, expected.values.size(), comparison_limits(), plan, {}, &diagnostic);
     REQUIRE_FALSE(wrong_result);
     CHECK(wrong_result.error().code == InvalidInput);
-    REQUIRE(diagnostic);
-    CHECK(diagnostic->card_position == wrong_source.pshell.front().thickness->field.position);
-    CHECK(diagnostic->vertex == 0);
+    const auto deck_detail = take(diagnostic);
+    CHECK(deck_detail.card_position == take(wrong_source.pshell.front().thickness).field.position);
+    CHECK(deck_detail.vertex == 0);
+
+    const auto corner = pshell("2.54", true);
+    const auto corner_source = take(corner.view());
+    const auto unqualified = check_imported_pshell_thickness(
+        corner_source.input.elements.front(), corner_source.pshell.front(),
+        SiLengthUnit::Millimetre, expected, si.length, expected.values.size(), comparison_limits(),
+        plan, {}, &diagnostic);
+    REQUIRE_FALSE(unqualified);
+    CHECK(unqualified.error().code == Unsupported);
+    CHECK_FALSE(diagnostic);
 }
 
 } // namespace

@@ -183,14 +183,13 @@ core::Result<void> check_imported_pshell_thickness(
     if (element.property.property_ordinal != property.property_ordinal) {
         return fail(Code::InvalidInput);
     }
-    const auto has_corner = std::visit(
-        [](const auto& corners) {
-            return std::ranges::any_of(corners, [](const NastranShellCorner& corner) {
-                return corner.thickness.has_value();
-            });
-        },
-        element.corners);
-    if (has_corner) {
+    const auto has_corner = [](const auto* corners) noexcept {
+        return corners && std::ranges::any_of(*corners, [](const NastranShellCorner& corner) {
+                   return corner.thickness.has_value();
+               });
+    };
+    if (has_corner(std::get_if<0>(&element.corners)) ||
+        has_corner(std::get_if<1>(&element.corners))) {
         return fail(Code::Unsupported);
     }
     if (!property.thickness) {
