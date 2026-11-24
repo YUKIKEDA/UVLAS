@@ -39,6 +39,25 @@ struct Grid {
 };
 } // namespace case_clock_detail
 
+struct CaseReferenceClockSample {
+    structure::ExactRational seconds;
+    CaseFlowClockQuery address;
+    CaseClockRestart restart;
+};
+
+/// Prepare the case grid and validate declared motion/load events without selecting a flow.
+[[nodiscard]] core::Result<case_clock_detail::Grid>
+prepare_case_reference_clock(const io::SiCase&, aero::detail::pchip::PchipInputStamp,
+                             const CaseFlowClockLimits&, std::uint64_t maximum_event_work,
+                             core::ResourcePlan&, const std::stop_token& = {},
+                             core::FailureDetails = {}) noexcept;
+
+[[nodiscard]] core::Result<CaseReferenceClockSample>
+evaluate_case_reference_clock(const case_clock_detail::Grid&,
+                              const case_clock_detail::Grid& current, CaseFlowClockQuery,
+                              const CaseFlowClockLimits&, core::ResourcePlan&,
+                              const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
 class CaseClockedFlows {
 public:
     CaseClockedFlows(CaseClockedFlows&&) noexcept = default;

@@ -39,8 +39,6 @@
     "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
     "docs/specs/foundation/checkpoint-manifest-contract.md": "0c14b5624c7f41ee18ad1e408af436e83fa0604f97b24b90f2fdd62fa77f83eb",
     "docs/specs/foundation/case-schema-fields.md": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119",
-    "src/coupling/case_flow_clock.cpp": "78930c092b0b978d97897f428c19d52afdffcbac1277a780b406b78b19d3d3cb",
-    "src/coupling/case_flow_clock.hpp": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13",
     "src/coupling/case_known_flow.cpp": "700eabb0dbcdea3913541c6ba6e9439b68bdebaa6885c902050099e9f5471254",
     "src/coupling/case_known_flow.hpp": "5c9b5bfc36afe0a2d2026f1c49b6be4455f3a91cf3f38f6082d7d49f700af0f8",
     "src/coupling/case_motion.cpp": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058",
@@ -132,5 +130,15 @@
       "hint": "docs/verification/IM-03/clocked-known-input-restore-v1/verification.md",
       "sha256": "6c4b77111bffd588ee1dc7f098acb0da37e4dc902ee0f8541635d58b6811b437"
     }
-  ]
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "80fdcefd1fcd155536fef7dcae0a72c2041e4986",
+      "sha256": "78930c092b0b978d97897f428c19d52afdffcbac1277a780b406b78b19d3d3cb"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "80fdcefd1fcd155536fef7dcae0a72c2041e4986",
+      "sha256": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13"
+    }
+  }
 }

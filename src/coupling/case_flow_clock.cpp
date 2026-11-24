@@ -659,6 +659,47 @@ struct Builder {
 };
 } // namespace case_clock_detail
 
+core::Result<case_clock_detail::Grid>
+prepare_case_reference_clock(const io::SiCase& source, p::PchipInputStamp stamp,
+                             const CaseFlowClockLimits& limits, std::uint64_t maximum_event_work,
+                             core::ResourcePlan& memory, const std::stop_token& stop,
+                             core::FailureDetails details) noexcept {
+    return guarded<case_clock_detail::Grid>(prepare, details, [&] {
+        auto grid =
+            case_clock_detail::Builder::make_grid(source, stamp, limits, memory, stop, details);
+        const auto root = take(take(source.source_case()).get().root());
+        const auto transient = std::get<s::AnalysisTransient>(root.analysis.record());
+        case_clock_detail::TimeSeriesEventCheck events{source,
+                                                       grid.intervals.values(),
+                                                       limits.fields.conversion,
+                                                       limits.fields.flow.arithmetic,
+                                                       maximum_event_work,
+                                                       memory,
+                                                       stop,
+                                                       details};
+        events.check_motions(root.model.record());
+        events.check_loads(transient);
+        check_stop(stop, prepare, details);
+        return grid;
+    });
+}
+
+core::Result<CaseReferenceClockSample>
+evaluate_case_reference_clock(const case_clock_detail::Grid& field,
+                              const case_clock_detail::Grid& current, CaseFlowClockQuery address,
+                              const CaseFlowClockLimits& limits, core::ResourcePlan& memory,
+                              const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return guarded<CaseReferenceClockSample>(evaluate, details, [&] {
+        auto node = case_clock_detail::Builder::locate(field, current, address, limits, memory,
+                                                       stop, details);
+        auto instant = node.interior
+                           ? std::move(*node.interior)
+                           : take(node.time(address.step).clone(limits.fields.conversion, memory));
+        check_stop(stop, evaluate, details);
+        return CaseReferenceClockSample{std::move(instant), address, node.interval.restart};
+    });
+}
+
 CaseClockedFlows::CaseClockedFlows(case_clock_detail::Grid&& grid, CaseUniformFlowReady&& ambient,
                                    CasePrescribedWakeReady&& wake) noexcept
     : grid_(std::move(grid)), ambient_(std::move(ambient)), wake_(std::move(wake)) {}

@@ -39,8 +39,6 @@
     "docs/specs/foundation/case-schema-fields.md": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119",
     "include/uvlas/io/case_schema_records.hpp": "737bad957979af654395ed92bc2cdd1f4e6e45f9d8ce3708b8519f54ec5348d8",
     "src/io/case_schema_exact.cpp": "8b18eefd6c7869a12480784bdf315711d190c398a2ed8d26b3b336b0968d6f78",
-    "src/coupling/case_flow_clock.cpp": "b3e7d9f2c26e33a997ca7132f9f6d1cd0dff80f82e052c2043b00ffe827eaaaf",
-    "src/coupling/case_flow_clock.hpp": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13",
     "tests/coupling/case_motion_time_series_test.cpp": "85609fe1a52f10a766c93d8bcc50768a74669ca83be28c1ea3b76b4db91baac0"
   },
   "source_records": [
@@ -89,5 +87,15 @@
       "hint": "docs/verification/IM-03/all-motion-clock-events-v1/verification.md",
       "sha256": "9d27bfc9e1e0c0092789f20e839957b08f28fd0d40beb23c230e9af617e9e597"
     }
-  ]
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "a75bcdd43fedb3f5b30e68c58e10abb969305dc8",
+      "sha256": "b3e7d9f2c26e33a997ca7132f9f6d1cd0dff80f82e052c2043b00ffe827eaaaf"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "a75bcdd43fedb3f5b30e68c58e10abb969305dc8",
+      "sha256": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13"
+    }
+  }
 }

@@ -29,8 +29,16 @@
   },
   "artifacts": {
     "docs/verification/IM-03/case-clocked-prescribed-inputs.md": "3d78aa53213a6e84e648e2bcfc8397dab1c2f6a31d8c5ee7de0f5687386236e2",
-    "src/coupling/case_flow_clock.cpp": "59c1bddac8d066b2a42f14ff42e87e9740611964918f8a7960d107e71650c053",
-    "src/coupling/case_flow_clock.hpp": "51ea851ef1eec81c0e87f1506700c1568bb318657ecfe29dba4c70f6b4d8f7c2",
     "tests/coupling/case_motion_time_series_test.cpp": "24de119e94a0cf546ab541a27848deba460525a45ecd09aff35cb36abee266d4"
+  },
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "d8fe0d4ed4fec152a3d8458fae1074a52fd63e59",
+      "sha256": "59c1bddac8d066b2a42f14ff42e87e9740611964918f8a7960d107e71650c053"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "d8fe0d4ed4fec152a3d8458fae1074a52fd63e59",
+      "sha256": "51ea851ef1eec81c0e87f1506700c1568bb318657ecfe29dba4c70f6b4d8f7c2"
+    }
   }
 }

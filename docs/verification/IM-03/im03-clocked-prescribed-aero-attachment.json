@@ -48,8 +48,6 @@
     "src/coupling/case_aero_attachment.cpp": "1e6f5c8668a233e969a1801876e90906d0736da6fc39ba3b7f76b75d87b42609",
     "src/coupling/case_aero_attachment.hpp": "212e1e992a90eea8d834263173e1e717e0ef8cd8bc2af747795260d56a793958",
     "src/coupling/case_dyadic_words_private.hpp": "240c4462266a0b168f6d078b23ccdf5e64e793c8c1a3ef21f3f991bae2bf9f38",
-    "src/coupling/case_flow_clock.cpp": "82284ac9614ceeda37c42b86bbf47af3fae7a40c9e7549711b403e643ea4b3aa",
-    "src/coupling/case_flow_clock.hpp": "a5d3cbd4ceb3b1c833624a2d7d93e4b837e78068a99705d8df4553d35a48cca0",
     "src/coupling/case_motion.cpp": "b225c57423602d869150ac5f7a550e3221c98d79c7cccadec7148079a1f96100",
     "src/coupling/case_motion.hpp": "9474737af3afdfda29b7ab4a120e74225bb76b1c6c16c56c778109563e1cd953",
     "src/coupling/discrete_nonpenetration.cpp": "f73f3d90789e3fc06fd3f66124452ec9b051f8e847e00411164d7d68d4d68f62",
@@ -143,5 +141,15 @@
       "hint": "docs/verification/IM-03/clocked-prescribed-aero-attachment-v1/verification.md",
       "sha256": "943d72660701ba855a3388f416cefa9c697054eddb56f407115309e4da8aa0a1"
     }
-  ]
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "57a0d8d8107491eebf0438c5e238bfa4907bc83e",
+      "sha256": "82284ac9614ceeda37c42b86bbf47af3fae7a40c9e7549711b403e643ea4b3aa"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "57a0d8d8107491eebf0438c5e238bfa4907bc83e",
+      "sha256": "a5d3cbd4ceb3b1c833624a2d7d93e4b837e78068a99705d8df4553d35a48cca0"
+    }
+  }
 }

@@ -948,6 +948,14 @@ uvlas_add_test(coupling.case_motion_time_series
 target_include_directories(uvlas_test_coupling_case_motion_time_series PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 
+uvlas_add_test(coupling.case_structural_pg_support
+    LABELS V-PG property negative verification
+    TIMEOUT 180
+    SOURCES coupling/case_structural_pg_support_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_structural_pg_support PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
+
 uvlas_add_test(coupling.case_pg_support_motion
     LABELS V-PG V-AERO property negative verification
     TIMEOUT 180

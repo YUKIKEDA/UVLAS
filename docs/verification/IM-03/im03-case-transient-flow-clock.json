@@ -38,8 +38,6 @@
     "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
     "src/coupling/case_uniform_flow.cpp": "636407dc2d4c1c01a227284e158196495a91afc26c2d50370764f5f3eed693ca",
     "src/coupling/case_uniform_flow_projection.cpp": "ea87abef779e6e530a28099c9a00cf21a26feefddb9f1a2fd0875042183593e3",
-    "src/coupling/case_flow_clock.cpp": "de8bda386d60d85b7431815665f1f356d53b66d250cf6b68e6742dc8c533367c",
-    "src/coupling/case_flow_clock.hpp": "ca1aee8edaf9ce7cae2c760a0d0182887cdbd1100cecfe1fe7c1d6de60f81640",
     "tests/coupling/case_uniform_flow_test.cpp": "da6f9277c821ea81cae01f8e39e34745e53b2c604b3fd478910ff12c162877b7"
   },
   "artifacts": {
@@ -108,5 +106,15 @@
       "hint": "docs/verification/IM-03/case-transient-flow-clock-v1/verification.md",
       "sha256": "063d2b67bb1e19a33eec2b104408ee8555318e81206b7aa661779b233c78d361"
     }
-  ]
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "8a69b27e1d19cab79279d346fae1a699545f5f3d",
+      "sha256": "de8bda386d60d85b7431815665f1f356d53b66d250cf6b68e6742dc8c533367c"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "8a69b27e1d19cab79279d346fae1a699545f5f3d",
+      "sha256": "ca1aee8edaf9ce7cae2c760a0d0182887cdbd1100cecfe1fe7c1d6de60f81640"
+    }
+  }
 }
