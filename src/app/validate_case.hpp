@@ -26,10 +26,10 @@ struct ValidatedCase {
     io::SchemaIdentity identity;
 };
 
-inline constexpr std::size_t case_manifest_max_bytes = 8 * 1024 * 1024;
+inline constexpr std::size_t case_manifest_max_bytes = std::size_t{8} * 1024 * 1024;
 inline constexpr std::size_t case_manifest_max_depth = 128;
-inline constexpr std::size_t case_manifest_max_nodes = 256 * 1024;
-inline constexpr std::size_t case_manifest_max_string_bytes = 64 * 1024;
+inline constexpr std::size_t case_manifest_max_nodes = std::size_t{256} * 1024;
+inline constexpr std::size_t case_manifest_max_string_bytes = std::size_t{64} * 1024;
 inline constexpr std::size_t case_manifest_max_number_bytes = 1024;
 
 /// Check the case schema and the external reference graph without writing files.
