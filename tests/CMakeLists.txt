@@ -768,6 +768,22 @@ uvlas_add_test(structure.pg_full_trace
 target_include_directories(uvlas_test_structure_pg_full_trace
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 
+uvlas_add_test(structure.pg_chart_candidate
+    LABELS property negative verification V-PG
+    TIMEOUT 180
+    SOURCES structure/pg_chart_candidate_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_chart_candidate
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
+uvlas_add_test(structure.pg_support_history
+    LABELS property negative verification V-PG
+    TIMEOUT 120
+    SOURCES structure/pg_support_history_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_support_history
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
@@ -924,6 +940,14 @@ uvlas_add_test(coupling.case_motion_time_series
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_motion_time_series PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+
+uvlas_add_test(coupling.case_pg_support_motion
+    LABELS V-PG V-AERO property negative verification
+    TIMEOUT 180
+    SOURCES coupling/case_pg_support_motion_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_pg_support_motion PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
 
 uvlas_add_test(coupling.case_motion_frame
     LABELS V-AERO property negative verification

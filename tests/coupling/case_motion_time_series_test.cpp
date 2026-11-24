@@ -7,6 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 
 namespace {
@@ -119,6 +120,15 @@ void exact(core::Result<p::RationalView> result, std::uint32_t n, std::uint32_t 
     const auto expected = n == 0 ? std::span<const std::uint32_t>{} : std::span{numerator}.first(1);
     CHECK(std::ranges::equal(view.numerator, expected));
     CHECK(std::ranges::equal(view.denominator, denominator));
+}
+
+void same_enclosure(core::Result<io::SiEnclosure> a, core::Result<io::SiEnclosure> b) {
+    const auto left = std::get<io::ScaledTwoWord>(take(std::move(a)));
+    const auto right = std::get<io::ScaledTwoWord>(take(std::move(b)));
+    CHECK(std::bit_cast<std::uint64_t>(left.high) == std::bit_cast<std::uint64_t>(right.high));
+    CHECK(std::bit_cast<std::uint64_t>(left.low) == std::bit_cast<std::uint64_t>(right.low));
+    CHECK(std::bit_cast<std::uint64_t>(left.radius) == std::bit_cast<std::uint64_t>(right.radius));
+    CHECK(left.exponent2 == right.exponent2);
 }
 } // namespace
 
@@ -293,7 +303,7 @@ TEST_CASE("Typed Motion retains Hold and periodic knot accelerations in SI time"
 }
 
 TEST_CASE("Clocked prescribed inputs share one exact node and event side",
-          "[AE-07][FD-02][N4-03][N4-06][verification][negative]") {
+          "[AE-07][FD-02][FD-06][FD-07][IO4-06][N4-03][N4-06][verification][negative]") {
     auto input = a::root("aerodynamic_prescribed_transient");
     input.field("analysis")
         .set(
@@ -380,6 +390,10 @@ TEST_CASE("Clocked prescribed inputs share one exact node and event side",
             REQUIRE(sample.prescribed);
             exact(sample.prescribed->jet().time(), 1);
             exact(sample.prescribed->jet().velocity(0), 6);
+            exact(sample.prescribed->jet().time_partial(0), 2);
+            const auto acceleration_word = take(sample.ambient.time_partial(0));
+            const auto& dt = std::get<io::ScaledTwoWord>(acceleration_word);
+            CHECK(std::ldexp(dt.high + dt.low, static_cast<int>(dt.exponent2)) == 3.0);
             const auto velocity = take(sample.ambient.velocity(0));
             const auto& enclosed = std::get<io::ScaledTwoWord>(velocity);
             CHECK(std::ldexp(enclosed.high + enclosed.low, static_cast<int>(enclosed.exponent2)) ==
@@ -395,6 +409,138 @@ TEST_CASE("Clocked prescribed inputs share one exact node and event side",
         const p::PchipInputStamp stale{p::PchipIssuerId{71}, p::PchipInputGeneration{9}};
         rejected(evaluate(ready, current, {stale, 0, 2, Left}, wake),
                  core::FailureCode::StaleGeneration);
+    }
+
+    SECTION("the owned snapshot restores every checked input at both sides of the event") {
+        const auto current = take(prepare(input, clock_limits));
+        const auto restored = [&] {
+            const auto archive = [&] {
+                core::ResourcePlan local{budget};
+                aero::detail::UniformFlowWorkspace local_fields;
+                p::CurveWorkspace local_motion;
+                const auto original = checked_case(input);
+                const auto ready = take(c::prepare_case_clocked_prescribed_inputs(
+                    original, attachment_field(original), stamp, local_fields, local_motion,
+                    clock_limits, local));
+                return take(c::snapshot_case_clocked_prescribed_inputs(
+                    ready, local_fields, local_motion, clock_limits, local));
+            }();
+            const auto requalify = [&](const c::CaseClockedPrescribedInputs& live) {
+                return c::restore_case_clocked_prescribed_inputs(
+                    archive, live, flow_workspace, motion_workspace, clock_limits, memory);
+            };
+            const auto refuse_case = [&](const a::JsonToken& json, core::Operation operation) {
+                const auto changed = take(prepare(json, clock_limits));
+                const auto result = requalify(changed);
+                if (result)
+                    FAIL("Unexpected clocked restore success");
+                CHECK(result.error().code == core::FailureCode::StaleGeneration);
+                CHECK(result.error().operation == operation);
+            };
+            auto alternate = input;
+            alternate.field("analysis")
+                .field("intervals")
+                .elements[1]
+                .set("step", a::parse("0.25"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            alternate.field("analysis")
+                .field("intervals")
+                .elements[1]
+                .set("restart", a::string("step_change"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            alternate.field("flow").field("uniform").set("coefficients",
+                                                         a::parse("[[1,0,0],[4,0,0]]"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            alternate.field("analysis")
+                .field("wake")
+                .field("convection")
+                .field("velocity")
+                .set("coefficients", a::parse("[[4,0,0],[3,0,0]]"));
+            refuse_case(alternate, core::Operation::EvaluateAero);
+            alternate = input;
+            motion_json(alternate)
+                .field("translation")
+                .set("values", a::parse("[[0,0,0],[1,0,0],[4,0,0]]"));
+            refuse_case(alternate, core::Operation::PrepareModel);
+            alternate = input;
+            alternate.field("analysis")
+                .field("wake")
+                .set("convection", a::parse(R"({"kind":"free"})"));
+            const auto free = take(prepare(alternate, clock_limits));
+            core::ResourcePlan mismatch{0};
+            rejected(c::restore_case_clocked_prescribed_inputs(
+                         archive, free, flow_workspace, motion_workspace, clock_limits, mismatch),
+                     core::FailureCode::StaleGeneration);
+            CHECK(mismatch.allocated_bytes() == 0);
+            const auto free_archive = take(c::snapshot_case_clocked_prescribed_inputs(
+                free, flow_workspace, motion_workspace, clock_limits, memory));
+            const auto current_free = take(prepare(alternate, clock_limits));
+            const auto restored_free = take(c::restore_case_clocked_prescribed_inputs(
+                free_archive, current_free, flow_workspace, motion_workspace, clock_limits,
+                memory));
+            const auto free_sample =
+                take(evaluate(restored_free, current_free, {stamp, 0, 2, Left}, {}));
+            CHECK_FALSE(free_sample.prescribed);
+            exact(free_sample.ambient.time(), 1);
+            rejected(c::restore_case_clocked_prescribed_inputs(free_archive, current,
+                                                               flow_workspace, motion_workspace,
+                                                               clock_limits, mismatch),
+                     core::FailureCode::StaleGeneration);
+            return take(requalify(current));
+        }();
+        for (const auto address : {c::CaseFlowClockQuery{stamp, 0, 2, Left},
+                                   c::CaseFlowClockQuery{stamp, 1, 0, Right}}) {
+            const auto uninterrupted = take(evaluate(current, current, address, wake));
+            const auto resumed = take(evaluate(restored, current, address, wake));
+            CHECK(resumed.address.side == address.side);
+            CHECK(resumed.restart == uninterrupted.restart);
+            CHECK(resumed.restart == (address.side == Left ? c::CaseClockRestart::ItemInitial
+                                                           : c::CaseClockRestart::ItemEvent));
+            const auto step = resumed.step.view();
+            exact(p::RationalView{step.sign, step.numerator, step.denominator}, 1, 2);
+            const auto& motion_jet = take(resumed.motion.time()).get();
+            exact(motion_jet.time(), 1);
+            exact(motion_jet.translation(0, First), 4, 3);
+            exact(motion_jet.translation(0, Second), address.side == Left ? 1U : 5U, 3);
+            exact(motion_jet.rotation_coefficient(2, First), 1, 2);
+            exact(resumed.ambient.time(), 1);
+            CHECK(motion_jet.requested_side() == address.side);
+            CHECK(resumed.ambient.requested_side() == address.side);
+            const auto& saved_wake = resumed.prescribed;
+            const auto& original_wake = uninterrupted.prescribed;
+            if (!saved_wake || !original_wake)
+                FAIL("The restored prescribed mode lost its velocity input");
+            CHECK(saved_wake->requested_side() == address.side);
+            exact(saved_wake->jet().time(), 1);
+            exact(saved_wake->jet().velocity(0), 6);
+            exact(saved_wake->jet().time_partial(0), 2);
+            for (std::size_t k = 0; k < 3; ++k) {
+                same_enclosure(resumed.ambient.velocity(k), uninterrupted.ambient.velocity(k));
+                same_enclosure(resumed.ambient.time_partial(k),
+                               uninterrupted.ambient.time_partial(k));
+                same_enclosure(saved_wake->velocity(k), original_wake->velocity(k));
+                same_enclosure(saved_wake->time_partial(k), original_wake->time_partial(k));
+                for (std::size_t j = 0; j < 3; ++j)
+                    same_enclosure(resumed.ambient.spatial_partial(k, j),
+                                   uninterrupted.ambient.spatial_partial(k, j));
+            }
+            for (const auto order : {Value, First, Second}) {
+                for (std::size_t i = 0; i < 3; ++i) {
+                    same_enclosure(resumed.motion.centre(i, order),
+                                   uninterrupted.motion.centre(i, order));
+                    for (std::size_t j = 0; j < 3; ++j)
+                        same_enclosure(resumed.motion.rotation(i, j, order),
+                                       uninterrupted.motion.rotation(i, j, order));
+                }
+            }
+        }
+    }
+
+    SECTION("direct evaluation refuses independently changed ready input") {
+        const auto ready = take(prepare(input, clock_limits));
         input.field("analysis").field("intervals").elements[1].set("step", a::parse("0.25"));
         const auto changed_grid = take(prepare(input, clock_limits));
         rejected(evaluate(ready, changed_grid, {stamp, 0, 2, Left}, wake),
@@ -562,4 +708,331 @@ TEST_CASE("Prepared Motion projects a rotated Frame and PCHIP side accelerations
                                      {core::Precision::TwoWord, strict}, workspace, motion_limits,
                                      plan),
              core::FailureCode::PrecisionUnresolved);
+}
+
+TEST_CASE("Prescribed Motion restores owned exact inputs and requalifies saved coefficients",
+          "[AE-07][IO4-06][FD-05][FD-06][N4-06][verification][negative]") {
+    auto input = a::root("aerodynamic_prescribed_transient");
+    input.field("units").set("time", a::string("s"));
+    input.field("units").set("length", a::string("m"));
+    input.field("units").set("angle", a::string("deg"));
+    input.field("analysis")
+        .set(
+            "intervals",
+            a::parse(
+                R"([{"start":0,"end":1,"step":1,"restart":"initial"},{"start":1,"end":2,"step":1,"restart":"event"}])"));
+    auto& motion = motion_json(input);
+    motion.set("origin", a::parse(R"({"origin":[3,4,5],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[1,0,0],[3,0,0]],"outside":{"kind":"reject"}})"));
+    motion.set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,2],"coefficients":[[0,0,0],[0,0,90]]})"));
+    motion.set("events", a::parse("[0,1,2]"));
+
+    const c::CaseMotionLimits motion_limits{
+        {exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+        limits,
+        2048,
+        50'000};
+    const auto prepare = [&](p::CurveWorkspace& workspace, core::ResourcePlan& plan) {
+        const auto source = checked_case(input);
+        const auto begin = exact_time("0", plan);
+        const auto end = exact_time("2", plan);
+        return take(c::prepare_case_motion(source, motion_field(source), {begin, end}, stamp,
+                                           workspace, motion_limits, plan));
+    };
+    core::ResourcePlan memory{budget};
+    p::CurveWorkspace workspace;
+    const auto current = prepare(workspace, memory);
+    const auto restored = [&] {
+        const auto archive = [&] {
+            core::ResourcePlan local{budget};
+            p::CurveWorkspace builder;
+            const auto original = prepare(builder, local);
+            return take(c::snapshot_case_motion(original, builder, motion_limits, local));
+        }();
+        const auto saved = take(archive.view());
+        const auto requalify = [&](const c::CaseMotionSnapshotView& record) {
+            return c::restore_case_motion(record, current, workspace, motion_limits, memory);
+        };
+        const std::array<std::uint32_t, 1> one{1}, four{4}, nine{9};
+        const p::RationalView changed_frame{1, four, one}, changed_coefficient{1, nine, one};
+        const auto* pchip = std::get_if<p::PchipSnapshotView>(&saved.time.translation);
+        const auto* formula = std::get_if<c::CaseMotionFormulaSnapshotView>(&saved.time.rotation);
+        if (pchip == nullptr || formula == nullptr)
+            FAIL("Expected a PCHIP translation and polynomial rotation");
+        REQUIRE_FALSE(pchip->coefficients.empty());
+        REQUIRE_FALSE(formula->coefficients.empty());
+        REQUIRE(saved.time.events.size() == 3);
+        REQUIRE(saved.time.pi_power == 1);
+        exact(saved.frame.components[0], 3);
+        exact(saved.time.events[1], 1);
+
+        auto invalid = saved;
+        invalid.formula_version += 1;
+        rejected(requalify(invalid), core::FailureCode::CheckpointIncompatible);
+        invalid = saved;
+        invalid.frame.components[0] = changed_frame;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        const p::RationalView positive{1, one, one}, negative{-1, one, one}, zero{0, {}, one};
+        const std::array rotated{zero, negative, zero, positive, zero, zero, zero, zero, positive};
+        invalid = saved;
+        std::ranges::copy(rotated, invalid.frame.components.begin() + 3);
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        invalid = saved;
+        invalid.time.pi_power = 0;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        const auto nearby = exact_time("1.000000000000000001", memory);
+        const auto nearby_words = take(io::detail::copy_rational_words(nearby, memory, {}));
+        const auto near = nearby_words.view();
+        const p::RationalView distinct_event{near.sign, near.numerator, near.denominator};
+        auto events = std::array{saved.time.events[0], distinct_event, saved.time.events[2]};
+        invalid = saved;
+        invalid.time.events = events;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        invalid = saved;
+        invalid.time.end = distinct_event;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        std::vector<p::RationalView> raw{pchip->input.samples.values.begin(),
+                                         pchip->input.samples.values.end()};
+        REQUIRE_FALSE(raw.empty());
+        raw[0] = changed_coefficient;
+        auto altered = *pchip;
+        altered.input.samples.values = raw;
+        invalid = saved;
+        invalid.time.translation = altered;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        altered = *pchip;
+        altered.input.boundary.policy = p::HoldBoundary{};
+        invalid.time.translation = altered;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        std::vector<p::RationalView> generated{pchip->coefficients.begin(),
+                                               pchip->coefficients.end()};
+        generated[0] = changed_coefficient;
+        altered = *pchip;
+        altered.coefficients = generated;
+        invalid.time.translation = altered;
+        rejected(requalify(invalid), core::FailureCode::InvalidInput);
+        invalid = saved;
+        std::vector<p::RationalView> polynomial{formula->coefficients.begin(),
+                                                formula->coefficients.end()};
+        polynomial[0] = changed_coefficient;
+        auto altered_formula = *formula;
+        altered_formula.coefficients = polynomial;
+        invalid.time.rotation = altered_formula;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+        altered_formula = *formula;
+        if (const auto& domain = altered_formula.domain) {
+            auto changed_domain = *domain;
+            changed_domain[3] = changed_frame;
+            altered_formula.domain = changed_domain;
+        } else {
+            FAIL("The saved rotation lost its polynomial domain");
+        }
+        invalid = saved;
+        invalid.time.rotation = altered_formula;
+        rejected(requalify(invalid), core::FailureCode::StaleGeneration);
+
+        auto zero_work = motion_limits;
+        zero_work.maximum_interval_work = 0;
+        core::ResourcePlan capped{budget};
+        rejected(c::restore_case_motion(saved, current, workspace, zero_work, capped),
+                 core::FailureCode::ResourceExceeded);
+        CHECK(capped.allocated_bytes() == 0);
+
+        core::ResourcePlan refused{0};
+        rejected(c::restore_case_motion(saved, current, workspace, motion_limits, refused),
+                 core::FailureCode::ResourceExceeded);
+        CHECK(refused.allocated_bytes() == 0);
+        // Kept until all independent corruptions have been refused; these calls may not consume it.
+        return take(requalify(saved));
+    }();
+
+    const auto at = exact_time("1", memory);
+    const std::array<std::uint32_t, 1> one{1};
+    const std::array<std::uint32_t, 3> denominator{0, 0, 1U << 17U};
+    const p::RationalView unit{1, one, one}, absolute{1, one, denominator}, zero{0, {}, one};
+    std::array<c::CaseFlowComponentBudget, 36> budgets{};
+    budgets.fill({unit, absolute, zero});
+    const c::CaseMotionProjection projection{core::Precision::TwoWord, budgets};
+    for (const auto side : {Left, Right}) {
+        const auto evaluate = [&](const c::CaseMotionReady& prepared) {
+            return take(c::evaluate_case_motion(prepared, current, {stamp, at, Second, side},
+                                                projection, workspace, motion_limits, memory));
+        };
+        const auto uninterrupted = evaluate(current);
+        const auto resumed = evaluate(restored);
+        const auto& time = take(resumed.time()).get();
+        exact(time.time(), 1);
+        exact(time.translation(0, First), 4, 3);
+        exact(time.translation(0, Second), side == Left ? 1U : 5U, 3);
+        exact(time.rotation_coefficient(2, First), 1, 2);
+        CHECK(time.rotation_pi_power() == 1);
+        CHECK(time.requested_side() == side);
+        for (const auto order : {Value, First, Second}) {
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                same_enclosure(resumed.centre(axis, order), uninterrupted.centre(axis, order));
+                for (std::size_t col = 0; col < 3; ++col)
+                    same_enclosure(resumed.rotation(axis, col, order),
+                                   uninterrupted.rotation(axis, col, order));
+            }
+        }
+    }
+}
+
+TEST_CASE("The checked case clock includes knots of every declared Motion consumer",
+          "[AE-07][FD-02][FD-06][FD-07][N4-06][verification][negative]") {
+    auto base = a::root("coupled_transient");
+    const auto fixed_motion = a::parse(
+        R"({"origin":{"origin":[0,0,0],"rotation":[[1,0,0],[0,1,0],[0,0,1]]},"translation":{"kind":"constant","value":[0,0,0]},"rotation_vector":{"kind":"constant","value":[0,0,0]},"events":[]})");
+    auto& baseline_surfaces = base.field("model").field("aero_surfaces").elements;
+    auto selected = baseline_surfaces.front();
+    selected.set("id", a::string("2"));
+    auto attachment = a::parse(R"({"kind":"prescribed_motion"})");
+    attachment.set("motion", fixed_motion);
+    selected.set("attachment", attachment);
+    baseline_surfaces.insert(baseline_surfaces.begin(), selected);
+    const auto periodic = a::parse(
+        R"({"kind":"pchip","times":[0,1,2,3],"values":[[0,0,0],[1,0,0],[-1,0,0],[0,0,0]],"outside":{"kind":"periodic","period":3}})");
+    auto recurring = fixed_motion;
+    recurring.set("translation", periodic);
+    // 1.25 is an additional absolute event, not a periodic knot.
+    recurring.set("events", a::parse("[0,1,1.25,2,3]"));
+    const auto split = a::parse(
+        R"([{"start":-3.5,"end":-3,"step":0.5,"restart":"initial"},{"start":-3,"end":-2.5,"step":0.5,"restart":"event"}])");
+    const auto unsplit = a::parse(R"([{"start":-3.5,"end":-2.5,"step":0.5,"restart":"initial"}])");
+
+    const c::CaseUniformFlowLimits uniform{exact_limits(), limits.curve, 100};
+    const c::CaseClockedPrescribedLimits clock_limits{
+        {{uniform, 8, 8}, {uniform, 2048, 50'000}},
+        {{exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+         limits,
+         2048,
+         50'000},
+        budget};
+    core::ResourcePlan memory{budget};
+    aero::detail::UniformFlowWorkspace fields;
+    p::CurveWorkspace motion_workspace;
+    const auto prepare = [&](const a::JsonToken& json) {
+        const auto source = checked_case(json);
+        return c::prepare_case_clocked_prescribed_inputs(source, attachment_field(source), stamp,
+                                                         fields, motion_workspace, clock_limits,
+                                                         memory);
+    };
+    const std::array<std::uint32_t, 1> one_word{1};
+    const std::array<std::uint32_t, 2> denominator{0, 1U << 12U};
+    const p::RationalView one{1, one_word, one_word}, zero{0, {}, one_word};
+    const c::CaseFlowComponentBudget component{one, {1, one_word, denominator}, zero};
+    std::array<c::CaseFlowComponentBudget, 36> pose{};
+    std::array<c::CaseFlowComponentBudget, 9> gradient{};
+    pose.fill(component);
+    gradient.fill(component);
+    const std::array vector{component, component, component};
+    const c::CaseKnownFlowProjection ambient{core::Precision::TwoWord, vector, vector, gradient};
+    const c::CaseMotionProjection projection{core::Precision::TwoWord, pose};
+    const auto evaluate = [&](const c::CaseClockedPrescribedInputs& ready,
+                              const c::CaseClockedPrescribedInputs& current,
+                              c::CaseFlowClockQuery node) {
+        return c::evaluate_case_clocked_prescribed_inputs(ready, current, node, {zero, zero, zero},
+                                                          ambient, {}, Second, projection, fields,
+                                                          motion_workspace, clock_limits, memory);
+    };
+
+    constexpr std::array<std::string_view, 5> consumers{"another aero attachment", "point support",
+                                                        "trace support", "elastic reference",
+                                                        "gravity"};
+    for (const auto consumer : consumers) {
+        CAPTURE(consumer);
+        auto input = base;
+        auto& model = input.field("model");
+        auto& analysis = input.field("analysis");
+        auto& supports = model.field("supports").elements;
+        if (consumer == "another aero attachment") {
+            auto other = selected;
+            other.set("id", a::string("3"));
+            other.field("attachment").set("motion", recurring);
+            model.field("aero_surfaces").elements.push_back(std::move(other));
+        } else if (consumer == "point support") {
+            auto support = a::parse(
+                R"({"kind":"constraint","id":"2","target":{"target":{"kind":"shell","id":"1"},"coordinates":[0,0,0],"side":"interior"},"components":[0]})");
+            support.set("motion", recurring);
+            supports.push_back(std::move(support));
+        } else if (consumer == "trace support") {
+            auto with_rotation = fixed_motion;
+            with_rotation.set("rotation_vector", periodic);
+            with_rotation.set("events", recurring.field("events"));
+            supports.front().set("motion", std::move(with_rotation));
+        } else if (consumer == "elastic reference") {
+            auto elastic = a::parse(
+                R"({"kind":"elastic","id":"2","target":{"target":{"kind":"shell","id":"1"},"coordinates":[0,0,0],"side":"interior"},"stiffness":[[1,0,0,0,0,0],[0,1,0,0,0,0],[0,0,1,0,0,0],[0,0,0,1,0,0],[0,0,0,0,1,0],[0,0,0,0,0,1]],"damping":[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]],"frame":{"origin":[0,0,0],"rotation":[[1,0,0],[0,1,0],[0,0,1]]}})");
+            elastic.set("reference", recurring);
+            supports.push_back(std::move(elastic));
+        } else {
+            auto load = a::parse(R"({"kind":"gravity","id":"1"})");
+            load.set("acceleration", periodic);
+            analysis.field("loads").elements.push_back(std::move(load));
+        }
+
+        analysis.set("intervals", unsplit);
+        rejected(prepare(input), core::FailureCode::InvalidInput);
+        analysis.set("intervals", split);
+        const auto ready = take(prepare(input));
+        const auto current = take(prepare(input));
+        const auto archive = take(c::snapshot_case_clocked_prescribed_inputs(
+            ready, fields, motion_workspace, clock_limits, memory));
+        const auto restored = take(c::restore_case_clocked_prescribed_inputs(
+            archive, current, fields, motion_workspace, clock_limits, memory));
+        for (const auto address : {c::CaseFlowClockQuery{stamp, 0, 1, Left},
+                                   c::CaseFlowClockQuery{stamp, 1, 0, Right}}) {
+            const auto sample = take(evaluate(restored, current, address));
+            const auto& jet = take(sample.motion.time()).get();
+            exact(sample.ambient.time(), 3, 1, -1);
+            exact(jet.time(), 3, 1, -1);
+            CHECK(jet.requested_side() == address.side);
+            CHECK(sample.ambient.requested_side() == address.side);
+            exact(jet.translation(0, Second), 0);
+        }
+        rejected(evaluate(restored, current, {stamp, 0, 1, Right}),
+                 core::FailureCode::InvalidInput);
+
+        if (consumer == "trace support") {
+            auto different = input;
+            different.field("model")
+                .field("supports")
+                .elements.front()
+                .field("motion")
+                .field("rotation_vector")
+                .set("values", a::parse("[[0,0,0],[2,0,0],[-2,0,0],[0,0,0]]"));
+            const auto altered = take(prepare(different));
+            rejected(c::restore_case_clocked_prescribed_inputs(
+                         archive, altered, fields, motion_workspace, clock_limits, memory),
+                     core::FailureCode::StaleGeneration);
+
+            supports.front().field("motion").set("events", a::parse("[-3.25,0,1,1.25,2,3]"));
+            analysis.set(
+                "intervals",
+                a::parse(
+                    R"([{"start":-3.5,"end":-3.25,"step":0.25,"restart":"initial"},{"start":-3.25,"end":-3,"step":0.25,"restart":"event"},{"start":-3,"end":-2.5,"step":0.5,"restart":"event"}])"));
+            const auto with_absolute = take(prepare(input));
+            for (const auto node : {c::CaseFlowClockQuery{stamp, 0, 1, Left},
+                                    c::CaseFlowClockQuery{stamp, 1, 0, Right}}) {
+                const auto actual = take(evaluate(with_absolute, with_absolute, node));
+                exact(actual.ambient.time(), 13, 4, -1);
+                CHECK(take(actual.motion.time()).get().requested_side() == node.side);
+            }
+        }
+
+        // Here -2 is a periodic knot at the first endpoint. The extra absolute
+        // event 1.25 would be inside the interval if incorrectly repeated as -1.75.
+        analysis.set("intervals",
+                     a::parse(R"([{"start":-2,"end":-1.5,"step":0.5,"restart":"initial"}])"));
+        REQUIRE(prepare(input));
+    }
 }

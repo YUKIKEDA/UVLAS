@@ -13,6 +13,44 @@ constexpr auto operation = core::Operation::SolveLinear;
 auto fail(core::FailureCode code) noexcept {
     return std::unexpected(core::Failure{code, operation});
 }
+core::Result<void> solve_transposed_columns(const SparseReal& factor, std::span<double> work,
+                                            bool upper, bool unit_diagonal) noexcept {
+    const auto row_indices = factor.row_indices();
+    const auto values = factor.values();
+    const auto offsets = factor.column_offsets();
+    const auto n = work.size();
+    for (std::size_t step = 0; step < n; ++step) {
+        const auto column = upper ? step : n - 1 - step;
+        const auto begin = static_cast<std::size_t>(offsets[column]);
+        const auto end = static_cast<std::size_t>(offsets[column + 1]);
+        if (begin == end) {
+            return fail(core::FailureCode::FactorizationFailed);
+        }
+        const auto diagonal = upper ? end - 1 : begin;
+        if (row_indices[diagonal] != static_cast<core::Index>(column)) {
+            return fail(core::FailureCode::FactorizationFailed);
+        }
+        const double pivot = values[diagonal];
+        if (!unit_diagonal && (pivot == 0 || !std::isfinite(pivot))) {
+            return fail(core::FailureCode::RankUnresolved);
+        }
+        double value = work[column];
+        for (auto slot = upper ? begin : begin + 1; slot < (upper ? diagonal : end); ++slot) {
+            value -= values[slot] * work[static_cast<std::size_t>(row_indices[slot])];
+            if (!std::isfinite(value)) {
+                return fail(core::FailureCode::Nonfinite);
+            }
+        }
+        if (!unit_diagonal) {
+            value /= pivot;
+        }
+        if (!std::isfinite(value)) {
+            return fail(core::FailureCode::Nonfinite);
+        }
+        work[column] = value;
+    }
+    return {};
+}
 } // namespace
 
 core::Result<SparseTriangularFactors> extract_sparse_lu(const SparseLuFactor& factor,
@@ -225,8 +263,8 @@ core::Result<SparseTriangularFactors> extract_sparse_llt(const SparseLltFactor& 
 
 core::Result<void> solve_sparse_triangular(const SparseTriangularFactors& factors,
                                            std::span<const double> rhs, core::Index columns,
-                                           std::span<double> work,
-                                           std::span<double> output) noexcept {
+                                           std::span<double> work, std::span<double> output,
+                                           LinearSystemOrientation orientation) noexcept {
     const auto n = factors.lower.rows();
     const auto count = core::checked_extent_product(std::array{n, columns}, operation);
     if (!count) {
@@ -253,6 +291,11 @@ core::Result<void> solve_sparse_triangular(const SparseTriangularFactors& factor
     if (n == 0 || columns == 0) {
         return {};
     }
+    const bool transposed = orientation == LinearSystemOrientation::Transpose;
+    const auto rows = factors.row_old_to_factor.values();
+    const auto columns_map = factors.column_old_to_factor.values();
+    const auto rhs_map = transposed ? columns_map : rows;
+    const auto output_map = transposed ? rows : columns_map;
     const auto l_offsets = factors.lower.column_offsets();
     const auto l_rows = factors.lower.row_indices();
     const auto l_values = factors.lower.values();
@@ -266,63 +309,72 @@ core::Result<void> solve_sparse_triangular(const SparseTriangularFactors& factor
             if (!std::isfinite(rhs[index])) {
                 return fail(core::FailureCode::Nonfinite);
             }
-            work[start +
-                 static_cast<std::size_t>(
-                     factors.row_old_to_factor.values()[static_cast<std::size_t>(original)])] =
+            work[start + static_cast<std::size_t>(rhs_map[static_cast<std::size_t>(original)])] =
                 rhs[index];
         }
-        for (core::Index column = 0; column < n; ++column) {
-            const auto begin = l_offsets[static_cast<std::size_t>(column)];
-            const auto end = l_offsets[static_cast<std::size_t>(column + 1)];
-            if (begin == end || l_rows[static_cast<std::size_t>(begin)] != column) {
-                return fail(core::FailureCode::FactorizationFailed);
+        if (transposed) {
+            const auto column_work = work.subspan(start, static_cast<std::size_t>(n));
+            const auto upper = solve_transposed_columns(factors.upper, column_work, true, false);
+            if (!upper) {
+                return upper;
             }
-            auto& value = work[start + static_cast<std::size_t>(column)];
-            if (!factors.unit_lower) {
-                value /= l_values[static_cast<std::size_t>(begin)];
+            const auto lower =
+                solve_transposed_columns(factors.lower, column_work, false, factors.unit_lower);
+            if (!lower) {
+                return lower;
             }
-            if (!std::isfinite(value)) {
-                return fail(core::FailureCode::Nonfinite);
-            }
-            for (auto entry = begin + 1; entry < end; ++entry) {
-                const auto index = static_cast<std::size_t>(entry);
-                auto& target = work[start + static_cast<std::size_t>(l_rows[index])];
-                target -= l_values[index] * value;
-                if (!std::isfinite(target)) {
+        } else {
+            for (core::Index column = 0; column < n; ++column) {
+                const auto begin = l_offsets[static_cast<std::size_t>(column)];
+                const auto end = l_offsets[static_cast<std::size_t>(column + 1)];
+                if (begin == end || l_rows[static_cast<std::size_t>(begin)] != column) {
+                    return fail(core::FailureCode::FactorizationFailed);
+                }
+                auto& value = work[start + static_cast<std::size_t>(column)];
+                if (!factors.unit_lower) {
+                    value /= l_values[static_cast<std::size_t>(begin)];
+                }
+                if (!std::isfinite(value)) {
                     return fail(core::FailureCode::Nonfinite);
                 }
+                for (auto entry = begin + 1; entry < end; ++entry) {
+                    const auto index = static_cast<std::size_t>(entry);
+                    auto& target = work[start + static_cast<std::size_t>(l_rows[index])];
+                    target -= l_values[index] * value;
+                    if (!std::isfinite(target)) {
+                        return fail(core::FailureCode::Nonfinite);
+                    }
+                }
             }
-        }
-        for (auto column = n; column > 0;) {
-            --column;
-            const auto begin = u_offsets[static_cast<std::size_t>(column)];
-            const auto end = u_offsets[static_cast<std::size_t>(column + 1)];
-            if (begin == end || u_rows[static_cast<std::size_t>(end - 1)] != column) {
-                return fail(core::FailureCode::FactorizationFailed);
-            }
-            const double pivot = u_values[static_cast<std::size_t>(end - 1)];
-            if (pivot == 0 || !std::isfinite(pivot)) {
-                return fail(core::FailureCode::RankUnresolved);
-            }
-            auto& value = work[start + static_cast<std::size_t>(column)];
-            value /= pivot;
-            if (!std::isfinite(value)) {
-                return fail(core::FailureCode::Nonfinite);
-            }
-            for (auto entry = begin; entry < end - 1; ++entry) {
-                const auto index = static_cast<std::size_t>(entry);
-                auto& target = work[start + static_cast<std::size_t>(u_rows[index])];
-                target -= u_values[index] * value;
-                if (!std::isfinite(target)) {
+            for (auto column = n; column > 0;) {
+                --column;
+                const auto begin = u_offsets[static_cast<std::size_t>(column)];
+                const auto end = u_offsets[static_cast<std::size_t>(column + 1)];
+                if (begin == end || u_rows[static_cast<std::size_t>(end - 1)] != column) {
+                    return fail(core::FailureCode::FactorizationFailed);
+                }
+                const double pivot = u_values[static_cast<std::size_t>(end - 1)];
+                if (pivot == 0 || !std::isfinite(pivot)) {
+                    return fail(core::FailureCode::RankUnresolved);
+                }
+                auto& value = work[start + static_cast<std::size_t>(column)];
+                value /= pivot;
+                if (!std::isfinite(value)) {
                     return fail(core::FailureCode::Nonfinite);
+                }
+                for (auto entry = begin; entry < end - 1; ++entry) {
+                    const auto index = static_cast<std::size_t>(entry);
+                    auto& target = work[start + static_cast<std::size_t>(u_rows[index])];
+                    target -= u_values[index] * value;
+                    if (!std::isfinite(target)) {
+                        return fail(core::FailureCode::Nonfinite);
+                    }
                 }
             }
         }
         for (core::Index original = 0; original < n; ++original) {
-            output[start + static_cast<std::size_t>(original)] =
-                work[start +
-                     static_cast<std::size_t>(factors.column_old_to_factor
-                                                  .values()[static_cast<std::size_t>(original)])];
+            const auto index = static_cast<std::size_t>(original);
+            output[start + index] = work[start + static_cast<std::size_t>(output_map[index])];
         }
     }
     return {};

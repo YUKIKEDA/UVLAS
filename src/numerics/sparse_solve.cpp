@@ -64,6 +64,23 @@ bool same_matrix(const SparseReal& a, const SparseReal& b) noexcept {
                return std::bit_cast<std::uint64_t>(x) == std::bit_cast<std::uint64_t>(y);
            });
 }
+bool same_evaluation(const Context& original, const Context& oriented) noexcept {
+    return original.cache == oriented.cache && original.trial == oriented.trial &&
+           original.time == oriented.time;
+}
+
+bool same_scales(const Scales& requested, const detail::MetadataBuffers& original) noexcept {
+    const auto equal_scales = [](auto a, auto b) noexcept {
+        return std::ranges::equal(a, b, [](double x, double y) {
+            return std::bit_cast<std::uint64_t>(x) == std::bit_cast<std::uint64_t>(y);
+        });
+    };
+    return equal_scales(requested.unknown, original.unknown_scales.values()) &&
+           equal_scales(requested.residual, original.residual_scales.values()) &&
+           std::ranges::equal(requested.unknown_units, original.unknown_units.values()) &&
+           std::ranges::equal(requested.residual_units, original.residual_units.values());
+}
+
 struct WitnessAssessment {
     SparseSpdStatus status = SparseSpdStatus::Uncertified;
     std::optional<double> quadratic;
@@ -124,6 +141,14 @@ core::Result<WitnessAssessment> check_witness(const SparseReal& matrix,
 } // namespace
 
 namespace detail {
+struct TransposeScaleSnapshot {
+    TransposeScaleSnapshot(Context identity, MetadataBuffers buffers) noexcept
+        : context(identity), scales(std::move(buffers)) {}
+
+    Context context;
+    MetadataBuffers scales;
+};
+
 class SparsePreparedData {
 public:
     SparsePreparedData(
@@ -134,7 +159,8 @@ public:
         core::PlannedBuffer<Accumulator> sums_in,
         core::PlannedBuffer<MagnitudeBounds> magnitudes_in, core::PlannedBuffer<double> last_in,
         core::PlannedBuffer<RefinementProgress> progress_in, BackendMemoryPlan plan_in,
-        BackendAdmission admission_in, core::Index capacity_in, MetadataBuffers scales_in) noexcept
+        BackendAdmission admission_in, core::Index capacity_in, MetadataBuffers scales_in,
+        std::optional<TransposeScaleSnapshot> transpose_in) noexcept
         : original(std::move(source)),
           triangular(std::move(factors)),
           work(std::move(work_in)),
@@ -151,7 +177,8 @@ public:
           memory_plan(plan_in),
           admission(admission_in),
           capacity(capacity_in),
-          scales(std::move(scales_in)) {}
+          scales(std::move(scales_in)),
+          transpose(std::move(transpose_in)) {}
     SparseReal original;
     SparseTriangularFactors triangular;
     core::PlannedBuffer<double> work, rhs, rhs_low, residual, correction, error, denominator;
@@ -163,6 +190,7 @@ public:
     BackendAdmission admission;
     core::Index capacity;
     MetadataBuffers scales;
+    std::optional<TransposeScaleSnapshot> transpose;
     std::atomic_flag busy = ATOMIC_FLAG_INIT;
 };
 } // namespace detail
@@ -301,6 +329,21 @@ core::Result<SparsePrepared> SparsePrepared::prepare(const SparseOperator& origi
                                                      const Scales& scales, SparseMethod method,
                                                      const Limits& limits,
                                                      core::ResourcePlan& plan) noexcept {
+    return prepare_impl(original, scales, nullptr, method, limits, plan);
+}
+
+core::Result<SparsePrepared> SparsePrepared::prepare(const SparseOperator& original,
+                                                     const Scales& scales, const Scales& transposed,
+                                                     SparseMethod method, const Limits& limits,
+                                                     core::ResourcePlan& plan) noexcept {
+    return prepare_impl(original, scales, &transposed, method, limits, plan);
+}
+
+core::Result<SparsePrepared> SparsePrepared::prepare_impl(const SparseOperator& original,
+                                                          const Scales& scales,
+                                                          const Scales* transpose,
+                                                          SparseMethod method, const Limits& limits,
+                                                          core::ResourcePlan& plan) noexcept {
     auto outcome = core::guard_entry(
         operation, core::FailureCode::FactorizationFailed, {},
         [&]() -> core::Result<SparsePrepared> {
@@ -317,6 +360,16 @@ core::Result<SparsePrepared> SparsePrepared::prepare(const SparseOperator& origi
                 return std::unexpected(scale_check.error());
             }
             const auto n = original.values().rows();
+            if (transpose != nullptr) {
+                const auto transpose_check =
+                    detail::check_scale_inputs(n, *transpose, transpose->context);
+                if (!transpose_check) {
+                    return std::unexpected(transpose_check.error());
+                }
+                if (!same_evaluation(original.context(), transpose->context)) {
+                    return fail(core::FailureCode::StaleGeneration);
+                }
+            }
             const auto forecast = backend_plan(original.values());
             if (!forecast) {
                 return std::unexpected(forecast.error());
@@ -329,6 +382,15 @@ core::Result<SparsePrepared> SparsePrepared::prepare(const SparseOperator& origi
                 original.values().rows(), 0, scales, {}, plan);
             if (!scale_snapshot) {
                 return std::unexpected(scale_snapshot.error());
+            }
+            std::optional<detail::TransposeScaleSnapshot> transpose_snapshot;
+            if (transpose != nullptr) {
+                auto snapshot =
+                    detail::SolutionFactory::prepare_metadata(n, 0, *transpose, {}, plan);
+                if (!snapshot) {
+                    return std::unexpected(snapshot.error());
+                }
+                transpose_snapshot.emplace(transpose->context, std::move(*snapshot));
             }
             auto snapshot = SparseReal::copy_csc(n, n, original.values().column_offsets(),
                                                  original.values().row_indices(),
@@ -424,7 +486,8 @@ core::Result<SparsePrepared> SparsePrepared::prepare(const SparseOperator& origi
                 std::move(*rhs_low), std::move(*residual), std::move(*correction),
                 std::move(*error), std::move(*denominator), std::move(*sums),
                 std::move(*magnitudes), std::move(*last), std::move(*progress), *forecast,
-                *admitted, limits.maximum_rhs_columns, std::move(*scale_snapshot));
+                *admitted, limits.maximum_rhs_columns, std::move(*scale_snapshot),
+                std::move(transpose_snapshot));
             return SparsePrepared{std::move(data), original.context(), method};
         });
     if (!outcome) {
@@ -468,9 +531,11 @@ core::Result<bool> evaluate_sparse_columns(detail::SparsePreparedData& data,
                                            std::span<const double> x, std::span<const double> x_low,
                                            core::Index columns, const Scales& scales,
                                            const Accuracy& accuracy,
-                                           std::span<ColumnMetrics> metrics) noexcept {
+                                           std::span<ColumnMetrics> metrics,
+                                           LinearSystemOrientation orientation) noexcept {
     const auto n = data.original.rows();
     const auto& matrix = data.original;
+    const bool transposed = orientation == LinearSystemOrientation::Transpose;
     bool achieved = true;
     for (core::Index column = 0; column < columns; ++column) {
         const auto start = static_cast<std::size_t>(column * n);
@@ -493,32 +558,41 @@ core::Result<bool> evaluate_sparse_columns(detail::SparsePreparedData& data,
             }
             data.magnitudes.values()[index] = *magnitude;
         }
-        for (core::Index coordinate = 0; coordinate < n; ++coordinate) {
-            const double value = x[start + static_cast<std::size_t>(coordinate)];
-            const double low =
-                x_low.empty() ? 0 : x_low[start + static_cast<std::size_t>(coordinate)];
-            const auto absolute = detail::actual_magnitude_bounds(value, low);
+        // The prepared row buffers hold input magnitude bounds until the final residual pass.
+        for (std::size_t coordinate = 0; coordinate < static_cast<std::size_t>(n); ++coordinate) {
+            const auto i = start + coordinate;
+            const auto absolute =
+                detail::actual_magnitude_bounds(x[i], x_low.empty() ? 0 : x_low[i]);
             if (!absolute) {
                 return std::unexpected(absolute.error());
             }
-            for (auto entry = matrix.column_offsets()[static_cast<std::size_t>(coordinate)];
-                 entry < matrix.column_offsets()[static_cast<std::size_t>(coordinate + 1)];
-                 ++entry) {
+            data.denominator.values()[coordinate] = absolute->lower;
+            data.error.values()[coordinate] = absolute->upper;
+        }
+        for (std::size_t coordinate = 0; coordinate < static_cast<std::size_t>(n); ++coordinate) {
+            for (auto entry = matrix.column_offsets()[coordinate];
+                 entry < matrix.column_offsets()[coordinate + 1]; ++entry) {
                 const auto index = static_cast<std::size_t>(entry);
                 const auto row = static_cast<std::size_t>(matrix.row_indices()[index]);
-                const auto product =
-                    data.sums.values()[row].product(matrix.values()[index], value, -1);
+                const auto input = transposed ? row : coordinate;
+                const auto output = transposed ? coordinate : row;
+                const auto x_index = start + input;
+                auto& sum = data.sums.values()[output];
+                const double a = matrix.values()[index];
+                const auto product = sum.product(a, x[x_index], -1);
                 if (!product) {
                     return std::unexpected(product.error());
                 }
-                const auto low_product =
-                    data.sums.values()[row].product(matrix.values()[index], low, -1);
+                const auto low_product = sum.product(a, x_low.empty() ? 0 : x_low[x_index], -1);
                 if (!low_product) {
                     return std::unexpected(low_product.error());
                 }
-                const double a = std::abs(matrix.values()[index]);
-                data.magnitudes.values()[row] = detail::add_magnitudes(
-                    data.magnitudes.values()[row], detail::multiply_magnitudes({a, a}, *absolute));
+                const detail::MagnitudeBounds absolute{data.denominator.values()[input],
+                                                       data.error.values()[input]};
+                auto& magnitude = data.magnitudes.values()[output];
+                const double abs_a = std::abs(a);
+                magnitude = detail::add_magnitudes(
+                    magnitude, detail::multiply_magnitudes({abs_a, abs_a}, absolute));
             }
         }
         for (core::Index row = 0; row < n; ++row) {
@@ -559,6 +633,25 @@ core::Result<Solution<double>>
 solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scales& scales,
              const Precision<double>& precision, const Accuracy& accuracy, const Limits& limits,
              SparsePrepared& prepared, core::ResourcePlan& result_plan) noexcept {
+    return prepared.solve(original, rhs, scales, precision, accuracy, limits,
+                          LinearSystemOrientation::Original, result_plan);
+}
+
+core::Result<Solution<double>>
+solve_transposed_linear(const SparseOperator& original, const Rhs<double>& rhs,
+                        const Scales& scales, const Precision<double>& precision,
+                        const Accuracy& accuracy, const Limits& limits, SparsePrepared& prepared,
+                        core::ResourcePlan& result_plan) noexcept {
+    return prepared.solve(original, rhs, scales, precision, accuracy, limits,
+                          LinearSystemOrientation::Transpose, result_plan);
+}
+
+core::Result<Solution<double>> SparsePrepared::solve(const SparseOperator& original,
+                                                     const Rhs<double>& rhs, const Scales& scales,
+                                                     const Precision<double>& precision,
+                                                     const Accuracy& accuracy, const Limits& limits,
+                                                     LinearSystemOrientation orientation,
+                                                     core::ResourcePlan& result_plan) noexcept {
     auto outcome = core::guard_entry(
         operation, core::FailureCode::FactorizationFailed, {},
         [&]() -> core::Result<Solution<double>> {
@@ -566,30 +659,30 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
             if (!checked) {
                 return std::unexpected(checked.error());
             }
-            if (!prepared.active()) {
+            if (!active()) {
                 return fail(core::FailureCode::StaleGeneration);
             }
-            auto& data = *prepared.data_;
-            if (original.context() != prepared.context_ ||
-                !same_matrix(original.values(), data.original)) {
+            auto& data = *data_;
+            if (original.context() != context_ || !same_matrix(original.values(), data.original)) {
                 return fail(core::FailureCode::StaleGeneration);
             }
+            const detail::TransposeScaleSnapshot* transposed = nullptr;
+            if (orientation == LinearSystemOrientation::Transpose) {
+                if (!data.transpose) {
+                    return fail(core::FailureCode::Unsupported);
+                }
+                transposed = &*data.transpose;
+            }
+            const auto& evaluation = transposed != nullptr ? transposed->context : context_;
+            const auto& scale_snapshot = transposed != nullptr ? transposed->scales : data.scales;
             const auto n = data.original.rows();
-            const auto valid = detail::check_solve_inputs(n, 0, original.context(), rhs, scales,
-                                                          precision, accuracy, limits);
+            const auto valid = detail::check_solve_inputs(n, 0, evaluation, rhs, scales, precision,
+                                                          accuracy, limits);
             if (!valid) {
                 return std::unexpected(valid.error());
             }
-            // Scale labels alone cannot authorize replacement by different actual scales/units.
-            for (std::size_t i = 0; i < scales.unknown.size(); ++i) {
-                if (std::bit_cast<std::uint64_t>(scales.unknown[i]) !=
-                        std::bit_cast<std::uint64_t>(data.scales.unknown_scales.values()[i]) ||
-                    std::bit_cast<std::uint64_t>(scales.residual[i]) !=
-                        std::bit_cast<std::uint64_t>(data.scales.residual_scales.values()[i]) ||
-                    scales.unknown_units[i] != data.scales.unknown_units.values()[i] ||
-                    scales.residual_units[i] != data.scales.residual_units.values()[i]) {
-                    return fail(core::FailureCode::StaleGeneration);
-                }
+            if (!same_scales(scales, scale_snapshot)) {
+                return fail(core::FailureCode::StaleGeneration);
             }
             const auto* binary_source = std::get_if<Binary64<double>>(&rhs.values().storage());
             const auto* pair_source = std::get_if<TwoWord<double>>(&rhs.values().storage());
@@ -653,7 +746,7 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
             }
             auto solved = detail::solve_sparse_triangular(
                 data.triangular, data.rhs.values().first(count), shape.columns, data.work.values(),
-                values->values());
+                values->values(), orientation);
             if (!solved) {
                 return std::unexpected(solved.error());
             }
@@ -663,7 +756,7 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
             if (two) {
                 solved = detail::solve_sparse_triangular(
                     data.triangular, data.rhs_low.values().first(count), shape.columns,
-                    data.work.values(), data.correction.values().first(count));
+                    data.work.values(), data.correction.values().first(count), orientation);
                 if (!solved) {
                     return std::unexpected(solved.error());
                 }
@@ -681,7 +774,8 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
             while (true) {
                 const auto metrics = evaluate_sparse_columns(
                     data, values->values(), two ? low_values->values() : std::span<const double>{},
-                    shape.columns, scales, accuracy, metadata->retained_columns.values());
+                    shape.columns, scales, accuracy, metadata->retained_columns.values(),
+                    orientation);
                 if (!metrics) {
                     return std::unexpected(metrics.error());
                 }
@@ -707,7 +801,7 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
                 }
                 solved = detail::solve_sparse_triangular(
                     data.triangular, data.residual.values().first(count), shape.columns,
-                    data.work.values(), data.correction.values().first(count));
+                    data.work.values(), data.correction.values().first(count), orientation);
                 if (!solved) {
                     return std::unexpected(solved.error());
                 }
@@ -809,9 +903,9 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
                     }
                     projected_values->values()[i] = projected_value;
                 }
-                const auto checked_projection =
-                    evaluate_sparse_columns(data, projected_values->values(), {}, shape.columns,
-                                            scales, accuracy, metadata->returned_columns.values());
+                const auto checked_projection = evaluate_sparse_columns(
+                    data, projected_values->values(), {}, shape.columns, scales, accuracy,
+                    metadata->returned_columns.values(), orientation);
                 if (!checked_projection) {
                     return std::unexpected(checked_projection.error());
                 }
@@ -826,7 +920,7 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
                 }
                 projected.emplace(std::move(*output));
             }
-            const detail::Finalization context{original.context(),
+            const detail::Finalization context{evaluation,
                                                rhs.cache_request().rhs,
                                                rhs.values().generation(),
                                                accuracy,
@@ -834,7 +928,8 @@ solve_linear(const SparseOperator& original, const Rhs<double>& rhs, const Scale
                                                *admitted,
                                                corrections,
                                                retention,
-                                               NotEvaluated{}};
+                                               NotEvaluated{},
+                                               orientation};
             return detail::SolutionFactory::finalize(std::move(*retained), std::move(projected),
                                                      precision, std::move(*metadata), context);
         });

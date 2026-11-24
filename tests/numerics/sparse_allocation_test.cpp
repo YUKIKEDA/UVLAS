@@ -33,8 +33,13 @@ TEST_CASE("Prepared sparse triangular kernel allocates no C++ or Eigen storage",
     std::array<double, 2> work{}, output{};
     AllocationAudit audit{strict_kernel_backends, AuditThreadDomain::CallingThread};
     auto solved = solve_sparse_triangular(*factors, rhs, 1, work, output);
+    std::array<double, 2> transposed{};
+    const auto dual = solve_sparse_triangular(*factors, rhs, 1, work, transposed,
+                                              numerics::linear::LinearSystemOrientation::Transpose);
     const auto observed = audit.finish();
     REQUIRE(solved);
+    REQUIRE(dual);
+    CHECK(transposed == output);
     CHECK(observed.status == AllocationAuditStatus::Clean);
     CHECK(observed.cpp_allocation_attempts == 0);
     CHECK(output[0] == 1);
@@ -49,7 +54,7 @@ TEST_CASE("Sparse refinement adds no allocations beyond fixed owning result prep
     const std::array<Triplet, 1> entries{{{0, 0, 3}}};
     auto matrix = fixture.matrix(1, entries);
     const SparseOperator original{matrix, context()};
-    auto prepared = take(SparsePrepared::prepare(original, fixture.scales(),
+    auto prepared = take(SparsePrepared::prepare(original, fixture.scales(), fixture.scales(),
                                                  SparseMethod::GeneralLu, limits(), fixture.plan));
     const std::array right{1.0};
     auto b = fixture.rhs(1, 1, right);
@@ -72,4 +77,13 @@ TEST_CASE("Sparse refinement adds no allocations beyond fixed owning result prep
     CHECK(binary_allocations.cpp_allocation_attempts == pair_allocations.cpp_allocation_attempts);
     // Six metadata arrays and two owning solution planes are prepared before either kernel.
     CHECK(pair_allocations.cpp_allocation_attempts == 8);
+
+    AllocationAudit transpose{strict_kernel_backends, AuditThreadDomain::CallingThread};
+    auto dual = solve_transposed_linear(original, rhs, fixture.scales(), fixture.precision(),
+                                        demand, limits(), prepared, fixture.plan);
+    const auto dual_allocations = transpose.finish();
+    REQUIRE(dual);
+    CHECK(dual->values().precision() == core::Precision::TwoWord);
+    CHECK(dual_allocations.status == AllocationAuditStatus::AllocationObserved);
+    CHECK(dual_allocations.cpp_allocation_attempts == 8);
 }

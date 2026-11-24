@@ -1,0 +1,132 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-prescribed-motion-resume-v1",
+  "ids": [
+    "AE-07",
+    "FD-05",
+    "FD-06",
+    "IO4-06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "c9f0f8f396462db1ec07d4e665a409e697725bd3",
+  "claimed_state": "Owned typed snapshot of exact prescribed-motion inputs and coefficients, requalification against an independently prepared current case. J1 file mapping and accepted history are separate.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 8/8 per configuration. Coupling suite 48.45 s in Debug and 8.59 s in Release.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, affected CTest 8/8. Coupling suite 5.01 s.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "coupling.case_motion",
+      "coupling.case_motion_frame",
+      "coupling.case_motion_time_series",
+      "aero.pchip_curve",
+      "io.si_case",
+      "io.si_case_resources",
+      "io.si_interval"
+    ],
+    "catch": "Prescribed Motion restores owned exact inputs and requalifies saved coefficients, 342 assertions in one case per configuration, seed 23.",
+    "oracle": "At the absolute event t=1 s the independent Hermite derivatives are 4/3 and left 1/3, right 5/3. Rotation angle rate pi/2. All 36 pose components (values and two orders) are compared between restored and original by exact TwoWord bits, exponent and radius on both sides.",
+    "negative": "With the original case identity retained, independently alter the PCHIP raw samples, boundary policy, generated coefficient, Frame origin or proper rotation, polynomial coefficient or domain, pi factor, exact event or demand endpoint, and formula version. Zero budget or work prevents activation. Reuse the original saved data after rejection.",
+    "mutation": "An isolated GCC 14 build replaced PCHIP requalification by normal prepare, which omits comparing the saved coefficient. One assertion detected unexpected success (exit 42); exact-byte restore and rebuild passed all 342 assertions.",
+    "static": "Pinned clang-format 21.1.2 and both Windows and Linux clang-tidy 21.1.1 for five modified translation units, fingerprint and trace-check."
+  },
+  "sources": {
+    "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
+    "docs/specs/foundation/checkpoint-manifest-contract.md": "0c14b5624c7f41ee18ad1e408af436e83fa0604f97b24b90f2fdd62fa77f83eb",
+    "src/aero/pchip_curve.cpp": "f4c6b6f402b8654bb36eff7452f3bf9d9f21d9dc4cacf4387e441a97e8ed67c2",
+    "src/aero/pchip_curve.hpp": "343036850180b7472e4100b5521e2e69b5358778d3579896552f34b2b5d9931e",
+    "src/coupling/case_motion.cpp": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058",
+    "src/coupling/case_motion.hpp": "b85214d88aeca06a1f75cbf565f28e465acd37213f7929f395988eaed2dd24d6",
+    "src/coupling/case_motion_frame.cpp": "d45056f342fca0a9f13471e065e73341c5d790737a87c5d619110ebe3369a790",
+    "src/coupling/case_motion_time_series.cpp": "24dd8654e113f2ea7bbceafca81aac0a015ec9c6de335f77fa551b2d3a70b906",
+    "src/coupling/case_motion_time_series.hpp": "164d0443a23b99f0565b1e081ff46d38c0a689d845f766eac4bd5cd176fd671f",
+    "src/io/si_exact.cpp": "f348fa5f86812cd0d1e109ffdab02dcc89e5e535045584a68190291adf27a97b",
+    "src/io/si_exact_words.hpp": "bf2cc3503d2f50120eb98a19d0c515fe482a4ec9a3969cd36fa4b8c9d7142c66",
+    "tests/coupling/case_motion_time_series_test.cpp": "389acde2f7de461d2f8cdbe5113354c8ba2ceb03a38e6495ddab05ba845f0481"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "hint": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "sha256": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8"
+    },
+    {
+      "id": "docs/specs/foundation/checkpoint-manifest-contract.md",
+      "hint": "docs/specs/foundation/checkpoint-manifest-contract.md",
+      "sha256": "0c14b5624c7f41ee18ad1e408af436e83fa0604f97b24b90f2fdd62fa77f83eb"
+    },
+    {
+      "id": "src/aero/pchip_curve.cpp",
+      "hint": "src/aero/pchip_curve.cpp",
+      "sha256": "f4c6b6f402b8654bb36eff7452f3bf9d9f21d9dc4cacf4387e441a97e8ed67c2"
+    },
+    {
+      "id": "src/aero/pchip_curve.hpp",
+      "hint": "src/aero/pchip_curve.hpp",
+      "sha256": "343036850180b7472e4100b5521e2e69b5358778d3579896552f34b2b5d9931e"
+    },
+    {
+      "id": "src/coupling/case_motion.cpp",
+      "hint": "src/coupling/case_motion.cpp",
+      "sha256": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058"
+    },
+    {
+      "id": "src/coupling/case_motion.hpp",
+      "hint": "src/coupling/case_motion.hpp",
+      "sha256": "b85214d88aeca06a1f75cbf565f28e465acd37213f7929f395988eaed2dd24d6"
+    },
+    {
+      "id": "src/coupling/case_motion_frame.cpp",
+      "hint": "src/coupling/case_motion_frame.cpp",
+      "sha256": "d45056f342fca0a9f13471e065e73341c5d790737a87c5d619110ebe3369a790"
+    },
+    {
+      "id": "src/coupling/case_motion_frame.hpp",
+      "hint": "src/coupling/case_motion_frame.hpp",
+      "sha256": "c1263f05a87609b6b908427fb3ef3e7fcc127feb2c35d0d4ca1d1f834d48861f"
+    },
+    {
+      "id": "src/coupling/case_motion_time_series.cpp",
+      "hint": "src/coupling/case_motion_time_series.cpp",
+      "sha256": "24dd8654e113f2ea7bbceafca81aac0a015ec9c6de335f77fa551b2d3a70b906"
+    },
+    {
+      "id": "src/coupling/case_motion_time_series.hpp",
+      "hint": "src/coupling/case_motion_time_series.hpp",
+      "sha256": "164d0443a23b99f0565b1e081ff46d38c0a689d845f766eac4bd5cd176fd671f"
+    },
+    {
+      "id": "src/io/si_exact.cpp",
+      "hint": "src/io/si_exact.cpp",
+      "sha256": "f348fa5f86812cd0d1e109ffdab02dcc89e5e535045584a68190291adf27a97b"
+    },
+    {
+      "id": "src/io/si_exact_words.hpp",
+      "hint": "src/io/si_exact_words.hpp",
+      "sha256": "bf2cc3503d2f50120eb98a19d0c515fe482a4ec9a3969cd36fa4b8c9d7142c66"
+    },
+    {
+      "id": "tests/coupling/case_motion_time_series_test.cpp",
+      "hint": "tests/coupling/case_motion_time_series_test.cpp",
+      "sha256": "389acde2f7de461d2f8cdbe5113354c8ba2ceb03a38e6495ddab05ba845f0481"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/prescribed-motion-resume-v1/verification.md": "2feb4b3ba09c6ca5ffc8d135cd4ab234fc92bf708c2e9f2ed339f6bf95ad928a"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/prescribed-motion-resume-v1/verification.md",
+      "hint": "docs/verification/IM-03/prescribed-motion-resume-v1/verification.md",
+      "sha256": "2feb4b3ba09c6ca5ffc8d135cd4ab234fc92bf708c2e9f2ed339f6bf95ad928a"
+    }
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_motion_frame.hpp": {
+      "commit": "c9f0f8f396462db1ec07d4e665a409e697725bd3",
+      "sha256": "c1263f05a87609b6b908427fb3ef3e7fcc127feb2c35d0d4ca1d1f834d48861f"
+    }
+  }
+}

@@ -4,6 +4,7 @@
 #include "io/si_exact_words.hpp"
 #include "structure/pg_reference_polynomials.hpp"
 
+#include <algorithm>
 #include <ranges>
 
 namespace uvlas::coupling::detail {
@@ -259,6 +260,109 @@ core::Result<CaseMotionFrameView> CaseMotionFrame::view() const& noexcept {
         return std::unexpected(core::Failure{FailureCode::StaleGeneration, check_operation});
     const auto& saved = data_.values().front();
     return CaseMotionFrameView{saved.origin_interval, saved.rotation_interval};
+}
+
+CaseMotionFrameSnapshot::CaseMotionFrameSnapshot(
+    core::PlannedBuffer<io::detail::SiRationalWords> components, CaseMotionFrameInfo info) noexcept
+    : components_(std::move(components)), info_(info) {}
+
+core::Result<CaseMotionFrameSnapshotView> CaseMotionFrameSnapshot::view() const& noexcept {
+    const auto components = components_.values();
+    if (components.empty())
+        return std::unexpected(core::Failure{FailureCode::InvalidInput, prepare_operation});
+    CaseMotionFrameSnapshotView result{info_.source, info_.origin_component_node, {}};
+    for (std::size_t i = 0; i < result.components.size(); ++i) {
+        const auto words = components[i].view();
+        result.components[i] = {words.sign, words.numerator, words.denominator};
+    }
+    return result;
+}
+
+core::Result<CaseMotionFrameSnapshot>
+CaseMotionFrame::snapshot(const CaseMotionFrameLimits& limits, core::ResourcePlan& memory,
+                          const std::stop_token& stop,
+                          core::FailureDetails details) const noexcept {
+    return guarded(prepare_operation, details, [&]() -> core::Result<CaseMotionFrameSnapshot> {
+        m::Work work{0, limits.maximum_work, stop};
+        work.step();
+        if (data_.values().empty())
+            partition_fail(FailureCode::StaleGeneration);
+        const auto& current = data_.values().front();
+        const auto count =
+            static_cast<core::Index>(current.origin.size() + current.rotation.size());
+        auto storage =
+            partition_take(memory.allocate<io::detail::SiRationalWords>(count, prepare_operation));
+        std::size_t i = 0;
+        for (const auto parts : {std::span<const ExactRational>{current.origin},
+                                 std::span<const ExactRational>{current.rotation}}) {
+            for (const auto& value : parts) {
+                work.step();
+                const auto bits = std::max(value.numerator_bits(), value.denominator_bits());
+                if (bits > limits.exact.maximum_value_bits)
+                    partition_fail(FailureCode::ResourceExceeded);
+                const auto n = value.numerator_bits();
+                const auto d = value.denominator_bits();
+                for (const auto limbs :
+                     {n / 32U + (n % 32U != 0 ? 1U : 0U), d / 32U + (d % 32U != 0 ? 1U : 0U)})
+                    for (std::uint64_t limb = 0; limb < limbs; ++limb)
+                        work.step();
+                storage.values()[i++] =
+                    partition_take(io::detail::copy_rational_words(value, memory, stop));
+            }
+        }
+        work.step();
+        return CaseMotionFrameSnapshot{std::move(storage), info_};
+    });
+}
+
+core::Result<CaseMotionFrame>
+CaseMotionFrame::restore(const CaseMotionFrameSnapshotView& saved,
+                         const CaseMotionFrameLimits& limits, core::ResourcePlan& memory,
+                         const std::stop_token& stop, core::FailureDetails details) const noexcept {
+    return guarded(prepare_operation, details, [&]() -> core::Result<CaseMotionFrame> {
+        m::Work work{0, limits.maximum_work, stop};
+        work.step();
+        if (data_.values().empty() || !io::detail::same_identity(saved.source, info_.source) ||
+            saved.origin_component_node != info_.origin_component_node)
+            partition_fail(FailureCode::StaleGeneration);
+        const auto& current = data_.values().front();
+        std::size_t i = 0;
+        for (const auto parts : {std::span<const ExactRational>{current.origin},
+                                 std::span<const ExactRational>{current.rotation}}) {
+            for (const auto& value : parts) {
+                work.step();
+                const auto match = [&](auto left, auto right) {
+                    work.step();
+                    return left == right;
+                };
+                const auto& from_file = saved.components[i++];
+                const auto bits = std::max(value.numerator_bits(), value.denominator_bits());
+                if (bits > limits.exact.maximum_value_bits)
+                    partition_fail(FailureCode::ResourceExceeded);
+                const auto words =
+                    partition_take(io::detail::copy_rational_words(value, memory, stop));
+                const auto live = words.view();
+                if (from_file.sign != live.sign ||
+                    !std::ranges::equal(from_file.numerator, live.numerator, match) ||
+                    !std::ranges::equal(from_file.denominator, live.denominator, match))
+                    partition_fail(FailureCode::StaleGeneration);
+            }
+        }
+        auto storage = partition_take(memory.allocate<Data>(1, prepare_operation));
+        auto& result = storage.values().front();
+        const auto clone = [&](const auto& values, auto& output) {
+            for (std::size_t n = 0; n < values.size(); ++n) {
+                work.step();
+                output[n] = partition_take(values[n].clone(limits.exact, memory));
+            }
+        };
+        clone(current.origin, result.origin);
+        clone(current.rotation, result.rotation);
+        result.origin_interval = current.origin_interval;
+        result.rotation_interval = current.rotation_interval;
+        work.step();
+        return CaseMotionFrame{std::move(storage), info_};
+    });
 }
 
 core::Result<CaseMotionFrameInfo> CaseMotionFrame::info() const noexcept {

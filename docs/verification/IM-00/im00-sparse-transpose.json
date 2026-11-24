@@ -1,0 +1,103 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im00-sparse-transpose",
+  "ids": [
+    "N4-03",
+    "N4-04",
+    "N4-05",
+    "N4-06",
+    "N4-09"
+  ],
+  "package": "IM-00",
+  "date": "2026-11-24",
+  "source_commit": "5e33979a77484e8aca09ffd98413b5d4cf09fd2b",
+  "claimed_state": "準備済みの同一疎LUまたはLLTを転置三角求解・反復改良に再利用し、原の転置作用で認定した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configurations": [
+        "Release",
+        "Debug"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "eigen": "5.0.1",
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "test_configurations": [
+      "msvc_release",
+      "msvc_debug",
+      "gcc14_asan_ubsan"
+    ],
+    "runs_per_configuration": {
+      "numerics.sparse_spd": {
+        "cases": 8,
+        "assertions": 35
+      },
+      "numerics.sparse_triangular": {
+        "cases": 3,
+        "assertions": 61
+      },
+      "numerics.sparse_solve": {
+        "cases": 15,
+        "assertions": 152
+      },
+      "numerics.sparse_allocation": {
+        "cases": 2,
+        "assertions": 20
+      },
+      "numerics.dense_solve": {
+        "cases": 11,
+        "assertions": 153
+      },
+      "numerics.gmres_solve": {
+        "cases": 5,
+        "assertions": 39
+      }
+    },
+    "clang_tidy_unique_translation_units": 5,
+    "independent_adjoint_work": -45,
+    "triangular_cpp_allocation_attempts": 0,
+    "qualified_retention_cpp_allocation_attempts": {
+      "forward": 8,
+      "transpose": 8
+    },
+    "rejected_mutation": {
+      "change": "qualify both directions with original forward action while keeping transposed triangular solves",
+      "positive_source_sha256": "02ae6fe4e8042369a0bad9880cba9f50e9bef0242a24b28faa7e0bb0df4da8a9",
+      "mutated_source_sha256": "63ca81acce87496e806e357dbcce85cdeb7439b25bd4d64b11833cb418bb64df",
+      "failure": "LinearUnconverged",
+      "assertions_before_expected_failure": 7
+    }
+  },
+  "sources": {
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+    "docs/specs/foundation/sparse-solve-contract.md": "5b43eb2139f8033d2cbcf72c33e4f848f9d19235a4adf2ec30c0381c36adae96",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/foundation/sparse-transpose-contract.md": "36f58473ff4c096538fb17ab857a127e67ad2aee895068db29559031e95313e6",
+    "docs/verification/IM-00/sparse-transpose.md": "266574ef5d18c0db59f6efe802c87bb0745324dd3b06922bb70c7b068cf74373",
+    "include/uvlas/numerics/sparse_solve.hpp": "e3d93090456456d23bc30f265dedb177923c16c7db8011799373d553f0dc6cab",
+    "include/uvlas/numerics/linear_solve.hpp": "6d7a1011f8721de8fc25c8bf0a84afaa5c6810a0d56a038a409c45d92f2125fb",
+    "src/numerics/sparse_solve.cpp": "02ae6fe4e8042369a0bad9880cba9f50e9bef0242a24b28faa7e0bb0df4da8a9",
+    "src/numerics/sparse_triangular.hpp": "df2625d8fa7e71369c69496cda624a5798e96cac88dce3d02ca648a430f584c2",
+    "src/numerics/sparse_triangular.cpp": "e953015091a207de49d1c3e8562cd17ac749b3517334eb24e2f3544b70a3d05b",
+    "src/numerics/linear_solve_detail.hpp": "474fccdd3b0a490dbb8d9e8b5a738b7f6dad39e111fa982e5841044bc0ae9b46",
+    "src/numerics/linear_result.cpp": "b9feac939b591127dba00a17738e7692919e3470d955783ce20ff67b3b4e928f",
+    "tests/numerics/sparse_solve_test.cpp": "2246e3d1340a397fbc87294f17959dcd9e906de3fff271271da70513fc9ea894",
+    "tests/numerics/sparse_allocation_test.cpp": "10afe4ec386b0dad613f5e8a707fee526b17859dd40a6ec46c2382c199f9b376"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "source_commit": "8dd743b5d1387bd4730db119bd7f6d75db5e1f2f",
+  "final_qualification_source_commit": "ab9231b1edba011e1dcc470511dc77e573f1d74b",
+  "product_implementation_commit": "cec8187abd790e99857ca0bd40d54e9003bdf01c",
+  "baseline": "docs/verification/IM-01/pg-sparse-chart-series/result.json",
+  "raw_cases": [
+    {
+      "patches": 2,
+      "connections": 1,
+      "rank": 107,
+      "project_and_factor": {
+        "nanoseconds": 680369000,
+        "charged_bytes": 73584967,
+        "resident_bytes": 549150720,
+        "lifetime_peak_resident_bytes": 936976384
+      },
+      "lift": {
+        "nanoseconds": 30025600,
+        "charged_bytes": 39882,
+        "resident_bytes": 549257216,
+        "lifetime_peak_resident_bytes": 936976384
+      },
+      "transpose": {
+        "nanoseconds": 29898000,
+        "charged_bytes": 410874,
+        "resident_bytes": 549466112,
+        "lifetime_peak_resident_bytes": 936976384
+      },
+      "lift_failure": 11,
+      "lift_operation": 0,
+      "transpose_failure": 11,
+      "transpose_operation": 0,
+      "operation_zero_scope": "original coefficient qualification after SparsePrepared solve",
+      "failure_code_11": "PrecisionUnresolved",
+      "baseline_exact_lift_nanoseconds": 3985643400,
+      "baseline_exact_transpose_nanoseconds": 4136478300,
+      "baseline_exact_process_peak_resident_bytes": 936898560
+    },
+    {
+      "patches": 3,
+      "connections": 2,
+      "rank": 144,
+      "project_and_factor": {
+        "nanoseconds": 903875000,
+        "charged_bytes": 101734984,
+        "resident_bytes": 684466176,
+        "lifetime_peak_resident_bytes": 936939520
+      },
+      "lift": {
+        "nanoseconds": 49313800,
+        "charged_bytes": 53328,
+        "resident_bytes": 684572672,
+        "lifetime_peak_resident_bytes": 936939520
+      },
+      "transpose": {
+        "nanoseconds": 50529700,
+        "charged_bytes": 545744,
+        "resident_bytes": 684802048,
+        "lifetime_peak_resident_bytes": 936939520
+      },
+      "lift_failure": 11,
+      "lift_operation": 0,
+      "transpose_failure": 11,
+      "transpose_operation": 0,
+      "operation_zero_scope": "original coefficient qualification after SparsePrepared solve",
+      "failure_code_11": "PrecisionUnresolved",
+      "baseline_exact_lift_nanoseconds": 13131122800,
+      "baseline_exact_transpose_nanoseconds": 13608667500,
+      "baseline_exact_process_peak_resident_bytes": 936873984
+    },
+    {
+      "patches": 4,
+      "connections": 4,
+      "rank": 248,
+      "project_and_factor": {
+        "nanoseconds": 1936102800,
+        "charged_bytes": 222219280,
+        "resident_bytes": 821698560,
+        "lifetime_peak_resident_bytes": 936968192
+      },
+      "lift": {
+        "nanoseconds": 90924300,
+        "charged_bytes": 81648,
+        "resident_bytes": 821805056,
+        "lifetime_peak_resident_bytes": 936968192
+      },
+      "transpose": {
+        "nanoseconds": 89779100,
+        "charged_bytes": 701488,
+        "resident_bytes": 822435840,
+        "lifetime_peak_resident_bytes": 936968192
+      },
+      "lift_failure": 11,
+      "lift_operation": 0,
+      "transpose_failure": 11,
+      "transpose_operation": 0,
+      "operation_zero_scope": "original coefficient qualification after SparsePrepared solve",
+      "failure_code_11": "PrecisionUnresolved",
+      "baseline_exact_lift_nanoseconds": 39652195600,
+      "baseline_exact_transpose_nanoseconds": 37137953200,
+      "baseline_exact_process_peak_resident_bytes": 936873984
+    }
+  ],
+  "platform": {
+    "os": "Windows 11 26H2 (10.0.26300.9974)",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "assigned_logical_cpu": 2,
+    "compiler": "MSVC 19.51.36260 x64",
+    "boost": "1.92.0"
+  },
+  "budgets": {
+    "planned_bytes": 51539607552,
+    "maximum_absolute_coefficient_error": 9.313225746154785e-10,
+    "internal_absolute_residual": 1e-12,
+    "internal_component_backward": 1e-12,
+    "original_absolute_residual_and_balance": 1e-05,
+    "optional_absolute_work_error": 1e-06,
+    "maximum_visits_per_action": 2000000,
+    "maximum_backend_estimate_bytes": 536870912
+  }
+}

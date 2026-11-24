@@ -3,6 +3,7 @@
 #include <array>
 #include <charconv>
 #include <limits>
+#include <type_traits>
 
 namespace uvlas::coupling::detail {
 namespace a = aero::detail;
@@ -112,14 +113,67 @@ public:
           stop_(stop),
           details_(details) {}
 
+    void check_motions(const s::Model& model) {
+        for (core::Index i = 0; std::cmp_less(i, model.aero_surfaces.size()); ++i) {
+            charge(1);
+            const auto declared = take(model.aero_surfaces.at(i)).record().attachment.record();
+            if (const auto* prescribed = std::get_if<s::AeroAttachmentPrescribed>(&declared))
+                check_motion(prescribed->motion.record());
+        }
+        for (core::Index i = 0; std::cmp_less(i, model.supports.size()); ++i) {
+            charge(1);
+            std::visit(
+                [&](const auto& support) {
+                    using Support = std::remove_cvref_t<decltype(support)>;
+                    if constexpr (std::is_same_v<Support, s::SupportElastic>)
+                        check_motion(support.reference.record());
+                    else
+                        check_motion(support.motion.record());
+                },
+                take(model.supports.at(i)).record());
+        }
+    }
+
+    void check_loads(const s::AnalysisTransient& analysis) {
+        for (core::Index i = 0; std::cmp_less(i, analysis.loads.size()); ++i) {
+            charge(1);
+            std::visit(
+                [&](const auto& load) {
+                    using Load = std::remove_cvref_t<decltype(load)>;
+                    if constexpr (std::is_same_v<Load, s::LoadPointForce> ||
+                                  std::is_same_v<Load, s::LoadCouple>)
+                        check(load.series.record());
+                    else if constexpr (std::is_same_v<Load, s::LoadGravity>)
+                        check(load.acceleration.record());
+                    else if constexpr (std::is_same_v<Load, s::LoadCurrentExpression>)
+                        check_expression(load.expression.record());
+                    else
+                        check(load.multiplier.record());
+                },
+                take(analysis.loads.at(i)).record());
+        }
+    }
+
+    void check_events(decltype(s::Motion::events) events) {
+        for (core::Index i = 0; std::cmp_less(i, events.size()); ++i) {
+            charge(1);
+            check_absolute(
+                read_time(source_, take(events.at(i)), conversion_, memory_, stop_, details_));
+        }
+    }
+
     template <class Series>
     void check(const Series& series) {
+        charge(1);
+        if (const auto* expression = std::get_if<s::TimeSeriesExpression>(&series)) {
+            check_expression(expression->expression.record());
+            return;
+        }
         const auto* pchip = std::get_if<s::TimeSeriesPchip>(&series);
         if (pchip == nullptr)
             return;
         const auto outside = pchip->outside.record();
         const auto* periodic = std::get_if<s::OutsidePeriodic>(&outside);
-        charge(1);
         std::optional<Period> period;
         if (periodic != nullptr) {
             auto value =
@@ -139,18 +193,34 @@ public:
                     check_periodic(interval, knot, knot_words, *period);
                 continue;
             }
-            // The case schema already checks declared events. A time series
-            // (for example prescribed wake) can still have an undeclared knot.
-            for (const auto& interval : intervals_) {
-                charge(1);
-                if (take(interval.begin.compare(knot, conversion_, memory_)) < 0 &&
-                    take(knot.compare(interval.end, conversion_, memory_)) < 0)
-                    fail(InvalidInput, prepare, details_);
-            }
+            check_absolute(knot);
         }
     }
 
 private:
+    void check_absolute(const structure::ExactRational& instant) {
+        for (const auto& interval : intervals_) {
+            charge(1);
+            if (take(interval.begin.compare(instant, conversion_, memory_)) < 0 &&
+                take(instant.compare(interval.end, conversion_, memory_)) < 0)
+                fail(InvalidInput, prepare, details_);
+        }
+    }
+
+    void check_motion(const s::Motion& motion) {
+        check_events(motion.events);
+        check(motion.translation.record());
+        check(motion.rotation_vector.record());
+    }
+
+    void check_expression(const s::Expression& expression) {
+        const auto domain = expression.domain.record();
+        if (const auto* time = std::get_if<s::ExpressionDomainTime>(&domain))
+            check_events(time->events);
+        else if (const auto* current = std::get_if<s::ExpressionDomainCurrentPositionTime>(&domain))
+            check_events(current->events);
+    }
+
     struct Period {
         structure::ExactRational value;
         io::detail::SiRationalWords encoded;
@@ -305,6 +375,25 @@ struct Builder {
         }
     }
 
+    /// Both save and restore check bounds and qualifications with bind before copying.
+    static Grid copy_grid(const Grid& source, const CaseFlowClockLimits& limits,
+                          core::ResourcePlan& memory, const std::stop_token& stop,
+                          core::FailureDetails details) {
+        const auto intervals = source.intervals.values();
+        const auto size = static_cast<core::Index>(intervals.size());
+        auto copied = take(memory.allocate<Grid::Interval>(size, prepare));
+        const auto& arithmetic = limits.fields.conversion;
+        for (std::size_t i = 0; i < intervals.size(); ++i) {
+            check_stop(stop, prepare, details);
+            const auto& record = intervals[i];
+            copied.values()[i] = {take(record.begin.clone(arithmetic, memory)),
+                                  take(record.end.clone(arithmetic, memory)),
+                                  take(record.step.clone(arithmetic, memory)), record.steps,
+                                  record.restart};
+        }
+        return {source.source, source.stamp, std::move(copied)};
+    }
+
     struct Node {
         const Grid::Interval& interval;
         std::optional<structure::ExactRational> interior;
@@ -427,7 +516,6 @@ struct Builder {
         auto moving = take(prepare_prescribed_aero_attachment(
             source, attachment, {intervals.front().begin, intervals.back().end}, stamp,
             motion_workspace, limits.motion, memory, stop, details));
-        const auto motion_inputs = attachment.motion.record();
         const auto root = take(take(source.source_case()).get().root());
         // Grid and ambient preparation already qualified these variants.
         const auto ambient = std::get<s::FlowKnown>(root.flow.record());
@@ -447,8 +535,9 @@ struct Builder {
                                     memory,
                                     stop,
                                     details};
-        events.check(motion_inputs.translation.record());
-        events.check(motion_inputs.rotation_vector.record());
+        events.check_motions(root.model.record());
+        events.check_loads(transient);
+        events.check_events(ambient.events);
         events.check(ambient.uniform.record());
         if (const auto* sine = std::get_if<s::GustSine>(&gust))
             events.check(sine->amplitude.record());
@@ -460,6 +549,55 @@ struct Builder {
         }
         check_stop(stop, prepare, details);
         return {std::move(grid), std::move(flow), std::move(transport), std::move(moving)};
+    }
+
+    static CaseClockedPrescribedSnapshot
+    save(const CaseClockedPrescribedInputs& source, a::UniformFlowWorkspace& field_workspace,
+         p::CurveWorkspace& motion_workspace, const CaseClockedPrescribedLimits& limits,
+         core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details) {
+        check_stop(stop, prepare, details);
+        const auto& clock = limits.flow.clock_and_wake;
+        bind(source.grid_, source.grid_, source.grid_.stamp, clock, stop, details);
+        auto grid = copy_grid(source.grid_, clock, memory, stop, details);
+        auto ambient = take(snapshot_case_known_flow(source.ambient_, field_workspace,
+                                                     limits.flow.ambient, memory, stop, details));
+        std::optional<CasePrescribedWakeSnapshot> transport;
+        if (const auto& prescribed = source.prescribed_)
+            transport.emplace(take(snapshot_case_prescribed_wake(
+                *prescribed, field_workspace, clock.fields.flow, memory, stop, details)));
+        auto motion = take(snapshot_case_motion(source.attachment_.motion_, motion_workspace,
+                                                limits.motion, memory, stop, details));
+        check_stop(stop, prepare, details);
+        return {std::move(grid), std::move(ambient), std::move(transport), std::move(motion)};
+    }
+
+    static CaseClockedPrescribedInputs
+    restore(const CaseClockedPrescribedSnapshot& saved, const CaseClockedPrescribedInputs& current,
+            a::UniformFlowWorkspace& field_workspace, p::CurveWorkspace& motion_workspace,
+            const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
+            const std::stop_token& stop, core::FailureDetails details) {
+        check_stop(stop, prepare, details);
+        const auto& clock = limits.flow.clock_and_wake;
+        bind(saved.grid_, current.grid_, current.grid_.stamp, clock, stop, details);
+        const auto& saved_wake = saved.prescribed_;
+        const auto& live_wake = current.prescribed_;
+        if (saved_wake.has_value() != live_wake.has_value())
+            fail(StaleGeneration, prepare, details);
+        auto ambient =
+            take(restore_case_known_flow(saved.ambient_, current.ambient_, field_workspace,
+                                         limits.flow.ambient, memory, stop, details));
+        std::optional<CasePrescribedWakeReady> transport;
+        if (saved_wake && live_wake)
+            transport.emplace(
+                take(restore_case_prescribed_wake(*saved_wake, *live_wake, field_workspace,
+                                                  clock.fields.flow, memory, stop, details)));
+        auto moving =
+            take(restore_case_motion(take(saved.motion_.view()), current.attachment_.motion_,
+                                     motion_workspace, limits.motion, memory, stop, details));
+        auto grid = copy_grid(current.grid_, clock, memory, stop, details);
+        check_stop(stop, prepare, details);
+        return {std::move(grid), std::move(ambient), std::move(transport),
+                PrescribedAeroAttachment{std::move(moving)}};
     }
 
     static CaseClockedPrescribedSample
@@ -625,6 +763,28 @@ core::Result<CaseClockedPrescribedInputs> prepare_case_clocked_prescribed_inputs
     return guarded<CaseClockedPrescribedInputs>(prepare, details, [&] {
         return case_clock_detail::Builder::make(source, attachment, stamp, flow_workspace,
                                                 motion_workspace, limits, memory, stop, details);
+    });
+}
+
+core::Result<CaseClockedPrescribedSnapshot> snapshot_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedInputs& source, a::UniformFlowWorkspace& field_workspace,
+    p::CurveWorkspace& motion_workspace, const CaseClockedPrescribedLimits& limits,
+    core::ResourcePlan& memory, const std::stop_token& stop,
+    core::FailureDetails details) noexcept {
+    return guarded<CaseClockedPrescribedSnapshot>(prepare, details, [&] {
+        return case_clock_detail::Builder::save(source, field_workspace, motion_workspace, limits,
+                                                memory, stop, details);
+    });
+}
+
+core::Result<CaseClockedPrescribedInputs> restore_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedSnapshot& saved, const CaseClockedPrescribedInputs& current,
+    a::UniformFlowWorkspace& field_workspace, p::CurveWorkspace& motion_workspace,
+    const CaseClockedPrescribedLimits& limits, core::ResourcePlan& memory,
+    const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return guarded<CaseClockedPrescribedInputs>(prepare, details, [&] {
+        return case_clock_detail::Builder::restore(saved, current, field_workspace,
+                                                   motion_workspace, limits, memory, stop, details);
     });
 }
 

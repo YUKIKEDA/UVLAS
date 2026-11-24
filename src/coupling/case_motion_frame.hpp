@@ -1,6 +1,8 @@
 #pragma once
 
+#include "aero/pchip_rational_slots.hpp"
 #include "case_motion_rotation_private.hpp"
+#include "io/si_exact_words.hpp"
 
 #include <uvlas/io/si_case.hpp>
 
@@ -31,6 +33,35 @@ struct CaseMotionFrameInfo {
     std::uint64_t work;
 };
 
+/// Borrowed save of the three world-origin and nine row-major rotation components.
+struct CaseMotionFrameSnapshotView {
+    CaseMotionFrameSnapshotView(io::SchemaIdentity identity, std::uint64_t origin_node,
+                                std::array<aero::detail::pchip::RationalView, 12> values) noexcept
+        : source(identity), origin_component_node(origin_node), components(values) {}
+
+    io::SchemaIdentity source;
+    std::uint64_t origin_component_node{};
+    std::array<aero::detail::pchip::RationalView, 12> components;
+};
+
+class CaseMotionFrameSnapshot {
+public:
+    CaseMotionFrameSnapshot(CaseMotionFrameSnapshot&&) noexcept = default;
+    CaseMotionFrameSnapshot& operator=(CaseMotionFrameSnapshot&&) noexcept = default;
+    CaseMotionFrameSnapshot(const CaseMotionFrameSnapshot&) = delete;
+    CaseMotionFrameSnapshot& operator=(const CaseMotionFrameSnapshot&) = delete;
+
+    [[nodiscard]] core::Result<CaseMotionFrameSnapshotView> view() const& noexcept;
+    [[nodiscard]] core::Result<CaseMotionFrameSnapshotView> view() const&& = delete;
+
+private:
+    friend class CaseMotionFrame;
+    CaseMotionFrameSnapshot(core::PlannedBuffer<io::detail::SiRationalWords>,
+                            CaseMotionFrameInfo) noexcept;
+    core::PlannedBuffer<io::detail::SiRationalWords> components_;
+    CaseMotionFrameInfo info_;
+};
+
 /// Owns all twelve exact SI values, their interval enclosures and motion provenance.
 class CaseMotionFrame {
 public:
@@ -59,6 +90,12 @@ public:
     [[nodiscard]] core::Result<CaseMotionFrameView> view() const& noexcept;
     [[nodiscard]] core::Result<CaseMotionFrameView> view() const&& = delete;
     [[nodiscard]] core::Result<CaseMotionFrameInfo> info() const noexcept;
+    [[nodiscard]] core::Result<CaseMotionFrameSnapshot>
+    snapshot(const CaseMotionFrameLimits&, core::ResourcePlan&, const std::stop_token& = {},
+             core::FailureDetails = {}) const noexcept;
+    [[nodiscard]] core::Result<CaseMotionFrame>
+    restore(const CaseMotionFrameSnapshotView&, const CaseMotionFrameLimits&, core::ResourcePlan&,
+            const std::stop_token& = {}, core::FailureDetails = {}) const noexcept;
 
 private:
     struct Data;

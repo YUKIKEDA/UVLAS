@@ -17,8 +17,10 @@ Certificate::Certificate(
     core::PlannedBuffer<UnitDimensions> residual_units,
     core::PlannedBuffer<std::optional<ConsumerProof>> consumers,
     BackendAdmission preparation_admission, BackendAdmission solve_admission, unsigned refinements,
-    RetentionPath retention, ConditionDiagnostic condition) noexcept
+    RetentionPath retention, ConditionDiagnostic condition,
+    LinearSystemOrientation orientation) noexcept
     : context_(context),
+      orientation_(orientation),
       rhs_(rhs),
       rhs_buffer_(rhs_buffer),
       accuracy_(accuracy),
@@ -387,7 +389,8 @@ core::Result<Solution<Scalar>> SolutionFactory::finalize(
                             context.solve_admission,
                             context.refinements,
                             context.retention,
-                            context.condition};
+                            context.condition,
+                            context.orientation};
     return Solution<Scalar>{projected ? std::move(*projected) : std::move(retained),
                             std::move(certificate)};
 }

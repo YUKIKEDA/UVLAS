@@ -1,0 +1,46 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-chart-candidate",
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-04",
+    "N4-05",
+    "N4-06"
+  ],
+  "source_commit": "ab9231b1edba011e1dcc470511dc77e573f1d74b",
+  "claimed_state": "固定ピボットの単一疎因子を用いる数値候補を小規模実接続で認定し、R-02系列では原CSRの暫定境界で未認定を確認した。",
+  "checks": {
+    "assertions": 2482,
+    "msvc_release_seconds": 3.39,
+    "msvc_debug_seconds": 15.16,
+    "gcc14_asan_ubsan_seconds": 26.89,
+    "mutation": "drop all input low words",
+    "mutation_base_commit": "6547753db75fd8c6f2bf7bc15a6f9d1b7a7537aa",
+    "mutated_source_sha256": "d7c111dff845c49f638ac5a81c64f9b0f23d19b0d6dbdc509f2019cd47479047",
+    "positive_source_sha256": "89eb181dcd9f849d836b61797ff259aa2106ea778dd7837e60279501d9a721fa"
+  },
+  "sources": {
+    "docs/verification/IM-01/pg-sparse-chart-series/result.json": "9a14db55a4e5e4ed0d18956a227a7c9cdf3649fa505d373755b72def03082968",
+    "docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt": "78ef8a8e65259b473d0201efe94b7b22fa3d0c2b953a033434310aea34f3f384",
+    "docs/specs/foundation/sparse-transpose-contract.md": "36f58473ff4c096538fb17ab857a127e67ad2aee895068db29559031e95313e6",
+    "docs/specs/structure/pg-chart-support-history-contract.md": "df0dc9974e018f8fb1492a2cf8c13b2a8be524d7614b8bc1a0bcb86369e88f99",
+    "src/structure/pg_volume_position_arithmetic.hpp": "b430b347ef64d35719d55883b932743413f4a670d980b450124cd8df9955d7c0",
+    "src/structure/pg_reference_projection.hpp": "eacf129a8874d98e451e57ad2a550b186c633aee2bc02782eecbd2500f8af398",
+    "src/numerics/sparse_solve.cpp": "02ae6fe4e8042369a0bad9880cba9f50e9bef0242a24b28faa7e0bb0df4da8a9",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-chart-candidate.md": "5c49366a59b1987e3e47faa4ba40351f8d6d9225e948e9216b1f6ae1e7ff1d5d",
+    "docs/verification/IM-01/pg-chart-candidate-series/result.json": "d4b7aa5b6e8ae24f3ea8ec4259834c832ceb50d41034f2702a3d548d6bc8c3c8",
+    "docs/verification/IM-01/pg-chart-candidate-series/run-series.ps1.txt": "157d764477827836053177167d77503aece893b147a1d4292c9e416ab05b1f65",
+    "docs/verification/IM-01/pg-chart-candidate-series/measure-candidate.cpp.txt": "da07e9d9c7593721761f9f7ebed930a23002b0aed9d7c89aaf6a6f0fa35fca42",
+    "docs/specs/structure/pg-chart-numerical-candidate-contract.md": "2ad6cb9cb9ff066293477bfe544077de536cc91e63a6e542c1230fe473ccecb9",
+    "include/uvlas/structure/pg_chart_candidate.hpp": "656fb6b402cdb67abb18907fede4be95fd89474c555ac0e79d92944d960f6e19",
+    "src/structure/pg_chart_candidate.cpp": "89eb181dcd9f849d836b61797ff259aa2106ea778dd7837e60279501d9a721fa",
+    "tests/structure/pg_chart_candidate_test.cpp": "513d403da5d355fc29c1f47ca713b18174bcf717d7164dbb2e397ae2691794ea"
+  }
+}
