@@ -3,7 +3,6 @@
 #include "aero/local_geometry_bounds_private.hpp"
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
-#include "aero/query_coordinates_private.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -142,7 +141,6 @@ struct PgAeroMap::Data {
     struct Row {
         a::FacetId facet{0};
         a::QueryId query{0};
-        std::optional<a::SourceFacePoint> incidence;
         bool reverse_orientation = false;
     };
     s::PgProjectedReferenceBatch position;
@@ -183,9 +181,7 @@ core::Result<PgAeroMap> PgAeroMap::prepare_impl(
             if (limits.cancellation.stop_requested())
                 reject(Cancelled);
             const auto& row = rows[i];
-            if (row.incidence && row.incidence->facet != row.facet)
-                reject(InvalidInput);
-            rules.values()[i] = {row.facet, row.query, row.incidence, row.reverse_orientation};
+            rules.values()[i] = {row.facet, row.query, row.reverse_orientation};
         }
         auto budget = limits;
         budget.maximum_partition_visits -= material_count;
@@ -520,14 +516,6 @@ struct PgAeroBuilder {
             return take(a::resolve_query(geometry, {id, definition}, state.context, limits.geometry,
                                          coordinates, memory, stop));
         };
-        const auto exact_position = [&](const a::ResolvedQuery& query) {
-            auto budget = limits.geometry;
-            budget.max_steps = std::min(budget.max_steps, remaining(work));
-            auto exact =
-                take(a::exact_query_coordinates(geometry, query, budget, coordinates, stop));
-            account(work, exact.used_steps);
-            return exact.numerator;
-        };
         for (std::size_t i = 0; i < map.data_->rows.size(); ++i) {
             work.step();
             const auto& row = map.data_->rows.values()[i];
@@ -544,12 +532,6 @@ struct PgAeroBuilder {
                 }
             const auto position_row = ids.size() + i;
             auto query = resolve(row.query, point(xs, position_row));
-            if (row.incidence) {
-                auto source = resolve(row.query, *row.incidence);
-                if (exact_position(query) != exact_position(source))
-                    reject(GeometryInvalid);
-                query = std::move(source);
-            }
             const auto derivatives = tangents.words();
             ExplicitCollocationTangents frame{vector(derivatives, 2 * i),
                                               vector(derivatives, 2 * i + 1)};

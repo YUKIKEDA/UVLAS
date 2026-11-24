@@ -10,7 +10,7 @@ enum class PgVolumePositionDirection : std::uint8_t { ToPoints, TransposeToColum
 /// Three Cartesian components per basis column or evaluation row, contiguous in
 /// x,y,z order. Representation identifies whether the low span is required.
 struct PgCartesianWords {
-    core::Precision representation;
+    core::Precision representation{};
     std::span<const double> high;
     std::span<const double> low;
 };
@@ -84,11 +84,11 @@ private:
                                PgVolumePositionResult&) noexcept;
 
     struct MatrixView {
-        const PgConditioningCertificate* certificate;
-        std::size_t rank, rows;
+        const PgConditioningCertificate* certificate{};
+        std::size_t rank{}, rows{};
         std::span<const double> high, low;
-        std::size_t prefix;
-        double maximum_coefficient_error;
+        std::size_t prefix{};
+        double maximum_coefficient_error{};
         std::size_t column_stride = 1;
     };
 

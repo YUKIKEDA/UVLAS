@@ -53,9 +53,10 @@ using CaseMotionSeriesSnapshotView =
 
 /// Borrowed model-input save. Events and the demand window retain absolute SI time.
 struct CaseMotionTimeSnapshotView {
-    io::SchemaIdentity source;
+    io::SchemaIdentity source{{io::SourceId{0}, 0, {}}, 0, 0};
     std::uint64_t declaration_ordinal{};
-    aero::detail::pchip::PchipInputStamp stamp;
+    aero::detail::pchip::PchipInputStamp stamp{aero::detail::pchip::PchipIssuerId{0},
+                                               aero::detail::pchip::PchipInputGeneration{0}};
     std::int16_t pi_power{};
     aero::detail::pchip::RationalView begin, end;
     std::span<const aero::detail::pchip::RationalView> events;

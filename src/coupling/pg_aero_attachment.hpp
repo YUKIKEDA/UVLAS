@@ -8,13 +8,11 @@
 
 namespace uvlas::coupling::detail {
 
-/// Physical face and its fixed structural collocation. A detached point uses
-/// the actual PG coordinates. A source expression, when supplied, must agree
-/// with the same PG position on the contact-qualified finite facet.
+/// Physical face and its fixed structural collocation. Location uses the
+/// actual PG coordinates without claiming a piecewise-affine material stencil.
 struct PgAeroCollocation {
     aero::detail::FacetId facet{0};
     aero::detail::QueryId query{0};
-    std::optional<aero::detail::SourceFacePoint> incidence;
     bool reverse_orientation = false;
 };
 

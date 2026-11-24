@@ -4090,7 +4090,7 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
         a::prepare_owned_geometry(reference, test_geometry::limits(), *geometry_work, memory));
     const auto topology = take_global(
         a::build_global_topology(geometry, topology_input, global_limits, *global, memory));
-    const std::array roles{cf::PgAeroCollocation{a::FacetId{200}, a::QueryId{501}, {}}};
+    const std::array roles{cf::PgAeroCollocation{a::FacetId{200}, a::QueryId{501}}};
     constexpr auto format = core::Precision::TwoWord;
     constexpr st::PgPreparedReferenceProjection projection{format, 1e-26, 1e-26,
                                                            1e-24,  1e-24, 1e-24};
@@ -4126,10 +4126,6 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     auto wrong_state = state;
     wrong_state.context.current = core::GeometryGeneration{999};
     reject(run(map, wrong_state), core::FailureCode::StaleGeneration);
-    auto wrong_incidence = roles;
-    wrong_incidence[0].incidence.emplace(a::FacetId{200}, a::SingleWord{.375}, a::SingleWord{.375});
-    const auto impostor = take(prepare(wrong_incidence));
-    reject(run(impostor, state), core::FailureCode::GeometryInvalid);
     const auto trial = take(run(map, state));
     const auto& contact = take(trial.contact()).get();
     const auto& current = take_global(contact.geometry()).get();
@@ -4328,4 +4324,29 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     const double source_mps = 127. / 12500.;
     residual_expected(take(residual.row(0)).residual,
                       rational_word((source_mps - 9. / 16.) / std::sqrt(2.)), rational_word(1e-15));
+    // The same provider remains usable for exact planar points, without
+    // claiming the sampled PG point has a facet interpolation stencil.
+    auto planar_high = q_high;
+    auto planar_low = q_low;
+    for (std::size_t i = 2; i < planar_high.size(); i += 3) {
+        planar_high[i] = 0.;
+        planar_low[i] = 0.;
+    }
+    auto planar_state = state;
+    planar_state.position = {format, planar_high, planar_low};
+    const auto planar = take(run(map, planar_state));
+    const std::array planar_rows{take(planar.collocation(0))};
+    CHECK(std::holds_alternative<a::FreePoint>(
+        test_geometry::take(planar_rows[0].query.definition()).definition));
+    const cf::DiscreteNonpenetrationInput planar_input{
+        take(planar.contact()).get(),   planar_rows, {},
+        {core::AcceptedStateId{2}, {}}, state.stamp, stamp,
+        p::RequestedSide::Automatic};
+    auto planar_flow =
+        take(cf::project_case_uniform_flow(evaluate(provider, provider, flow_workspace, time),
+                                           {format, budgets, budgets, {4096, budget}}));
+    const auto planar_residual = take(cf::evaluate_discrete_nonpenetration(
+        planar_input, std::move(planar_flow), load_limits, shared, *local, *kernel, memory));
+    residual_expected(take(planar_residual.row(0)).residual, Rat{127, 12500} - Rat{9, 16},
+                      rational_word(1e-15));
 }
