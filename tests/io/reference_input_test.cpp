@@ -1531,6 +1531,8 @@ $EndElements
     bool contradictory_group_thickness = false;
     bool partial_pshell = false;
     bool wrong_pshell_thickness = false;
+    enum class Corners { None, Absolute, Fraction, WrongFraction, MissingBase, MixedMaterial };
+    Corners corners = Corners::None;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1663,6 +1665,28 @@ $EndElements
         partial_pshell = true;
         wrong_pshell_thickness = true;
     }
+    SECTION("Absolute triangle corner thickness and omitted corners bind to the Case") {
+        physical = true;
+        corners = Corners::Absolute;
+    }
+    SECTION("Native quadrilateral thickness factors own the value and the scale position") {
+        physical = true;
+        corners = Corners::Fraction;
+    }
+    SECTION("A wrong native corner fraction is distinguished from a uniform property") {
+        physical = true;
+        corners = Corners::WrongFraction;
+    }
+    SECTION("Fractional corner thickness requires the referenced PSHELL thickness") {
+        physical = true;
+        corners = Corners::MissingBase;
+    }
+    SECTION("Separate membrane and bending materials have no Case total thickness match") {
+        physical = true;
+        corners = Corners::MixedMaterial;
+    }
+    const bool corner_claim = corners != Corners::None;
+    const bool quad = corner_claim && corners != Corners::Absolute;
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1723,7 +1747,15 @@ $EndElements
         sidecar["units"] = {{"length", "m"}, {"mass", "kg"}, {"time", "s"}, {"angle", "deg"}};
         sidecar["shells"].push_back({{"element", "702"}, {"shell", "1"}, {"chart", chart(true)}});
         sidecar["shells"].push_back({{"element", "701"}, {"shell", "1"}, {"chart", chart(false)}});
+        if (quad) {
+            sidecar["shells"].erase(0);
+            auto& vertices = sidecar["shells"][0]["chart"]["vertices"];
+            vertices.push_back(nlohmann::json::array({zero, one}));
+        }
         sidecar["materials"] = nlohmann::json::array({{{"mid", "6"}, {"material", "1"}}});
+        if (corners == Corners::MixedMaterial) {
+            sidecar["materials"].push_back({{"mid", "9"}, {"material", "1"}});
+        }
         if (pcomp) {
             sidecar["materials"].push_back(
                 {{"mid", "9"}, {"material", wrong_layer_material ? "1" : "2"}});
@@ -1785,6 +1817,25 @@ $EndElements
         replace_group("$Elements\n3 4 501 999\n", "$Elements\n4 4 501 999\n");
         replace_group("2 17 2 2\n702 10 40 99\n701 10 20 40\n",
                       "2 17 2 1\n702 10 40 99\n2 19 2 1\n701 10 20 40\n");
+    }
+    if (corner_claim) {
+        constexpr std::string_view original = "PSHELL,90,6,0.25\n";
+        const auto position = source_text.find(original);
+        REQUIRE(position != std::string::npos);
+        const std::string_view property = corners == Corners::MissingBase ? "PSHELL,90,6,,6,,6\n"
+                                          : corners == Corners::MixedMaterial
+                                              ? "PSHELL,90,6,0.25,9,,6\nMAT1,9,1.0,,0.0,1.0\n"
+                                              : "PSHELL,90,6,0.25,6,,6\n";
+        source_text.replace(position, original.size(), property);
+        constexpr std::string_view triangles = "CTRIA3,701,90,10,20,40\nCTRIA3,702,90,10,40,99\n";
+        const auto face_position = source_text.find(triangles);
+        REQUIRE(face_position != std::string::npos);
+        const std::string_view faces = !quad ? "CTRIA3,701,90,10,20,40,,,\n,,0,,0.5,0.5\n"
+                                               "CTRIA3,702,90,10,40,99,,,\n,,0,,0.5,\n"
+                                       : corners == Corners::WrongFraction
+                                           ? "CQUAD4,701,90,10,20,40,99,0.0,0.0\n,,1,,2.1,2.0\n"
+                                           : "CQUAD4,701,90,10,20,40,99,0.0,0.0\n,,1,,2.0,2.0\n";
+        source_text.replace(face_position, triangles.size(), faces);
     }
     if (partial_pshell) {
         constexpr std::string_view original = "CTRIA3,701,90";
@@ -1855,6 +1906,13 @@ $EndElements
             top.set("material", fixture::json(R"("2")"));
         }
         layers.push_back(std::move(top));
+    }
+    if (corner_claim) {
+        config.field("model")
+            .field("geometry")
+            .elements[0]
+            .field("thickness")
+            .set("values", fixture::json("[0.25,0.5,0.5,0.25]"));
     }
     if (partial_group || shared_group_thickness || partial_pshell) {
         config.field("model")
@@ -1971,22 +2029,26 @@ $EndElements
     }
 
     REQUIRE(result);
-    REQUIRE(result->faces().size() == 2);
+    REQUIRE(result->faces().size() == (quad ? 1U : 2U));
     CHECK_FALSE(diagnostic);
     CHECK(result->sidecar().source().source == io::SourceId{2});
     CHECK(result->sidecar().geometry() == rd::MeshGeometryId{2});
     const auto faces = result->faces();
-    CHECK(faces[0].element == 702);
+    CHECK(faces[0].element == (quad ? 701U : 702U));
     CHECK(faces[0].pg == rd::MeshGeometryId{1});
     CHECK(faces[0].shell == rd::MeshShellId{1});
-    CHECK(faces[0].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 99, 40, 0}
-                                      : std::array<std::uint64_t, 4>{10, 40, 99, 0}));
-    CHECK(faces[1].element == 701);
-    CHECK(faces[1].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 40, 20, 0}
-                                      : std::array<std::uint64_t, 4>{10, 20, 40, 0}));
-    CHECK(faces[1].sidecar_node != faces[0].sidecar_node);
     CHECK(faces[0].sidecar_row == 0);
-    CHECK(faces[1].sidecar_row == 1);
+    if (quad) {
+        CHECK(faces[0].nodes == std::array<std::uint64_t, 4>{10, 20, 40, 99});
+    } else {
+        CHECK(faces[0].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 99, 40, 0}
+                                          : std::array<std::uint64_t, 4>{10, 40, 99, 0}));
+        CHECK(faces[1].element == 701);
+        CHECK(faces[1].nodes == (reversed ? std::array<std::uint64_t, 4>{10, 40, 20, 0}
+                                          : std::array<std::uint64_t, 4>{10, 20, 40, 0}));
+        CHECK(faces[1].sidecar_node != faces[0].sidecar_node);
+        CHECK(faces[1].sidecar_row == 1);
+    }
     if (physical) {
         using namespace uvlas::structure;
         const PgReferenceLimits pg_limits{
@@ -2077,7 +2139,28 @@ $EndElements
         const auto qualified = uvlas::coupling::detail::prepare_case_external_planar_pg(
             si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr, preparation,
             qualification, workspace, plan, &failure);
-        if (wrong_layer_material) {
+        if (corners == Corners::MissingBase || corners == Corners::MixedMaterial ||
+            corners == Corners::WrongFraction) {
+            REQUIRE_FALSE(qualified);
+            CHECK(qualified.error().code == (corners == Corners::MixedMaterial
+                                                 ? core::FailureCode::Unsupported
+                                                 : core::FailureCode::InvalidInput));
+            if (corners == Corners::WrongFraction) {
+                if (const auto& detail = failure.regional_thickness) {
+                    CHECK(detail->reason == rd::ExternalPgThicknessFailure::Difference);
+                    CHECK(detail->node == 20);
+                    CHECK(detail->field);
+                    CHECK(detail->scale_field);
+                } else {
+                    FAIL("Missing native corner mismatch");
+                }
+            } else if (const auto& detail = failure.binding) {
+                CHECK(detail->element == 701);
+                CHECK(detail->byte);
+            } else {
+                FAIL("Missing property or corner diagnostic");
+            }
+        } else if (wrong_layer_material) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == core::FailureCode::InvalidInput);
             if (const auto& binding_error = failure.binding) {
@@ -2123,15 +2206,32 @@ $EndElements
             if (!pcomp) {
                 if (const auto& regional = matched_case.thickness_regions) {
                     const auto claims = regional->matches.values();
-                    REQUIRE(claims.size() == ((partial_group || partial_pshell) ? 1U : 2U));
-                    CHECK(claims.front().element == 702);
-                    CHECK(claims.front().value_metres ==
-                          fixture::take(
-                              ExactRational::from_integer_pair("1", "4", pg_limits.algebra, plan)));
+                    REQUIRE(claims.size() == ((partial_group || partial_pshell || quad) ? 1U : 2U));
+                    CHECK(claims.front().element == (quad ? 701U : 702U));
+                    const auto base = fixture::take(
+                        ExactRational::from_integer_pair("1", "4", pg_limits.algebra, plan));
+                    if (corner_claim) {
+                        const auto* samples =
+                            std::get_if<rd::ExternalPgNodalThickness>(&claims.front().value_metres);
+                        REQUIRE(samples);
+                        CHECK(samples->count == (quad ? 4U : 3U));
+                        CHECK(samples->values[0].node == 10);
+                        CHECK(samples->values[0].value_metres == base);
+                        CHECK(samples->values[0].field);
+                        CHECK_FALSE(samples->values[0].scale_field);
+                        CHECK(samples->values[1].node == (quad ? 20U : 40U));
+                        CHECK(samples->values[1].value_metres ==
+                              fixture::take(ExactRational::from_integer_pair(
+                                  "1", "2", pg_limits.algebra, plan)));
+                        CHECK(samples->values[1].field);
+                        CHECK(samples->values[1].scale_field.has_value() == quad);
+                    } else {
+                        CHECK(std::get<ExactRational>(claims.front().value_metres) == base);
+                    }
                     if (claims.size() == 2 && is_gmsh) {
                         CHECK(claims[1].sidecar_node == claims[0].sidecar_node);
                     }
-                    if (claims.size() == 2 && !is_gmsh) {
+                    if (claims.size() == 2 && !is_gmsh && !corner_claim) {
                         CHECK(claims[1].field == claims[0].field);
                     }
                 } else {
@@ -2140,6 +2240,7 @@ $EndElements
             }
             CHECK(matched_case.materials_compared == (is_gmsh                     ? 0
                                                       : (pcomp || partial_pshell) ? 2
+                                                      : corner_claim              ? 3
                                                                                   : 1));
             if (pcomp) {
                 REQUIRE_FALSE(matched_case.laminate[reversed ? 0U : 1U]);
@@ -2159,15 +2260,15 @@ $EndElements
             CHECK(matched_case.pg == rd::MeshGeometryId{1});
             if (const auto admitted = matched_case.geometry.view()) {
                 CHECK(admitted->patch == fixture::take(qualified->reference().identity()));
-                CHECK(admitted->faces.size() == 2);
-                CHECK(admitted->faces.front().element == 702);
+                CHECK(admitted->faces.size() == faces.size());
+                CHECK(admitted->faces.front().element == (quad ? 701U : 702U));
             } else {
                 FAIL("Missing owned geometric correspondence");
             }
         }
     }
     auto boundary = binding;
-    boundary.faces = 2;
+    boundary.faces = static_cast<std::uint64_t>(faces.size());
     boundary.work = result->work();
     core::ResourcePlan exact{fixture::budget};
     CHECK(rd::bind_external_mesh_sidecar(schema, *graph, rd::MeshGeometryId{2}, boundary, exact, {},
