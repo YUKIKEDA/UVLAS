@@ -117,23 +117,25 @@ void add_external(fixture::JsonToken& model, const files::Tree& tree, bool gmsh,
                    native_sidecar(gmsh, bad, std::to_string(id)).dump());
 }
 
-const rd::MeshSidecarBindingLimits binding_limits{
-    {files::limits().document,
-     {256, 256, 256, 8, 8, 4096, 8192, ExactEstimateAdmission{fixture::budget},
-      ExactTimingMode::Disabled},
-     32,
-     8,
-     32'000},
-    {4096, 16, 16, 64, 16, 16, 32'000},
-    {4096, 80, 32, 32, 256, 32'000},
-    {32, 32, 8, 32'000},
-    {32, 32, 32'000},
-    {32, 32, 32'000},
-    8,
-    32'000};
+rd::MeshSidecarBindingLimits make_binding_limits() {
+    return {{files::limits().document,
+             {256, 256, 256, 8, 8, 4096, 8192, ExactEstimateAdmission{fixture::budget},
+              ExactTimingMode::Disabled},
+             32,
+             8,
+             32'000},
+            {4096, 16, 16, 64, 16, 16, 32'000},
+            {4096, 80, 32, 32, 256, 32'000},
+            {32, 32, 8, 32'000},
+            {32, 32, 32'000},
+            {32, 32, 32'000},
+            8,
+            32'000};
+}
 
 rd::ReferencedCase read_graph(const files::Tree& tree, const fixture::JsonToken& config,
                               core::ResourcePlan& plan) {
+    const auto binding_limits = make_binding_limits();
     files::write_file(tree.root / "case.json", config.wire());
     rd::ReferenceInputDiagnostic input_problem;
     const auto input = rd::ReferenceInput::from_file(tree.root, "case.json", io::SourceId{12},
@@ -350,7 +352,7 @@ TEST_CASE("One planar Case has the same measured Shell through Nastran and Gmsh"
     pg.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
     auto& layer = model.field("shells").elements.front().field("layers").elements.front();
     layer.field("axis").field("direction").set("value", fixture::json("[0,1,0]"));
-    const auto& binding = binding_limits;
+    const auto binding = make_binding_limits();
     const auto graph = [&] {
         const files::Tree tree;
         add_external(model, tree, true, false, 2, 1);
@@ -500,7 +502,13 @@ TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
           "[FD-03][IO4-03][R-05][integration][verification][negative]") {
     using Code = core::FailureCode;
     using Reason = coupling::CaseNastranPointSupportFailure;
-    enum class Trial { Match, DifferentComponents, PrescribedMotion, DifferentPoint, Offset };
+    enum class Trial : std::uint8_t {
+        Match,
+        DifferentComponents,
+        PrescribedMotion,
+        DifferentPoint,
+        Offset
+    };
     const auto trial = GENERATE(Trial::Match, Trial::DifferentComponents, Trial::PrescribedMotion,
                                 Trial::DifferentPoint, Trial::Offset);
     CAPTURE(static_cast<unsigned>(trial));
@@ -541,6 +549,7 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     }();
     const auto schema = fixture::checked(config);
     const auto parent = fixture::take(schema.identity());
+    const auto binding_limits = make_binding_limits();
     const auto bound = fixture::take(rd::bind_external_mesh_sidecar(
         schema, graph, rd::MeshGeometryId{2}, binding_limits, plan, {}));
     const auto cards = quantities(graph, parent, io::SourceId{1}, binding_limits, plan);
@@ -574,23 +583,28 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         const auto rejected = certify({arithmetic, 2});
         REQUIRE_FALSE(rejected);
         CHECK(rejected.error().code == Code::InvalidInput);
-        REQUIRE(diagnostic);
-        CHECK(diagnostic->set == rd::NastranSupportSetId{61});
-        CHECK(diagnostic->grid == rd::NastranGridId{10});
-        REQUIRE(diagnostic->field);
-        if (trial == Trial::DifferentComponents) {
-            CHECK(diagnostic->reason == Reason::Components);
-            CHECK(diagnostic->field->byte == native.find(",1,10") + 1);
-            REQUIRE(diagnostic->cd_field);
-            CHECK(diagnostic->cd_field->byte == native.find(",12") + 1);
-        } else if (trial == Trial::PrescribedMotion) {
-            CHECK(diagnostic->reason == Reason::Motion);
-            CHECK(diagnostic->field->byte == native.find("0.001"));
+        if (const auto& problem = diagnostic) {
+            CHECK(problem->set == rd::NastranSupportSetId{61});
+            CHECK(problem->grid == rd::NastranGridId{10});
+            REQUIRE(problem->field);
+            const auto byte = [](const auto& field) { return field.byte; };
+            const auto field_byte = problem->field.transform(byte);
+            if (trial == Trial::DifferentComponents) {
+                CHECK(problem->reason == Reason::Components);
+                CHECK(field_byte == native.find(",1,10") + 1);
+                REQUIRE(problem->cd_field);
+                CHECK(problem->cd_field.transform(byte) == native.find(",12") + 1);
+            } else if (trial == Trial::PrescribedMotion) {
+                CHECK(problem->reason == Reason::Motion);
+                CHECK(field_byte == native.find("0.001"));
+            } else {
+                CHECK(problem->reason == Reason::Position);
+                CHECK(field_byte == native.find("10"));
+                if (trial == Trial::Offset)
+                    CHECK(problem->offset_byte == native.find("0.125"));
+            }
         } else {
-            CHECK(diagnostic->reason == Reason::Position);
-            CHECK(diagnostic->field->byte == native.find("10"));
-            if (trial == Trial::Offset)
-                CHECK(diagnostic->offset_byte == native.find("0.125"));
+            FAIL("Missing support diagnostic");
         }
         CHECK(fixture::take(shell.reference().identity()) == patch);
         return;
@@ -617,7 +631,8 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     REQUIRE_FALSE(stale);
     CHECK(stale.error().code == Code::StaleGeneration);
     REQUIRE(diagnostic);
-    CHECK(diagnostic->reason == Reason::Binding);
+    CHECK(diagnostic.transform([](const auto& problem) { return problem.reason; }) ==
+          Reason::Binding);
 
     const auto limited = certify({arithmetic, 1});
     REQUIRE_FALSE(limited);
@@ -646,5 +661,6 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     CHECK(terms[1].card.byte == native.find("SPC,31"));
     CHECK_FALSE(terms[0].motion);
     REQUIRE(terms[1].motion);
-    CHECK(terms[1].motion->byte == native.find("-0.0"));
+    CHECK(terms[1].motion.transform([](const auto& field) { return field.byte; }) ==
+          native.find("-0.0"));
 }

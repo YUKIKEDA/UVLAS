@@ -105,8 +105,8 @@ select_shell(Query& q, const CaseNastranPlanarPgSet& set, const in::ParsedMeshSi
                                     [&](const auto& original, const auto& current) {
                                         return q.equal(original, current);
                                     })) {
-                if (face.nastran_offset)
-                    q.detail.offset_byte = face.nastran_offset->byte;
+                q.detail.offset_byte =
+                    face.nastran_offset.transform([](const auto& offset) { return offset.byte; });
                 q.reject(Reason::Position);
             }
             return face.element;
