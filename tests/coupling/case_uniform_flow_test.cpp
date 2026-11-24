@@ -1295,6 +1295,18 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     stale = transpose_request;
     stale.scales.context.trial = core::TrialId{99};
     reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    for (const auto primal_layout :
+         {scales.context.unknown_layout, scales.context.residual_layout}) {
+        stale = transpose_request;
+        stale.scales.context.unknown_layout = primal_layout;
+        reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+        stale = transpose_request;
+        stale.scales.context.residual_layout = primal_layout;
+        reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    }
+    stale = transpose_request;
+    stale.scales.context.residual_layout = stale.scales.context.unknown_layout;
+    reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
     auto bad_units = transpose_request;
     bad_units.scales.unknown_units = velocity_units;
     reject(linearize(transpose_sense, seed, bad_units), core::FailureCode::InvalidInput);
@@ -1370,7 +1382,7 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
         residual_small(take(zero_tangent.row(i)).original_residual, Rat{0});
     }
 
-    auto relocated = std::move(solved);
+    const auto relocated = std::move(solved);
     reject(linearize(tangent_sense, {}, tangent_request), core::FailureCode::InvalidInput);
     CHECK(relocated.flow().source().jet.active());
     CHECK(abs(solution_word(tangent.solution(), 0) - tangent_reference[0]) <= rational_word(1e-14));

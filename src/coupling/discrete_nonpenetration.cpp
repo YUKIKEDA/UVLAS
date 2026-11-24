@@ -344,10 +344,17 @@ linear::Solution<double> solve_projected(const numerics::DenseReal& matrix, nume
 
 void match_linearization_context(linear::Context actual, const linear::Context& primal,
                                  bool transposed) {
-    if (transposed == (actual.cache.matrix == primal.cache.matrix))
+    const bool is_distinct_matrix = actual.cache.matrix != primal.cache.matrix;
+    if (transposed != is_distinct_matrix)
         reject(core::FailureCode::StaleGeneration);
     actual.cache.scales = primal.cache.scales;
     if (transposed) {
+        const auto is_primal_layout = [&](core::ScopeId layout) {
+            return layout == primal.unknown_layout || layout == primal.residual_layout;
+        };
+        if (is_primal_layout(actual.unknown_layout) || is_primal_layout(actual.residual_layout) ||
+            actual.unknown_layout == actual.residual_layout)
+            reject(core::FailureCode::StaleGeneration);
         actual.cache.matrix = primal.cache.matrix;
         actual.unknown_layout = primal.unknown_layout;
         actual.residual_layout = primal.residual_layout;

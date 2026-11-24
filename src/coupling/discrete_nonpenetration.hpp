@@ -229,6 +229,9 @@ solve_discrete_circulation(const DiscreteNonpenetrationInput&, ProjectedCaseUnif
 enum class CirculationSense : std::uint8_t { Tangent, Transpose };
 
 struct CirculationLinearRhs {
+    CirculationLinearRhs(aero::detail::PhysicalFaceId entity,
+                         const aero::detail::ScalarWords& words) noexcept
+        : face(entity), value(words) {}
     aero::detail::PhysicalFaceId face;
     aero::detail::ScalarWords value; ///< Fixed-circulation δR (m/s), or the dual seed (s/m²).
 };
