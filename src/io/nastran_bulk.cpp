@@ -110,6 +110,14 @@ struct Row {
                : Lexeme{line.at(first), 0};
 }
 
+[[nodiscard]] bool uses_commas(Format format) noexcept {
+    return format == Format::Free || format == Format::FreeLarge;
+}
+
+[[nodiscard]] bool has_large_fields(Format format) noexcept {
+    return format == Format::Large || format == Format::FreeLarge;
+}
+
 template <class Accept>
 void data_fields(const Line& line, Format format, Work& work, Accept accept) {
     const auto produce = [&](Lexeme token) {
@@ -119,12 +127,25 @@ void data_fields(const Line& line, Format format, Work& work, Accept accept) {
             reject(Code::InvalidInput, Reason::Field, token.position);
         accept(token);
     };
-    if (format == Format::Free) {
+    if (uses_commas(format)) {
+        const bool large = format == Format::FreeLarge;
+        std::size_t count = 0;
         for (auto comma = line.text.find(','); comma != line.text.npos;) {
             const auto first = comma + 1;
             comma = line.text.find(',', first);
             const auto end = comma == line.text.npos ? line.text.size() : comma;
-            produce(line.field(first, end - first));
+            const auto field = line.field(first, end - first);
+            if (large && count == 4) {
+                if (field.size != 0 || comma != line.text.npos)
+                    reject(Code::InvalidInput, Reason::Field, field.position);
+                break; // A delimiter after the fourth field is optional.
+            }
+            produce(field);
+            ++count;
+        }
+        if (large) {
+            for (; count < 4; ++count)
+                produce(line.field(line.text.size(), 0));
         }
         return;
     }
@@ -149,13 +170,26 @@ void data_fields(const Line& line, Format format, Work& work, Accept accept) {
             if (separator != 0)
                 reject(Code::InvalidInput, Reason::Header, row.first.position);
             row.kind = RowKind::Automatic;
-        } else if (first.front() == '+' || first.front() == '*' || first.back() == '*') {
+        } else if (first == "*") {
+            if (row.first.position.column != 1)
+                reject(Code::InvalidInput, Reason::Continuation, row.first.position);
+            row.format = Format::FreeLarge;
+            row.kind = RowKind::Automatic;
+        } else if (first.front() == '+' || first.front() == '*') {
             reject(Code::Unsupported, Reason::UnsupportedForm, row.first.position);
+        } else if (first.back() == '*') {
+            row.format = Format::FreeLarge;
+            --row.first.size;
         }
     } else {
         row.tail = line.field(field_end, 8);
         row.outgoing = label(line, field_end + 1);
         if (first.empty()) {
+            row.kind = RowKind::Automatic;
+        } else if (first == "*" || first == "*+") {
+            if (row.first.position.column != 1)
+                reject(Code::InvalidInput, Reason::Continuation, row.first.position);
+            row.format = Format::Large;
             row.kind = RowKind::Automatic;
         } else if (first.front() == '+' || first.front() == '*') {
             row.kind = RowKind::Named;
@@ -175,7 +209,7 @@ void data_fields(const Line& line, Format format, Work& work, Accept accept) {
             reject(Code::InvalidInput, Reason::Header, row.first.position);
     }
     data_fields(line, row.format, work, [&](Lexeme token) {
-        if (row.format == Format::Free) {
+        if (uses_commas(row.format)) {
             const auto value = line.text.substr(token.position.byte - line.offset, token.size);
             if (value.size() > 1 && (value.front() == '+' || value.front() == '*') &&
                 letter(value[1]))
@@ -265,8 +299,7 @@ struct Continuation {
 void link(std::span<Row> rows, std::size_t from, std::size_t to) {
     const auto& following = rows[to];
     const auto preceding = rows[from].format;
-    if (preceding != following.format &&
-        (preceding == Format::Free || following.format == Format::Free))
+    if (preceding != following.format && (uses_commas(preceding) || uses_commas(following.format)))
         reject(Code::Unsupported, Reason::UnsupportedForm, following.first.position);
     if (rows[from].next != no_row)
         reject(Code::InvalidInput, Reason::Continuation, following.first.position);
@@ -323,9 +356,17 @@ void connect(std::string_view bytes, std::span<Row> rows, std::span<Continuation
         if (row.outgoing.size != 0)
             labels[count++] = {row.outgoing, i, false};
         if (row.kind == RowKind::Automatic) {
-            if (i == 0 || rows[i - 1].tail.size != 0)
+            if (i == 0)
                 reject(Code::InvalidInput, Reason::Continuation, row.first.position);
             const auto& prior = rows[i - 1];
+            if (row.format == Format::Large) {
+                const auto marker = spelling(bytes, row.first);
+                const auto tail = marker == "*+" ? std::string_view{"+"} : std::string_view{};
+                if (prior.format != Format::Large || spelling(bytes, prior.tail) != tail)
+                    reject(Code::InvalidInput, Reason::Continuation, row.first.position);
+            } else if (prior.tail.size != 0) {
+                reject(Code::InvalidInput, Reason::Continuation, row.first.position);
+            }
             // The documented free-field continuation starts after a complete eight-field group.
             // A partial group could require implied padding before the next physical line.
             if (prior.format == Format::Free && row.format == Format::Free && prior.count % 8 != 0)
@@ -358,7 +399,7 @@ void flatten(std::string_view bytes, std::span<Row> rows, std::span<NastranBulkC
             if (row.used)
                 reject(Code::InvalidInput, Reason::Continuation, row.first.position);
             row.used = true;
-            if (row.format == Format::Large)
+            if (has_large_fields(row.format))
                 incomplete_large_group = !incomplete_large_group;
             else if (incomplete_large_group)
                 reject(Code::Unsupported, Reason::UnsupportedForm, row.first.position);

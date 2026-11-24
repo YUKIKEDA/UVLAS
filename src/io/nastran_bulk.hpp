@@ -5,7 +5,7 @@
 
 namespace uvlas::io::detail {
 
-enum class NastranBulkFormat : std::uint8_t { Small, Large, Free };
+enum class NastranBulkFormat : std::uint8_t { Small, Large, Free, FreeLarge };
 
 struct NastranBulkPosition {
     std::size_t byte = 0;   // Zero based.

@@ -203,6 +203,37 @@ TEST_CASE("Fixed continuations can change width at a complete field group",
     CHECK(view.text(points[15]).empty());
 }
 
+TEST_CASE("Large GRID entries preserve decimal fields in either adjacent spelling",
+          "[IO4-03][integration]") {
+    const auto free = std::string{"GRID*, 22, , 1.25D+1, -2.0,\n*, 3.0, , 136"};
+    const auto combined = free + "\n" + fixed("GRID*", {"24", "", "1.25D+1", "-2.0"}, 16, "+") +
+                          "\n" + fixed("*+", {"3.0", "", "136"}, 16) + "\n" +
+                          fixed("GRID*", {"26", "", "1.25D+1", "-2.0"}, 16) + "\n" +
+                          fixed("*", {"3.0", "", "136"}, 16);
+    auto source = snapshot(combined);
+    core::ResourcePlan plan{memory};
+    const auto deck = take(NastranBulkDeck::prepare(std::move(source), limits, plan, {}));
+    const auto view = take(deck.view());
+    REQUIRE(view.cards.size() == 3);
+    CHECK(view.cards[0].format == NastranBulkFormat::FreeLarge);
+    CHECK(view.cards[1].format == NastranBulkFormat::Large);
+    CHECK(view.cards[2].format == NastranBulkFormat::Large);
+    for (const auto& card : view.cards) {
+        CHECK(view.text(card.name) == "GRID");
+        const auto fields = view.data_fields(card);
+        REQUIRE(fields.size() == 8);
+        const auto x = take(view.real(fields[2]));
+        CHECK(x.decimal() == "1.25e+1");
+        CHECK(view.text(fields[3]) == "-2.0");
+        CHECK(view.text(fields[4]) == "3.0");
+        CHECK(take(view.integer(fields[6])) == 136);
+        CHECK(view.text(fields[7]).empty());
+    }
+    const auto fields = view.data_fields(view.cards[0]);
+    CHECK(fields[4].position == NastranBulkPosition{free.find("3.0"), 2, 4});
+    CHECK(fields[7].position == NastranBulkPosition{free.size(), 2, 14});
+}
+
 TEST_CASE("The checked lexical limits count padding and preserve the snapshot on failure",
           "[IO4-03][N4-02][negative]") {
     const auto text = std::string{"GRID    42\nSPC1,1, 12,,45,"};
@@ -281,8 +312,18 @@ TEST_CASE("Ambiguous forms and inconsistent continuation graphs fail visibly",
     SECTION("orphan named small field") {
         text = "+LOST   12\n";
     }
-    SECTION("large format has two named halves at minimum") {
+    SECTION("large fixed entries require a complete pair of half-lines") {
         text = "GRID*   12\n";
+    }
+    SECTION("large free entries require a complete pair of half-lines") {
+        text = "GRID*,11,,1.0,-2.0,\n";
+    }
+    SECTION("large free entries cannot place a fifth data field on one line") {
+        text = "GRID*,11,,1.0,-2.0,3.0\n*,1.0\n";
+    }
+    SECTION("fixed adjacent plus markers must match") {
+        text = fixed("GRID*", {"11"}, 16) + "\n" + fixed("*+", {"2.0"}, 16);
+        line = 2;
     }
     SECTION("explicit tail marker cannot disappear") {
         text = fixed("GRID", {"12"}, 8, "+LOST");
