@@ -1,0 +1,55 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-product-volume-rule",
+  "ids": [
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "527ee84046e36ec4d731a3c53f319bd927f04713",
+  "claimed_state": "40の分割体積に正重みの積則を適用し、切断曲面の幾何体積を独立な連続積分と比較した。",
+  "checks": {
+    "volumes": 40,
+    "coarse_points": 320,
+    "fine_points": 1000,
+    "normalized_volume_absolute_tolerance": "1e-12",
+    "product_assertions": 1746,
+    "windows": {
+      "compiler": "MSVC 19.51",
+      "configuration": "Release",
+      "ctest_targets_passed": 5,
+      "product_seconds": 54.38
+    },
+    "linux": {
+      "compiler": "GCC 14.2",
+      "configuration": "Release",
+      "ctest_targets_passed": 5,
+      "product_seconds": 38.56
+    },
+    "rejected_mutations": [
+      {
+        "change": "omit the triangle Jacobian",
+        "expected": "3/28",
+        "obtained": "1/7"
+      },
+      {
+        "change": "omit the layer-depth weight",
+        "expected": "3/28",
+        "obtained": "3/16"
+      }
+    ]
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-product-volume-rule-contract.md": "cadb1b693e5041a0e0f84f0c027f81269cf822db26669817f1098c9f8f25b4bf",
+    "docs/verification/IM-01/pg-product-volume-rule.md": "b510d845f2811edb15b52ae8b869af2857af591e7ecbdbcd3c1be48ca9183e91",
+    "include/uvlas/structure/pg_discrete_gram.hpp": "6ec1d311ec2f7720150a107cc1937b511b6d24af973eb885307e24e6514f462d",
+    "src/structure/pg_discrete_gram.cpp": "4d9989706721f17aaf30c0ce4495ad1b41647105b0256ded57698bef698f4d76",
+    "tests/CMakeLists.txt": "1127de1e9832cba15431897da98f532566e18ab6c34e22f834bb8008a529b616",
+    "tests/structure/pg_discrete_gram_test.cpp": "dbd0007578d8751e41fc3b6b9b1de4e6a76401252e1fb328f701ce91f44e9d73",
+    "tests/structure/pg_product_quadrature_test.cpp": "5568c93dd779ebb986f818e7c98c6187f1aea1d8259636043603b54ad3bb89e2"
+  }
+}
