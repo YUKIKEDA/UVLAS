@@ -68,6 +68,7 @@ enum class ExternalPgFailure : std::uint8_t {
     Coverage,
     Planarity,
     SourceWinding,
+    EdgeIncidence,
 };
 
 struct ExternalPgDiagnostic {
