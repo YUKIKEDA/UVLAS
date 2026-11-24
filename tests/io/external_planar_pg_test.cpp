@@ -569,4 +569,57 @@ TEST_CASE("Irrational Nastran shell placement bounds the whole oriented planar P
     CHECK(take(diagnostic).node == 95);
 }
 
+TEST_CASE("Nastran face bounds include the interior gap from a curved PG graph",
+          "[IO4-03][IO4-04][SH-D02][N4-02][integration][negative][verification]") {
+    Fixture fixture;
+    core::ResourcePlan plan{budget};
+    const auto target = pg(fixture, plan, true);
+    const Corners c{fixture};
+    const std::array ring{ExternalPgCorner{10, c.a}, ExternalPgCorner{40, c.b},
+                          ExternalPgCorner{90, c.c}, ExternalPgCorner{95, c.d}};
+    const std::array second{ring[0], ring[2], ring[3]};
+    const std::array reversed{ring[0], ring[3], ring[2], ring[1]};
+    const std::array quad{ExternalPgFace{101, Winding::Forward, ring}};
+    const std::array split{ExternalPgFace{201, Winding::Forward, std::span{ring}.first(3)},
+                           ExternalPgFace{202, Winding::Forward, second}};
+    const std::array reverse{ExternalPgFace{102, Winding::Reversed, reversed}};
+    const std::array wrong{ExternalPgFace{102, Winding::Forward, reversed}};
+    const auto deck = cards("CQUAD4,101,20,10,40,90,95\nCQUAD4,102,20,10,95,90,40\n"
+                            "CTRIA3,201,20,10,40,90\nCTRIA3,202,20,10,90,95\n",
+                            plan);
+    const NastranPgBoundLimits limits{{reference_limits(), 2}, 200'000};
+    std::optional<ExternalPgDiagnostic> diagnostic;
+    const auto measure = [&](std::span<const ExternalPgFace> selection) {
+        return NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Millimetre, selection,
+                                              limits, plan, &diagnostic);
+    };
+    const auto compare = [&](const ExactRational& actual, const ExactRational& bound) {
+        return take(actual.compare(bound, algebra(), plan));
+    };
+    // The two positions agree at every corner; the extra height is
+    // 2*(s^2-s)/10000 m, so the whole-face maximum is attained at s=1/2.
+    for (const auto selection :
+         {std::span<const ExternalPgFace>{quad}, std::span<const ExternalPgFace>{split},
+          std::span<const ExternalPgFace>{reverse}}) {
+        const auto result = take(measure(selection));
+        const auto view = take(result.view());
+        CHECK(view.patch == take(target.identity()));
+        CHECK(view.faces.size() == selection.size());
+        for (const auto& face : view.faces) {
+            CHECK(std::is_gteq(compare(face.distance_upper_metres, fixture.r("1", "20000"))));
+            CHECK(std::is_lt(
+                compare(face.distance_upper_metres, fixture.r("500000001", "10000000000000"))));
+            // Local unnormalized normals at s=0 differ by (1,1/4,0)/10000.
+            // After normalization, the x-component difference exceeds 1/30000.
+            CHECK(std::is_gt(compare(face.normal_chord_upper, fixture.r("1", "30000"))));
+            CHECK(std::is_lt(compare(face.normal_chord_upper, fixture.r("1", "1000"))));
+        }
+    }
+    const auto rejected_winding = measure(wrong);
+    REQUIRE_FALSE(rejected_winding);
+    CHECK(rejected_winding.error().code == Code::GeometryInvalid);
+    CHECK(take(diagnostic).reason == Reason::SourceWinding);
+    CHECK(take(diagnostic).element == 102);
+}
+
 } // namespace
