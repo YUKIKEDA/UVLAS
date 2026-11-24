@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-pg-material-angle",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "MAT-D05",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "20e8749d617c0a3d812d69eab039934756caf2c4",
+  "claimed_state": "一定全厚の認証済みNastran平面の有理基準方向に対し、符号付きの角度差を厳密に判定する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "real_file_assertions": 1593,
+    "sine_sign_omission_failures": 1,
+    "cosine_sign_omission_failures": 1,
+    "restored_real_file_assertions": 1593
+  },
+  "artifacts": {
+    "CMakeLists.txt": "765b3a369b9d032120440b1f58611be07c2e8b13144e5716a3cc99d7edf261d1",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/specs/structure/material-layer-adoption-contract.md": "cafea600ef53cb76426b6b980c9cac463eb73c96eb3223cd9a2950c33a2b8155",
+    "docs/verification/IM-06/nastran-pg-material-angle.md": "c22ea778465d8aa15ed96e7a2fb13850463a7ad294f0e8a9c4db4020928e715b",
+    "src/coupling/case_external_pg.cpp": "5858290149f7b88316a7f19497c2e25febb2ae8dbcdd6bc65087e4c56ff23969",
+    "src/io/external_mesh_sidecar_pg.cpp": "0d11744a47d16756f254fb3cce4fc043d8667aa9e9225f319c7e49e0fdd5d726",
+    "src/io/external_pg_regional_thickness.hpp": "bf789a338d86e5ca6a8a9d79c2d4194ab0dee58a4c1487a042eb759970770c48",
+    "src/io/external_planar_pg.hpp": "942b4c9e8cc906865b21cda5e4e3a339b204efc86e9e1341c8703e37f88a5b5b",
+    "src/io/nastran_pg_material_axes.cpp": "9ce084494abd4903f3d53a87f1c2e43b04126c2546c9546a2acc3911360e2459",
+    "src/io/nastran_pg_material_axes.hpp": "f680ecea58ba3c61602d3f73e24b159ddfa54dbae25ecedba9d13cf7d867d705",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "tests/io/reference_input_test.cpp": "3f5f149a4a6c9131e025ba3bc17a299fda3e056b1b5de3c47504826ea622f0a2"
+  }
+}
