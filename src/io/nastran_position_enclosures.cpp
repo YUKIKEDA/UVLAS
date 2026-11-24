@@ -2,6 +2,7 @@
 
 #include "../aero/certified_trigonometry_private.hpp"
 #include "../structure/pg_reference_arithmetic.hpp"
+#include "nastran_isotropic_shell_cards.hpp"
 #include "nastran_position_arithmetic.hpp"
 
 #include <algorithm>
@@ -395,6 +396,54 @@ NastranPositionEnclosures::prepare(const NastranShellCards& input, SiLengthUnit 
                                    std::optional<NastranPositionDiagnostic>* diagnostic) noexcept {
     const auto source = input.view();
     return prepare_view(source ? &source->input : nullptr, length, grids, limits, plan, diagnostic);
+}
+
+core::Result<NastranPositionEnclosures>
+NastranPositionEnclosures::prepare(const NastranIsotropicShellCards& input, SiLengthUnit length,
+                                   std::span<const NastranGridId> grids,
+                                   const NastranPositionLimits& limits, core::ResourcePlan& plan,
+                                   std::optional<NastranPositionDiagnostic>* diagnostic) noexcept {
+    const auto source = input.view();
+    return prepare_view(source ? &source->input.input : nullptr, length, grids, limits, plan,
+                        diagnostic);
+}
+
+core::Result<NastranGridDisplacementAxes>
+prepare_nastran_displacement_axes(const NastranIsotropicShellCards& input, NastranGridId id,
+                                  std::uint8_t required_axes,
+                                  const NastranSpcDirectionLimits& limits, core::ResourcePlan& plan,
+                                  std::optional<NastranPositionDiagnostic>* diagnostic) noexcept {
+    if (diagnostic) {
+        diagnostic->reset();
+    }
+    NastranPositionDiagnostic active;
+    auto result = g::partition_entry([&]() -> core::Result<NastranGridDisplacementAxes> {
+        try {
+            const auto source = input.view();
+            if (!source || required_axes == 0 || required_axes > 7) {
+                partition_fail(Code::InvalidInput);
+            }
+            m::Work work{0, limits.maximum_work, limits.stop};
+            const structure::PgReferenceLimits admission{limits.exact, limits.maximum_work,
+                                                         limits.maximum_work, limits.stop};
+            g::ReferenceArithmetic budget{admission, plan};
+            budget.admit(18 + 16);
+            Transform transform{source->input.input, budget.leaf_limits, plan, work, active};
+            auto axes = transform.component_axes(transform.select(id), required_axes);
+            work.step();
+            return NastranGridDisplacementAxes{std::move(axes), work.used};
+        } catch (const m::ArithmeticFailure& failure) {
+            partition_fail(failure.code);
+        } catch (const std::overflow_error&) {
+            partition_fail(Code::PrecisionUnresolved);
+        } catch (const std::range_error&) {
+            partition_fail(Code::PrecisionUnresolved);
+        }
+    });
+    if (!result && diagnostic && result.error().code != Code::Cancelled) {
+        *diagnostic = active;
+    }
+    return result;
 }
 
 NastranSpcDirections::NastranSpcDirections(const NastranSpcDirectionOrigin& origin,

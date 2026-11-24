@@ -122,7 +122,7 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/nastran_shell_cards.cpp src/io/nastran_isotropic_shell_cards.cpp
     src/io/nastran_laminate_cards.cpp src/io/external_mesh_quantity.cpp src/io/external_planar_pg.cpp
     src/io/nastran_support_cards.cpp src/io/nastran_lumped_mass_cards.cpp
-    src/io/nastran_lumped_mass_geometry.cpp
+    src/io/nastran_lumped_mass_geometry.cpp src/io/nastran_beam_si.cpp
     src/io/nastran_rigid_link_cards.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
