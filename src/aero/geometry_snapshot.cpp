@@ -542,6 +542,7 @@ AeroResult<OwnedGeometry> GeometryEngine::prepare(const GeometryInput& input,
                 return std::unexpected(hashed.error());
         }
         hash(*data);
+        data->preparation_steps = run.steps;
         return OwnedGeometry{std::move(data), context};
     });
 }
@@ -990,6 +991,11 @@ AeroResult<std::uint64_t> OwnedGeometry::payload_bytes() const noexcept {
         return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
     return data_->payload;
 }
+AeroResult<std::uint64_t> OwnedGeometry::used_preparation_steps() const noexcept {
+    if (!data_)
+        return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
+    return data_->preparation_steps;
+}
 AeroResult<PointId> OwnedGeometry::owner(PointId id) const noexcept {
     if (!data_)
         return std::unexpected(rejected(core::FailureCode::InvalidInput, context_, id));
@@ -1251,7 +1257,7 @@ GeometryEngine::resolve(const OwnedGeometry& geometry, const QueryRequest& reque
             return std::unexpected(
                 OwnedGeometryFailure{complete(storage.error(), context), request.id, context});
         storage->values()[0] = query;
-        return ResolvedQuery{geometry.data_, std::move(*storage), context};
+        return ResolvedQuery{geometry.data_, std::move(*storage), context, run.steps};
     });
 }
 
@@ -1543,9 +1549,9 @@ std::uint64_t GeometryWorkspace::payload_bytes() noexcept {
     return PredicateWorkspace::payload_bytes() + sizeof(QueryArithmeticScratch);
 }
 ResolvedQuery::ResolvedQuery(std::shared_ptr<const GeometryData> data,
-                             core::PlannedBuffer<QueryStorage> query,
-                             GeometryContext stamp) noexcept
-    : geometry_(std::move(data)), query_(std::move(query)), context_(stamp) {}
+                             core::PlannedBuffer<QueryStorage> query, GeometryContext stamp,
+                             std::uint64_t steps) noexcept
+    : geometry_(std::move(data)), query_(std::move(query)), context_(stamp), steps_(steps) {}
 ResolvedQuery::ResolvedQuery(ResolvedQuery&&) noexcept = default;
 ResolvedQuery& ResolvedQuery::operator=(ResolvedQuery&&) noexcept = default;
 ResolvedQuery::~ResolvedQuery() = default;
