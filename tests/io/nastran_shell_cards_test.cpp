@@ -1,4 +1,5 @@
-#include "nastran_lumped_mass_cards.hpp"
+#include "../../src/structure/exact_polynomial_detail.hpp"
+#include "nastran_lumped_mass_geometry.hpp"
 #include "nastran_rigid_link_cards.hpp"
 #include "nastran_shell_cards.hpp"
 #include "nastran_support_cards.hpp"
@@ -663,6 +664,204 @@ TEST_CASE("RBE2 rejects ambiguous thermal fields and inconsistent GRID reference
     CHECK(failure.reason == expected);
     CHECK(failure.position.line == 5);
     CHECK(take(parent.view()).input.bulk.bytes == source);
+}
+
+using MassQ = structure::detail::Rational;
+using MassVector = std::array<MassQ, 3>;
+using MassGeometryReason = NastranMassGeometryFailure;
+constexpr auto mass_geometry_budget = std::uint64_t{1} << 28U;
+
+[[nodiscard]] NastranMassGeometryLimits mass_geometry_limits() noexcept {
+    const structure::ExactLimits exact{512,
+                                       8,
+                                       32,
+                                       8,
+                                       8,
+                                       4096,
+                                       8192,
+                                       structure::ExactEstimateAdmission{mass_geometry_budget},
+                                       structure::ExactTimingMode::Disabled};
+    return {{exact, 30000, 30000, {}}, 64000};
+}
+
+[[nodiscard]] std::string mass_geometry_fixture() {
+    return "CORD2R,9,0,100.0,200.0,300.0,100.0,200.0,301.0,101.0,200.0,300.0\n"
+           "GRID,17,9,0.0,0.0,0.0,9\n" +
+           fixed("CONM2", {"101", "17", "0", "2000.0", "300.0", "-400.0", "100.0"}, 8, "+OFFSET") +
+           fixed("+OFFSET", {"1.4E8", "2.0E7", "1.0E8", "", "-3.0E7", "6.0E7"}) +
+           fixed("CONM2", {"102", "17", "-1", "2000.0", "400.0", "-200.0", "400.0"}, 8, "+CENTRE") +
+           fixed("+CENTRE", {"1.4E8", "2.0E7", "1.0E8", "", "-3.0E7", "6.0E7"}) +
+           "CONM2,103,17,,500.0\nCONM2,104,17,9,1.0\nCONM2,105,17,0,-1.0\n" +
+           fixed("CONM2", {"106", "17", "0", "1.0"}, 8, "+SLACK") +
+           fixed("+SLACK", {"10.0", "", "1.0", "", "", "1.0"}) +
+           fixed("CONM2", {"107", "17", "0", "1.0"}, 8, "+SPD") +
+           fixed("+SPD", {"1.0", "2.0", "1.0", "", "", "1.0"}) +
+           "CONM2,108,17,-1,1.0,400.0,,400.0\n";
+}
+
+constexpr SiUnits mass_geometry_units{SiLengthUnit::Millimetre, SiMassUnit::Gram,
+                                      SiTimeUnit::Second, SiAngleUnit::Degree};
+
+[[nodiscard]] const MassQ& mass_q(const structure::ExactRational& r) {
+    return structure::detail::ExactFactory::value(r);
+}
+
+void mass_contains(const NastranCartesianInterval& enclosure, const MassQ& exact) {
+    const auto& lower = mass_q(enclosure.lower);
+    const auto& upper = mass_q(enclosure.upper);
+    CHECK(lower <= exact);
+    CHECK(upper >= exact);
+    CHECK(upper - lower < MassQ("1/10000000000000000000000000000000000000000"));
+}
+
+[[nodiscard]] MassVector mv_add(const MassVector& a, const MassVector& b) {
+    return {a[0] + b[0], a[1] + b[1], a[2] + b[2]};
+}
+
+[[nodiscard]] MassVector mv_cross(const MassVector& a, const MassVector& b) {
+    return {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
+}
+
+[[nodiscard]] MassQ mv_dot(const MassVector& a, const MassVector& b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+TEST_CASE("CONM2 basic offset and absolute centre preserve independent rigid kinetic energy",
+          "[IO4-03][ST-07][R-05][integration][verification]") {
+    const auto source = mass_geometry_fixture();
+    const auto projections = [&] {
+        core::ResourcePlan plan{mass_geometry_budget};
+        const auto deck =
+            take(NastranShellCards::prepare(coordinates(source), shell_limits, plan, {}));
+        const auto parsed = take(NastranLumpedMassCards::prepare(deck, {8, 10000}, plan, {}));
+        const auto prepare = [&](std::uint64_t id) {
+            return take(prepare_nastran_basic_mass(deck, parsed, NastranElementId{id},
+                                                   mass_geometry_units, mass_geometry_limits(),
+                                                   plan));
+        };
+        return std::array{prepare(101), prepare(102), prepare(103)};
+    }();
+
+    const MassVector grid{MassQ("1/10"), MassQ("1/5"), MassQ("3/10")};
+    const MassVector centre{MassQ("2/5"), MassQ("-1/5"), MassQ("2/5")};
+    const MassVector lever{MassQ("3/10"), MassQ("-2/5"), MassQ("1/10")};
+    // Four equal point masses about their centre. The second pair's yz product
+    // is negative, so the two nonzero card products have opposite signs.
+    const std::array particles{MassVector{MassQ("1/10"), MassQ("1/5"), MassQ{0}},
+                               MassVector{MassQ("-1/10"), MassQ("-1/5"), MassQ{0}},
+                               MassVector{MassQ{0}, MassQ("1/10"), MassQ("-3/10")},
+                               MassVector{MassQ{0}, MassQ("-1/10"), MassQ("3/10")}};
+    const MassVector omega{MassQ{2}, MassQ{-1}, MassQ{3}};
+    const MassVector velocity{MassQ("-1/5"), MassQ("2/5"), MassQ("1/10")};
+    MassQ particle_energy{};
+    for (const auto& relative : particles) {
+        const auto v = mv_add(velocity, mv_cross(omega, mv_add(lever, relative)));
+        particle_energy += mv_dot(v, v) / 4; // Each particle has mass 1/2 kg.
+    }
+    const std::array expected_inertia{MassQ("7/50"), MassQ("-1/50"), MassQ("1/10"),
+                                      MassQ{0},      MassQ("3/100"), MassQ("3/50")};
+    CHECK(std::holds_alternative<NastranBasicMassOffset>(projections[0].card.frame));
+    CHECK(std::holds_alternative<NastranBasicMassCentre>(projections[1].card.frame));
+    for (const auto& row : std::span{projections}.first(2)) {
+        CHECK(row.kind == NastranBasicMassKind::Rigid);
+        CHECK(row.source.digest == source_digest(std::as_bytes(std::span{source})));
+        CHECK(row.card.grid == NastranGridId{17});
+        CHECK(row.input_units.mass == SiMassUnit::Gram);
+        CHECK(mass_q(row.mass_kg) == 2);
+        const auto original_i21 = take(row.card.inertia.i21.supplied);
+        const auto original_i32 = take(row.card.inertia.i32.supplied);
+        CHECK(original_i21.decimal() == "2.0e7");
+        CHECK(original_i32.decimal() == "-3.0e7");
+        for (std::size_t i = 0; i < grid.size(); ++i) {
+            mass_contains(row.grid_metres[i], grid[i]);
+            mass_contains(row.centre_metres[i], centre[i]);
+            mass_contains(row.grid_to_centre_metres[i], lever[i]);
+        }
+        for (std::size_t i = 0; i < expected_inertia.size(); ++i) {
+            CHECK(mass_q(row.centre_inertia_kg_m2[i]) == expected_inertia[i]);
+        }
+
+        // Evaluate the kinetic energy from GRID-referenced quantities. Only
+        // the tensor entries below are produced by the parallel-axis formula.
+        const auto translation =
+            mv_dot(velocity, velocity) + 2 * mv_dot(velocity, mv_cross(omega, lever));
+        MassQ lower = translation, upper = translation;
+        std::size_t entry = 0;
+        for (std::size_t i = 0; i < omega.size(); ++i) {
+            for (std::size_t j = 0; j <= i; ++j) {
+                const MassQ weight = omega[i] * omega[j] / (i == j ? 2 : 1);
+                const auto& value = row.grid_inertia_kg_m2[entry++];
+                lower += weight * mass_q(weight < 0 ? value.upper : value.lower);
+                upper += weight * mass_q(weight < 0 ? value.lower : value.upper);
+            }
+        }
+        CHECK(lower <= particle_energy);
+        CHECK(upper >= particle_energy);
+        CHECK(upper - lower < MassQ("1/10000000000000000000000000000000000000000"));
+    }
+    const auto& point_mass = projections[2];
+    CHECK(point_mass.kind == NastranBasicMassKind::Particle);
+    CHECK(mass_q(point_mass.mass_kg) == MassQ("1/2"));
+    for (const auto& value : point_mass.grid_inertia_kg_m2) {
+        mass_contains(value, MassQ{0});
+    }
+}
+
+TEST_CASE("CONM2 SI preparation rejects unsupported frames and unphysical inertia",
+          "[IO4-03][ST-07][integration][negative][verification]") {
+    core::ResourcePlan plan{mass_geometry_budget};
+    const auto source = mass_geometry_fixture();
+    const auto deck = take(NastranShellCards::prepare(coordinates(source), shell_limits, plan, {}));
+    const auto masses = take(NastranLumpedMassCards::prepare(deck, {8, 10000}, plan, {}));
+    const auto cards = take(masses.view());
+    std::optional<NastranMassGeometryDiagnostic> diagnostic;
+    const auto prepare = [&](std::uint64_t id, const NastranMassGeometryLimits& bounded) {
+        return prepare_nastran_basic_mass(deck, masses, NastranElementId{id}, mass_geometry_units,
+                                          bounded, plan, &diagnostic);
+    };
+    const auto framed = prepare(104, mass_geometry_limits());
+    REQUIRE_FALSE(framed);
+    CHECK(framed.error().code == Unsupported);
+    CHECK(take(diagnostic).reason == MassGeometryReason::Frame);
+    CHECK(take(diagnostic).position == take(cards.masses[3].frame_field).position);
+    CHECK(take(diagnostic).coordinate == NastranCoordinateId{9});
+    const auto negative = prepare(105, mass_geometry_limits());
+    REQUIRE_FALSE(negative);
+    CHECK(negative.error().code == InvalidInput);
+    CHECK(take(diagnostic).reason == MassGeometryReason::Mass);
+    CHECK(take(diagnostic).position == take(cards.masses[4].mass.field).position);
+    for (const auto id : {106U, 107U}) {
+        const auto impossible = prepare(id, mass_geometry_limits());
+        REQUIRE_FALSE(impossible);
+        CHECK(impossible.error().code == InvalidInput);
+        CHECK(take(diagnostic).reason == MassGeometryReason::Inertia);
+    }
+
+    const auto incomplete_centre = prepare(108, mass_geometry_limits());
+    REQUIRE_FALSE(incomplete_centre);
+    CHECK(incomplete_centre.error().code == Unsupported);
+    CHECK(take(diagnostic).reason == MassGeometryReason::Position);
+    CHECK(take(diagnostic).position == take(cards.masses[7].position[1].field).position);
+
+    const auto measured = take(prepare(101, mass_geometry_limits()));
+    auto short_work = mass_geometry_limits();
+    short_work.maximum_directed_work = measured.directed_work - 1;
+    const auto denied = prepare(101, short_work);
+    REQUIRE_FALSE(denied);
+    CHECK(denied.error().code == ResourceExceeded);
+    ++short_work.maximum_directed_work;
+    REQUIRE(prepare(101, short_work));
+    CHECK_FALSE(diagnostic);
+    CHECK(take(deck.view()).input.bulk.bytes == source);
+
+    const auto other = take(NastranShellCards::prepare(
+        coordinates(source + "$ different snapshot\n"), shell_limits, plan, {}));
+    const auto stale =
+        prepare_nastran_basic_mass(other, masses, NastranElementId{101}, mass_geometry_units,
+                                   mass_geometry_limits(), plan, &diagnostic);
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == StaleGeneration);
+    CHECK(take(diagnostic).reason == MassGeometryReason::Source);
 }
 
 } // namespace

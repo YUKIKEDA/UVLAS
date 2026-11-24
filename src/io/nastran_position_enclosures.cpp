@@ -29,16 +29,6 @@ source_position(const std::optional<NastranBulkLexeme>& field) noexcept {
     return field ? std::optional{field->position} : std::nullopt;
 }
 
-[[nodiscard]] bool same_deck(const NastranBulkView& deck, const NastranSupportOrigin& support) {
-    const auto& a = deck.location;
-    const auto& b = support.location;
-    return deck.digest == support.digest && a.source == b.source && a.role == b.role &&
-           a.declaration_node == b.declaration_node && a.declaring_file == b.declaring_file &&
-           a.parent.source == b.parent.source &&
-           a.parent.contract_revision == b.parent.contract_revision &&
-           a.parent.representation_revision == b.parent.representation_revision;
-}
-
 [[nodiscard]] bool selects(const NastranSupportTerm& term, NastranGridId grid) {
     if (const auto* point = std::get_if<NastranSupportPoint>(&term.target)) {
         return point->grid == grid;
@@ -459,7 +449,7 @@ core::Result<NastranSpcDirections> NastranSpcDirections::prepare(
             if (!deck || !parsed) {
                 partition_fail(Code::InvalidInput);
             }
-            if (!same_deck(deck->bulk, parsed->source)) {
+            if (!deck->bulk.same_snapshot(parsed->source.location, parsed->source.digest)) {
                 partition_fail(Code::StaleGeneration);
             }
             active = {Reason::SpcTerm, grid, {}, {}};
