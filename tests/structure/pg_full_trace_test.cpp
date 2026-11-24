@@ -4,6 +4,7 @@
 #include <string>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_full_trace.hpp>
+#include <uvlas/structure/pg_global_constraints.hpp>
 
 namespace {
 using namespace uvlas;
@@ -322,4 +323,223 @@ TEST_CASE("PG nonconforming full trace owns coefficient rows and the original du
     CHECK(std::ranges::any_of(mismatch.values(), [](const auto& row) {
         return std::ranges::any_of(row, [](const auto& x) { return x.sign() != 0; });
     }));
+}
+
+TEST_CASE("PG global constraints retain original rows, right-hand sides and exact work",
+          "[SH-D05][SH-D06][N4-03][N4-04][N4-08][verification]") {
+    Fixture f, fb, fc;
+    const auto zero = f.r("0"), one = f.r("1");
+    std::array<ExactRational, 9> rotation;
+    for (const auto i : {0U, 4U, 8U})
+        rotation[i] = f.r("1");
+    const std::array<ExactRational, 3> oa{};
+    std::array<ExactRational, 3> ob, oc;
+    ob[0] = f.r("1");
+    oc[0] = f.r("2");
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    auto a = patch(f, {rotation, oa, one}, workspace, plan);
+    auto b = patch(fb, {rotation, ob, one}, workspace, plan);
+    auto c = patch(fc, {rotation, oc, one}, workspace, plan);
+    const auto ai = take(a.info()).identity, bi = take(b.info()).identity,
+               ci = take(c.info()).identity;
+
+    const auto a_right = vertical_edges(f, a, Q{1}, Q{1});
+    const auto b_left = vertical_edges(f, b, Q{0}, Q{1});
+    const auto b_right = vertical_edges(f, b, Q{1}, Q{1});
+    const auto c_left = vertical_edges(f, c, Q{0}, Q{1});
+    const auto ar = edge_spans(a_right, zero, one), bl = edge_spans(b_left, zero, one),
+               br = edge_spans(b_right, zero, one), cl = edge_spans(c_left, zero, one);
+    PgGlobalConstraintLimits limits{query_limits(), 3, 4, 8192, 100'000};
+    limits.arithmetic.maximum_scalar_operations = 300'000'000;
+    limits.arithmetic.maximum_partition_visits = 100'000'000;
+    const PgTraceLimits trace_limits{limits.arithmetic, limits.maximum_nonzeros};
+    auto ab = take(PgFullTrace::prepare(a, ar, b, bl, trace_limits, workspace, plan));
+    auto bc = take(PgFullTrace::prepare(b, br, c, cl, trace_limits, workspace, plan));
+    const auto prescribed = states(f, c.reference_coordinates().size(), 8);
+    auto fixed = take(PgFullTrace::prepare_support(c, std::span{cl}.first(1), ci, prescribed,
+                                                   trace_limits, workspace, plan));
+    const std::array patches{PgConstraintPatchBinding{numerics::PatchId{72}, b},
+                             PgConstraintPatchBinding{numerics::PatchId{45}, c},
+                             PgConstraintPatchBinding{numerics::PatchId{17}, a}};
+    const std::array bindings{PgConstraintTraceBinding{PgConstraintId{240}, fixed, 1, {}},
+                              PgConstraintTraceBinding{PgConstraintId{118}, ab, 2, core::Index{0}},
+                              PgConstraintTraceBinding{PgConstraintId{315}, bc, 0, core::Index{1}},
+                              PgConstraintTraceBinding{PgConstraintId{660}, ab, 2, core::Index{0}}};
+    const auto prepare = [&](const auto& p, const auto& t, const PgGlobalConstraintLimits& bound,
+                             core::ResourcePlan& budget) {
+        return PgGlobalConstraints::prepare(p, t, bound, workspace, budget);
+    };
+    core::ResourcePlan none{0};
+    auto cancelled = limits;
+    cancelled.arithmetic.cancellation = requested_stop_token();
+    check_failure(prepare(patches, bindings, cancelled, none), core::FailureCode::Cancelled);
+    check_failure(prepare(patches, bindings, limits, none), core::FailureCode::ResourceExceeded);
+    CHECK(none.allocated_bytes() == 0);
+    const std::array duplicates{patches[0], PgConstraintPatchBinding{patches[0].id, c}, patches[2]};
+    check_failure(prepare(duplicates, bindings, limits, plan), core::FailureCode::InvalidInput);
+    const std::array reversed{PgConstraintTraceBinding{PgConstraintId{118}, ab, 0, core::Index{2}}};
+    check_failure(prepare(patches, reversed, limits, plan), core::FailureCode::StaleGeneration);
+    const std::array bad_support{
+        PgConstraintTraceBinding{PgConstraintId{240}, fixed, 1, core::Index{0}}};
+    check_failure(prepare(patches, bad_support, limits, plan), core::FailureCode::InvalidInput);
+    const std::array repeated_id{bindings[1], bindings[1]};
+    check_failure(prepare(patches, repeated_id, limits, plan), core::FailureCode::InvalidInput);
+
+    auto global = take(prepare(patches, bindings, limits, plan));
+    const auto layout = global.layout();
+    const auto sources = global.sources();
+    const auto info = take(global.info());
+    REQUIRE(layout.size() == 3);
+    REQUIRE(sources.size() == bindings.size());
+    CHECK(layout[0].first == 0);
+    CHECK(layout[1].first == layout[0].count);
+    CHECK(layout[2].first == layout[0].count + layout[1].count);
+    CHECK(info.columns == layout[2].first + layout[2].count);
+    CHECK(layout[0].id == patches[0].id);
+    CHECK(layout[1].basis == ci);
+    CHECK(layout[2].basis == ai);
+    CHECK(sources[0].left == patches[1].id);
+    CHECK_FALSE(sources[0].right.has_value());
+    CHECK(sources[1].left == patches[2].id);
+    CHECK(sources[1].right == patches[0].id);
+    CHECK(sources[2].left == patches[0].id);
+    CHECK(sources[2].right == patches[1].id);
+    CHECK(sources[3].first_row == sources[2].first_row + sources[2].rows);
+    CHECK(info.rows == sources.back().first_row + sources.back().rows);
+
+    auto exact_count = limits;
+    exact_count.maximum_rows = static_cast<std::uint64_t>(info.rows);
+    exact_count.maximum_nonzeros = static_cast<std::uint64_t>(info.nonzeros);
+    auto just_enough = take(prepare(patches, bindings, exact_count, plan));
+    CHECK(take(just_enough.info()).nonzeros == info.nonzeros);
+    const std::array<PgConstraintTraceBinding, 0> no_traces{};
+    const auto unconstrained = take(prepare(patches, no_traces, limits, plan));
+    CHECK(take(unconstrained.info()).rows == 0);
+    CHECK(take(unconstrained.info()).columns == info.columns);
+    CHECK(unconstrained.original_rows().empty());
+
+    auto short_rows = exact_count;
+    --short_rows.maximum_rows;
+    check_failure(prepare(patches, bindings, short_rows, plan),
+                  core::FailureCode::ResourceExceeded);
+    auto short_terms = exact_count;
+    --short_terms.maximum_nonzeros;
+    check_failure(prepare(patches, bindings, short_terms, plan),
+                  core::FailureCode::ResourceExceeded);
+
+    const auto column_count = static_cast<std::size_t>(info.columns);
+    const auto values = states(f, column_count, 5);
+    const auto lambda = states(f, static_cast<std::size_t>(info.rows), 3);
+    const auto blocks = [&](std::size_t i) {
+        return std::span{values}.subspan(static_cast<std::size_t>(layout[i].first),
+                                         static_cast<std::size_t>(layout[i].count));
+    };
+    const std::array local_inputs{PgTraceCoordinates{ci, {}, blocks(1), {}},
+                                  PgTraceCoordinates{ai, bi, blocks(2), blocks(0)},
+                                  PgTraceCoordinates{bi, ci, blocks(0), blocks(1)},
+                                  PgTraceCoordinates{ai, bi, blocks(2), blocks(0)}};
+    const PgGlobalConstraintCoordinates state{layout, values};
+    const auto forward = take(global.apply(state, limits.arithmetic, workspace, plan));
+    const auto residual = take(global.residual(state, limits.arithmetic, workspace, plan));
+    const auto force = take(global.transpose(lambda, limits.arithmetic, workspace, plan));
+    std::vector<std::array<Q, 3>> expected_force(column_count);
+    bool have_zero_row = false, have_nonzero_right_hand_side = false;
+    for (std::size_t i = 0; i < bindings.size(); ++i) {
+        const auto& local = bindings[i].trace;
+        const auto first = static_cast<std::size_t>(sources[i].first_row);
+        const auto count = static_cast<std::size_t>(sources[i].rows);
+        const auto baseline =
+            take(local.apply(local_inputs[i], limits.arithmetic, workspace, plan));
+        const auto local_residual =
+            take(local.residual(local_inputs[i], limits.arithmetic, workspace, plan));
+        const auto local_force = take(local.transpose(std::span{lambda}.subspan(first, count),
+                                                      limits.arithmetic, workspace, plan));
+        const auto local_left = static_cast<std::size_t>(bindings[i].left_patch);
+        const auto left_count = static_cast<std::size_t>(layout[local_left].count);
+        const auto global_col = [&](core::Index column) {
+            if (static_cast<std::size_t>(column) < left_count)
+                return layout[local_left].first + column;
+            return layout[static_cast<std::size_t>(bindings[i].right_patch.value())].first +
+                   column - static_cast<core::Index>(left_count);
+        };
+        CHECK(sources[i].id == bindings[i].id);
+        REQUIRE(sources[i].overlaps == static_cast<core::Index>(local.overlaps().size()));
+        const auto overlap_start = static_cast<std::size_t>(sources[i].first_overlap);
+        for (std::size_t j = 0; j < local.overlaps().size(); ++j) {
+            const auto& reference = local.overlaps()[j];
+            const auto& stored = global.overlaps()[overlap_start + j];
+            CHECK(stored.left_edge == reference.left_edge);
+            CHECK(stored.right_edge == reference.right_edge);
+            CHECK(stored.first == reference.first);
+            CHECK(stored.last == reference.last);
+            CHECK(stored.left_depth.lower_first == reference.left_depth.lower_first);
+            CHECK(stored.right_depth.upper_last == reference.right_depth.upper_last);
+        }
+        for (std::size_t j = 0; j < count; ++j) {
+            const auto raw = take(global.row(static_cast<core::Index>(first + j)));
+            const auto& original = local.original_rows()[j];
+            const auto& gathered = global.original_rows()[first + j];
+            CHECK(gathered.source == static_cast<core::Index>(i));
+            CHECK(gathered.source_row == static_cast<core::Index>(j));
+            CHECK(gathered.source_overlap == original.overlap);
+            CHECK(gathered.field == original.field);
+            CHECK(gathered.power == original.power);
+            CHECK(gathered.local_representative == original.unique_row);
+            CHECK(gathered.local_scale == original.scale);
+            CHECK(gathered.prescribed == original.prescribed);
+            CHECK(forward.values()[first + j] == baseline.values()[j]);
+            CHECK(residual.values()[first + j] == local_residual.values()[j]);
+            have_nonzero_right_hand_side |= std::ranges::any_of(
+                gathered.prescribed, [](const auto& x) { return x.sign() != 0; });
+            if (original.unique_row < 0) {
+                CHECK(raw.empty());
+                have_zero_row = true;
+                continue;
+            }
+            const auto local_row = take(local.unique_row(original.unique_row));
+            REQUIRE(raw.size() == local_row.size());
+            CHECK(std::ranges::is_sorted(raw, std::ranges::less{}, &PgTraceSparseEntry::column));
+            for (const auto& term : local_row) {
+                const auto column = global_col(term.column);
+                const auto found = std::ranges::lower_bound(raw, column, std::ranges::less{},
+                                                            &PgTraceSparseEntry::column);
+                REQUIRE(found != raw.end());
+                CHECK(found->column == column);
+                CHECK(q(found->coefficient) == q(original.scale) * q(term.coefficient));
+            }
+        }
+        for (std::size_t j = 0; j < local_force.size(); ++j)
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                expected_force[static_cast<std::size_t>(global_col(static_cast<core::Index>(j)))]
+                              [axis] += q(local_force.values()[j][axis]);
+    }
+    CHECK(have_zero_row);
+    CHECK(have_nonzero_right_hand_side);
+    for (std::size_t j = 0; j < column_count; ++j)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            CHECK(q(force.values()[j][axis]) == expected_force[j][axis]);
+    CHECK(work(forward.values(), lambda) == work(force.values(), values));
+
+    const auto stale = std::array{layout[1], layout[0], layout[2]};
+    check_failure(global.apply({stale, values}, limits.arithmetic, workspace, none),
+                  core::FailureCode::StaleGeneration);
+    check_failure(global.transpose(std::span{lambda}.first(1), limits.arithmetic, workspace, none),
+                  core::FailureCode::InvalidInput);
+    {
+        const auto discard_ab = std::move(ab);
+        const auto discard_bc = std::move(bc);
+        const auto discard_support = std::move(fixed);
+        const auto discard_a = std::move(a);
+        const auto discard_b = std::move(b);
+        const auto discard_c = std::move(c);
+        CHECK(discard_ab.info().has_value());
+        CHECK(discard_bc.info().has_value());
+        CHECK(discard_support.info().has_value());
+        CHECK(discard_a.info().has_value());
+        CHECK(discard_b.info().has_value());
+        CHECK(discard_c.info().has_value());
+    }
+    const auto independent = take(global.apply(state, limits.arithmetic, workspace, plan));
+    CHECK(std::ranges::equal(independent.values(), forward.values()));
 }
