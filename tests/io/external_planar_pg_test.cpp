@@ -82,6 +82,15 @@ private:
     return take(GmshMesh::prepare(source, {4096, 0, 0, 0, 12, 12, 64000}, plan, {}));
 }
 
+[[nodiscard]] NastranShellCards read_cards(std::string_view text, core::ResourcePlan& plan) {
+    auto file = snapshot(text, SourceId{20}, ReferenceRole::NastranDeck, plan);
+    auto bulk =
+        take(NastranBulkDeck::prepare(std::move(file), {4096, 80, 32, 32, 256, 64000}, plan, {}));
+    auto coordinate =
+        take(NastranCoordinateCards::prepare(std::move(bulk), {12, 8, 8, 20000}, plan, {}));
+    return take(NastranShellCards::prepare(std::move(coordinate), {12, 12, 20000}, plan, {}));
+}
+
 [[nodiscard]] NastranShellCards cards(std::string_view connectivity, core::ResourcePlan& plan,
                                       bool nonbasic = false) {
     std::string text = nonbasic ? "CORD2R,5,,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0\n"
@@ -90,12 +99,7 @@ private:
     text += "GRID,40,,1750.0,6500.0,3000.0\nGRID,90,,1625.0,6250.0,4000.0\n"
             "GRID,95,,1250.0,2000.0,5000.0\nPSHELL,20\n";
     text += connectivity;
-    auto file = snapshot(text, SourceId{20}, ReferenceRole::NastranDeck, plan);
-    auto bulk =
-        take(NastranBulkDeck::prepare(std::move(file), {4096, 80, 32, 32, 256, 64000}, plan, {}));
-    auto coordinate =
-        take(NastranCoordinateCards::prepare(std::move(bulk), {12, 8, 8, 20000}, plan, {}));
-    return take(NastranShellCards::prepare(std::move(coordinate), {12, 12, 20000}, plan, {}));
+    return read_cards(text, plan);
 }
 
 [[nodiscard]] PgReferenceGeometry pg(Fixture& f, core::ResourcePlan& plan, bool curved = false,
@@ -254,10 +258,8 @@ TEST_CASE("Planar certification separates winding, coverage and overlap without 
     rejected(qualify(target, deck, gap), Code::GeometryInvalid, diagnostic, Reason::Coverage);
     rejected(qualify(target, deck, overlap), Code::GeometryInvalid, diagnostic, Reason::Overlap);
     CHECK(take(diagnostic).other == 201);
-    rejected(qualify(target, nonbasic, full), Code::Unsupported, diagnostic,
-             Reason::PositionSystem);
-    CHECK(take(diagnostic).node == 10);
-    rejected(qualify(target, offset, full), Code::Unsupported, diagnostic, Reason::Offset);
+    REQUIRE(qualify(target, nonbasic, full));
+    rejected(qualify(target, offset, full), Code::PrecisionUnsupported, diagnostic, Reason::Offset);
     CHECK(take(diagnostic).byte.has_value());
     REQUIRE(qualify(target, deck, joined));
 
@@ -295,6 +297,159 @@ TEST_CASE("Planar certification separates winding, coverage and overlap without 
     CHECK(cancelled.error().code == Code::Cancelled);
     CHECK_FALSE(diagnostic);
     REQUIRE(qualify(target, deck, full));
+}
+
+PgReferenceGeometry flat_target(Fixture& f, const PgReferenceFrame& frame,
+                                core::ResourcePlan& plan) {
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto dictionary = take(PgCoefficientDictionary::prepare(
+        f.chart_graph(), {partition_test::exact_limits(), 2000, 20000000, 100000, {}}, workspace,
+        plan));
+    auto partition = take(
+        PgIntegrationPartition::prepare(f.request(), partition_test::limits(), workspace, plan));
+    PgReferenceInputs input{std::move(f.chart_graph()), std::move(dictionary),
+                            std::move(partition)};
+    return take(PgReferenceGeometry::prepare(std::move(input), frame, reference_limits(), plan));
+}
+
+TEST_CASE("Nastran rectangular ancestors and signed shell offsets match one exact PG plane",
+          "[IO4-03][IO4-04][SH-D02][N4-02][integration][negative][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto length = f.r("1");
+    const std::array origin{f.r("61", "50"), f.r("-27", "50"), f.r("1")};
+    const std::array rotation{f.r("4", "5"),  f.r("-3", "5"), f.r("0"),
+                              f.r("-3", "5"), f.r("-4", "5"), f.r("0"),
+                              f.r("0"),       f.r("0"),       f.r("-1")};
+    const auto target = flat_target(f, {rotation, origin, length}, plan);
+    const std::array points{f.point("0", "0"), f.point("1", "0"), f.point("1", "1"),
+                            f.point("0", "1")};
+    const std::array abcd{ExternalPgCorner{10, points[0]}, ExternalPgCorner{40, points[1]},
+                          ExternalPgCorner{90, points[2]}, ExternalPgCorner{95, points[3]}};
+    const std::array dcba{abcd[0], abcd[3], abcd[2], abcd[1]};
+    const std::array acd{abcd[0], abcd[2], abcd[3]};
+    const std::array forward{ExternalPgFace{201, Winding::Forward, abcd}};
+    const std::array reversed{ExternalPgFace{202, Winding::Reversed, dcba}};
+    const std::array wrong_sign{ExternalPgFace{203, Winding::Forward, abcd}};
+    const std::array triangles{ExternalPgFace{301, Winding::Forward, std::span{abcd}.first(3)},
+                               ExternalPgFace{302, Winding::Forward, acd}};
+    constexpr std::string_view nested =
+        "CORD2R,5,12,100.0,200.0,300.0,100.0,200.0,400.0,100.0,300.0,300.0\n"
+        "CORD2R,12,0,1000.0,-500.0,1000.0,1000.0,-500.0,900.0,1000.3,-499.6,1000.0\n";
+    constexpr std::string_view nodes = "GRID,10,5,0.0,0.0,0.0\nGRID,40,5,1000.0,0.0,0.0\n"
+                                       "GRID,90,5,1000.0,1000.0,0.0\nGRID,95,5,0.0,1000.0,0.0\n"
+                                       "PSHELL,20,8,2.54,8,,8\nMAT1,8,1.0\n";
+    constexpr std::string_view shells =
+        "CQUAD4,201,20,10,40,90,95,,-300.0\nCQUAD4,202,20,10,95,90,40,,300.0\n"
+        "CQUAD4,203,20,10,40,90,95,,300.0\n"
+        "CTRIA3,301,20,10,40,90,,-300.0\nCTRIA3,302,20,10,90,95,,-300.0\n";
+    const auto deck =
+        read_cards(std::string{nested} + std::string{nodes} + std::string{shells}, plan);
+    const auto view = take(deck.view());
+    const ExternalPgLimits limits{reference_limits(), 2};
+    std::optional<ExternalPgDiagnostic> diagnostic;
+    const auto qualify = [&](const NastranShellCards& input,
+                             std::span<const ExternalPgFace> mapping) {
+        return ExternalPlanarPg::prepare(target, input, SiLengthUnit::Millimetre, mapping, limits,
+                                         plan, &diagnostic);
+    };
+
+    const auto forward_match = take(qualify(deck, forward));
+    const auto forward_view = take(forward_match.view());
+    const auto& face = forward_view.faces.front();
+    const auto signed_offset =
+        face.nastran_offset
+            ? std::reference_wrapper<const NastranReferenceOffset>{*face.nastran_offset}
+            : throw std::runtime_error("Missing ZOFFS source");
+    CHECK(signed_offset.get().signed_metres == f.r("-3", "10"));
+    CHECK(signed_offset.get().byte == take(view.elements[0].offset).field.position.byte);
+    const auto& node = face.ring()[1];
+    if (const auto& placement = node.nastran) {
+        CHECK(placement->position_system == NastranCoordinateId{5});
+        CHECK(placement->cp_byte.has_value());
+        if (const auto& grid = placement->unshifted_metres) {
+            // In world millimetres, (x,y,z) -> (1220+4x/5-3y/5,-540-3x/5-4y/5,700-z).
+            CHECK((*grid)[0] == f.r("101", "50"));
+            CHECK((*grid)[1] == f.r("-57", "50"));
+            CHECK((*grid)[2] == f.r("7", "10"));
+        } else {
+            FAIL("Original basic GRID coordinates were lost");
+        }
+    } else {
+        FAIL("GRID CP provenance was lost");
+    }
+    CHECK(node.position_metres[0] == f.r("101", "50"));
+    CHECK(node.position_metres[1] == f.r("-57", "50"));
+    CHECK(node.position_metres[2] == f.r("1"));
+
+    const auto reverse_match = take(qualify(deck, reversed));
+    const auto reverse_view = take(reverse_match.view());
+    const auto& reverse_face = reverse_view.faces.front();
+    if (const auto& source = reverse_face.nastran_offset) {
+        CHECK(source->signed_metres == f.r("3", "10"));
+    } else {
+        FAIL("Reversed element lost its ZOFFS declaration");
+    }
+    CHECK(reverse_face.ring()[3].position_metres == node.position_metres);
+    REQUIRE(qualify(deck, triangles));
+    rejected(qualify(deck, wrong_sign), Code::GeometryInvalid, diagnostic, Reason::Position);
+    const auto sign_failure = take(diagnostic);
+    CHECK(sign_failure.byte == take(view.elements[2].offset).field.position.byte);
+    CHECK(sign_failure.coordinate_system == NastranCoordinateId{5});
+
+    auto warped_nodes = std::string{nodes};
+    constexpr std::string_view flat_grid = "GRID,95,5,0.0,1000.0,0.0";
+    const auto grid_byte = warped_nodes.find(flat_grid);
+    REQUIRE(grid_byte != std::string::npos);
+    warped_nodes.replace(grid_byte, flat_grid.size(), "GRID,95,5,0.0,1000.0,100.0");
+    const auto warped = read_cards(std::string{nested} + warped_nodes + std::string{shells}, plan);
+    rejected(qualify(warped, forward), Code::GeometryInvalid, diagnostic, Reason::Offset);
+    CHECK(take(diagnostic).node == 95);
+
+    const auto abnormal = [&](std::string_view frame) {
+        return read_cards(std::string{frame} + std::string{nodes} + std::string{shells}, plan);
+    };
+    const auto irrational = abnormal("CORD2R,5,0,0.0,0.0,0.0,1.0,0.0,1.0,1.0,1.0,0.0\n");
+    rejected(qualify(irrational, forward), Code::PrecisionUnsupported, diagnostic,
+             Reason::CoordinateFrame);
+    CHECK(take(diagnostic).coordinate_system == NastranCoordinateId{5});
+    CHECK(take(diagnostic).node == 10);
+    CHECK(take(diagnostic).byte.has_value());
+
+    const auto invalid = abnormal("CORD2R,5,0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,2.0\n");
+    rejected(qualify(invalid, forward), Code::GeometryInvalid, diagnostic, Reason::CoordinateFrame);
+    const auto curvilinear = abnormal("CORD2C,5,0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0\n");
+    rejected(qualify(curvilinear, forward), Code::Unsupported, diagnostic, Reason::PositionSystem);
+}
+
+TEST_CASE("Nastran ZOFFS moves both components of an oblique planar normal",
+          "[IO4-03][IO4-04][SH-D02][N4-02][integration][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto length = f.r("1");
+    const std::array origin{f.r("0"), f.r("3", "10"), f.r("2", "5")};
+    const std::array rotation{f.r("1"),      f.r("0"), f.r("0"),       f.r("0"),     f.r("4", "5"),
+                              f.r("3", "5"), f.r("0"), f.r("-3", "5"), f.r("4", "5")};
+    const auto target = flat_target(f, {rotation, origin, length}, plan);
+    const std::array points{f.point("0", "0"), f.point("1", "0"), f.point("1", "1"),
+                            f.point("0", "1")};
+    const std::array ring{ExternalPgCorner{10, points[0]}, ExternalPgCorner{40, points[1]},
+                          ExternalPgCorner{90, points[2]}, ExternalPgCorner{95, points[3]}};
+    const std::array selection{ExternalPgFace{201, Winding::Forward, ring}};
+    const auto deck =
+        read_cards("GRID,10,0,0.0,0.0,0.0\nGRID,40,0,1000.0,0.0,0.0\n"
+                   "GRID,90,0,1000.0,800.0,-600.0\nGRID,95,0,0.0,800.0,-600.0\n"
+                   "PSHELL,20,8,2.54,8,,8\nMAT1,8,1.0\nCQUAD4,201,20,10,40,90,95,,500.0\n",
+                   plan);
+    const ExternalPgLimits limits{reference_limits(), 1};
+    const auto result = take(
+        ExternalPlanarPg::prepare(target, deck, SiLengthUnit::Millimetre, selection, limits, plan));
+    const auto face = take(result.view());
+    const auto& point = face.faces.front().ring()[2];
+    // A source point at (1, .8, -.6) plus .5*(0, .6, .8).
+    CHECK(point.position_metres[0] == f.r("1"));
+    CHECK(point.position_metres[1] == f.r("11", "10"));
+    CHECK(point.position_metres[2] == f.r("-1", "5"));
 }
 
 } // namespace

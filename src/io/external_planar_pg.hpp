@@ -21,11 +21,23 @@ struct ExternalPgFace {
     std::span<const ExternalPgCorner> corners; // Original element ring, not sorted by tag.
 };
 
+struct NastranGridPlacement {
+    NastranCoordinateId position_system{0};
+    std::optional<std::uint64_t> cp_byte;
+    std::optional<std::array<structure::ExactRational, 3>> unshifted_metres;
+};
+
+struct NastranReferenceOffset {
+    structure::ExactRational signed_metres;
+    std::uint64_t byte{};
+};
+
 struct ExternalPgOwnedCorner {
     std::uint64_t node{};
     structure::PgPartitionPoint chart;
     std::array<std::optional<std::uint64_t>, 3> source_bytes;
     std::array<structure::ExactRational, 3> position_metres;
+    std::optional<NastranGridPlacement> nastran;
 };
 
 struct ExternalPgOwnedFace {
@@ -33,6 +45,7 @@ struct ExternalPgOwnedFace {
     ExternalPgWinding winding = ExternalPgWinding::Forward;
     std::uint8_t count{};
     std::array<ExternalPgOwnedCorner, 4> corners;
+    std::optional<NastranReferenceOffset> nastran_offset;
 
     [[nodiscard]] std::span<const ExternalPgOwnedCorner> ring() const& noexcept {
         return std::span{corners}.first(count);
@@ -45,6 +58,7 @@ enum class ExternalPgFailure : std::uint8_t {
     CurvedPatch,
     Selection,
     PositionSystem,
+    CoordinateFrame,
     Offset,
     SourceOrder,
     Position,
@@ -57,6 +71,7 @@ enum class ExternalPgFailure : std::uint8_t {
 struct ExternalPgDiagnostic {
     ExternalPgFailure reason = ExternalPgFailure::Source;
     std::optional<std::uint64_t> element, other, node, byte;
+    std::optional<NastranCoordinateId> coordinate_system;
 };
 
 struct ExternalPgLimits {
