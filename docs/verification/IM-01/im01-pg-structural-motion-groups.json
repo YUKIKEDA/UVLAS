@@ -1,0 +1,61 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-structural-motion-groups",
+  "package": "IM-01",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-04"
+  ],
+  "date": "2026-11-24",
+  "source_commit": "2958a24010a4fe79aea5c2c996cb48160864dc8e",
+  "claimed_state": "原CSRの像を各Motionで個別に認定し、共通時計から二枚の全厚構造支持の元行と片側ジェットを検証した。",
+  "checks": {
+    "ctest": [
+      "coupling.case_structural_pg_support",
+      "coupling.case_pg_support_motion"
+    ],
+    "assertions_per_configuration": [
+      5473,
+      6365
+    ],
+    "elapsed_seconds": {
+      "msvc_release": [
+        2.23,
+        0.58
+      ],
+      "msvc_debug": [
+        13.97,
+        3.0
+      ],
+      "gcc14_asan_ubsan": [
+        37.67,
+        15.37
+      ]
+    },
+    "clang_tidy_translation_units": 3,
+    "mutation": {
+      "change": "omit rotation and translation image checks for each motion group",
+      "mutated_source_sha256": "90c4c1cce51d2de90ed1ec5d22575d70ddc94cc8cc5458438b18cd33a2db5733",
+      "failure_assertion_index": 3,
+      "base_commit": "7285b0dc17785a4244d81461087ca73b1509cc57"
+    }
+  },
+  "sources": {
+    "include/uvlas/structure/pg_rigid_support_rows.hpp": "bddde2e2b92413374eb5dc993f193030bc0e16989e443f5dfba5786a7b3fac34",
+    "src/structure/pg_rigid_support_rows.cpp": "e9faff3eaf57e5b9a86033afec51e5e5cfce2a386886177d3184cdf98d07db29",
+    "src/coupling/case_flow_clock.cpp": "d7a6007e4d50bcbf11462ad40a5893e388faa9eaf884591568d4a00a23cb46c5",
+    "src/coupling/case_pg_support_motion.hpp": "fe895484aec3bb99fbc71e85c1e5d9963b219b2e17ba2935728c3604730c42d9",
+    "src/coupling/case_pg_support_motion.cpp": "cbda1da6348a69b00b9d612af39f1721107c1d8fa7f1560e1ef2d1ff86a0fdb6",
+    "src/coupling/case_motion.cpp": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "tests/coupling/case_structural_pg_support_test.cpp": "e24f730ec0b8b5b4722e46a34c53463854443b93359dad2e520382427a26eae9",
+    "tests/coupling/case_pg_support_motion_test.cpp": "58c2bd65d83cb20ecea8befc095a765722ece7c7dfbd79ac0c53cc3257ef5eb8",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-structural-motion-groups.md": "8e6126558196e66e71d2be4f3a2dca442f50640f03b86f1462a4abf3e750bfd8",
+    "docs/specs/structure/pg-case-structural-support-contract.md": "7ceadb794e7801cf9604ca65f0ae98f88ba4cc06bf6bb3a958738f34663744fe"
+  }
+}
