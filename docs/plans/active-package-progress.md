@@ -4,7 +4,7 @@
 
 | パッケージ | 完了／全体 | 残り | 統合済みの成果 | 次に完了させる成果と判定条件 |
 |---|---:|---:|---|---|
-| [IM-01 構造](#im-01-構造) | 11／12（92%） | 1 | 一つのCaseから、認定基底と有限求積点を保持する全パッチ、その全厚拘束と固定疎チャートを準備できる。凍結R4・R5の32配置で有限則の合同誤差を測り、必須場を厳密に照合した。 [Caseの準備仕様](../specs/structure/pg-case-chart-contract.md)・[32配置の照合](../verification/IM-01/pg-vpg-finite-conditioning/verification.md) | Caseで準備した全厚拘束を凍結接続の原行と照合し、同じパッチ・拘束・チャートをIM-02へ引き継ぐ。 |
+| [IM-01 構造](#im-01-構造) | 11／12（92%） | 1 | 一つのCaseから、認定基底と有限求積点を保持する全パッチ、その全厚拘束と固定疎チャートを準備できる。凍結R4・R5の32配置で有限則の合同誤差を測り、必須場を厳密に照合した。 [Caseの準備仕様](../specs/structure/pg-case-chart-contract.md)・[32配置の照合](../verification/IM-01/pg-vpg-finite-conditioning/verification.md) | 同じ所有パッチとチャートで時刻依存の全厚支持を検証し、IM-02への引継ぎを審査する。 |
 | [IM-03 空力](#im-03-空力) | 7／13（54%） | 6 | 局所P1核、大域幾何、後縁所有、共有辺の誘導・全微分を実装した。非一様な既知流れを同じ試行の循環・荷重とその微分に使う。全指定運動と励振のイベントを共通時計で検査し、同じ時刻の片側で離散空力取付を評価する。型付き入力の再開時には現行ケースと保存した係数・時刻表を照合する。 | PGの物質点写像と循環時間微分を接続し、自由後流の時間更新とJ1の状態確定・再開を検証する。 |
 | [IM-06 入出力](#im-06-入出力) | 6／18（33%） | 12 | 型付きschemaとSI変換、マニフェスト直下の全参照の取得、Gmshメッシュの読取り、チェックポイント容器を実装した。容器は既存番号を保護して保存し、検証を通った最新番号のチャンクを復元する。 [チェックポイントの検証](../verification/IM-06/checkpoint-manifest.md) | Gmshのsidecarで部材、材料、支持、接続、参照面への対応を定め、役割ごとの参照を解決する。実行再開にはJ1と探索の受理済み状態が必要。 |
 
@@ -27,7 +27,7 @@
 | 全位置traceと拘束 | 完了 | 非整合面を共通細分し、厚さ段差、指定層と部分面、向きを検査する。原拘束と固定支持の指定値を保持し、厳密な重複行の尺度と双対仕事を照合した。時間依存の指定値と複数接続の閉路処理は固定ピボットの疎チャートで扱う。 [全厚拘束の検証](../verification/IM-01/pg-prepared-patch-trace.md) |
 | 固定pivot疎chart | 完了 | 固定支持、物理拘束ID、元行順で代表を選ぶ。同じ因子で位置・接線・転置・元行反力を計算し、独立に作ったKKT解と照合した。Caseの複数Motionは各群の元行を個別認定し、共通時計で片側の位置・速度・加速度を評価する。R-02の2・3・4パッチでは元有理CSRによる補正後、全厚位置差を全域で $1.153\times10^{-16}$ m以下と確認した。 [複数Motion](../verification/IM-01/pg-structural-motion-groups.md)・[実空間の残差](../verification/IM-01/pg-chart-refinement-series/physical-trace-verification.md) |
 | 早期R-02 | 完了 | 非整合を含む2・3・4パッチ、接続1・2・4本の系列で、原行の非零数、rank、L/U、準備・再利用の課金と常駐量を測った。4パッチの閉路はrank 248、因子23,503項。実項数ちょうどで準備に成功し、チャート識別子、rank、L/U各項数が一致した。1項不足では元拘束を保持して拒否した。実務規模の性能はA5-06で確認する。 [R-02の計測](../verification/IM-01/pg-sparse-chart-series.md) |
-| 終了審査 | 残 | 凍結34 Caseの36 Shellから製品の物理参照を準備した。R4の28配置とR5の4配置で、位置、法線、全厚、層の片側と物理測度を独立式と照合した。32配置では指定有限則の合同誤差が $10^{-20}$ 以下となり、385,968成分で必須場の厳密一致を確認した。凍結した二曲面の整合・非整合接続には独立した全厚拘束の参照があり、Caseから同じ準備を通す検証に使う。IM-02へはパッチ、有限点と重み、原拘束およびチャートをまとめて渡す。 [Caseからの物理参照](../verification/IM-01/vpg-case-product-reference.md)・[R4の物理幾何](../verification/IM-01/pg-r4-domain-geometry.md)・[R5の切断境界と層](../verification/IM-01/pg-r5-domain-geometry.md)・[R4の二曲面接続](../verification/IM-01/pg-r4-curved-interface/verification.md)・[有限則と資源の照合](../verification/IM-01/pg-vpg-finite-conditioning/verification.md) |
+| 終了審査 | 残 | 凍結34 Caseの36 Shellから製品の物理参照を準備した。R4の28配置とR5の4配置で、位置、法線、全厚、層の片側と物理測度を独立式と照合した。32配置では指定有限則の合同誤差が $10^{-20}$ 以下となり、385,968成分で必須場の厳密一致を確認した。凍結した二曲面の整合・非整合接続をCaseから準備し、両OSで全元行の拘束、再構成、転置の仕事と反力を照合した。非整合の元行は288、rankは171。時刻依存支持を同じCase入口で検査し、パッチ、有限点と重み、原拘束およびチャートをIM-02へ引き継ぐ。 [Caseからの物理参照](../verification/IM-01/vpg-case-product-reference.md)・[R4の物理幾何](../verification/IM-01/pg-r4-domain-geometry.md)・[R5の切断境界と層](../verification/IM-01/pg-r5-domain-geometry.md)・[R4の二曲面接続](../verification/IM-01/pg-r4-curved-interface/verification.md)・[有限則と資源の照合](../verification/IM-01/pg-vpg-finite-conditioning/verification.md)・[Caseの全厚拘束](../verification/IM-01/pg-case-full-chart/verification.md) |
 
 ## IM-03 空力
 

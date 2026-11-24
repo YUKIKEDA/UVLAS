@@ -1,3 +1,5 @@
+// Reuse the checked Case loader in this standalone driver.
+// NOLINTNEXTLINE(bugprone-suspicious-include)
 #include "case_pg_support_motion_test.cpp"
 #include "coupling/case_pg_chart.hpp"
 #include "run-series.cpp.txt"
