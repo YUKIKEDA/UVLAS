@@ -121,7 +121,8 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp src/io/nastran_beam_cards.cpp
     src/io/nastran_pbeam_cards.cpp src/io/nastran_position_enclosures.cpp
     src/io/nastran_shell_cards.cpp src/io/nastran_isotropic_shell_cards.cpp
-    src/io/nastran_laminate_cards.cpp src/io/external_mesh_quantity.cpp src/io/external_planar_pg.cpp
+    src/io/nastran_laminate_cards.cpp
+    src/io/nastran_pcomp_physical.cpp src/io/external_mesh_quantity.cpp src/io/external_planar_pg.cpp
     src/io/external_mesh_sidecar.cpp
     src/io/external_mesh_sidecar_binding.cpp
     src/io/external_mesh_sidecar_pg.cpp
