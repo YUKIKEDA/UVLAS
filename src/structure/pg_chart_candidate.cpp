@@ -492,33 +492,34 @@ PgChartCandidate::refine_lift(PgChartCandidateInput independent, PgChartCandidat
         auto rhs = allocate<Words>(plan, partition_mul(3, data.rank));
         auto coordinates = allocate<Words>(plan, partition_mul(3, data.columns));
         auto exact_values = allocate<ExactRational>(plan, data.columns);
-        auto representative = allocate<core::Index>(plan, data.rows);
-        for (auto& selected : representative.values()) {
-            budget.visit();
-            selected = -1;
-        }
-        for (std::size_t i = 0; i < data.rank; ++i) {
-            budget.visit();
-            representative.values()[static_cast<std::size_t>(pivots[i].original_row)] =
-                partition_index(i);
-        }
-        for (std::size_t axis = 0; axis < 3; ++axis) {
-            auto lane = coordinates.values().subspan(axis * data.columns, data.columns);
+        for (std::size_t axis = 0; axis < 3; ++axis)
             for (std::size_t j = 0; j < data.columns; ++j) {
                 budget.visit();
                 const auto free = data.free.values()[j];
                 if (free >= 0)
-                    lane[j] = r.at(static_cast<std::size_t>(free), axis);
+                    coordinates.values()[axis * data.columns + j] =
+                        r.at(static_cast<std::size_t>(free), axis);
+            }
+        const auto read_coordinates = [&](std::size_t axis) {
+            const auto lane = coordinates.values().subspan(axis * data.columns, data.columns);
+            for (std::size_t j = 0; j < data.columns; ++j) {
+                budget.visit();
                 exact_values.values()[j] = retained_rational(math, lane[j]);
             }
-            for (std::size_t i = 0; i < data.rank; ++i) {
-                budget.visit();
-                const auto row = pivots[i].original_row;
-                rhs.values()[axis * data.rank + i] = round_original_pair(
-                    math, original_row_defect(math, original, row, exact_values.values(),
-                                              c.at(static_cast<std::size_t>(row), axis)));
+        };
+        const auto build_rhs = [&] {
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                read_coordinates(axis);
+                for (std::size_t i = 0; i < data.rank; ++i) {
+                    budget.visit();
+                    const auto row = pivots[i].original_row;
+                    rhs.values()[axis * data.rank + i] = round_original_pair(
+                        math, original_row_defect(math, original, row, exact_values.values(),
+                                                  c.at(static_cast<std::size_t>(row), axis)));
+                }
             }
-        }
+        };
+        build_rhs();
         for (std::uint64_t corrections = 0;; ++corrections) {
             budget.visit();
             math.cancel();
@@ -526,7 +527,6 @@ PgChartCandidate::refine_lift(PgChartCandidateInput independent, PgChartCandidat
             const auto delta =
                 planes(data.identity, {data.identity, solved_values(solved)}, data.rank);
             ExactRational worst;
-            const bool have_next = corrections < refinement.maximum_corrections;
             for (std::size_t axis = 0; axis < 3; ++axis) {
                 auto lane = coordinates.values().subspan(axis * data.columns, data.columns);
                 for (std::size_t i = 0; i < data.rank; ++i) {
@@ -534,20 +534,13 @@ PgChartCandidate::refine_lift(PgChartCandidateInput independent, PgChartCandidat
                     auto& coordinate = lane[static_cast<std::size_t>(pivots[i].dependent_column)];
                     coordinate = round_pair(lifted(coordinate) + lifted(delta.at(i, axis)));
                 }
-                for (std::size_t j = 0; j < data.columns; ++j) {
-                    budget.visit();
-                    exact_values.values()[j] = retained_rational(math, lane[j]);
-                }
+                read_coordinates(axis);
                 for (std::size_t row = 0; row < data.rows; ++row) {
                     budget.visit();
                     const auto residual =
                         original_row_defect(math, original, partition_index(row),
                                             exact_values.values(), c.at(row, axis));
                     record_defect(math, worst, residual);
-                    const auto index = representative.values()[row];
-                    if (have_next && index >= 0)
-                        rhs.values()[axis * data.rank + static_cast<std::size_t>(index)] =
-                            round_original_pair(math, residual);
                 }
             }
             if (math.compare(worst, allowed) <= 0) {
@@ -559,8 +552,10 @@ PgChartCandidate::refine_lift(PgChartCandidateInput independent, PgChartCandidat
                 return PgChartRefined<PgChartCandidateLift>{
                     {data.identity, std::move(result), bound}, math.info(), corrections};
             }
-            if (!have_next || data.rank == 0)
+            if (corrections == refinement.maximum_corrections || data.rank == 0)
                 partition_fail(core::FailureCode::PrecisionUnresolved);
+            // Repeat only the selected residuals after a failed convergence test.
+            build_rhs();
         }
     });
 }
@@ -589,6 +584,26 @@ PgChartCandidate::refine_transpose(PgChartCandidateInput force,
         auto multipliers = allocate<Words>(plan, partition_mul(3, data.rows));
         auto reduced_force = allocate<Words>(plan, partition_mul(3, data.independent));
         auto balance = allocate<ExactRational>(plan, data.columns);
+        const auto original_balance = [&](std::size_t axis) {
+            const auto actual = multipliers.values().subspan(axis * data.rows, data.rows);
+            for (std::size_t col = 0; col < data.columns; ++col) {
+                budget.visit();
+                balance.values()[col] = retained_rational(math, f.at(col, axis));
+            }
+            for (const auto& pivot : pivots) {
+                const auto row = pivot.original_row;
+                const auto exact_multiplier =
+                    retained_rational(math, actual[static_cast<std::size_t>(row)]);
+                math.visit(1);
+                for (const auto& term : partition_take(original.row(row))) {
+                    math.visit(1);
+                    auto& component = balance.values()[static_cast<std::size_t>(term.column)];
+                    if (exact_multiplier.sign() != 0)
+                        component =
+                            math.sub(component, math.mul(term.coefficient, exact_multiplier));
+                }
+            }
+        };
         for (std::size_t axis = 0; axis < 3; ++axis)
             for (std::size_t i = 0; i < data.rank; ++i) {
                 budget.visit();
@@ -602,30 +617,17 @@ PgChartCandidate::refine_transpose(PgChartCandidateInput force,
             const auto delta =
                 planes(data.identity, {data.identity, solved_values(solved)}, data.rank);
             ExactRational worst;
-            const bool have_next = corrections < refinement.maximum_corrections;
             for (std::size_t axis = 0; axis < 3; ++axis) {
                 auto actual = multipliers.values().subspan(axis * data.rows, data.rows);
                 auto reduced =
                     reduced_force.values().subspan(axis * data.independent, data.independent);
-                for (std::size_t col = 0; col < data.columns; ++col) {
-                    budget.visit();
-                    balance.values()[col] = retained_rational(math, f.at(col, axis));
-                }
                 for (std::size_t i = 0; i < data.rank; ++i) {
                     budget.visit();
                     const auto row = pivots[i].original_row;
                     auto& multiplier = actual[static_cast<std::size_t>(row)];
                     multiplier = round_pair(lifted(multiplier) + lifted(delta.at(i, axis)));
-                    const auto exact_multiplier = retained_rational(math, multiplier);
-                    math.visit(1);
-                    for (const auto& term : partition_take(original.row(row))) {
-                        math.visit(1);
-                        auto& component = balance.values()[static_cast<std::size_t>(term.column)];
-                        if (exact_multiplier.sign() != 0)
-                            component =
-                                math.sub(component, math.mul(term.coefficient, exact_multiplier));
-                    }
                 }
+                original_balance(axis);
                 for (std::size_t col = 0; col < data.columns; ++col) {
                     budget.visit();
                     auto& residual = balance.values()[col];
@@ -634,10 +636,6 @@ PgChartCandidate::refine_transpose(PgChartCandidateInput force,
                         auto& value = reduced[static_cast<std::size_t>(free)];
                         value = round_original_pair(math, residual);
                         residual = math.sub(residual, retained_rational(math, value));
-                    } else if (have_next) {
-                        const auto pivot = static_cast<std::size_t>(data.dependent.values()[col]);
-                        rhs.values()[axis * data.rank + pivot] =
-                            round_original_pair(math, residual);
                     }
                     record_defect(math, worst, residual);
                 }
@@ -655,8 +653,18 @@ PgChartCandidate::refine_transpose(PgChartCandidateInput force,
                     math.info(),
                     corrections};
             }
-            if (!have_next || data.rank == 0)
+            if (corrections == refinement.maximum_corrections || data.rank == 0)
                 partition_fail(core::FailureCode::PrecisionUnresolved);
+            // Rebuild dependent-column defects only when another solve is needed.
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                original_balance(axis);
+                for (std::size_t i = 0; i < data.rank; ++i) {
+                    budget.visit();
+                    const auto col = static_cast<std::size_t>(pivots[i].dependent_column);
+                    rhs.values()[axis * data.rank + i] =
+                        round_original_pair(math, balance.values()[col]);
+                }
+            }
         }
     });
 }
