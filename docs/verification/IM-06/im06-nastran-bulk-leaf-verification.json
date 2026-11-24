@@ -1,0 +1,45 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-bulk-leaf-verification",
+  "ids": [
+    "IO4-01",
+    "IO4-03"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "7cbaf7c7ea351ea152ad2fa77c9e898892d48ec8",
+  "scope": "Inspect authenticated standalone Nastran Bulk Data as a leaf in CLI reference validation",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 4
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 4,
+      "clang_tidy": "21.1.1 PASS on five translation units"
+    },
+    "mutation": "Admitting CBUSH as an adopted card made io.nastran_bulk fail; all four tests passed again after restoration."
+  },
+  "tested_target_registration": {
+    "commit": "7cbaf7c7ea351ea152ad2fa77c9e898892d48ec8",
+    "CMakeLists.txt": "8dc2f0db5b508e940d09b7279779ebf2f742298a9b0f224cac917c5135a5a797",
+    "tests/CMakeLists.txt": "faf63075071e298eadf8a7b2c6679747cdfe46c3f106fc398240c07a28c3ee8e"
+  },
+  "sources": {
+    "src/io/nastran_bulk.cpp": "321d5d2a0e9b2371d045942667e19ed388e13a9f1dbf7c39c42726cf604778c4",
+    "src/io/nastran_bulk.hpp": "78165153d932ffedb5ee2c21a97ad4283cfc2d59bebcc6fd2c15d45204fa4244",
+    "src/io/reference_resolution.cpp": "f4d33fb030fa789c30660a5bf77a777c1859e057a3af00e8c71814bef6aefe6f",
+    "src/io/reference_resolution.hpp": "b7d064c18e2b07ba948346b424a3682d032b6b06e1eb7678966e812913b03f0b",
+    "src/app/validate_case.cpp": "489c69ae9cfb90e89c96306cb48efd95411625e9824a103aceb83319d634df3d",
+    "tests/io/nastran_bulk_test.cpp": "3835c0170fc5119c585808ac512997513037f5b6ceb6fa2ad990a0f74770a98d",
+    "tests/io/reference_input_test.cpp": "02dbd93f5416a63edab80c58e35826ae55492c90772cc9356b88e45acd7b52b8",
+    "tests/check_cli_validate.cmake": "b71b6a59150b17e97665ed22a167e8477db48d902c2e44aa93faa894ee71d454"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-bulk-leaf-verification.md": "0eef86d7d76d9e1e15b552262c47e9b566aa331a526f3b67aa89e2663236d40b"
+  }
+}

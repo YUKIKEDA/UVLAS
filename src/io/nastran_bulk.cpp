@@ -1,6 +1,7 @@
 #include "nastran_bulk.hpp"
 
 #include <algorithm>
+#include <array>
 #include <limits>
 #include <utility>
 
@@ -438,6 +439,82 @@ std::string_view text_of(std::span<const std::byte> bytes) noexcept {
     return {reinterpret_cast<const char*>(bytes.data()), bytes.size()};
 }
 
+enum class DeckScope : std::uint8_t { Lexical, Standalone };
+
+[[nodiscard]] bool adopted_card(std::string_view name) noexcept {
+    constexpr std::array<std::string_view, 17> names{
+        "GRID",  "CORD2R", "CORD2C", "CORD2S", "CQUAD4", "CTRIA3", "MAT1", "PSHELL", "MAT8",
+        "PCOMP", "CBEAM",  "PBEAM",  "CONM2",  "RBE2",   "SPC",    "SPC1", "SPCADD",
+    };
+    return std::ranges::any_of(
+        names, [name](std::string_view supported) { return same_keyword(name, supported); });
+}
+
+struct BulkRecords {
+    core::PlannedBuffer<NastranBulkCard> cards;
+    core::PlannedBuffer<Lexeme> fields;
+    std::uint64_t work{};
+};
+
+[[nodiscard]] core::Result<BulkRecords>
+read_records(const AcquiredRootSnapshot& snapshot, NastranBulkLimits limits, DeckScope scope,
+             core::ResourcePlan& plan, const std::stop_token& stop,
+             std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
+    if (diagnostic)
+        diagnostic->reset();
+    return core::guard_entry(operation, Code::InvalidInput, {}, [&]() -> core::Result<BulkRecords> {
+        try {
+            Work work{limits.work, stop};
+            work.charge(0);
+            const auto source = snapshot.file.view();
+            if (!source || snapshot.location.role != ReferenceRole::NastranDeck)
+                reject(Code::InvalidInput, Reason::Snapshot);
+            if (source->bytes.size() > limits.file_bytes)
+                reject(Code::ResourceExceeded, Reason::Limit);
+            const auto bytes = text_of(source->bytes);
+            Counts counts;
+            scan(bytes, limits, work, [&](const Row& row) {
+                add(counts.rows, 1, limits.physical_lines, row.first.position);
+                add(counts.fields, row.count, limits.fields, row.first.position);
+                if (row.kind == RowKind::Card) {
+                    add(counts.cards, 1, limits.cards, row.first.position);
+                    if (scope == DeckScope::Standalone) {
+                        work.charge(1, row.first.position);
+                        if (!adopted_card(spelling(bytes, row.first)))
+                            reject(Code::Unsupported, Reason::UnsupportedCard, row.first.position);
+                    }
+                }
+                for (const auto label : {row.incoming, row.outgoing}) {
+                    if (label.size != 0)
+                        add(counts.labels, 1, std::numeric_limits<std::uint64_t>::max(),
+                            label.position);
+                }
+            });
+            if (counts.rows == 0)
+                reject(Code::InvalidInput, Reason::Header);
+            auto remaining = plan.remaining_bytes();
+            admit<Row>(counts.rows, remaining, work);
+            admit<Continuation>(counts.labels, remaining, work);
+            admit<NastranBulkCard>(counts.cards, remaining, work);
+            admit<Lexeme>(counts.fields, remaining, work);
+            auto rows = allocate<Row>(plan, counts.rows);
+            auto labels = allocate<Continuation>(plan, counts.labels);
+            auto cards = allocate<NastranBulkCard>(plan, counts.cards);
+            auto fields = allocate<Lexeme>(plan, counts.fields);
+            std::size_t i = 0;
+            scan(bytes, limits, work, [&](const Row& row) { rows.values()[i++] = row; });
+            connect(bytes, rows.values(), labels.values(), work);
+            flatten(bytes, rows.values(), cards.values(), fields.values(), work);
+            work.charge(0);
+            return BulkRecords{std::move(cards), std::move(fields), work.used()};
+        } catch (const Abort& error) {
+            if (diagnostic && error.failure.code != Code::Cancelled)
+                *diagnostic = error.diagnostic;
+            return std::unexpected(error.failure);
+        }
+    });
+}
+
 } // namespace
 
 std::string_view NastranBulkView::text(NastranBulkLexeme lexeme) const noexcept {
@@ -474,55 +551,22 @@ core::Result<NastranBulkDeck>
 NastranBulkDeck::prepare(AcquiredRootSnapshot&& snapshot, NastranBulkLimits limits,
                          core::ResourcePlan& plan, const std::stop_token& stop,
                          std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
-    if (diagnostic)
-        diagnostic->reset();
-    return core::guard_entry(
-        operation, Code::InvalidInput, {}, [&]() -> core::Result<NastranBulkDeck> {
-            try {
-                Work work{limits.work, stop};
-                work.charge(0);
-                const auto source = snapshot.file.view();
-                if (!source || snapshot.location.role != ReferenceRole::NastranDeck)
-                    reject(Code::InvalidInput, Reason::Snapshot);
-                if (source->bytes.size() > limits.file_bytes)
-                    reject(Code::ResourceExceeded, Reason::Limit);
-                const auto bytes = text_of(source->bytes);
-                Counts counts;
-                scan(bytes, limits, work, [&](const Row& row) {
-                    add(counts.rows, 1, limits.physical_lines, row.first.position);
-                    add(counts.fields, row.count, limits.fields, row.first.position);
-                    if (row.kind == RowKind::Card)
-                        add(counts.cards, 1, limits.cards, row.first.position);
-                    for (const auto label : {row.incoming, row.outgoing}) {
-                        if (label.size != 0)
-                            add(counts.labels, 1, std::numeric_limits<std::uint64_t>::max(),
-                                label.position);
-                    }
-                });
-                if (counts.rows == 0)
-                    reject(Code::InvalidInput, Reason::Header);
-                auto remaining = plan.remaining_bytes();
-                admit<Row>(counts.rows, remaining, work);
-                admit<Continuation>(counts.labels, remaining, work);
-                admit<NastranBulkCard>(counts.cards, remaining, work);
-                admit<Lexeme>(counts.fields, remaining, work);
-                auto rows = allocate<Row>(plan, counts.rows);
-                auto labels = allocate<Continuation>(plan, counts.labels);
-                auto cards = allocate<NastranBulkCard>(plan, counts.cards);
-                auto fields = allocate<Lexeme>(plan, counts.fields);
-                std::size_t i = 0;
-                scan(bytes, limits, work, [&](const Row& row) { rows.values()[i++] = row; });
-                connect(bytes, rows.values(), labels.values(), work);
-                flatten(bytes, rows.values(), cards.values(), fields.values(), work);
-                work.charge(0);
-                return NastranBulkDeck{std::move(snapshot), std::move(cards), std::move(fields),
-                                       work.used()};
-            } catch (const Abort& error) {
-                if (diagnostic && error.failure.code != Code::Cancelled)
-                    *diagnostic = error.diagnostic;
-                return std::unexpected(error.failure);
-            }
-        });
+    auto result = read_records(snapshot, limits, DeckScope::Lexical, plan, stop, diagnostic);
+    if (!result)
+        return std::unexpected(result.error());
+    return NastranBulkDeck{std::move(snapshot), std::move(result->cards), std::move(result->fields),
+                           result->work};
+}
+
+core::Result<std::uint64_t>
+verify_nastran_bulk_leaf(const AcquiredRootSnapshot& snapshot, NastranBulkLimits limits,
+                         core::ResourcePlan& plan, const std::stop_token& stop,
+                         std::optional<NastranBulkDiagnostic>* diagnostic) noexcept {
+    const auto result =
+        read_records(snapshot, limits, DeckScope::Standalone, plan, stop, diagnostic);
+    if (!result)
+        return std::unexpected(result.error());
+    return result->work;
 }
 
 } // namespace uvlas::io::detail

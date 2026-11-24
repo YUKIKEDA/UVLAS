@@ -959,8 +959,9 @@ TEST_CASE("Only format-proven root leaves enter a closed reference graph",
     rd::LeafReferenceDiagnostic diagnostic;
     rd::RootSnapshotDiagnostic file_diagnostic;
     const auto resolve = [&](rd::PreparedRootReferences& pending, rd::DependencyWalkLimits bounds) {
-        return rd::resolve_leaf_references(input, std::move(pending), acquisition, bounds, gmsh,
-                                           graph_plan, {}, &file_diagnostic, &diagnostic);
+        return rd::resolve_leaf_references(input, std::move(pending), acquisition, bounds,
+                                           {gmsh, {}}, graph_plan, {}, &file_diagnostic,
+                                           &diagnostic);
     };
     check_acquisition_failure(resolve(roots, closure), core::FailureCode::Unsupported);
     CHECK_FALSE(file_diagnostic.reason);

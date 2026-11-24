@@ -1,0 +1,131 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-prescribed-wake-velocity-v1",
+  "ids": [
+    "AE-07",
+    "UW-D02",
+    "UW-D08",
+    "IO4-01",
+    "N4-02",
+    "N4-03",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "2d13fd13d2ad085c335fed9d453f88ee3a0dee69",
+  "claimed_state": "Typed SI prescribed convection velocity with exact constant, polynomial and PCHIP jets, input-content-bound in-memory restore and explicit projection. Spatial derivative is zero.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51 Debug and Release, four selected CTest series. Debug companions at 2e871c16 and changed coupling series rerun at this final source, 34.79 seconds under the existing 60-second cap.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2 Release, warnings as errors. Four selected CTest series.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.uniform_flow",
+      "aero.pchip_curve",
+      "io.si_case"
+    ],
+    "catch": "Typed SI prescribed wake owns its velocity independently of ambient flow; 1 case with 680 assertions in MSVC and GCC Release, seed 23.",
+    "oracle": "Signed exact ft/min rational conversion, analytical position in polynomial time, independent low-degree Hermite formula and derivatives at an interior point and a knot, zero spatial Jacobian, and rational reconstruction of projected words and radius.",
+    "negative": "Free and absent wake, changed current samples at the same stamp including in-memory restoration, insufficient time coverage and work, cancellation, and failed finite projection preserving the source. Changed ambient input leaves the prescribed curve unchanged.",
+    "mutation": "Byte-identical GCC 14.2 Release control at 2e871c16b4845d5d73dc100ee877636a0c4886d5: 707 assertions. Selecting ambient velocity in the prescribed branch fails 82 assertions, Catch2 exit 42. Final test-only revision removes repeated setup and boundary checks.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on the two product and one test translation unit in MSVC and GCC databases."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "include/uvlas/io/case_schema_records.hpp": "737bad957979af654395ed92bc2cdd1f4e6e45f9d8ce3708b8519f54ec5348d8",
+    "src/aero/uniform_flow.cpp": "948a42d9002bf7dd21ef9df5cf3ad4c42c75886c1a6ca0c201fbc3015a26189b",
+    "src/aero/pchip_curve.cpp": "f4c6b6f402b8654bb36eff7452f3bf9d9f21d9dc4cacf4387e441a97e8ed67c2",
+    "src/io/si_exact_words.hpp": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177",
+    "src/io/si_rational_projection.cpp": "e23a0831c547f5eb502ef43fff554e99695162dea0cd45a23f6258644a661307",
+    "src/coupling/case_uniform_flow.cpp": "636407dc2d4c1c01a227284e158196495a91afc26c2d50370764f5f3eed693ca",
+    "src/coupling/case_uniform_flow.hpp": "1ef10ed85199e5a79537c0c8bfbd6d3ed571f47318a9baf3cf9fc987844b25b4",
+    "src/coupling/case_uniform_flow_projection.cpp": "ea87abef779e6e530a28099c9a00cf21a26feefddb9f1a2fd0875042183593e3",
+    "src/coupling/case_uniform_flow_projection.hpp": "89951f36f40d9b1004b737887e205fdc5599ca2b0cdc3084632606540c4712ab",
+    "tests/coupling/case_uniform_flow_test.cpp": "5d9741d7b84be089c8f73960c218529d5f5a9802a890f3b1ece2c84ced805b58"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-prescribed-wake-velocity-v1/verification.md": "09c831689b16d7d0d6fc1604c70045a8ab83fef756e454f0e107d742304a4308"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-examples.json",
+      "hint": "docs/specs/foundation/case-schema-examples.json",
+      "sha256": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe"
+    },
+    {
+      "id": "include/uvlas/io/case_schema_records.hpp",
+      "hint": "include/uvlas/io/case_schema_records.hpp",
+      "sha256": "737bad957979af654395ed92bc2cdd1f4e6e45f9d8ce3708b8519f54ec5348d8"
+    },
+    {
+      "id": "src/aero/uniform_flow.cpp",
+      "hint": "src/aero/uniform_flow.cpp",
+      "sha256": "948a42d9002bf7dd21ef9df5cf3ad4c42c75886c1a6ca0c201fbc3015a26189b"
+    },
+    {
+      "id": "src/aero/pchip_curve.cpp",
+      "hint": "src/aero/pchip_curve.cpp",
+      "sha256": "f4c6b6f402b8654bb36eff7452f3bf9d9f21d9dc4cacf4387e441a97e8ed67c2"
+    },
+    {
+      "id": "src/io/si_exact_words.hpp",
+      "hint": "src/io/si_exact_words.hpp",
+      "sha256": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177"
+    },
+    {
+      "id": "src/io/si_rational_projection.cpp",
+      "hint": "src/io/si_rational_projection.cpp",
+      "sha256": "e23a0831c547f5eb502ef43fff554e99695162dea0cd45a23f6258644a661307"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.cpp",
+      "hint": "src/coupling/case_uniform_flow.cpp",
+      "sha256": "636407dc2d4c1c01a227284e158196495a91afc26c2d50370764f5f3eed693ca"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.hpp",
+      "hint": "src/coupling/case_uniform_flow.hpp",
+      "sha256": "1ef10ed85199e5a79537c0c8bfbd6d3ed571f47318a9baf3cf9fc987844b25b4"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow_projection.cpp",
+      "hint": "src/coupling/case_uniform_flow_projection.cpp",
+      "sha256": "ea87abef779e6e530a28099c9a00cf21a26feefddb9f1a2fd0875042183593e3"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow_projection.hpp",
+      "hint": "src/coupling/case_uniform_flow_projection.hpp",
+      "sha256": "89951f36f40d9b1004b737887e205fdc5599ca2b0cdc3084632606540c4712ab"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "5d9741d7b84be089c8f73960c218529d5f5a9802a890f3b1ece2c84ced805b58"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/case-prescribed-wake-velocity-v1/verification.md",
+      "hint": "docs/verification/IM-03/case-prescribed-wake-velocity-v1/verification.md",
+      "sha256": "09c831689b16d7d0d6fc1604c70045a8ab83fef756e454f0e107d742304a4308"
+    }
+  ]
+}

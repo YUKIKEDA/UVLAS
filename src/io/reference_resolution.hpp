@@ -1,10 +1,16 @@
 #pragma once
 
 #include "gmsh_mesh.hpp"
+#include "nastran_bulk.hpp"
 
 namespace uvlas::io::detail {
 
 enum class LeafReferenceFailure : std::uint8_t { UnsupportedRole, Format, Graph };
+
+struct LeafFormatLimits {
+    GmshLimits gmsh;
+    NastranBulkLimits nastran;
+};
 
 struct LeafReferenceDiagnostic {
     std::optional<LeafReferenceFailure> reason;
@@ -35,7 +41,7 @@ public:
 private:
     friend core::Result<ReferencedCase>
     resolve_leaf_references(const ReferenceInput&, PreparedRootReferences&&, RootInventoryLimits,
-                            DependencyWalkLimits, GmshLimits, core::ResourcePlan&,
+                            DependencyWalkLimits, LeafFormatLimits, core::ResourcePlan&,
                             const std::stop_token&, RootSnapshotDiagnostic*,
                             LeafReferenceDiagnostic*) noexcept;
 
@@ -49,7 +55,7 @@ private:
 // repeated manifest edges. Move the declarations only on success.
 [[nodiscard]] core::Result<ReferencedCase>
 resolve_leaf_references(const ReferenceInput&, PreparedRootReferences&&, RootInventoryLimits,
-                        DependencyWalkLimits, GmshLimits, core::ResourcePlan&,
+                        DependencyWalkLimits, LeafFormatLimits, core::ResourcePlan&,
                         const std::stop_token&, RootSnapshotDiagnostic*,
                         LeafReferenceDiagnostic*) noexcept;
 

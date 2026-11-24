@@ -29,7 +29,7 @@ void describe(LeafReferenceDiagnostic& diagnostic, RootSnapshotLocation location
 
 class LeafInspector final : public RootSnapshotInspector {
 public:
-    LeafInspector(GmshLimits limits, std::uint64_t pointer_limit, core::ResourcePlan& plan,
+    LeafInspector(LeafFormatLimits limits, std::uint64_t pointer_limit, core::ResourcePlan& plan,
                   const std::stop_token& stop, LeafReferenceDiagnostic* diagnostic) noexcept
         : limits_(limits),
           pointer_limit_(pointer_limit),
@@ -39,23 +39,52 @@ public:
 
     [[nodiscard]] core::Result<void>
     inspect(const AcquiredRootSnapshot& snapshot) noexcept override {
-        if (snapshot.location.role != ReferenceRole::GmshMesh) {
+        switch (snapshot.location.role) {
+        case ReferenceRole::GmshMesh:
+            return inspect_gmsh(snapshot);
+        case ReferenceRole::NastranDeck:
+            return inspect_nastran(snapshot);
+        default:
             return reject({Code::Unsupported, operation}, snapshot,
                           LeafReferenceFailure::UnsupportedRole);
         }
-        std::size_t offset = 0;
-        const auto proof = prove_gmsh_mesh_leaf(snapshot, limits_, plan_, stop_, &offset);
-        if (!proof) {
-            if (diagnostic_ && proof.error().code != Code::ResourceExceeded) {
-                diagnostic_->format_offset = offset;
-            }
-            return reject(proof.error(), snapshot, LeafReferenceFailure::Format);
-        }
-        limits_.work -= proof->work();
-        return {};
     }
 
 private:
+    [[nodiscard]] core::Result<void> inspect_gmsh(const AcquiredRootSnapshot& snapshot) noexcept {
+        std::size_t offset = 0;
+        const auto proof = prove_gmsh_mesh_leaf(snapshot, limits_.gmsh, plan_, stop_, &offset);
+        if (!proof) {
+            return reject_format(proof.error(), snapshot, offset);
+        }
+        limits_.gmsh.work -= proof->work();
+        return {};
+    }
+
+    [[nodiscard]] core::Result<void>
+    inspect_nastran(const AcquiredRootSnapshot& snapshot) noexcept {
+        std::optional<NastranBulkDiagnostic> detail;
+        const auto work =
+            verify_nastran_bulk_leaf(snapshot, limits_.nastran, plan_, stop_, &detail);
+        if (!work) {
+            return reject_format(work.error(), snapshot,
+                                 detail.transform([](const NastranBulkDiagnostic& value) {
+                                     return value.position.byte;
+                                 }));
+        }
+        limits_.nastran.work -= *work;
+        return {};
+    }
+
+    [[nodiscard]] core::Result<void> reject_format(core::Failure error,
+                                                   const AcquiredRootSnapshot& file,
+                                                   std::optional<std::size_t> offset) noexcept {
+        if (diagnostic_ && error.code != Code::ResourceExceeded) {
+            diagnostic_->format_offset = offset;
+        }
+        return reject(error, file, LeafReferenceFailure::Format);
+    }
+
     [[nodiscard]] core::Result<void> reject(core::Failure error, const AcquiredRootSnapshot& file,
                                             LeafReferenceFailure reason) noexcept {
         if (diagnostic_ && error.code != Code::Cancelled) {
@@ -70,7 +99,7 @@ private:
         return std::unexpected(error);
     }
 
-    GmshLimits limits_;
+    LeafFormatLimits limits_;
     std::uint64_t pointer_limit_;
     core::ResourcePlan& plan_;
     const std::stop_token& stop_;
@@ -163,9 +192,9 @@ ReferencedCase::ReferencedCase(AcquiredRootReferences&& roots,
 
 core::Result<ReferencedCase>
 resolve_leaf_references(const ReferenceInput& input, PreparedRootReferences&& prepared,
-                        RootInventoryLimits intake, DependencyWalkLimits limits, GmshLimits gmsh,
-                        core::ResourcePlan& plan, const std::stop_token& stop,
-                        RootSnapshotDiagnostic* acquisition,
+                        RootInventoryLimits intake, DependencyWalkLimits limits,
+                        LeafFormatLimits formats, core::ResourcePlan& plan,
+                        const std::stop_token& stop, RootSnapshotDiagnostic* acquisition,
                         LeafReferenceDiagnostic* diagnostic) noexcept {
     if (acquisition) {
         acquisition->reset();
@@ -198,7 +227,7 @@ resolve_leaf_references(const ReferenceInput& input, PreparedRootReferences&& pr
         }
         return std::unexpected(order.error());
     }
-    LeafInspector inspector{gmsh, limits.diagnostic_bytes, plan, stop, diagnostic};
+    LeafInspector inspector{formats, limits.diagnostic_bytes, plan, stop, diagnostic};
     auto inventory = acquire_root_references(input, std::move(prepared), intake, plan, stop,
                                              acquisition, &inspector);
     if (!inventory) {

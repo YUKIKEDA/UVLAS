@@ -78,6 +78,56 @@ std::string fixed(std::string_view head, std::initializer_list<std::string_view>
     return result;
 }
 
+TEST_CASE("Nastran root inspection accepts the adopted standalone card names",
+          "[IO4-01][IO4-03][verification][negative]") {
+    constexpr std::string_view text = "BEGIN BULK\n"
+                                      "grid,1\nCORD2R,2\nCORD2C,3\nCORD2S,4\nCQUAD4,5\nCTRIA3,6\n"
+                                      "MAT1,7\nPSHELL,8\nMAT8,9\nPCOMP,10\nCBEAM,11\nPBEAM,12\n"
+                                      "CONM2,13\nRBE2,14\nSPC,15\nSPC1,16\nSPCADD,17\n"
+                                      "$ INCLUDE 'ignored.bdf'\nENDDATA\n";
+    // The leaf check verifies card names and structure. Numeric fields are read later.
+    const auto input = snapshot(text);
+    core::ResourcePlan plan{memory};
+    std::optional<NastranBulkDiagnostic> detail;
+    auto caps = limits;
+    caps.work = take(verify_nastran_bulk_leaf(input, caps, plan, {}, &detail));
+    CHECK_FALSE(detail);
+    REQUIRE(plan.allocated_bytes() > 0);
+    core::ResourcePlan exact{plan.allocated_bytes()};
+    CHECK(take(verify_nastran_bulk_leaf(input, caps, exact, {}, &detail)) == caps.work);
+    core::ResourcePlan short_memory{plan.allocated_bytes() - 1};
+    const auto not_admitted = verify_nastran_bulk_leaf(input, caps, short_memory, {}, &detail);
+    REQUIRE_FALSE(not_admitted);
+    CHECK(not_admitted.error().code == ResourceExceeded);
+    CHECK(short_memory.allocated_bytes() == 0);
+    --caps.work;
+    core::ResourcePlan work_plan{memory};
+    const auto exhausted = verify_nastran_bulk_leaf(input, caps, work_plan, {}, &detail);
+    REQUIRE_FALSE(exhausted);
+    CHECK(exhausted.error().code == ResourceExceeded);
+    const auto view = take(input.file.view());
+    CHECK(std::ranges::equal(view.bytes, std::as_bytes(std::span{text})));
+    CHECK(view.digest == source_digest(std::as_bytes(std::span{text})));
+}
+
+TEST_CASE("Nastran root inspection rejects dependencies and unadopted cards through EOF",
+          "[IO4-01][IO4-03][verification][negative]") {
+    constexpr std::string_view head = "BEGIN BULK\nGRID,1\n";
+    for (const auto tail : {"INCLUDE 'child.bdf'\n", "include,'child.bdf'\n", "INCLUDE*,CHILD\n",
+                            "CBUSH,5,1,2\n", "PARAM,POST,-1\n", "ENDDATA\nGRID,2\n"}) {
+        CAPTURE(tail);
+        const auto input = snapshot(std::string{head} + tail);
+        core::ResourcePlan plan{memory};
+        std::optional<NastranBulkDiagnostic> detail;
+        const auto outcome = verify_nastran_bulk_leaf(input, limits, plan, {}, &detail);
+        REQUIRE_FALSE(outcome);
+        const bool trailing = std::string_view{tail}.starts_with("ENDDATA");
+        CHECK(outcome.error().code == (trailing ? InvalidInput : Unsupported));
+        CHECK(take(detail).position.byte == head.size() + (trailing ? 8 : 0));
+        CHECK(plan.allocated_bytes() == 0);
+    }
+}
+
 TEST_CASE("Nastran lexer retains formats, spelling and source positions in one snapshot",
           "[IO4-03][IO4-01][verification]") {
     const auto small_head =
