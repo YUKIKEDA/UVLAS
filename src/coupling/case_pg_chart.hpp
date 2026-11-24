@@ -100,16 +100,28 @@ public:
     [[nodiscard]] const CaseStructuralSupport* motion() const& noexcept;
     [[nodiscard]] const CaseStructuralSupport* motion() const&& = delete;
 
+    /// Attach or replace numerical preparation on the same exact chart, preserving it on failure.
+    /// Do not retain borrows of this chart or its numerical candidate across successful
+    /// preparation.
+    [[nodiscard]] core::Result<void>
+    prepare_numerical(const numerics::linear::Scales&, const numerics::linear::Scales&,
+                      const structure::PgChartCandidatePreparation&,
+                      core::ResourcePlan&) & noexcept;
+    [[nodiscard]] const structure::PgChartCandidate* numerical() const& noexcept;
+    [[nodiscard]] const structure::PgChartCandidate* numerical() const&& = delete;
+
 private:
     friend struct case_pg_chart_detail::Builder;
     CasePgChart(core::PlannedBuffer<std::optional<structure::PgPreparedPatch>>&& patches,
                 structure::PgSparseChart&& chart) noexcept
-        : patches_(std::move(patches)), chart_(std::move(chart)) {}
+        : patches_(std::move(patches)),
+          chart_(std::in_place_type<structure::PgChartOwner>, std::move(chart)) {}
+    CasePgChart(core::PlannedBuffer<std::optional<structure::PgPreparedPatch>>&& patches,
+                CaseStructuralSupport&& motion) noexcept
+        : patches_(std::move(patches)), chart_(std::move(motion)) {}
 
     core::PlannedBuffer<std::optional<structure::PgPreparedPatch>> patches_;
-    // The fixed owner moves into the motion result only after successful qualification.
-    structure::PgSparseChart chart_;
-    std::optional<CaseStructuralSupport> motion_;
+    std::variant<structure::PgChartOwner, CaseStructuralSupport> chart_;
 };
 
 /// Prepare every PG shell, fixed full-position edge support and compatible

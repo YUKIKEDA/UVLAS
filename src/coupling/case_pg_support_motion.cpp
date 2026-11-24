@@ -842,7 +842,7 @@ retain_case_structural_pg_rhs(const CaseStructuralSupportSample& sample, p::JetO
 }
 
 core::Result<structure::PgChartCandidateLift> lift_case_structural_pg_support(
-    structure::PgChartCandidate& chart, structure::PgChartCandidateInput independent,
+    const structure::PgChartCandidate& chart, structure::PgChartCandidateInput independent,
     const CaseStructuralRetainedRhs& rhs, const structure::PgChartCandidateSolve& request,
     core::Workspace& workspace, core::ResourcePlan& plan, core::FailureDetails details) noexcept {
     return structural_support_detail::guarded<structure::PgChartCandidateLift>(

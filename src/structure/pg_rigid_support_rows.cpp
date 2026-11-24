@@ -220,7 +220,7 @@ PgRigidSupportRows::prepare_groups(PgSparseChart&& chart,
 }
 
 const PgSparseChart& PgRigidSupportRows::chart() const& noexcept {
-    return chart_;
+    return chart_.exact();
 }
 std::span<const PgRigidSupportRow> PgRigidSupportRows::rows() const& noexcept {
     return rows_.values();

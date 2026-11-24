@@ -74,6 +74,7 @@ public:
 
 private:
     friend struct structural_support_detail::Builder;
+    friend class CasePgChart;
     CaseStructuralSupport(case_clock_detail::Grid&& clock,
                           core::PlannedBuffer<std::optional<CaseMotionReady>>&& motions,
                           structure::PgRigidSupportRows&& support) noexcept
@@ -223,7 +224,7 @@ retain_case_structural_pg_rhs(const CaseStructuralSupportSample&, aero::detail::
 
 /// Add the true RHS radius to the numerical chart's original-CSR certificate.
 [[nodiscard]] core::Result<structure::PgChartCandidateLift> lift_case_structural_pg_support(
-    structure::PgChartCandidate&, structure::PgChartCandidateInput independent,
+    const structure::PgChartCandidate&, structure::PgChartCandidateInput independent,
     const CaseStructuralRetainedRhs&, const structure::PgChartCandidateSolve&, core::Workspace&,
     core::ResourcePlan&, core::FailureDetails = {}) noexcept;
 

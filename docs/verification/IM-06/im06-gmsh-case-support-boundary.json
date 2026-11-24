@@ -1,0 +1,36 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-gmsh-case-support-boundary",
+  "ids": [
+    "FD-03",
+    "FD-05",
+    "IO4-04",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "5566d743d04668f570b578624b1bfa1a697dd2b3",
+  "claimed_state": "元のGmsh一次線の物理グループと、同じCaseのShellに指定した名前付きPG境界を全域で厳密照合し、出典を所有する。",
+  "checks": {
+    "windows_debug_targets_passed": 4,
+    "windows_release_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "boundary_fixture_assertions": 93,
+    "whole_boundary_comparison_mutations_detected": 1
+  },
+  "artifacts": {
+    "CMakeLists.txt": "83a56c9fa31a6fdca37c2ce6d33da4901560d96413733b628454b269d9742a62",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/specs/structure/pg-case-structural-support-contract.md": "7ceadb794e7801cf9604ca65f0ae98f88ba4cc06bf6bb3a958738f34663744fe",
+    "docs/verification/IM-06/gmsh-case-support-boundary.md": "e3b34a473cfe72a7bfc802f428b11c83a9a6e723015bc40315fa0562bf629d56",
+    "src/coupling/case_gmsh_support_boundary.cpp": "90dd8838878b8557ac997e99c1a2616bc624b57c201d546ba3adfb0124c8663f",
+    "src/coupling/case_gmsh_support_boundary.hpp": "616e48e5dbfdd0b815b24247ee8022e7f85f65bccacb4f4c5a2df067b83db3a5",
+    "src/io/external_mesh_sidecar_binding.cpp": "9cbd37416783ababdea439f14f89e9cff099a5c50fd6723cf3fe307dd13d2929",
+    "src/io/gmsh_entity_physical.hpp": "ff1b4095094a1048bd2782e007744e4cb232d09ac1e3c9346ec61057e6390bf2",
+    "tests/CMakeLists.txt": "3e4ea8cbd2aae07340bfc2d314c3c0a635b1a10fb4b7562f38bf23e45230719a",
+    "tests/io/gmsh_case_support_boundary_test.cpp": "75d90bedbab2a61d2537b28381b50b4ae31e064094a47fde162b03a5f732ded1",
+    "tests/io/reference_file_test_fixture.hpp": "6c14eafea3b396fa43fc768c1dcae6b4efff0e02b3ccf43cb86b5b2d7bf716de"
+  }
+}
