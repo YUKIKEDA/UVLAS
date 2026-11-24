@@ -929,9 +929,10 @@ void rigid_contains(const NastranRigidIntervalVector& values, std::array<int, 3>
 void rigid_lanes(const std::array<std::optional<NastranCartesianInterval>, 3>& values,
                  const std::array<std::optional<int>, 3>& expected) {
     for (std::size_t i = 0; i < expected.size(); ++i) {
-        CHECK(values[i].has_value() == expected[i].has_value());
-        if (const auto& actual = values[i]; actual && expected[i]) {
-            si_contains(*actual, MassQ{*expected[i]});
+        const auto expected_value = expected[i];
+        CHECK(values[i].has_value() == expected_value.has_value());
+        if (const auto& actual = values[i]; actual && expected_value) {
+            si_contains(*actual, MassQ{*expected_value});
         }
     }
 }
