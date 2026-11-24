@@ -4299,6 +4299,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
         cf::prepare_wake_material_transition(wake_si, transport_clock, growth_trial, extended_trial,
                                              next_epoch, extended_limits, memory));
     REQUIRE(extended.size() == 4);
+    CHECK_FALSE(extended.window());
+    CHECK_FALSE(extended.retirement_source());
     const auto inherited = take(extended.row(0));
     if (!inherited.parent) {
         FAIL("A retained row must keep its parent material point");
@@ -4521,10 +4523,12 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
         window_si, stamp, transport_clock_limits, 1000000, memory));
     const cf::WakeTransportClock window_first{window_grid, window_grid, first_interval.destination};
     const cf::WakeTransportClock window_second{window_grid, window_grid, destination};
-    CHECK(take(cf::prepare_wake_material_transition(window_si, window_first, growth_parent,
-                                                    growth_trial, release.epoch, extended_limits,
-                                                    memory))
-              .retired_count() == 0);
+    const auto first_window = take(
+        cf::prepare_wake_material_transition(window_si, window_first, growth_parent, growth_trial,
+                                             release.epoch, extended_limits, memory));
+    CHECK(first_window.retired_count() == 0);
+    CHECK(first_window.window().has_value());
+    CHECK_FALSE(first_window.retirement_source());
     const std::array window_points{extended_points[1], extended_points[3]};
     const cf::WakeMaterialSnapshot window_trial{contact, window_points};
     const auto window = take(cf::prepare_wake_material_transition(
@@ -4535,6 +4539,28 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK(take(window.retired(1)).release == second_release);
     CHECK(take(window.retired(0)).point == id[4]);
     CHECK(take(window.row(0)).current.release.epoch == next_epoch);
+    const auto& requirements = window.window();
+    const auto& retirement_source = window.retirement_source();
+    if (!requirements || !retirement_source) {
+        FAIL("The finite window must keep its Case limits and retirement source");
+        return;
+    }
+    CHECK(requirements->rows == 1);
+    CHECK(pg_conditioning_test::q(requirements->duration_seconds) ==
+          pg_conditioning_test::Q{"1/8"});
+    CHECK(pg_conditioning_test::q(requirements->distance_metres) == pg_conditioning_test::Q{1});
+    CHECK(pg_conditioning_test::q(requirements->error_budget) == pg_conditioning_test::Q{"1/100"});
+    CHECK(retirement_source->geometry == test_geometry::take(previous_geometry.identity()));
+    const auto retired_at = retirement_source->time_seconds.view();
+    exact({retired_at.sign, retired_at.numerator, retired_at.denominator}, previous_time);
+    const auto upper_retired = take(window.retired_sample(0));
+    const auto lower_retired = take(window.retired_sample(1));
+    CHECK(upper_retired.material.release == release);
+    CHECK(sum_words(upper_retired.parent_position_metres[0]) == Rat{15, 8});
+    CHECK(sum_words(upper_retired.parent_position_metres[1]) == 1);
+    CHECK(sum_words(lower_retired.parent_position_metres[0]) == 2);
+    CHECK(sum_words(lower_retired.parent_position_metres[1]) == 0);
+    reject(window.retired_sample(2), core::FailureCode::InvalidInput);
     const std::array window_panels{
         cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, newest_id}};
     const std::array window_history{extended_trace.front()};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "case_flow_clock.hpp"
+#include "io/si_exact_words.hpp"
 
 namespace uvlas::coupling::detail {
 
@@ -133,6 +134,24 @@ struct FirstFreeWakePoint {
     std::optional<WakeMaterialPoint> parent;
 };
 
+/// Exact Case inputs retained for later closed-window qualification.
+struct WakeWindowRequirements {
+    structure::ExactRational duration_seconds;
+    structure::ExactRational distance_metres;
+    structure::ExactRational error_budget;
+    std::uint64_t rows{};
+};
+
+struct RetiredWakeMaterialPoint {
+    WakeMaterialPoint material;
+    NonpenetrationVector parent_position_metres;
+};
+
+struct WakeRetirementSource {
+    std::array<std::byte, 32> geometry{};
+    io::detail::SiRationalWords time_seconds;
+};
+
 /// Complete material correspondence between a parent and its wake trial.
 /// Each row pairs a retained owner with its parent, or identifies a new trailing-edge release.
 class WakeMaterialTransition {
@@ -148,6 +167,15 @@ public:
         return retired_.size();
     }
     [[nodiscard]] core::Result<WakeMaterialPoint> retired(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<RetiredWakeMaterialPoint> retired_sample(std::size_t) const noexcept;
+    [[nodiscard]] const std::optional<WakeWindowRequirements>& window() const& noexcept {
+        return window_;
+    }
+    [[nodiscard]] const std::optional<WakeWindowRequirements>& window() const&& = delete;
+    [[nodiscard]] const std::optional<WakeRetirementSource>& retirement_source() const& noexcept {
+        return retirement_source_;
+    }
+    [[nodiscard]] const std::optional<WakeRetirementSource>& retirement_source() const&& = delete;
     [[nodiscard]] std::uint64_t used_steps() const noexcept {
         return used_steps_;
     }
@@ -155,11 +183,19 @@ public:
 private:
     friend struct WakeTransportBuilder;
     WakeMaterialTransition(core::PlannedBuffer<std::optional<FirstFreeWakePoint>>&& rows,
-                           core::PlannedBuffer<std::optional<WakeMaterialPoint>>&& retired,
+                           core::PlannedBuffer<std::optional<RetiredWakeMaterialPoint>>&& retired,
+                           std::optional<WakeWindowRequirements>&& window,
+                           std::optional<WakeRetirementSource>&& retirement_source,
                            std::uint64_t used_steps) noexcept
-        : rows_(std::move(rows)), retired_(std::move(retired)), used_steps_(used_steps) {}
+        : rows_(std::move(rows)),
+          retired_(std::move(retired)),
+          window_(std::move(window)),
+          retirement_source_(std::move(retirement_source)),
+          used_steps_(used_steps) {}
     core::PlannedBuffer<std::optional<FirstFreeWakePoint>> rows_;
-    core::PlannedBuffer<std::optional<WakeMaterialPoint>> retired_;
+    core::PlannedBuffer<std::optional<RetiredWakeMaterialPoint>> retired_;
+    std::optional<WakeWindowRequirements> window_;
+    std::optional<WakeRetirementSource> retirement_source_;
     std::uint64_t used_steps_;
 };
 

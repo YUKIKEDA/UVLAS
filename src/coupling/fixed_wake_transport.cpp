@@ -444,6 +444,11 @@ core::Result<FirstFreeWakePoint> WakeMaterialTransition::row(std::size_t i) cons
 }
 
 core::Result<WakeMaterialPoint> WakeMaterialTransition::retired(std::size_t i) const noexcept {
+    return retired_sample(i).transform([](const auto& sample) { return sample.material; });
+}
+
+core::Result<RetiredWakeMaterialPoint>
+WakeMaterialTransition::retired_sample(std::size_t i) const noexcept {
     const auto rows = retired_.values();
     if (i < rows.size() && rows[i])
         return *rows[i];
@@ -451,11 +456,10 @@ core::Result<WakeMaterialPoint> WakeMaterialTransition::retired(std::size_t i) c
 }
 
 struct WakeTransportBuilder {
-    static std::uint64_t fixed_window_rows(const io::SiCase& si,
-                                           const io::schema::RetentionWindow& window,
-                                           const WakeTransportClock& clock,
-                                           const WakeTransportLimits& limits,
-                                           core::ResourcePlan& memory, m::Work& work) {
+    static WakeWindowRequirements
+    fixed_window_requirements(const io::SiCase& si, const io::schema::RetentionWindow& window,
+                              const WakeTransportClock& clock, const WakeTransportLimits& limits,
+                              core::ResourcePlan& memory, m::Work& work) {
         const auto intervals = clock.clock.intervals.values();
         const auto& step = intervals[static_cast<std::size_t>(clock.destination.interval)].step;
         for (const auto& interval : intervals) {
@@ -464,8 +468,12 @@ struct WakeTransportBuilder {
                 reject(Unsupported);
         }
         const auto arithmetic = limits.clock.fields.conversion;
-        const auto duration = read(io::materialize_rational(
-            read(si.quantity(window.duration)).recipe, arithmetic, memory));
+        const auto value = [&](const auto& field) {
+            work.step();
+            return read(
+                io::materialize_rational(read(si.quantity(field)).recipe, arithmetic, memory));
+        };
+        auto duration = value(window.duration);
         const auto count = read(duration.divide(step, arithmetic, memory));
         if (count.sign() != 1 || count.denominator_bits() != 1)
             reject(InvalidInput);
@@ -476,7 +484,7 @@ struct WakeTransportBuilder {
         auto rows = static_cast<std::uint64_t>(numerator[0]);
         if (numerator.size() == 2)
             rows |= static_cast<std::uint64_t>(numerator[1]) << 32U;
-        return rows;
+        return {std::move(duration), value(window.distance), value(window.error_budget), rows};
     }
     static WakeMaterialTransition
     material_transition(const io::SiCase& si, const WakeTransportClock& clock,
@@ -515,13 +523,14 @@ struct WakeTransportBuilder {
                                              CaseFlowClockQuery address) {
             const auto instant = read(evaluate_case_reference_clock(
                 clock.clock, clock.current, address, limits.clock, memory, stop));
-            const auto exact = read(io::detail::copy_rational_words(instant.seconds, memory, stop));
+            auto exact = read(io::detail::copy_rational_words(instant.seconds, memory, stop));
             const auto owned = read(geometry.exact_time());
             if (!owned || !same_time(view(exact), *owned, work))
                 reject(StaleGeneration);
+            return exact;
         };
-        check_geometry_time(y, earlier);
-        check_geometry_time(x, clock.destination);
+        auto parent_time = check_geometry_time(y, earlier);
+        (void)check_geometry_time(x, clock.destination);
         if (!same_model(x.context(), y.context()))
             reject(StaleGeneration);
 
@@ -578,8 +587,11 @@ struct WakeTransportBuilder {
             elapsed += prior;
         }
         std::optional<a::ReleaseEpoch> retire;
+        std::optional<WakeWindowRequirements> requirements;
         if (window != nullptr) {
-            const auto capacity = fixed_window_rows(si, *window, clock, limits, memory, work);
+            requirements.emplace(
+                fixed_window_requirements(si, *window, clock, limits, memory, work));
+            const auto capacity = requirements->rows;
             if (rows > capacity || (births != 0 && rows < std::min(elapsed, capacity)) ||
                 (rows != 0 &&
                  (parent.points.size() / rows != births || parent.points.size() % rows != 0)))
@@ -613,7 +625,7 @@ struct WakeTransportBuilder {
         if (retained_count > trial.points.size() || trial.points.size() - retained_count != births)
             reject(StaleGeneration);
 
-        auto retired = allocate<std::optional<WakeMaterialPoint>>(memory, retired_count);
+        auto retired = allocate<std::optional<RetiredWakeMaterialPoint>>(memory, retired_count);
         auto output = allocate<std::optional<FirstFreeWakePoint>>(memory, trial.points.size());
         std::size_t previous = 0, retired_index = 0;
         const auto skip_retired = [&] {
@@ -621,7 +633,8 @@ struct WakeTransportBuilder {
                 work.step();
                 auto point = parent.points[previous++];
                 point.point = read(y.owner(point.point));
-                retired.values()[retired_index++].emplace(point);
+                const auto position = read(y.point_words(point.point, a::Configuration::Current));
+                retired.values()[retired_index++].emplace(point, position);
             }
         };
         for (std::size_t i = 0; i < trial.points.size(); ++i) {
@@ -650,8 +663,12 @@ struct WakeTransportBuilder {
         if (previous != parent.points.size())
             reject(StaleGeneration);
         unique_owners(visited.values().first(trial.points.size()));
+        std::optional<WakeRetirementSource> origin;
+        if (retired_count != 0)
+            origin.emplace(read(y.identity()), std::move(parent_time));
         work.step();
-        return WakeMaterialTransition{std::move(output), std::move(retired), work.used};
+        return WakeMaterialTransition{std::move(output), std::move(retired),
+                                      std::move(requirements), std::move(origin), work.used};
     }
 
     static const a::OwnedGeometry& first_geometry(const WakeTransportClock& clock,
