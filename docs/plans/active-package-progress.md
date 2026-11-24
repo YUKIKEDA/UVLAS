@@ -69,7 +69,7 @@
 | 結果と診断 | 実装中 | 状態と来歴のJSON、確定観測のCSV、適格な可視化標本のVTU・PVDを内部で生成できる。VTU・PVDは層界面の両側と再始動区間を保つ。型検査・SI変換済みケースから、元入力、保持値、誤差半径、現時点で解決した既定値を出力し、その指紋を来歴に結び付けられる。物理回復から可視化標本を作り、物理準備で確定する設定とともに実行結果の保存へつなぐ工程が残る。 [解決済みケース](../verification/IM-06/resolved-case-document.md)・[観測CSV](../verification/IM-06/observation-csv.md)・[VTU・PVD](../verification/IM-06/visualization-series.md) |
 | checkpoint容器 | 完了 | 型付きチャンクと指紋からマニフェストを作り、既存番号を保持したまま確定する。中断した保存を除外し、型、長さ、SHA-256、指紋が一致する最新番号を復元する。 [マニフェストと確定ディレクトリの検証](../verification/IM-06/checkpoint-manifest.md) |
 | 実状態とresume | 残 | 全BDF2ステンシル、受理済みの微分・荷重・後流履歴、探索状態などを保存する。IM-04／05の実状態を使い、同版・同環境での再開結果のビット一致と非互換の拒否を確認する |
-| CLI | 実装中 | `validate` は全スキーマと参照を検査する。直下の外部ファイルは SHA-256 を照合し、MSH 4.1 ASCII は節とタグも検査する。`inspect` は保存済み状態と来歴を照合し、来歴に指紋がある場合は解決済みケースも確認する。Python と検査処理を共有する。形式別の子依存の検査、prepare／run／resume、実行終了時の状態記録が残る。 [開発用CLI](../build.md#開発用cliの終了規約) |
+| CLI | 実装中 | `validate` は全スキーマと対応する外部参照を検査し、未対応の役割を拒否する。直下の外部ファイルは SHA-256 を照合し、MSH 4.1 ASCII は節とタグも検査する。`inspect` は保存済み状態と来歴を照合し、来歴に指紋がある場合は解決済みケースも確認する。Python と検査処理を共有する。形式別の子依存の検査、prepare／run／resume、実行終了時の状態記録が残る。 [開発用CLI](../build.md#開発用cliの終了規約) |
 | Python | 実装中 | ファイル・辞書の検査と結果確認に CLI と同じ C++ 処理を使い、検査済み入力と参照を所有する。物理準備・実行・再開、受理済み解析結果への接続が残る。 [入口の検証](../verification/IM-06/shared-case-frontends.md) |
 | ランタイムと新規環境 | 基盤あり | Windows と Linux で非公開ランタイムを移設し、開発ツールの PATH を外した CLI と新規 Python 環境でケース検査と所有権を確認した。配布用 CLI／wheel の対応環境と、導入後の実行・再開の受入が残る。 [移設後の検証](../verification/IM-06/shared-case-frontends.md) |
 | 終了審査 | 残 | V-USE・V-STATEで3入力経路とCLI／Pythonの物理結果、両OSの導入・中断・再開を照合する |
