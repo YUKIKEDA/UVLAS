@@ -1,0 +1,38 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-prepared-weight-admission",
+  "ids": [
+    "SH-D03",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "58ff6be6df3e77560698eece89ddde8e084691ed",
+  "claimed_state": "固定則の点を投影する途中で、コピー済みの重みの外部メモリ枠を次の厳密点評価から予約する。",
+  "checks": {
+    "basis_columns": 130,
+    "separate_points_at_isolated_point_limit": "both accepted",
+    "two_points_at_isolated_point_limit": "ResourceExceeded",
+    "two_points_with_one_additional_rational_slot": "accepted",
+    "patch_identity_preserved": true,
+    "unfixed_release_regressions": 1,
+    "windows": {
+      "compiler": "MSVC 19.51.36260",
+      "configuration": "Release",
+      "ctest_targets_passed": 4
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets_passed": 4
+    }
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-prepared-patch-contract.md": "e5dd36518774b5328e8169591dfd1bc36f6b810d84c84185b0c71b4b8b240992",
+    "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
+    "src/structure/pg_volume_mass_reference.cpp": "d9f3140f5525c5640f43185594984396c0eda654189746ac15beb2aecfc7978f",
+    "tests/structure/pg_discrete_gram_test.cpp": "28261f04f3bf1fccb864bd15179df0827d32be949bd1c11504ff89d85f2fb2f0"
+  }
+}
