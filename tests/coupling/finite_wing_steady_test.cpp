@@ -1386,6 +1386,14 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                 FAIL("The row replay must admit its payload before assembly");
             CHECK(denied.error().code == core::FailureCode::ResourceExceeded);
             CHECK(insufficient.allocated_bytes() == 0);
+            auto changed = request;
+            changed.rhs_generation = core::RhsGeneration{9};
+            const auto stale = cf::verify_discrete_circulation_row_replay(
+                input, loads.primal(), caps, changed, shared, *local, *kernel, insufficient);
+            if (stale)
+                FAIL("A different RHS generation must not qualify a replay");
+            CHECK(stale.error().code == core::FailureCode::StaleGeneration);
+            CHECK(insufficient.allocated_bytes() == 0);
         }
         const auto tolerance = rational_word(2e-10);
         for (std::size_t k = 0; k < count; ++k) {

@@ -1552,11 +1552,15 @@ struct NonpenetrationBuilder {
         const auto order = input.collocations.size();
         if (retained.rows_.size() != order)
             reject(core::FailureCode::InvalidInput);
+        const auto& certificate = retained.solution_.certificate();
         if (!retained.source_.same_owner(require(input.contact.reference_topology())) ||
-            retained.solution_.certificate().context() != request.scales.context)
+            certificate.context() != request.scales.context ||
+            certificate.rhs_generation() != request.rhs_generation ||
+            retained.solution_.values().generation() != request.retained_generation)
             reject(core::FailureCode::StaleGeneration);
         match_circulation_geometry(request, geometry.context());
         validate_circulation(request, order, work);
+        match_reused_scales(request.scales, certificate, work);
         match_flow(input, retained.flow_, work);
 
         const auto initial_bytes = memory.allocated_bytes();
