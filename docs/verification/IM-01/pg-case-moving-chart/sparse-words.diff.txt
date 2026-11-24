@@ -1,0 +1,33 @@
+diff --git a/src/numerics/sparse_solve.cpp b/src/numerics/sparse_solve.cpp
+index cb599e99..d4c9062f 100644
+--- a/src/numerics/sparse_solve.cpp
++++ b/src/numerics/sparse_solve.cpp
+@@ -1,3 +1,4 @@
++#include <cstdio>
+ #include "backend_memory_detail.hpp"
+ #include "compensated.hpp"
+ #include "linear_candidate_detail.hpp"
+@@ -783,6 +784,23 @@ core::Result<Solution<double>> SparsePrepared::solve(const SparseOperator& origi
+                     break;
+                 }
+                 if (corrections == limits.maximum_refinements) {
++                    if (orientation != LinearSystemOrientation::Transpose) {
++                        for (core::Index i = 0; i < n; ++i) {
++                            for (auto k = data.original.column_offsets()[i];
++                                 k < data.original.column_offsets()[i + 1]; ++k)
++                                std::fprintf(stderr, "BMAT,%lld,%lld,%a\n",
++                                             static_cast<long long>(data.original.row_indices()[k]),
++                                             static_cast<long long>(i), data.original.values()[k]);
++                        }
++                        for (core::Index d = 0; d < shape.columns; ++d)
++                            for (core::Index i = 0; i < n; ++i) {
++                                const auto k = static_cast<std::size_t>(d*n+i);
++                                std::fprintf(stderr, "WORDS,%lld,%lld,%a,%a,%a,%a\n",
++                                    static_cast<long long>(d), static_cast<long long>(i),
++                                    values->values()[k], (two ? low_values->values()[k] : 0.),
++                                    data.rhs.values()[k], data.rhs_low.values()[k]);
++                            }
++                    }
+                     return fail(core::FailureCode::LinearUnconverged);
+                 }
+                 if (!two && corrections > 0) {
