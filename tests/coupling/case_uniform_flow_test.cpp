@@ -1,4 +1,6 @@
 #include "aero/geometry_snapshot_fixture.hpp"
+#include "aero/query_coordinates_private.hpp"
+#include "coupling/case_aero_attachment.hpp"
 #include "coupling/case_flow_clock.hpp"
 #include "coupling/case_known_flow.hpp"
 #include "coupling/case_uniform_flow.hpp"
@@ -3674,4 +3676,215 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
                                                     cap_velocity, shared, *local, *kernel,
                                                     no_payload),
            core::FailureCode::ResourceExceeded);
+}
+
+TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete nonpenetration",
+          "[AE-07][IO4-01][UW-D06][UW-D07][N4-06][verification][negative]") {
+    auto input = root("aerodynamic_prescribed_transient");
+    input.field("units").set("time", string("s"));
+    input.field("units").set("length", string("m"));
+    input.field("units").set("angle", string("deg"));
+    input.field("analysis").set("intervals", parse(one_step));
+    auto& motion =
+        input.field("model").field("aero_surfaces").elements[0].field("attachment").field("motion");
+    motion.set("origin", parse(R"({"origin":[0,0,0],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    motion.set(
+        "translation",
+        parse(
+            R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[0,0,0],[1,0,0]]})"));
+    motion.set(
+        "rotation_vector",
+        parse(
+            R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[0,0,0],[600,0,0]]})"));
+    motion.set("events", parse("[0,1]"));
+
+    core::ResourcePlan memory{128ULL * 1024 * 1024};
+    p::CurveWorkspace curves;
+    const auto begin = take(structure::ExactRational::from_decimal("0", exact_limits(), memory));
+    const auto end = take(structure::ExactRational::from_decimal("1", exact_limits(), memory));
+    const auto at = take(structure::ExactRational::from_decimal("0.1", exact_limits(), memory));
+    const auto different = take(
+        structure::ExactRational::from_decimal("0.100000000000000001", exact_limits(), memory));
+    const auto geometry_caps = test_geometry::limits();
+    const a::GlobalLimits contact_caps{std::numeric_limits<std::uint64_t>::max() / 4,
+                                       numerics::linear::EstimateAdmission{4096}};
+    const cf::PrescribedAeroLimits caps{
+        {{exact_limits(), 10000, cf::case_motion_frame_interval_scratch_bytes},
+         {exact_limits(),
+          {{128, 100000, budget, 10000}, numerics::linear::EstimateAdmission{budget}},
+          100,
+          10000},
+         4096,
+         100000},
+        geometry_caps,
+        contact_caps,
+        UINT64_C(10000000000)};
+    const auto prepare = [&](const JsonToken& json) {
+        const auto si = materialize(json, io::SourceId{79});
+        const auto top = take(take(si.source_case()).get().root());
+        const auto attached =
+            take(top.model.record().aero_surfaces.at(0)).record().attachment.record();
+        const auto* selected = std::get_if<io::schema::AeroAttachmentPrescribed>(&attached);
+        if (selected == nullptr)
+            FAIL("Missing checked prescribed attachment");
+        return take(cf::prepare_prescribed_aero_attachment(si, *selected, {begin, end}, stamp,
+                                                           curves, caps.motion, memory));
+    };
+    const auto attachment = prepare(input);
+    const auto current = prepare(input);
+    const Number unit{1}, exact_instant{1, 10}, abs_budget{1, 1000000000}, zero{0};
+    std::array<cf::CaseFlowComponentBudget, 24> budget_rows{};
+    budget_rows.fill({unit.view(), abs_budget.view(), zero.view()});
+    const cf::PrescribedAeroProjection projection{
+        core::Precision::Binary64, budget_rows,
+        std::span<const cf::CaseFlowComponentBudget>{budget_rows}.first<6>()};
+
+    ResidualFixture fixture;
+    const auto& id = fixture.id;
+    const a::PointId alias{7};
+    const std::array ids{id[0], id[1], id[2], id[3], id[4], alias};
+    auto alias_binding = test_geometry::binding();
+    alias_binding.ownership = a::AliasOf{id[3]};
+    const auto& binding = fixture.bindings;
+    const std::array bindings{binding[0], binding[1], binding[2],
+                              binding[3], binding[4], alias_binding};
+    const std::array<double, 18> coordinates0{0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 2, 1, 0, 1, 0, 0};
+    const std::array moving{id[0], id[1], id[2], id[3]};
+    fixture.quads[0].points[3] = alias;
+    fixture.edges[2].points[1] = alias;
+    fixture.edges[3].points[0] = alias;
+    auto original = fixture.input();
+    original.points = ids;
+    original.bindings = bindings;
+    original.reference = a::SinglePositions{coordinates0};
+    original.current = a::SinglePositions{coordinates0};
+    original.edges = std::span{fixture.edges}.first<5>();
+    original.faces = std::span{fixture.faces}.first<1>();
+    original.bands = std::span{fixture.bands}.first<1>();
+    original.quads = std::span{fixture.quads}.first<1>();
+    original.context.time = 0.1;
+    original.exact_time = exact_instant.view();
+    auto geometry_work = test_geometry::workspace(memory);
+    auto global = take(a::GlobalWorkspace::create(memory, contact_caps.metadata));
+    const auto reference_geometry = test_geometry::take(
+        a::prepare_owned_geometry(original, geometry_caps, *geometry_work, memory));
+    const auto topology = take_global(a::build_global_topology(
+        reference_geometry,
+        {std::span{fixture.roles}.first<1>(), std::span{fixture.edge_owners}.first<5>(), {}},
+        contact_caps, *global, memory));
+    const std::array rows{cf::PrescribedAeroRow{
+        a::QueryId{22}, a::SourceFacePoint{a::FacetId{201}, a::SingleWord{.25}, a::SingleWord{.5}},
+        a::SingleWord{0}, a::SingleWord{0}}};
+    const auto side = p::RequestedSide::Left;
+    const auto run = [&](const cf::PrescribedAeroAttachment& live,
+                         const structure::ExactRational& instant, cf::PrescribedAeroReference model,
+                         const cf::PrescribedAeroLimits& cap, core::ResourcePlan& plan) {
+        return cf::evaluate_prescribed_aero_attachment(
+            attachment, live, model, {stamp, instant, p::JetOrder::First, side}, projection, curves,
+            *geometry_work, *global, cap, plan);
+    };
+    const cf::PrescribedAeroReference model{topology, original, moving, rows};
+    const auto state = take(run(current, at, model, caps, memory));
+    const auto& sampled = take(state.motion()).get();
+    const auto& instant = take(sampled.time()).get();
+    exact(instant.time(), exact_instant);
+    CHECK(instant.requested_side() == side);
+    CHECK(state.collocation_count() == 1);
+    const auto row = take(state.collocation(0));
+    const auto& contact = take(state.contact()).get();
+    const auto& geometry = take_global(contact.geometry()).get();
+    CHECK(test_geometry::take(geometry.owner(alias)) == id[3]);
+    const auto alias_position =
+        test_geometry::take(geometry.point_words(alias, a::Configuration::Current));
+    const auto owner_position =
+        test_geometry::take(geometry.point_words(id[3], a::Configuration::Current));
+    for (std::size_t k = 0; k < 3; ++k) {
+        CHECK(sum_words(alias_position[k]) == sum_words(owner_position[k]));
+        const auto aliased = take(state.material_point(alias, k, p::JetOrder::First));
+        const auto owned = take(state.material_point(id[3], k, p::JetOrder::First));
+        const auto* alias_word = std::get_if<io::ScaledBinary64>(&aliased);
+        const auto* owner_word = std::get_if<io::ScaledBinary64>(&owned);
+        if (alias_word == nullptr || owner_word == nullptr)
+            FAIL("Expected binary64 motion words");
+        CHECK(alias_word->center == owner_word->center);
+        CHECK(alias_word->exponent2 == owner_word->exponent2);
+    }
+    reject(state.material_point(id[4], 0, p::JetOrder::First), core::FailureCode::InvalidInput);
+    const auto inherited =
+        test_geometry::take(geometry.point_words(id[4], a::Configuration::Current));
+    CHECK(sum_words(inherited[0]) == 2);
+    CHECK(sum_words(inherited[1]) == 1);
+    const auto tol = rational_word(1e-12);
+    const auto near = [&](const Rat& actual, double expected) {
+        CHECK(abs(actual - rational_word(expected)) < tol);
+    };
+    const auto irrational = 1.7320508075688772935;
+    const auto angular_rate = 10.471975511965977462;
+    near(sum_words(row.velocity[0]), 1);
+    near(sum_words(row.velocity[1]), -angular_rate * irrational / 4);
+    near(sum_words(row.velocity[2]), angular_rate / 4);
+    const auto xy = test_geometry::take(
+        a::exact_query_coordinates(geometry, row.query, geometry_caps, *geometry_work));
+    const auto denom = two_power(static_cast<int>(a::ExactQueryCoordinates::denominator_shift));
+    near(Rat{xy.numerator[0]} / denom, .85);
+    near(Rat{xy.numerator[1]} / denom, .25);
+    near(Rat{xy.numerator[2]} / denom, irrational / 4);
+
+    const auto zero_flow = source(R"({"kind":"constant","value":[0,0,0]})", one_step);
+    a::UniformFlowWorkspace flow_workspace;
+    const auto ambient = import(zero_flow, io::SourceId{81}, flow_workspace);
+    const auto ambient_current = import(zero_flow, io::SourceId{82}, flow_workspace);
+    const std::array budgets{budget_rows[0], budget_rows[1], budget_rows[2]};
+    const cf::CaseFlowProjectionRequest flow_projection{
+        core::Precision::TwoWord, budgets, budgets, {4096, budget}};
+    const auto collocations = std::array{row};
+    const cf::DiscreteNonpenetrationInput view{
+        contact, collocations, {}, {core::AcceptedStateId{2}, {}}, {7, 11}, stamp, side};
+    const cf::DiscreteNonpenetrationLimits residual_limits{
+        {core::Precision::TwoWord, 1e-10},
+        {core::Precision::TwoWord, 1e-10, 1e-10},
+        {geometry_caps,
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(5000000000)},
+        100000,
+        UINT64_C(6000000000)};
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const auto residual = [&](p::RequestedSide requested) {
+        auto flow = take(cf::project_case_uniform_flow(
+            evaluate(ambient, ambient_current, flow_workspace, exact_instant, requested),
+            flow_projection));
+        return cf::evaluate_discrete_nonpenetration(view, std::move(flow), residual_limits, shared,
+                                                    *local, *kernel, memory);
+    };
+    reject(residual(p::RequestedSide::Right), core::FailureCode::StaleGeneration);
+    const auto result = take(residual(side));
+    const auto value = take(result.row(0)).residual;
+    const auto center = sum_words(value.center()) * two_power(value.exponent());
+    near(center, -angular_rate / 2);
+
+    reject(run(current, different, model, caps, memory), core::FailureCode::StaleGeneration);
+    const std::array invalid_points{id[0], id[1], id[2], alias};
+    reject(run(current, at, {topology, original, invalid_points, rows}, caps, memory),
+           core::FailureCode::InvalidInput);
+    const std::array extra_point{id[0], id[1], id[2], id[3], id[4]};
+    reject(run(current, at, {topology, original, extra_point, rows}, caps, memory),
+           core::FailureCode::InvalidInput);
+    auto changed_input = input;
+    changed_input.field("model")
+        .field("aero_surfaces")
+        .elements[0]
+        .field("attachment")
+        .field("motion")
+        .field("translation")
+        .set("coefficients", parse("[[0,0,0],[2,0,0]]"));
+    const auto changed = prepare(changed_input);
+    reject(run(changed, at, model, caps, memory), core::FailureCode::StaleGeneration);
+    auto no_work = caps;
+    no_work.work = 0;
+    core::ResourcePlan refused{0};
+    reject(run(current, at, model, no_work, refused), core::FailureCode::ResourceExceeded);
+    CHECK(refused.allocated_bytes() == 0);
+    CHECK(test_geometry::take(geometry.owner(alias)) == id[3]);
 }

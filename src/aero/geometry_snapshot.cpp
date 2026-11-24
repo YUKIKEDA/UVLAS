@@ -370,7 +370,7 @@ public:
 
     static AeroResult<ExactQueryCoordinates> coordinates(const OwnedGeometry&, const ResolvedQuery&,
                                                          const GeometryLimits&, GeometryWorkspace&,
-                                                         std::stop_token) noexcept;
+                                                         std::stop_token, Configuration) noexcept;
 
 private:
     static AeroResult<void> copy(const GeometryInput&, GeometryData&, Run&);
@@ -386,7 +386,8 @@ private:
                                        std::array<ExactInteger, 3>&, QueryArithmeticScratch&, Run&);
     static AeroResult<void> query_position(const GeometryData&, const QueryStorage&, ExactPoints&,
                                            QueryArithmeticScratch&, Run&,
-                                           ExactQueryCoordinates* = nullptr);
+                                           ExactQueryCoordinates* = nullptr,
+                                           Configuration = Configuration::Current);
     static void hash(GeometryData&);
 };
 
@@ -1257,7 +1258,8 @@ GeometryEngine::resolve(const OwnedGeometry& geometry, const QueryRequest& reque
 AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const QueryStorage& query,
                                                 ExactPoints& points,
                                                 QueryArithmeticScratch& scratch, Run& run,
-                                                ExactQueryCoordinates* result) {
+                                                ExactQueryCoordinates* result,
+                                                Configuration configuration) {
     if (const auto* single = std::get_if<FreeSingleStorage>(&query.definition)) {
         for (std::size_t axis = 0; axis < 3; ++axis) {
             if (auto r = run.step(QueryId{query.id}); !r)
@@ -1287,7 +1289,7 @@ AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const 
             result->point_ids[0] = data.points.values()[static_cast<std::size_t>(owner)].id;
             result->weights[0] = ExactInteger{1} << 1074;
         }
-        return load_point(data, *index, Configuration::Current, points[3], scratch, run);
+        return load_point(data, *index, configuration, points[3], scratch, run);
     }
     std::array<core::Index, 3> vertices{};
     std::size_t count = 0;
@@ -1335,8 +1337,8 @@ AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const 
                 return r;
             // Decode at delta, multiply complete exact word sums, then add at
             // delta^2. No rounded derived point or independent third weight exists.
-            scalar_into(position(data, vertices[i], Configuration::Current, axis), 0,
-                        scratch.coordinate, scratch.word);
+            scalar_into(position(data, vertices[i], configuration, axis), 0, scratch.coordinate,
+                        scratch.word);
             scratch.product = scratch.weights[i] * scratch.coordinate;
             scratch.sum += scratch.product;
         }
@@ -1461,13 +1463,14 @@ classify_resolved_query(const OwnedGeometry& geometry, const ResolvedQuery& quer
                                     std::move(stop));
 }
 
-AeroResult<ExactQueryCoordinates> GeometryEngine::coordinates(const OwnedGeometry& geometry,
-                                                              const ResolvedQuery& query,
-                                                              const GeometryLimits& limits,
-                                                              GeometryWorkspace& workspace,
-                                                              std::stop_token stop) noexcept {
+AeroResult<ExactQueryCoordinates>
+GeometryEngine::coordinates(const OwnedGeometry& geometry, const ResolvedQuery& query,
+                            const GeometryLimits& limits, GeometryWorkspace& workspace,
+                            std::stop_token stop, Configuration configuration) noexcept {
     const auto context = geometry.context_;
     return guarded(context, [&]() -> AeroResult<ExactQueryCoordinates> {
+        if (configuration != Configuration::Reference && configuration != Configuration::Current)
+            return std::unexpected(rejected(core::FailureCode::InvalidInput, context));
         if (!geometry.data_ || !query.active())
             return std::unexpected(rejected(core::FailureCode::InvalidInput, context));
         const auto& data = *geometry.data_;
@@ -1495,7 +1498,7 @@ AeroResult<ExactQueryCoordinates> GeometryEngine::coordinates(const OwnedGeometr
                 OwnedGeometryFailure{complete(slots.error(), context), QueryId{q.id}, context});
         ExactQueryCoordinates coordinates{};
         if (auto loaded = query_position(data, q, slots->get(), workspace.arithmetic_.values()[0],
-                                         run, &coordinates);
+                                         run, &coordinates, configuration);
             !loaded)
             return std::unexpected(loaded.error());
         if (auto published = run.step(QueryId{q.id}); !published)
@@ -1506,12 +1509,12 @@ AeroResult<ExactQueryCoordinates> GeometryEngine::coordinates(const OwnedGeometr
     });
 }
 
-AeroResult<ExactQueryCoordinates> exact_query_coordinates(const OwnedGeometry& geometry,
-                                                          const ResolvedQuery& query,
-                                                          const GeometryLimits& limits,
-                                                          GeometryWorkspace& workspace,
-                                                          std::stop_token stop) noexcept {
-    return GeometryEngine::coordinates(geometry, query, limits, workspace, std::move(stop));
+AeroResult<ExactQueryCoordinates>
+exact_query_coordinates(const OwnedGeometry& geometry, const ResolvedQuery& query,
+                        const GeometryLimits& limits, GeometryWorkspace& workspace,
+                        std::stop_token stop, Configuration configuration) noexcept {
+    return GeometryEngine::coordinates(geometry, query, limits, workspace, std::move(stop),
+                                       configuration);
 }
 
 GeometryWorkspace::GeometryWorkspace(Key, std::unique_ptr<PredicateWorkspace> predicate,
