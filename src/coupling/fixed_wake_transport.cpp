@@ -214,8 +214,7 @@ TransportStencil prepare_stencil(const WakeTransportClock& clock,
                 const auto& detached = read(snapshots[1].contact.geometry()).get();
                 for (int bit = 0; bit <= std::numeric_limits<std::size_t>::digits; ++bit)
                     work.step();
-                if (!snapshot.preceding_births->has_birth(point.release, read(geometry.identity()),
-                                                          read(detached.identity())))
+                if (!snapshot.preceding_births->has_birth(point.release, clock, geometry, detached))
                     reject(StaleGeneration);
                 return point.point;
             }();
@@ -307,8 +306,10 @@ Vector current_direction(const DiscreteFreeWakeDirection& direction, a::PointId 
 } // namespace
 
 struct WakeBirthHistory {
-    std::array<std::byte, 32> origin_geometry;
-    std::array<std::byte, 32> detached_geometry;
+    io::SchemaIdentity source;
+    p::PchipInputStamp stamp;
+    a::GeometryContext origin_context, detached_context;
+    std::array<std::byte, 32> origin_geometry, detached_geometry;
     core::PlannedBuffer<std::uint8_t> born;
 };
 
@@ -338,15 +339,21 @@ core::Result<WakeTransportRow> WakeTransportResult::row(std::size_t i) const noe
     }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
-bool WakeTransportResult::has_birth(
-    a::MaterialReleaseKey key, const std::array<std::byte, 32>& origin_geometry,
-    const std::array<std::byte, 32>& detached_geometry) const noexcept {
+bool WakeTransportResult::has_birth(a::MaterialReleaseKey key, const WakeTransportClock& clock,
+                                    const a::OwnedGeometry& origin,
+                                    const a::OwnedGeometry& detached) const noexcept {
     if (data_.size() == 0)
         return false;
     const auto& data = data_.values().front();
     const auto& birth = data.birth_history;
-    if (!birth || birth->origin_geometry != origin_geometry ||
-        birth->detached_geometry != detached_geometry)
+    if (!birth || !io::detail::same_identity(birth->source, clock.clock.source) ||
+        birth->stamp != clock.destination.stamp || birth->origin_context != origin.context() ||
+        birth->detached_context != detached.context())
+        return false;
+    const auto origin_identity = origin.identity();
+    const auto detached_identity = detached.identity();
+    if (!origin_identity || !detached_identity || birth->origin_geometry != *origin_identity ||
+        birth->detached_geometry != *detached_identity)
         return false;
     const auto rows = data.rows.values();
     const auto at = std::ranges::lower_bound(
@@ -509,7 +516,8 @@ struct WakeTransportBuilder {
         out.rows = allocate<std::optional<WakeTransportRow>>(memory, points.size());
         out.dual = allocate<std::optional<WakeTransportPositionDual>>(memory, seeds.size());
         if (birth_epoch)
-            out.birth_history.emplace(read(y.identity()), read(x.identity()),
+            out.birth_history.emplace(clock.clock.source, clock.destination.stamp, y.context(),
+                                      x.context(), read(y.identity()), read(x.identity()),
                                       allocate<std::uint8_t>(memory, points.size()));
         a::LocalRootScratch scratch;
         for (std::size_t i = 0; i < points.size(); ++i) {

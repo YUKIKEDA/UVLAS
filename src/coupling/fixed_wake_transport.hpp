@@ -71,9 +71,9 @@ public:
 
     [[nodiscard]] std::size_t size() const noexcept;
     [[nodiscard]] core::Result<WakeTransportRow> row(std::size_t) const noexcept;
-    [[nodiscard]] bool has_birth(aero::detail::MaterialReleaseKey,
-                                 const std::array<std::byte, 32>& origin_geometry,
-                                 const std::array<std::byte, 32>& detached_geometry) const noexcept;
+    [[nodiscard]] bool has_birth(aero::detail::MaterialReleaseKey, const WakeTransportClock&,
+                                 const aero::detail::OwnedGeometry& origin,
+                                 const aero::detail::OwnedGeometry& detached) const noexcept;
     [[nodiscard]] core::Result<WakeTransportPositionDual> position_dual(std::size_t) const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
     parent_free_velocity() const& noexcept;

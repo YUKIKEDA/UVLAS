@@ -3959,12 +3959,15 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const cf::WakeTransportClock transport_clock{wake_grid, wake_grid, destination};
     const cf::WakeTransportLimits transport_limits{transport_clock_limits, 1, 10000, 4096,
                                                    core::Precision::TwoWord};
-    const auto history_contact = [&](const Number& stamp_time, double seconds, double downstream) {
+    const auto history_contact = [&](const Number& stamp_time, double seconds, double downstream,
+                                     std::optional<core::GeometryGeneration> generation = {}) {
         auto shape = xyz;
         shape[12] = downstream;
         auto history_geometry = input_geometry;
         history_geometry.current = a::SinglePositions{shape};
         history_geometry.context.time = seconds;
+        if (generation)
+            history_geometry.context.current = *generation;
         history_geometry.exact_time = stamp_time.view();
         const auto snapshot = test_geometry::take(a::prepare_owned_geometry(
             history_geometry, test_geometry::limits(), *geometry_work, memory));
@@ -4158,6 +4161,64 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK(take(after_birth.position_dual(0)).release == release);
     const std::array origin_as_current{from_origin[2], from_origin[1], from_origin[2]};
     reject(run_material(origin_as_current), core::FailureCode::InvalidInput);
+
+    const auto stale_origin = history_contact(start_time, 1., 1.625, core::GeometryGeneration{7});
+    const std::array wrong_origin_context{
+        from_origin[0], from_origin[1],
+        cf::WakeMaterialSnapshot{stale_origin, birth_origin, &interval_birth}};
+    reject(run_material(wrong_origin_context), core::FailureCode::StaleGeneration);
+
+    auto other_case = source_case;
+    other_case.field("flow").set("uniform", parse(R"({"kind":"constant","value":[0,0,2]})"));
+    const auto other_si = materialize(other_case, io::SourceId{485});
+    const auto other_grid = take(
+        cf::prepare_case_reference_clock(other_si, stamp, transport_clock_limits, 1000000, memory));
+    const auto other_provider = prepare_gust(other_case, io::SourceId{485}, flow_workspace, memory);
+    const cf::DiscreteKnownFlowInput other_flow{
+        other_provider,   other_provider,         flow.time,      flow.projection,
+        flow.flow_limits, flow.coordinate_limits, *geometry_work, flow_workspace};
+    const cf::WakeTransportClock other_clock{other_grid, other_grid, destination};
+    reject(cf::evaluate_fixed_free_wake_transport(
+               other_clock, from_origin, input, other_flow, selected, &d, history_direction,
+               transport_seeds, transport_limits, cap_velocity, shared, *local, *kernel, memory),
+           core::FailureCode::StaleGeneration);
+
+    auto event_case = source_case;
+    event_case.field("analysis")
+        .set(
+            "intervals",
+            parse(
+                R"([{"start":0.875,"end":1.125,"step":0.25,"restart":"initial"},{"start":1.125,"end":1.375,"step":0.125,"restart":"event"}])"));
+    const auto event_si = materialize(event_case, io::SourceId{484});
+    const cf::CaseFlowClockLimits event_clock_limits{limits, 2, 4};
+    const auto event_grid = take(
+        cf::prepare_case_reference_clock(event_si, stamp, event_clock_limits, 1000000, memory));
+    const auto event_provider = prepare_gust(event_case, io::SourceId{484}, flow_workspace, memory);
+    const cf::WakeTransportClock event_clock{
+        event_grid, event_grid, {stamp, 1, 1, p::RequestedSide::Automatic}};
+    auto event_limits = transport_limits;
+    event_limits.clock = event_clock_limits;
+    const cf::DiscreteKnownFlowInput event_trial_flow{
+        event_provider,   event_provider,         flow.time,      flow.projection,
+        flow.flow_limits, flow.coordinate_limits, *geometry_work, flow_workspace};
+    const cf::FirstFreeWakeEndpoint event_trial{input, event_trial_flow, selected, &d};
+    const auto after_event = [&](p::RequestedSide side) {
+        const cf::DiscreteNonpenetrationInput parent_source{
+            previous, previous_bound, wake, input.history, {7, 10}, stamp, side};
+        const cf::DiscreteKnownFlowInput parent_flow{
+            event_provider,  event_provider,   {stamp, previous_time.view(), side},
+            flow.projection, flow.flow_limits, flow.coordinate_limits,
+            *geometry_work,  flow_workspace};
+        const cf::FirstFreeWakeEndpoint parent{parent_source, parent_flow, selected, &d};
+        return cf::evaluate_first_free_wake_transport(
+            event_clock, event_trial, parent, std::nullopt, restarted, transport_seeds,
+            event_limits, cap_velocity, shared, *local, *kernel, memory);
+    };
+    reject(after_event(p::RequestedSide::Left), core::FailureCode::StaleGeneration);
+    const auto post_event = take(after_event(p::RequestedSide::Right));
+    residual_expected(take(post_event.row(0)).residual[0], Rat{1});
+    const auto& event_parent = take(post_event.parent_free_velocity()).get();
+    exact(take(take(event_parent.ambient(0)).get().time()), previous_time);
 
     auto prescribed_case = source(R"({"kind":"constant","value":[0,0,9]})",
                                   R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
