@@ -948,6 +948,9 @@ if(UVLAS_SANITIZERS AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # Both full schema suites reached the default 60 s on GCC 14 with
     # ASan/UBSan. Give these runners a separate, bounded test time.
     set_tests_properties(io.case_schema io.case_schema_resources PROPERTIES TIMEOUT 300)
+    # Exact coefficient work and the full circulation path are slower under ASan and UBSan.
+    set_tests_properties(structure.pg_conditioning PROPERTIES TIMEOUT 600)
+    set_tests_properties(coupling.case_uniform_flow PROPERTIES TIMEOUT 300)
 endif()
 
 uvlas_add_test(io.reference_root_plan
