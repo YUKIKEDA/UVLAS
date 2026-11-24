@@ -987,4 +987,83 @@ solve_discrete_known_loads(const DiscreteNonpenetrationInput&, const DiscreteVec
                            aero::detail::P1Workspace&, core::ResourcePlan&,
                            const std::stop_token& = {}) noexcept;
 
+struct DiscreteFreeWakeDirection {
+    std::span<const aero::detail::PointId> points; ///< Ascending canonical point IDs.
+    std::span<const NonpenetrationVector> displacements;
+    std::span<const FrozenWakeTrace> history; ///< Old trace directions in source ID order.
+    NonpenetrationVector uniform_flow;
+    aero::detail::ScalarWords flow_time; ///< Only the input field's time coordinate.
+    aero::detail::ScalarWords core_radius;
+};
+
+struct DiscreteFreeWakeLimits {
+    DiscreteNonpenetrationLimits action;
+    std::uint64_t max_particles;
+};
+
+struct FreeWakeVelocitySource {
+    aero::detail::GeometryContext geometry;
+    aero::detail::P1ActionStamp stamp;
+    core::AcceptedStateId parent;
+};
+
+struct FreeWakeVelocityRow {
+    aero::detail::PointId particle;
+    aero::detail::PointId owner;
+    DiscreteLoadVector velocity;
+    std::optional<DiscreteLoadVector> direction;
+    bool includes_wake_quadrature;
+};
+
+struct FreeWakeStrengthCovector {
+    aero::detail::P1StrengthId id; ///< Bound circulation or independent old wake trace.
+    aero::detail::ScaledEnclosure value;
+};
+struct FreeWakeFieldCovector {
+    DiscreteLoadVector uniform_flow;
+    aero::detail::ScaledEnclosure flow_time, core_radius;
+};
+struct DiscreteFreeWakeRun;
+
+class DiscreteFreeWakeVelocity {
+public:
+    DiscreteFreeWakeVelocity(DiscreteFreeWakeVelocity&&) noexcept;
+    DiscreteFreeWakeVelocity& operator=(DiscreteFreeWakeVelocity&&) noexcept;
+    DiscreteFreeWakeVelocity(const DiscreteFreeWakeVelocity&) = delete;
+    DiscreteFreeWakeVelocity& operator=(const DiscreteFreeWakeVelocity&) = delete;
+    ~DiscreteFreeWakeVelocity();
+    [[nodiscard]] std::size_t size() const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept;
+    [[nodiscard]] core::Result<FreeWakeVelocitySource> source() const noexcept;
+    [[nodiscard]] core::Result<FreeWakeVelocityRow> row(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    ambient(std::size_t) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    ambient(std::size_t) const&& = delete;
+    [[nodiscard]] std::size_t point_count() const noexcept;
+    [[nodiscard]] std::size_t strength_count() const noexcept;
+    [[nodiscard]] core::Result<CirculationPointCovector> point_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<FreeWakeStrengthCovector> strength_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<FreeWakeFieldCovector> field_dual() const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    explicit DiscreteFreeWakeVelocity(core::PlannedBuffer<DiscreteFreeWakeRun>&&) noexcept;
+    core::PlannedBuffer<DiscreteFreeWakeRun> data_;
+};
+
+/// Use a fixed contact-qualified source state and its positive common SI radius.
+/// Each selected particle belongs to a retained wake face. The listed IDs can be
+/// explicit aliases of wake points, with one evaluation per canonical owner.
+/// The circulation words (and directions, when requested) are the supplied
+/// bound rows. The attached trace follows T; history entries remain independent.
+/// Seeds are empty for no adjoint, otherwise one real velocity seed per particle.
+/// No material identity is released or advanced here.
+[[nodiscard]] core::Result<DiscreteFreeWakeVelocity> evaluate_discrete_free_wake_velocity(
+    const DiscreteNonpenetrationInput&, const DiscreteKnownFlowInput&,
+    std::span<const aero::detail::PointId> particles, const DiscreteFreeWakeDirection*,
+    std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits&,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail

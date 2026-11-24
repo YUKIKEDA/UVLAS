@@ -855,6 +855,20 @@ struct ComputedLoads {
     std::uint64_t steps;
 };
 
+struct FreeWakeSample {
+    FreeWakeVelocityRow result;
+    CaseKnownFlowJet ambient;
+};
+
+struct DiscreteFreeWakeRun {
+    std::optional<FreeWakeVelocitySource> source;
+    core::PlannedBuffer<std::optional<FreeWakeSample>> rows;
+    core::PlannedBuffer<std::optional<CirculationPointCovector>> points;
+    core::PlannedBuffer<std::optional<FreeWakeStrengthCovector>> strengths;
+    std::optional<FreeWakeFieldCovector> field;
+    std::uint64_t steps = 0;
+};
+
 struct KnownLoadRun {
     std::optional<DiscreteKnownCirculation> circulation;
     std::optional<LoadValues> values;
@@ -927,7 +941,8 @@ a::P1ActionStamp DiscreteNonpenetration::trial_stamp() const noexcept {
 struct NonpenetrationBuilder {
     static Assembly assemble(const DiscreteNonpenetrationInput& input,
                              const DiscreteNonpenetrationLimits& limits, core::ResourcePlan& memory,
-                             p::Work& work, bool solve) {
+                             p::Work& work, bool solve,
+                             std::span<const FrozenWakeTrace> history_direction = {}) {
         const auto& stop = work.stop;
         work.step();
         if (!a::p1_environment_supported())
@@ -975,14 +990,25 @@ struct NonpenetrationBuilder {
             work.step();
             return l.panel.face < r.panel.face;
         });
+        if (!history_direction.empty() && history_direction.size() != input.history.columns.size())
+            reject(core::FailureCode::InvalidInput);
         auto prior = input.history.columns.end();
+        std::size_t history_index = 0;
         for (auto it = input.history.columns.begin(); it != input.history.columns.end(); ++it) {
             work.step();
             if (it->id.bound_face() ||
                 (prior != input.history.columns.end() && prior->id >= it->id))
                 reject(core::FailureCode::InvalidInput);
             prior = it;
-            trace[num_traces++] = {it->id, it->strength, a::SingleWord{0}};
+            auto strength_direction = a::ScalarWords{a::SingleWord{0}};
+            if (!history_direction.empty()) {
+                const auto& entry = history_direction[history_index];
+                if (entry.id != it->id)
+                    reject(core::FailureCode::InvalidInput);
+                strength_direction = entry.strength;
+            }
+            ++history_index;
+            trace[num_traces++] = {it->id, it->strength, strength_direction};
         }
         const auto order = [&](const Trace& l, const Trace& r) {
             work.step();
@@ -2397,6 +2423,273 @@ struct NonpenetrationBuilder {
                 result.steps};
     }
 
+    struct WakeQueries {
+        core::PlannedBuffer<std::optional<a::ResolvedQuery>> resolved;
+        core::PlannedBuffer<std::uint64_t> canonical;
+    };
+
+    static WakeQueries
+    prepare_wake_queries(const DiscreteNonpenetrationInput& input, const a::OwnedGeometry& geometry,
+                         const DiscreteKnownFlowInput& flow, const Assembly& assembly,
+                         std::span<const a::PointId> particles,
+                         const DiscreteFreeWakeLimits& limits, core::ResourcePlan& memory,
+                         p::Work& work, bool adjoint) {
+        if (input.wake.size() >
+            static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max()) / 6)
+            reject(core::FailureCode::ResourceExceeded);
+        auto points = allocate<std::uint64_t>(memory, 6 * input.wake.size());
+        std::size_t visited = 0;
+        for (const auto& row : input.wake) {
+            work.step();
+            const auto wake =
+                require(input.contact.uvlm_quad(row.facet, remaining(work), work.stop));
+            account(work, wake.used_steps);
+            for (const auto face : wake.facets)
+                for (const auto point : require(geometry.facet_points(face))) {
+                    work.step();
+                    points.values()[visited++] = point.value();
+                }
+        }
+        const auto less = [&](std::uint64_t left, std::uint64_t right) {
+            work.step();
+            return left < right;
+        };
+        std::ranges::sort(points.values(), less);
+        auto resolved = allocate<std::optional<a::ResolvedQuery>>(memory, particles.size());
+        auto canonical = allocate<std::uint64_t>(memory, particles.size());
+        auto sorted = allocate<std::uint64_t>(memory, particles.size());
+        for (std::size_t i = 0; i < particles.size(); ++i) {
+            work.step();
+            const auto owner = require(geometry.owner(particles[i]));
+            if (!std::binary_search(points.values().begin(), points.values().end(), owner.value(),
+                                    less))
+                reject(core::FailureCode::InvalidInput);
+            canonical.values()[i] = owner.value();
+            sorted.values()[i] = owner.value();
+        }
+        std::ranges::sort(sorted.values(), less);
+        if (std::adjacent_find(sorted.values().begin(), sorted.values().end(), [&](auto l, auto r) {
+                work.step();
+                return l == r;
+            }) != sorted.values().end())
+            reject(core::FailureCode::InvalidInput);
+
+        std::uint64_t bytes = 0, steps = 0;
+        for (std::size_t i = 0; i < particles.size(); ++i) {
+            auto coordinate_limits = flow.coordinate_limits;
+            coordinate_limits.max_steps = std::min(coordinate_limits.max_steps, remaining(work));
+            auto query = require(a::resolve_query(
+                geometry,
+                {a::QueryId{particles[i].value()},
+                 a::SourceVertex{a::PointId{canonical.values()[i]}}},
+                geometry.context(), coordinate_limits, flow.coordinates, memory, work.stop));
+            // Query resolution has an explicit allowance, with no measured-work readback.
+            account(work, coordinate_limits.max_steps);
+            const a::P1ActionSource source{input.contact, query, input.trial_stamp};
+            auto action_limits = limits.action.induction;
+            action_limits.steps = std::min(action_limits.steps, remaining(work));
+            const auto plan = require(a::forecast_bound_wake_induction(
+                source, assembly.maps.values(), assembly.ids.values(), action_limits, work.stop));
+            account(work, plan.preflight_steps);
+            bytes = sum_budget(bytes, plan.payload_bytes);
+            steps = sum_budget(sum_budget(steps, plan.reserved_steps), limits.action.action_steps);
+            if (adjoint)
+                steps = sum_budget(steps, limits.action.action_steps);
+            resolved.values()[i].emplace(std::move(query));
+        }
+        if (bytes > memory.remaining_bytes() || steps > remaining(work))
+            reject(core::FailureCode::ResourceExceeded);
+        return {std::move(resolved), std::move(canonical)};
+    }
+
+    struct WakeDualAccumulator {
+        core::PlannedBuffer<std::uint64_t> ids;
+        core::PlannedBuffer<Vector> positions;
+        core::PlannedBuffer<p::Interval> strengths;
+        Vector ambient{};
+        p::Interval time{}, radius{};
+    };
+
+    static void accumulate_wake_dual(WakeDualAccumulator& dual, const KnownRowData& sample,
+                                     const NonpenetrationVector& seed,
+                                     const a::SharedP1Action& action,
+                                     const a::P1ActionSource& source, const Assembly& assembly,
+                                     const DiscreteNonpenetrationLimits& limits,
+                                     a::SharedP1Workspace& shared, core::ResourcePlan& memory,
+                                     p::Work& work) {
+        if (dual.ids.size() == 0) {
+            dual.ids = allocate<std::uint64_t>(memory, action.point_count());
+            dual.positions = allocate<Vector>(memory, action.point_count());
+            for (std::size_t i = 0; i < action.point_count(); ++i) {
+                work.step();
+                dual.ids.values()[i] = require(action.point(i)).value();
+            }
+        }
+        std::array<a::P1ComplexWords, 3> weights{};
+        for (std::size_t axis = 0; axis < weights.size(); ++axis)
+            weights[axis].real = seed[axis];
+        const auto effect = require(a::adjoint_shared_p1(
+            action, source, assembly.values.values(), weights,
+            std::min(limits.action_steps, remaining(work)), shared, memory, work.stop));
+        account(work, effect.used_steps());
+        std::optional<Vector> free;
+        scatter_geometry(effect, p::integer(1), dual.positions.values(), free, work);
+        const std::span<const a::P1StrengthId> ids = assembly.ids.values();
+        for (std::size_t i = 0; i < ids.size(); ++i) {
+            work.step();
+            const auto& row = assembly.traces.values()[i];
+            const auto value = import(require(effect.strength(i)).real, work);
+            if (row.transfer && row.transfer->reverse) {
+                const auto column =
+                    material_column(ids, a::P1StrengthId::bound(row.transfer->face), work);
+                auto& bound = dual.strengths.values()[column];
+                bound = p::subtract(bound, value, work);
+            } else {
+                auto& result = dual.strengths.values()[i];
+                result = p::add(result, value, work);
+            }
+        }
+        dual.radius = p::add(dual.radius, import(require(effect.radius()), work), work);
+        const auto velocity = import(seed, work);
+        accumulate_vector(dual.ambient, velocity, work);
+        dual.time = p::add(dual.time, dot(sample.time, velocity, work), work);
+        const auto spatial = known_position_dual(sample, velocity, work);
+        const std::span<const std::uint64_t> point_ids = dual.ids.values();
+        for (std::size_t i = 0; i < sample.point_count; ++i) {
+            const auto column = material_column(point_ids, sample.points[i], work);
+            accumulate_vector(dual.positions.values()[column],
+                              scale_vector(spatial, sample.weights[i], work), work);
+        }
+    }
+
+    static void finish_wake_dual(DiscreteFreeWakeRun& out, WakeDualAccumulator& dual,
+                                 const Assembly& assembly, const DiscreteNonpenetrationInput& input,
+                                 core::Precision representation, a::LocalRootScratch& rounding,
+                                 core::ResourcePlan& memory, p::Work& work) {
+        out.points = allocate<std::optional<CirculationPointCovector>>(memory, dual.ids.size());
+        out.strengths = allocate<std::optional<FreeWakeStrengthCovector>>(
+            memory, input.collocations.size() + input.history.columns.size());
+        for (std::size_t i = 0; i < dual.ids.size(); ++i)
+            out.points.values()[i].emplace(CirculationPointCovector{
+                a::PointId{dual.ids.values()[i]},
+                enclose_vector(dual.positions.values()[i], representation, rounding, work)});
+        std::size_t count = 0;
+        for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
+            work.step();
+            const auto& trace = assembly.traces.values()[i];
+            if (trace.transfer && trace.transfer->reverse)
+                continue;
+            out.strengths.values()[count++].emplace(
+                FreeWakeStrengthCovector{trace.id, a::enclose_p1_value(dual.strengths.values()[i],
+                                                                       representation, rounding)});
+        }
+        out.field.emplace(
+            FreeWakeFieldCovector{enclose_vector(dual.ambient, representation, rounding, work),
+                                  a::enclose_p1_value(dual.time, representation, rounding),
+                                  a::enclose_p1_value(dual.radius, representation, rounding)});
+    }
+
+    static DiscreteFreeWakeVelocity evaluate_wake_velocity(
+        const DiscreteNonpenetrationInput& input, const DiscreteKnownFlowInput& flow,
+        std::span<const a::PointId> particles, const DiscreteFreeWakeDirection* direction,
+        std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits& limits,
+        a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+        core::ResourcePlan& memory, const std::stop_token& stop) {
+        p::Work work{0, limits.action.steps, stop};
+        work.step();
+        if (particles.empty() || input.wake.empty() ||
+            (!seeds.empty() && seeds.size() != particles.size()))
+            reject(core::FailureCode::InvalidInput);
+        if (particles.size() > limits.max_particles)
+            reject(core::FailureCode::ResourceExceeded);
+        match_flow(input, flow.time.stamp, flow.time.side, flow.time.time, work);
+        const auto held = require(input.contact.geometry());
+        const auto& geometry = held.get();
+        const auto radius = import(require(geometry.core_radius()), work);
+        if (p::compare(radius.lower, {}) <= 0)
+            reject(core::FailureCode::GeometryInvalid);
+        if (direction != nullptr && (direction->points.size() != direction->displacements.size() ||
+                                     direction->history.size() != input.history.columns.size()))
+            reject(core::FailureCode::InvalidInput);
+
+        const auto assembly = assemble(input, limits.action, memory, work, false,
+                                       direction != nullptr ? direction->history
+                                                            : std::span<const FrozenWakeTrace>{});
+        const auto queries = prepare_wake_queries(input, geometry, flow, assembly, particles,
+                                                  limits, memory, work, !seeds.empty());
+        Vector ambient_direction{};
+        p::Interval time_direction{};
+        if (direction != nullptr) {
+            ambient_direction = import(direction->uniform_flow, work);
+            time_direction = import(direction->flow_time, work);
+        }
+        auto owner = allocate<DiscreteFreeWakeRun>(memory, 1);
+        const auto storage = owner.values();
+        auto& out = storage.front();
+        out.rows = allocate<std::optional<FreeWakeSample>>(memory, particles.size());
+        WakeDualAccumulator dual{};
+        if (!seeds.empty())
+            dual.strengths = allocate<p::Interval>(memory, assembly.ids.size());
+        a::LocalRootScratch rounding;
+        const auto representation = limits.action.induction_accuracy.representation;
+        const auto finish = [&](const Vector& value) {
+            return enclose_vector(value, representation, rounding, work);
+        };
+        for (std::size_t i = 0; i < particles.size(); ++i) {
+            work.step();
+            const auto& query = queries.resolved.values()[i];
+            if (!query)
+                reject(core::FailureCode::InvalidInput);
+            const a::P1ActionSource source{input.contact, *query, input.trial_stamp};
+            const auto action = prepare_action(assembly, source, limits.action, shared, local,
+                                               kernel, memory, work);
+            auto sample = evaluate_known_row(geometry, *query, flow, memory, work);
+            const auto report = require(action.report());
+            std::optional<a::P1ActionDirection> variation;
+            if (direction != nullptr) {
+                if (action.point_count() != direction->points.size())
+                    reject(core::FailureCode::InvalidInput);
+                if (i == 0)
+                    for (std::size_t j = 0; j < direction->points.size(); ++j) {
+                        work.step();
+                        if (require(action.point(j)) != direction->points[j])
+                            reject(core::FailureCode::InvalidInput);
+                    }
+                variation.emplace(direction->displacements, assembly.directions.values(),
+                                  std::nullopt, direction->core_radius);
+            }
+            const auto induced = require(a::apply_shared_p1(
+                action, source, assembly.values.values(), variation,
+                std::min(limits.action.action_steps, remaining(work)), shared, stop));
+            account(work, induced.used_steps());
+            std::optional<DiscreteLoadVector> jvp;
+            if (direction != nullptr) {
+                const auto point = material_column(direction->points,
+                                                   a::PointId{queries.canonical.values()[i]}, work);
+                const auto dx = import(direction->displacements[point], work);
+                const auto known =
+                    known_direction(sample, dx, ambient_direction, time_direction, work);
+                jvp.emplace(finish(add_vectors(known, induction_direction(induced, work), work)));
+            }
+            if (!seeds.empty())
+                accumulate_wake_dual(dual, sample, seeds[i], action, source, assembly,
+                                     limits.action, shared, memory, work);
+            if (!sample.jet)
+                reject(core::FailureCode::InvalidInput);
+            out.rows.values()[i].emplace(
+                FreeWakeSample{{particles[i], a::PointId{queries.canonical.values()[i]},
+                                finish(native_velocity(sample.velocity, induced, work)),
+                                std::move(jvp), report.far_facets != 0},
+                               std::move(*sample.jet)});
+        }
+        if (!seeds.empty())
+            finish_wake_dual(out, dual, assembly, input, representation, rounding, memory, work);
+        work.step();
+        out.steps = work.used;
+        out.source.emplace(geometry.context(), input.trial_stamp, input.history.parent);
+        return DiscreteFreeWakeVelocity{std::move(owner)};
+    }
+
     static DiscreteKnownLoads solve_known_loads(
         const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
         const DiscreteKnownFlowInput& flow, const KnownLoadDerivative& derivative,
@@ -3386,6 +3679,114 @@ core::Result<DiscreteKnownLoads> solve_discrete_known_loads(
     try {
         return NonpenetrationBuilder::solve_known_loads(
             input, loads, flow, derivative, limits, request, shared, local, kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+DiscreteFreeWakeVelocity::DiscreteFreeWakeVelocity(
+    core::PlannedBuffer<DiscreteFreeWakeRun>&& data) noexcept
+    : data_(std::move(data)) {}
+DiscreteFreeWakeVelocity::DiscreteFreeWakeVelocity(DiscreteFreeWakeVelocity&&) noexcept = default;
+DiscreteFreeWakeVelocity&
+DiscreteFreeWakeVelocity::operator=(DiscreteFreeWakeVelocity&&) noexcept = default;
+DiscreteFreeWakeVelocity::~DiscreteFreeWakeVelocity() = default;
+
+std::size_t DiscreteFreeWakeVelocity::size() const noexcept {
+    const auto records = data_.values();
+    return records.empty() ? 0 : records.front().rows.size();
+}
+std::size_t DiscreteFreeWakeVelocity::point_count() const noexcept {
+    const auto records = data_.values();
+    return records.empty() ? 0 : records.front().points.size();
+}
+std::size_t DiscreteFreeWakeVelocity::strength_count() const noexcept {
+    const auto records = data_.values();
+    return records.empty() ? 0 : records.front().strengths.size();
+}
+std::uint64_t DiscreteFreeWakeVelocity::used_steps() const noexcept {
+    const auto records = data_.values();
+    return records.empty() ? 0 : records.front().steps;
+}
+
+core::Result<FreeWakeVelocitySource> DiscreteFreeWakeVelocity::source() const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(absent());
+    const auto& source = records.front().source;
+    if (!source)
+        return std::unexpected(absent());
+    return *source;
+}
+
+core::Result<FreeWakeVelocityRow> DiscreteFreeWakeVelocity::row(std::size_t i) const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(absent());
+    const auto rows = records.front().rows.values();
+    if (i >= rows.size())
+        return std::unexpected(absent());
+    const auto& sample = rows[i];
+    if (!sample)
+        return std::unexpected(absent());
+    return sample->result;
+}
+
+core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+DiscreteFreeWakeVelocity::ambient(std::size_t i) const& noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(absent());
+    const auto rows = records.front().rows.values();
+    if (i >= rows.size())
+        return std::unexpected(absent());
+    const auto& sample = rows[i];
+    if (!sample)
+        return std::unexpected(absent());
+    return std::cref(sample->ambient);
+}
+
+core::Result<CirculationPointCovector>
+DiscreteFreeWakeVelocity::point_dual(std::size_t i) const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(absent());
+    return known_load_item(records.front().points, i);
+}
+
+core::Result<FreeWakeStrengthCovector>
+DiscreteFreeWakeVelocity::strength_dual(std::size_t i) const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(absent());
+    return known_load_item(records.front().strengths, i);
+}
+
+core::Result<FreeWakeFieldCovector> DiscreteFreeWakeVelocity::field_dual() const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(absent());
+    const auto& field = records.front().field;
+    if (!field)
+        return std::unexpected(absent());
+    return *field;
+}
+
+core::Result<DiscreteFreeWakeVelocity> evaluate_discrete_free_wake_velocity(
+    const DiscreteNonpenetrationInput& input, const DiscreteKnownFlowInput& flow,
+    std::span<const a::PointId> particles, const DiscreteFreeWakeDirection* direction,
+    std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits& limits,
+    a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::evaluate_wake_velocity(
+            input, flow, particles, direction, seeds, limits, shared, local, kernel, memory, stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {
