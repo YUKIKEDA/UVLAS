@@ -1,0 +1,120 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-free-wake-cost-v1",
+  "ids": [
+    "IM-03",
+    "R-03",
+    "V-AERO",
+    "UW-D02",
+    "UW-D07",
+    "J1-D01"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "1daf3a704054e8b151ffc5b0755111b456501ce4",
+  "claimed_state": "Early direct finite-core free wake/transport measurement on 2/4/8 connected wake panels, with 4/8/16 qualified released material receivers and two retained precision policies. Independent finite-core point-velocity oracle and deterministic same-input replay.",
+  "verification": {
+    "reference": "75 decimal digits; frozen direct finite-core P0/W-P1 quadrature at GL64 and GL88.",
+    "replays": "30 independent mode groups, three consecutive calls per group, 90 rows.",
+    "timing": "Windows x64 MSVC 19.51 Release, CPU 0, steady clock, no J1 state acceptance.",
+    "memory": "Explicit cumulative payload and before/after resident and process-lifetime peak.",
+    "msvc": "Windows x64 MSVC 19.51 Release. Four affected ordinary CTests passed. Each of the three opt-in measurement geometries passed 381 assertions with seed 23.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release. Four affected ordinary CTests passed. The two-panel measurement fixture passed 381 assertions; 30 result signatures agreed with MSVC.",
+    "static": "Pinned clang-format 21.1.2, Ruff, Japanese prose lint, verification manifest byte hashes, and trace-check."
+  },
+  "sources": {
+    "src/coupling/discrete_nonpenetration.cpp": "9f8922f33603fb98feffc3181f20c970abeb0d4eca6e12d1e47c0a5f9ac99748",
+    "src/coupling/discrete_nonpenetration.hpp": "303b7c0c91a98dfbe457a1f428b1e2b534fddb0f0e3c63768d87b8709c613301",
+    "src/coupling/fixed_wake_transport.cpp": "b65b21923b5f3d5979be1fb6f8e27b147b27d050ada1bf20b67bfaaef681d423",
+    "tests/coupling/case_uniform_flow_test.cpp": "7b18b73dae81c9f2e51cc4c478e3520e74373097499893e5a179ef066f8c81a2",
+    "docs/requirements/practical-acceptance-plan.md": "050213606ad95a1cab93ece3a0500f5b7444cafcb24f9b5e064f4f0466890c0f",
+    "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py": "24f80eb3a7fa8ff4c7b92062f4582a8d56deed2aaed562d77a076aa61b576dc2",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/free-wake-cost-v1/capture.ps1": "1269c27fd2b40a308b1b465d93922c33cd8e2e2100ed3c1b1252b0b97155d321",
+    "docs/verification/IM-03/free-wake-cost-v1/extract.py": "e2fdd120a2f6b822bd0beff79915b0db1f00914580fb706be20c00b5c5ce19c7",
+    "docs/verification/IM-03/free-wake-cost-v1/observations.csv": "2d255fb287f80df0695e35a657aedaa9c23e45037b27558eab03c061c33e5c4b",
+    "docs/verification/IM-03/free-wake-cost-v1/preparation.csv": "9278939bf136513b139c7a20702982ac6242f2a0663a45b37e0315d9ffe0a18c",
+    "docs/verification/IM-03/free-wake-cost-v1/reference.json": "b50e5cce4da70bd487e2e2acd8118e59e6d62bad2582821d11469faeb880d58a",
+    "docs/verification/IM-03/free-wake-cost-v1/reference.py": "b34f1934be27ba7b5ef60bb4796310d88759d4af6e5a179c3e6df7c074e6026b",
+    "docs/verification/IM-03/free-wake-cost-v1/verification.md": "90d08f6412ef2a884e178f5a9b5ab4ef762754eee60dfa75f896e32c06b3e91c"
+  },
+  "source_records": [
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "9f8922f33603fb98feffc3181f20c970abeb0d4eca6e12d1e47c0a5f9ac99748"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "303b7c0c91a98dfbe457a1f428b1e2b534fddb0f0e3c63768d87b8709c613301"
+    },
+    {
+      "id": "src/coupling/fixed_wake_transport.cpp",
+      "hint": "src/coupling/fixed_wake_transport.cpp",
+      "sha256": "b65b21923b5f3d5979be1fb6f8e27b147b27d050ada1bf20b67bfaaef681d423"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "7b18b73dae81c9f2e51cc4c478e3520e74373097499893e5a179ef066f8c81a2"
+    },
+    {
+      "id": "docs/requirements/practical-acceptance-plan.md",
+      "hint": "docs/requirements/practical-acceptance-plan.md",
+      "sha256": "050213606ad95a1cab93ece3a0500f5b7444cafcb24f9b5e064f4f0466890c0f"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py",
+      "sha256": "24f80eb3a7fa8ff4c7b92062f4582a8d56deed2aaed562d77a076aa61b576dc2"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/free-wake-cost-v1/capture.ps1",
+      "hint": "docs/verification/IM-03/free-wake-cost-v1/capture.ps1",
+      "sha256": "1269c27fd2b40a308b1b465d93922c33cd8e2e2100ed3c1b1252b0b97155d321"
+    },
+    {
+      "id": "docs/verification/IM-03/free-wake-cost-v1/extract.py",
+      "hint": "docs/verification/IM-03/free-wake-cost-v1/extract.py",
+      "sha256": "e2fdd120a2f6b822bd0beff79915b0db1f00914580fb706be20c00b5c5ce19c7"
+    },
+    {
+      "id": "docs/verification/IM-03/free-wake-cost-v1/observations.csv",
+      "hint": "docs/verification/IM-03/free-wake-cost-v1/observations.csv",
+      "sha256": "2d255fb287f80df0695e35a657aedaa9c23e45037b27558eab03c061c33e5c4b"
+    },
+    {
+      "id": "docs/verification/IM-03/free-wake-cost-v1/preparation.csv",
+      "hint": "docs/verification/IM-03/free-wake-cost-v1/preparation.csv",
+      "sha256": "9278939bf136513b139c7a20702982ac6242f2a0663a45b37e0315d9ffe0a18c"
+    },
+    {
+      "id": "docs/verification/IM-03/free-wake-cost-v1/reference.json",
+      "hint": "docs/verification/IM-03/free-wake-cost-v1/reference.json",
+      "sha256": "b50e5cce4da70bd487e2e2acd8118e59e6d62bad2582821d11469faeb880d58a"
+    },
+    {
+      "id": "docs/verification/IM-03/free-wake-cost-v1/reference.py",
+      "hint": "docs/verification/IM-03/free-wake-cost-v1/reference.py",
+      "sha256": "b34f1934be27ba7b5ef60bb4796310d88759d4af6e5a179c3e6df7c074e6026b"
+    },
+    {
+      "id": "docs/verification/IM-03/free-wake-cost-v1/verification.md",
+      "hint": "docs/verification/IM-03/free-wake-cost-v1/verification.md",
+      "sha256": "90d08f6412ef2a884e178f5a9b5ab4ef762754eee60dfa75f896e32c06b3e91c"
+    }
+  ],
+  "observation_source_commit": "f160f7e16dadf548452fcccf102b16bcbd1fd5db",
+  "observation_fixture_sha256": "bb36696ee10cb245e23c44186094b918b125f4d952512af67d37eb1d885186fc"
+}
