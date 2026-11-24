@@ -1498,6 +1498,8 @@ namespace {
 constexpr int curved_rule_order = 5;
 constexpr int curved_rule_planar_count = (curved_rule_order + 1) * (curved_rule_order + 2) / 2;
 constexpr int curved_rule_depth_count = 3;
+constexpr auto curved_rule_points_per_volume = static_cast<std::size_t>(curved_rule_planar_count) *
+                                               static_cast<std::size_t>(curved_rule_depth_count);
 constexpr int curved_rule_weight_denominator =
     2 * curved_rule_planar_count * curved_rule_depth_count;
 
@@ -1625,10 +1627,9 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     check_failure(prepare(points, grid, stop, empty), core::FailureCode::Cancelled);
     check_failure(prepare(points, grid, caps, empty), core::FailureCode::ResourceExceeded);
     check_failure(prepare(points, {271, 272}, caps, empty), core::FailureCode::InvalidInput);
-    check_failure(prepare(std::span{points}.subspan(static_cast<std::size_t>(
-                              curved_rule_planar_count * curved_rule_depth_count)),
-                          grid, caps, empty),
-                  core::FailureCode::InvalidInput);
+    check_failure(
+        prepare(std::span{points}.subspan(curved_rule_points_per_volume), grid, caps, empty),
+        core::FailureCode::InvalidInput);
     // Keep the full volume coverage and change only the weight or order.
     const std::array invalid_weights{f.r("0"), f.r("-1")};
     for (const auto& invalid_weight : invalid_weights) {
@@ -1642,8 +1643,7 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     }
     std::vector<PgDiscreteVolumePoint> reversed;
     reversed.reserve(points.size());
-    constexpr auto block =
-        static_cast<std::size_t>(curved_rule_planar_count * curved_rule_depth_count);
+    constexpr auto block = curved_rule_points_per_volume;
     for (std::size_t k = 0; k < points.size(); ++k)
         reversed.push_back(points[k == block + 1 ? 0 : k]);
     check_failure(prepare(reversed, grid, caps, empty), core::FailureCode::InvalidInput);
