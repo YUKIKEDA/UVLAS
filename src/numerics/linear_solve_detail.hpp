@@ -65,7 +65,8 @@ struct Finalization {
     Finalization(Context identity, core::RhsGeneration rhs_identity,
                  core::NumericalGeneration rhs_values, Accuracy request, BackendAdmission prepared,
                  BackendAdmission current, unsigned corrections, RetentionPath path,
-                 ConditionDiagnostic diagnostic) noexcept
+                 ConditionDiagnostic diagnostic,
+                 LinearSystemOrientation system = LinearSystemOrientation::Original) noexcept
         : context(identity),
           rhs(rhs_identity),
           rhs_buffer_generation(rhs_values),
@@ -74,7 +75,8 @@ struct Finalization {
           solve_admission(current),
           refinements(corrections),
           retention(path),
-          condition(diagnostic) {}
+          condition(diagnostic),
+          orientation(system) {}
     Context context;
     core::RhsGeneration rhs;
     core::NumericalGeneration rhs_buffer_generation;
@@ -84,6 +86,7 @@ struct Finalization {
     unsigned refinements;
     RetentionPath retention;
     ConditionDiagnostic condition;
+    LinearSystemOrientation orientation;
 };
 class SolutionFactory {
 public:

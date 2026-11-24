@@ -200,6 +200,12 @@ enum class RetentionPath : std::uint8_t {
     PromotedTwoWord   ///< Binary64 correction stagnated and retention was promoted.
 };
 
+/// Orientation of the original system used to independently qualify the result.
+enum class LinearSystemOrientation : std::uint8_t {
+    Original, ///< A x = b, or the advertised supplied matrix-free action.
+    Transpose ///< A^T x = b for an explicitly requested real transpose solve.
+};
+
 /// Owning qualification metadata bound to one exact solver candidate, not workspace storage.
 class Certificate {
 public:
@@ -216,6 +222,10 @@ public:
     /// Full cached operator identity and physical evaluation context.
     [[nodiscard]] Context context() const noexcept {
         return context_;
+    }
+    /// Which action of the prepared original system was used for qualification.
+    [[nodiscard]] LinearSystemOrientation orientation() const noexcept {
+        return orientation_;
     }
     /// Explicit RHS generation, distinct from matrix/factor identity.
     [[nodiscard]] core::RhsGeneration rhs_generation() const noexcept {
@@ -323,8 +333,10 @@ private:
                 core::PlannedBuffer<double>, core::PlannedBuffer<UnitDimensions>,
                 core::PlannedBuffer<UnitDimensions>,
                 core::PlannedBuffer<std::optional<ConsumerProof>>, BackendAdmission,
-                BackendAdmission, unsigned, RetentionPath, ConditionDiagnostic) noexcept;
+                BackendAdmission, unsigned, RetentionPath, ConditionDiagnostic,
+                LinearSystemOrientation) noexcept;
     Context context_;
+    LinearSystemOrientation orientation_;
     core::RhsGeneration rhs_;
     core::NumericalGeneration rhs_buffer_;
     Accuracy accuracy_;
