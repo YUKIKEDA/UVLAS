@@ -2,7 +2,7 @@
 
 #include <array>
 #include <cstring>
-#include <uvlas/structure/pg_volume_position.hpp>
+#include <uvlas/structure/pg_boundary_position.hpp>
 
 namespace uvlas::structure {
 namespace {
@@ -28,11 +28,10 @@ using namespace detail;
     return plane.empty() ? 0.0 : plane[i];
 }
 
-void add_term(VolumeInteger& value, VolumeInteger& reference_error, PgVolumeMassWords basis,
-              std::size_t coefficient, PgCartesianWords input, std::size_t original,
-              VolumeWord epsilon) {
-    const auto n_hi = volume_decode(basis.high[coefficient]);
-    const auto n_lo = volume_decode(low_at(basis.low, coefficient));
+void add_term(VolumeInteger& value, VolumeInteger& reference_error, double high, double low,
+              PgCartesianWords input, std::size_t original, VolumeWord epsilon) {
+    const auto n_hi = volume_decode(high);
+    const auto n_lo = volume_decode(low);
     const auto q_hi = volume_decode(input.high[original]);
     const auto q_lo = volume_decode(low_at(input.low, original));
     value += volume_product(n_hi, q_hi);
@@ -104,22 +103,21 @@ PgCartesianWords PgVolumePositionResult::words() const& noexcept {
             low_.values().empty() ? std::span<const double>{} : low_.values().first(size)};
 }
 
-core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& reference,
-                                            PgVolumePositionDirection direction,
-                                            PgCartesianWords input,
-                                            const PgVolumePositionLimits& limits,
-                                            core::Workspace& workspace,
-                                            PgVolumePositionResult& output) noexcept {
+core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
+                                                 PgVolumePositionDirection direction,
+                                                 PgCartesianWords input,
+                                                 const PgVolumePositionLimits& limits,
+                                                 core::Workspace& workspace) noexcept {
     return core::guard_entry(
         volume_operation, core::FailureCode::InvalidInput, {}, [&]() -> core::Result<void> {
             if (limits.cancellation.stop_requested())
                 return reject(core::FailureCode::Cancelled);
-            if (const auto accepted = reference.conditioning().info(); !accepted)
+            if (const auto accepted = reference.certificate.info(); !accepted)
                 return std::unexpected(accepted.error());
             if (!valid_precision(input.representation))
                 return reject(core::FailureCode::PrecisionUnsupported);
             const auto input_paired = input.representation == core::Precision::TwoWord;
-            const auto output_paired = output.representation_ == core::Precision::TwoWord;
+            const auto output_paired = representation_ == core::Precision::TwoWord;
             if (!volume_finite(limits.maximum_absolute_error))
                 return reject(core::FailureCode::Nonfinite);
             const auto allowance = volume_lift(volume_decode(limits.maximum_absolute_error));
@@ -128,8 +126,8 @@ core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& referen
             const auto forward = direction == PgVolumePositionDirection::ToPoints;
             if (!forward && direction != PgVolumePositionDirection::TransposeToColumns)
                 return reject(core::FailureCode::InvalidInput);
-            const auto rank = reference.column_count();
-            const auto points = reference.points().size();
+            const auto rank = reference.rank;
+            const auto points = reference.points;
             const auto inner = forward ? rank : points;
             const auto outer = forward ? points : rank;
             if (std::max(inner, outer) > std::numeric_limits<std::size_t>::max() / 3)
@@ -139,7 +137,7 @@ core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& referen
             if (input.high.size() != input_size ||
                 input.low.size() != (input_paired ? input_size : 0))
                 return reject(core::FailureCode::InvalidInput);
-            if (output_size > output.high_.size() ||
+            if (output_size > high_.size() ||
                 !fits_steps(limits.maximum_steps, input, inner, output_size))
                 return reject(core::FailureCode::ResourceExceeded);
 
@@ -158,9 +156,8 @@ core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& referen
             if (const auto valid = validate_plane(input.low, limits); !valid)
                 return valid;
 
-            const auto basis = reference.words();
-            const auto epsilon = volume_decode(reference.projection().maximum_shape_error);
-            const auto stride = rank + 1;
+            const auto epsilon = volume_decode(reference.maximum_shape_error);
+            const auto stride = rank + reference.prefix;
             for (std::size_t i = 0; i < outer; ++i)
                 for (std::size_t axis = 0; axis < 3; ++axis) {
                     VolumeInteger sum{}, reference_error{};
@@ -169,9 +166,10 @@ core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& referen
                     for (std::size_t k = 0; k < inner; ++k) {
                         if (limits.cancellation.stop_requested())
                             return reject(core::FailureCode::Cancelled);
-                        const auto coefficient = forward ? i * stride + k + 1 : k * stride + i + 1;
-                        add_term(sum, reference_error, basis, coefficient, input, 3 * k + axis,
-                                 epsilon);
+                        const auto coefficient =
+                            (forward ? i * stride + k : k * stride + i) + reference.prefix;
+                        add_term(sum, reference_error, reference.high[coefficient],
+                                 low_at(reference.low, coefficient), input, 3 * k + axis, epsilon);
                     }
                     const auto value =
                         volume_finalize(std::move(sum), reference_error, allowance, output_paired);
@@ -185,13 +183,39 @@ core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& referen
             if (limits.cancellation.stop_requested())
                 return reject(core::FailureCode::Cancelled);
             if (bytes != 0) {
-                std::memcpy(output.high_.values().data(), high.data(), bytes);
+                std::memcpy(high_.values().data(), high.data(), bytes);
                 if (output_paired)
-                    std::memcpy(output.low_.values().data(), low.data(), bytes);
+                    std::memcpy(low_.values().data(), low.data(), bytes);
             }
-            output.size_ = static_cast<std::size_t>(output_size);
+            size_ = static_cast<std::size_t>(output_size);
             return {};
         });
+}
+
+core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& reference,
+                                            PgVolumePositionDirection direction,
+                                            PgCartesianWords input,
+                                            const PgVolumePositionLimits& limits,
+                                            core::Workspace& workspace,
+                                            PgVolumePositionResult& output) noexcept {
+    const auto words = reference.words();
+    return output.apply({reference.conditioning(), reference.column_count(),
+                         reference.points().size(), words.high, words.low, 1,
+                         reference.projection().maximum_shape_error},
+                        direction, input, limits, workspace);
+}
+
+core::Result<void> apply_pg_boundary_position(const PgBoundaryPositionReference& reference,
+                                              PgVolumePositionDirection direction,
+                                              PgCartesianWords input,
+                                              const PgVolumePositionLimits& limits,
+                                              core::Workspace& workspace,
+                                              PgVolumePositionResult& output) noexcept {
+    const auto words = reference.words();
+    return output.apply({reference.conditioning(), reference.column_count(),
+                         reference.points().size(), words.high, words.low, 0,
+                         reference.projection().maximum_shape_error},
+                        direction, input, limits, workspace);
 }
 
 } // namespace uvlas::structure
