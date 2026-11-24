@@ -7,7 +7,7 @@
 namespace uvlas::io::detail {
 
 struct ExternalSidecarPgLimits {
-    ExternalSidecarPgLimits(ExternalPgLimits pg, GmshTopologyLimits topology_limits,
+    ExternalSidecarPgLimits(const ExternalPgLimits& pg, GmshTopologyLimits topology_limits,
                             std::uint64_t thickness_vertices, std::uint64_t work_limit) noexcept
         : geometry(pg),
           topology(topology_limits),

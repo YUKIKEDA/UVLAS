@@ -1490,7 +1490,7 @@ $EndElements
         "GRID,10,,0.0,0.0,0.0\nGRID,20,,1.0,0.0,0.0\nGRID,40,,1.0,1.0,0.0\n"
         "GRID,99,,0.0,1.0,0.0\nPSHELL,90,6,0.25\nMAT1,6,1.0,,0.0,1.0\n"
         "CTRIA3,701,90,10,20,40\nCTRIA3,702,90,10,40,99\n"
-        "SPC,42,10,1,0.0\nSPC1,51,36,10,40\nSPCADD,61,42,51\n";
+        "SPC,42,10,1,0.0\nSPC1,51,36,10,40\nSPC1,61,5,10\nSPCADD,61,42,51\n";
     const auto zero = nlohmann::json{{"numerator", "0"}, {"denominator", "1"}};
     const auto one = nlohmann::json{{"numerator", "1"}, {"denominator", "1"}};
     const auto chart = [&](bool upper) {

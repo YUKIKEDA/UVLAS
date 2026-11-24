@@ -385,7 +385,7 @@ struct QuantityCounts {
         p.reject(Code::Unsupported, Reason::Binding);
     }
     const auto* bending = std::get_if<NastranMaterialReference>(&property->bending);
-    std::array<const NastranMaterialReference*, 4> uses{
+    const std::array<const NastranMaterialReference*, 4> uses{
         property->membrane ? &*property->membrane : nullptr, bending,
         property->transverse_shear ? &*property->transverse_shear : nullptr,
         property->coupling ? &*property->coupling : nullptr};

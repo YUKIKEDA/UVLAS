@@ -531,9 +531,15 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
             })) {
             b.reject(Reason::Selection);
         }
+        const bool combination =
+            std::ranges::any_of(supports.union_members, [&](const auto& member) {
+                b.step();
+                return member.combination == row.set;
+            });
         const auto in_set = [&](NastranSupportSetId set) {
-            if (set == row.set) {
-                return true;
+            // A selected SPCADD takes precedence over direct terms with the same SID.
+            if (!combination) {
+                return set == row.set;
             }
             return std::ranges::any_of(supports.union_members, [&](const auto& member) {
                 b.step();
