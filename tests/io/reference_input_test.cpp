@@ -1643,7 +1643,7 @@ $EndElements
             sidecar["schema"] = "uvlas.gmsh-sidecar/2";
         } else if (wrong_chart) {
             sidecar["shells"][0]["faces"][0]["chart"]["vertices"][1][0]["denominator"] = "0";
-        } else if (lexical) {
+        } else if (lexical && !wrong_sidecar_geometry) {
             sidecar["include"] = "unread.json";
         }
         if (budget_repeat) {
