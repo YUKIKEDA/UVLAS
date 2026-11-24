@@ -192,7 +192,8 @@ TEST_CASE("The checked lexical limits count padding and preserve the snapshot on
     caps.work = view.work;
     core::ResourcePlan exact{plan.allocated_bytes()};
     auto repeated = snapshot(text);
-    CHECK(NastranBulkDeck::prepare(std::move(repeated), caps, exact, {}));
+    const auto replay = NastranBulkDeck::prepare(std::move(repeated), caps, exact, {});
+    CHECK(replay);
     CHECK(exact.allocated_bytes() == plan.allocated_bytes());
 
     auto amount = exact.allocated_bytes();
