@@ -150,7 +150,7 @@ struct Builder {
             output = output.subspan(point_stride);
         }
         work.step();
-        return CaseMotionEvaluation{std::move(curves), std::move(values), std::move(points), orders,
+        return CaseMotionEvaluation{std::move(curves), values, std::move(points), orders,
                                     work.used};
     }
 };
@@ -164,24 +164,23 @@ std::span<const p::RationalView> CaseMotionReady::events() const& noexcept {
     return curves_.events();
 }
 
-CaseMotionEvaluation::CaseMotionEvaluation(CaseMotionTimeJet time, Values values,
+CaseMotionEvaluation::CaseMotionEvaluation(CaseMotionTimeJet time, const Values& values,
                                            core::PlannedBuffer<io::SiEnclosure> points,
                                            std::size_t orders, std::uint64_t work) noexcept
     : time_(std::move(time)),
-      values_(std::move(values)),
+      values_(values),
       points_(std::move(points)),
       orders_(orders),
       interval_work_(work) {}
 
 CaseMotionEvaluation::CaseMotionEvaluation(CaseMotionEvaluation&& source) noexcept
-    : CaseMotionEvaluation(std::move(source.time_), std::move(source.values_),
-                           std::move(source.points_), std::exchange(source.orders_, 0),
-                           source.interval_work_) {}
+    : CaseMotionEvaluation(std::move(source.time_), source.values_, std::move(source.points_),
+                           std::exchange(source.orders_, 0), source.interval_work_) {}
 
 CaseMotionEvaluation& CaseMotionEvaluation::operator=(CaseMotionEvaluation&& source) noexcept {
     if (this != &source) {
         time_ = std::move(source.time_);
-        values_ = std::move(source.values_);
+        values_ = source.values_;
         points_ = std::move(source.points_);
         orders_ = std::exchange(source.orders_, 0);
         interval_work_ = source.interval_work_;

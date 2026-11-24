@@ -16,8 +16,8 @@ struct Builder;
 struct CaseMotionLimits {
     CaseMotionFrameLimits frame;
     CaseMotionTimeLimits time_series;
-    std::uint64_t maximum_interval_input_bits;
-    std::uint64_t maximum_interval_work;
+    std::uint64_t maximum_interval_input_bits{};
+    std::uint64_t maximum_interval_work{};
 };
 
 struct CaseMotionReferencePoint {
@@ -78,7 +78,7 @@ private:
     friend struct case_motion_detail::Builder;
     static constexpr std::size_t components_per_order = 12;
     using Values = std::array<io::SiEnclosure, 3 * components_per_order>;
-    CaseMotionEvaluation(CaseMotionTimeJet, Values, core::PlannedBuffer<io::SiEnclosure>,
+    CaseMotionEvaluation(CaseMotionTimeJet, const Values&, core::PlannedBuffer<io::SiEnclosure>,
                          std::size_t orders, std::uint64_t) noexcept;
 
     CaseMotionTimeJet time_;
