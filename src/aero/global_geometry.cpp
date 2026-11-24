@@ -538,6 +538,47 @@ GlobalResult<UvlmQuad> GlobalContactState::uvlm_quad(FacetId id, std::uint64_t m
                         used};
     });
 }
+GlobalResult<UvlmOriginalQuad>
+GlobalContactState::uvlm_original_quad(std::size_t index, std::uint64_t maximum,
+                                       const std::stop_token& stop) const noexcept {
+    return guarded(context_, [&]() -> GlobalResult<UvlmOriginalQuad> {
+        const auto owner = geometry();
+        if (!owner)
+            return std::unexpected(owner.error());
+        const auto data = data_.values();
+        const auto& topology = data.front().topology;
+        const auto& source = GlobalEngine::source(owner->get());
+        if (!topology || !source || index >= source->quads.size())
+            reject(core::FailureCode::InvalidInput);
+        const auto& quad = source->quads.values()[index];
+        const auto face = PhysicalFaceId{quad.parent};
+        std::uint64_t used = 0;
+        const auto step = [&] {
+            if (stop.stop_requested())
+                reject(core::FailureCode::Cancelled, face);
+            if (used == maximum)
+                reject(core::FailureCode::ResourceExceeded, face);
+            ++used;
+        };
+        const auto faces = source->face_lookup.values();
+        step();
+        const auto found = std::lower_bound(faces.begin(), faces.end(), face.value(),
+                                            [&](const IdLookup& row, std::uint64_t value) {
+                                                step();
+                                                return row.id < value;
+                                            });
+        if (found == faces.end() || found->id != face.value())
+            reject(core::FailureCode::InvalidInput, face);
+        const auto bound = topology->roles.values()[static_cast<std::size_t>(found->ordinal)] ==
+                           GlobalTopologyData::bound_role;
+        return UvlmOriginalQuad{face,
+                                bound ? AeroFaceRole::Bound : AeroFaceRole::Wake,
+                                {PointId{quad.points[0]}, PointId{quad.points[1]},
+                                 PointId{quad.points[2]}, PointId{quad.points[3]}},
+                                {FacetId{quad.facets[0]}, FacetId{quad.facets[1]}},
+                                used};
+    });
+}
 std::size_t GlobalContactState::trailing_edge_count() const noexcept {
     if (!active() || !data_.values()[0].topology)
         return 0;

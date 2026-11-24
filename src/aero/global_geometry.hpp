@@ -96,6 +96,14 @@ struct UvlmQuad {
     std::optional<TrailingEdgeRow> attachment;
     std::uint64_t used_steps;
 };
+/// Original D2 corners and children of one contact-qualified physical bound face.
+struct UvlmOriginalQuad {
+    PhysicalFaceId face{0};
+    AeroFaceRole role{};
+    std::array<PointId, 4> corners;
+    std::array<FacetId, 2> facets;
+    std::uint64_t used_steps{};
+};
 /// Canonical edge in the checked topology, with endpoints in the stored D2 order.
 struct UvlmLoadEdge {
     EdgeId edge;
@@ -197,6 +205,9 @@ public:
     /// Inspect the fixed quad of a source facet. A wake's L edge uses quad vertices 0→1.
     [[nodiscard]] GlobalResult<UvlmQuad> uvlm_quad(FacetId, std::uint64_t max_steps,
                                                    const std::stop_token& = {}) const noexcept;
+    [[nodiscard]] GlobalResult<UvlmOriginalQuad>
+    uvlm_original_quad(std::size_t, std::uint64_t max_steps,
+                       const std::stop_token& = {}) const noexcept;
     [[nodiscard]] std::size_t trailing_edge_count() const noexcept;
     /// Resolve an original edge or explicit alias to the edge owner and TE classification.
     [[nodiscard]] GlobalResult<UvlmLoadEdge>
