@@ -19,12 +19,31 @@ struct Rejected {
     core::Failure error;
 };
 
+struct ForwardStop {
+    std::stop_source& source;
+
+    void operator()() const noexcept {
+        source.request_stop();
+    }
+};
+
 class Preparation {
+    std::stop_source cancellation_;
+    std::stop_callback<ForwardStop> caller_stop_;
+    std::stop_callback<ForwardStop> geometry_stop_;
+    std::stop_callback<ForwardStop> reference_stop_;
+
 public:
     Preparation(const ExternalSidecarPgLimits& configured, core::ResourcePlan& resources,
                 const std::stop_token& token, RootSnapshotLocation location,
-                ExternalSidecarPgDiagnostic* output) noexcept
-        : limits(configured), plan(resources), stop(token), diagnostic(output) {
+                ExternalSidecarPgDiagnostic* output, const std::stop_token& reference = {})
+        : caller_stop_(token, ForwardStop{cancellation_}),
+          geometry_stop_(configured.geometry.arithmetic.cancellation, ForwardStop{cancellation_}),
+          reference_stop_(reference, ForwardStop{cancellation_}),
+          limits(configured),
+          plan(resources),
+          stop(cancellation_.get_token()),
+          diagnostic(output) {
         detail.source = location;
     }
 
@@ -78,7 +97,7 @@ public:
 
     const ExternalSidecarPgLimits& limits;
     core::ResourcePlan& plan;
-    const std::stop_token& stop;
+    const std::stop_token stop;
     ExternalSidecarPgDiagnostic* diagnostic;
     MeshSidecarDiagnostic detail{};
     std::uint64_t work = 0;
@@ -407,20 +426,22 @@ struct QuantityCounts {
 
 } // namespace
 
-core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
-    const SchemaCase& schema, const ExternalMeshSidecarBinding& bound, MeshShellId shell,
-    const structure::PgReferenceGeometry& pg, const SiUnits& case_units,
-    const NastranLaminateCards* quantities, const ExternalSidecarPgLimits& limits,
-    core::ResourcePlan& plan, const std::stop_token& stop,
-    ExternalSidecarPgDiagnostic* diagnosis) noexcept {
+core::Result<QualifiedCaseSidecarPg> qualify_external_sidecar_planar_pg(
+    const SiCase& si, const ExternalMeshSidecarBinding& bound, MeshShellId shell,
+    const NastranLaminateCards* quantities, const CasePgReferenceLimits& reference_limits,
+    const ExternalSidecarPgLimits& limits, core::Workspace& workspace, core::ResourcePlan& plan,
+    const std::stop_token& stop, ExternalSidecarPgDiagnostic* diagnosis) noexcept {
     if (diagnosis) {
         *diagnosis = {};
     }
     return core::guard_entry(
-        operation, Code::InvalidInput, {}, [&]() -> core::Result<QualifiedExternalSidecarPg> {
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<QualifiedCaseSidecarPg> {
             try {
-                Preparation call{limits, plan, stop, bound.sidecar().source(), diagnosis};
+                Preparation call{limits,    plan,
+                                 stop,      bound.sidecar().source(),
+                                 diagnosis, reference_limits.cancellation};
                 call.step();
+                const auto& schema = call.value(si.source_case()).get();
                 const auto parent = call.value(schema.identity());
                 const auto source = bound.sidecar().source();
                 if (parent.source != source.parent.source ||
@@ -430,11 +451,22 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                 }
                 call.detail.target_namespace = SchemaNamespace::Shell;
                 call.detail.target = shell.value();
-                const auto model = call.value(schema.root(), Reason::CaseReference).model.record();
+                const auto root = call.value(schema.root(), Reason::CaseReference);
+                const auto units = root.units.record();
+                const SiUnits case_units{static_cast<SiLengthUnit>(units.length.selected()),
+                                         static_cast<SiMassUnit>(units.mass.selected()),
+                                         static_cast<SiTimeUnit>(units.time.selected()),
+                                         static_cast<SiAngleUnit>(units.angle.selected())};
+                const auto model = root.model.record();
                 const auto selected = find_shell(call, model, shell);
                 const auto pg_id = MeshGeometryId{selected.geometry.unsigned_value()};
                 const auto pg_record = find_pg(call, model, pg_id);
                 const auto count = selected_faces(call, bound, shell, pg_id);
+                auto preparation = reference_limits;
+                preparation.cancellation = call.stop;
+                auto pg = call.value(
+                    prepare_case_pg_reference(si, shell.value(), preparation, workspace, plan),
+                    Reason::CaseReference);
                 auto geometry = establish_geometry(call, bound, pg, shell, count);
                 const auto& payload = bound.sidecar().payload();
                 QuantityCounts result;
@@ -453,14 +485,10 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                                            deck, model, selected, pg_record, case_units);
                 }
                 call.step();
-                return QualifiedExternalSidecarPg{std::move(geometry),
-                                                  shell,
-                                                  pg_id,
-                                                  source,
-                                                  bound.sidecar().digest(),
-                                                  result.thickness,
-                                                  result.materials,
-                                                  call.work};
+                return QualifiedCaseSidecarPg{std::move(pg),
+                                              {std::move(geometry), shell, pg_id, source,
+                                               bound.sidecar().digest(), result.thickness,
+                                               result.materials, call.work}};
             } catch (const Rejected& error) {
                 return std::unexpected(error.error);
             }

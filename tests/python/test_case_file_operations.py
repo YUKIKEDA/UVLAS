@@ -128,15 +128,20 @@ class CaseFileOperations(unittest.TestCase):
             root = Path(workspace)
             path = root / "case.json"
             (root / "skin.bdf").write_bytes(deck)
-            for data, valid in ((json_bytes(sidecar), True), (b"{}", False)):
-                with self.subTest(valid=valid):
+            cases = {
+                "matching geometry": json_bytes(sidecar),
+                "malformed sidecar": b"{}",
+                "different geometry": json_bytes({**sidecar, "geometry": "999"}),
+            }
+            for scenario, data in cases.items():
+                with self.subTest(scenario=scenario):
                     geometry["sidecar"]["sha256"] = hashlib.sha256(data).hexdigest()
                     (root / "skin.json").write_bytes(data)
                     path.write_bytes(json_bytes(case))
                     result = uvlas.load_case(path)
                     other = uvlas.case_from_dict(case, reference_root=root)
                     output = cli("validate", path)
-                    if valid:
+                    if scenario == "matching geometry":
                         self.assertTrue(result.ok)
                         self.assertTrue(other.ok)
                         self.assertEqual(output.returncode, 0, output.stderr)
