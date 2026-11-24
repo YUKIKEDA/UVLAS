@@ -361,13 +361,13 @@ ls::Context context(const a::GeometryContext& geometry) {
 
 class AlgebraicOnly final : public ls::ConsumerEvaluator<double> {
 public:
-    numerics::SupportedPrecision supported_precision() const noexcept override {
+    [[nodiscard]] numerics::SupportedPrecision supported_precision() const noexcept override {
         return numerics::SupportedPrecision::Binary64AndTwoWord;
     }
-    core::Result<core::ErrorCertificate> assess(const numerics::PrecisionBuffer<double>&,
-                                                const numerics::PrecisionBuffer<double>&,
-                                                const ls::Context&, const ls::ConsumerCheck& check,
-                                                core::CertificateContext expected) const override {
+    [[nodiscard]] core::Result<core::ErrorCertificate>
+    assess(const numerics::PrecisionBuffer<double>&, const numerics::PrecisionBuffer<double>&,
+           const ls::Context&, const ls::ConsumerCheck& check,
+           core::CertificateContext expected) const override {
         FAIL_CHECK("The explicit original residual follows the dense solve");
         return core::ErrorCertificate::unevaluated(expected, check.budget);
     }
@@ -423,7 +423,7 @@ struct SolutionSetup {
         gamma_units.fill({2, 0, -1, 0, 0, 0, 0});
         speed_units.fill({1, 0, -1, 0, 0, 0, 0});
     }
-    ls::Scales scales() const {
+    [[nodiscard]] ls::Scales scales() const {
         return {scale, scale, gamma_units, speed_units, identity};
     }
 };
@@ -529,6 +529,7 @@ void run_wing(const nlohmann::json& shape, const nlohmann::json& wing,
 
     const auto parameters = [&](const Circulation& gamma) {
         std::vector<cf::DiscreteCollocation> rows;
+        rows.reserve(columns);
         for (std::size_t i = 0; i < columns; ++i)
             rows.emplace_back(mesh.quads[i].facets[0], queries[i], case_grid.tangents[i], xyz({}),
                               gamma[i], a::SingleWord{0});
