@@ -622,4 +622,44 @@ TEST_CASE("Nastran face bounds include the interior gap from a curved PG graph",
     CHECK(take(diagnostic).element == 102);
 }
 
+TEST_CASE("Nastran triangle distance bound needs the mixed PG height derivative",
+          "[IO4-03][IO4-04][SH-D02][N4-02][integration][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto zero = f.r("0"), one = f.r("1");
+    const std::array terms{ExactInputTerm{{1, 1}, one}};
+    const auto height = take(ExactChartPolynomial::make(terms, algebra(), plan));
+    f.graph = take(PgGraph::prepare({zero, one, zero, height, 1, PgGraphConvention::Version1},
+                                    {algebra(), 64, {}}, plan));
+    f.domain[2] = f.point("0", "1");
+    f.domain.resize(3);
+    for (auto& thickness : f.heights) {
+        thickness = f.r("1", "10");
+    }
+    const std::array<ExactRational, 3> origin;
+    std::array<ExactRational, 9> rotation;
+    rotation[0] = f.r("1");
+    rotation[4] = f.r("1");
+    rotation[8] = f.r("1");
+    const auto target = flat_target(f, {rotation, origin, one}, plan);
+
+    const auto deck = read_cards("GRID,10,,0.0,0.0,0.0\nGRID,40,,1.0,0.0,0.0\n"
+                                 "GRID,90,,0.0,1.0,0.0\nPSHELL,20\nCTRIA3,101,20,10,40,90\n",
+                                 plan);
+    const std::array ring{ExternalPgCorner{10, f.domain[0]}, ExternalPgCorner{40, f.domain[1]},
+                          ExternalPgCorner{90, f.domain[2]}};
+    const std::array selection{ExternalPgFace{101, Winding::Forward, ring}};
+    const NastranPgBoundLimits limits{{reference_limits(), 1}, 200'000};
+    const auto result = take(
+        NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Metre, selection, limits, plan));
+    const auto faces = take(result.view()).faces;
+    REQUIRE(faces.size() == 1);
+    REQUIRE(faces.front().ring().size() == 3);
+    // Source (s,t,0), PG (s,t,st). All vertex errors and both pure second
+    // derivatives are zero. The maximum gap is 1/4 at (1/2,1/2).
+    const auto quarter = f.r("1", "4");
+    CHECK(
+        std::is_gteq(take(faces.front().distance_upper_metres.compare(quarter, algebra(), plan))));
+}
+
 } // namespace
