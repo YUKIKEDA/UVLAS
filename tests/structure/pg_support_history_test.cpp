@@ -132,6 +132,7 @@ TEST_CASE("PG support history qualifies complete common intervals of dependent r
             std::vector<PgCartesianExactPosition> value, speed;
         };
         std::vector<Sample> data;
+        data.reserve(times.size());
         for (std::size_t i = 0; i < times.size(); ++i) {
             const auto& t = times[i];
             const auto derivatives = acts(t, t > 1);
@@ -152,6 +153,7 @@ TEST_CASE("PG support history qualifies complete common intervals of dependent r
     };
     const auto views = [](const auto& samples) {
         std::vector<PgSupportTimeKnot> result;
+        result.reserve(samples.size());
         for (const auto& s : samples)
             result.push_back({s.t, s.value, s.speed});
         return result;
