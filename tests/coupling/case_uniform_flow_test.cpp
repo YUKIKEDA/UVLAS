@@ -3247,6 +3247,12 @@ TEST_CASE("Two discrete circulation rows consume their own known-flow values and
     stale.retained_generation = primal_request.retained_generation;
     reject(run(cf::KnownCirculationTangent{state, a::SingleWord{.5}, stale}),
            core::FailureCode::StaleGeneration);
+    auto stale_dual = transpose_request;
+    stale_dual.rhs_generation = primal_request.rhs_generation;
+    reject(run(cf::KnownCirculationAdjoint{seed, stale_dual}), core::FailureCode::StaleGeneration);
+    stale_dual = transpose_request;
+    stale_dual.retained_generation = primal_request.retained_generation;
+    reject(run(cf::KnownCirculationAdjoint{seed, stale_dual}), core::FailureCode::StaleGeneration);
     const Number wrong_time{1};
     flow.time.time = wrong_time.view();
     reject(run(std::monostate{}), core::FailureCode::StaleGeneration);

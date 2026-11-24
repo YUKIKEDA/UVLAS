@@ -1510,13 +1510,18 @@ struct NonpenetrationBuilder {
         return finish_primal(std::move(data), std::move(flow));
     }
 
+    static void match_fresh_vectors(const DiscreteCirculationRequest& action,
+                                    const DiscreteCirculationRequest& primal) {
+        if (action.rhs_generation == primal.rhs_generation ||
+            action.retained_generation == primal.retained_generation)
+            reject(core::FailureCode::StaleGeneration);
+    }
+
     static void validate_tangent(const DiscreteCirculationRequest& tangent,
                                  const DiscreteCirculationRequest& primal, std::size_t order,
                                  p::Work& work) {
         match_linearization_context(tangent.scales.context, primal.scales.context, false);
-        if (tangent.rhs_generation == primal.rhs_generation ||
-            tangent.retained_generation == primal.retained_generation)
-            reject(core::FailureCode::StaleGeneration);
+        match_fresh_vectors(tangent, primal);
         validate_circulation(tangent, order, work);
     }
 
@@ -1632,6 +1637,7 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::InvalidInput);
             match_linearization_context(adjoint->request.scales.context, request.scales.context,
                                         true);
+            match_fresh_vectors(adjoint->request, request);
             validate_circulation(adjoint->request, order, work, true);
         }
 
@@ -2025,9 +2031,7 @@ struct NonpenetrationBuilder {
         if (implicit != nullptr) {
             match_linearization_context(implicit->request.scales.context, request.scales.context,
                                         true);
-            if (implicit->request.rhs_generation == request.rhs_generation ||
-                implicit->request.retained_generation == request.retained_generation)
-                reject(core::FailureCode::StaleGeneration);
+            match_fresh_vectors(implicit->request, request);
             validate_circulation(implicit->request, order, work, true);
         }
         if (tangent != nullptr)
