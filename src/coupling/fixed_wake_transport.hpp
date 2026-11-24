@@ -45,10 +45,10 @@ struct WakeTransportRow {
                      std::optional<DiscreteLoadVector> position,
                      std::optional<DiscreteLoadVector> position_tangent) noexcept
         : release(key),
-          residual(std::move(rate)),
-          direction(std::move(tangent)),
-          prescribed_position(std::move(position)),
-          prescribed_position_direction(std::move(position_tangent)) {}
+          residual(rate),
+          direction(tangent),
+          prescribed_position(position),
+          prescribed_position_direction(position_tangent) {}
 
     aero::detail::MaterialReleaseKey release;
     DiscreteLoadVector
@@ -65,7 +65,7 @@ struct WakeTransportHistoryDirection {
 struct WakeTransportPositionDual {
     WakeTransportPositionDual(aero::detail::MaterialReleaseKey key,
                               std::array<DiscreteLoadVector, 3> weights) noexcept
-        : release(key), stencil(std::move(weights)) {}
+        : release(key), stencil(weights) {}
 
     aero::detail::MaterialReleaseKey release;
     // Current, previous, older terms of the time stencil. The free velocity
