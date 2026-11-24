@@ -636,4 +636,92 @@ private:
     aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
     const std::stop_token& = {}) noexcept;
 
+struct DiscreteLoadSampleWeights {
+    DiscreteLoadSampleWeights(const NonpenetrationVector& x, const NonpenetrationVector& f) noexcept
+        : position(x), force(f) {}
+    NonpenetrationVector position, force; ///< 1/m and 1/N for a dimensionless objective.
+};
+
+/// Explicit weights on all value load outputs, in the corresponding result order.
+struct DiscreteVectorLoadWeights {
+    DiscreteVectorLoadWeights(aero::detail::P1ActionStamp trial,
+                              core::NumericalGeneration circulation_generation,
+                              std::span<const DiscreteLoadSampleWeights> edge_rows,
+                              std::span<const DiscreteLoadSampleWeights> facet_rows,
+                              std::span<const NonpenetrationVector> point_rows,
+                              const NonpenetrationVector& total_force,
+                              const NonpenetrationVector& total_moment) noexcept
+        : stamp(trial),
+          circulation(circulation_generation),
+          edges(edge_rows),
+          facets(facet_rows),
+          points(point_rows),
+          force(total_force),
+          moment(total_moment) {}
+    aero::detail::P1ActionStamp stamp;
+    core::NumericalGeneration circulation;
+    std::span<const DiscreteLoadSampleWeights> edges, facets;
+    std::span<const NonpenetrationVector> points; ///< Weights on the assembled nodal forces, 1/N.
+    NonpenetrationVector force, moment;           ///< Weights on the totals, 1/N and 1/(N m).
+};
+
+struct LoadEdgeVelocityCovector {
+    aero::detail::EdgeId edge;
+    DiscreteLoadVector velocity; ///< Dual to midpoint velocity, s/m.
+};
+
+struct LoadCirculationCovector {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScaledEnclosure circulation, circulation_rate; ///< s/m² and s²/m².
+};
+
+/// Transpose of the explicit load variables at the attained value circulation.
+class DiscreteCirculationLoadVjp {
+public:
+    DiscreteCirculationLoadVjp(DiscreteCirculationLoadVjp&&) noexcept = default;
+    DiscreteCirculationLoadVjp& operator=(DiscreteCirculationLoadVjp&&) noexcept = default;
+    DiscreteCirculationLoadVjp(const DiscreteCirculationLoadVjp&) = delete;
+    DiscreteCirculationLoadVjp& operator=(const DiscreteCirculationLoadVjp&) = delete;
+    [[nodiscard]] const DiscreteCirculationLoads& loads() const& noexcept {
+        return loads_;
+    }
+    [[nodiscard]] const DiscreteCirculationLoads& loads() const&& = delete;
+    [[nodiscard]] std::size_t point_count() const noexcept {
+        return points_.size();
+    }
+    [[nodiscard]] core::Result<CirculationPointCovector> point(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<LoadEdgeVelocityCovector>
+    midpoint_velocity(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<LoadCirculationCovector> bound(std::size_t) const noexcept;
+    [[nodiscard]] DiscreteLoadVector uniform_flow() const noexcept {
+        return flow_;
+    }
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationLoadVjp(DiscreteCirculationLoads&&,
+                               core::PlannedBuffer<std::optional<CirculationPointCovector>>,
+                               core::PlannedBuffer<std::optional<LoadEdgeVelocityCovector>>,
+                               core::PlannedBuffer<std::optional<LoadCirculationCovector>>,
+                               const DiscreteLoadVector& flow) noexcept;
+    DiscreteCirculationLoads loads_;
+    core::PlannedBuffer<std::optional<CirculationPointCovector>> points_;
+    core::PlannedBuffer<std::optional<LoadEdgeVelocityCovector>> edges_;
+    core::PlannedBuffer<std::optional<LoadCirculationCovector>> bound_;
+    DiscreteLoadVector flow_;
+};
+
+/// Pull all supplied load duals back to the fixed-chart inputs used by the JVP.
+/// Point covectors are ascending canonical IDs. With no midpoint evaluations,
+/// only points of the loaded triangles can receive covectors.
+/// Time, radius, density, moment origin and inherited wake strength are fixed.
+/// Consume the flow only after the value and pullback both succeed.
+[[nodiscard]] core::Result<DiscreteCirculationLoadVjp> solve_discrete_circulation_load_pullback(
+    const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
+    const DiscreteVectorLoadWeights&, ProjectedCaseUniformFlow&&,
+    const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest&,
+    aero::detail::GeometryWorkspace&, aero::detail::SharedP1Workspace&,
+    aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail

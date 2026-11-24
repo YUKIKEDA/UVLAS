@@ -511,21 +511,25 @@ struct LoadTotals {
     }
 };
 
+std::size_t load_node(std::span<const NodalLoad> nodes, a::PointId point, p::Work& work) {
+    work.step();
+    const auto it = std::ranges::lower_bound(
+        nodes, point.value(),
+        [&](std::uint64_t left, std::uint64_t right) {
+            work.step();
+            return left < right;
+        },
+        &NodalLoad::point);
+    if (it == nodes.end() || it->point != point.value())
+        reject(core::FailureCode::InvalidInput);
+    return static_cast<std::size_t>(it - nodes.begin());
+}
+
 void distribute_load(std::span<NodalLoad> nodes, std::span<const a::PointId> vertices,
                      const Vector& force, const p::Interval& weight, p::Work& work) {
     const auto piece = scale_vector(force, weight, work);
     for (const auto point : vertices) {
-        work.step();
-        const auto it = std::ranges::lower_bound(
-            nodes, point.value(),
-            [&](std::uint64_t left, std::uint64_t right) {
-                work.step();
-                return left < right;
-            },
-            &NodalLoad::point);
-        if (it == nodes.end() || it->point != point.value())
-            reject(core::FailureCode::InvalidInput);
-        accumulate_vector(it->force, piece, work);
+        accumulate_vector(nodes[load_node(nodes, point, work)].force, piece, work);
     }
 }
 
@@ -566,6 +570,56 @@ Vector induction_direction(const a::P1ActionValue& induced, p::Work& work) {
         reject(core::FailureCode::InvalidInput);
     return {import((*jvp)[0].real, work), import((*jvp)[1].real, work),
             import((*jvp)[2].real, work)};
+}
+
+struct LoadPullbackData {
+    explicit LoadPullbackData(const DiscreteVectorLoadWeights& weights) noexcept : input(weights) {}
+    const DiscreteVectorLoadWeights& input;
+    Vector force{}, moment{}, ambient{};
+    core::PlannedBuffer<Vector> node_weights, position;
+    core::PlannedBuffer<std::uint64_t> point_ids;
+    core::PlannedBuffer<p::Interval> gamma, rate, strength;
+    core::PlannedBuffer<std::optional<CirculationPointCovector>> points;
+    core::PlannedBuffer<std::optional<LoadEdgeVelocityCovector>> edges;
+    core::PlannedBuffer<std::optional<LoadCirculationCovector>> bound;
+    std::optional<DiscreteLoadVector> flow{};
+};
+
+struct LoadSampleCovector {
+    Vector position{}, force{};
+};
+
+void add_position_dual(LoadPullbackData& target, a::PointId id, const Vector& value,
+                       p::Work& work) {
+    const auto points = target.point_ids.values();
+    work.step();
+    const auto it = std::lower_bound(points.begin(), points.end(), id.value(),
+                                     [&](std::uint64_t left, std::uint64_t right) {
+                                         work.step();
+                                         return left < right;
+                                     });
+    if (it == points.end() || *it != id.value())
+        reject(core::FailureCode::InvalidInput);
+    accumulate_vector(target.position.values()[static_cast<std::size_t>(it - points.begin())],
+                      value, work);
+}
+
+LoadSampleCovector
+load_sample_covector(const LoadPullbackData& target, const DiscreteLoadSampleWeights& seed,
+                     std::span<const NodalLoad> nodes, std::span<const a::PointId> vertices,
+                     const Vector& position, const Vector& value, const Vector& origin,
+                     const p::Interval& weight, p::Work& work) {
+    LoadSampleCovector result{
+        add_vectors(import(seed.position, work), cross(value, target.moment, work), work),
+        add_vectors(import(seed.force, work), target.force, work)};
+    accumulate_vector(result.force, cross(target.moment, difference(position, origin, work), work),
+                      work);
+    for (const auto point : vertices) {
+        const auto i = load_node(nodes, point, work);
+        accumulate_vector(result.force, scale_vector(target.node_weights.values()[i], weight, work),
+                          work);
+    }
+    return result;
 }
 
 a::ScalarWords retained_word(const numerics::PrecisionBuffer<double>& retained, std::size_t i) {
@@ -1317,6 +1371,23 @@ struct NonpenetrationBuilder {
                 work.used};
     }
 
+    static std::pair<std::size_t, int>
+    take_edge_panel(std::span<const LoadEdgeOccurrence> occurrences, std::size_t& cursor,
+                    p::Work& work) {
+        const auto key = occurrences[cursor].edge;
+        const auto panel = occurrences[cursor].panel;
+        int orientation = 0;
+        while (cursor < occurrences.size() && occurrences[cursor].edge == key &&
+               occurrences[cursor].panel == panel) {
+            work.step();
+            orientation += occurrences[cursor].vortex_sign;
+            ++cursor;
+        }
+        if (orientation < -1 || orientation > 1)
+            reject(core::FailureCode::GeometryInvalid);
+        return {panel, orientation};
+    }
+
     static void reduce_load_edges(std::span<LoadEdgeOccurrence> occurrences,
                                   std::span<const EdgeMidpointVelocity> velocities,
                                   std::span<LoadEdge> edges,
@@ -1334,18 +1405,9 @@ struct NonpenetrationBuilder {
             p::Interval strength{}, d_strength{};
             bool exterior = false;
             while (i < occurrences.size() && occurrences[i].edge == owner.edge) {
-                const auto panel = occurrences[i].panel;
-                int orientation = 0;
-                while (i < occurrences.size() && occurrences[i].edge == owner.edge &&
-                       occurrences[i].panel == panel) {
-                    work.step();
-                    orientation += occurrences[i].vortex_sign;
-                    ++i;
-                }
+                const auto [panel, orientation] = take_edge_panel(occurrences, i, work);
                 if (orientation == 0)
                     continue; // The two occurrences of the same quad diagonal cancel exactly.
-                if (orientation != -1 && orientation != 1)
-                    reject(core::FailureCode::GeometryInvalid);
                 exterior = true;
                 const auto gamma = import(retained_word(solution.values(), panel), work);
                 strength = orientation == 1 ? p::add(strength, gamma, work)
@@ -1457,13 +1519,119 @@ struct NonpenetrationBuilder {
         }
     }
 
+    static void prepare_load_pullback(LoadPullbackData& pullback, std::span<const NodalLoad> nodes,
+                                      std::size_t edges, std::size_t order,
+                                      core::ResourcePlan& memory, p::Work& work) {
+        if (pullback.input.points.size() != nodes.size())
+            reject(core::FailureCode::InvalidInput);
+        pullback.force = import(pullback.input.force, work);
+        pullback.moment = import(pullback.input.moment, work);
+        pullback.node_weights = allocate<Vector>(memory, nodes.size());
+        pullback.strength = allocate<p::Interval>(memory, edges);
+        pullback.gamma = allocate<p::Interval>(memory, order);
+        pullback.rate = allocate<p::Interval>(memory, order);
+        pullback.edges = allocate<std::optional<LoadEdgeVelocityCovector>>(memory, edges);
+        pullback.bound = allocate<std::optional<LoadCirculationCovector>>(memory, order);
+        for (std::size_t i = 0; i < nodes.size(); ++i)
+            pullback.node_weights.values()[i] = import(pullback.input.points[i], work);
+        if (edges == 0) {
+            pullback.position = allocate<Vector>(memory, nodes.size());
+            pullback.point_ids = allocate<std::uint64_t>(memory, nodes.size());
+            for (std::size_t i = 0; i < nodes.size(); ++i) {
+                work.step();
+                pullback.point_ids.values()[i] = nodes[i].point;
+            }
+        }
+    }
+
+    static void init_midpoint_pullback(LoadPullbackData& pullback, const a::SharedP1Action& action,
+                                       core::ResourcePlan& memory, p::Work& work) {
+        pullback.position = allocate<Vector>(memory, action.point_count());
+        pullback.point_ids = allocate<std::uint64_t>(memory, action.point_count());
+        for (std::size_t i = 0; i < action.point_count(); ++i) {
+            work.step();
+            pullback.point_ids.values()[i] = require(action.point(i)).value();
+        }
+    }
+
+    static void scatter_midpoint_induction(LoadPullbackData& pullback,
+                                           const a::SharedP1Action& action,
+                                           const a::P1ActionSource& source,
+                                           const Assembly& assembly, const Vector& velocity_dual,
+                                           const DiscreteNonpenetrationLimits& limits,
+                                           a::SharedP1Workspace& shared, core::ResourcePlan& memory,
+                                           p::Work& work) {
+        const auto bound = assembly.bound.values();
+        std::optional<Vector> free_query;
+        for (std::size_t axis = 0; axis < velocity_dual.size(); ++axis) {
+            const auto dual = adjoint_axis(action, source, assembly.values.values(), axis, limits,
+                                           shared, memory, work);
+            scatter_geometry(dual, velocity_dual[axis], pullback.position.values(), free_query,
+                             work);
+            for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
+                work.step();
+                const auto& transfer = assembly.traces.values()[i].transfer;
+                if (!transfer)
+                    continue;
+                const auto coefficient = import(require(dual.strength(i)).real, work);
+                const auto contribution = p::multiply(velocity_dual[axis], coefficient, work);
+                auto& gamma = pullback.gamma.values()[transfer_column(bound, *transfer, work)];
+                gamma = transfer->reverse ? p::subtract(gamma, contribution, work)
+                                          : p::add(gamma, contribution, work);
+            }
+        }
+    }
+
+    static void scatter_force_edge_strength(LoadPullbackData& pullback,
+                                            std::span<const LoadEdgeOccurrence> occurrences,
+                                            std::span<const LoadEdge> edges, p::Work& work) {
+        std::size_t at = 0;
+        for (std::size_t i = 0; i < edges.size(); ++i) {
+            const auto key = edges[i].edge;
+            while (at < occurrences.size() && occurrences[at].edge < key) {
+                work.step();
+                ++at;
+            }
+            const auto& dual = pullback.strength.values()[i];
+            while (at < occurrences.size() && occurrences[at].edge == key) {
+                const auto [panel, orientation] = take_edge_panel(occurrences, at, work);
+                auto& gamma = pullback.gamma.values()[panel];
+                if (orientation == 1)
+                    gamma = p::add(gamma, dual, work);
+                else if (orientation == -1)
+                    gamma = p::subtract(gamma, dual, work);
+            }
+        }
+    }
+
+    static void finish_load_pullback(LoadPullbackData& pullback, std::span<const PanelRow> bound,
+                                     core::Precision representation, a::LocalRootScratch& scratch,
+                                     core::ResourcePlan& memory, p::Work& work) {
+        pullback.points =
+            allocate<std::optional<CirculationPointCovector>>(memory, pullback.point_ids.size());
+        for (std::size_t i = 0; i < pullback.points.size(); ++i) {
+            work.step();
+            pullback.points.values()[i].emplace(CirculationPointCovector{
+                a::PointId{pullback.point_ids.values()[i]},
+                enclose_vector(pullback.position.values()[i], representation, scratch, work)});
+        }
+        for (std::size_t i = 0; i < bound.size(); ++i) {
+            work.step();
+            pullback.bound.values()[i].emplace(LoadCirculationCovector{
+                bound[i].panel.face,
+                a::enclose_p1_value(pullback.gamma.values()[i], representation, scratch),
+                a::enclose_p1_value(pullback.rate.values()[i], representation, scratch)});
+        }
+        pullback.flow.emplace(enclose_vector(pullback.ambient, representation, scratch, work));
+    }
+
     static DiscreteCirculationLoads
     solve_loads(const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
                 ProjectedCaseUniformFlow&& flow, const DiscreteNonpenetrationLimits& limits,
                 const DiscreteCirculationRequest& request, a::GeometryWorkspace& geometry_work,
                 a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local,
                 a::P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop,
-                LoadDirections* direction = nullptr) {
+                LoadDirections* direction = nullptr, LoadPullbackData* pullback = nullptr) {
         p::Work work{0, limits.steps, stop};
         work.step();
         const auto order = input.collocations.size();
@@ -1476,6 +1644,13 @@ struct NonpenetrationBuilder {
             reject(core::FailureCode::ResourceExceeded);
         if (loads.edges.size() > 6 * order)
             reject(core::FailureCode::InvalidInput);
+        if (pullback != nullptr) {
+            const auto& seed = pullback->input;
+            if (seed.stamp != loads.stamp || seed.circulation != loads.circulation)
+                reject(core::FailureCode::StaleGeneration);
+            if (seed.edges.size() != loads.edges.size() || seed.facets.size() != 2 * order)
+                reject(core::FailureCode::InvalidInput);
+        }
         const auto density = import(loads.density, work);
         if (p::compare(density.lower, {}) <= 0)
             reject(core::FailureCode::InvalidInput);
@@ -1519,6 +1694,8 @@ struct NonpenetrationBuilder {
         auto facet_loads = allocate<std::optional<DiscreteNoncirculatoryLoad>>(memory, 2 * order);
         const auto vertex_loads = prepare_load_topology(bound, geometry, input.contact,
                                                         occurrences.values(), nodes.values(), work);
+        if (pullback != nullptr)
+            prepare_load_pullback(*pullback, vertex_loads, loads.edges.size(), order, memory, work);
         auto point_loads = allocate<std::optional<DiscreteNodalLoad>>(memory, vertex_loads.size());
         auto edges = allocate<LoadEdge>(memory, loads.edges.size());
         if (direction != nullptr)
@@ -1605,6 +1782,29 @@ struct NonpenetrationBuilder {
                 direction->edges.values()[i].emplace(
                     DiscreteLoadSampleDirection{finish(dx), finish(df)});
             }
+            if (pullback != nullptr) {
+                if (i == 0)
+                    init_midpoint_pullback(*pullback, action, memory, work);
+                const auto dual =
+                    load_sample_covector(*pullback, pullback->input.edges[i], vertex_loads,
+                                         edge.endpoints, center, force, origin, half, work);
+                pullback->strength.values()[i] =
+                    p::multiply(density, dot(dual.force, velocity_cross_edge, work), work);
+                const auto velocity_dual =
+                    scale_vector(cross(edge_vector, dual.force, work), factor, work);
+                const auto edge_dual =
+                    scale_vector(cross(dual.force, effective, work), factor, work);
+                const auto midpoint_dual = scale_vector(dual.position, half, work);
+                add_position_dual(*pullback, edge.endpoints[0],
+                                  difference(midpoint_dual, edge_dual, work), work);
+                add_position_dual(*pullback, edge.endpoints[1],
+                                  add_vectors(midpoint_dual, edge_dual, work), work);
+                accumulate_vector(pullback->ambient, velocity_dual, work);
+                pullback->edges.values()[i].emplace(LoadEdgeVelocityCovector{
+                    edge.edge, finish(scale_vector(velocity_dual, p::integer(-1), work))});
+                scatter_midpoint_induction(*pullback, action, source, assembly, velocity_dual,
+                                           limits, shared, memory, work);
+            }
             totals.add(center, force, origin, work);
             distribute_load(vertex_loads, edge.endpoints, force, half, work);
             edge_loads.values()[i].emplace(
@@ -1646,6 +1846,26 @@ struct NonpenetrationBuilder {
                     direction->facets.values()[2 * i + child].emplace(
                         DiscreteLoadSampleDirection{finish(dcenter), finish(df)});
                 }
+                if (pullback != nullptr) {
+                    const auto dual = load_sample_covector(
+                        *pullback, pullback->input.facets[2 * i + child], vertex_loads, points,
+                        center, force, origin, third, work);
+                    auto& rate = pullback->rate.values()[i];
+                    rate = p::add(rate,
+                                  p::multiply(p::multiply(density, half, work),
+                                              dot(dual.force, doubled_area, work), work),
+                                  work);
+                    const auto y_dual = scale_vector(cross(xz, dual.force, work), factor, work);
+                    const auto z_dual = scale_vector(cross(dual.force, xy, work), factor, work);
+                    const auto centroid_dual = scale_vector(dual.position, third, work);
+                    add_position_dual(
+                        *pullback, points[0],
+                        difference(centroid_dual, add_vectors(y_dual, z_dual, work), work), work);
+                    add_position_dual(*pullback, points[1],
+                                      add_vectors(centroid_dual, y_dual, work), work);
+                    add_position_dual(*pullback, points[2],
+                                      add_vectors(centroid_dual, z_dual, work), work);
+                }
                 totals.add(center, force, origin, work);
                 distribute_load(vertex_loads, points, force, third, work);
                 facet_loads.values()[2 * i + child].emplace(DiscreteNoncirculatoryLoad{
@@ -1664,6 +1884,10 @@ struct NonpenetrationBuilder {
         if (direction != nullptr) {
             direction->force.emplace(finish(direction->totals.force));
             direction->moment.emplace(finish(direction->totals.moment));
+        }
+        if (pullback != nullptr) {
+            scatter_force_edge_strength(*pullback, occurrences.values(), edges.values(), work);
+            finish_load_pullback(*pullback, bound, representation, rounding, memory, work);
         }
         const auto force = finish(totals.force);
         const auto moment = finish(totals.moment);
@@ -1697,6 +1921,22 @@ struct NonpenetrationBuilder {
                 std::move(direction.points),
                 *direction.force,
                 *direction.moment};
+    }
+
+    static DiscreteCirculationLoadVjp solve_load_pullback(
+        const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+        const DiscreteVectorLoadWeights& weights, ProjectedCaseUniformFlow&& flow,
+        const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+        a::GeometryWorkspace& geometry_work, a::SharedP1Workspace& shared,
+        a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+        const std::stop_token& stop) {
+        LoadPullbackData target{weights};
+        auto value = solve_loads(input, loads, std::move(flow), limits, request, geometry_work,
+                                 shared, local, kernel, memory, stop, nullptr, &target);
+        if (!target.flow)
+            reject(core::FailureCode::InvalidInput);
+        return {std::move(value), std::move(target.points), std::move(target.edges),
+                std::move(target.bound), *target.flow};
     }
 
     static a::PhysicalFaceId face_at(std::span<const std::optional<CirculationResidualRow>> rows,
@@ -2064,6 +2304,53 @@ core::Result<DiscreteCirculationLoadJvp> solve_discrete_circulation_load_directi
         return NonpenetrationBuilder::solve_load_direction(input, loads, direction, std::move(flow),
                                                            limits, request, geometry_work, shared,
                                                            local, kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+DiscreteCirculationLoadVjp::DiscreteCirculationLoadVjp(
+    DiscreteCirculationLoads&& loads,
+    core::PlannedBuffer<std::optional<CirculationPointCovector>> points,
+    core::PlannedBuffer<std::optional<LoadEdgeVelocityCovector>> edges,
+    core::PlannedBuffer<std::optional<LoadCirculationCovector>> bound,
+    const DiscreteLoadVector& flow) noexcept
+    : loads_(std::move(loads)),
+      points_(std::move(points)),
+      edges_(std::move(edges)),
+      bound_(std::move(bound)),
+      flow_(flow) {}
+
+core::Result<CirculationPointCovector>
+DiscreteCirculationLoadVjp::point(std::size_t i) const noexcept {
+    return load_row(points_, i);
+}
+core::Result<LoadEdgeVelocityCovector>
+DiscreteCirculationLoadVjp::midpoint_velocity(std::size_t i) const noexcept {
+    return load_row(edges_, i);
+}
+core::Result<LoadCirculationCovector>
+DiscreteCirculationLoadVjp::bound(std::size_t i) const noexcept {
+    return load_row(bound_, i);
+}
+
+core::Result<DiscreteCirculationLoadVjp> solve_discrete_circulation_load_pullback(
+    const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
+    const DiscreteVectorLoadWeights& weights, ProjectedCaseUniformFlow&& flow,
+    const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+    a::GeometryWorkspace& geometry_work, a::SharedP1Workspace& shared,
+    a::LocalPacketWorkspace& local, a::P1Workspace& kernel, core::ResourcePlan& memory,
+    const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_load_pullback(input, loads, weights, std::move(flow),
+                                                          limits, request, geometry_work, shared,
+                                                          local, kernel, memory, stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {
