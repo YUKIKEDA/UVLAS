@@ -750,7 +750,7 @@ cf::DiscreteCirculationRequest circulation_request(const ls::Scales& scales, cor
             0.};
 }
 
-Rat solution_word(const cf::DiscreteCirculation& value, std::size_t i) {
+Rat solution_word(const ls::Solution<double>& value, std::size_t i) {
     return std::visit(
         [&](const auto& words) -> Rat {
             if constexpr (std::is_same_v<std::decay_t<decltype(words)>, numerics::Binary64<double>>)
@@ -758,7 +758,7 @@ Rat solution_word(const cf::DiscreteCirculation& value, std::size_t i) {
             else
                 return rational_word(words.hi.values()[i]) + rational_word(words.lo.values()[i]);
         },
-        value.solution().values().storage());
+        value.values().storage());
 }
 
 void residual_small(const a::ScaledEnclosure& value, const Rat& limit) {
@@ -934,11 +934,18 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         CHECK(solved.solution().values().precision() == core::Precision::TwoWord);
         const Rat expected = -Rat{Big{"10103660544137754684298736617717105223494942188"}} /
                              Rat{Big{"1000000000000000000000000000000000000000000000000"}};
-        CHECK(abs(solution_word(solved, 0) - expected) <= rational_word(1e-15));
+        CHECK(abs(solution_word(solved.solution(), 0) - expected) <= rational_word(1e-15));
         const auto original = take(solved.row(0));
         CHECK(original.face == fixture.faces[0].id);
         residual_small(original.original_residual, rational_word(1e-13));
         reject(solved.row(1), core::FailureCode::InvalidInput);
+        const std::array tangent_rhs{cf::CirculationLinearRhs{row.face, a::SingleWord{.125}}};
+        const auto tangent = take(cf::solve_discrete_circulation_linearization(
+            solved, cf::CirculationSense::Tangent, tangent_rhs, request, 100000, memory));
+        const Rat expected_tangent{Big{"167540106538491744036640792288003354"},
+                                   Big{"1000000000000000000000000000000000000"}};
+        CHECK(abs(solution_word(tangent.solution(), 0) - expected_tangent) <= rational_word(1e-15));
+        residual_small(take(tangent.row(0)).original_residual, rational_word(1e-13));
     }
 }
 
@@ -1154,9 +1161,8 @@ struct DisjointCirculationPanels {
 };
 } // namespace
 
-TEST_CASE(
-    "Discrete circulation solves all nonsymmetric mutual influences and rejects singular rows",
-    "[UW-D01][UW-D06][N4-05][N4-06][verification][negative]") {
+TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual influences",
+          "[UW-D01][UW-D06][N4-05][N4-06][verification][negative]") {
     const auto input_case = source(R"({"kind":"constant","value":[0,0,100]})", one_step);
     a::UniformFlowWorkspace flow_workspace;
     const auto provider = import(input_case, io::SourceId{110}, flow_workspace);
@@ -1229,15 +1235,143 @@ TEST_CASE(
     };
     reject(solve(first), core::FailureCode::RankUnresolved);
     CHECK(flow.source().jet.active());
-    const auto solved = take(solve(second));
+    auto solved = take(solve(second));
     const Rat denominator{Big{"1000000000000000000000000000000000000"}};
     const std::array reference{Rat{Big{"5487032447771171614219353426944195"}} / denominator,
                                -Rat{Big{"274509732948309252476622637390296804"}} / denominator};
     for (std::size_t i = 0; i < reference.size(); ++i) {
         CAPTURE(i);
-        CHECK(abs(solution_word(solved, i) - reference[i]) <= rational_word(1e-14));
+        CHECK(abs(solution_word(solved.solution(), i) - reference[i]) <= rational_word(1e-14));
         const auto original = take(solved.row(i));
         CHECK(original.face == fixture.faces[i].id);
         residual_small(original.original_residual, rational_word(1e-13) * residual_scales[i]);
     }
+
+    constexpr std::uint64_t linearization_steps = 100000;
+    std::array forcing{
+        cf::CirculationLinearRhs{fixture.faces[0].id, a::DoubleWord{-.125, 0x1p-57}},
+        cf::CirculationLinearRhs{fixture.faces[1].id, a::DoubleWord{.1875, -0x1p-58}}};
+    const std::array seed{
+        cf::CirculationLinearRhs{fixture.faces[0].id, a::DoubleWord{.25, 0x1p-57}},
+        cf::CirculationLinearRhs{fixture.faces[1].id, a::DoubleWord{-.15625, -0x1p-59}}};
+    const auto tangent_sense = cf::CirculationSense::Tangent;
+    const auto transpose_sense = cf::CirculationSense::Transpose;
+    auto tangent_request = request;
+    tangent_request.rhs_generation = core::RhsGeneration{30};
+    tangent_request.retained_generation = core::NumericalGeneration{31};
+
+    const std::array<ls::UnitDimensions, 2> dual_speed{
+        {{-1, 0, 1, 0, 0, 0, 0}, {-1, 0, 1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 2> dual_gamma{
+        {{-2, 0, 1, 0, 0, 0, 0}, {-2, 0, 1, 0, 0, 0, 0}}};
+    auto dual_context = scales.context;
+    dual_context.cache.matrix = core::NumericalGeneration{32};
+    dual_context.cache.scales = core::ScaleGeneration{33};
+    dual_context.unknown_layout = core::ScopeId{34};
+    dual_context.residual_layout = core::ScopeId{35};
+    const ls::Scales dual_scales{residual_scales, unknown_scales, dual_speed, dual_gamma,
+                                 dual_context};
+    auto transpose_request = circulation_request(dual_scales, 2, ls::Norm::L2);
+    transpose_request.rhs_generation = core::RhsGeneration{36};
+    transpose_request.retained_generation = core::NumericalGeneration{37};
+
+    const auto linearize = [&](cf::CirculationSense sense,
+                               std::span<const cf::CirculationLinearRhs> rhs,
+                               const cf::DiscreteCirculationRequest& selected) {
+        return cf::solve_discrete_circulation_linearization(solved, sense, rhs, selected,
+                                                            linearization_steps, memory);
+    };
+    reject(linearize(tangent_sense, std::span{forcing}.first(1), tangent_request),
+           core::FailureCode::InvalidInput);
+    const std::array reversed_forcing{forcing[1], forcing[0]};
+    reject(linearize(tangent_sense, reversed_forcing, tangent_request),
+           core::FailureCode::InvalidInput);
+    auto bad_forcing = forcing;
+    bad_forcing[0].value = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+    reject(linearize(tangent_sense, bad_forcing, tangent_request), core::FailureCode::Nonfinite);
+    auto stale = transpose_request;
+    stale.scales.context.cache.matrix = scales.context.cache.matrix;
+    reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    stale = transpose_request;
+    stale.scales.context.trial = core::TrialId{99};
+    reject(linearize(transpose_sense, seed, stale), core::FailureCode::StaleGeneration);
+    auto bad_units = transpose_request;
+    bad_units.scales.unknown_units = velocity_units;
+    reject(linearize(transpose_sense, seed, bad_units), core::FailureCode::InvalidInput);
+    auto exact_rhs_projection = transpose_request;
+    exact_rhs_projection.rhs_absolute = 0;
+    reject(linearize(transpose_sense, seed, exact_rhs_projection),
+           core::FailureCode::PrecisionUnresolved);
+    auto exact_original = transpose_request;
+    exact_original.original_absolute = 0;
+    reject(linearize(transpose_sense, seed, exact_original), core::FailureCode::LinearUnconverged);
+    // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+    std::stop_source cancellation;
+    REQUIRE(cancellation.request_stop());
+    core::ResourcePlan no_space{0};
+    reject(cf::solve_discrete_circulation_linearization(solved, tangent_sense, forcing,
+                                                        tangent_request, linearization_steps,
+                                                        no_space, cancellation.get_token()),
+           core::FailureCode::Cancelled);
+    CHECK(no_space.allocated_bytes() == 0);
+    reject(cf::solve_discrete_circulation_linearization(solved, tangent_sense, forcing,
+                                                        tangent_request, 0, no_space),
+           core::FailureCode::ResourceExceeded);
+    reject(cf::solve_discrete_circulation_linearization(
+               solved, tangent_sense, forcing, tangent_request, linearization_steps, no_space),
+           core::FailureCode::ResourceExceeded);
+
+    const auto tangent = take(linearize(tangent_sense, forcing, tangent_request));
+    const auto transpose = take(linearize(transpose_sense, seed, transpose_request));
+    CHECK(tangent.sense() == tangent_sense);
+    CHECK(transpose.sense() == transpose_sense);
+    CHECK(tangent.solution().values().precision() == core::Precision::TwoWord);
+    CHECK(transpose.solution().values().precision() == core::Precision::TwoWord);
+    CHECK(transpose.solution().certificate().context() == dual_context);
+    CHECK(transpose.solution().certificate().rhs_generation() == core::RhsGeneration{36});
+    CHECK(tangent.used_steps() <= linearization_steps);
+    CHECK(transpose.used_steps() <= linearization_steps);
+    forcing[0].value = a::SingleWord{500};
+    const std::array tangent_reference{
+        -Rat{Big{"131244355849310971713061064609083227"}} / denominator,
+        Rat{Big{"210813958349156791484623892498037848"}} / denominator};
+    const std::array transpose_reference{
+        -Rat{Big{"264772325234835981543571156442296025"}} / denominator,
+        Rat{Big{"174155889600154653987400703840364351"}} / denominator};
+    const std::array forcing_exact{-Rat{1, 8} + two_power(-57), Rat{3, 16} - two_power(-58)};
+    const std::array seed_exact{Rat{1, 4} + two_power(-57), -Rat{5, 32} - two_power(-59)};
+    Rat dual_error{0};
+    for (std::size_t i = 0; i < forcing.size(); ++i) {
+        CAPTURE(i);
+        const auto t = solution_word(tangent.solution(), i);
+        const auto l = solution_word(transpose.solution(), i);
+        CHECK(abs(t - tangent_reference[i]) <= rational_word(1e-14));
+        CHECK(abs(l - transpose_reference[i]) <= rational_word(1e-14));
+        dual_error += seed_exact[i] * t + forcing_exact[i] * l;
+        const auto tangent_row = take(tangent.row(i));
+        const auto transpose_row = take(transpose.row(i));
+        CHECK(tangent_row.face == fixture.faces[i].id);
+        CHECK(transpose_row.face == fixture.faces[i].id);
+        residual_small(tangent_row.original_residual, rational_word(1e-13) * residual_scales[i]);
+        residual_small(transpose_row.original_residual, rational_word(1e-13) * unknown_scales[i]);
+        CHECK(abs(solution_word(solved.solution(), i) - reference[i]) <= rational_word(1e-14));
+    }
+    CHECK(abs(dual_error) <= rational_word(1e-16));
+    reject(tangent.row(forcing.size()), core::FailureCode::InvalidInput);
+    CHECK(solved.flow().source().jet.active());
+    const std::array zero_rhs{cf::CirculationLinearRhs{fixture.faces[0].id, a::SingleWord{0}},
+                              cf::CirculationLinearRhs{fixture.faces[1].id, a::SingleWord{0}}};
+    auto exact_zero = tangent_request;
+    exact_zero.rhs_absolute = 0;
+    exact_zero.original_absolute = 0;
+    const auto zero_tangent = take(linearize(tangent_sense, zero_rhs, exact_zero));
+    for (std::size_t i = 0; i < zero_rhs.size(); ++i) {
+        CHECK(solution_word(zero_tangent.solution(), i) == Rat{0});
+        residual_small(take(zero_tangent.row(i)).original_residual, Rat{0});
+    }
+
+    auto relocated = std::move(solved);
+    reject(linearize(tangent_sense, {}, tangent_request), core::FailureCode::InvalidInput);
+    CHECK(relocated.flow().source().jet.active());
+    CHECK(abs(solution_word(tangent.solution(), 0) - tangent_reference[0]) <= rational_word(1e-14));
 }

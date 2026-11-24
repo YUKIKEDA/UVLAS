@@ -5,6 +5,10 @@
 
 #include <uvlas/numerics/linear_solve.hpp>
 
+namespace uvlas::aero::detail::p1 {
+struct Interval;
+}
+
 namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
 
@@ -179,8 +183,9 @@ struct CirculationResidualRow {
 /// check. No physical mapping or continuous wake-integral accuracy is inferred.
 class DiscreteCirculation {
 public:
-    DiscreteCirculation(DiscreteCirculation&&) noexcept = default;
-    DiscreteCirculation& operator=(DiscreteCirculation&&) noexcept = default;
+    DiscreteCirculation(DiscreteCirculation&&) noexcept;
+    DiscreteCirculation& operator=(DiscreteCirculation&&) noexcept;
+    ~DiscreteCirculation();
     DiscreteCirculation(const DiscreteCirculation&) = delete;
     DiscreteCirculation& operator=(const DiscreteCirculation&) = delete;
     [[nodiscard]] const numerics::linear::Solution<double>& solution() const& noexcept {
@@ -200,11 +205,13 @@ private:
     friend struct NonpenetrationBuilder;
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
-                        std::optional<aero::detail::P1ActionValue>, std::uint64_t) noexcept;
+                        std::optional<aero::detail::P1ActionValue>,
+                        core::PlannedBuffer<aero::detail::p1::Interval>, std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
     std::optional<aero::detail::P1ActionValue> geometry_owner_;
+    core::PlannedBuffer<aero::detail::p1::Interval> influence_;
     std::uint64_t steps_;
 };
 
@@ -217,4 +224,59 @@ solve_discrete_circulation(const DiscreteNonpenetrationInput&, ProjectedCaseUnif
                            aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
                            aero::detail::P1Workspace&, core::ResourcePlan&,
                            const std::stop_token& = {}) noexcept;
+/// The coefficient transpose uses the real dual pairing for a dimensionless
+/// scalar: its seed has units s/m² and its solution has units s/m.
+enum class CirculationSense : std::uint8_t { Tangent, Transpose };
+
+struct CirculationLinearRhs {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScalarWords value; ///< Fixed-circulation δR (m/s), or the dual seed (s/m²).
+};
+
+struct CirculationLinearRow {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScaledEnclosure original_residual; ///< m/s in Tangent, s/m² in Transpose.
+};
+
+/// A certified solve on the fixed finite-discrete operator. The retained solution
+/// and row enclosures own their data independently of the primal and RHS.
+class DiscreteCirculationLinearization {
+public:
+    DiscreteCirculationLinearization(DiscreteCirculationLinearization&&) noexcept = default;
+    DiscreteCirculationLinearization&
+    operator=(DiscreteCirculationLinearization&&) noexcept = default;
+    DiscreteCirculationLinearization(const DiscreteCirculationLinearization&) = delete;
+    DiscreteCirculationLinearization& operator=(const DiscreteCirculationLinearization&) = delete;
+    [[nodiscard]] const numerics::linear::Solution<double>& solution() const& noexcept {
+        return solution_;
+    }
+    [[nodiscard]] const numerics::linear::Solution<double>& solution() const&& = delete;
+    [[nodiscard]] core::Result<CirculationLinearRow> row(std::size_t) const noexcept;
+    [[nodiscard]] CirculationSense sense() const noexcept {
+        return sense_;
+    }
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return steps_;
+    }
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationLinearization(numerics::linear::Solution<double>,
+                                     core::PlannedBuffer<std::optional<CirculationLinearRow>>,
+                                     CirculationSense, std::uint64_t) noexcept;
+    numerics::linear::Solution<double> solution_;
+    core::PlannedBuffer<std::optional<CirculationLinearRow>> rows_;
+    CirculationSense sense_;
+    std::uint64_t steps_;
+};
+
+/// Solve A_eff δΓ = −δR or A_effᵀ λ = seed. The latter pairs with −δR.
+/// RHS rows and component scales follow the primal's ascending face IDs. The
+/// transpose has a distinct matrix generation and its own dual layout IDs.
+/// rhs_absolute uses the RHS's units and matrix_absolute uses 1/m in both senses.
+[[nodiscard]] core::Result<DiscreteCirculationLinearization>
+solve_discrete_circulation_linearization(const DiscreteCirculation&, CirculationSense,
+                                         std::span<const CirculationLinearRhs>,
+                                         const DiscreteCirculationRequest&, std::uint64_t max_steps,
+                                         core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 } // namespace uvlas::coupling::detail
