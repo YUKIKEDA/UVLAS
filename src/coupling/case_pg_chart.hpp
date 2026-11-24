@@ -6,13 +6,15 @@
 
 #include <uvlas/structure/pg_prepared_patch.hpp>
 #include <uvlas/structure/pg_sparse_chart.hpp>
+#include <variant>
 
 namespace uvlas::coupling::detail {
 
-/// The finite points and weights are supplied for each named shell in Case order.
+/// One caller-supplied finite point list or positive product rule per named Shell in Case order.
 struct CasePgRuleBinding {
     std::uint64_t shell;
-    std::span<const structure::PgDiscreteVolumePoint> points;
+    std::variant<std::span<const structure::PgDiscreteVolumePoint>, structure::PgVolumeProductRule>
+        quadrature;
 };
 
 struct CasePgChartLimits {

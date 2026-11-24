@@ -4,7 +4,7 @@
 
 ## シェルと参照作用
 
-CaseのShell順に、一つずつ同じIDと明示の有限点列を渡す。点には、Caseの幾何と層が定める体積片番号と正の重みを含める。各Shellの参照幾何から辞書と分割を借りて厳密rankを求め、同じ参照とrankを `PgReferenceBasis` に移す。その所有元から有限則のGramを包絡し、[合同誤差と必須場](pg-discrete-conditioning-certificate-contract.md)を認定して `PgPreparedPatch` に移す。返す所有パッチには認定に使った点と重みを保持する。
+CaseのShell順に、同じIDと有限則を一つずつ渡す。明示点列では、Caseの幾何と層が定める体積片番号と正の重みを指定する。[正の積則](pg-product-volume-rule-contract.md)では、三つの単位区間則を指定し、実際の共通分割上で体積片ごとに点と重みを作る。どちらを使うかは呼出し側が指定する。各Shellの参照幾何から辞書と分割を借りて厳密rankを求め、同じ参照とrankを `PgReferenceBasis` に移す。その所有元から有限則のGramを包絡し、[合同誤差と必須場](pg-discrete-conditioning-certificate-contract.md)を認定して `PgPreparedPatch` に移す。返す所有パッチには認定に使った点と重みを保持する。
 
 チャートのパッチ表はCaseのShell順と物理IDを保持する。各列の基底識別と係数の数は、全厚トレースを作った同じパッチのものを格納する。IM-02はここから列順、点・重み、$N,G,X_0$ と正の測度、原位置拘束 $Cq=c$ とその消去・転置を受け取る。[各層の材料と軸](material-layer-adoption-contract.md)、積分誤差、物理質量・剛性と構造応答は、IM-02側の資格判定を経る。
 
