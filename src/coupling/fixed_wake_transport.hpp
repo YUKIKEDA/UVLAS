@@ -40,6 +40,16 @@ struct WakeTransportLimits {
 };
 
 struct WakeTransportRow {
+    WakeTransportRow(aero::detail::MaterialReleaseKey key, DiscreteLoadVector rate,
+                     std::optional<DiscreteLoadVector> tangent,
+                     std::optional<DiscreteLoadVector> position,
+                     std::optional<DiscreteLoadVector> position_tangent) noexcept
+        : release(key),
+          residual(std::move(rate)),
+          direction(std::move(tangent)),
+          prescribed_position(std::move(position)),
+          prescribed_position_direction(std::move(position_tangent)) {}
+
     aero::detail::MaterialReleaseKey release;
     DiscreteLoadVector
         residual; ///< m/s, discrete transport rate minus the corresponding fluid velocity.
@@ -53,6 +63,10 @@ struct WakeTransportHistoryDirection {
 };
 
 struct WakeTransportPositionDual {
+    WakeTransportPositionDual(aero::detail::MaterialReleaseKey key,
+                              std::array<DiscreteLoadVector, 3> weights) noexcept
+        : release(key), stencil(std::move(weights)) {}
+
     aero::detail::MaterialReleaseKey release;
     // Current, previous, older terms of the time stencil. The free velocity
     // transpose on current source geometry belongs to the same returned action.
