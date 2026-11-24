@@ -343,19 +343,27 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                     math.div(math.mul(geometry.zeta, geometry.full_thickness_metres), two_length);
                 const auto half_z_squared = math.div(math.square(z), two);
                 const auto director_radical = math.div(z, math.square(geometry.g));
+                const auto evaluate = [&](const Numerators& terms) {
+                    auto a = math.add(terms[0], math.mul(half_z_squared, terms[2]));
+                    auto b = math.mul(director_radical, terms[1]);
+                    return radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
+                };
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);
-                    Numerators local;
-                    auto& terms = cached.size() > 0 ? cached.values()[i] : local;
-                    if (depth_slot == 0) {
+                    const auto numerator_values = [&]() -> Numerators {
                         auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
                                                        /*derivatives=*/false);
-                        terms = {std::move(jet[0][0]), std::move(jet[1][0]), std::move(jet[2][0])};
+                        return {std::move(jet[0][0]), std::move(jet[1][0]), std::move(jet[2][0])};
+                    };
+                    if (cached.size() == 0) {
+                        values[i] = evaluate(numerator_values());
+                        continue;
                     }
-                    auto a = math.add(terms[0], math.mul(half_z_squared, terms[2]));
-                    auto b = math.mul(director_radical, terms[1]);
-                    values[i] = radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
+                    auto& terms = cached.values()[i];
+                    if (depth_slot == 0)
+                        terms = numerator_values();
+                    values[i] = evaluate(terms);
                 }
                 accumulate_sample(work, sums.values(), values, measure);
                 // fill_product emits all depths consecutively for one volume and (u, v).
