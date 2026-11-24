@@ -19,6 +19,8 @@ template <class Work>
 template <class Work>
 [[nodiscard]] RankWide conditioning_nearest(Work& work, const RankWide& a, const RankWide& b) {
     work.charge();
+    if (a == 0)
+        return {};
     const auto absolute = rank_abs(a);
     auto quotient = conditioning_divide(work, absolute, b);
     const auto twice_remainder = (absolute - rank_product(work, quotient, b)) << 1U;
@@ -68,8 +70,10 @@ void conditioning_factor(Work& work, std::span<const Interval> gram, std::uint32
                                                  gram_bits + 1, 2 * factor_bits);
             for (std::size_t k = 0; k < i; ++k) {
                 work.charge();
-                residual -= rank_product(work, RankWide{factor[packed(k, i)]},
-                                         RankWide{factor[packed(k, j)]});
+                const auto& left = factor[packed(k, i)];
+                const auto& right = factor[packed(k, j)];
+                if (left != 0 && right != 0)
+                    residual -= rank_product(work, RankWide{left}, RankWide{right});
             }
             if (i == j) {
                 if (residual <= 0)
@@ -96,7 +100,9 @@ void conditioning_inverse(Work& work, std::span<const PgConditioningFactor> fact
             auto residual = i == j ? one : RankWide{};
             for (std::size_t k = i + 1; k <= j; ++k) {
                 work.charge();
-                residual -= rank_product(work, RankWide{factor[packed(i, k)]}, RankWide{column[k]});
+                const auto& coefficient = factor[packed(i, k)];
+                if (coefficient != 0 && column[k] != 0)
+                    residual -= rank_product(work, RankWide{coefficient}, RankWide{column[k]});
             }
             column[i] = PgConditioningFactor{
                 conditioning_nearest(work, residual, RankWide{factor[packed(i, i)]})};
