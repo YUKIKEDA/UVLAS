@@ -192,8 +192,8 @@ private:
     friend class PgFlatGram;
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
     basis_cell_jet(detail::ReferenceArithmetic&, PgRankBasisColumn, PgCellIndex,
-                   const ExactRational& u, const ExactRational& v,
-                   const ExactRational& axis_scale) const;
+                   const ExactRational& u, const ExactRational& v, const ExactRational& axis_scale,
+                   bool derivatives) const;
 
     explicit PgRankPreparation(core::PlannedBuffer<detail::PgRankState>) noexcept;
     core::PlannedBuffer<detail::PgRankState> state_;

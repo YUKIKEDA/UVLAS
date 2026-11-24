@@ -90,7 +90,9 @@ def gram_enclosure(cell_terms, moment_provider):
     return [(lower[i][j], upper[i][j]) for j in range(RANK) for i in range(j + 1)]
 
 
-def congruence_bound(entries, transform: list[list[int]], subtract_identity: bool) -> Fraction:
+def congruence_bounds(
+    entries, transform: list[list[int]], subtract_identity: bool
+) -> tuple[Fraction, Fraction]:
     size = len(transform)
     midpoints = [[0] * size for _ in range(size)]
     radii = [[0] * size for _ in range(size)]
@@ -107,18 +109,23 @@ def congruence_bound(entries, transform: list[list[int]], subtract_identity: boo
     def dot(left, right) -> int:
         return sum(a * b for a, b in zip(left, right, strict=True))
 
-    row_sum = []
+    row_lower = []
+    row_upper = []
     for i in range(size):
         left_midpoints = [dot(transposed[i], row) for row in midpoints]
         left_radii = [dot(magnitudes[i], row) for row in radii]
-        bound = 0
+        lo = 0
+        hi = 0
         for j in range(size):
             midpoint = dot(left_midpoints, transposed[j])
             if subtract_identity and i == j:
                 midpoint -= scale
-            bound += abs(midpoint) + dot(left_radii, magnitudes[j])
-        row_sum.append(bound)
-    return Fraction(max(row_sum), scale)
+            radius = dot(left_radii, magnitudes[j])
+            lo += max(abs(midpoint) - radius, 0)
+            hi += abs(midpoint) + radius
+        row_lower.append(lo)
+        row_upper.append(hi)
+    return Fraction(max(row_lower), scale), Fraction(max(row_upper), scale)
 
 
 def propose(finite):
@@ -165,14 +172,18 @@ def main() -> None:
         for (lo, hi), (finite_lo, finite_hi) in zip(continuum, finite, strict=True)
     ]
     limit = Fraction(1, 10**20)
-    for label, bound in (
-        ("independent_finite_congruence", congruence_bound(finite, transform, True)),
-        ("continuous_difference", congruence_bound(difference, transform, False)),
-        ("continuous_congruence", congruence_bound(continuum, transform, True)),
+    for label, (lo, hi) in (
+        ("independent_finite_congruence", congruence_bounds(finite, transform, True)),
+        ("continuous_difference", congruence_bounds(difference, transform, False)),
+        ("continuous_congruence", congruence_bounds(continuum, transform, True)),
     ):
-        print(f"{label}={Decimal(bound.numerator) / Decimal(bound.denominator):.12E}", flush=True)
-        if bound > limit:
+        lower = Decimal(lo.numerator) / Decimal(lo.denominator)
+        upper = Decimal(hi.numerator) / Decimal(hi.denominator)
+        print(f"{label}=[{lower:.12E}, {upper:.12E}]", flush=True)
+        if lo > limit:
             raise ValueError(f"{label} exceeds {limit} on the cut-parabola fixture")
+        if hi > limit:
+            raise ValueError(f"{label} cannot be qualified at {limit} on the cut-parabola fixture")
 
 
 if __name__ == "__main__":

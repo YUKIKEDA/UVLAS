@@ -330,7 +330,8 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);
-                    const auto jet = basis.numerator_jet(math, {partition_index(i)}, located);
+                    const auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
+                                                         /*derivatives=*/false);
                     auto a = math.add(jet[0][0], math.mul(half_z_squared, jet[2][0]));
                     auto b = math.mul(director_radical, jet[1][0]);
                     values[i] = radical_bounds(work, {std::move(a), std::move(b)}, root, bits);

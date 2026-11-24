@@ -59,7 +59,7 @@ private:
                                                      const PgReferencePoint&) const;
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
     numerator_jet(detail::ReferenceArithmetic&, PgRankBasisColumn,
-                  const detail::BasisReferencePoint&) const;
+                  const detail::BasisReferencePoint&, bool derivatives = true) const;
     [[nodiscard]] detail::BasisReferenceSample
     sample(detail::ReferenceArithmetic&, const detail::BasisReferencePoint&,
            const std::array<std::array<ExactRational, 3>, 3>&) const;

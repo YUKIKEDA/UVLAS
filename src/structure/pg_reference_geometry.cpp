@@ -382,9 +382,9 @@ BasisReferencePoint PgReferenceBasis::locate(ReferenceArithmetic& m,
 
 std::array<std::array<ExactRational, 3>, 3>
 PgReferenceBasis::numerator_jet(ReferenceArithmetic& m, PgRankBasisColumn column,
-                                const BasisReferencePoint& point) const {
-    return rank_.basis_cell_jet(m, column, point.reference.cell, point.u, point.v,
-                                point.axis_scale);
+                                const BasisReferencePoint& point, bool derivatives) const {
+    return rank_.basis_cell_jet(m, column, point.reference.cell, point.u, point.v, point.axis_scale,
+                                derivatives);
 }
 
 BasisReferenceSample
