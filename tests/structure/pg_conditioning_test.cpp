@@ -243,6 +243,181 @@ void check_jet(const PgReferenceBasisValue& result, const std::array<Q, 4>& expe
     }
 }
 
+Q flat_scalar(const PgReferenceScalar& x) {
+    return q(x.rational) + q(x.radical);
+}
+
+std::array<Q, 3> flat_vector(const PgReferenceVector& vector) {
+    return {flat_scalar(vector[0]), flat_scalar(vector[1]), flat_scalar(vector[2])};
+}
+
+void check_batch_limits(const PgConditioningCertificate& certificate, const PgReferencePoint& query,
+                        const PgReferencePoint& invalid) {
+    const auto one_point = std::span{&query, 1};
+    const auto caps = query_limits();
+    core::ResourcePlan control{profile};
+    const auto reference = take(certificate.evaluate_reference(one_point, caps, control));
+    const auto& used = reference.call_info;
+    CHECK(used.allocated_owned_payload_bytes == control.allocated_bytes());
+    auto exact = caps;
+    exact.maximum_scalar_operations = used.scalar_operations;
+    exact.maximum_partition_visits = used.partition_visits;
+    core::ResourcePlan equal{used.allocated_owned_payload_bytes};
+    const auto repeated = take(certificate.evaluate_reference(one_point, exact, equal));
+    CHECK(repeated.call_info.allocated_owned_payload_bytes == equal.byte_limit());
+    CHECK(repeated.points.values().front().identity == reference.points.values().front().identity);
+    CHECK(flat_scalar(repeated.columns.values().back().value) ==
+          flat_scalar(reference.columns.values().back().value));
+    core::ResourcePlan short_bytes{used.allocated_owned_payload_bytes - 1};
+    check_failure(certificate.evaluate_reference(one_point, exact, short_bytes),
+                  core::FailureCode::ResourceExceeded);
+    --exact.maximum_scalar_operations;
+    check_failure(certificate.evaluate_reference(one_point, exact, control),
+                  core::FailureCode::ResourceExceeded);
+    ++exact.maximum_scalar_operations;
+    --exact.maximum_partition_visits;
+    check_failure(certificate.evaluate_reference(one_point, exact, control),
+                  core::FailureCode::ResourceExceeded);
+    const auto inline_bytes =
+        sizeof(PgReferenceValue) + reference.column_count * sizeof(PgConditionedReferenceColumn);
+    core::ResourcePlan short_inline{inline_bytes - 1};
+    check_failure(certificate.evaluate_reference(one_point, caps, short_inline),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(short_inline.allocated_bytes() == 0);
+    core::ResourcePlan cancelled{0};
+    exact.cancellation = requested_stop_token();
+    check_failure(certificate.evaluate_reference(one_point, exact, cancelled),
+                  core::FailureCode::Cancelled);
+    check_failure(certificate.evaluate_reference({}, exact, cancelled),
+                  core::FailureCode::Cancelled);
+    CHECK(cancelled.allocated_bytes() == 0);
+    auto short_external = caps;
+    short_external.algebra.external_memory = ExactEstimateAdmission{0};
+    core::ResourcePlan external{profile};
+    check_failure(certificate.evaluate_reference(one_point, short_external, external),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(external.allocated_bytes() == 0);
+    const auto none = take(certificate.evaluate_reference({}, caps, cancelled));
+    CHECK(none.column_count == reference.column_count);
+    CHECK(none.points.size() == 0);
+    CHECK(none.columns.size() == 0);
+    CHECK(none.call_info.allocated_owned_payload_bytes == 0);
+    CHECK(none.call_info.scalar_operations == 0);
+    CHECK(none.call_info.partition_visits == 0);
+    const std::array pair{query, invalid};
+    check_failure(certificate.evaluate_reference(pair, caps, control),
+                  core::FailureCode::InvalidInput);
+    REQUIRE(certificate.evaluate_reference(one_point, caps, control));
+}
+
+void check_reference_batch(const PgConditioningCertificate& certificate,
+                           const std::vector<std::vector<Term>>& terms,
+                           std::span<const ExactRational> transform,
+                           const PgIntegrationPartition& partition,
+                           const std::array<PgReferencePoint, 5>& queries) {
+    const auto caps = query_limits();
+    const auto triangles = take(partition.triangles());
+    const auto vertices = take(partition.vertices());
+    const auto pieces = take(partition.pieces());
+    const auto volumes = take(partition.volumes());
+    const auto faces = take(partition.horizontal_faces());
+    const Q s{"1/2"}, t{0}, zeta{"1/3"};
+    const auto batch = [&] {
+        core::ResourcePlan measured{profile};
+        auto output = take(certificate.evaluate_reference(queries, caps, measured));
+        CHECK(output.call_info.allocated_owned_payload_bytes == measured.allocated_bytes());
+        return output;
+    }();
+    REQUIRE(batch.column_count == terms.size());
+    REQUIRE(batch.points.size() == queries.size());
+    REQUIRE(batch.columns.size() == queries.size() * terms.size());
+    const auto points = batch.points.values();
+    const auto lateral_face = take(partition.lateral_faces()).front();
+    const auto edges = take(partition.edges());
+    const auto& edge = edges[static_cast<std::size_t>(lateral_face.edge)];
+    const auto first = lateral_face.canonical_direction ? 0U : 1U;
+    const auto& edge_a = vertices[static_cast<std::size_t>(edge.vertices[first])];
+    const auto& edge_b = vertices[static_cast<std::size_t>(edge.vertices[1 - first])];
+    const Q edge_s = (q(edge_a.s) + q(edge_b.s)) / 2;
+    const Q edge_t = (q(edge_a.t) + q(edge_b.t)) / 2;
+    const auto inside_piece =
+        (lateral_face.canonical_direction ? edge.left : edge.right).value_or(-1);
+    REQUIRE(inside_piece >= 0);
+    const auto edge_cell = pieces[static_cast<std::size_t>(inside_piece)].cell;
+    const auto edge_layer = static_cast<std::size_t>(lateral_face.layer);
+    const auto layers = take(partition.layers());
+    const Q edge_zeta = (q(layers[edge_layer].lower) + q(layers[edge_layer].upper)) / 2;
+    const Q interface_zeta{"-1/3"};
+    const std::array<PgCellIndex, 5> cells{{{1, 0}, {0, 0}, edge_cell, {0, 0}, {0, 0}}};
+    const std::array<std::array<Q, 3>, 5> positions{{{s, t, zeta},
+                                                     {s, t, interface_zeta},
+                                                     {edge_s, edge_t, edge_zeta},
+                                                     {s, t, zeta},
+                                                     {s, t, interface_zeta}}};
+    const std::array<core::LayerId, 5> layer_ids{core::LayerId{29}, core::LayerId{11},
+                                                 layers[edge_layer].id, core::LayerId{29},
+                                                 core::LayerId{29}};
+    const auto interface0 = std::get<PgReferenceHorizontalPoint>(queries[1]).face;
+    const auto interface1 = std::get<PgReferenceHorizontalPoint>(queries[4]).face;
+    const std::array<core::Index, 5> records{
+        std::get<PgReferenceVolumePoint>(queries[0]).volume, interface0, 0,
+        std::get<PgReferenceVolumePoint>(queries[3]).volume, interface1};
+    const std::array<std::array<Q, 3>, 3> identity{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}};
+    std::uint64_t scalar_operations = 0;
+    for (std::size_t p = 0; p < points.size(); ++p) {
+        CAPTURE(p);
+        const auto& point = points[p];
+        CHECK(point.cell == cells[p]);
+        CHECK(point.layer == layer_ids[p]);
+        CHECK(point.partition_record == records[p]);
+        CHECK(point.identity == points.front().identity);
+        REQUIRE(q(point.g) == 1);
+        CHECK(flat_vector(point.position_metres) == positions[p]);
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            CHECK(flat_vector(point.jacobian_columns_metres[axis]) == identity[axis]);
+        scalar_operations += point.call_info.scalar_operations;
+        for (std::size_t i = 0; i < terms.size(); ++i) {
+            CAPTURE(i);
+            const auto& [x, y, z] = positions[p];
+            const auto expected = conditioned_jet(terms, transform, i, cells[p], x, y, z);
+            const auto& sample = batch.columns.values()[p * terms.size() + i];
+            CHECK(flat_scalar(sample.value) == expected[0]);
+            CHECK(flat_vector(sample.physical_gradient_per_metre) ==
+                  std::array<Q, 3>{expected[1], expected[2], expected[3]});
+        }
+    }
+    CHECK(batch.call_info.scalar_operations == scalar_operations);
+    for (const auto p : {0U, 3U}) {
+        REQUIRE(std::holds_alternative<PgReferenceVolumeMeasure>(points[p].measure));
+        const auto& triangle = triangles[static_cast<std::size_t>(
+            volumes[static_cast<std::size_t>(records[p])].triangle)];
+        CHECK(flat_scalar(std::get<PgReferenceVolumeMeasure>(points[p].measure).jacobian) ==
+              q(triangle.twice_area) * Q("4/3"));
+    }
+    const Q triangle_scale =
+        q(triangles[static_cast<std::size_t>(faces[static_cast<std::size_t>(interface0)].triangle)]
+              .twice_area);
+    for (const auto p : {1U, 4U}) {
+        REQUIRE(std::holds_alternative<PgReferenceHorizontalMeasure>(points[p].measure));
+        const auto& face = std::get<PgReferenceHorizontalMeasure>(points[p].measure);
+        const auto upper = p == 1;
+        CHECK(face.side == (upper ? PgPartitionFaceSide::Upper : PgPartitionFaceSide::Lower));
+        CHECK(flat_vector(face.area.outward) ==
+              std::array<Q, 3>{Q{}, Q{}, upper ? triangle_scale : -triangle_scale});
+        CHECK(flat_scalar(face.area.squared_norm) == triangle_scale * triangle_scale);
+    }
+    REQUIRE(std::holds_alternative<PgReferenceLateralMeasure>(points[2].measure));
+    const auto& area = std::get<PgReferenceLateralMeasure>(points[2].measure).area;
+    const Q depth = q(layers[edge_layer].upper) - q(layers[edge_layer].lower);
+    const Q normal_x = depth * (q(edge_b.t) - q(edge_a.t));
+    const Q normal_y = depth * (q(edge_a.s) - q(edge_b.s));
+    CHECK(flat_vector(area.outward) == std::array<Q, 3>{normal_x, normal_y, Q{}});
+    CHECK(flat_scalar(area.squared_norm) == normal_x * normal_x + normal_y * normal_y);
+    const auto& lateral = std::get<PgReferenceLateralPoint>(queries[2]);
+    check_batch_limits(certificate, queries.front(),
+                       PgReferenceLateralPoint{-1, lateral.along, lateral.depth});
+}
+
 void check_reference_points(Fixture& f, const PgConditioningCertificate& certificate,
                             const std::vector<std::vector<Term>>& terms,
                             std::span<const ExactRational> transform) {
@@ -333,7 +508,7 @@ void check_reference_points(Fixture& f, const PgConditioningCertificate& certifi
     CHECK(values[0] == values[1]);
 
     const auto& left = side[0];
-    std::array<bool, 2> layer_seen{};
+    std::array<core::Index, 2> interface{-1, -1};
     core::ResourcePlan faces_plan{profile};
     for (std::size_t i = 0; i < faces.size(); ++i) {
         const auto& face = faces[i];
@@ -351,11 +526,11 @@ void check_reference_points(Fixture& f, const PgConditioningCertificate& certifi
         CHECK(std::get<PgReferenceHorizontalMeasure>(point.reference.measure).side == direction);
         const auto layer = static_cast<std::size_t>(face.layer);
         CHECK(point.reference.layer == core::LayerId{layer == 0 ? 11U : 29U});
-        layer_seen[layer] = true;
+        interface[layer] = static_cast<core::Index>(i);
         check_jet(point, conditioned_jet(terms, transform, j, {0, 0}, s, t, Q("-1/3")));
     }
-    REQUIRE(layer_seen[0]);
-    REQUIRE(layer_seen[1]);
+    REQUIRE(interface[0] >= 0);
+    REQUIRE(interface[1] >= 0);
 
     const auto lateral = take(
         certificate.evaluate(PgReferenceLateralPoint{0, half, half}, column, caps, faces_plan));
@@ -365,6 +540,20 @@ void check_reference_points(Fixture& f, const PgConditioningCertificate& certifi
     check_failure(
         certificate.evaluate(PgReferenceLateralPoint{-1, half, half}, column, caps, faces_plan),
         core::FailureCode::InvalidInput);
+
+    const auto volume_query = [&](const VertexQuery& row) {
+        return PgReferenceVolumePoint{row.volume, row.vertex == 1 ? one : zero,
+                                      row.vertex == 2 ? one : zero, half};
+    };
+    const auto interface_query = [&](core::Index face) {
+        return PgReferenceHorizontalPoint{face, left.vertex == 1 ? one : zero,
+                                          left.vertex == 2 ? one : zero};
+    };
+    const std::array<PgReferencePoint, 5> queries{
+        volume_query(side[1]), interface_query(interface[0]),
+        PgReferenceLateralPoint{0, half, half}, volume_query(side[0]),
+        interface_query(interface[1])};
+    check_reference_batch(certificate, terms, transform, partition, queries);
 }
 
 } // namespace

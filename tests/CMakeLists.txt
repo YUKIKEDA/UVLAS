@@ -42,6 +42,12 @@ uvlas_add_test(io.resolved_case_document
     LIBS uvlas_io nlohmann_json::nlohmann_json Boost::hash2)
 target_include_directories(uvlas_test_io_resolved_case_document PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.visualization_series
+    LABELS unit integration negative verification
+    SOURCES io/visualization_series_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_visualization_series PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.input_scalar
     LABELS unit property negative verification
     SOURCES io/input_scalar_test.cpp
@@ -155,6 +161,15 @@ foreach(case IN ITEMS version help missing-option unknown-option extra-option)
             -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli.cmake")
     set_tests_properties(cli.${case} PROPERTIES TIMEOUT 10 LABELS "integration")
 endforeach()
+
+# IO4-01: CLI success requires both complete schema validation and reference closure.
+add_test(NAME cli.validate
+    COMMAND "${CMAKE_COMMAND}"
+        "-DUVLAS_EXECUTABLE=$<TARGET_FILE:uvlas_cli>"
+        "-DCASE_EXAMPLES=${PROJECT_SOURCE_DIR}/docs/specs/foundation/case-schema-examples.json"
+        "-DCASE_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}/cli-validate-$<CONFIG>"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli_validate.cmake")
+set_tests_properties(cli.validate PROPERTIES TIMEOUT 30 LABELS "integration")
 
 # QA-04: results must equal the baseline of this platform bit for bit.
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)

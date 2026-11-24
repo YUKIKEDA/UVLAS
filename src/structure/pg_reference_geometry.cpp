@@ -387,17 +387,24 @@ PgReferenceBasis::numerator_jet(ReferenceArithmetic& m, PgRankBasisColumn column
                                 point.axis_scale);
 }
 
+BasisReferenceSample
+PgReferenceBasis::sample(ReferenceArithmetic& m, const BasisReferencePoint& point,
+                         const std::array<std::array<ExactRational, 3>, 3>& numerators) const {
+    auto shape =
+        reference_shape(m, numerators, point.reference, point.g_gradient, geometry_.length_);
+    auto gradient = physical_gradient(m, point.reference, shape.chart_derivatives);
+    return {std::move(shape.value), std::move(shape.chart_derivatives), std::move(gradient)};
+}
+
 PgReferenceBasisValue
 PgReferenceBasis::assemble(ReferenceArithmetic& m, BasisReferencePoint&& point,
                            PgRankBasisColumn column,
                            const std::array<std::array<ExactRational, 3>, 3>& numerators) const {
-    auto shape =
-        reference_shape(m, numerators, point.reference, point.g_gradient, geometry_.length_);
-    auto gradient = physical_gradient(m, point.reference, shape.chart_derivatives);
+    auto shape = sample(m, point, numerators);
     m.cancel();
     point.reference.call_info = m.info();
     return {std::move(point.reference), column, std::move(shape.value),
-            std::move(shape.chart_derivatives), std::move(gradient)};
+            std::move(shape.chart_derivatives), std::move(shape.physical_gradient_per_metre)};
 }
 
 core::Result<PgReferenceBasisValue>

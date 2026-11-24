@@ -304,6 +304,85 @@ PgConditioningCertificate::evaluate(const PgReferencePoint& query, PgRankBasisCo
     });
 }
 
+core::Result<PgConditionedReferenceBatch>
+PgConditioningCertificate::evaluate_reference(std::span<const PgReferencePoint> queries,
+                                              const PgReferenceLimits& limits,
+                                              core::ResourcePlan& plan) const noexcept {
+    return partition_entry([&]() -> core::Result<PgConditionedReferenceBatch> {
+        auto math = ReferenceArithmetic{limits, plan};
+        math.cancel();
+        const auto& accepted = state(state_);
+        if (queries.empty())
+            return PgConditionedReferenceBatch{accepted.info.rank, {}, {}, math.info()};
+
+        const auto point_count = partition_index(queries.size());
+        const auto column_count =
+            partition_index(partition_mul(queries.size(), accepted.info.rank));
+        const auto point_bytes = partition_take(
+            core::checked_byte_count(point_count, sizeof(PgReferenceValue), partition_operation));
+        const auto column_bytes = partition_take(core::checked_byte_count(
+            column_count, sizeof(PgConditionedReferenceColumn), partition_operation));
+        if (partition_add(point_bytes, column_bytes) > plan.remaining_bytes())
+            partition_fail(core::FailureCode::ResourceExceeded);
+        // Per point: 22 chart rationals, 44 Cartesian/determinant rationals,
+        // and up to 8 rationals for an area measure. Per column: 2 for N, 6 for G.
+        const auto retained =
+            partition_add(partition_mul(74, queries.size()),
+                          partition_mul(8, static_cast<std::uint64_t>(column_count)));
+        math.admit(partition_add(basis_live_rationals + 16, retained));
+        math.visit(partition_add(queries.size(), static_cast<std::uint64_t>(column_count)));
+        auto points =
+            partition_take(plan.allocate<PgReferenceValue>(point_count, partition_operation));
+        auto columns = partition_take(
+            plan.allocate<PgConditionedReferenceColumn>(column_count, partition_operation));
+        const auto rank = static_cast<std::size_t>(accepted.info.rank);
+        auto unfilled = columns.values();
+        for (std::size_t p = 0; p < queries.size(); ++p) {
+            const auto start = math.info();
+            math.visit(1);
+            auto point = basis_.locate(math, queries[p]);
+            auto row = unfilled.first(rank);
+            unfilled = unfilled.subspan(rank);
+            for (std::size_t i = 0; i < rank; ++i) {
+                math.visit(1);
+                const auto jet = basis_.numerator_jet(math, {partition_index(i)}, point);
+                auto value = basis_.sample(math, point, jet);
+                row[i] = {std::move(value.value), std::move(value.physical_gradient_per_metre)};
+            }
+            // N and G are linear in the selected basis. Traverse downwards so
+            // each column can replace its input without losing any untransformed
+            // row i <= j needed by the other columns of the upper triangular T.
+            auto field = ReferenceRadicals{math, point.reference.g};
+            for (std::size_t end = rank; end != 0; --end) {
+                const auto j = end - 1;
+                PgConditionedReferenceColumn combined{};
+                for (std::size_t i = 0; i <= j; ++i) {
+                    math.visit(1);
+                    if (accepted.transform.values()[packed(i, j)] == 0)
+                        continue;
+                    const auto weight = entry(math, accepted, i, j);
+                    combined.value = field.add(combined.value, field.scale(row[i].value, weight));
+                    auto& gradient = combined.physical_gradient_per_metre;
+                    for (std::size_t d = 0; d < gradient.size(); ++d)
+                        gradient[d] =
+                            field.add(gradient[d],
+                                      field.scale(row[i].physical_gradient_per_metre[d], weight));
+                }
+                row[j] = std::move(combined);
+            }
+            const auto after = math.info();
+            point.reference.call_info = {after.scalar_operations - start.scalar_operations,
+                                         after.partition_visits - start.partition_visits,
+                                         after.allocated_owned_payload_bytes -
+                                             start.allocated_owned_payload_bytes};
+            points.values()[p] = std::move(point.reference);
+        }
+        math.cancel();
+        return PgConditionedReferenceBatch{accepted.info.rank, std::move(points),
+                                           std::move(columns), math.info()};
+    });
+}
+
 core::Result<ExactRational>
 PgConditioningCertificate::coefficient(PgRankBasisColumn column, core::Index row,
                                        const PgReferenceLimits& limits,

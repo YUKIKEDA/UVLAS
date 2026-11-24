@@ -121,6 +121,7 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
     src/io/reference_input.cpp src/io/reference_root_snapshot.cpp)
 target_sources(uvlas_io PRIVATE src/io/result_documents.cpp src/io/resolved_case_document.cpp)
+target_sources(uvlas_io PRIVATE src/io/visualization_series.cpp)
 uvlas_configure_target(uvlas_io)
 target_include_directories(uvlas_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_io PUBLIC uvlas_core uvlas_structure PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
@@ -142,10 +143,11 @@ target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/s
 target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero
     PRIVATE uvlas_numerics Boost::multiprecision)
 
-add_executable(uvlas_cli src/app/main.cpp)
+add_executable(uvlas_cli src/app/main.cpp src/app/validate_case.cpp)
 uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
-target_link_libraries(uvlas_cli PRIVATE uvlas_core)
+target_include_directories(uvlas_cli PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/io")
+target_link_libraries(uvlas_cli PRIVATE uvlas_io)
 
 option(UVLAS_ENABLE_PRIVATE_RUNTIME_IMAGE "Enable the local Release runtime image component" OFF)
 if(UVLAS_ENABLE_PRIVATE_RUNTIME_IMAGE)

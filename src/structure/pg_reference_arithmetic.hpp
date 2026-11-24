@@ -21,6 +21,12 @@ struct BasisReferencePoint {
     ExactRational axis_scale, u, v;
 };
 
+struct BasisReferenceSample {
+    PgReferenceScalar value;
+    PgReferenceVector chart_derivatives;
+    PgReferenceVector physical_gradient_per_metre;
+};
+
 struct ReferenceArithmetic {
     const PgReferenceLimits& limits;
     core::ResourcePlan& plan;
