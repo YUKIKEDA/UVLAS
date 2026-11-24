@@ -143,7 +143,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp src/io/checkpoint_publication.cpp)
 endif()
 
-add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp
+add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
+    src/coupling/case_uniform_flow.cpp
     src/coupling/case_uniform_flow_projection.cpp src/coupling/discrete_nonpenetration.cpp)
 uvlas_configure_target(uvlas_coupling)
 target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
