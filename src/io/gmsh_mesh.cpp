@@ -509,6 +509,72 @@ void admit(std::size_t count, std::uint64_t& capacity) {
     capacity -= count * sizeof(T);
 }
 
+struct MeshRecords {
+    core::PlannedBuffer<GmshNames> names;
+    core::PlannedBuffer<GmshEntity> entities;
+    core::PlannedBuffer<GmshLink> links;
+    core::PlannedBuffer<GmshNode> nodes;
+    core::PlannedBuffer<GmshElement> elements;
+};
+
+[[nodiscard]] std::size_t block_owners(const Counts& shape) noexcept {
+    return shape.entities_declared ? shape.blocks : 0;
+}
+
+void admit_records(const Counts& shape, std::uint64_t capacity) {
+    admit<GmshNames>(shape.names, capacity);
+    admit<GmshEntity>(shape.entities, capacity);
+    admit<GmshLink>(shape.links, capacity);
+    admit<GmshNode>(shape.nodes, capacity);
+    admit<GmshElement>(shape.elements, capacity);
+    admit<BlockOwner>(block_owners(shape), capacity);
+}
+
+[[nodiscard]] MeshRecords decode(std::string_view input, const Counts& shape, Work& work,
+                                 GmshLimits limits, core::ResourcePlan& plan) {
+    MeshRecords result{allocate<GmshNames>(plan, shape.names),
+                       allocate<GmshEntity>(plan, shape.entities),
+                       allocate<GmshLink>(plan, shape.links), allocate<GmshNode>(plan, shape.nodes),
+                       allocate<GmshElement>(plan, shape.elements)};
+    auto owners = allocate<BlockOwner>(plan, block_owners(shape));
+    const Records records{result.names.values(), result.entities.values(), result.links.values(),
+                          result.nodes.values(), result.elements.values(), owners.values()};
+    if (Parser{input, work, limits, records}.read() != shape)
+        reject(InvalidInput, 0);
+    resolve(records, shape.entities_declared, work, input.size());
+    work.charge(0, input.size());
+    return result;
+}
+
+[[nodiscard]] ReferenceFileView mesh_source(const AcquiredRootSnapshot& snapshot, GmshLimits limits,
+                                            Work& work) {
+    work.charge(0, 0);
+    const auto source = snapshot.file.view();
+    if (!source || source->bytes.empty() || snapshot.location.role != ReferenceRole::GmshMesh)
+        reject(InvalidInput, 0);
+    if (source->bytes.size() > limits.file_bytes)
+        reject(ResourceExceeded, 0);
+    return *source;
+}
+
+[[nodiscard]] std::string_view text(std::span<const std::byte> bytes) noexcept {
+    return {reinterpret_cast<const char*>(bytes.data()), bytes.size()};
+}
+
+template <class T, class Parse>
+[[nodiscard]] core::Result<T> with_diagnostic(std::size_t* failure_offset, Parse parse) noexcept {
+    if (failure_offset != nullptr)
+        *failure_offset = 0;
+    return core::guard_entry(operation, InvalidInput, {}, [&]() -> core::Result<T> {
+        try {
+            return parse();
+        } catch (const Abort& error) {
+            if (failure_offset != nullptr)
+                *failure_offset = error.offset;
+            return std::unexpected(error.failure);
+        }
+    });
+}
 } // namespace
 
 std::span<const std::uint64_t> GmshElement::connectivity() const& noexcept {
@@ -531,67 +597,56 @@ std::string_view GmshMeshView::text(GmshLexeme value) const noexcept {
     return bytes.substr(value.offset, value.length);
 }
 
+core::Result<GmshMeshLeaf> prove_gmsh_mesh_leaf(const AcquiredRootSnapshot& snapshot,
+                                                GmshLimits limits, core::ResourcePlan& plan,
+                                                const std::stop_token& stop,
+                                                std::size_t* failure_offset) noexcept {
+    return with_diagnostic<GmshMeshLeaf>(failure_offset, [&] {
+        Work work{limits.work, stop};
+        const auto source = mesh_source(snapshot, limits, work);
+        const auto input = text(source.bytes);
+        const auto shape = Parser{input, work, limits, {}}.read();
+        admit_records(shape, plan.remaining_bytes());
+        work.charge(0, 0);
+        // Every supported section consumes only in-file entities, tags or metadata.
+        // The parser rejects unknown sections, so a decoded file has no child declarations.
+        static_cast<void>(decode(input, shape, work, limits, plan));
+        return GmshMeshLeaf{snapshot.location, source.digest, source.bytes.size(), work.used()};
+    });
+}
+
 core::Result<GmshMesh> GmshMesh::prepare(const AcquiredRootSnapshot& snapshot, GmshLimits limits,
                                          core::ResourcePlan& plan, const std::stop_token& stop,
                                          std::size_t* failure_offset) noexcept {
-    if (failure_offset != nullptr)
-        *failure_offset = 0;
-    return core::guard_entry(operation, InvalidInput, {}, [&]() -> core::Result<GmshMesh> {
-        try {
-            Work work{limits.work, stop};
-            work.charge(0, 0);
-            const auto source = snapshot.file.view();
-            if (!source || source->bytes.empty())
-                reject(InvalidInput, 0);
-            if (snapshot.location.role != ReferenceRole::GmshMesh)
-                reject(InvalidInput, 0);
-            if (source->bytes.size() > limits.file_bytes)
-                reject(ResourceExceeded, 0);
-            const std::string_view input{reinterpret_cast<const char*>(source->bytes.data()),
-                                         source->bytes.size()};
-            const auto shape = Parser{input, work, limits, {}}.read();
-            auto capacity = plan.remaining_bytes();
-            admit<char>(input.size(), capacity);
-            admit<GmshNames>(shape.names, capacity);
-            admit<GmshEntity>(shape.entities, capacity);
-            admit<GmshLink>(shape.links, capacity);
-            admit<GmshNode>(shape.nodes, capacity);
-            admit<GmshElement>(shape.elements, capacity);
-            const auto owner_count = shape.entities_declared ? shape.blocks : 0;
-            admit<BlockOwner>(owner_count, capacity);
-            work.charge(0, 0);
-            GmshMesh result;
-            result.location_ = snapshot.location;
-            result.digest_ = source->digest;
-            result.bytes_ = allocate<char>(plan, input.size());
-            const auto copy = result.bytes_.values();
-            for (std::size_t offset = 0; offset < input.size();) {
-                const auto part = std::min<std::size_t>(65536, input.size() - offset);
-                work.charge(part, offset);
-                std::memcpy(copy.data() + offset, input.data() + offset, part);
-                offset += part;
-            }
-            result.names_ = allocate<GmshNames>(plan, shape.names);
-            result.entities_ = allocate<GmshEntity>(plan, shape.entities);
-            result.links_ = allocate<GmshLink>(plan, shape.links);
-            result.nodes_ = allocate<GmshNode>(plan, shape.nodes);
-            result.elements_ = allocate<GmshElement>(plan, shape.elements);
-            auto owners = allocate<BlockOwner>(plan, owner_count);
-            const Records records{result.names_.values(),    result.entities_.values(),
-                                  result.links_.values(),    result.nodes_.values(),
-                                  result.elements_.values(), owners.values()};
-            if (Parser{{copy.data(), copy.size()}, work, limits, records}.read() != shape)
-                reject(InvalidInput, 0);
-            resolve(records, shape.entities_declared, work, input.size());
-            work.charge(0, input.size());
-            result.entities_declared_ = shape.entities_declared;
-            result.work_ = work.used();
-            return result;
-        } catch (const Abort& error) {
-            if (failure_offset != nullptr)
-                *failure_offset = error.offset;
-            return std::unexpected(error.failure);
+    return with_diagnostic<GmshMesh>(failure_offset, [&] {
+        Work work{limits.work, stop};
+        const auto source = mesh_source(snapshot, limits, work);
+        const auto input = text(source.bytes);
+        const auto shape = Parser{input, work, limits, {}}.read();
+        auto capacity = plan.remaining_bytes();
+        admit<char>(input.size(), capacity);
+        admit_records(shape, capacity);
+        work.charge(0, 0);
+        GmshMesh result;
+        result.location_ = snapshot.location;
+        result.digest_ = source.digest;
+        result.bytes_ = allocate<char>(plan, input.size());
+        const auto copy = result.bytes_.values();
+        for (std::size_t offset = 0; offset < input.size();) {
+            const auto part = std::min<std::size_t>(65536, input.size() - offset);
+            work.charge(part, offset);
+            std::memcpy(copy.data() + offset, input.data() + offset, part);
+            offset += part;
         }
+        auto records = decode({copy.data(), copy.size()}, shape, work, limits, plan);
+        result.names_ = std::move(records.names);
+        result.entities_ = std::move(records.entities);
+        result.links_ = std::move(records.links);
+        result.nodes_ = std::move(records.nodes);
+        result.elements_ = std::move(records.elements);
+        result.entities_declared_ = shape.entities_declared;
+        result.work_ = work.used();
+        return result;
     });
 }
 

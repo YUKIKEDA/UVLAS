@@ -1,6 +1,6 @@
 #include "validate_case.hpp"
 
-#include "reference_root_snapshot.hpp"
+#include "reference_resolution.hpp"
 #include "result_documents.hpp"
 
 #include <cstdint>
@@ -92,16 +92,6 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
         return reject(declarations.error(), "reference declarations",
                       declaration_diagnostic.path().value_or(""));
     }
-    const auto count = declarations->size();
-    if (!count) {
-        return reject(count.error(), "reference declarations");
-    }
-    if (*count == 0) {
-        // All FileRef occurrences have been enumerated. The reference graph is empty.
-        std::cout << "Case validation succeeded.\n";
-        return 0;
-    }
-
     RootReferenceDiagnostic plan_diagnostic;
     auto prepared =
         prepare_root_references(std::move(*declarations),
@@ -112,27 +102,46 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
         return reject(prepared.error(), "reference paths", plan_diagnostic.pointer().value_or(""));
     }
     RootSnapshotDiagnostic snapshot_diagnostic;
-    const auto inventory =
-        acquire_root_references(input, std::move(*prepared),
-                                {{{reference_cap, reference_cap + 1, 8192, reference_cap},
-                                  maximum_references,
-                                  maximum_path},
-                                 maximum_references,
-                                 reference_total_cap,
-                                 reference_total_cap + maximum_references,
-                                 32 * kib,
-                                 reference_total_cap,
-                                 maximum_references * maximum_references},
-                                plan, stop, &snapshot_diagnostic);
-    if (!inventory) {
+    LeafReferenceDiagnostic diagnostic;
+    const auto closed = resolve_leaf_references(
+        input, std::move(*prepared),
+        {{{reference_cap, reference_cap + 1, 8192, reference_cap},
+          maximum_references,
+          maximum_path},
+         maximum_references,
+         reference_total_cap,
+         reference_total_cap + maximum_references,
+         32 * kib,
+         reference_total_cap,
+         maximum_references * maximum_references},
+        {maximum_references, maximum_references, 1, maximum_work, maximum_path},
+        {reference_cap, maximum_nodes, maximum_nodes, 4 * maximum_nodes, maximum_nodes,
+         maximum_nodes, maximum_work},
+        plan, stop, &snapshot_diagnostic, &diagnostic);
+    if (!closed) {
+        if (diagnostic.reason == LeafReferenceFailure::UnsupportedRole) {
+            return reject(closed.error(), "external reference dependency validation is unsupported",
+                          diagnostic.pointer());
+        }
+        if (diagnostic.reason == LeafReferenceFailure::Format) {
+            const auto message =
+                diagnostic.format_offset
+                    ? "Gmsh mesh format at byte " + std::to_string(*diagnostic.format_offset)
+                    : "Gmsh mesh format";
+            return reject(closed.error(), message, diagnostic.pointer());
+        }
+        if (diagnostic.reason == LeafReferenceFailure::Graph) {
+            return reject(closed.error(), "external reference dependency graph",
+                          diagnostic.pointer());
+        }
         const auto message = snapshot_diagnostic.read && snapshot_diagnostic.read->reason ==
                                                              ReferenceFileFailure::DigestMismatch
                                  ? "reference SHA-256 mismatch"
                                  : "reference acquisition";
-        return reject(inventory.error(), message, snapshot_diagnostic.pointer());
+        return reject(closed.error(), message, snapshot_diagnostic.pointer());
     }
-    return report(FailedResultExit::Input,
-                  "external reference dependency validation is unsupported");
+    std::cout << "Case validation succeeded.\n";
+    return 0;
 }
 
 } // namespace
