@@ -318,11 +318,11 @@ void certify_panel(pg::ReferenceArithmetic& m, const Domain& domain, const Piece
 }
 
 template <class Field>
-R exact(const io::SiCase& input, Field field, pg::ReferenceArithmetic& m) {
+R exact(const io::SiCase& input, Field field, pg::ReferenceArithmetic& m,
+        io::SchemaDimension expected = {{0, 0, 0, 0}}) {
     m.charge();
     const auto recipe = partition_take(input.quantity(field)).recipe;
-    constexpr io::SchemaDimension dimensionless{{0, 0, 0, 0}};
-    if (recipe.dimensions.exponents != dimensionless.exponents || recipe.pi_power != 0)
+    if (recipe.dimensions.exponents != expected.exponents || recipe.pi_power != 0)
         partition_fail(FailureCode::InvalidInput);
     const auto input_digits = std::visit(
         [](const auto& x) -> std::uint64_t {
@@ -479,6 +479,7 @@ io::schema::AeroSurface find_surface(const io::SchemaCase& source, std::uint64_t
 struct CaseMaterialChart::Data {
     CaseMaterialChartIdentity identity{{{io::SourceId{0}, 0, {}}, 0, 0}, 0, 0, 0, false};
     std::optional<structure::PgReferenceGeometry> support;
+    R geometry_error;
     core::PlannedBuffer<R> chord, span;
     core::PlannedBuffer<Piece> pieces;
 };
@@ -527,6 +528,11 @@ core::Result<CaseMaterialChart> CaseMaterialChart::prepare(const io::SiCase& sou
         result.identity = {partition_take(owner.identity()), id, shell_id,
                            surface.geometry.unsigned_value(),
                            surface.orientation.text() == "reversed"};
+        const auto policy = partition_take(owner.root()).numerics.record().patch.record();
+        const auto* active = std::get_if<io::schema::PatchPolicyActive>(&policy);
+        if (!active)
+            partition_fail(FailureCode::InvalidInput);
+        result.geometry_error = exact(source, active->geometry_error, m, {{1, 0, 0, 0}});
         const auto knots = [&](auto field) {
             auto values =
                 partition_take(plan.allocate<R>(partition_index(field.size()), operation));
@@ -577,10 +583,19 @@ core::Result<CaseMaterialChartIdentity> CaseMaterialChart::identity() const noex
     return data_.values().front().identity;
 }
 
+core::Result<const R*> CaseMaterialChart::geometry_error_metres() const& noexcept {
+    if (data_.size() != 1)
+        return std::unexpected(core::Failure{FailureCode::InvalidInput, operation});
+    return &data_.values().front().geometry_error;
+}
+
 core::Result<const structure::PgReferenceGeometry*> CaseMaterialChart::support() const& noexcept {
-    if (data_.size() == 1)
-        if (const auto& geometry = data_.values().front().support)
+    const auto values = data_.values();
+    if (values.size() == 1) {
+        const auto& geometry = values.front().support;
+        if (geometry)
             return &*geometry;
+    }
     return std::unexpected(core::Failure{FailureCode::InvalidInput, operation});
 }
 
@@ -598,8 +613,12 @@ CaseMaterialChart::collocation(core::Index chord_cell, core::Index span_cell,
         const auto j = static_cast<std::size_t>(span_cell);
         const auto chord = data.chord.values(), span = data.span.values();
         m.admit();
-        return sample(m, piece, layers[piece.layer], quarter(m, chord[i], chord[i + 1], true),
-                      middle(m, span[j], span[j + 1]));
+        auto result =
+            sample(m, piece, layers[piece.layer], quarter(m, chord[i], chord[i + 1], true),
+                   middle(m, span[j], span[j + 1]));
+        result.panel_extent = {m.sub(chord[i + 1], chord[i]), m.sub(span[j + 1], span[j])};
+        result.call_info = m.info();
+        return result;
     });
 }
 
@@ -626,8 +645,10 @@ CaseMaterialChart::vertex(core::Index chord_column, core::Index span_knot,
         m.admit();
         auto xi = chord_column == chord_last ? m.copy(chord[i])
                                              : quarter(m, chord[i], chord[i + 1], false);
-        return sample(m, piece, layers[piece.layer], std::move(xi),
-                      m.copy(span[static_cast<std::size_t>(span_knot)]));
+        auto result = sample(m, piece, layers[piece.layer], std::move(xi),
+                             m.copy(span[static_cast<std::size_t>(span_knot)]));
+        result.call_info = m.info();
+        return result;
     });
 }
 

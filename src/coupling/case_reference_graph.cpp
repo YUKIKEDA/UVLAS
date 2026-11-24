@@ -266,9 +266,10 @@ CaseReferenceSurface::evaluate(const ExactRational& chord, const ExactRational& 
             }
             return result;
         };
-        CaseReferenceSurfaceSample result{world(position, true), world(chord_tangent, false),
-                                          world(span_tangent, false)};
+        CaseReferenceSurfaceSample result{
+            world(position, true), world(chord_tangent, false), world(span_tangent, false), {}};
         m.cancel();
+        result.call_info = m.info();
         return result;
     });
 }

@@ -1,4 +1,5 @@
 #include "coupling/case_material_chart.hpp"
+#include "coupling/case_material_reference.hpp"
 #include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
 #include "io/case_schema_test_adapter.hpp"
@@ -237,7 +238,27 @@ TEST_CASE("An explicit Case PG shell owns its exact reference geometry in SI",
 TEST_CASE("Case material chart owns the selected PG and preserves both sides at a shared vertex",
           "[verification][negative][AE-02][SH-D02][FD-06][V-MULTI]") {
     auto wire = a::root("coupled_flutter");
+    wire.field("units").set("length", a::string("m"));
     auto& model = wire.field("model");
+    auto& geometry = model.field("geometry").elements.at(0);
+    geometry.set("reference_length", a::parse("2"));
+    geometry.set("frame", a::parse(R"({"origin":[3,-4,5],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    geometry.set("degree", a::parse("[0,0]"));
+    geometry.set("coefficients", a::parse("[]"));
+    geometry.field("thickness").set("values", a::parse("[0.25,0.25,0.25,0.25]"));
+    auto thin_geometry = a::parse(R"({
+        "kind":"surface_graph","id":"2","reference_length":2,
+        "frame":{"origin":[3.5,-4,4.9375],"rotation":[[1,0,0],[0,1,0],[0,0,1]]},
+        "x0":{"numerator":"0","denominator":"1"},
+        "width":{"numerator":"1","denominator":"2"},
+        "skew":{"numerator":"0","denominator":"1"},
+        "degree":[0,1],"coefficients":[
+          {"powers":[0,1],"coefficient":{"numerator":"1","denominator":"16"}}],
+        "domain":[],"boundaries":[],"continuity":[]})");
+    thin_geometry.set("domain", geometry.field("domain"));
+    thin_geometry.set("boundaries", geometry.field("boundaries"));
+    model.field("geometry").elements.push_back(std::move(thin_geometry));
+    wire.field("numerics").field("patch").set("geometry_error", a::parse("0.000001"));
     auto& layers = model.field("shells").elements.at(0).field("layers").elements;
     auto high = layers.at(0);
     layers.at(0).set(
@@ -250,6 +271,7 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
     layers.push_back(std::move(high));
     auto& surface = model.field("aero_surfaces").elements.at(0);
     surface.set("span", a::parse("[0,0.5,1]"));
+    surface.set("geometry", a::string("2"));
     auto& attachment = surface.field("attachment");
     auto piece = a::parse(R"({
         "chord_cells":[0,1],"span_cells":[0,1],"layer":"1","side":"interior","terms":[
@@ -268,9 +290,10 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
     core::ResourcePlan plan{profile};
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
     const c::CaseMaterialChartLimits limits{case_pg_reference_limits(), query_limits(), 8};
-    const auto ready = [&] {
+    const auto [ready, thin] = [&] {
         const auto si = checked_case(wire);
-        return take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+        return std::pair{take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan)),
+                         take(c::CaseReferenceSurface::prepare(si, 2, limits.chart, plan))};
     }();
     CHECK(take(ready.identity()).shell_id == 1);
     CHECK(take(ready.identity()).surface_id == 1);
@@ -293,6 +316,43 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
     CHECK(q(collocation.span_tangent[1]) == 1);
     CHECK(q(collocation.span_tangent[2]) == 1);
     CHECK(collocation.side == c::CaseMaterialSide::Interior);
+    const auto located =
+        take(c::qualify_case_material_collocation_reference(ready, thin, 0, 1, limits.chart, plan));
+    const auto scalar = [](const PgReferenceScalar& value) {
+        return q(value.rational) + q(value.radical);
+    };
+    CHECK(q(located.reference.g) == 1);
+    CHECK(q(located.reference.s) == Q{5} / 8);
+    CHECK(q(located.reference.t) == Q{3} / 4);
+    CHECK(q(located.reference.zeta) == Q{1} / 4);
+    // The flat support gives X = (3+2s, -4+2t, 5+zeta/8).
+    CHECK(scalar(located.reference.position_metres[0]) == Q{17} / 4);
+    CHECK(scalar(located.reference.position_metres[1]) == Q{-5} / 2);
+    CHECK(scalar(located.reference.position_metres[2]) == Q{161} / 32);
+    if (!located.tangents) {
+        FAIL("The PG collocation must carry its exact tangent pair");
+        return;
+    }
+    CHECK(scalar((*located.tangents)[0][0]) == 1);
+    CHECK(scalar((*located.tangents)[0][1]) == 0);
+    CHECK(scalar((*located.tangents)[0][2]) == 0);
+    CHECK(scalar((*located.tangents)[1][0]) == 0);
+    CHECK(scalar((*located.tangents)[1][1]) == 2);
+    CHECK(scalar((*located.tangents)[1][2]) == Q{1} / 8);
+    const auto left_reference =
+        take(c::qualify_case_material_vertex_reference(ready, thin, 0, 1, 0, limits.chart, plan));
+    const auto right_reference =
+        take(c::qualify_case_material_vertex_reference(ready, thin, 0, 1, 1, limits.chart, plan));
+    CHECK_FALSE(left_reference.tangents);
+    CHECK_FALSE(right_reference.tangents);
+    CHECK(std::get<PgReferenceHorizontalMeasure>(left_reference.reference.measure).side ==
+          PgPartitionFaceSide::Upper);
+    CHECK(std::get<PgReferenceHorizontalMeasure>(right_reference.reference.measure).side ==
+          PgPartitionFaceSide::Lower);
+    CHECK(left_reference.reference.partition_record != right_reference.reference.partition_record);
+    CHECK(scalar(left_reference.reference.position_metres[2]) ==
+          scalar(right_reference.reference.position_metres[2]));
+
     CHECK(q(take(ready.vertex(1, 2, 1, limits.chart, plan)).aerodynamic[0]) == 1);
     const auto misplaced = ready.vertex(0, 2, 0, limits.chart, plan);
     REQUIRE_FALSE(misplaced);
@@ -333,6 +393,26 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
         for (auto& row : attachment.field("material_map").field("pieces").elements)
             row.field("terms").elements.push_back(quadratic);
         wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("Matching point position cannot hide an incorrect material tangent") {
+        auto& independent = model.field("geometry").elements.at(1);
+        independent.set("coefficients", a::parse(R"([
+          {"powers":[0,0],"coefficient":{"numerator":"-3","denominator":"64"}},
+          {"powers":[0,1],"coefficient":{"numerator":"1","denominator":"8"}}])"));
+        const auto si = checked_case(wire);
+        const auto new_ready = take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+        const auto new_thin = take(c::CaseReferenceSurface::prepare(si, 2, limits.chart, plan));
+        const auto at_same_position = take(new_thin.evaluate(
+            located.chart.aerodynamic[0], located.chart.aerodynamic[1], limits.chart, plan));
+        CHECK(q(at_same_position.position[2]) == Q{161} / 32);
+        const auto stale = c::qualify_case_material_collocation_reference(ready, new_thin, 0, 1,
+                                                                          limits.chart, plan);
+        REQUIRE_FALSE(stale);
+        CHECK(stale.error().code == core::FailureCode::StaleGeneration);
+        const auto mismatch = c::qualify_case_material_collocation_reference(new_ready, new_thin, 0,
+                                                                             1, limits.chart, plan);
+        REQUIRE_FALSE(mismatch);
+        CHECK(mismatch.error().code == core::FailureCode::GeometryInvalid);
     }
     SECTION("The subdivision allowance distinguishes uncertainty from a proved domain") {
         const auto nonlinear = a::parse(R"([

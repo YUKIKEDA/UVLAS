@@ -152,6 +152,7 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
                          src/coupling/pg_aero_attachment.cpp
                          src/coupling/case_reference_graph.cpp
                          src/coupling/case_material_chart.cpp
+                         src/coupling/case_material_reference.cpp
     src/coupling/fixed_bdf2_circulation.cpp
     src/coupling/fixed_wake_transport.cpp
     src/coupling/case_known_flow.cpp

@@ -11,7 +11,7 @@ enum class CaseMaterialSide : std::uint8_t { Interior, Lower, Upper };
 struct CaseMaterialChartLimits {
     CasePgReferenceLimits support;
     structure::PgReferenceLimits chart;
-    std::uint64_t maximum_subdivisions; ///< Shared across the aerodynamic surface.
+    std::uint64_t maximum_subdivisions{}; ///< Shared across the aerodynamic surface.
 };
 
 struct CaseMaterialChartIdentity {
@@ -23,10 +23,11 @@ struct CaseMaterialChartIdentity {
 };
 
 struct CaseMaterialChartPoint {
-    std::array<structure::ExactRational, 2> aerodynamic;
+    std::array<structure::ExactRational, 2> aerodynamic, panel_extent;
     std::array<structure::ExactRational, 3> material, chord_tangent, span_tangent;
     core::LayerId layer{0};
     CaseMaterialSide side{};
+    structure::PgReferenceCallInfo call_info;
 };
 
 /// Own the fixed Case material map and the physical reference selected from the same Case.
@@ -42,6 +43,10 @@ public:
     prepare(const io::SiCase&, std::uint64_t surface_id, const CaseMaterialChartLimits&,
             core::Workspace&, core::ResourcePlan&) noexcept;
     [[nodiscard]] core::Result<CaseMaterialChartIdentity> identity() const noexcept;
+    [[nodiscard]] core::Result<const structure::ExactRational*>
+    geometry_error_metres() const& noexcept;
+    [[nodiscard]] core::Result<const structure::ExactRational*>
+    geometry_error_metres() const&& = delete;
     [[nodiscard]] core::Result<const structure::PgReferenceGeometry*> support() const& noexcept;
     [[nodiscard]] core::Result<const structure::PgReferenceGeometry*> support() const&& = delete;
 

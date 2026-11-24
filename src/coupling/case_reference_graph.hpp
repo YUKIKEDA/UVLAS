@@ -10,6 +10,7 @@ struct CaseReferenceSurfaceSample {
     std::array<structure::ExactRational, 3> position;
     std::array<structure::ExactRational, 3> chord_tangent;
     std::array<structure::ExactRational, 3> span_tangent;
+    structure::PgReferenceCallInfo call_info;
 };
 
 struct CaseReferenceSurfaceIdentity {
