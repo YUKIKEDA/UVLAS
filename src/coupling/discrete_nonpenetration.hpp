@@ -282,4 +282,80 @@ solve_discrete_circulation_linearization(const DiscreteCirculation&, Circulation
                                          std::span<const CirculationLinearRhs>,
                                          const DiscreteCirculationRequest&, std::uint64_t max_steps,
                                          core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+struct CirculationCollocationDirection {
+    CirculationCollocationDirection(aero::detail::PhysicalFaceId id,
+                                    const std::optional<NonpenetrationVector>& query,
+                                    const std::array<NonpenetrationVector, 2>& frame,
+                                    const NonpenetrationVector& motion) noexcept
+        : face(id), free_query(query), tangents(frame), velocity(motion) {}
+    aero::detail::PhysicalFaceId face;
+    std::optional<NonpenetrationVector> free_query; ///< Present only for a free query.
+    std::array<NonpenetrationVector, 2> tangents;   ///< Variations of the original two tangents.
+    NonpenetrationVector velocity;                  ///< Explicit variation of wing velocity, m/s.
+};
+
+struct DiscreteCirculationDirection {
+    DiscreteCirculationDirection(std::span<const aero::detail::PointId> vertices,
+                                 std::span<const NonpenetrationVector> positions,
+                                 std::span<const CirculationCollocationDirection> collocations,
+                                 const NonpenetrationVector& flow) noexcept
+        : points(vertices), displacements(positions), rows(collocations), uniform_flow(flow) {}
+    std::span<const aero::detail::PointId> points;       ///< All canonical IDs in ascending order.
+    std::span<const NonpenetrationVector> displacements; ///< SI position directions in point order.
+    std::span<const CirculationCollocationDirection> rows; ///< Ascending bound physical face IDs.
+    NonpenetrationVector uniform_flow; ///< Uniform velocity variation at fixed time, m/s.
+};
+
+struct CirculationForcingRow {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScaledEnclosure residual_direction; ///< Fixed-circulation δR, in m/s.
+};
+
+/// Own the original solution, directional forcing, and qualified implicit tangent.
+class DiscreteCirculationDirectionalSolve {
+public:
+    DiscreteCirculationDirectionalSolve(DiscreteCirculationDirectionalSolve&&) noexcept = default;
+    DiscreteCirculationDirectionalSolve&
+    operator=(DiscreteCirculationDirectionalSolve&&) noexcept = default;
+    DiscreteCirculationDirectionalSolve(const DiscreteCirculationDirectionalSolve&) = delete;
+    DiscreteCirculationDirectionalSolve&
+    operator=(const DiscreteCirculationDirectionalSolve&) = delete;
+    [[nodiscard]] const DiscreteCirculation& primal() const& noexcept {
+        return primal_;
+    }
+    [[nodiscard]] const DiscreteCirculation& primal() const&& = delete;
+    [[nodiscard]] const DiscreteCirculationLinearization& tangent() const& noexcept {
+        return tangent_;
+    }
+    [[nodiscard]] const DiscreteCirculationLinearization& tangent() const&& = delete;
+    [[nodiscard]] core::Result<CirculationForcingRow> forcing(std::size_t) const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return steps_;
+    }
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationDirectionalSolve(DiscreteCirculation&&, DiscreteCirculationLinearization&&,
+                                        core::PlannedBuffer<std::optional<CirculationForcingRow>>,
+                                        std::uint64_t) noexcept;
+    DiscreteCirculation primal_;
+    DiscreteCirculationLinearization tangent_;
+    core::PlannedBuffer<std::optional<CirculationForcingRow>> forcing_;
+    std::uint64_t steps_;
+};
+
+/// Solve the primal and its fixed-contact-chart direction in one transaction.
+/// The strength used for the geometry JVP is the attained circulation, including
+/// signed attached wake fronts and fixed history. The unprojected δR enclosure
+/// is checked with the attained tangent. Both use limits.steps cumulatively.
+/// Time, radius and old wake strengths are fixed. No PG mapping is inferred.
+/// Consume the supplied flow only once both original residual checks succeed.
+[[nodiscard]] core::Result<DiscreteCirculationDirectionalSolve>
+solve_discrete_circulation_direction(
+    const DiscreteNonpenetrationInput&, const DiscreteCirculationDirection&,
+    ProjectedCaseUniformFlow&&, const DiscreteNonpenetrationLimits&,
+    const DiscreteCirculationRequest& primal, const DiscreteCirculationRequest& tangent,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail
