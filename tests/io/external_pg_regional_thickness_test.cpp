@@ -159,7 +159,7 @@ TEST_CASE("Regional exterior thickness is compared only over positive exact over
     CHECK(verified.sidecar_node == 4);
     CHECK(verified.winding ==
           (reversed ? ExternalPgWinding::Reversed : ExternalPgWinding::Forward));
-    CHECK(verified.value_metres == one);
+    CHECK(std::get<ExactRational>(verified.value_metres) == one);
     CHECK(verified.twice_chart_area == one);
     CHECK(verified.pieces > 0);
     CHECK(verified.vertices >= 3 * verified.pieces);
@@ -208,4 +208,111 @@ TEST_CASE("Regional exterior thickness is compared only over positive exact over
     CHECK(stale.error().code == Code::StaleGeneration);
 }
 
+[[nodiscard]] ExternalPlanarPg quad_geometry(const PgReferenceGeometry& reference,
+                                             const partition_test::Fixture& coordinates, bool skew,
+                                             bool reversed, const ExternalPgLimits& limits,
+                                             core::ResourcePlan& plan) {
+    const auto raw = std::string{"$MeshFormat\n4.1 0 8\n$EndMeshFormat\n$Nodes\n1 4 1 4\n"
+                                 "2 17 0 4\n1\n2\n3\n4\n0 0 0\n1 0 0\n"} +
+                     (skew ? "1 0.5 0\n" : "1 1 0\n") +
+                     "0 1 0\n$EndNodes\n$Elements\n1 1 19 19\n2 17 3 1\n" +
+                     (reversed ? "19 1 4 3 2\n" : "19 1 2 3 4\n") + "$EndElements\n";
+    const auto msh = source(raw, plan);
+    const std::array<std::uint64_t, 1> tags{19};
+    const auto topology =
+        take(GmshSurfaceTopology::prepare(msh, tags, {8, 16, 16, 4, 32'000}, plan, {}));
+    const auto& pts = coordinates.domain;
+    const auto first = reversed ? 3U : 1U;
+    const auto last = reversed ? 1U : 3U;
+    const std::array ring{ExternalPgCorner{1, pts[0]}, ExternalPgCorner{first + 1, pts[first]},
+                          ExternalPgCorner{3, pts[2]}, ExternalPgCorner{last + 1, pts[last]}};
+    const auto winding = reversed ? ExternalPgWinding::Reversed : ExternalPgWinding::Forward;
+    const std::array faces{ExternalPgFace{19, winding, ring}};
+    return take(ExternalPlanarPg::prepare(reference, msh, topology, SiLengthUnit::Metre, faces,
+                                          limits, plan));
+}
+
+TEST_CASE("Original quadrilateral thickness must agree as a bilinear field",
+          "[FD-03][IO4-03][R-05][N4-02][integration][verification][negative]") {
+    bool split_would_hide = false;
+    bool reversed = false;
+    bool wrong_order = false;
+    SECTION("A non-parallelogram represents a common affine physical thickness") {}
+    SECTION("Reverse winding retains the original node thickness order") {
+        reversed = true;
+    }
+    SECTION("Triangulating would hide an interior mismatch with identical corner values") {
+        split_would_hide = true;
+    }
+    SECTION("A reordered corner claim cannot attach source thickness to the wrong node") {
+        wrong_order = true;
+    }
+
+    partition_test::Fixture input;
+    if (!split_would_hide) {
+        input.domain[2] = {input.r("1"), input.r("1", "2")};
+        input.heights[1] = input.r("2");
+        input.heights[2] = input.r("3");
+        input.heights[3] = input.r("2");
+    }
+    core::ResourcePlan plan{partition_test::cap};
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const auto reference = pg(input, split_would_hide, arithmetic, plan);
+    const auto geometry_record =
+        quad_geometry(reference, input, !split_would_hide, reversed, {arithmetic, 4}, plan);
+    const std::array thickness{input.r("1"), input.r(split_would_hide ? "1" : "2"),
+                               split_would_hide ? input.r("1") : input.r("5", "2"), input.r("2")};
+    constexpr std::array<std::uint64_t, 4> direct_order{1, 2, 3, 4};
+    constexpr std::array<std::uint64_t, 4> reverse_order{1, 4, 3, 2};
+    const auto& order = reversed ? reverse_order : direct_order;
+    std::array<ExternalPgCornerThicknessClaim, 4> source_fields{};
+    for (std::size_t i = 0; i < order.size(); ++i) {
+        source_fields[i] = {order[i], &thickness[static_cast<std::size_t>(order[i] - 1)],
+                            NastranBulkPosition{100 + i, 2, 4 + i}};
+    }
+    if (wrong_order) {
+        source_fields[0].node = 2;
+    }
+    const std::array claims{ExternalPgThicknessClaim{19, source_fields, 27}};
+    std::optional<ExternalPgThicknessDiagnostic> diagnostic;
+    const auto result = compare_external_pg_regional_thickness(
+        geometry_record, reference, claims, {arithmetic, 1, 4}, plan, &diagnostic);
+    if (split_would_hide || wrong_order) {
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code == Code::InvalidInput);
+        if (const auto& failure = diagnostic) {
+            CHECK(failure->element == 19);
+            CHECK(failure->sidecar_node == 27);
+            if (wrong_order) {
+                CHECK(failure->reason == ExternalPgThicknessFailure::Selection);
+                CHECK(failure->node == 2);
+                CHECK(failure->field == source_fields.front().field);
+            } else {
+                // On the lower Case triangle at (3/4,1/4), the Case is 1 and
+                // the original bilinear field is 1+(1-3/4)*(1/4)=17/16.
+                CHECK(failure->reason == ExternalPgThicknessFailure::Difference);
+                CHECK(failure->case_triangle);
+                CHECK_FALSE(failure->overlap_vertex);
+                CHECK(failure->field);
+                CHECK((failure->node == 2 || failure->node == 4));
+            }
+        } else {
+            FAIL("Missing original thickness field diagnostic");
+        }
+        return;
+    }
+    REQUIRE(result);
+    CHECK_FALSE(diagnostic);
+    REQUIRE(result->matches.size() == 1);
+    const auto& face = result->matches.values().front();
+    CHECK(face.twice_chart_area == input.r("3", "2"));
+    const auto* nodal = std::get_if<ExternalPgNodalThickness>(&face.value_metres);
+    REQUIRE(nodal != nullptr);
+    CHECK(nodal->count == 4);
+    for (std::size_t i = 0; i < order.size(); ++i) {
+        CHECK(nodal->values[i].node == order[i]);
+        CHECK(nodal->values[i].value_metres == *source_fields[i].value_metres);
+        CHECK(nodal->values[i].field == source_fields[i].field);
+    }
+}
 } // namespace
