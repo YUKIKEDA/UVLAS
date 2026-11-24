@@ -99,7 +99,9 @@ TEST_CASE("Nastran shells preserve ordered corner identities, PSHELL and PCOMP a
         fixed("+TRI", {"", "0", "0.0", "1.25-3", ""}) +
         fixed("CQUAD4*", {"11", "40", "41", "22"}, 16, "*Q1") +
         fixed("*Q1", {"17", "8", "9", ""}, 16, "*Q2") + fixed("*Q2", {"", "", "", ""}, 16, "*Q3") +
-        fixed("*Q3", {}, 16) + std::string{grids} +
+        fixed("*Q3", {}, 16) +
+        "GRID,17\nGRID,8\nGRID,41\n"
+        "GRID*,22,,1.25D+1,-2.0,\n*,3.0\n"
         "PSHELL,10,31,0.2\nPCOMP,40\n"
         "CORD2R,9,,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0\n";
     core::ResourcePlan plan{memory};
@@ -152,6 +154,11 @@ TEST_CASE("Nastran shells preserve ordered corner identities, PSHELL and PCOMP a
     const auto& quad_corners = std::get<std::array<NastranShellCorner, 4>>(quad.corners);
     CHECK(quad_corners[0].id == NastranGridId{41});
     CHECK(quad_corners[1].id == NastranGridId{22});
+    REQUIRE(quad_corners[1].grid_ordinal < view.input.grids.size());
+    const auto& large_point = view.input.grids[quad_corners[1].grid_ordinal];
+    CHECK(large_point.id == NastranGridId{22});
+    CHECK(large_point.position[0].decimal() == "1.25e+1");
+    CHECK(large_point.position[2].decimal() == "3.0");
     CHECK(quad_corners[2].id == NastranGridId{17});
     CHECK(quad_corners[3].id == NastranGridId{8});
     const auto axis = std::get<NastranShellMaterialAxis>(quad.orientation);
