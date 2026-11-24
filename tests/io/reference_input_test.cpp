@@ -1519,6 +1519,7 @@ $EndElements
     bool thickness_shift = false;
     bool material_shift = false;
     bool chart_shift = false;
+    bool frame_shift = false;
     bool conversion = false;
     bool distance_short = false;
     bool normal_short = false;
@@ -1580,6 +1581,11 @@ $EndElements
         physical = true;
         thickness_shift = true;
         chart_shift = true;
+    }
+    SECTION("A translated Case frame cannot qualify the unchanged Gmsh source") {
+        is_gmsh = true;
+        physical = true;
+        frame_shift = true;
     }
     SECTION("Nastran admitted planes compare PSHELL thickness and explicit MAT1 quantities") {
         physical = true;
@@ -1764,6 +1770,13 @@ $EndElements
         .elements[0]
         .field("thickness")
         .set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    if (frame_shift) {
+        config.field("model")
+            .field("geometry")
+            .elements.front()
+            .field("frame")
+            .set("origin", fixture::json("[0,0,0.05]"));
+    }
     if (pcomp) {
         auto orthotropic = fixture::fragment("Material.orthotropic3d");
         orthotropic.set("id", fixture::json(R"("2")"));
@@ -2001,11 +2014,12 @@ $EndElements
             } else {
                 FAIL("Missing mapped material disagreement");
             }
-        } else if (material_shift || thickness_shift) {
+        } else if (material_shift || thickness_shift || frame_shift) {
             REQUIRE_FALSE(qualified);
-            CHECK(qualified.error().code == (chart_shift ? core::FailureCode::GeometryInvalid
-                                                         : core::FailureCode::InvalidInput));
-            if (chart_shift) {
+            CHECK(qualified.error().code == ((chart_shift || frame_shift)
+                                                 ? core::FailureCode::GeometryInvalid
+                                                 : core::FailureCode::InvalidInput));
+            if (chart_shift || frame_shift) {
                 CHECK(failure.geometry.has_value());
                 CHECK_FALSE(failure.quantity.has_value());
             } else if (const auto& mismatch = failure.quantity) {
