@@ -49,6 +49,7 @@ struct Fields {
     std::span<const Lexeme> fields;
     std::size_t used;
     Lexeme card;
+    NastranBulkFormat format;
 
     [[nodiscard]] std::optional<Lexeme> at(std::size_t index) const noexcept {
         return index < fields.size() ? std::optional{fields[index]} : std::nullopt;
@@ -62,6 +63,8 @@ struct Fields {
     }
 
     [[nodiscard]] std::uint64_t positive(Lexeme field) const {
+        if (format == NastranBulkFormat::Free && field.size > 8)
+            reject(Reason::InvalidField, field.position);
         const auto value = bulk.integer(field);
         if (!value || *value < 1)
             reject(Reason::InvalidField, field.position);
@@ -90,7 +93,7 @@ void read_spc(const Fields& input, NastranSupportSetId set, Lexeme set_field, Wo
               Emit emit) {
     if (input.used > 7)
         reject(Reason::ExtraField, input.fields[7].position);
-    for (std::size_t index : {std::size_t{1}, std::size_t{4}}) {
+    for (const std::size_t index : {std::size_t{1}, std::size_t{4}}) {
         work.visit(input.card.position);
         if (index == 4 && input.used <= index)
             break;
@@ -106,7 +109,7 @@ void read_spc(const Fields& input, NastranSupportSetId set, Lexeme set_field, Wo
         }
         emit(NastranSupportTerm{
             set, NastranSupportPoint{NastranGridId{input.positive(grid)}, grid, 0},
-            input.components(flags), input.card, set_field, flags, motion, std::move(prescribed)});
+            input.components(flags), input.card, set_field, flags, motion, prescribed});
     }
 }
 
@@ -165,7 +168,7 @@ void read_cards(const NastranBulkView& bulk, Work& work, Term term, Member membe
             work.visit(data[used - 1].position);
             --used;
         }
-        const Fields input{bulk, data, used, card.name};
+        const Fields input{bulk, data, used, card.name, card.format};
         const auto sid = input.required(0);
         const NastranSupportSetId set{input.positive(sid)};
         if (spc) {
@@ -296,10 +299,7 @@ NastranSupportCards::NastranSupportCards(NastranSupportOrigin source,
                                          core::PlannedBuffer<NastranSupportTerm>&& terms,
                                          core::PlannedBuffer<NastranSupportUnionMember>&& members,
                                          std::uint64_t work) noexcept
-    : source_(std::move(source)),
-      terms_(std::move(terms)),
-      members_(std::move(members)),
-      work_(work) {}
+    : source_(source), terms_(std::move(terms)), members_(std::move(members)), work_(work) {}
 
 NastranSupportCards::NastranSupportCards(NastranSupportCards&& other) noexcept
     : source_(std::exchange(other.source_, std::nullopt)),
@@ -333,11 +333,9 @@ NastranSupportCards::prepare(const NastranCoordinateCards& coordinates, NastranS
         std::size_t member_slot = 0;
         read_cards(
             source->bulk, work,
-            [&](NastranSupportTerm term) {
-                recorded_terms.values()[term_slot++] = std::move(term);
-            },
-            [&](NastranSupportUnionMember member) {
-                recorded_members.values()[member_slot++] = std::move(member);
+            [&](const NastranSupportTerm& term) { recorded_terms.values()[term_slot++] = term; },
+            [&](const NastranSupportUnionMember& member) {
+                recorded_members.values()[member_slot++] = member;
             });
         resolve_points(recorded_terms.values(), source->grids, work, memory);
         resolve_unions(recorded_terms.values(), recorded_members.values(), work, memory);

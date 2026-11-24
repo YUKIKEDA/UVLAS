@@ -314,15 +314,15 @@ TEST_CASE("Nastran structural supports preserve prescribed motion, THRU and set 
     const auto source = std::string{grids} + "SPC,10,17,135,-2.5D+1,8,46,\n"
                                              "SPC1,30,26,7,THRU,24\n"
                                              "SPC1,30,126,41,22\n"
-                                             "SPCADD,100,30,10\n";
+                                             "SPC1,100,1,17\nSPCADD,100,30,10\n";
     const auto parent = coordinates(source);
     const auto parent_view = take(parent.view());
     core::ResourcePlan plan{memory};
-    auto resolved = take(NastranSupportCards::prepare(parent, {5, 2, 10000}, plan, {}));
+    auto resolved = take(NastranSupportCards::prepare(parent, {6, 2, 10000}, plan, {}));
     const auto initial = take(resolved.view());
     CHECK(initial.source.digest == parent_view.bulk.digest);
     CHECK(initial.source.location.source == parent_view.bulk.location.source);
-    REQUIRE(initial.terms.size() == 5);
+    REQUIRE(initial.terms.size() == 6);
     REQUIRE(initial.union_members.size() == 2);
     CHECK(initial.terms[0].set == NastranSupportSetId{10});
     CHECK(initial.terms[0].components == 0b010101);
@@ -341,6 +341,7 @@ TEST_CASE("Nastran structural supports preserve prescribed motion, THRU and set 
     CHECK(parent_view.bulk.text(range.thru_field) == "THRU");
     CHECK(std::get<NastranSupportPoint>(initial.terms[3].target).grid == NastranGridId{41});
     CHECK(std::get<NastranSupportPoint>(initial.terms[4].target).grid == NastranGridId{22});
+    CHECK(initial.terms[5].set == NastranSupportSetId{100});
     CHECK(initial.union_members[0].combination == NastranSupportSetId{100});
     CHECK(initial.union_members[0].member == NastranSupportSetId{30});
     CHECK(initial.union_members[1].member == NastranSupportSetId{10});
@@ -349,18 +350,18 @@ TEST_CASE("Nastran structural supports preserve prescribed motion, THRU and set 
     const auto moved = std::move(resolved);
     // NOLINTNEXTLINE(bugprone-use-after-move): moving invalidates the old support view.
     CHECK_FALSE(resolved.view());
-    CHECK(take(moved.view()).terms.size() == 5);
+    CHECK(take(moved.view()).terms.size() == 6);
 
     core::ResourcePlan exact{plan.allocated_bytes()};
-    CHECK(NastranSupportCards::prepare(parent, {5, 2, initial.work}, exact, {}));
+    CHECK(NastranSupportCards::prepare(parent, {6, 2, initial.work}, exact, {}));
     core::ResourcePlan constrained{plan.allocated_bytes() - 1};
     const auto short_memory =
-        NastranSupportCards::prepare(parent, {5, 2, initial.work}, constrained, {});
+        NastranSupportCards::prepare(parent, {6, 2, initial.work}, constrained, {});
     REQUIRE_FALSE(short_memory);
     CHECK(short_memory.error().code == ResourceExceeded);
     core::ResourcePlan enough{memory};
     const auto short_work =
-        NastranSupportCards::prepare(parent, {5, 2, initial.work - 1}, enough, {});
+        NastranSupportCards::prepare(parent, {6, 2, initial.work - 1}, enough, {});
     REQUIRE_FALSE(short_work);
     CHECK(short_work.error().code == ResourceExceeded);
     // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop is non-const.
@@ -368,7 +369,7 @@ TEST_CASE("Nastran structural supports preserve prescribed motion, THRU and set 
     REQUIRE(stop.request_stop());
     core::ResourcePlan no_memory{0};
     const auto cancelled =
-        NastranSupportCards::prepare(parent, {5, 2, initial.work}, no_memory, stop.get_token());
+        NastranSupportCards::prepare(parent, {6, 2, initial.work}, no_memory, stop.get_token());
     REQUIRE_FALSE(cancelled);
     CHECK(cancelled.error().code == Cancelled);
     CHECK(no_memory.allocated_bytes() == 0);
@@ -398,6 +399,11 @@ TEST_CASE("Nastran structural supports diagnose invalid references before return
         input = "SPC,10,17,1,TRU";
         reason = SupportIssue::InvalidField;
     }
+    SECTION("small-width free integer fields have at most eight characters") {
+        input = "SPC1,123456789,1,17";
+        reason = SupportIssue::InvalidField;
+        expected_column = 6;
+    }
     SECTION("unsupported nesting") {
         input = "SPCADD,30,20\nSPCADD,20,10\nSPC1,10,2,17";
         reason = SupportIssue::NestedCombination;
@@ -422,11 +428,11 @@ TEST_CASE("Nastran structural supports diagnose invalid references before return
     std::optional<NastranSupportDiagnostic> diagnostic;
     const auto result = NastranSupportCards::prepare(parent, {8, 8, 10000}, plan, {}, &diagnostic);
     REQUIRE_FALSE(result);
-    REQUIRE(diagnostic);
-    CHECK(diagnostic->reason == reason);
-    CHECK(diagnostic->position.line == expected_line);
+    const auto recorded = take(diagnostic);
+    CHECK(recorded.reason == reason);
+    CHECK(recorded.position.line == expected_line);
     if (expected_column)
-        CHECK(diagnostic->position.column == *expected_column);
+        CHECK(recorded.position.column == *expected_column);
     CHECK(take(parent.view()).bulk.bytes == source);
 }
 
