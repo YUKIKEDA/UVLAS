@@ -2,8 +2,8 @@
 import argparse
 import hashlib
 import json
-from pathlib import Path
 import re
+from pathlib import Path
 
 
 def split_fields(text):
@@ -73,7 +73,10 @@ def main():
     sources[contract.name] = hashlib.sha256(contract.read_bytes()).hexdigest()
     contract_text = contract.read_text(encoding='utf-8')
     assert '`{numerator: Text, denominator: Text}`' in contract_text
-    assert '`{source_id: Id<Source>, path: Text, sha256: Digest, role: Tag{指定role}}`' in contract_text
+    file_reference = (
+        '`{source_id: Id<Source>, path: Text, sha256: Digest, role: Tag{指定role}}`'
+    )
+    assert file_reference in contract_text
     expected['Rational'] = [{'name': key, 'optional': False, 'spelling': 'Text'}
                             for key in ('numerator', 'denominator')]
     expected['FileReference'] = [

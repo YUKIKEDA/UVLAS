@@ -15,7 +15,7 @@
 | DIST-02 | [product-requirements.md:46](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | ENV-01 | [product-requirements.md:40](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | ENV-02 | [product-requirements.md:41](../requirements/product-requirements.md) | 0 | 0 | 0 |
-| GEO-01 | [product-requirements.md:19](../requirements/product-requirements.md) | 2 | 1 | 0 |
+| GEO-01 | [product-requirements.md:19](../requirements/product-requirements.md) | 3 | 2 | 0 |
 | IO-01 | [product-requirements.md:33](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | IO-02 | [product-requirements.md:34](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | IO-03 | [product-requirements.md:35](../requirements/product-requirements.md) | 0 | 0 | 0 |
@@ -51,7 +51,7 @@
 | ID | 定義 | 試験 | 記録 | コード |
 |---|---|---:|---:|---:|
 | AE-01 | [uvlm-integrated-specification.md:1](../specs/aero/uvlm-integrated-specification.md) | 0 | 0 | 0 |
-| AE-02 | [design-decisions.md:55](../specs/design-decisions.md) | 2 | 3 | 0 |
+| AE-02 | [design-decisions.md:55](../specs/design-decisions.md) | 5 | 4 | 0 |
 | AE-03 | [design-decisions.md:56](../specs/design-decisions.md) | 0 | 0 | 0 |
 | AE-04 | [design-decisions.md:57](../specs/design-decisions.md) | 0 | 0 | 0 |
 | AE-05 | [design-decisions.md:58](../specs/design-decisions.md) | 0 | 0 | 0 |
@@ -94,14 +94,14 @@
 | FD-03 | [case-schema-fields.md:46](../specs/foundation/case-schema-fields.md) | 0 | 1 | 0 |
 | FD-04 | [case-schema-fields.md:63](../specs/foundation/case-schema-fields.md) | 0 | 1 | 1 |
 | FD-05 | [case-schema-fields.md:83](../specs/foundation/case-schema-fields.md) | 1 | 1 | 0 |
-| FD-06 | [case-schema-fields.md:108](../specs/foundation/case-schema-fields.md) | 12 | 4 | 1 |
-| FD-07 | [case-schema-fields.md:131](../specs/foundation/case-schema-fields.md) | 4 | 5 | 0 |
-| FD-08 | [case-schema-fields.md:156](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| FD-09 | [case-schema-fields.md:179](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| FD-10 | [case-schema-fields.md:228](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| FD-11 | [case-schema-fields.md:316](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| FD-12 | [case-schema-fields.md:330](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 183 | 48 | 0 |
+| FD-06 | [case-schema-fields.md:108](../specs/foundation/case-schema-fields.md) | 15 | 5 | 1 |
+| FD-07 | [case-schema-fields.md:134](../specs/foundation/case-schema-fields.md) | 4 | 5 | 0 |
+| FD-08 | [case-schema-fields.md:159](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-09 | [case-schema-fields.md:182](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-10 | [case-schema-fields.md:231](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-11 | [case-schema-fields.md:319](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-12 | [case-schema-fields.md:333](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 185 | 49 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 13 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 71 | 19 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 26 | 11 | 0 |
@@ -230,10 +230,10 @@
 | IM-00 | [design-decisions.md:4](../specs/design-decisions.md) | 0 | 0 | 0 |
 | IM-01 | [implementation-start-review.md:40](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | IM-02 | [implementation-start-review.md:41](../plans/implementation-start-review.md) | 0 | 0 | 0 |
-| IM-03 | [implementation-start-review.md:42](../plans/implementation-start-review.md) | 0 | 0 | 0 |
+| IM-03 | [implementation-start-review.md:42](../plans/implementation-start-review.md) | 0 | 1 | 0 |
 | IM-04 | [implementation-start-review.md:43](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | IM-05 | [implementation-start-review.md:44](../plans/implementation-start-review.md) | 0 | 0 | 0 |
-| IM-06 | [implementation-start-review.md:45](../plans/implementation-start-review.md) | 0 | 0 | 0 |
+| IM-06 | [implementation-start-review.md:45](../plans/implementation-start-review.md) | 0 | 1 | 0 |
 | IM-07 | [implementation-start-review.md:46](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | IM-08 | [implementation-start-review.md:47](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 
