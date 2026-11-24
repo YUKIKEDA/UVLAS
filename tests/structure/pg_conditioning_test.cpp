@@ -599,41 +599,43 @@ void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certifi
                              PgReferenceVolumePoint{0, third, third, third}};
     const auto request_limits = query_limits();
     const auto prepare = [&](const PgVolumeMassProjection& policy, const PgReferenceLimits& caps,
-                             core::ResourcePlan& plan) {
-        return PgVolumeMassReference::prepare(std::move(certificate), queries, policy, caps, plan);
+                             core::ResourcePlan& plan,
+                             std::span<const PgReferenceVolumePoint> points) {
+        return PgVolumeMassReference::prepare(std::move(certificate), points, policy, caps, plan);
     };
     if (negative_controls) {
         core::ResourcePlan none{0};
         auto invalid = projection;
         invalid.representation = static_cast<core::Precision>(255);
-        check_failure(prepare(invalid, request_limits, none),
+        check_failure(prepare(invalid, request_limits, none, queries),
                       core::FailureCode::PrecisionUnsupported);
         invalid = projection;
         invalid.maximum_shape_error = -0x1p-1074;
-        check_failure(prepare(invalid, request_limits, none), core::FailureCode::InvalidInput);
+        check_failure(prepare(invalid, request_limits, none, queries),
+                      core::FailureCode::InvalidInput);
         invalid.maximum_shape_error = std::numeric_limits<double>::infinity();
-        check_failure(prepare(invalid, request_limits, none), core::FailureCode::Nonfinite);
+        check_failure(prepare(invalid, request_limits, none, queries),
+                      core::FailureCode::Nonfinite);
         auto stopped = request_limits;
         stopped.cancellation = requested_stop_token();
-        check_failure(prepare(projection, stopped, none), core::FailureCode::Cancelled);
-        check_failure(prepare(projection, request_limits, none),
+        check_failure(prepare(projection, stopped, none, queries), core::FailureCode::Cancelled);
+        check_failure(prepare(projection, request_limits, none, queries),
                       core::FailureCode::ResourceExceeded);
         CHECK(none.allocated_bytes() == 0);
         auto zero_work = request_limits;
         zero_work.maximum_partition_visits = 0;
         core::ResourcePlan work_reject{profile};
-        check_failure(prepare(projection, zero_work, work_reject),
+        check_failure(prepare(projection, zero_work, work_reject, queries),
                       core::FailureCode::ResourceExceeded);
         CHECK(work_reject.allocated_bytes() == 0);
         auto strict = projection;
         strict.maximum_volume_jacobian_error_metres_cubed = 0;
         core::ResourcePlan reject{profile};
-        check_failure(prepare(strict, request_limits, reject),
+        check_failure(prepare(strict, request_limits, reject, queries),
                       core::FailureCode::PrecisionUnresolved);
         const std::array invalid_query{queries.front(),
                                        PgReferenceVolumePoint{-1, third, third, third}};
-        check_failure(PgVolumeMassReference::prepare(std::move(certificate), invalid_query,
-                                                     projection, request_limits, reject),
+        check_failure(prepare(projection, request_limits, reject, invalid_query),
                       core::FailureCode::InvalidInput);
         REQUIRE(certificate.info());
     }
@@ -658,7 +660,7 @@ void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certifi
     }
     const auto result = [&] {
         core::ResourcePlan evaluation{profile};
-        auto retained = take(prepare(projection, request_limits, evaluation));
+        auto retained = take(prepare(projection, request_limits, evaluation, queries));
         CHECK(retained.call_info().allocated_owned_payload_bytes == evaluation.allocated_bytes());
         return retained;
     }();
