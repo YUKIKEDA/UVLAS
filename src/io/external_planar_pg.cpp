@@ -2,9 +2,14 @@
 
 #include "../structure/pg_conditioning_factor.hpp"
 #include "../structure/pg_reference_arithmetic.hpp"
+#include "nastran_position_arithmetic.hpp"
+#include "nastran_position_enclosures.hpp"
 
 #include <algorithm>
 #include <compare>
+#include <stdexcept>
+#include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace uvlas::io::detail {
@@ -18,7 +23,6 @@ using Point = structure::PgPartitionPoint;
 using Rational = structure::ExactRational;
 using Code = core::FailureCode;
 using Reason = ExternalPgFailure;
-using Ring = std::span<const ExternalPgOwnedCorner>;
 using Triangle = std::array<const Point*, 3>;
 using Position = std::array<Rational, 3>;
 constexpr auto operation = core::Operation::PrepareModel;
@@ -225,13 +229,12 @@ rectangular(ReferenceArithmetic& math, const Diagnostic& diag, const NastranCoor
     return {math.copy(p.s), math.copy(p.t)};
 }
 
-[[nodiscard]] const Point& positive_corner(const ExternalPgOwnedFace& face,
-                                           std::size_t i) noexcept {
+[[nodiscard]] const Point& positive_corner(const auto& face, std::size_t i) noexcept {
     const auto n = static_cast<std::size_t>(face.count);
     return face.corners[face.winding == ExternalPgWinding::Forward ? i : (n - i) % n].chart;
 }
 
-[[nodiscard]] Rational area2(ReferenceArithmetic& math, const ExternalPgOwnedFace& face) {
+[[nodiscard]] Rational area2(ReferenceArithmetic& math, const auto& face) {
     Rational sum;
     const auto count = static_cast<std::size_t>(face.count);
     for (std::size_t i = 0; i < count; ++i) {
@@ -242,12 +245,11 @@ rectangular(ReferenceArithmetic& math, const Diagnostic& diag, const NastranCoor
 }
 
 // This tests the interiors of two convex polygons. A shared edge is not an overlap.
-[[nodiscard]] bool separated(ReferenceArithmetic& math, const ExternalPgOwnedFace& first,
-                             const ExternalPgOwnedFace& second) {
+[[nodiscard]] bool separated(ReferenceArithmetic& math, const auto& first, const auto& second) {
     for (std::size_t i = 0; i < first.count; ++i) {
         const auto& a = positive_corner(first, i);
         const auto& b = positive_corner(first, (i + 1) % first.count);
-        if (std::ranges::none_of(second.ring(), [&](const ExternalPgOwnedCorner& p) {
+        if (std::ranges::none_of(second.ring(), [&](const auto& p) {
                 return orient(math, a, b, p.chart).sign() > 0;
             })) {
             return true;
@@ -265,7 +267,7 @@ rectangular(ReferenceArithmetic& math, const Diagnostic& diag, const NastranCoor
 
 // A convex triangle clipped by at most four half-planes has at most seven vertices.
 [[nodiscard]] Rational intersect_area2(ReferenceArithmetic& math, const Triangle& triangle,
-                                       const ExternalPgOwnedFace& face) {
+                                       const auto& face) {
     std::array<Point, 7> ring;
     std::size_t size = triangle.size();
     for (std::size_t i = 0; i < size; ++i) {
@@ -389,6 +391,55 @@ void fill_corner(ReferenceArithmetic& math, const Diagnostic& diagnostic,
     }
 }
 
+void validate_chart_row(ReferenceArithmetic& math, const Diagnostic& diagnostic, const auto& row,
+                        auto previous, std::span<const structure::PgPartitionTriangle> triangles,
+                        std::span<const Point> vertices, Rational& total) {
+    if (row.winding != ExternalPgWinding::Forward && row.winding != ExternalPgWinding::Reversed) {
+        diagnostic.reject(Code::InvalidInput, Reason::Winding, row.element);
+    }
+    for (std::size_t j = 0; j < row.count; ++j) {
+        const auto& a = positive_corner(row, j);
+        const auto& b = positive_corner(row, (j + 1) % row.count);
+        const auto& c = positive_corner(row, (j + 2) % row.count);
+        // These are the corner Jacobian signs of the bilinear map for a quad.
+        if (orient(math, a, b, c).sign() <= 0) {
+            diagnostic.reject(Code::GeometryInvalid, Reason::Winding, row.element);
+        }
+    }
+    for (const auto& other : previous) {
+        math.visit(1);
+        if (!separated(math, row, other) && !separated(math, other, row)) {
+            diagnostic.reject(Code::GeometryInvalid, Reason::Overlap, row.element, other.element);
+        }
+    }
+    const auto area = area2(math, row);
+    Rational inside;
+    for (const auto& triangle : triangles) {
+        math.visit(1);
+        const Triangle t{&vertices[static_cast<std::size_t>(triangle.vertices[0])],
+                         &vertices[static_cast<std::size_t>(triangle.vertices[1])],
+                         &vertices[static_cast<std::size_t>(triangle.vertices[2])]};
+        inside = math.add(inside, intersect_area2(math, t, row));
+    }
+    if (math.compare(inside, area) != 0) {
+        diagnostic.reject(Code::GeometryInvalid, Reason::Outside, row.element);
+    }
+    total = math.add(total, area);
+}
+
+void validate_chart_coverage(ReferenceArithmetic& math, const Diagnostic& diagnostic,
+                             std::span<const structure::PgPartitionTriangle> triangles,
+                             const Rational& total) {
+    Rational reference_area;
+    for (const auto& triangle : triangles) {
+        math.visit(1);
+        reference_area = math.add(reference_area, triangle.twice_area);
+    }
+    if (math.compare(total, reference_area) != 0) {
+        diagnostic.reject(Code::GeometryInvalid, Reason::Coverage);
+    }
+}
+
 struct Prepared {
     structure::PgReferenceIdentity patch;
     core::PlannedBuffer<ExternalPgOwnedFace> faces;
@@ -447,50 +498,10 @@ template <class ReadFace>
             fill_corner(math, diagnostic, physical, source, j, given.corners[j], row.corners[j]);
         }
         row.nastran_offset = std::move(source.offset);
-        if (row.winding != ExternalPgWinding::Forward &&
-            row.winding != ExternalPgWinding::Reversed) {
-            diagnostic.reject(Code::InvalidInput, Reason::Winding, row.element);
-        }
-        for (std::size_t j = 0; j < source.count; ++j) {
-            const auto& a = positive_corner(row, j);
-            const auto& b = positive_corner(row, (j + 1) % source.count);
-            const auto& c = positive_corner(row, (j + 2) % source.count);
-            // These are the corner Jacobian signs of the bilinear map for a quad.
-            if (orient(math, a, b, c).sign() <= 0) {
-                diagnostic.reject(Code::GeometryInvalid, Reason::Winding, row.element);
-            }
-        }
-        for (std::size_t j = 0; j < i; ++j) {
-            math.visit(1);
-            const auto& other = faces.values()[j];
-            if (!separated(math, row, other) && !separated(math, other, row)) {
-                diagnostic.reject(Code::GeometryInvalid, Reason::Overlap, row.element,
-                                  other.element);
-            }
-        }
-        const auto area = area2(math, row);
-        Rational inside;
-        for (const auto& triangle : triangles) {
-            math.visit(1);
-            const Triangle t{&vertices[static_cast<std::size_t>(triangle.vertices[0])],
-                             &vertices[static_cast<std::size_t>(triangle.vertices[1])],
-                             &vertices[static_cast<std::size_t>(triangle.vertices[2])]};
-            inside = math.add(inside, intersect_area2(math, t, row));
-        }
-        if (math.compare(inside, area) != 0) {
-            diagnostic.reject(Code::GeometryInvalid, Reason::Outside, row.element);
-        }
-        total = math.add(total, area);
+        validate_chart_row(math, diagnostic, row, faces.values().first(i), triangles, vertices,
+                           total);
     }
-
-    Rational reference_area;
-    for (const auto& triangle : triangles) {
-        math.visit(1);
-        reference_area = math.add(reference_area, triangle.twice_area);
-    }
-    if (math.compare(total, reference_area) != 0) {
-        diagnostic.reject(Code::GeometryInvalid, Reason::Coverage);
-    }
+    validate_chart_coverage(math, diagnostic, triangles, total);
     math.cancel();
     return {patch, std::move(faces), math.info()};
 }
@@ -545,9 +556,10 @@ void apply_offset(ReferenceArithmetic& math, const Diagnostic& diagnostic, Face&
     face.offset = NastranReferenceOffset{std::move(length), byte};
 }
 
-[[nodiscard]] Face nastran_face(ReferenceArithmetic& math, const Diagnostic& diagnostic,
-                                const NastranShellView& deck, std::uint64_t id,
-                                const Rational& unit) {
+[[nodiscard]] const NastranShellElement& find_shell(ReferenceArithmetic& math,
+                                                    const Diagnostic& diagnostic,
+                                                    const NastranShellView& deck,
+                                                    std::uint64_t id) {
     const auto found = std::ranges::find_if(deck.elements, [&](const NastranShellElement& row) {
         math.visit(1);
         return row.id.value() == id;
@@ -555,6 +567,13 @@ void apply_offset(ReferenceArithmetic& math, const Diagnostic& diagnostic, Face&
     if (found == deck.elements.end()) {
         diagnostic.reject(Code::InvalidInput, Reason::Selection, id);
     }
+    return *found;
+}
+
+[[nodiscard]] Face nastran_face(ReferenceArithmetic& math, const Diagnostic& diagnostic,
+                                const NastranShellView& deck, std::uint64_t id,
+                                const Rational& unit) {
+    const auto& shell = find_shell(math, diagnostic, deck, id);
     auto face = std::visit(
         [&](const auto& corners) {
             Face result;
@@ -578,11 +597,203 @@ void apply_offset(ReferenceArithmetic& math, const Diagnostic& diagnostic, Face&
             }
             return result;
         },
-        found->corners);
-    if (const auto& offset = found->offset) {
+        shell.corners);
+    if (const auto& offset = shell.offset) {
         apply_offset(math, diagnostic, face, *offset, unit);
     }
     return face;
+}
+
+namespace directed = nastran_directed;
+namespace m = directed::m;
+using IntervalPosition = directed::Position;
+
+[[nodiscard]] m::Interval dot(const IntervalPosition& a, const IntervalPosition& b, m::Work& work) {
+    return m::add(m::add(m::multiply(a[0], b[0], work), m::multiply(a[1], b[1], work), work),
+                  m::multiply(a[2], b[2], work), work);
+}
+
+void require_positive(const m::Interval& value, const Diagnostic& diagnostic,
+                      const NastranPgFaceBound& row) {
+    if (value.lower.mantissa <= 0) {
+        diagnostic.reject(value.upper.mantissa <= 0 ? Code::GeometryInvalid
+                                                    : Code::PrecisionUnresolved,
+                          Reason::SourceWinding, row.element, {}, {}, row.element_field.byte);
+    }
+}
+
+[[nodiscard]] IntervalPosition to_interval(const Position& value, m::Work& work) {
+    return {directed::number(value[0], work), directed::number(value[1], work),
+            directed::number(value[2], work)};
+}
+
+[[nodiscard]] IntervalPosition to_interval(const NastranGridEnclosure& grid, m::Work& work) {
+    IntervalPosition result;
+    for (std::size_t i = 0; i < result.size(); ++i) {
+        result[i] = {directed::number(grid.metres[i].lower, work).lower,
+                     directed::number(grid.metres[i].upper, work).upper};
+    }
+    return result;
+}
+
+void prove_planarity(ReferenceArithmetic& math, const Diagnostic& diagnostic,
+                     const NastranShellView& deck, const std::array<NastranShellCorner, 4>& corners,
+                     const NastranShellElement& shell) {
+    const auto& first = deck.input.grids[corners[0].grid_ordinal];
+    const auto cp = first.position_system.id;
+    if (cp.value() != 0) {
+        static_cast<void>(rectangular(math, diagnostic, deck.input, first.position_system,
+                                      shell.id.value(), first.id.value(),
+                                      first.id_field.position.byte));
+    }
+
+    std::array<Position, 4> points;
+    for (std::size_t i = 0; i < corners.size(); ++i) {
+        const auto& grid = deck.input.grids[corners[i].grid_ordinal];
+        if (grid.position_system.id != cp) {
+            diagnostic.reject(Code::Unsupported, Reason::Planarity, shell.id.value(), {},
+                              grid.id.value(), grid.id_field.position.byte,
+                              grid.position_system.id);
+        }
+        points[i] = tuple(math, grid.position);
+    }
+    const auto normal = vector_cross(math, vector_sub(math, points[1], points[0]),
+                                     vector_sub(math, points[2], points[0]));
+    if (dot(math, normal, vector_sub(math, points[3], points[0])).sign() != 0) {
+        diagnostic.reject(Code::GeometryInvalid, Reason::Planarity, shell.id.value(), {},
+                          corners[3].id.value(), corners[3].field.position.byte);
+    }
+}
+
+[[nodiscard]] m::Bound upper_norm(const IntervalPosition& value, m::Work& work) {
+    const auto squared = directed::norm_squared(value, work);
+    return m::square_root({{}, squared.upper}, work).upper;
+}
+
+void fill_bounds(const NastranShellCards& deck_owner, const NastranShellView& deck,
+                 const NastranShellElement& shell, SiLengthUnit units, const Rational& unit,
+                 const ExternalPgFace& declared, const AffineMidSurface& surface,
+                 const IntervalPosition& pg_normal, ReferenceArithmetic& math, m::Work& work,
+                 const Diagnostic& diagnostic, NastranPgFaceBound& row) {
+    std::array ids{NastranGridId{0}, NastranGridId{0}, NastranGridId{0}, NastranGridId{0}};
+    std::visit(
+        [&](const auto& corners) {
+            if (declared.corners.size() != corners.size()) {
+                diagnostic.reject(Code::InvalidInput, Reason::Selection, declared.element);
+            }
+            row.count = static_cast<std::uint8_t>(corners.size());
+            for (std::size_t i = 0; i < corners.size(); ++i) {
+                const auto& given = declared.corners[i];
+                ids[i] = corners[i].id;
+                if (given.node != ids[i].value()) {
+                    diagnostic.reject(Code::InvalidInput, Reason::SourceOrder, declared.element, {},
+                                      ids[i].value(), corners[i].field.position.byte);
+                }
+                row.corners[i].node = given.node;
+                row.corners[i].chart = copy(math, given.point);
+            }
+            if constexpr (std::tuple_size_v<std::remove_cvref_t<decltype(corners)>> == 4) {
+                // A common Cartesian frame is rigid. Only its raw determinant can
+                // certify exact coplanarity in this path, even if CP is irrational.
+                prove_planarity(math, diagnostic, deck, corners, shell);
+            }
+        },
+        shell.corners);
+    std::optional<NastranPositionDiagnostic> position_diagnostic;
+    const auto positions = NastranPositionEnclosures::prepare(
+        deck_owner, units, std::span{ids}.first(row.count),
+        {math.leaf_limits, row.count, work.limit - work.used, work.stop}, math.plan,
+        &position_diagnostic);
+    if (!positions) {
+        if (position_diagnostic) {
+            const auto& error = *position_diagnostic;
+            diagnostic.reject(positions.error().code, Reason::Position, row.element, {},
+                              error.grid ? std::optional{error.grid->value()} : std::nullopt,
+                              error.position ? std::optional{error.position->byte} : std::nullopt,
+                              error.coordinate);
+        }
+        throw geom::PartitionAbort{positions.error()};
+    }
+    const auto position_view = positions->view();
+    if (!position_view) {
+        diagnostic.reject(Code::InvalidInput, Reason::Source, row.element);
+    }
+    const auto source = position_view->grids;
+    work.used += position_view->work;
+    std::array<IntervalPosition, 4> corners;
+    for (std::size_t i = 0; i < row.count; ++i) {
+        corners[i] = to_interval(source[i], work);
+        row.corners[i].cp = source[i].cp;
+        row.corners[i].cp_field = source[i].cp_field;
+        row.corners[i].tuple_fields = source[i].tuple_fields;
+    }
+
+    const auto raw_normal = directed::cross(directed::subtract(corners[1], corners[0], work),
+                                            directed::subtract(corners[2], corners[0], work), work);
+    require_positive(directed::norm_squared(raw_normal, work), diagnostic, row);
+    const auto normal = directed::normalized(raw_normal, work);
+    if (row.count == 4) {
+        // The four signed corner Jacobians suffice for this planar bilinear ring.
+        for (std::size_t i = 1; i < corners.size(); ++i) {
+            const auto turn = directed::cross(
+                directed::subtract(corners[(i + 1) % corners.size()], corners[i], work),
+                directed::subtract(corners[(i + 2) % corners.size()], corners[i], work), work);
+            require_positive(dot(turn, normal, work), diagnostic, row);
+        }
+    }
+    IntervalPosition oriented;
+    for (std::size_t i = 0; i < oriented.size(); ++i) {
+        oriented[i] = row.winding == ExternalPgWinding::Forward ? normal[i]
+                                                                : m::subtract({}, normal[i], work);
+    }
+    require_positive(dot(oriented, pg_normal, work), diagnostic, row);
+    const auto normal_upper = upper_norm(directed::subtract(oriented, pg_normal, work), work);
+    row.normal_chord_upper = directed::retain(normal_upper, math.leaf_limits, math.plan, work);
+
+    m::Interval offset;
+    if (const auto& field = shell.offset) {
+        auto metres = math.mul(decimal(math, field->value.decimal()), unit);
+        offset = directed::number(metres, work);
+        row.nastran_offset = NastranReferenceOffset{std::move(metres), field->field.position.byte};
+    }
+    // PG is affine in its chart, so also its corner interpolant. Both
+    // residual maps use nonnegative weights summing to one over the whole face.
+    m::Bound distance;
+    for (std::size_t i = 0; i < row.count; ++i) {
+        IntervalPosition residual;
+        for (std::size_t k = 0; k < residual.size(); ++k) {
+            const auto actual = m::add(corners[i][k], m::multiply(offset, normal[k], work), work);
+            const auto expected = surface.coordinate(math, row.corners[i].chart, k);
+            residual[k] = m::subtract(actual, directed::number(expected, work), work);
+        }
+        auto corner = upper_norm(residual, work);
+        if (m::compare(corner, distance) > 0) {
+            distance = std::move(corner);
+        }
+    }
+    row.distance_upper_metres = directed::retain(distance, math.leaf_limits, math.plan, work);
+}
+
+void validate_bound_correspondence(ReferenceArithmetic& math, const Diagnostic& diagnostic,
+                                   const NastranPgFaceBound& row,
+                                   std::span<const NastranPgFaceBound> previous) {
+    for (const auto& other : previous) {
+        math.visit(1);
+        if (row.element == other.element) {
+            diagnostic.reject(Code::InvalidInput, Reason::Selection, row.element, {}, {},
+                              row.element_field.byte);
+        }
+        for (const auto& corner : row.ring()) {
+            for (const auto& old : other.ring()) {
+                const bool same_chart = math.compare(corner.chart.s, old.chart.s) == 0 &&
+                                        math.compare(corner.chart.t, old.chart.t) == 0;
+                if ((corner.node == old.node) != same_chart) {
+                    diagnostic.reject(Code::GeometryInvalid, Reason::SourceOrder, row.element,
+                                      other.element, corner.node, row.element_field.byte);
+                }
+            }
+        }
+    }
 }
 
 } // namespace
@@ -673,4 +884,111 @@ ExternalPlanarPg::prepare(const structure::PgReferenceGeometry& pg, const Nastra
     });
 }
 
+NastranPlanarPgBounds::NastranPlanarPgBounds(RootSnapshotLocation source, SourceDigest digest,
+                                             SiLengthUnit units,
+                                             structure::PgReferenceIdentity patch,
+                                             core::PlannedBuffer<NastranPgFaceBound>&& faces,
+                                             structure::PgReferenceCallInfo chart_work,
+                                             std::uint64_t directed_work) noexcept
+    : source_(source),
+      digest_(digest),
+      units_(units),
+      patch_(patch),
+      faces_(std::move(faces)),
+      chart_work_(chart_work),
+      directed_work_(directed_work) {}
+
+std::optional<NastranPlanarPgBoundView> NastranPlanarPgBounds::view() const& noexcept {
+    if (faces_.size() == 0) {
+        return std::nullopt;
+    }
+    return NastranPlanarPgBoundView{source_,         digest_,     units_,        patch_,
+                                    faces_.values(), chart_work_, directed_work_};
+}
+
+core::Result<NastranPlanarPgBounds> NastranPlanarPgBounds::prepare(
+    const structure::PgReferenceGeometry& pg, const NastranShellCards& deck, SiLengthUnit units,
+    std::span<const ExternalPgFace> charts, const NastranPgBoundLimits& limits,
+    core::ResourcePlan& plan, std::optional<ExternalPgDiagnostic>* slot) noexcept {
+    if (slot) {
+        slot->reset();
+    }
+    const Diagnostic diagnostic{slot};
+    return geom::partition_entry([&]() -> core::Result<NastranPlanarPgBounds> {
+        try {
+            ReferenceArithmetic math{limits.region.arithmetic, plan};
+            math.cancel();
+            const auto input = deck.view();
+            if (!input) {
+                diagnostic.reject(Code::InvalidInput, Reason::Source);
+            }
+            if (charts.empty()) {
+                diagnostic.reject(Code::InvalidInput, Reason::Selection);
+            }
+            if (charts.size() > limits.region.maximum_faces) {
+                partition_fail(Code::ResourceExceeded);
+            }
+            const auto owner = partition_take(pg.source());
+            const auto graph = partition_take(owner.graph.view());
+            for (const auto& term : graph.height.terms()) {
+                math.visit(1);
+                if (term.powers.first + term.powers.second > 1) {
+                    diagnostic.reject(Code::Unsupported, Reason::CurvedPatch);
+                }
+            }
+            const auto patch = partition_take(pg.identity());
+            const auto triangles = partition_take(owner.partition.triangles());
+            const auto vertices = partition_take(owner.partition.vertices());
+            // Four chart points, two bounds and one optional offset per face.
+            const auto slots = geom::partition_add(geom::reference_live_rationals,
+                                                   geom::partition_mul(11, charts.size()));
+            math.admit(slots);
+            const auto surface = mid_surface(math, graph, partition_take(pg.frame()));
+            m::Work work{0, limits.maximum_directed_work, limits.region.arithmetic.cancellation};
+            const auto pq = vector_cross(math, surface.tangent_s, surface.tangent_t);
+            const auto pg_normal = directed::normalized(to_interval(pq, work), work);
+            const SiUnits system{units, SiMassUnit::Kilogram, SiTimeUnit::Second,
+                                 SiAngleUnit::Radian};
+            const SiRecipeView scale{SiDecimalView{1, "1", 0}, {}, system, {{1, 0, 0, 0}}, 0};
+            math.charge();
+            const auto unit = partition_take(materialize_rational(scale, math.leaf_limits, plan));
+            auto faces = partition_take(
+                plan.allocate<NastranPgFaceBound>(geom::partition_index(charts.size()), operation));
+            Rational total;
+            for (std::size_t i = 0; i < charts.size(); ++i) {
+                math.visit(1);
+                const auto& chart = charts[i];
+                const auto& shell = find_shell(math, diagnostic, *input, chart.element);
+                auto& row = faces.values()[i];
+                row.element = chart.element;
+                row.element_field = shell.id_field.position;
+                row.winding = chart.winding;
+                if (row.winding != ExternalPgWinding::Forward &&
+                    row.winding != ExternalPgWinding::Reversed) {
+                    diagnostic.reject(Code::InvalidInput, Reason::Winding, row.element);
+                }
+                fill_bounds(deck, *input, shell, units, unit, chart, surface, pg_normal, math, work,
+                            diagnostic, row);
+                const auto previous = faces.values().first(i);
+                validate_bound_correspondence(math, diagnostic, row, previous);
+                validate_chart_row(math, diagnostic, row, previous, triangles, vertices, total);
+            }
+            validate_chart_coverage(math, diagnostic, triangles, total);
+            math.cancel();
+            return NastranPlanarPgBounds{input->input.bulk.location,
+                                         input->input.bulk.digest,
+                                         units,
+                                         patch,
+                                         std::move(faces),
+                                         math.info(),
+                                         work.used};
+        } catch (const m::ArithmeticFailure& failure) {
+            partition_fail(failure.code);
+        } catch (const std::overflow_error&) {
+            partition_fail(Code::PrecisionUnresolved);
+        } catch (const std::range_error&) {
+            partition_fail(Code::PrecisionUnresolved);
+        }
+    });
+}
 } // namespace uvlas::io::detail

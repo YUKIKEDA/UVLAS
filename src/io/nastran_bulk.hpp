@@ -68,6 +68,17 @@ struct NastranBulkView {
     std::uint64_t work;
     std::string_view declaration_pointer;
 
+    [[nodiscard]] bool same_snapshot(const RootSnapshotLocation& other,
+                                     const SourceDigest& other_digest) const noexcept {
+        const auto& parent = location.parent;
+        return digest == other_digest && location.source == other.source &&
+               location.role == other.role && location.declaration_node == other.declaration_node &&
+               location.declaring_file == other.declaring_file &&
+               parent.source == other.parent.source &&
+               parent.contract_revision == other.parent.contract_revision &&
+               parent.representation_revision == other.parent.representation_revision;
+    }
+
     [[nodiscard]] std::string_view text(NastranBulkLexeme) const noexcept;
     // The card dictionary selects the field's type. The spelling and source position
     // remain available independently of conversion.
