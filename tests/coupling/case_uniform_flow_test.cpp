@@ -4335,6 +4335,13 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     REQUIRE(qualified_strengths.history().size() == 2);
     CHECK(qualified_strengths.material().size() == extended.size());
     CHECK(qualified_strengths.history()[1].id == mapped_old_id);
+    REQUIRE(qualified_strengths.history_material().size() == 2);
+    CHECK(qualified_strengths.history_material()[1].from == second_release.point);
+    CHECK(qualified_strengths.history_material()[1].to == release.point);
+    CHECK(qualified_strengths.history_material()[1].epoch == release.epoch);
+    CHECK(qualified_strengths.history_material()[0].epoch == next_epoch);
+    CHECK(qualified_strengths.retired_history().empty());
+
     const auto held = std::get<a::DoubleWord>(qualified_strengths.history()[1].strength);
     CHECK(held.high == -.25);
     CHECK(held.low == -low_word);
@@ -4435,6 +4442,13 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK(window_strengths.material().retired_count() == 2);
     REQUIRE(window_strengths.history().size() == 1);
     CHECK(window_strengths.history().front().id == newest_id);
+    REQUIRE(window_strengths.retired_history().size() == 1);
+    const auto& retired_strength = window_strengths.retired_history().front();
+    CHECK(retired_strength.material.epoch == release.epoch);
+    CHECK(retired_strength.material.from == second_release.point);
+    CHECK(retired_strength.trace.id == old_id);
+    CHECK(std::get<a::DoubleWord>(retired_strength.trace.strength).low == -low_word);
+
     ResidualFixture reversed_fixture;
     reversed_fixture.reverse_wake();
     auto reversed_geometry_input = reversed_fixture.input();

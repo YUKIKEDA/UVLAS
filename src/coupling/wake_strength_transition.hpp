@@ -9,6 +9,17 @@ struct WakeStrengthEndpoint {
     std::span<const WakeMaterialPoint> material;
 };
 
+/// Oriented span endpoints identify a physical band independent of numeric source columns.
+struct WakeTraceMaterial {
+    aero::detail::PointId from{0}, to{0};
+    aero::detail::ReleaseEpoch epoch{0};
+};
+
+struct RetiredWakeTrace {
+    WakeTraceMaterial material;
+    FrozenWakeTrace trace;
+};
+
 /// Own material correspondence and the exact frozen words qualified for the trial.
 class WakeStrengthTransition {
 public:
@@ -23,6 +34,15 @@ public:
         return history_.values();
     }
     [[nodiscard]] std::span<const FrozenWakeTrace> history() const&& = delete;
+    /// Physical identities in history() order, even when the trial renumbers columns.
+    [[nodiscard]] std::span<const WakeTraceMaterial> history_material() const& noexcept {
+        return identities_.values();
+    }
+    [[nodiscard]] std::span<const WakeTraceMaterial> history_material() const&& = delete;
+    [[nodiscard]] std::span<const RetiredWakeTrace> retired_history() const& noexcept {
+        return retired_.values();
+    }
+    [[nodiscard]] std::span<const RetiredWakeTrace> retired_history() const&& = delete;
 
 private:
     friend core::Result<WakeStrengthTransition>
@@ -31,10 +51,17 @@ private:
                                      aero::detail::ReleaseEpoch, const WakeTransportLimits&,
                                      core::ResourcePlan&, const std::stop_token&) noexcept;
     WakeStrengthTransition(WakeMaterialTransition&& material,
-                           core::PlannedBuffer<FrozenWakeTrace>&& history) noexcept
-        : material_(std::move(material)), history_(std::move(history)) {}
+                           core::PlannedBuffer<FrozenWakeTrace>&& history,
+                           core::PlannedBuffer<WakeTraceMaterial>&& identities,
+                           core::PlannedBuffer<RetiredWakeTrace>&& retired) noexcept
+        : material_(std::move(material)),
+          history_(std::move(history)),
+          identities_(std::move(identities)),
+          retired_(std::move(retired)) {}
     WakeMaterialTransition material_;
     core::PlannedBuffer<FrozenWakeTrace> history_;
+    core::PlannedBuffer<WakeTraceMaterial> identities_;
+    core::PlannedBuffer<RetiredWakeTrace> retired_;
 };
 
 /// Derive each strength's material band and release epoch from its checked D2

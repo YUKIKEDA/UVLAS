@@ -80,7 +80,7 @@ struct IndexedPoint {
 struct Column {
     MaterialTraceKey key;
     a::P1StrengthId id;
-    std::array<double, 2> value{};
+    a::ScalarWords strength{a::SingleWord{0}};
     std::optional<MaterialTraceKey> leading_key;
     std::optional<a::P1StrengthId> leading_id;
 };
@@ -189,7 +189,8 @@ Section describe(const WakeStrengthEndpoint& endpoint, core::ResourcePlan& memor
         if (at == history.end() || at->id != row.trailing)
             reject(InvalidInput);
         auto& trace = traces.values()[i];
-        trace = {back, row.trailing, words(at->strength), {}, {}};
+        (void)words(at->strength);
+        trace = {back, row.trailing, at->strength, {}, {}};
         identifiers.values()[i] = row.trailing;
         if (quad.attachment) {
             if (!std::holds_alternative<AttachedWakeFront>(row.leading) || front >= attached.size())
@@ -253,7 +254,7 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                     {trial.source.contact, trial.material}, epoch, limits, memory, stop));
                 Work work{material.used_steps(), limits.maximum_steps, stop};
                 const auto before = describe(parent, memory, work);
-                const auto after = describe(trial, memory, work);
+                auto after = describe(trial, memory, work);
                 if (before.attached.size() != after.attached.size())
                     reject(StaleGeneration);
                 for (std::size_t i = 0; i < before.attached.size(); ++i) {
@@ -265,7 +266,7 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                     const MaterialTraceKey newborn{old.band, epoch};
                     const auto row = find(after.frozen.values(), newborn, &Column::key, work);
                     if (row == after.frozen.values().end() || row->key != newborn ||
-                        row->value != old.value)
+                        words(row->strength) != old.value)
                         reject(StaleGeneration);
                 }
 
@@ -280,15 +281,18 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                         find(retired.values(), std::optional{key}, std::identity{}, work);
                     return at != retired.values().end() && *at == key;
                 };
+                const auto retired_column = [&](const Column& column) {
+                    const auto& key = column.key;
+                    return expired({key.band.from, key.epoch}) && expired({key.band.to, key.epoch});
+                };
                 std::size_t retained = 0;
                 for (const auto& old : before.frozen.values()) {
                     work.step();
-                    const auto& key = old.key;
-                    if (expired({key.band.from, key.epoch}) && expired({key.band.to, key.epoch}))
+                    if (retired_column(old))
                         continue;
-                    const auto row = find(after.frozen.values(), key, &Column::key, work);
-                    if (row == after.frozen.values().end() || row->key != key ||
-                        row->value != old.value)
+                    const auto row = find(after.frozen.values(), old.key, &Column::key, work);
+                    if (row == after.frozen.values().end() || row->key != old.key ||
+                        words(row->strength) != words(old.strength))
                         reject(StaleGeneration);
                     ++retained;
                 }
@@ -296,14 +300,32 @@ core::Result<WakeStrengthTransition> prepare_wake_strength_transition(
                     after.frozen.size() - retained != before.attached.size())
                     reject(StaleGeneration);
 
-                const auto supplied = trial.source.history.columns;
-                auto history = allocate<FrozenWakeTrace>(memory, supplied.size());
-                for (std::size_t i = 0; i < supplied.size(); ++i) {
+                const auto physical = [](const MaterialTraceKey& key) {
+                    return WakeTraceMaterial{key.band.from, key.band.to, key.epoch};
+                };
+                auto retired_history =
+                    allocate<RetiredWakeTrace>(memory, before.frozen.size() - retained);
+                auto retired_at = retired_history.values().begin();
+                for (const auto& old : before.frozen.values()) {
                     work.step();
-                    history.values()[i] = supplied[i];
+                    if (retired_column(old))
+                        *retired_at++ = {physical(old.key), {old.id, old.strength}};
+                }
+                auto columns = after.frozen.values();
+                std::ranges::sort(columns, [&](const Column& lhs, const Column& rhs) {
+                    work.step();
+                    return lhs.id < rhs.id;
+                });
+                auto history = allocate<FrozenWakeTrace>(memory, columns.size());
+                auto identities = allocate<WakeTraceMaterial>(memory, columns.size());
+                for (std::size_t i = 0; i < columns.size(); ++i) {
+                    work.step();
+                    history.values()[i] = {columns[i].id, columns[i].strength};
+                    identities.values()[i] = physical(columns[i].key);
                 }
                 work.step();
-                return WakeStrengthTransition{std::move(material), std::move(history)};
+                return WakeStrengthTransition{std::move(material), std::move(history),
+                                              std::move(identities), std::move(retired_history)};
             } catch (const core::Failure& failure) {
                 return std::unexpected(failure);
             } catch (const a::p1::ArithmeticFailure& failure) {
