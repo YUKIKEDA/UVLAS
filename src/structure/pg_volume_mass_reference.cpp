@@ -85,7 +85,7 @@ template <class Record, class Query, class FillRow>
 project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditioning,
              std::uint64_t rank, std::span<const Query> queries, bool two_word,
              std::uint64_t prefix, std::uint64_t directions, const FillRow& fill_row,
-             std::uint64_t retained_rationals = 0) {
+             std::uint64_t retained_rationals_per_point = 0) {
     if (queries.empty())
         return {};
     auto& plan = math.plan;
@@ -102,6 +102,7 @@ project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditi
     // Only one exact reference row remains alive while producing the rounded row.
     // Multicomponent projections also need their Cartesian and area temporaries.
     const auto extra = directions > 1 ? 32U : 0U;
+    const auto retained_rationals = partition_mul(queries.size(), retained_rationals_per_point);
     math.admit(
         partition_add(partition_add(reference_live_rationals + 74 + extra, retained_rationals),
                       partition_mul(8, rank)));
@@ -119,6 +120,8 @@ project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditi
         auto remaining = math.limits;
         remaining.maximum_scalar_operations -= math.scalar_operations;
         remaining.maximum_partition_visits -= math.partition_visits;
+        math.reserve_nested_rationals(remaining.algebra,
+                                      partition_mul(p, retained_rationals_per_point));
         const auto query = reference_query(queries[p]);
         const auto exact =
             partition_take(conditioning.evaluate_reference(std::span{&query, 1}, remaining, plan));
@@ -497,7 +500,7 @@ PgPreparedVolumeReference::prepare(const PgPreparedPatch& patch, std::size_t fir
                                               current,
                                               math.copy((*rule)[current].weight)};
             },
-            queries.size());
+            1); // The owned output retains one exact weight per completed point.
         return PgPreparedVolumeReference{source.identity,
                                          static_cast<std::size_t>(source.basis.rank),
                                          projection,

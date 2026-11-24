@@ -374,6 +374,35 @@ void check_fixed_projection(const PgPreparedPatch& patch, std::span<const Curved
     }
 }
 
+void check_projected_weight_admission(const PgPreparedPatch& patch, const PgReferenceLimits& limits,
+                                      core::ResourcePlan& plan) {
+    const auto source = take(patch.info());
+    REQUIRE(source.basis.rank == 130);
+    constexpr std::uint64_t limb_bits = detail::IntegerBackend::limb_bits;
+    const auto limbs = limits.algebra.maximum_work_bits / limb_bits;
+    const auto integer_payload = 4 * limbs * sizeof(boost::multiprecision::limb_type);
+    // An isolated exact point has 336 work slots, 74 point slots and 8 per basis column.
+    const auto point_rationals = 336 + 74 + 8 * source.basis.rank;
+    const auto point_payload = (2 * point_rationals + 1) * integer_payload;
+    const auto isolated = take(
+        detail::exact_rational_admission(limits.algebra, (limbs - 2) * limb_bits, point_payload));
+
+    const PgVolumeMassProjection projection{core::Precision::Binary64, 0x1p-42, 0x1p-45};
+    auto restricted = limits;
+    auto& budget = std::get<ExactEstimateAdmission>(restricted.algebra.external_memory).bytes;
+    budget = isolated.estimated_external_payload_bytes;
+    REQUIRE(PgPreparedVolumeReference::prepare(patch, 1, 1, projection, restricted, plan));
+    REQUIRE(PgPreparedVolumeReference::prepare(patch, 2, 1, projection, restricted, plan));
+    check_failure(PgPreparedVolumeReference::prepare(patch, 1, 2, projection, restricted, plan),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(take(patch.info()).identity == source.identity);
+
+    budget += 2 * integer_payload;
+    const auto pair =
+        take(PgPreparedVolumeReference::prepare(patch, 1, 2, projection, restricted, plan));
+    CHECK(pair.points().size() == 2);
+}
+
 } // namespace
 
 TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its transform",
@@ -546,6 +575,7 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
         PgPreparedPatch::prepare(std::move(adjacent_certificate), caps.arithmetic, scratch, plan));
     check_curved_trace(f, patch, adjacent_patch, caps.arithmetic, scratch, plan);
     check_fixed_projection(patch, rule, caps.arithmetic, plan);
+    check_projected_weight_admission(patch, caps.arithmetic, plan);
     check_curved_area_projection(f, patch, caps.arithmetic, plan);
 }
 
