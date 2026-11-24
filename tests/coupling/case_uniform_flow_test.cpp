@@ -4159,6 +4159,13 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     residual_expected(after_birth_row.residual[0], Rat{-2});
     near(center(after_birth_row.residual[2]), -vz[1]);
     CHECK(take(after_birth.position_dual(0)).release == release);
+    const std::array different_detached{cf::WakeMaterialPoint{release, id[5], a::FacetId{202}}};
+    auto wrong_detached = from_origin;
+    wrong_detached[1].points = different_detached;
+    reject(run_material(wrong_detached), core::FailureCode::StaleGeneration);
+    auto replaced_origin = from_origin;
+    replaced_origin[2].points = stages[2].points;
+    reject(run_material(replaced_origin), core::FailureCode::StaleGeneration);
     const std::array origin_as_current{from_origin[2], from_origin[1], from_origin[2]};
     reject(run_material(origin_as_current), core::FailureCode::InvalidInput);
 

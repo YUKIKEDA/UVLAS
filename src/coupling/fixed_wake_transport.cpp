@@ -205,17 +205,23 @@ TransportStencil prepare_stencil(const WakeTransportClock& clock,
                 point.release != snapshots.front().points[i].release)
                 reject(StaleGeneration);
             const auto canonical = [&] {
+                auto birth = WakeBirthMatch::Missing;
+                if (snapshot.preceding_births) {
+                    const auto& detached = read(snapshots[1].contact.geometry()).get();
+                    for (int bit = 0; bit <= std::numeric_limits<std::size_t>::digits; ++bit)
+                        work.step();
+                    birth = snapshot.preceding_births->match_birth(
+                        point.release, clock, geometry, detached, retained.values()[i].point[1]);
+                }
+                if (birth == WakeBirthMatch::Stale ||
+                    (birth == WakeBirthMatch::Verified && point.wake_facet))
+                    reject(StaleGeneration);
                 if (point.wake_facet)
                     return certify_particle(point, geometry, snapshot.contact, topology, work);
-                if (!snapshot.preceding_births || k != 2 || point.point != point.release.point ||
+                if (birth != WakeBirthMatch::Verified || point.point != point.release.point ||
                     read(geometry.owner(point.point)) != point.point ||
                     !trailing_point(topology, point.point, work))
                     reject(InvalidInput);
-                const auto& detached = read(snapshots[1].contact.geometry()).get();
-                for (int bit = 0; bit <= std::numeric_limits<std::size_t>::digits; ++bit)
-                    work.step();
-                if (!snapshot.preceding_births->has_birth(point.release, clock, geometry, detached))
-                    reject(StaleGeneration);
                 return point.point;
             }();
             const auto row = retained.values();
@@ -310,7 +316,7 @@ struct WakeBirthHistory {
     p::PchipInputStamp stamp;
     a::GeometryContext origin_context, detached_context;
     std::array<std::byte, 32> origin_geometry, detached_geometry;
-    core::PlannedBuffer<std::uint8_t> born;
+    core::PlannedBuffer<std::optional<a::PointId>> detached_points;
 };
 
 struct WakeTransportData {
@@ -339,22 +345,18 @@ core::Result<WakeTransportRow> WakeTransportResult::row(std::size_t i) const noe
     }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
-bool WakeTransportResult::has_birth(a::MaterialReleaseKey key, const WakeTransportClock& clock,
-                                    const a::OwnedGeometry& origin,
-                                    const a::OwnedGeometry& detached) const noexcept {
+WakeBirthMatch WakeTransportResult::match_birth(a::MaterialReleaseKey key,
+                                                const WakeTransportClock& clock,
+                                                const a::OwnedGeometry& origin,
+                                                const a::OwnedGeometry& detached,
+                                                a::PointId detached_point) const noexcept {
     if (data_.size() == 0)
-        return false;
+        return WakeBirthMatch::Missing;
     const auto& data = data_.values().front();
     const auto& birth = data.birth_history;
-    if (!birth || !io::detail::same_identity(birth->source, clock.clock.source) ||
-        birth->stamp != clock.destination.stamp || birth->origin_context != origin.context() ||
-        birth->detached_context != detached.context())
-        return false;
-    const auto origin_identity = origin.identity();
-    const auto detached_identity = detached.identity();
-    if (!origin_identity || !detached_identity || birth->origin_geometry != *origin_identity ||
-        birth->detached_geometry != *detached_identity)
-        return false;
+    if (!birth)
+        return WakeBirthMatch::Missing;
+
     const auto rows = data.rows.values();
     const auto at = std::ranges::lower_bound(
         rows, std::optional{key}, {}, [](const auto& row) -> std::optional<a::MaterialReleaseKey> {
@@ -362,8 +364,24 @@ bool WakeTransportResult::has_birth(a::MaterialReleaseKey key, const WakeTranspo
                 return row->release;
             return std::nullopt;
         });
-    return at != rows.end() && *at && (*at)->release == key &&
-           birth->born.values()[static_cast<std::size_t>(at - rows.begin())] != 0;
+    if (at == rows.end() || !*at || (*at)->release != key)
+        return WakeBirthMatch::Missing;
+    const auto& retained =
+        birth->detached_points.values()[static_cast<std::size_t>(at - rows.begin())];
+    if (!retained)
+        return WakeBirthMatch::Missing;
+
+    if (*retained != detached_point ||
+        !io::detail::same_identity(birth->source, clock.clock.source) ||
+        birth->stamp != clock.destination.stamp || birth->origin_context != origin.context() ||
+        birth->detached_context != detached.context())
+        return WakeBirthMatch::Stale;
+    const auto origin_identity = origin.identity();
+    const auto detached_identity = detached.identity();
+    if (!origin_identity || !detached_identity || birth->origin_geometry != *origin_identity ||
+        birth->detached_geometry != *detached_identity)
+        return WakeBirthMatch::Stale;
+    return WakeBirthMatch::Verified;
 }
 
 core::Result<WakeTransportPositionDual>
@@ -518,7 +536,7 @@ struct WakeTransportBuilder {
         if (birth_epoch)
             out.birth_history.emplace(clock.clock.source, clock.destination.stamp, y.context(),
                                       x.context(), read(y.identity()), read(x.identity()),
-                                      allocate<std::uint8_t>(memory, points.size()));
+                                      allocate<std::optional<a::PointId>>(memory, points.size()));
         a::LocalRootScratch scratch;
         for (std::size_t i = 0; i < points.size(); ++i) {
             work.step();
@@ -548,7 +566,7 @@ struct WakeTransportBuilder {
             }
             const auto key = points[i].current.release;
             if (out.birth_history && !points[i].parent)
-                out.birth_history->born.values()[i] = 1;
+                out.birth_history->detached_points.values()[i] = point;
             out.rows.values()[i].emplace(WakeTransportRow{
                 key, keep(residual, limits.representation, scratch, work), tangent, {}, {}});
             if (!seeds.empty()) {

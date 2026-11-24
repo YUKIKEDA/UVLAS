@@ -59,6 +59,8 @@ struct WakeTransportPositionDual {
     std::array<DiscreteLoadVector, 3> stencil;
 };
 
+enum class WakeBirthMatch : std::uint8_t { Missing, Stale, Verified };
+
 struct WakeTransportData;
 
 class WakeTransportResult {
@@ -71,9 +73,11 @@ public:
 
     [[nodiscard]] std::size_t size() const noexcept;
     [[nodiscard]] core::Result<WakeTransportRow> row(std::size_t) const noexcept;
-    [[nodiscard]] bool has_birth(aero::detail::MaterialReleaseKey, const WakeTransportClock&,
-                                 const aero::detail::OwnedGeometry& origin,
-                                 const aero::detail::OwnedGeometry& detached) const noexcept;
+    [[nodiscard]] WakeBirthMatch match_birth(aero::detail::MaterialReleaseKey,
+                                             const WakeTransportClock&,
+                                             const aero::detail::OwnedGeometry& origin,
+                                             const aero::detail::OwnedGeometry& detached,
+                                             aero::detail::PointId detached_point) const noexcept;
     [[nodiscard]] core::Result<WakeTransportPositionDual> position_dual(std::size_t) const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
     parent_free_velocity() const& noexcept;
