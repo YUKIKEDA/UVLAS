@@ -11,6 +11,13 @@ struct CaseExternalPgFactory {
                                       Match&& match) noexcept {
         return CaseExternalPg<Match>{std::move(reference), std::forward<Match>(match)};
     }
+
+    static CaseExternalPg<CaseNastranPgMatch>
+    with_material_axes(CaseExternalPg<imported::QualifiedExternalSidecarPg>&& planar,
+                       imported::NastranPgMaterialAxes&& axes) noexcept {
+        return make(std::move(planar.reference_),
+                    CaseNastranPgMatch{std::move(planar.match_), std::move(axes)});
+    }
 };
 
 core::Result<CaseExternalPg<imported::QualifiedExternalSidecarPg>> prepare_case_external_planar_pg(
@@ -43,6 +50,36 @@ core::Result<CaseExternalPg<imported::QualifiedExternalSidecarPg>> prepare_case_
     if (!match)
         return std::unexpected(match.error());
     return CaseExternalPgFactory::make(std::move(*reference), std::move(*match));
+}
+
+core::Result<CaseExternalPg<CaseNastranPgMatch>> prepare_case_nastran_planar_pg(
+    const io::SiCase& si, const imported::ExternalMeshSidecarBinding& bound,
+    imported::MeshShellId shell, const imported::NastranLaminateCards& quantities,
+    const CasePgReferenceLimits& reference_limits,
+    const imported::ExternalSidecarPgLimits& external_limits, std::uint64_t maximum_axis_matches,
+    core::Workspace& workspace, core::ResourcePlan& plan,
+    CaseNastranPgDiagnostic* diagnostic) noexcept {
+    if (diagnostic)
+        *diagnostic = {};
+    if (!std::holds_alternative<imported::NastranShellCards>(bound.source())) {
+        return std::unexpected(
+            core::Failure{core::FailureCode::Unsupported, core::Operation::PrepareModel});
+    }
+    auto planar = prepare_case_external_planar_pg(si, bound, shell, &quantities, reference_limits,
+                                                  external_limits, workspace, plan,
+                                                  diagnostic ? &diagnostic->planar : nullptr);
+    if (!planar)
+        return std::unexpected(planar.error());
+
+    imported::NastranPgAxisLimits axis_limits{external_limits.geometry.arithmetic,
+                                              maximum_axis_matches};
+    axis_limits.arithmetic.cancellation = reference_limits.cancellation;
+    auto axes =
+        imported::match_nastran_pg_material_axes(si, bound, planar->match(), axis_limits, plan,
+                                                 diagnostic ? &diagnostic->material_axes : nullptr);
+    if (!axes)
+        return std::unexpected(axes.error());
+    return CaseExternalPgFactory::with_material_axes(std::move(*planar), std::move(*axes));
 }
 
 core::Result<CaseExternalPg<imported::CertifiedExternalSidecarPgBounds>>
