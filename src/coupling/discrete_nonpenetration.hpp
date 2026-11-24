@@ -981,7 +981,8 @@ public:
     [[nodiscard]] core::Result<CirculationPointCovector> point_dual(std::size_t) const noexcept;
     [[nodiscard]] core::Result<LoadEdgeVelocityCovector>
     midpoint_velocity_dual(std::size_t) const noexcept;
-    [[nodiscard]] core::Result<LoadCirculationCovector>
+    /// Dual to independent Γdot. The solved Γ response is included in the other covectors.
+    [[nodiscard]] core::Result<LoadCirculationRateCovector>
     circulation_dual(std::size_t) const noexcept;
     [[nodiscard]] core::Result<CirculationCollocationCovector>
     collocation_dual(std::size_t) const noexcept;
