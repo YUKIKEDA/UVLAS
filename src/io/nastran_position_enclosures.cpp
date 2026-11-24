@@ -1,8 +1,8 @@
 #include "nastran_position_enclosures.hpp"
 
 #include "../aero/certified_trigonometry_private.hpp"
-#include "../structure/pg_rank_storage.hpp"
 #include "../structure/pg_reference_arithmetic.hpp"
+#include "nastran_position_arithmetic.hpp"
 
 #include <algorithm>
 #include <utility>
@@ -18,78 +18,11 @@ using g::partition_take;
 using Rational = structure::ExactRational;
 using Code = core::FailureCode;
 using Reason = NastranPositionFailure;
-using Position = std::array<m::Interval, 3>;
-using FixedInteger = aero::detail::ExactInteger;
+using nastran_directed::cross;
+using nastran_directed::normalized;
+using nastran_directed::Position;
+using nastran_directed::subtract;
 constexpr auto operation = core::Operation::PrepareModel;
-
-[[nodiscard]] g::RankFraction<FixedInteger> fixed_fraction(const Rational& source, m::Work& work) {
-    work.step();
-    constexpr auto width = static_cast<std::uint64_t>(std::numeric_limits<g::RankWide>::digits);
-    if (std::max(source.numerator_bits(), source.denominator_bits()) > width) {
-        partition_fail(Code::ResourceExceeded);
-    }
-    return g::rank_fraction<FixedInteger>(source);
-}
-
-[[nodiscard]] m::Interval ratio(const FixedInteger& numerator, const FixedInteger& denominator,
-                                m::Work& work) {
-    return m::divide(m::exact(numerator, 0), m::exact(denominator, 0), work);
-}
-
-[[nodiscard]] Rational retain(const m::Bound& input, const structure::ExactLimits& exact,
-                              core::ResourcePlan& plan, m::Work& work) {
-    work.step();
-    if (input.mantissa == 0) {
-        return {};
-    }
-    constexpr auto width = std::numeric_limits<g::RankWide>::digits;
-    if (input.power < -width + 1 ||
-        static_cast<std::int64_t>(m::bits(input.mantissa)) + input.power > width) {
-        partition_fail(Code::ResourceExceeded);
-    }
-    const g::RankWide units{input.mantissa};
-    if (input.power < 0) {
-        return g::rank_materialize_dyadic(units, static_cast<std::uint32_t>(-input.power), exact,
-                                          plan);
-    }
-    auto shifted = g::rank_abs(units) << static_cast<unsigned>(input.power);
-    if (units < 0) {
-        shifted = -shifted;
-    }
-    return g::rank_exact(g::RankFraction<g::RankWide>{std::move(shifted), g::RankWide{1}}, exact,
-                         plan);
-}
-
-[[nodiscard]] Position subtract(const Position& first, const Position& second, m::Work& work) {
-    return {m::subtract(first[0], second[0], work), m::subtract(first[1], second[1], work),
-            m::subtract(first[2], second[2], work)};
-}
-
-[[nodiscard]] Position cross(const Position& first, const Position& second, m::Work& work) {
-    Position output;
-    for (std::size_t i = 0; i < output.size(); ++i) {
-        const auto j = (i + 1) % 3, k = (i + 2) % 3;
-        output[i] = m::subtract(m::multiply(first[j], second[k], work),
-                                m::multiply(first[k], second[j], work), work);
-    }
-    return output;
-}
-
-[[nodiscard]] Position normalized(const Position& direction, m::Work& work) {
-    m::Interval squared;
-    for (const auto& value : direction) {
-        squared = m::add(squared, m::multiply(value, value, work), work);
-    }
-    if (squared.upper.mantissa == 0) {
-        partition_fail(Code::GeometryInvalid);
-    }
-    if (squared.lower.mantissa <= 0) {
-        partition_fail(Code::PrecisionUnresolved);
-    }
-    const auto length = m::square_root(squared, work);
-    return {m::divide(direction[0], length, work), m::divide(direction[1], length, work),
-            m::divide(direction[2], length, work)};
-}
 
 [[nodiscard]] std::optional<NastranBulkPosition>
 source_position(const std::optional<NastranBulkLexeme>& field) noexcept {
@@ -158,15 +91,10 @@ public:
         for (std::size_t i = 0; i < position.size(); ++i) {
             result.tuple_fields[i] = source_position(source->position[i].field);
             const auto metres = m::multiply(position[i], unit, work_);
-            result.metres[i] = {retain(metres.lower, exact_, plan_, work_),
-                                retain(metres.upper, exact_, plan_, work_)};
+            result.metres[i] = {nastran_directed::retain(metres.lower, exact_, plan_, work_),
+                                nastran_directed::retain(metres.upper, exact_, plan_, work_)};
         }
         return result;
-    }
-
-    [[nodiscard]] m::Interval number(const Rational& value) const {
-        const auto value_fraction = fixed_fraction(value, work_);
-        return ratio(value_fraction.numerator, value_fraction.denominator, work_);
     }
 
 private:
@@ -202,10 +130,10 @@ private:
 
     [[nodiscard]] m::SinCos angle(const NastranCoordinateValue& field) {
         const auto exact = read(field);
-        const auto value = fixed_fraction(exact, work_);
+        const auto value = nastran_directed::fixed_fraction(exact, work_);
         work_.step();
         const auto wrapped = value.numerator % (value.denominator * 360);
-        const auto phase = ratio(wrapped, value.denominator * 180, work_);
+        const auto phase = nastran_directed::ratio(wrapped, value.denominator * 180, work_);
         if (!pi_) {
             pi_ = m::pi_constant(work_);
         }
@@ -214,14 +142,15 @@ private:
 
     [[nodiscard]] Position cartesian(const std::array<NastranCoordinateValue, 3>& raw,
                                      NastranCoordinateKind frame_kind) {
-        const auto first = number(read(raw[0]));
+        const auto first = nastran_directed::number(read(raw[0]), work_);
         if (frame_kind == NastranCoordinateKind::Rectangular) {
-            return {first, number(read(raw[1])), number(read(raw[2]))};
+            return {first, nastran_directed::number(read(raw[1]), work_),
+                    nastran_directed::number(read(raw[2]), work_)};
         }
         const auto theta = angle(raw[1]);
         if (frame_kind == NastranCoordinateKind::Cylindrical) {
             return {m::multiply(first, theta.cosine, work_), m::multiply(first, theta.sine, work_),
-                    number(read(raw[2]))};
+                    nastran_directed::number(read(raw[2]), work_)};
         }
         const auto phi = angle(raw[2]);
         const auto radial_xy = m::multiply(first, theta.sine, work_);
@@ -300,8 +229,8 @@ core::Result<NastranPositionEnclosures> NastranPositionEnclosures::prepare_view(
             const SiRecipeView scale{SiDecimalView{1, "1", 0}, {}, units, {{1, 0, 0, 0}}, 0};
             active.reason = Reason::Conversion;
             work.step();
-            const auto unit = transform.number(
-                partition_take(materialize_rational(scale, budget.leaf_limits, plan)));
+            const auto unit = nastran_directed::number(
+                partition_take(materialize_rational(scale, budget.leaf_limits, plan)), work);
             auto rows = partition_take(
                 plan.allocate<NastranGridEnclosure>(partition_index(requested.size()), operation));
             for (std::size_t i = 0; i < requested.size(); ++i) {

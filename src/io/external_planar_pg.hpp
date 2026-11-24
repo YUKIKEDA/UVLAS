@@ -66,6 +66,8 @@ enum class ExternalPgFailure : std::uint8_t {
     Outside,
     Overlap,
     Coverage,
+    Planarity,
+    SourceWinding,
 };
 
 struct ExternalPgDiagnostic {
@@ -119,6 +121,74 @@ private:
     structure::PgReferenceIdentity patch_;
     core::PlannedBuffer<ExternalPgOwnedFace> faces_;
     structure::PgReferenceCallInfo work_;
+};
+
+struct NastranPgBoundCorner {
+    std::uint64_t node{};
+    NastranCoordinateId cp{0};
+    structure::PgPartitionPoint chart;
+    std::optional<NastranBulkPosition> cp_field;
+    std::array<std::optional<NastranBulkPosition>, 3> tuple_fields;
+};
+
+struct NastranPgFaceBound {
+    std::uint64_t element{};
+    NastranBulkPosition element_field;
+    ExternalPgWinding winding = ExternalPgWinding::Forward;
+    std::uint8_t count{};
+    std::array<NastranPgBoundCorner, 4> corners;
+    std::optional<NastranReferenceOffset> nastran_offset;
+    structure::ExactRational distance_upper_metres;
+    structure::ExactRational normal_chord_upper;
+
+    [[nodiscard]] std::span<const NastranPgBoundCorner> ring() const& noexcept {
+        return std::span{corners}.first(count);
+    }
+    [[nodiscard]] std::span<const NastranPgBoundCorner> ring() const&& = delete;
+};
+
+struct NastranPgBoundLimits {
+    ExternalPgLimits region;
+    std::uint64_t maximum_directed_work;
+};
+
+struct NastranPlanarPgBoundView {
+    RootSnapshotLocation source;
+    SourceDigest digest;
+    SiLengthUnit units;
+    structure::PgReferenceIdentity patch;
+    std::span<const NastranPgFaceBound> faces;
+    structure::PgReferenceCallInfo chart_work;
+    std::uint64_t directed_work;
+};
+
+// Bounds the same-chart reference-surface distance and oriented normal chord
+// on each complete planar face. Geometry bounds do not confer exact equivalence
+// or acceptance under a physical conversion budget.
+class NastranPlanarPgBounds {
+public:
+    NastranPlanarPgBounds(NastranPlanarPgBounds&&) noexcept = default;
+    NastranPlanarPgBounds& operator=(NastranPlanarPgBounds&&) = delete;
+
+    [[nodiscard]] static core::Result<NastranPlanarPgBounds>
+    prepare(const structure::PgReferenceGeometry&, const NastranShellCards&, SiLengthUnit,
+            std::span<const ExternalPgFace>, const NastranPgBoundLimits&, core::ResourcePlan&,
+            std::optional<ExternalPgDiagnostic>* = nullptr) noexcept;
+
+    [[nodiscard]] std::optional<NastranPlanarPgBoundView> view() const& noexcept;
+    [[nodiscard]] std::optional<NastranPlanarPgBoundView> view() const&& = delete;
+
+private:
+    NastranPlanarPgBounds(RootSnapshotLocation, SourceDigest, SiLengthUnit,
+                          structure::PgReferenceIdentity, core::PlannedBuffer<NastranPgFaceBound>&&,
+                          structure::PgReferenceCallInfo, std::uint64_t) noexcept;
+    RootSnapshotLocation source_;
+    SourceDigest digest_;
+    SiLengthUnit units_;
+    structure::PgReferenceIdentity patch_;
+    core::PlannedBuffer<NastranPgFaceBound> faces_;
+    structure::PgReferenceCallInfo chart_work_;
+    std::uint64_t directed_work_;
 };
 
 } // namespace uvlas::io::detail
