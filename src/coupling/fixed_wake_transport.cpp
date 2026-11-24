@@ -138,7 +138,8 @@ bool trailing_point(const a::PreparedTopologyOwner& topology, a::PointId point, 
 
 a::PointId certify_particle(const WakeMaterialPoint& point, const a::OwnedGeometry& geometry,
                             const a::GlobalContactState& contact,
-                            const a::PreparedTopologyOwner& topology, m::Work& work) {
+                            const a::PreparedTopologyOwner& topology, m::Work& work,
+                            bool newest = false) {
     const auto canonical = read(geometry.owner(point.point));
     if (read(geometry.owner(point.release.point)) != point.release.point ||
         !trailing_point(topology, point.release.point, work) ||
@@ -150,6 +151,17 @@ a::PointId certify_particle(const WakeMaterialPoint& point, const a::OwnedGeomet
     work.used += wake.used_steps;
     if (wake.role != a::AeroFaceRole::Wake)
         reject(InvalidInput);
+    if (newest) {
+        if (!wake.attachment)
+            reject(StaleGeneration);
+        for (std::size_t i = 0; i < 2; ++i) {
+            work.step();
+            if (read(geometry.owner(wake.corners[i])) == point.release.point &&
+                read(geometry.owner(wake.corners[3 - i])) == canonical)
+                return canonical;
+        }
+        reject(StaleGeneration);
+    }
 
     for (const auto facet : wake.facets)
         for (const auto id : read(geometry.facet_points(facet))) {
@@ -557,16 +569,27 @@ struct WakeTransportBuilder {
             return lhs == rhs;
         });
         auto rows = static_cast<std::uint64_t>(distinct.begin() - epochs.begin());
+        auto elapsed = earlier.step;
+        for (std::size_t i = 0; i < static_cast<std::size_t>(earlier.interval); ++i) {
+            work.step();
+            const auto prior = clock.clock.intervals.values()[i].steps;
+            if (prior > std::numeric_limits<std::uint64_t>::max() - elapsed)
+                reject(ResourceExceeded);
+            elapsed += prior;
+        }
         std::optional<a::ReleaseEpoch> retire;
         if (window != nullptr) {
             const auto capacity = fixed_window_rows(si, *window, clock, limits, memory, work);
-            if (rows > capacity || (rows != 0 && (parent.points.size() / rows != births ||
-                                                  parent.points.size() % rows != 0)))
+            if (rows > capacity || (births != 0 && rows < std::min(elapsed, capacity)) ||
+                (rows != 0 &&
+                 (parent.points.size() / rows != births || parent.points.size() % rows != 0)))
                 reject(StaleGeneration);
             if (rows == capacity && births != 0) {
                 retire.emplace(epochs.front());
                 --rows;
             }
+        } else if (births != 0 && rows < elapsed) {
+            reject(StaleGeneration);
         }
         if (births != 0)
             ++rows;
@@ -596,16 +619,20 @@ struct WakeTransportBuilder {
         const auto skip_retired = [&] {
             while (previous < parent.points.size() && expires(parent.points[previous])) {
                 work.step();
-                retired.values()[retired_index++].emplace(parent.points[previous++]);
+                auto point = parent.points[previous++];
+                point.point = read(y.owner(point.point));
+                retired.values()[retired_index++].emplace(point);
             }
         };
         for (std::size_t i = 0; i < trial.points.size(); ++i) {
             work.step();
-            const auto& row = trial.points[i];
+            auto row = trial.points[i];
             if (i != 0 && trial.points[i - 1].release >= row.release)
                 reject(StaleGeneration);
-            visited.values()[i] = certify_particle(row, x, trial.contact, to, work).value();
-            if (row.release.epoch == epoch) {
+            const bool newborn = row.release.epoch == epoch;
+            row.point = certify_particle(row, x, trial.contact, to, work, newborn);
+            visited.values()[i] = row.point.value();
+            if (newborn) {
                 if (!trailing_point(from, row.release.point, work))
                     reject(StaleGeneration);
                 output.values()[i].emplace(row, std::nullopt);
@@ -614,8 +641,9 @@ struct WakeTransportBuilder {
                 if (previous == parent.points.size() ||
                     row.release != parent.points[previous].release)
                     reject(StaleGeneration);
-                output.values()[i].emplace(row, parent.points[previous]);
-                ++previous;
+                auto old = parent.points[previous++];
+                old.point = read(y.owner(old.point));
+                output.values()[i].emplace(row, old);
             }
         }
         skip_retired();
@@ -702,7 +730,8 @@ struct WakeTransportBuilder {
             if (i != 0 && points[i - 1].current.release >= key)
                 reject(InvalidInput);
             if (read(x.owner(current.particles[i])) !=
-                certify_particle(point.current, x, current.source.contact, topology, work))
+                certify_particle(point.current, x, current.source.contact, topology, work,
+                                 !point.parent))
                 reject(StaleGeneration);
             const auto parent_point = read(y.owner(parent.particles[i]));
             if (point.parent) {

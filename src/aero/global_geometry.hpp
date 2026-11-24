@@ -84,15 +84,18 @@ struct TrailingEdgeRow {
 /// Contact-qualified fixed quadrilateral and its declared leading attachment.
 struct UvlmQuad {
     UvlmQuad(PhysicalFaceId physical, AeroFaceRole selected, std::array<FacetId, 2> children,
+             std::array<PointId, 4> original_corners,
              const std::optional<TrailingEdgeRow>& trailing, std::uint64_t steps) noexcept
         : face(physical),
           role(selected),
           facets(children),
+          corners(original_corners),
           attachment(trailing),
           used_steps(steps) {}
     PhysicalFaceId face;
     AeroFaceRole role;
     std::array<FacetId, 2> facets;
+    std::array<PointId, 4> corners; ///< Original D2 order, including declared aliases.
     std::optional<TrailingEdgeRow> attachment;
     std::uint64_t used_steps;
 };

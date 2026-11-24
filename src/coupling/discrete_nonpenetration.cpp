@@ -212,8 +212,12 @@ bool same_time(const a::OwnedGeometry& geometry, a::pchip::RationalView supplied
 }
 
 struct PanelRow {
-    a::UvlmQuad panel{
-        a::PhysicalFaceId{0}, a::AeroFaceRole::Bound, {a::FacetId{0}, a::FacetId{0}}, {}, 0};
+    a::UvlmQuad panel{a::PhysicalFaceId{0},
+                      a::AeroFaceRole::Bound,
+                      {a::FacetId{0}, a::FacetId{0}},
+                      {a::PointId{0}, a::PointId{0}, a::PointId{0}, a::PointId{0}},
+                      {},
+                      0};
     std::size_t caller = 0;
 };
 struct Transfer {

@@ -538,6 +538,8 @@ GlobalResult<UvlmQuad> GlobalContactState::uvlm_quad(FacetId id, std::uint64_t m
         return UvlmQuad{PhysicalFaceId{quad.parent},
                         bound ? AeroFaceRole::Bound : AeroFaceRole::Wake,
                         {FacetId{quad.facets[0]}, FacetId{quad.facets[1]}},
+                        {PointId{quad.points[0]}, PointId{quad.points[1]}, PointId{quad.points[2]},
+                         PointId{quad.points[3]}},
                         attachment,
                         used};
     });

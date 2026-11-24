@@ -4179,7 +4179,19 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     auto aliased = growth_points;
     aliased[1].point = id[4];
     const cf::WakeMaterialSnapshot repeated_owner{previous, aliased};
-    reject(growth(growth_parent, repeated_owner, release.epoch), core::FailureCode::InvalidInput);
+    reject(growth(growth_parent, repeated_owner, release.epoch),
+           core::FailureCode::StaleGeneration);
+    auto crossed = growth_points;
+    std::swap(crossed[0].point, crossed[1].point);
+    const cf::WakeMaterialSnapshot crossed_releases{previous, crossed};
+    reject(growth(growth_parent, crossed_releases, release.epoch),
+           core::FailureCode::StaleGeneration);
+    const std::array crossed_birth{cf::FirstFreeWakePoint{crossed[0], std::nullopt}};
+    const std::array swapped_departure{id[5]};
+    const cf::FirstFreeWakeEndpoint wrong_span{
+        previous_source, previous_flow, swapped_departure, {}};
+    reject(first(first_interval, wrong_span, trailing_start, release.epoch, crossed_birth),
+           core::FailureCode::StaleGeneration);
     const cf::WakeMaterialSnapshot already_released{older, material};
     reject(growth(already_released, growth_trial, release.epoch),
            core::FailureCode::StaleGeneration);
@@ -4326,6 +4338,41 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK(take(window.retired(1)).release == second_release);
     CHECK(take(window.retired(0)).point == id[4]);
     CHECK(take(window.row(0)).current.release.epoch == next_epoch);
+    const cf::WakeMaterialSnapshot omitted_window{previous, {}};
+    reject(cf::prepare_wake_material_transition(window_si, window_second, omitted_window,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
+    reject(cf::prepare_wake_material_transition(wake_si, transport_clock, omitted_window,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
+
+    auto alias_bindings = bindings;
+    alias_bindings[7].ownership = a::AliasOf{id[4]};
+    auto alias_reference = xyz;
+    std::ranges::copy(std::span{xyz}.subspan(12, 3), alias_reference.begin() + 21);
+    auto alias_current = alias_reference;
+    alias_current[12] = alias_current[21] = 1.875;
+    auto alias_input = input_geometry;
+    alias_input.bindings = alias_bindings;
+    alias_input.reference = a::SinglePositions{alias_reference};
+    alias_input.current = a::SinglePositions{alias_current};
+    alias_input.context.time = 1.125;
+    alias_input.exact_time = previous_time.view();
+    const auto alias_geometry = test_geometry::take(
+        a::prepare_owned_geometry(alias_input, test_geometry::limits(), *geometry_work, memory));
+    const auto alias_topology = take_global(a::build_global_topology(
+        alias_geometry, {fixture.roles, ownership, trailing}, cap, *global, memory));
+    const auto alias_contact =
+        take_global(a::check_global_geometry(alias_topology, alias_geometry, cap, *global, memory));
+    auto alias_parent_points = growth_points;
+    alias_parent_points[0].point = coincident;
+    const cf::WakeMaterialSnapshot alias_window_parent{alias_contact, alias_parent_points};
+    const auto alias_window = take(
+        cf::prepare_wake_material_transition(window_si, window_second, alias_window_parent,
+                                             window_trial, next_epoch, extended_limits, memory));
+    REQUIRE(alias_window.retired_count() == 2);
+    CHECK(take(alias_window.retired(0)).point == id[4]);
+
     const cf::WakeMaterialSnapshot partial_window{previous, material};
     reject(cf::prepare_wake_material_transition(window_si, window_second, partial_window,
                                                 window_trial, next_epoch, extended_limits, memory),
@@ -4351,6 +4398,47 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     reject(cf::prepare_wake_material_transition(limited_si, limited_second, growth_trial,
                                                 window_trial, next_epoch, extended_limits, memory),
            core::FailureCode::ResourceExceeded);
+
+    auto two_rows_case = window_case;
+    two_rows_case.field("analysis").field("wake").field("retention").set("duration", parse("0.25"));
+    two_rows_case.field("numerics").field("wake_rows").set("maximum_rows", parse("2"));
+    const auto two_rows_si = materialize(two_rows_case, io::SourceId{490});
+    const auto two_rows_grid = take(cf::prepare_case_reference_clock(
+        two_rows_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock two_rows_clock{
+        two_rows_grid, two_rows_grid, {stamp, 0, 3, p::RequestedSide::Automatic}};
+    const Number third_time{11, 8};
+    auto later_input = extended_input;
+    later_input.context.time = 1.375;
+    later_input.exact_time = third_time.view();
+    const auto later_geometry = test_geometry::take(
+        a::prepare_owned_geometry(later_input, test_geometry::limits(), *geometry_work, memory));
+    const auto later_contact = take_global(
+        a::check_global_geometry(extended_topology, later_geometry, cap, *global, memory));
+    const a::ReleaseEpoch latest_epoch{10};
+    auto shifted_points = extended_points;
+    for (const auto i : {std::size_t{0}, std::size_t{2}}) {
+        shifted_points[i].release.epoch = next_epoch;
+        shifted_points[i + 1].release.epoch = latest_epoch;
+    }
+    const cf::WakeMaterialSnapshot shifted_trial{later_contact, shifted_points};
+    const auto shifted = take(
+        cf::prepare_wake_material_transition(two_rows_si, two_rows_clock, extended_trial,
+                                             shifted_trial, latest_epoch, extended_limits, memory));
+    REQUIRE(shifted.retired_count() == 2);
+    CHECK(take(shifted.retired(0)).release == release);
+    CHECK(take(shifted.retired(1)).release == second_release);
+    const auto retained = take(shifted.row(0));
+    REQUIRE(retained.parent);
+    CHECK(retained.parent->release.epoch == next_epoch);
+    CHECK(retained.parent->point == id[4]);
+    CHECK(retained.current.point == far_up);
+    auto retired_wrong_row = shifted_points;
+    retired_wrong_row[0].release = release;
+    const cf::WakeMaterialSnapshot wrong_tail{later_contact, retired_wrong_row};
+    reject(cf::prepare_wake_material_transition(two_rows_si, two_rows_clock, extended_trial,
+                                                wrong_tail, latest_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
 
     const std::array birth_origin{cf::WakeMaterialPoint{release, release.point, std::nullopt}};
     auto from_origin = stages;
