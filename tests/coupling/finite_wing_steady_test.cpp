@@ -674,10 +674,8 @@ Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh
         const auto wake =
             take_global(contact.uvlm_quad(mesh.quads[columns + i].facets[0], 1000000));
         const auto& owner = wake.attachment;
-        if (!owner) {
+        if (!owner)
             FAIL("The Trefftz trace must come from a qualified trailing owner");
-            return 0;
-        }
         const auto first = endpoint(vertices, wake.corners[0]);
         if (i != 0)
             CHECK(edge[i] == first);
