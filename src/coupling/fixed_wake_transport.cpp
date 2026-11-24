@@ -164,8 +164,8 @@ TransportStencil prepare_stencil(const WakeTransportClock& clock,
         reject(ResourceExceeded);
     if (count == 0 || clock.destination.step < 2)
         reject(InvalidInput);
-    if (limits.representation != core::Precision::Binary64 &&
-        limits.representation != core::Precision::TwoWord)
+    if (!a::p1_environment_supported() || (limits.representation != core::Precision::Binary64 &&
+                                           limits.representation != core::Precision::TwoWord))
         reject(PrecisionUnsupported);
     auto retained = allocate<RetainedParticle>(memory, count);
     auto visited = allocate<std::uint64_t>(memory, count);
