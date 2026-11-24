@@ -42,6 +42,19 @@ struct PgChartCandidateDual {
     double original_balance_upper;
 };
 
+/// Bounds original rational arithmetic across one candidate and all its corrections.
+struct PgChartRefinement {
+    PgReferenceLimits original_arithmetic;
+    std::uint64_t maximum_corrections;
+};
+
+template <class Output>
+struct PgChartRefined {
+    Output output;
+    PgReferenceCallInfo original_work;
+    std::uint64_t corrections; ///< Additional solves using the original prepared factor.
+};
+
 /// Fixed sparse projection candidate plus certificates in the original coefficient layout.
 class PgChartCandidate {
 public:
@@ -68,6 +81,17 @@ public:
                                                                const PgChartCandidateSolve&,
                                                                core::Workspace&,
                                                                core::ResourcePlan&) noexcept;
+
+    /// Qualify a retained TwoWord result directly with the original sparse rational rows.
+    /// The inner solve requires retained precision and algebraic checks only.
+    [[nodiscard]] core::Result<PgChartRefined<PgChartCandidateLift>>
+    refine_lift(PgChartCandidateInput independent, PgChartCandidateInput original_rhs,
+                const PgChartCandidateSolve&, const PgChartRefinement&, core::Workspace&,
+                core::ResourcePlan&) noexcept;
+
+    [[nodiscard]] core::Result<PgChartRefined<PgChartCandidateDual>>
+    refine_transpose(PgChartCandidateInput force, const PgChartCandidateSolve&,
+                     const PgChartRefinement&, core::Workspace&, core::ResourcePlan&) noexcept;
 
     /// Check actual retained work: f^T*q = h^T*r + lambda^T*c.
     [[nodiscard]] core::Result<double>

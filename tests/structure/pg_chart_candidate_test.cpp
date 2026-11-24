@@ -289,4 +289,90 @@ TEST_CASE("PG numerical chart keeps the exact sparse pattern and checks original
     dual_request.cancellation = requested_stop_token();
     check_failure(candidate.transpose({id, f}, dual_request, workspace, plan),
                   core::FailureCode::Cancelled);
+    // Keep the coefficient-space tolerances explicit for this real two-patch trial.
+    auto precise_forward = request(fwd);
+    auto precise_reverse = request(rev);
+    precise_forward.maximum_absolute_original_defect = 1e-15;
+    precise_reverse.maximum_absolute_original_defect = 1e-15;
+    const PgChartRefinement refinement{exact_limits, 3};
+    const auto refined =
+        take(candidate.refine_lift({id, r}, {id, c}, precise_forward, refinement, workspace, plan));
+    const auto refined_dual =
+        take(candidate.refine_transpose({id, f}, precise_reverse, refinement, workspace, plan));
+    CHECK(refined.output.coordinates.precision() == core::Precision::TwoWord);
+    CHECK(refined_dual.output.original_multipliers.precision() == core::Precision::TwoWord);
+    compare(refined.output.coordinates, exact_lift.values());
+    compare(refined_dual.output.independent_force, exact_dual.independent_force.values());
+    compare(refined_dual.output.original_multipliers, exact_dual.original_multipliers.values());
+    const auto refined_q = exact_words(a, refined.output.coordinates);
+    const auto refined_h = exact_words(a, refined_dual.output.independent_force);
+    const auto refined_lambda = exact_words(a, refined_dual.output.original_multipliers);
+    const auto exact_c = exact_words(a, c);
+    const auto& source = candidate.exact().original();
+    Q checked_work = 0, true_defect = 0, true_balance = 0;
+    for (std::size_t axis = 0; axis < 3; ++axis) {
+        std::vector<Q> balance(refined_q.size());
+        for (std::size_t j = 0; j < balance.size(); ++j) {
+            balance[j] = q(f_exact[j][axis]);
+            checked_work += balance[j] * q(refined_q[j][axis]);
+        }
+        for (std::size_t row = 0; row < refined_lambda.size(); ++row) {
+            Q residual = q(exact_c[row][axis]);
+            const auto multiplier = q(refined_lambda[row][axis]);
+            if (std::ranges::none_of(candidate.exact().pivots(), [&](const auto& pivot) {
+                    return pivot.original_row == static_cast<core::Index>(row);
+                }))
+                CHECK(multiplier == 0);
+            for (const auto& term : take(source.row(static_cast<core::Index>(row)))) {
+                const auto coefficient = q(term.coefficient);
+                const auto j = static_cast<std::size_t>(term.column);
+                residual -= coefficient * q(refined_q[j][axis]);
+                balance[j] -= coefficient * multiplier;
+            }
+            true_defect = std::max(true_defect, Q(abs(residual)));
+            checked_work -= multiplier * q(exact_c[row][axis]);
+        }
+        for (std::size_t i = 0; i < independent; ++i) {
+            const auto j = static_cast<std::size_t>(candidate.exact().free_columns()[i]);
+            CHECK(q(refined_q[j][axis]) == q(r_exact[i][axis]));
+            balance[j] -= q(refined_h[i][axis]);
+            checked_work -= q(refined_h[i][axis]) * q(r_exact[i][axis]);
+        }
+        for (const auto& residual : balance)
+            true_balance = std::max(true_balance, Q(abs(residual)));
+    }
+    CHECK(true_defect <= exact_bound(refined.output.original_residual_upper));
+    CHECK(true_balance <= exact_bound(refined_dual.output.original_balance_upper));
+    CHECK(refined.output.original_residual_upper <=
+          precise_forward.maximum_absolute_original_defect);
+    CHECK(refined_dual.output.original_balance_upper <=
+          precise_reverse.maximum_absolute_original_defect);
+    const auto refined_work = take(candidate.work_defect({id, f}, {id, r}, {id, c}, refined.output,
+                                                         refined_dual.output, 1e-12, 10'000, {}));
+    CHECK(abs(checked_work) <= exact_bound(refined_work));
+    CHECK(refined.original_work.scalar_operations > 0);
+    CHECK(refined_dual.original_work.partition_visits > 0);
+    auto too_few = refinement;
+    too_few.maximum_corrections = 0;
+    check_failure(
+        candidate.refine_lift({id, r}, {id, c}, precise_forward, too_few, workspace, plan),
+        core::FailureCode::PrecisionUnresolved);
+    check_failure(candidate.refine_transpose({id, f}, precise_reverse, too_few, workspace, plan),
+                  core::FailureCode::PrecisionUnresolved);
+    core::ResourcePlan no_payload{0};
+    check_failure(
+        candidate.refine_lift({id, r}, {id, c}, precise_forward, refinement, workspace, no_payload),
+        core::FailureCode::ResourceExceeded);
+    CHECK(no_payload.allocated_bytes() == 0);
+    too_few.original_arithmetic.maximum_scalar_operations = 0;
+    check_failure(candidate.refine_transpose({id, f}, precise_reverse, too_few, workspace, plan),
+                  core::FailureCode::ResourceExceeded);
+    precise_reverse.cancellation = requested_stop_token();
+    const auto charged_before = plan.allocated_bytes();
+    check_failure(candidate.refine_transpose({id, f}, precise_reverse, refinement, workspace, plan),
+                  core::FailureCode::Cancelled);
+    CHECK(plan.allocated_bytes() == charged_before);
+    check_failure(
+        candidate.refine_lift({id, r}, {id, c}, binary_request, refinement, workspace, plan),
+        core::FailureCode::PrecisionUnsupported);
 }

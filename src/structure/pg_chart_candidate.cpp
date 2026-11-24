@@ -118,6 +118,60 @@ Buffer buffer(std::size_t rows, std::span<const Words> values, bool two_word,
     auto lo = partition_take(DenseReal::copy(shape, low.values(), plan, volume_operation));
     return partition_take(Buffer::two_word(std::move(hi), std::move(lo), generation));
 }
+
+ExactRational original_tolerance(ReferenceArithmetic& math, const PgChartCandidateSolve& request) {
+    static_cast<void>(allowance(request.maximum_absolute_original_defect));
+    if (!std::holds_alternative<linear::RetainedPrecision>(request.precision.returned) ||
+        !request.precision.required_checks.empty())
+        partition_fail(core::FailureCode::PrecisionUnsupported);
+    return reference_binary64(math, request.maximum_absolute_original_defect);
+}
+
+ExactRational retained_rational(ReferenceArithmetic& math, Words value) {
+    auto high = reference_binary64(math, value.hi);
+    if (value.lo == 0.0)
+        return high;
+    return math.add(high, reference_binary64(math, value.lo));
+}
+
+Words round_original_pair(ReferenceArithmetic& math, const ExactRational& value) {
+    const PgProjectionComparator comparator{math, {}, 0};
+    const auto high = pg_round_word(comparator, value);
+    const auto residual = math.sub(value, reference_binary64(math, high));
+    return {high, pg_round_word(comparator, residual)};
+}
+
+void record_defect(ReferenceArithmetic& math, ExactRational& worst, const ExactRational& residual) {
+    if (residual.sign() == 0)
+        return;
+    auto magnitude = math.abs(residual);
+    if (math.compare(magnitude, worst) > 0)
+        worst = std::move(magnitude);
+}
+
+double upper_original(ReferenceArithmetic& math, const ExactRational& magnitude) {
+    const PgProjectionComparator comparator{math, {}, 0};
+    auto bound = pg_round_word(comparator, magnitude);
+    if (math.compare(reference_binary64(math, bound), magnitude) < 0)
+        bound = std::bit_cast<double>(std::bit_cast<std::uint64_t>(bound) + 1);
+    if (!volume_finite(bound))
+        partition_fail(core::FailureCode::PrecisionUnresolved);
+    return bound;
+}
+
+ExactRational original_row_defect(ReferenceArithmetic& math, const PgGlobalConstraints& original,
+                                  core::Index row, std::span<const ExactRational> values,
+                                  Words rhs) {
+    math.visit(1);
+    auto residual = retained_rational(math, rhs);
+    for (const auto& term : partition_take(original.row(row))) {
+        math.visit(1);
+        const auto& value = values[static_cast<std::size_t>(term.column)];
+        if (value.sign() != 0)
+            residual = math.sub(residual, math.mul(term.coefficient, value));
+    }
+    return residual;
+}
 } // namespace
 
 struct PgChartCandidate::Data {
@@ -411,6 +465,199 @@ core::Result<PgChartCandidateDual> PgChartCandidate::transpose(PgChartCandidateI
         budget.visit();
         return PgChartCandidateDual{data.identity, std::move(force_result),
                                     std::move(reaction_result), upper(worst)};
+    });
+}
+
+core::Result<PgChartRefined<PgChartCandidateLift>>
+PgChartCandidate::refine_lift(PgChartCandidateInput independent, PgChartCandidateInput original_rhs,
+                              const PgChartCandidateSolve& request,
+                              const PgChartRefinement& refinement, core::Workspace& workspace,
+                              core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgChartRefined<PgChartCandidateLift>> {
+        VisitBudget budget{request.maximum_visits, request.cancellation};
+        budget.visit();
+        ReferenceArithmetic math{refinement.original_arithmetic, plan};
+        math.cancel();
+        const auto lease = partition_take(workspace.acquire());
+        static_cast<void>(lease);
+        if (data_.size() == 0)
+            partition_fail(core::FailureCode::StaleGeneration);
+        auto& data = data_.values().front();
+        const auto r = planes(data.identity, independent, data.independent);
+        const auto c = planes(data.identity, original_rhs, data.rows);
+        math.admit(partition_add(data.columns, reference_live_rationals));
+        const auto allowed = original_tolerance(math, request);
+        const auto& original = exact_.original();
+        const auto pivots = exact_.pivots();
+        auto rhs = allocate<Words>(plan, partition_mul(3, data.rank));
+        auto coordinates = allocate<Words>(plan, partition_mul(3, data.columns));
+        auto exact_values = allocate<ExactRational>(plan, data.columns);
+        auto representative = allocate<core::Index>(plan, data.rows);
+        for (auto& selected : representative.values()) {
+            budget.visit();
+            selected = -1;
+        }
+        for (std::size_t i = 0; i < data.rank; ++i) {
+            budget.visit();
+            representative.values()[static_cast<std::size_t>(pivots[i].original_row)] =
+                partition_index(i);
+        }
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            auto lane = coordinates.values().subspan(axis * data.columns, data.columns);
+            for (std::size_t j = 0; j < data.columns; ++j) {
+                budget.visit();
+                const auto free = data.free.values()[j];
+                if (free >= 0)
+                    lane[j] = r.at(static_cast<std::size_t>(free), axis);
+                exact_values.values()[j] = retained_rational(math, lane[j]);
+            }
+            for (std::size_t i = 0; i < data.rank; ++i) {
+                budget.visit();
+                const auto row = pivots[i].original_row;
+                rhs.values()[axis * data.rank + i] = round_original_pair(
+                    math, original_row_defect(math, original, row, exact_values.values(),
+                                              c.at(static_cast<std::size_t>(row), axis)));
+            }
+        }
+        for (std::uint64_t corrections = 0;; ++corrections) {
+            budget.visit();
+            math.cancel();
+            const auto solved = data.solve(rhs.values(), false, request, plan);
+            const auto delta =
+                planes(data.identity, {data.identity, solved_values(solved)}, data.rank);
+            ExactRational worst;
+            const bool have_next = corrections < refinement.maximum_corrections;
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                auto lane = coordinates.values().subspan(axis * data.columns, data.columns);
+                for (std::size_t i = 0; i < data.rank; ++i) {
+                    budget.visit();
+                    auto& coordinate = lane[static_cast<std::size_t>(pivots[i].dependent_column)];
+                    coordinate = round_pair(lifted(coordinate) + lifted(delta.at(i, axis)));
+                }
+                for (std::size_t j = 0; j < data.columns; ++j) {
+                    budget.visit();
+                    exact_values.values()[j] = retained_rational(math, lane[j]);
+                }
+                for (std::size_t row = 0; row < data.rows; ++row) {
+                    budget.visit();
+                    const auto residual =
+                        original_row_defect(math, original, partition_index(row),
+                                            exact_values.values(), c.at(row, axis));
+                    record_defect(math, worst, residual);
+                    const auto index = representative.values()[row];
+                    if (have_next && index >= 0)
+                        rhs.values()[axis * data.rank + static_cast<std::size_t>(index)] =
+                            round_original_pair(math, residual);
+                }
+            }
+            if (math.compare(worst, allowed) <= 0) {
+                const auto bound = upper_original(math, worst);
+                auto result = buffer(data.columns, coordinates.values(), true,
+                                     request.output_generation, plan);
+                budget.visit();
+                math.cancel();
+                return PgChartRefined<PgChartCandidateLift>{
+                    {data.identity, std::move(result), bound}, math.info(), corrections};
+            }
+            if (!have_next || data.rank == 0)
+                partition_fail(core::FailureCode::PrecisionUnresolved);
+        }
+    });
+}
+
+core::Result<PgChartRefined<PgChartCandidateDual>>
+PgChartCandidate::refine_transpose(PgChartCandidateInput force,
+                                   const PgChartCandidateSolve& request,
+                                   const PgChartRefinement& refinement, core::Workspace& workspace,
+                                   core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgChartRefined<PgChartCandidateDual>> {
+        VisitBudget budget{request.maximum_visits, request.cancellation};
+        budget.visit();
+        ReferenceArithmetic math{refinement.original_arithmetic, plan};
+        math.cancel();
+        const auto lease = partition_take(workspace.acquire());
+        static_cast<void>(lease);
+        if (data_.size() == 0)
+            partition_fail(core::FailureCode::StaleGeneration);
+        auto& data = data_.values().front();
+        const auto f = planes(data.identity, force, data.columns);
+        math.admit(partition_add(data.columns, reference_live_rationals));
+        const auto allowed = original_tolerance(math, request);
+        const auto& original = exact_.original();
+        const auto pivots = exact_.pivots();
+        auto rhs = allocate<Words>(plan, partition_mul(3, data.rank));
+        auto multipliers = allocate<Words>(plan, partition_mul(3, data.rows));
+        auto reduced_force = allocate<Words>(plan, partition_mul(3, data.independent));
+        auto balance = allocate<ExactRational>(plan, data.columns);
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            for (std::size_t i = 0; i < data.rank; ++i) {
+                budget.visit();
+                rhs.values()[axis * data.rank + i] =
+                    f.at(static_cast<std::size_t>(pivots[i].dependent_column), axis);
+            }
+        for (std::uint64_t corrections = 0;; ++corrections) {
+            budget.visit();
+            math.cancel();
+            const auto solved = data.solve(rhs.values(), true, request, plan);
+            const auto delta =
+                planes(data.identity, {data.identity, solved_values(solved)}, data.rank);
+            ExactRational worst;
+            const bool have_next = corrections < refinement.maximum_corrections;
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                auto actual = multipliers.values().subspan(axis * data.rows, data.rows);
+                auto reduced =
+                    reduced_force.values().subspan(axis * data.independent, data.independent);
+                for (std::size_t col = 0; col < data.columns; ++col) {
+                    budget.visit();
+                    balance.values()[col] = retained_rational(math, f.at(col, axis));
+                }
+                for (std::size_t i = 0; i < data.rank; ++i) {
+                    budget.visit();
+                    const auto row = pivots[i].original_row;
+                    auto& multiplier = actual[static_cast<std::size_t>(row)];
+                    multiplier = round_pair(lifted(multiplier) + lifted(delta.at(i, axis)));
+                    const auto exact_multiplier = retained_rational(math, multiplier);
+                    math.visit(1);
+                    for (const auto& term : partition_take(original.row(row))) {
+                        math.visit(1);
+                        auto& component = balance.values()[static_cast<std::size_t>(term.column)];
+                        if (exact_multiplier.sign() != 0)
+                            component =
+                                math.sub(component, math.mul(term.coefficient, exact_multiplier));
+                    }
+                }
+                for (std::size_t col = 0; col < data.columns; ++col) {
+                    budget.visit();
+                    auto& residual = balance.values()[col];
+                    const auto free = data.free.values()[col];
+                    if (free >= 0) {
+                        auto& value = reduced[static_cast<std::size_t>(free)];
+                        value = round_original_pair(math, residual);
+                        residual = math.sub(residual, retained_rational(math, value));
+                    } else if (have_next) {
+                        const auto pivot = static_cast<std::size_t>(data.dependent.values()[col]);
+                        rhs.values()[axis * data.rank + pivot] =
+                            round_original_pair(math, residual);
+                    }
+                    record_defect(math, worst, residual);
+                }
+            }
+            if (math.compare(worst, allowed) <= 0) {
+                const auto bound = upper_original(math, worst);
+                auto h = buffer(data.independent, reduced_force.values(), true,
+                                request.output_generation, plan);
+                auto lambda =
+                    buffer(data.rows, multipliers.values(), true, request.output_generation, plan);
+                budget.visit();
+                math.cancel();
+                return PgChartRefined<PgChartCandidateDual>{
+                    {data.identity, std::move(h), std::move(lambda), bound},
+                    math.info(),
+                    corrections};
+            }
+            if (!have_next || data.rank == 0)
+                partition_fail(core::FailureCode::PrecisionUnresolved);
+        }
     });
 }
 
