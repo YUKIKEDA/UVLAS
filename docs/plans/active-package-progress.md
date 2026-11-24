@@ -51,7 +51,7 @@
 
 ## IM-06 入出力
 
-[#22](https://github.com/YUKIKEDA/UVLAS/issues/22) の終了審査まで12段階。安全に取得した同じバイト列を、外部入力の形式ごとの読取りに渡す。NastranとGmsh、CLIとPythonは、それぞれの共通基盤が揃い次第並行できる。
+[#22](https://github.com/YUKIKEDA/UVLAS/issues/22) の終了審査まで12段階。取得した同じバイト列から、Nastranの基本系座標、支持方向、集中質量をSIで評価する。外部面から共通参照面への変換では、対応する面の全域にわたる位置と法線の誤差を包絡した。
 
 | 段階 | 状態 | 到達点と残作業 |
 |---|---|---|
@@ -65,7 +65,7 @@
 | parametric入力とprepare | 残 | 型付きcaseを共通のRawModelへ渡す。物理準備には対応するIM-01／02／03の成果が必要 |
 | Nastran | 実装中 | 取得済みdeckから数値欄と継続を読み、GRIDとCORD2R/C/Sの参照を検査する。CTRIA3とCQUAD4は節点順、PSHELL／PCOMPの参照、材料軸、オフセット、厚さ指定を元の欄とともに保持する。MAT1・PSHELLとMAT8・PCOMPの材料参照、積層の宣言順と継承元を検査し、SPC・SPC1・SPCADDの支持集合とCONM2の重心・慣性欄を保持する。CBEAM の節点・方向・端部指定と、RBE2 の従属節点・自由度・熱膨張欄を保持する。同じデッキの CBEAM から PBEAM の断面・軸方向ステーションと MAT1 をたどれる。CLI は照合済みデッキを走査し、採用カードだけの単一ファイルであることを検査する。単位変換、梁断面の補間と K6／質量への対応、剛体拘束の組立て、sidecar が残る。 [座標・シェル](../verification/IM-06/nastran-shell-cards.md)・[材料・積層](../verification/IM-06/nastran-laminate-cards.md)・[支持集合](../verification/IM-06/nastran-support-cards.md)・[集中質量](../verification/IM-06/nastran-lumped-mass-cards.md)・[はり](../verification/IM-06/nastran-beam-cards.md)・[剛体結合](../verification/IM-06/nastran-rigid-link-cards.md)・[はり断面](../verification/IM-06/nastran-pbeam-cards.md)・[デッキの参照検査](../verification/IM-06/nastran-bulk-leaf-verification.md) |
 | Gmsh | 一部実装 | 検査済みのスナップショットからMSH 4.1 ASCIIを読み、疎な節点タグ、所属、物理名、向きと元の座標字句を保持する。CLI は同じバイト列からメッシュ本体に子参照がないことを確かめる。明示した面集合を検査し、共有辺の向きと頂点のつながりを照合して面の連結成分と自由境界を返す。sidecar の型、部材への割当、幾何の自己交差と物理モデルへの対応が残る。 [入力契約](../specs/foundation/gmsh-mesh-input-contract.md)・[面位相](../verification/IM-06/gmsh-surface-topology.md) |
-| 共通参照への変換 | 残 | 外部面を共通の曲面・厚さ・接続へ変換し、質量・仕事などの誤差を評価する。対応するIM-01／02の成果が必要 |
+| 共通参照への変換 | 実装中 | Nastranの座標を基本系へ包絡し、アフィンPG参照面への三角形・四辺形の対応で位置と法線の誤差を全域評価した。SPCの並進・回転の方向と、CONM2の重心・慣性を独立参照で照合した。任意の曲面、部材割当、接続と材料の組立て、変換前後の質量・仕事の誤差評価が残る。 [面の誤差上界](../verification/IM-06/nastran-affine-pg-bounds.md)・[支持方向](../verification/IM-06/nastran-spc-component-directions.md)・[集中質量](../verification/IM-06/nastran-basic-mass-geometry.md) |
 | 結果と診断 | 実装中 | 状態と来歴のJSON、確定観測のCSV、適格な可視化標本のVTU・PVDを内部で生成できる。VTU・PVDは層界面の両側と再始動区間を保つ。型検査・SI変換済みケースから、元入力、保持値、誤差半径、現時点で解決した既定値を出力し、その指紋を来歴に結び付けられる。物理回復から可視化標本を作り、物理準備で確定する設定とともに実行結果の保存へつなぐ工程が残る。 [解決済みケース](../verification/IM-06/resolved-case-document.md)・[観測CSV](../verification/IM-06/observation-csv.md)・[VTU・PVD](../verification/IM-06/visualization-series.md) |
 | checkpoint容器 | 完了 | 型付きチャンクと指紋からマニフェストを作り、既存番号を保持したまま確定する。中断した保存を除外し、型、長さ、SHA-256、指紋が一致する最新番号を復元する。 [マニフェストと確定ディレクトリの検証](../verification/IM-06/checkpoint-manifest.md) |
 | 実状態とresume | 残 | 全BDF2ステンシル、受理済みの微分・荷重・後流履歴、探索状態などを保存する。IM-04／05の実状態を使い、同版・同環境での再開結果のビット一致と非互換の拒否を確認する |

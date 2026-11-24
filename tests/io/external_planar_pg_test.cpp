@@ -3,6 +3,7 @@
 #include "source_digest.hpp"
 
 #include <algorithm>
+#include <compare>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -450,6 +451,122 @@ TEST_CASE("Nastran ZOFFS moves both components of an oblique planar normal",
     CHECK(point.position_metres[0] == f.r("1"));
     CHECK(point.position_metres[1] == f.r("11", "10"));
     CHECK(point.position_metres[2] == f.r("-1", "5"));
+}
+
+TEST_CASE("Irrational Nastran shell placement bounds the whole oriented planar PG map",
+          "[IO4-03][IO4-04][SH-D02][N4-02][integration][negative][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto length = f.r("1");
+    const std::array<ExactRational, 3> origin;
+    // The PG map is (s,t,0) with a +Z normal.
+    const std::array rotation{f.r("1"), f.r("0"), f.r("0"), f.r("0"), f.r("1"),
+                              f.r("0"), f.r("0"), f.r("0"), f.r("1")};
+    const auto target = flat_target(f, {rotation, origin, length}, plan);
+    const auto a = f.point("0", "0"), b = f.point("1", "0"), c = f.point("1", "1"),
+               d = f.point("0", "1");
+    const std::array ring{ExternalPgCorner{10, a}, ExternalPgCorner{40, b}, ExternalPgCorner{90, c},
+                          ExternalPgCorner{95, d}};
+    const std::array reverse{ring[0], ring[3], ring[2], ring[1]};
+    const std::array second_triangle{ring[0], ring[2], ring[3]};
+    const std::array forward{ExternalPgFace{101, Winding::Forward, ring}};
+    const std::array reversed{ExternalPgFace{102, Winding::Reversed, reverse}};
+    const std::array opposite{ExternalPgFace{103, Winding::Reversed, reverse}};
+    const std::array triangles{ExternalPgFace{201, Winding::Forward, std::span{ring}.first(3)},
+                               ExternalPgFace{202, Winding::Forward, second_triangle}};
+    constexpr std::string_view source =
+        "CORD2R,5,0,0.0,0.0,0.0,1.0,0.0,1.0,1.0,0.0,-1.0\n"
+        "GRID,10,5,0.0,0.0,0.0\nGRID,40,5,1000.0,0.0,0.0\n"
+        "GRID,90,5,1000.0,1000.0,0.0\nGRID,95,5,0.0,1000.0,0.0\nPSHELL,20\n"
+        "CQUAD4,101,20,10,40,90,95,,500.0\nCQUAD4,102,20,10,95,90,40,,-500.0\n"
+        "CQUAD4,103,20,10,95,90,40,,500.0\nCTRIA3,201,20,10,40,90,,500.0\n"
+        "CTRIA3,202,20,10,90,95,,500.0\n";
+    const NastranPgBoundLimits limits{{reference_limits(), 2}, 200'000};
+    std::optional<ExternalPgDiagnostic> diagnostic;
+    const auto measure = [&](const NastranShellCards& deck,
+                             std::span<const ExternalPgFace> selection) {
+        return NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Millimetre, selection,
+                                              limits, plan, &diagnostic);
+    };
+    const auto recorded = [&] {
+        const auto deck = read_cards(source, plan);
+        const auto exact = ExternalPlanarPg::prepare(target, deck, SiLengthUnit::Millimetre,
+                                                     forward, limits.region, plan, &diagnostic);
+        rejected(exact, Code::PrecisionUnsupported, diagnostic, Reason::CoordinateFrame);
+        auto first = take(measure(deck, forward));
+        const auto inspected = take(first.view());
+        const auto parsed = take(deck.view());
+        CHECK(inspected.digest == parsed.input.bulk.digest);
+        CHECK(inspected.patch == take(target.identity()));
+        CHECK(inspected.faces.front().element_field == parsed.elements[0].id_field.position);
+        CHECK(inspected.directed_work > 0);
+        const auto result_rev = take(measure(deck, reversed));
+        const auto reverse_view = take(result_rev.view());
+        REQUIRE(reverse_view.faces.front().nastran_offset);
+        if (const auto& reverse_offset = reverse_view.faces.front().nastran_offset) {
+            CHECK(reverse_offset->signed_metres == f.r("-1", "2"));
+        }
+        CHECK(take(reverse_view.faces.front().corners[3].cp_field).line == 3);
+        CHECK(reverse_view.faces.front().corners[3].cp == NastranCoordinateId{5});
+
+        const auto other = take(measure(deck, opposite));
+        const auto other_view = take(other.view());
+        const auto& large = other_view.faces.front().distance_upper_metres;
+        CHECK(std::is_gt(take(large.compare(f.r("61", "50"), algebra(), plan))));
+        CHECK(std::is_lt(take(large.compare(f.r("5", "4"), algebra(), plan))));
+        const auto split = take(measure(deck, triangles));
+        const auto split_view = take(split.view());
+        CHECK(split_view.faces.size() == 2);
+
+        const auto baseline = plan.remaining_bytes();
+        const auto partial = measure(deck, std::span{triangles}.first(1));
+        REQUIRE_FALSE(partial);
+        CHECK(take(diagnostic).reason == Reason::Coverage);
+        CHECK(plan.remaining_bytes() < baseline);
+        const auto after_partial = plan.remaining_bytes();
+        const NastranPgBoundLimits no_work{limits.region, 0};
+        const auto exhausted = NastranPlanarPgBounds::prepare(
+            target, deck, SiLengthUnit::Millimetre, forward, no_work, plan);
+        REQUIRE_FALSE(exhausted);
+        CHECK(exhausted.error().code == Code::ResourceExceeded);
+        CHECK(plan.remaining_bytes() < after_partial);
+        CHECK(take(deck.view()).input.bulk.digest == inspected.digest);
+        CHECK(take(target.identity()) == inspected.patch);
+        return first;
+    }();
+
+    const auto recorded_view = take(recorded.view());
+    const auto& row = recorded_view.faces.front();
+    REQUIRE(row.nastran_offset);
+    if (const auto& placed = row.nastran_offset) {
+        CHECK(placed->signed_metres == f.r("1", "2"));
+    }
+    // Independent map before comparison:
+    // ((s+1/2)/sqrt(2), t, (1/2-s)/sqrt(2)).
+    // The squared residual is convex and achieves 1/4 at s=0.
+    CHECK(std::is_gteq(take(row.distance_upper_metres.compare(f.r("1", "2"), algebra(), plan))));
+    CHECK(std::is_lt(take(
+        row.distance_upper_metres.compare(f.r("500000000001", "1000000000000"), algebra(), plan))));
+    // Chord from (1,0,1)/sqrt(2) to +Z has squared length 2-sqrt(2).
+    const auto square =
+        take(row.normal_chord_upper.multiply(row.normal_chord_upper, algebra(), plan));
+    const auto excess = take(f.r("2").subtract(square, algebra(), plan));
+    REQUIRE(excess.sign() > 0);
+    const auto exact_test = take(excess.multiply(excess, algebra(), plan));
+    CHECK(std::is_lteq(take(exact_test.compare(f.r("2"), algebra(), plan))));
+    CHECK(std::is_lt(take(row.normal_chord_upper.compare(f.r("766", "1000"), algebra(), plan))));
+
+    std::string warped{source};
+    const auto node = warped.find("GRID,95,5,0.0,1000.0,0.0");
+    REQUIRE(node != std::string::npos);
+    warped.replace(node, std::string_view{"GRID,95,5,0.0,1000.0,0.0"}.size(),
+                   "GRID,95,5,0.0,1000.0,1.0");
+    const auto nonplanar = read_cards(warped, plan);
+    const auto rejected_quad = measure(nonplanar, forward);
+    REQUIRE_FALSE(rejected_quad);
+    CHECK(rejected_quad.error().code == Code::GeometryInvalid);
+    CHECK(take(diagnostic).reason == Reason::Planarity);
+    CHECK(take(diagnostic).node == 95);
 }
 
 } // namespace
