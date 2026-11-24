@@ -1,0 +1,76 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-volume-position",
+  "ids": [
+    "SH-D02",
+    "SH-D05",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "96ed856fe43fa2c3e4393d268f2ac2146e3443c7",
+  "claimed_state": "固定PG体積点への位置写像と転置を両形式で評価し、格納誤差を認定した。同じWorkspaceで再利用でき、試験した反復でC++確保はなかった。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configurations": [
+        "Debug",
+        "Release"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "points": 2,
+    "conditioned_columns": 109,
+    "exact_oracle_cartesian_components": 666,
+    "audited_success_calls": 9,
+    "audited_precision_rejections": 2,
+    "cpp_allocation_attempts": 0,
+    "windows_release_ctest_passed": 1,
+    "windows_debug_ctest_passed": 1,
+    "linux_sanitizer_test_cases": 7,
+    "linux_sanitizer_assertions": 52475,
+    "linux_sanitizer_direct_timeout_seconds": 180,
+    "clang_tidy_translation_units": 2,
+    "rejected_mutation": {
+      "change": "omit the retained basis high word times the input low word",
+      "failed_assertions": 114
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-volume-mass-reference-contract.md": "89f7fe68b05c8a6a427be23a7b773f9fe97a45af0615f686e131c3e87a371c23",
+    "include/uvlas/structure/pg_volume_mass_reference.hpp": "c46477b607fd2c52028548886e0c7672aeb810cf0338cd720a9012b3f1192a2a",
+    "src/structure/pg_volume_mass_reference.cpp": "812fe72431184045d8c090c0a784d03e18bfaf888f4eb9e84eed5989bda9a010",
+    "src/structure/pg_rank_storage.hpp": "baf41ab8cf4a8ee63f11b05a2c4714eff277484bfa38ae352cfe436911ff6e7f",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "tests/support/allocation_audit.hpp": "43dbcee0598effdd3765a4d20c3bd2f844dddcb08d3b7d259989d09c276b0ba8",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-volume-position-contract.md": "dfe235ba43570c8189e44c9012b1a127a359e30ee4689d162d8ae5a554b5feb9",
+    "include/uvlas/structure/pg_volume_position.hpp": "5afbf443d30ffbca9dc91fae5284f9ca5ecd9688d9eed4e1e14c611983e3deaf",
+    "src/structure/pg_volume_position.cpp": "4bcb66659d21c0ed3e2d1ee6fbe037a6d45c2898eb2278b1e726a7ac5138b247",
+    "src/structure/pg_volume_position_arithmetic.hpp": "b430b347ef64d35719d55883b932743413f4a670d980b450124cd8df9955d7c0",
+    "tests/structure/pg_conditioning_test.cpp": "b976a86d665a0f0295938714cbad6387a6e324c8d2c0e88726bf3f045862b628",
+    "docs/verification/IM-01/pg-volume-position.md": "12462c017a3fdee2ba0631aecbd888d7cdca79e5a5686e702efe8df02fe2d872"
+  }
+}

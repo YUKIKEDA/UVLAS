@@ -1,7 +1,9 @@
+#include "../support/allocation_audit.hpp"
 #include "exact_polynomial_detail.hpp"
 #include "pg_partition_test_support.hpp"
 #include "pg_rank_storage.hpp"
 #include "pg_reference_projection.hpp"
+#include "pg_volume_position_arithmetic.hpp"
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
@@ -10,6 +12,7 @@
 #include <limits>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_volume_mass_reference.hpp>
+#include <uvlas/structure/pg_volume_position.hpp>
 
 namespace {
 using namespace uvlas;
@@ -575,6 +578,155 @@ Q independent_double(double value) {
     return exponent >= 0 ? Q{n * (I{1} << shift)} : Q{n} / (I{1} << shift);
 }
 
+void check_volume_position(const PgVolumeMassReference& reference,
+                           std::span<const Q> exact_shapes) {
+    using namespace test_support;
+    const auto points = reference.points().size();
+    const auto rank = reference.column_count();
+    REQUIRE(exact_shapes.size() == points * rank);
+    const auto n = 3 * rank;
+    const auto m = 3 * points;
+    const auto precision = reference.projection().representation;
+    const bool paired = precision == core::Precision::TwoWord;
+    const auto low_size = [paired](std::size_t size) { return paired ? size : 0; };
+    const auto absolute_error = paired ? 0x1p-75 : 0x1p-32;
+    const auto exact_error = independent_double(absolute_error);
+    std::vector<double> q_hi(n), q_lo(low_size(n)), f_hi(m), f_lo(low_size(m));
+    for (std::size_t i = 0; i < n; ++i)
+        q_hi[i] = static_cast<double>(static_cast<int>(i % 7) - 3) / 4;
+    for (std::size_t i = 0; i < m; ++i)
+        f_hi[i] = static_cast<double>(i + 1) / 8;
+    if (paired) {
+        q_lo[0] = 0x1p-50;
+        f_lo[0] = -0x1p-51;
+    }
+    const PgCartesianWords q_input{precision, q_hi, q_lo}, f_input{precision, f_hi, f_lo};
+    const auto forward = PgVolumePositionDirection::ToPoints;
+    const auto transpose = PgVolumePositionDirection::TransposeToColumns;
+    const auto forward_steps = q_hi.size() + q_lo.size() + m + m * rank;
+    const auto transpose_steps = f_hi.size() + f_lo.size() + n + n * points;
+    const PgVolumePositionLimits fwd_caps{forward_steps, absolute_error, {}};
+    const PgVolumePositionLimits trans_caps{transpose_steps, absolute_error, {}};
+    core::ResourcePlan plan{profile};
+    auto output =
+        take(PgVolumePositionResult::allocate(static_cast<core::Index>(n), precision, plan));
+    const std::array<std::unique_ptr<core::Workspace>, 2> workspaces{
+        take(core::Workspace::create(output.workspace_bytes(), plan)),
+        take(core::Workspace::create(output.workspace_bytes() - 1, plan))};
+    auto& workspace = *workspaces[0];
+    CHECK(output.words().high.empty());
+
+    const auto exact_word = [](PgCartesianWords words, std::size_t k) -> Q {
+        auto value = independent_double(words.high[k]);
+        if (!words.low.empty())
+            value += independent_double(words.low[k]);
+        return value;
+    };
+    const auto compare_run = [&](PgVolumePositionDirection direction, PgCartesianWords input,
+                                 const PgVolumePositionLimits& caps) {
+        AllocationAudit audit{cpp_backend, AuditThreadDomain::CallingThread};
+        const auto applied =
+            apply_pg_volume_position(reference, direction, input, caps, workspace, output);
+        const auto allocations = audit.finish();
+        REQUIRE(applied);
+        CHECK(allocations.status == AllocationAuditStatus::Clean);
+        CHECK(allocations.cpp_allocation_attempts == 0);
+        return output.words();
+    };
+    const auto evaluate = [&](PgVolumePositionDirection direction, PgCartesianWords input,
+                              const PgVolumePositionLimits& caps) {
+        const auto words = compare_run(direction, input, caps);
+        const bool to_points = direction == forward;
+        const auto outer = to_points ? points : rank;
+        const auto inner = to_points ? rank : points;
+        REQUIRE(words.representation == precision);
+        REQUIRE(words.high.size() == 3 * outer);
+        REQUIRE(words.low.size() == low_size(3 * outer));
+        std::vector<Q> retained(words.high.size());
+        for (std::size_t i = 0; i < outer; ++i)
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                CAPTURE(i, axis);
+                Q expected;
+                for (std::size_t j = 0; j < inner; ++j) {
+                    const auto coefficient = to_points ? i * rank + j : j * rank + i;
+                    expected += exact_shapes[coefficient] * exact_word(input, 3 * j + axis);
+                }
+                auto& value = retained[3 * i + axis];
+                value = exact_word(words, 3 * i + axis);
+                CHECK(abs(value - expected) <= exact_error);
+            }
+        return retained;
+    };
+    const auto positions = evaluate(forward, q_input, fwd_caps);
+    const auto repeated = compare_run(forward, q_input, fwd_caps);
+    for (std::size_t i = 0; i < positions.size(); ++i)
+        CHECK(exact_word(repeated, i) == positions[i]);
+    const auto forces = evaluate(transpose, f_input, trans_caps);
+
+    Q forward_work{}, transpose_work{}, input_norm{};
+    for (std::size_t i = 0; i < positions.size(); ++i) {
+        const auto scalar = exact_word(f_input, i);
+        forward_work += positions[i] * scalar;
+        input_norm += abs(scalar);
+    }
+    for (std::size_t i = 0; i < forces.size(); ++i) {
+        const auto scalar = exact_word(q_input, i);
+        transpose_work += forces[i] * scalar;
+        input_norm += abs(scalar);
+    }
+    CHECK(abs(forward_work - transpose_work) <= exact_error * input_norm);
+
+    auto caps = trans_caps;
+    --caps.maximum_steps;
+    const auto rejected = [&](PgCartesianWords input, const PgVolumePositionLimits& bounds,
+                              core::Workspace& scratch, core::FailureCode failure) {
+        check_failure(
+            apply_pg_volume_position(reference, transpose, input, bounds, scratch, output),
+            failure);
+        REQUIRE(output.words().high.size() == forces.size());
+        for (std::size_t i = 0; i < forces.size(); ++i)
+            CHECK(exact_word(output.words(), i) == forces[i]);
+    };
+    rejected(f_input, caps, workspace, core::FailureCode::ResourceExceeded);
+    rejected(f_input, trans_caps, *workspaces[1], core::FailureCode::ResourceExceeded);
+    caps = trans_caps;
+    caps.cancellation = requested_stop_token();
+    rejected(f_input, caps, workspace, core::FailureCode::Cancelled);
+    caps = trans_caps;
+    caps.maximum_absolute_error = 0;
+    rejected(f_input, caps, workspace, core::FailureCode::PrecisionUnresolved);
+    auto bad_high = f_hi;
+    bad_high.back() = std::numeric_limits<double>::infinity();
+    rejected({precision, bad_high, f_lo}, trans_caps, workspace, core::FailureCode::Nonfinite);
+    {
+        const auto busy = take(workspace.acquire());
+        static_cast<void>(busy);
+        rejected(f_input, trans_caps, workspace, core::FailureCode::InvalidInput);
+    }
+    CHECK(evaluate(forward, q_input, fwd_caps) == positions);
+    if (paired) {
+        const PgCartesianWords mixed{core::Precision::Binary64, q_hi, {}};
+        auto mixed_caps = fwd_caps;
+        mixed_caps.maximum_steps -= q_lo.size();
+        REQUIRE(evaluate(forward, mixed, mixed_caps) != positions);
+    }
+    // A single unit coefficient reproduces an already representable retained N.
+    // The zero error limit still has to reject the nonzero source uncertainty.
+    std::vector<double> unit(n);
+    unit[1] = 1;
+    const auto before = std::vector<double>(output.words().high.begin(), output.words().high.end());
+    auto rigorous = fwd_caps;
+    rigorous.maximum_absolute_error = 0;
+    const PgCartesianWords unit_input{core::Precision::Binary64, unit, {}};
+    AllocationAudit audit{cpp_backend, AuditThreadDomain::CallingThread};
+    const auto refused =
+        apply_pg_volume_position(reference, forward, unit_input, rigorous, workspace, output);
+    const auto evidence = audit.finish();
+    check_failure(refused, core::FailureCode::PrecisionUnresolved);
+    CHECK(evidence.cpp_allocation_attempts == 0);
+    CHECK(std::ranges::equal(output.words().high, before));
+}
+
 void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certificate,
                                   const std::vector<std::vector<Term>>& terms,
                                   std::span<const ExactRational> transform,
@@ -680,6 +832,8 @@ void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certifi
     };
     const auto budget_n = independent_double(projection.maximum_shape_error);
     const auto budget_j = independent_double(projection.maximum_volume_jacobian_error_metres_cubed);
+    std::vector<Q> exact_shapes;
+    exact_shapes.reserve(terms.size() * queries.size());
     for (std::size_t row = 0; row < queries.size(); ++row) {
         const auto& point = result.points()[row];
         CHECK(point.cell == cell);
@@ -692,18 +846,20 @@ void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certifi
             const auto expected =
                 conditioned_jet(terms, transform, column, cell, s, t, expected_zeta[row])[0];
             CHECK(abs(stored(row * stride + column + 1) - expected) <= budget_n);
+            exact_shapes.push_back(expected);
         }
     }
     if (two_word) {
         CHECK(std::ranges::any_of(words.low, [](double low) { return low != 0; }));
         CHECK(abs(independent_double(words.high.front()) - expected_jacobian.front()) > budget_j);
     }
+    check_volume_position(result, exact_shapes);
 }
 
 } // namespace
 
 TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory fields",
-          "[SH-D03][N4-02][N4-08][verification]") {
+          "[SH-D02][SH-D03][SH-D05][N4-02][N4-06][N4-08][verification]") {
     Fixture f;
     core::Workspace ws{core::PlannedBuffer<std::byte>{}};
     core::ResourcePlan plan{profile};
@@ -1032,4 +1188,27 @@ TEST_CASE("PG projection rounds the actual exact radical and enforces the reques
     check_failure(round(overflow_tie, one, 0x1p970, binary),
                   core::FailureCode::PrecisionUnresolved);
     CHECK(take(round(below_tie, one, 0x1p970, binary)).high == std::numeric_limits<double>::max());
+}
+
+TEST_CASE("PG dyadic dot preserves cancellation and subnormal rounding",
+          "[SH-D02][SH-D05][N4-06][verification]") {
+    using namespace detail;
+    const auto max = volume_decode(std::numeric_limits<double>::max());
+    const auto min = volume_decode(std::numeric_limits<double>::denorm_min());
+    const auto one = volume_decode(1);
+    const auto large_product = volume_product(max, max);
+    const auto subnormal = volume_product(min, one);
+    const auto cancelled = large_product + subnormal - large_product;
+    CHECK(take(volume_round(cancelled)) == std::numeric_limits<double>::denorm_min());
+    check_failure(volume_round(large_product), core::FailureCode::PrecisionUnresolved);
+    const auto half_subnormal = volume_product(min, volume_decode(0.5));
+    CHECK(take(volume_round(half_subnormal)) == 0);
+    CHECK(take(volume_round(subnormal + half_subnormal)) ==
+          2 * std::numeric_limits<double>::denorm_min());
+    const auto tail = volume_lift(volume_decode(0x1p-53));
+    const auto tie = volume_lift(one) + tail;
+    const auto paired = take(volume_finalize(tie, {}, {}, true));
+    CHECK(paired.high == 1);
+    CHECK(paired.low == 0x1p-53);
+    check_failure(volume_finalize(tie, {}, {}, false), core::FailureCode::PrecisionUnresolved);
 }

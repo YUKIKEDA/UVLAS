@@ -347,8 +347,9 @@ void match_linearization_context(linear::Context actual, const linear::Context& 
     const bool is_distinct_matrix = actual.cache.matrix != primal.cache.matrix;
     if (transposed != is_distinct_matrix)
         reject(core::FailureCode::StaleGeneration);
-    actual.cache.scales = primal.cache.scales;
     if (transposed) {
+        if (actual.cache.scales == primal.cache.scales)
+            reject(core::FailureCode::StaleGeneration);
         const auto is_primal_layout = [&](core::ScopeId layout) {
             return layout == primal.unknown_layout || layout == primal.residual_layout;
         };
@@ -359,7 +360,29 @@ void match_linearization_context(linear::Context actual, const linear::Context& 
         actual.unknown_layout = primal.unknown_layout;
         actual.residual_layout = primal.residual_layout;
     }
+    actual.cache.scales = primal.cache.scales;
     if (actual != primal)
+        reject(core::FailureCode::StaleGeneration);
+}
+
+void match_reused_scales(const linear::Scales& actual, const linear::Certificate& primal,
+                         p::Work& work) {
+    if (actual.context.cache.scales != primal.context().cache.scales)
+        return;
+    const auto equal = [&](auto supplied, auto certified) {
+        if (supplied.size() != certified.size())
+            return false;
+        for (std::size_t i = 0; i < supplied.size(); ++i) {
+            work.step();
+            if (supplied[i] != certified[i])
+                return false;
+        }
+        return true;
+    };
+    if (!equal(actual.unknown, primal.unknown_scales()) ||
+        !equal(actual.residual, primal.residual_scales()) ||
+        !equal(actual.unknown_units, primal.unknown_units()) ||
+        !equal(actual.residual_units, primal.residual_units()))
         reject(core::FailureCode::StaleGeneration);
 }
 
@@ -1041,8 +1064,9 @@ struct NonpenetrationBuilder {
         const auto shape = primal.solution_.values().shape();
         if (input.size() != order || shape.columns != 1 || !std::cmp_equal(shape.rows, order))
             reject(core::FailureCode::InvalidInput);
-        const auto previous = primal.solution_.certificate().context();
-        match_linearization_context(request.scales.context, previous, transposed);
+        const auto& previous = primal.solution_.certificate();
+        match_linearization_context(request.scales.context, previous.context(), transposed);
+        match_reused_scales(request.scales, previous, work);
         validate_circulation(request, order, work, transposed);
         auto right = allocate<p::Interval>(memory, order);
         for (std::size_t i = 0; i < order; ++i) {
