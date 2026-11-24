@@ -212,7 +212,7 @@ CaseUniformTimeWindow canonical_window(const TimeWindow& source, SiSeries& value
 struct ImportContext {
     const io::SiCase& source;
     const s::Case& root;
-    const s::FlowKnown& flow;
+    const decltype(s::FlowKnown::events)* events;
     p::PchipInputStamp stamp;
     std::optional<CaseUniformTimeWindow> window;
     a::UniformFlowWorkspace& workspace;
@@ -226,19 +226,28 @@ struct ImportContext {
             a::prepare_uniform_flow(request, workspace, limits.flow, memory, stop, details));
     }
 
+    [[nodiscard]] std::uint64_t event_count() const noexcept {
+        return events == nullptr ? 0 : events->size();
+    }
+
+    [[nodiscard]] std::span<const RationalView> read_events(SiSeries& values) const {
+        if (events == nullptr)
+            return {};
+        return values.sequence(*events, seconds);
+    }
+
     template <class Series>
     a::UniformFlowReady operator()(const Series& series) const {
         if constexpr (std::is_same_v<Series, s::TimeSeriesConstant>) {
-            SiSeries values{
-                source, add_count(flow.events.size(), xyz, details), limits, memory, stop, details};
-            const auto events = values.sequence(flow.events, seconds);
-            return prepare({stamp, events, a::ConstantUniformFlow{values.row(series.value)}});
+            SiSeries values{source, add_count(event_count(), xyz, details), limits, memory, stop,
+                            details};
+            const auto declared = read_events(values);
+            return prepare({stamp, declared, a::ConstantUniformFlow{values.row(series.value)}});
         } else if constexpr (std::is_same_v<Series, s::TimeSeriesPolynomial>) {
-            const auto count =
-                add_count(4,
-                          add_count(flow.events.size(),
-                                    components(series.coefficients.size(), details), details),
-                          details);
+            const auto count = add_count(
+                4,
+                add_count(event_count(), components(series.coefficients.size(), details), details),
+                details);
             const auto required = transient_window(root, details);
             SiSeries values{source, count, limits, memory, stop, details, required ? 2U : 0U};
             const auto domain = [&] {
@@ -248,28 +257,28 @@ struct ImportContext {
                     values.check_coverage(lower, upper, *required);
                 return std::pair{values.retain(lower), values.retain(upper)};
             }();
-            const auto events = values.sequence(flow.events, seconds);
+            const auto declared = read_events(values);
             return prepare(
-                {stamp, events,
+                {stamp, declared,
                  a::PolynomialUniformFlow{values.read(series.origin, seconds),
                                           values.read(series.scale, seconds), domain.first,
                                           domain.second, values.grid(series.coefficients)}});
         } else if constexpr (std::is_same_v<Series, s::TimeSeriesPchip>) {
             const auto requested = window_for(root, window, details);
             const auto outside = series.outside.record();
-            auto count = add_count(flow.events.size(), series.times.size(), details);
+            auto count = add_count(event_count(), series.times.size(), details);
             count = add_count(count, components(series.values.size(), details), details);
             if (std::holds_alternative<TimeWindowFields>(requested))
                 count = add_count(count, 2, details);
             if (std::holds_alternative<s::OutsidePeriodic>(outside))
                 count = add_count(count, 1, details);
             SiSeries values{source, count, limits, memory, stop, details};
-            const auto events = values.sequence(flow.events, seconds);
+            const auto declared = read_events(values);
             const auto times = values.sequence(series.times, seconds);
             const auto samples = values.grid(series.values);
             const auto interval = canonical_window(requested, values);
             const auto policy = outside_policy(outside, values);
-            return prepare({stamp, events,
+            return prepare({stamp, declared,
                             a::PchipUniformFlow{{times, samples, xyz},
                                                 {interval.begin, interval.end, policy}}});
         } else {
@@ -317,9 +326,54 @@ struct Builder {
         const auto* known = std::get_if<s::FlowKnown>(&flow);
         if (!known || !std::holds_alternative<s::GustNone>(known->gust.record()))
             fail(Unsupported, preparation, details);
-        const ImportContext session{source,    root,   *known, stamp, window,
-                                    workspace, limits, memory, stop,  details};
+        const ImportContext session{source,    root,   &known->events, stamp, window,
+                                    workspace, limits, memory,         stop,  details};
         return CaseUniformFlowReady{std::visit(session, known->uniform.record())};
+    }
+
+    static CasePrescribedWakeReady
+    prepare_prescribed(const io::SiCase& source, p::PchipInputStamp stamp,
+                       std::optional<CaseUniformTimeWindow> window,
+                       a::UniformFlowWorkspace& workspace, const CaseUniformFlowLimits& limits,
+                       core::ResourcePlan& memory, const std::stop_token& stop,
+                       core::FailureDetails details) {
+        if (stop.stop_requested())
+            fail(Cancelled, preparation, details);
+        const auto schema = take(source.source_case());
+        const auto root = take(schema.get().root());
+        const auto wake = std::visit([](const auto& analysis) { return analysis.wake.record(); },
+                                     root.analysis.record());
+        const auto* active = std::get_if<s::WakeActive>(&wake);
+        if (active == nullptr)
+            fail(Unsupported, preparation, details);
+        const auto convection = active->convection.record();
+        const auto* prescribed = std::get_if<s::ConvectionPrescribed>(&convection);
+        if (prescribed == nullptr)
+            fail(Unsupported, preparation, details);
+        const ImportContext session{source,    root,   nullptr, stamp, window,
+                                    workspace, limits, memory,  stop,  details};
+        return CasePrescribedWakeReady{
+            CaseUniformFlowReady{std::visit(session, prescribed->velocity.record())}};
+    }
+
+    [[nodiscard]] static const CaseUniformFlowReady&
+    provider(const CasePrescribedWakeReady& field) noexcept {
+        return field.provider_;
+    }
+    [[nodiscard]] static CasePrescribedWakeEvaluation
+    prescribed(CaseUniformFlowEvaluation&& value) noexcept {
+        return CasePrescribedWakeEvaluation{std::move(value)};
+    }
+    [[nodiscard]] static CasePrescribedWakeSnapshot
+    prescribed(a::UniformFlowSnapshot&& value) noexcept {
+        return CasePrescribedWakeSnapshot{std::move(value)};
+    }
+    [[nodiscard]] static const a::UniformFlowSnapshot&
+    snapshot(const CasePrescribedWakeSnapshot& saved) noexcept {
+        return saved.snapshot_;
+    }
+    [[nodiscard]] static CasePrescribedWakeReady prescribed(CaseUniformFlowReady&& value) noexcept {
+        return CasePrescribedWakeReady{std::move(value)};
     }
 
     static CaseUniformFlowReady restore(const a::UniformFlowSnapshotView& saved,
@@ -400,6 +454,66 @@ restore_case_uniform_flow(const a::UniformFlowSnapshotView& saved,
     return guarded<CaseUniformFlowReady>(evaluation, details, [&] {
         return case_flow_detail::Builder::restore(saved, current, workspace, limits, memory, stop,
                                                   details);
+    });
+}
+
+core::Result<CasePrescribedWakeReady>
+prepare_case_prescribed_wake(const io::SiCase& source, p::PchipInputStamp stamp,
+                             std::optional<CaseUniformTimeWindow> window,
+                             a::UniformFlowWorkspace& workspace,
+                             const CaseUniformFlowLimits& limits, core::ResourcePlan& memory,
+                             const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return guarded<CasePrescribedWakeReady>(preparation, details, [&] {
+        return case_flow_detail::Builder::prepare_prescribed(source, stamp, window, workspace,
+                                                             limits, memory, stop, details);
+    });
+}
+
+core::Result<p::CurveAdmission>
+forecast_case_prescribed_wake(const CasePrescribedWakeReady& field,
+                              const CasePrescribedWakeReady& current, CaseUniformFlowQuery query,
+                              p::CurveLimits limits, const std::stop_token& stop,
+                              core::FailureDetails details) noexcept {
+    using B = case_flow_detail::Builder;
+    return forecast_case_uniform_flow(B::provider(field), B::provider(current), query, limits, stop,
+                                      details);
+}
+
+core::Result<CasePrescribedWakeEvaluation>
+evaluate_case_prescribed_wake(const CasePrescribedWakeReady& field,
+                              const CasePrescribedWakeReady& current, CaseUniformFlowQuery query,
+                              a::UniformFlowWorkspace& workspace, p::CurveLimits limits,
+                              core::ResourcePlan& memory, const std::stop_token& stop,
+                              core::FailureDetails details) noexcept {
+    using B = case_flow_detail::Builder;
+    return guarded<CasePrescribedWakeEvaluation>(evaluation, details, [&] {
+        return B::prescribed(
+            take(evaluate_case_uniform_flow(B::provider(field), B::provider(current), query,
+                                            workspace, limits, memory, stop, details)));
+    });
+}
+
+core::Result<CasePrescribedWakeSnapshot>
+snapshot_case_prescribed_wake(const CasePrescribedWakeReady& field,
+                              a::UniformFlowWorkspace& workspace, p::CurveLimits limits,
+                              core::ResourcePlan& memory, const std::stop_token& stop,
+                              core::FailureDetails details) noexcept {
+    using B = case_flow_detail::Builder;
+    return guarded<CasePrescribedWakeSnapshot>(evaluation, details, [&] {
+        return B::prescribed(take(snapshot_case_uniform_flow(B::provider(field), workspace, limits,
+                                                             memory, stop, details)));
+    });
+}
+
+core::Result<CasePrescribedWakeReady> restore_case_prescribed_wake(
+    const CasePrescribedWakeSnapshot& saved, const CasePrescribedWakeReady& current,
+    a::UniformFlowWorkspace& workspace, p::CurveLimits limits, core::ResourcePlan& memory,
+    const std::stop_token& stop, core::FailureDetails details) noexcept {
+    using B = case_flow_detail::Builder;
+    return guarded<CasePrescribedWakeReady>(evaluation, details, [&] {
+        const auto view = take(B::snapshot(saved).view());
+        return B::prescribed(take(restore_case_uniform_flow(view, B::provider(current), workspace,
+                                                            limits, memory, stop, details)));
     });
 }
 

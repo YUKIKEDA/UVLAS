@@ -62,4 +62,48 @@ private:
 project_case_uniform_flow(CaseUniformFlowEvaluation&&, const CaseFlowProjectionRequest&,
                           const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
+class ProjectedCasePrescribedWake {
+public:
+    ProjectedCasePrescribedWake(ProjectedCasePrescribedWake&&) noexcept = default;
+    ProjectedCasePrescribedWake& operator=(ProjectedCasePrescribedWake&&) noexcept = default;
+    ProjectedCasePrescribedWake(const ProjectedCasePrescribedWake&) = delete;
+    ProjectedCasePrescribedWake& operator=(const ProjectedCasePrescribedWake&) = delete;
+
+    [[nodiscard]] const aero::detail::ExactUniformFlowJet& jet() const& noexcept {
+        return value_.source().jet;
+    }
+    [[nodiscard]] const aero::detail::ExactUniformFlowJet& jet() const&& = delete;
+    [[nodiscard]] aero::detail::pchip::RequestedSide requested_side() const noexcept {
+        return value_.source().requested_side;
+    }
+    [[nodiscard]] core::Result<io::SiEnclosure> velocity(std::size_t component) const noexcept {
+        return value_.velocity(component);
+    }
+    [[nodiscard]] core::Result<io::SiEnclosure> time_partial(std::size_t component) const noexcept {
+        return value_.time_partial(component);
+    }
+    [[nodiscard]] core::Result<io::SiEnclosure>
+    spatial_partial(std::size_t component, std::size_t coordinate) const noexcept {
+        return value_.spatial_partial(component, coordinate);
+    }
+    [[nodiscard]] core::Precision representation() const noexcept {
+        return value_.representation();
+    }
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return value_.used_steps();
+    }
+
+private:
+    friend struct case_flow_detail::PrescribedProjection;
+    explicit ProjectedCasePrescribedWake(ProjectedCaseUniformFlow&& value) noexcept
+        : value_(std::move(value)) {}
+    ProjectedCaseUniformFlow value_;
+};
+
+/// Use the same per-component SI projection bounds while preserving transport provenance.
+/// The evaluated transport jet remains active when a projection fails.
+[[nodiscard]] core::Result<ProjectedCasePrescribedWake>
+project_case_prescribed_wake(CasePrescribedWakeEvaluation&&, const CaseFlowProjectionRequest&,
+                             const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
 } // namespace uvlas::coupling::detail
