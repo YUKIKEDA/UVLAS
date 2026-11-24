@@ -513,7 +513,8 @@ PgRankPreparation::translation_axis(PgRankRequiredColumn target) const noexcept 
 std::array<std::array<ExactRational, 3>, 3>
 PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn column,
                                   PgCellIndex cell, const ExactRational& u, const ExactRational& v,
-                                  const ExactRational& axis_scale, bool derivatives) const {
+                                  const ExactRational& axis_scale, bool derivatives,
+                                  PgRankMonomialPowers* powers) const {
     const auto& state = rank_state(state_);
     math.visit(1);
     const auto k = rank_index(column.value, state.info.rank);
@@ -539,6 +540,11 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
             math.charge();
             const auto coefficient =
                 rank_exact(state.basis_values.values()[offset], math.leaf_limits, math.plan);
+            if (powers != nullptr) {
+                jet[field][0] =
+                    math.add(jet[field][0], powers->term(math, coefficient, row.powers));
+                continue;
+            }
             for (std::size_t i = 0; i < orders.size(); ++i) {
                 const auto order = orders[i];
                 if (order.first > row.powers.first || order.second > row.powers.second)
@@ -553,6 +559,40 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
             jet[field][i] = math.mul(jet[field][i], axis_scale);
     }
     return jet;
+}
+
+bool PgRankMonomialPowers::fits(const ExactRational& u, const ExactRational& v,
+                                const ExactLimits& limits) {
+    // The validated rank dictionaries bound the total degree and store the
+    // coefficients in RankCell. Bound the products before any cancellation.
+    const auto width =
+        partition_add(std::numeric_limits<RankCell>::digits,
+                      partition_mul(degree, std::max(partition_bits(u), partition_bits(v))));
+    return width <= std::min(limits.maximum_value_bits, limits.maximum_work_bits);
+}
+
+const ExactRational& PgRankMonomialPowers::Axis::power(ReferenceArithmetic& math,
+                                                       std::size_t exponent) {
+    if (exponent == 1)
+        return coordinate;
+    while (last_power < exponent) {
+        auto& next = values[last_power - 1];
+        next = math.mul(last_power == 1 ? coordinate : values[last_power - 2], coordinate);
+        ++last_power;
+    }
+    return values[exponent - 2];
+}
+
+ExactRational PgRankMonomialPowers::term(ReferenceArithmetic& math,
+                                         const ExactRational& coefficient, ExactPowers exponents) {
+    const auto a = static_cast<std::size_t>(exponents.first);
+    const auto b = static_cast<std::size_t>(exponents.second);
+    if (a == 0)
+        return b == 0 ? math.copy(coefficient) : math.mul(coefficient, v_.power(math, b));
+    auto value = math.mul(coefficient, u_.power(math, a));
+    if (b != 0)
+        value = math.mul(value, v_.power(math, b));
+    return value;
 }
 
 core::Result<std::span<const std::uint32_t>>

@@ -134,6 +134,24 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
         CHECK(product_entries[i].upper == explicit_entries[i].upper);
     }
 
+    // A smaller exact value limit leaves room for this geometry and finite rule,
+    // but not for every cached power product allowed by the rank dictionary.
+    auto narrow_basis = make_curve_basis();
+    auto narrow_limits = limits;
+    narrow_limits.arithmetic.algebra.maximum_value_bits = 1536;
+    core::ResourcePlan narrow_plan{profile};
+    const auto narrow_gram =
+        take(PgDiscreteGram::prepare_product(std::move(narrow_basis), {low, low, depth_pair}, grid,
+                                             narrow_limits, scratch, narrow_plan));
+    const auto narrow_entries = take(narrow_gram.enclosure()).upper_triangle;
+    REQUIRE(narrow_entries.size() == product_entries.size());
+    CHECK(low_gram.info().arithmetic.scalar_operations <
+          narrow_gram.info().arithmetic.scalar_operations);
+    for (std::size_t i = 0; i < product_entries.size(); ++i) {
+        CHECK(product_entries[i].lower == narrow_entries[i].lower);
+        CHECK(product_entries[i].upper == narrow_entries[i].upper);
+    }
+
     // A symmetric five-point Gauss approximation to 42 decimal places.
     // The symmetric coordinates and reconstructed center weight keep the
     // mass and first moment exact for the actual finite rational rule.
