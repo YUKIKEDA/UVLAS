@@ -996,6 +996,31 @@ foreach(wing_index RANGE 0 1)
             TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
     endforeach()
 endforeach()
+set(multiple_surface_cases steady loads)
+foreach(native_loads RANGE 0 1)
+    list(GET multiple_surface_cases ${native_loads} mode)
+    set(test_name coupling.multiple_surface_${mode})
+    set(target uvlas_test_coupling_multiple_surface_${mode})
+    set(mode_options TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
+    if(native_loads)
+        # The full frozen load observation repeats the qualified action at every
+        # load point. The matrix and work regression still runs in every build.
+        set(mode_options TIMEOUT 420 CONFIGURATIONS Release)
+    endif()
+    uvlas_add_test(${test_name}
+        LABELS V-MULTI verification
+        SOURCES coupling/multiple_surface_steady_test.cpp
+        LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json
+        ${mode_options})
+    target_include_directories(${target} PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+    target_compile_definitions(${target} PRIVATE
+        UVLAS_MULTIPLE_SURFACE_NATIVE_LOADS=${native_loads}
+        UVLAS_MULTIPLE_SURFACE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/multiple-surface-steady-v1.json")
+    if(native_loads AND TEST "${test_name}")
+        set_tests_properties(${test_name} PROPERTIES RUN_SERIAL TRUE)
+    endif()
+endforeach()
 uvlas_add_test(coupling.case_motion
     LABELS V-AERO property negative verification
     SOURCES coupling/case_motion_test.cpp
