@@ -3743,7 +3743,10 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     input.field("units").set("length", string("m"));
     input.field("units").set("angle", string("deg"));
     input.field("analysis")
-        .set("intervals", parse(R"([{"start":0,"end":1,"step":0.1,"restart":"initial"}])"));
+        .set(
+            "intervals",
+            parse(
+                R"([{"start":0,"end":0.1,"step":0.1,"restart":"initial"},{"start":0.1,"end":1,"step":0.1,"restart":"event"}])"));
     auto& motion =
         input.field("model").field("aero_surfaces").elements[0].field("attachment").field("motion");
     motion.set("origin", parse(R"({"origin":[0,0,0],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
@@ -3755,15 +3758,14 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
         "rotation_vector",
         parse(
             R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[0,0,0],[600,0,0]]})"));
-    motion.set("events", parse("[0,1]"));
+    motion.set("events", parse("[0,0.1,1]"));
 
     core::ResourcePlan memory{128ULL * 1024 * 1024};
     p::CurveWorkspace curves;
-    const auto begin = take(structure::ExactRational::from_decimal("0", exact_limits(), memory));
-    const auto end = take(structure::ExactRational::from_decimal("1", exact_limits(), memory));
-    const auto at = take(structure::ExactRational::from_decimal("0.1", exact_limits(), memory));
     const auto different = take(
         structure::ExactRational::from_decimal("0.100000000000000001", exact_limits(), memory));
+    const auto different_words = take(io::detail::copy_rational_words(different, memory, {}));
+    const auto different_time = different_words.view();
     const auto geometry_caps = test_geometry::limits();
     const a::GlobalLimits contact_caps{std::numeric_limits<std::uint64_t>::max() / 4,
                                        numerics::linear::EstimateAdmission{4096}};
@@ -3787,13 +3789,6 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
             FAIL("Missing checked prescribed attachment");
         return *selected;
     };
-    const auto prepare = [&](const JsonToken& json) {
-        const auto si = materialize(json, io::SourceId{79});
-        return take(cf::prepare_prescribed_aero_attachment(
-            si, selected_attachment(si), {begin, end}, stamp, curves, caps.motion, memory));
-    };
-    const auto attachment = prepare(input);
-    const auto current = prepare(input);
     const Number unit{1}, exact_instant{1, 10}, abs_budget{1, 1000000000}, zero{0};
     std::array<cf::CaseFlowComponentBudget, 24> budget_rows{};
     budget_rows.fill({unit.view(), abs_budget.view(), zero.view()});
@@ -3843,17 +3838,10 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
         a::QueryId{22}, a::SourceFacePoint{a::FacetId{201}, a::SingleWord{.25}, a::SingleWord{.5}},
         a::SingleWord{0}, a::SingleWord{0}}};
     const auto side = p::RequestedSide::Left;
-    const auto run = [&](const cf::PrescribedAeroAttachment& live,
-                         const structure::ExactRational& instant, cf::PrescribedAeroReference model,
-                         const cf::PrescribedAeroLimits& cap, core::ResourcePlan& plan) {
-        return cf::evaluate_prescribed_aero_attachment(
-            attachment, live, model, {stamp, instant, p::JetOrder::First, side}, projection, curves,
-            *geometry_work, *global, cap, plan);
-    };
     const cf::PrescribedAeroReference model{topology, original, moving, rows};
     a::UniformFlowWorkspace flow_workspace;
     const cf::CaseClockedPrescribedLimits clock_caps{
-        {{limits, 1, 10}, gust_limits}, caps.motion, budget};
+        {{limits, 2, 10}, gust_limits}, caps.motion, budget};
     const auto prepare_clocked = [&](const JsonToken& json) {
         const auto si = materialize(json, io::SourceId{79});
         return take(cf::prepare_case_clocked_prescribed_inputs(
@@ -3861,14 +3849,20 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     };
     const auto clock = prepare_clocked(input);
     const auto current_clock = prepare_clocked(input);
+    const cf::CaseFlowClockQuery arrival{stamp, 0, 1, side};
     const auto run_clocked = [&](const cf::CaseClockedPrescribedInputs& live,
-                                 cf::CaseFlowClockQuery query) {
+                                 cf::CaseFlowClockQuery query,
+                                 const cf::PrescribedAeroReference& reference,
+                                 const cf::PrescribedAeroProjection& selected,
+                                 const cf::PrescribedAeroLimits& cap, core::ResourcePlan& plan) {
         return cf::evaluate_case_clocked_prescribed_attachment(
-            clock, live, query, model, projection, curves, *geometry_work, *global,
-            clock_caps.flow.clock_and_wake, caps, memory);
+            clock, live, query, reference, selected, curves, *geometry_work, *global,
+            clock_caps.flow.clock_and_wake, cap, plan);
     };
-    const auto state = take(run_clocked(current_clock, {stamp, 0, 1, side}));
-    reject(run_clocked(current_clock, {stamp, 0, 2, side}), core::FailureCode::StaleGeneration);
+    const auto state = take(run_clocked(current_clock, arrival, model, projection, caps, memory));
+    reject(run_clocked(current_clock, {stamp, 0, 1, p::RequestedSide::Right}, model, projection,
+                       caps, memory),
+           core::FailureCode::InvalidInput);
     const auto& sampled = take(state.motion()).get();
     const auto& instant = take(sampled.time()).get();
     exact(instant.time(), exact_instant);
@@ -3950,20 +3944,29 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     const std::array<double, 18> zero_low{};
     auto wide_original = original;
     wide_original.current = a::DoublePositions{coordinates0, zero_low};
-    const auto wide = take(cf::evaluate_prescribed_aero_attachment(
-        attachment, current, {topology, wide_original, moving, rows},
-        {stamp, at, p::JetOrder::First, side},
-        {core::Precision::TwoWord, projection.pose, projection.point}, curves, *geometry_work,
-        *global, caps, memory));
+    const auto wide = take(
+        run_clocked(current_clock, arrival, {topology, wide_original, moving, rows},
+                    {core::Precision::TwoWord, projection.pose, projection.point}, caps, memory));
+    const auto& wide_motion = take(wide.motion()).get();
+    const auto& wide_time = take(wide_motion.time()).get();
+    exact(wide_time.time(), exact_instant);
+    CHECK(wide_time.requested_side() == side);
     const auto wide_row = take(wide.collocation(0));
     CHECK(std::holds_alternative<a::DoubleWord>(wide_row.velocity[2]));
     near(sum_words(wide_row.velocity[2]), angular_rate / 4);
-    reject(run(current, different, model, caps, memory), core::FailureCode::StaleGeneration);
+    auto wrong_time = original;
+    wrong_time.exact_time =
+        p::RationalView{different_time.sign, different_time.numerator, different_time.denominator};
+    reject(run_clocked(current_clock, arrival, {topology, wrong_time, moving, rows}, projection,
+                       caps, memory),
+           core::FailureCode::StaleGeneration);
     const std::array invalid_points{id[0], id[1], id[2], alias};
-    reject(run(current, at, {topology, original, invalid_points, rows}, caps, memory),
+    reject(run_clocked(current_clock, arrival, {topology, original, invalid_points, rows},
+                       projection, caps, memory),
            core::FailureCode::InvalidInput);
     const std::array extra_point{id[0], id[1], id[2], id[3], id[4]};
-    reject(run(current, at, {topology, original, extra_point, rows}, caps, memory),
+    reject(run_clocked(current_clock, arrival, {topology, original, extra_point, rows}, projection,
+                       caps, memory),
            core::FailureCode::InvalidInput);
     auto changed_input = input;
     changed_input.field("model")
@@ -3973,14 +3976,14 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
         .field("motion")
         .field("translation")
         .set("coefficients", parse("[[0,0,0],[2,0,0]]"));
-    const auto changed = prepare(changed_input);
-    reject(run(changed, at, model, caps, memory), core::FailureCode::StaleGeneration);
     const auto changed_clock = prepare_clocked(changed_input);
-    reject(run_clocked(changed_clock, {stamp, 0, 1, side}), core::FailureCode::StaleGeneration);
+    reject(run_clocked(changed_clock, arrival, model, projection, caps, memory),
+           core::FailureCode::StaleGeneration);
     auto no_work = caps;
     no_work.work = 0;
     core::ResourcePlan refused{0};
-    reject(run(current, at, model, no_work, refused), core::FailureCode::ResourceExceeded);
+    reject(run_clocked(current_clock, arrival, model, projection, no_work, refused),
+           core::FailureCode::ResourceExceeded);
     CHECK(refused.allocated_bytes() == 0);
     CHECK(test_geometry::take(geometry.owner(alias)) == id[3]);
 }
