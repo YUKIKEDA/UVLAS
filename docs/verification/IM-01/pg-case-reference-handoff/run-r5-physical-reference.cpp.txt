@@ -127,8 +127,6 @@ Decimal field_value(const Quadratic& value, const Decimal& root) {
     return decimal(value[0]) + decimal(value[1]) * root;
 }
 
-const std::array<Q, 4> dual_probe{Q{2}, Q{3, 7}, Q{-4, 7}, Q{6, 7}};
-
 std::optional<WorkPoint> compare_point(const cc::CasePgShellReference& shell,
                                        const RequiredFields& modes, const PgReferencePoint& point,
                                        const Point& xy, const Decimal& depth, const Decimal& h,
@@ -141,6 +139,7 @@ std::optional<WorkPoint> compare_point(const cc::CasePgShellReference& shell,
     const Decimal root = sqrt(decimal(result.points.values().front().g));
     std::array<std::array<Quadratic, 4>, 2> actual{};
     std::array<std::array<Q, 4>, 2> rounded{};
+    const std::array<Q, 4> dual_probe{Q{2}, Q{3, 7}, Q{-4, 7}, Q{6, 7}};
     std::optional<WorkPoint> work_point;
     if (capture_work) {
         work_point.emplace();
