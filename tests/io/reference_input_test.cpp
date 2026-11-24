@@ -1,5 +1,6 @@
 #include "../structure/pg_partition_test_support.hpp"
 #include "coupling/case_external_pg.hpp"
+#include "coupling/case_nastran_reference_inputs.hpp"
 #include "external_mesh_sidecar_pg.hpp"
 #include "gmsh_mesh.hpp"
 #include "nastran_coordinate_cards.hpp"
@@ -1562,6 +1563,8 @@ $EndElements
     Axes axes = Axes::None;
     bool shell_set = false;
     bool late_axis_mismatch = false;
+    bool native_cards = false;
+    bool thermal_link = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1778,6 +1781,18 @@ $EndElements
         late_axis_mismatch = true;
     }
 
+    SECTION("One authenticated input owns its Shell, beam, mass and rigid reference evidence") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+    }
+    SECTION("The late native RBE2 error keeps its source field and Case declaration") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        thermal_link = true;
+    }
+
     const bool corner_claim = corners != Corners::None;
     const bool axis_pcomp = axes != Axes::None && axes != Axes::VariableThickness;
     const bool two_axis_layers = axes == Axes::Quarter || axes == Axes::Difference;
@@ -1902,6 +1917,11 @@ $EndElements
         }
         sidecar["beams"] = empty;
         sidecar["masses"] = empty;
+        if (native_cards) {
+            sidecar["beams"].push_back({{"element", "905"}, {"beam", "1"}});
+            sidecar["masses"].push_back({{"element", "906"}, {"mass", "1"}});
+            sidecar["joints"].push_back({{"element", "907"}, {"joint", "1"}});
+        }
         sidecar["supports"] = nlohmann::json::array(
             {{{"set", "61"},
               {"grid", "10"},
@@ -1964,6 +1984,11 @@ $EndElements
                             "GRID,140,,1.0,1.0,1.0\nGRID,199,,0.0,1.0,1.0\n"
                             "CTRIA3,900,90,110,140,199,0\nCQUAD4,701,90,10,20,40,99,0\n"
                             "CTRIA3,901,90,110,120,140,0\n");
+    }
+    if (native_cards) {
+        source_text += "CBEAM,905,95,10,20,99\nPBEAM,95,6,2.0,3.0,4.0,,5.0\n"
+                       "CONM2,906,10,0,2.0\n";
+        source_text += thermal_link ? "RBE2,907,10,123,20,0.001,293.15\n" : "RBE2,907,10,123,20\n";
     }
     if (axis_pcomp) {
         constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
@@ -2231,6 +2256,24 @@ $EndElements
         }
         shells.push_back(std::move(second_shell));
     }
+    if (native_cards) {
+        auto& model = config.field("model");
+        model.field("beams").elements.push_back(fixture::fragment("Beam"));
+        auto mass = fixture::fragment("Mass.particle");
+        mass.set("mass", fixture::json("2"));
+        model.field("masses").elements.push_back(std::move(mass));
+        model.field("joints").elements.push_back(fixture::fragment("Joint.rigid_attachment"));
+        auto& scales = config.field("numerics").field("scales").elements;
+        scales.back()
+            .field("constraint")
+            .set("orientation", fixture::fragment("ComponentScale3.values"));
+        for (const auto* scale_name : {"beam_translation", "beam_rotation", "moment_balance",
+                                       "structural_angular_velocity"}) {
+            scales.push_back(
+                fixture::json(std::string{R"({"kind":"uniform_components","field":")"} +
+                              scale_name + R"(","targets":[],"values":[1,1,1]})"));
+        }
+    }
 
     const rd::MeshSidecarBindingLimits binding{
         {limits().document,
@@ -2428,6 +2471,110 @@ $EndElements
                 rd::NastranIsotropicShellCards::prepare(std::move(cards), {32, 32'000}, plan, {}));
             quantities.emplace(fixture::take(
                 rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
+        }
+        if (native_cards) {
+            using uvlas::coupling::detail::CaseNastranReferenceDiagnostic;
+            using uvlas::coupling::detail::CaseNastranReferenceInputLimits;
+            using uvlas::coupling::detail::CaseNastranReferenceInputs;
+            const auto* native_quantities = quantities ? &*quantities : nullptr;
+            REQUIRE(native_quantities != nullptr);
+            const CaseNastranReferenceInputLimits native_limits{{2, 5, 2},
+                                                                {8, 8, 32'000},
+                                                                {8, 8, 32'000},
+                                                                {8, 32'000},
+                                                                {8, 8, 32'000},
+                                                                {pg_limits, 300'000, 8},
+                                                                {pg_limits, 300'000},
+                                                                {pg_limits, 300'000, 8},
+                                                                3};
+            CaseNastranReferenceDiagnostic provenance;
+            const auto native = CaseNastranReferenceInputs::prepare(
+                si, *result, *native_quantities, preparation, qualification, native_limits,
+                workspace, plan, &provenance);
+            if (thermal_link) {
+                REQUIRE_FALSE(native);
+                CHECK(native.error().code == core::FailureCode::Unsupported);
+                if (const auto& binding_error = provenance.selection) {
+                    CHECK(binding_error->target_space == io::SchemaNamespace::Joint);
+                    CHECK(binding_error->case_id == 1);
+                    CHECK(binding_error->element == rd::NastranElementId{907});
+                } else {
+                    FAIL("Missing Case binding for rejected rigid card");
+                }
+                const auto* card = std::get_if<rd::NastranAttachmentDiagnostic>(&provenance.card);
+                REQUIRE(card != nullptr);
+                CHECK(card->reason == rd::NastranAttachmentFailure::Thermal);
+                CHECK(card->link == rd::NastranElementId{907});
+                if (const auto field = card->position) {
+                    CHECK(field->byte == source_text.find("0.001,293.15"));
+                } else {
+                    FAIL("Missing original ALPHA field");
+                }
+                const auto same_inputs = uvlas::coupling::detail::CaseNastranPlanarPgSet::prepare(
+                    si, *result, *native_quantities, preparation, qualification,
+                    native_limits.shells, workspace, plan);
+                REQUIRE(same_inputs);
+                CHECK(same_inputs->size() == 2);
+                return;
+            }
+            REQUIRE(native);
+            CHECK_FALSE(provenance.selection);
+            CHECK(native->sidecar_source().source == io::SourceId{2});
+            CHECK(native->sidecar_digest() == result->sidecar().digest());
+            CHECK(native->deck_source().source == io::SourceId{1});
+            if (const auto& shells = native->shells()) {
+                REQUIRE(shells->size() == 2);
+                CHECK(fixture::take(shells->at(0)).get().match().planar.shell ==
+                      rd::MeshShellId{2});
+            } else {
+                FAIL("Missing owned Shell set");
+            }
+            const auto exact = [&](std::string_view number) {
+                return fixture::take(ExactRational::from_decimal(number, pg_limits.algebra, plan));
+            };
+            REQUIRE(native->beams().size() == 1);
+            if (const auto& beam = native->beams().front()) {
+                CHECK(beam->binding.element == rd::NastranElementId{905});
+                CHECK(beam->binding.target.value() == 1);
+                CHECK(beam->physical.source.location.source == io::SourceId{1});
+                CHECK(beam->physical.source.digest == native->deck_digest());
+                CHECK(beam->physical.length_metres.lower == exact("1"));
+                REQUIRE(beam->physical.stations.size() == 1);
+                CHECK(beam->physical.stations.values().front().section.area_m2 == exact("2"));
+            } else {
+                FAIL("Missing owned native beam");
+            }
+            REQUIRE(native->masses().size() == 1);
+            if (const auto& mass = native->masses().front()) {
+                CHECK(mass->binding.element == rd::NastranElementId{906});
+                CHECK(mass->binding.target.value() == 1);
+                CHECK(mass->physical.mass_kg == exact("2"));
+            } else {
+                FAIL("Missing owned native mass");
+            }
+            REQUIRE(native->joints().size() == 1);
+            if (const auto& joint = native->joints().front()) {
+                CHECK(joint->binding.element == rd::NastranElementId{907});
+                CHECK(joint->binding.target.value() == 1);
+                if (const auto joint_view = joint->physical.view()) {
+                    REQUIRE(joint_view->dependents.size() == 1);
+                    CHECK(joint_view->dependents.front().point_metres[0].lower == exact("1"));
+                } else {
+                    FAIL("Missing owned RBE2 reference");
+                }
+            } else {
+                FAIL("Missing joint binding");
+            }
+            auto short_limit = native_limits;
+            --short_limit.maximum_bound_cards;
+            const auto before = plan.allocated_bytes();
+            const auto shortage =
+                CaseNastranReferenceInputs::prepare(si, *result, *native_quantities, preparation,
+                                                    qualification, short_limit, workspace, plan);
+            REQUIRE_FALSE(shortage);
+            CHECK(shortage.error().code == core::FailureCode::ResourceExceeded);
+            CHECK(plan.allocated_bytes() == before);
+            return;
         }
         if (shell_set) {
             using uvlas::coupling::detail::CaseNastranPgSetDiagnostic;

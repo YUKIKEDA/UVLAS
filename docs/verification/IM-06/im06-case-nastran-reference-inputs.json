@@ -1,0 +1,36 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-case-nastran-reference-inputs",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "d8dc9510d5fc244ab36212381fa4e0d028e3978c",
+  "claimed_state": "一つの認証済みNastran対応表から、同じCaseに結び付くShellの照合結果と梁・質量・剛体接続の元物理量を所有する。",
+  "checks": {
+    "windows_release_targets_passed": 6,
+    "windows_debug_targets_passed": 6,
+    "gcc_asan_ubsan_targets_passed": 6,
+    "real_file_assertions": 1696
+  },
+  "artifacts": {
+    "CMakeLists.txt": "0bd203832a717e0713978a832234e4189ed8a5ef42d3c36b8bed947f55f42bab",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/case-nastran-reference-inputs.md": "abfe89b3459efcd403c0bc4d72d2ef13ec6027625e8c0d8e263aad58b114f1e2",
+    "src/coupling/case_external_pg.cpp": "a053deeadb5e07e841997d02e7141995a79c45ea9a57582b707192ab4a7d0782",
+    "src/coupling/case_nastran_reference_inputs.cpp": "5aad31b7efd23026755e565461b8ded33f1c6ac220b2f837a3008f16456440df",
+    "src/coupling/case_nastran_reference_inputs.hpp": "5ad853aa8bcb9cb6541998c762b6f2e2169cc519e1791c8e009cc7fa49b2d341",
+    "src/io/external_mesh_sidecar_binding.cpp": "af973ca65c706bb62798bd98aec41f57372df75256ffd72db9a8c2fe3e5443eb",
+    "src/io/nastran_beam_si.cpp": "f5ffe9d0b7875722f6f6d4c6a738451329328a37f131bc8fe12290ffb6c55e25",
+    "src/io/nastran_laminate_cards.hpp": "25e26033c15bf7aae5649213ad6c4096c1b0c9563c90d6e1a692317ba598cb47",
+    "src/io/nastran_lumped_mass_geometry.cpp": "30346f88d25aee7dc4fde5ca4e91d6a121462e9ad375ea945cc1946ded193dcd",
+    "src/io/nastran_rigid_attachment.cpp": "4282439771feb4e0cc5be0c739e90b020644be477a34e4fd654a10c1bfc62ba0",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "tests/io/reference_input_test.cpp": "1cd91841eae24e5e7dcaf224a5dd23d3a6d3eed9c4d1004a0b2eef6748622707"
+  }
+}
