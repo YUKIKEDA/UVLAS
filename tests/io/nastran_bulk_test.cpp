@@ -91,7 +91,8 @@ TEST_CASE("Nastran lexer retains formats, spelling and source positions in one s
                       "\r\n$ another comment\r\n" + small_head + "\r\n" + large_named + "\r\n" +
                       fixed("SPC1", {"3", "12", "11", "12", "13", "14", "15", "16"}, 8) + "\r\n" +
                       automatic +
-                      "\r\nRBE2,1,2,123,3,4,5,6,7,8,9\r\n,10,,+11 $ unchanged\r\nENDDATA";
+                      "\r\nRBE2,1,2,123,3,4,5,6,7,8,9\r\nSPC1,2,123,3,4,5,6,7,8\r\n,10,,+11 $ "
+                      "unchanged\r\nENDDATA";
     const char* original_address = nullptr;
     SourceDigest digest{};
     const auto deck = [&] {
@@ -113,7 +114,7 @@ TEST_CASE("Nastran lexer retains formats, spelling and source positions in one s
     CHECK(result.location.source == SourceId{99});
     CHECK(result.location.declaration_node == 31);
     CHECK(result.work > text.size());
-    REQUIRE(result.cards.size() == 4);
+    REQUIRE(result.cards.size() == 5);
 
     const auto& large = result.cards[0];
     CHECK(large.format == NastranBulkFormat::Large);
@@ -149,12 +150,19 @@ TEST_CASE("Nastran lexer retains formats, spelling and source positions in one s
     CHECK(free.format == NastranBulkFormat::Free);
     CHECK(result.text(free.name) == "RBE2");
     const auto free_fields = result.data_fields(free);
-    REQUIRE(free_fields.size() == 13);
+    REQUIRE(free_fields.size() == 10);
     CHECK(result.text(free_fields[9]) == "9");
-    CHECK(result.text(free_fields[10]) == "10");
-    CHECK(result.text(free_fields[11]).empty());
-    CHECK(free_fields[11].position == NastranBulkPosition{text.find(",,+11") + 1, 11, 5});
-    CHECK(result.text(free_fields[12]) == "+11");
+
+    const auto& free_continued = result.cards[4];
+    CHECK(free_continued.format == NastranBulkFormat::Free);
+    CHECK(result.text(free_continued.name) == "SPC1");
+    const auto continued = result.data_fields(free_continued);
+    REQUIRE(continued.size() == 11);
+    CHECK(result.text(continued[7]) == "8");
+    CHECK(result.text(continued[8]) == "10");
+    CHECK(result.text(continued[9]).empty());
+    CHECK(continued[9].position == NastranBulkPosition{text.find(",,+11") + 1, 12, 5});
+    CHECK(result.text(continued[10]) == "+11");
 }
 
 TEST_CASE("The checked lexical limits count padding and preserve the snapshot on failure",
@@ -251,6 +259,11 @@ TEST_CASE("Ambiguous forms and inconsistent continuation graphs fail visibly",
     }
     SECTION("fixed mixed-width handoff") {
         text = fixed("GRID*", {"11"}, 16, "*NEXT") + "\n" + fixed("+NEXT", {"2"}, 8);
+        line = 2;
+        code = Unsupported;
+    }
+    SECTION("free continuation after an incomplete group") {
+        text = "CORD2R,1,0,0.0\n,1,2,3\n";
         line = 2;
         code = Unsupported;
     }
