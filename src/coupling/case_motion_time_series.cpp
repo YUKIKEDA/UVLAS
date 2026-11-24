@@ -99,13 +99,13 @@ public:
             fail(Code::Cancelled);
     }
 
-    std::uint64_t sum(std::uint64_t left, std::uint64_t right) const {
+    [[nodiscard]] std::uint64_t sum(std::uint64_t left, std::uint64_t right) const {
         if (left > index_max || right > index_max - left)
             fail(Code::ResourceExceeded);
         return left + right;
     }
 
-    std::uint64_t times_three(std::uint64_t count) const {
+    [[nodiscard]] std::uint64_t times_three(std::uint64_t count) const {
         if (count > index_max / 3)
             fail(Code::ResourceExceeded);
         return 3 * count;
@@ -172,7 +172,7 @@ public:
         return take(left.divide(right, exact, memory));
     }
 
-    Words copy(const Rational& value) const {
+    [[nodiscard]] Words copy(const Rational& value) const {
         return take(io::detail::copy_rational_words(value, memory, cancellation));
     }
 
@@ -197,14 +197,14 @@ public:
     }
 
     template <class T>
-    core::PlannedBuffer<T> allocate(std::uint64_t count) const {
+    [[nodiscard]] core::PlannedBuffer<T> allocate(std::uint64_t count) const {
         stop();
         if (count > index_max)
             fail(Code::ResourceExceeded);
         return take(memory.allocate<T>(static_cast<core::Index>(count), op));
     }
 
-    WordsAndViews allocate_words(std::uint64_t count) const {
+    [[nodiscard]] WordsAndViews allocate_words(std::uint64_t count) const {
         constexpr auto width = sizeof(Words) + sizeof(View);
         if (count > memory.remaining_bytes() / width)
             fail(Code::ResourceExceeded);

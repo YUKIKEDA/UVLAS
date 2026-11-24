@@ -224,3 +224,47 @@ TEST_CASE("Typed Motion PCHIP preserves both accelerations and a shared physical
     CHECK(left.rotation_pi_power() == 1);
     CHECK(right.rotation_pi_power() == 1);
 }
+
+TEST_CASE("Typed Motion retains Hold and periodic knot accelerations in SI time",
+          "[AE-07][IO4-01][N4-02][N4-03][property][negative]") {
+    auto input = a::root("aerodynamic_prescribed_transient");
+    input.field("units").set("angle", a::string("deg"));
+    input.field("analysis")
+        .set("intervals", a::parse(R"([{"start":0,"end":1,"step":1,"restart":"initial"}])"));
+    auto& motion = motion_json(input);
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[1,0,0],[5,0,0]],"outside":{"kind":"hold"}})"));
+    motion.set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2,3],"values":[[0,0,0],[90,0,0],[-90,0,0],[0,0,0]],"outside":{"kind":"periodic","period":3}})"));
+    motion.set("events", a::parse("[0,1,2,3]"));
+    const auto si = checked_case(input);
+    core::ResourcePlan plan{budget};
+    p::CurveWorkspace workspace;
+    const auto begin = exact_time("-3", plan);
+    const auto end = exact_time("1", plan);
+    const auto zero = exact_time("0", plan);
+    const auto field = take(c::prepare_case_motion_time_series(si, motion_field(si), {begin, end},
+                                                               stamp, workspace, limits, plan));
+    REQUIRE(field.events().size() == 4);
+    const auto evaluate = [&](const structure::ExactRational& time, p::JetOrder order,
+                              p::RequestedSide side) {
+        return c::evaluate_case_motion_time_series(field, field, {stamp, time, order, side},
+                                                   workspace, limits, plan);
+    };
+    const auto before = take(evaluate(zero, Second, Left));
+    const auto after = take(evaluate(zero, Second, Right));
+    exact(before.translation(0, Second), 0);
+    exact(after.translation(0, Second), 14, 5);
+    rejected(evaluate(zero, Second, Automatic), core::FailureCode::InvalidInput);
+    const auto repeated_left = take(evaluate(begin, Second, Left));
+    const auto repeated_right = take(evaluate(begin, Second, Right));
+    exact(repeated_left.rotation_coefficient(0, Value), 0);
+    exact(repeated_left.rotation_coefficient(0, First), 5, 4);
+    exact(repeated_left.rotation_coefficient(0, Second), 2);
+    exact(repeated_right.rotation_coefficient(0, Second), 2, 1, -1);
+    exact(repeated_right.translation(0, Second), 0);
+}
