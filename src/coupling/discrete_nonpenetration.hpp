@@ -726,4 +726,69 @@ private:
     aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
     const std::stop_token& = {}) noexcept;
 
+struct LoadCirculationRateCovector {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScaledEnclosure rate; ///< Dual to the independent Γdot, s²/m².
+};
+
+/// Fixed-chart transpose of the solved load outputs. Point and flow duals
+/// include the response of the retained circulation. Γdot remains independent.
+class DiscreteCirculationImplicitLoadVjp {
+public:
+    DiscreteCirculationImplicitLoadVjp(DiscreteCirculationImplicitLoadVjp&&) noexcept = default;
+    DiscreteCirculationImplicitLoadVjp&
+    operator=(DiscreteCirculationImplicitLoadVjp&&) noexcept = default;
+    DiscreteCirculationImplicitLoadVjp(const DiscreteCirculationImplicitLoadVjp&) = delete;
+    DiscreteCirculationImplicitLoadVjp&
+    operator=(const DiscreteCirculationImplicitLoadVjp&) = delete;
+    [[nodiscard]] const DiscreteCirculationLoads& loads() const& noexcept {
+        return values_.loads();
+    }
+    [[nodiscard]] const DiscreteCirculationLoads& loads() const&& = delete;
+    [[nodiscard]] const DiscreteCirculationLinearization& transpose() const& noexcept {
+        return transpose_;
+    }
+    [[nodiscard]] const DiscreteCirculationLinearization& transpose() const&& = delete;
+    [[nodiscard]] DiscreteLoadVector uniform_flow() const noexcept {
+        return values_.uniform_flow();
+    }
+    [[nodiscard]] std::size_t point_count() const noexcept {
+        return values_.point_count();
+    }
+    [[nodiscard]] core::Result<CirculationPointCovector> point(std::size_t i) const noexcept {
+        return values_.point(i);
+    }
+    [[nodiscard]] core::Result<LoadEdgeVelocityCovector>
+    midpoint_velocity(std::size_t i) const noexcept {
+        return values_.midpoint_velocity(i);
+    }
+    [[nodiscard]] core::Result<LoadCirculationRateCovector>
+    circulation_rate(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationCollocationCovector>
+    collocation(std::size_t) const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    DiscreteCirculationImplicitLoadVjp(
+        DiscreteCirculationLoadVjp&& values, DiscreteCirculationLinearization&& transpose,
+        core::PlannedBuffer<std::optional<CirculationCollocationCovector>>&& rows) noexcept
+        : values_(std::move(values)), transpose_(std::move(transpose)), rows_(std::move(rows)) {}
+    DiscreteCirculationLoadVjp values_;
+    DiscreteCirculationLinearization transpose_;
+    core::PlannedBuffer<std::optional<CirculationCollocationCovector>> rows_;
+};
+
+/// Solve the primal once and solve A_effᵀ λ = ∂L/∂Γ against its native influence
+/// and the native load seed. Add −(dR/dinputs)ᵀ λ to the direct load duals.
+/// Each transpose layout and its matrix, scale, RHS and retained generations
+/// must be distinct from the corresponding primal data. Flow is consumed on success.
+[[nodiscard]] core::Result<DiscreteCirculationImplicitLoadVjp>
+solve_discrete_circulation_implicit_load_pullback(
+    const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
+    const DiscreteVectorLoadWeights&, ProjectedCaseUniformFlow&&,
+    const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest& primal,
+    const DiscreteCirculationRequest& transpose, aero::detail::GeometryWorkspace&,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 } // namespace uvlas::coupling::detail
