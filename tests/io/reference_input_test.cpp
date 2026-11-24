@@ -1531,7 +1531,14 @@ $EndElements
     bool contradictory_group_thickness = false;
     bool partial_pshell = false;
     bool wrong_pshell_thickness = false;
-    enum class Corners { None, Absolute, Fraction, WrongFraction, MissingBase, MixedMaterial };
+    enum class Corners : std::uint8_t {
+        None,
+        Absolute,
+        Fraction,
+        WrongFraction,
+        MissingBase,
+        MixedMaterial
+    };
     Corners corners = Corners::None;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
