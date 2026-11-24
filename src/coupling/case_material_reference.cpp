@@ -21,6 +21,23 @@ R orientation(pg::ReferenceArithmetic& m, const R& ax, const R& ay, const R& bx,
     return m.sub(m.mul(m.sub(bx, ax), m.sub(py, ay)), m.mul(m.sub(by, ay), m.sub(px, ax)));
 }
 
+std::optional<std::array<R, 2>> containing_coordinates(pg::ReferenceArithmetic& m,
+                                                       const structure::PgPartitionTriangle& cell,
+                                                       std::span<const Point> vertices,
+                                                       const CaseMaterialChartPoint& point) {
+    m.visit(1);
+    const auto& a = vertices[static_cast<std::size_t>(cell.vertices[0])];
+    const auto& b = vertices[static_cast<std::size_t>(cell.vertices[1])];
+    const auto& c = vertices[static_cast<std::size_t>(cell.vertices[2])];
+    const auto& s = point.material[0];
+    const auto& t = point.material[1];
+    auto u = orientation(m, a.s, a.t, s, t, c.s, c.t);
+    auto v = orientation(m, a.s, a.t, b.s, b.t, s, t);
+    if (u.sign() < 0 || v.sign() < 0 || m.compare(m.add(u, v), cell.twice_area) > 0)
+        return std::nullopt;
+    return std::array{std::move(u), std::move(v)};
+}
+
 std::array<structure::PgReferenceVector, 2> chain(pg::ReferenceArithmetic& m,
                                                   const structure::PgReferenceValue& value,
                                                   const CaseMaterialChartPoint& chart) {
@@ -107,21 +124,23 @@ evaluate(const CaseMaterialChart& chart, const structure::PgReferenceLimits& lim
                 const auto& layer_range = layers[*layer];
                 const auto depth = m.div(m.sub(point.material[2], layer_range.lower),
                                          m.sub(layer_range.upper, layer_range.lower));
+                // Count exact containments before retaining any alternate records.
+                std::size_t candidates = 0;
+                for (const auto& cell : triangles)
+                    if (containing_coordinates(m, cell, vertices, point))
+                        ++candidates;
+                if (candidates == 0)
+                    partition_fail(FailureCode::GeometryInvalid);
                 std::optional<CaseMaterialReferenceSample> result;
                 for (std::size_t i = 0; i < triangles.size(); ++i) {
-                    m.visit(1);
+                    if (result && result->alternate_count == candidates - 1)
+                        break;
                     const auto& cell = triangles[i];
-                    const auto& a = vertices[static_cast<std::size_t>(cell.vertices[0])];
-                    const auto& b = vertices[static_cast<std::size_t>(cell.vertices[1])];
-                    const auto& c = vertices[static_cast<std::size_t>(cell.vertices[2])];
-                    const auto& s = point.material[0];
-                    const auto& t = point.material[1];
-                    const auto u = orientation(m, a.s, a.t, s, t, c.s, c.t);
-                    const auto v = orientation(m, a.s, a.t, b.s, b.t, s, t);
-                    if (u.sign() < 0 || v.sign() < 0 || m.compare(m.add(u, v), cell.twice_area) > 0)
+                    const auto uv = containing_coordinates(m, cell, vertices, point);
+                    if (!uv)
                         continue;
-                    std::array<R, 3> local{m.div(u, cell.twice_area), m.div(v, cell.twice_area),
-                                           m.copy(depth)};
+                    std::array<R, 3> local{m.div((*uv)[0], cell.twice_area),
+                                           m.div((*uv)[1], cell.twice_area), m.copy(depth)};
                     const auto query =
                         locate_query(m, point.side, partition_index(i), partition_index(*layer),
                                      local, volumes, horizontal);
@@ -164,7 +183,7 @@ evaluate(const CaseMaterialChart& chart, const structure::PgReferenceLimits& lim
                     if (result->alternate.size() == 0)
                         result->alternate =
                             partition_take(plan.allocate<CaseMaterialReferenceCandidate>(
-                                partition_index(triangles.size() - 1), operation));
+                                partition_index(candidates - 1), operation));
                     result->alternate.values()[result->alternate_count++] = {
                         reference.partition_record, std::move(local)};
                     m.reserve_nested_rationals(m.leaf_limits, 3);

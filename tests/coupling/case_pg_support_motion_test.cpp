@@ -565,9 +565,17 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
                 ready, thin, prepared, c::CaseMaterialCollocationSite{0, 1}, projection, 1e-13,
                 limits.chart, plan));
             INFO("Collocation rows prepared");
+            namespace aero = uvlas::aero::detail;
+            const c::CaseMaterialLoadKey original_key{aero::PhysicalFaceId{71}, aero::FacetId{81},
+                                                      0, aero::PointId{91}};
+            const c::CaseMaterialLoadKey other_key{original_key.face, original_key.facet, 1,
+                                                   aero::PointId{92}};
             const auto original_vertex = take(c::CaseMaterialRows::prepare(
                 ready, thin, prepared, c::CaseMaterialVertexSite{0, 1, 1}, projection, 1e-13,
-                limits.chart, plan));
+                limits.chart, plan, original_key));
+            const auto other_vertex = take(c::CaseMaterialRows::prepare(
+                ready, thin, prepared, c::CaseMaterialVertexSite{1, 1, 1}, projection, 1e-13,
+                limits.chart, plan, other_key));
             INFO("Original vertex row prepared");
             const bool paired = precision == core::Precision::TwoWord;
             const auto capacity =
@@ -630,7 +638,6 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
             for (std::size_t k = 0; k < dual_words.high.size(); ++k)
                 work += word(dual_words, k) * word(v_state, k);
             CHECK(std::abs(work - 6.) < max_error);
-            namespace aero = uvlas::aero::detail;
             namespace interval = aero::p1;
             constexpr auto force_radius = 0x1p-35;
             aero::LocalRootScratch enclosure_scratch;
@@ -641,8 +648,25 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
             const c::DiscreteLoadVector enclosed_force{
                 zero_force, zero_force,
                 aero::enclose_p1_value(z_force, precision, enclosure_scratch)};
+            const auto contribution = [&](const c::CaseMaterialLoadKey& key) {
+                return c::DiscreteOriginalLoadContribution{
+                    key.face, key.facet, key.local_vertex, key.canonical, {}, enclosed_force};
+            };
+            const auto first_load = contribution(original_key);
+            const auto second_load = contribution(other_key);
             const auto enclosed = take(original_vertex.pullback_enclosed(
-                patch_id, enclosed_force, {steps, max_error, {}}, plan));
+                patch_id, first_load, {steps, max_error, {}}, plan));
+            const auto second = take(other_vertex.pullback_enclosed(patch_id, second_load,
+                                                                    {steps, max_error, {}}, plan));
+            CHECK(second.original_site.chord_column == 1);
+            const auto before_swap = plan.allocated_bytes();
+            check_failure(original_vertex.pullback_enclosed(patch_id, second_load,
+                                                            {steps, max_error, {}}, plan),
+                          core::FailureCode::StaleGeneration);
+            check_failure(
+                other_vertex.pullback_enclosed(patch_id, first_load, {steps, max_error, {}}, plan),
+                core::FailureCode::StaleGeneration);
+            CHECK(plan.allocated_bytes() == before_swap);
             CHECK(enclosed.original_site.original_span_cell == 1);
             double center_work = 0., work_radius = 0.;
             const auto scaled = [](const aero::ScaledEnclosure& value) {
@@ -679,6 +703,46 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
                                                    action_workspace, plan),
                           core::FailureCode::StaleGeneration);
         }
+    }
+
+    SECTION("Only the second triangle on the shared edge needs retained storage") {
+        const auto check_shared_edge = [&](bool subdivide) {
+            auto modified = wire;
+            auto& thickness =
+                modified.field("model").field("geometry").elements.at(0).field("thickness");
+            auto knots = a::parse(R"([
+              [{"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}],
+              [{"numerator":"5","denominator":"8"},{"numerator":"0","denominator":"1"}],
+              [{"numerator":"1","denominator":"1"},{"numerator":"0","denominator":"1"}],
+              [{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}],
+              [{"numerator":"5","denominator":"8"},{"numerator":"1","denominator":"1"}],
+              [{"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}]])");
+            if (subdivide)
+                knots.elements.push_back(a::parse(R"(
+                  [{"numerator":"15","denominator":"16"},{"numerator":"1","denominator":"3"}])"));
+            thickness.set("vertices", knots);
+            thickness.set("triangles",
+                          a::parse(subdivide ? "[[0,1,4],[0,4,3],[1,2,6],[2,5,6],[5,1,6],[1,5,4]]"
+                                             : "[[0,1,4],[0,4,3],[1,2,5],[1,5,4]]"));
+            thickness.set("values", a::parse(subdivide ? "[0.25,0.25,0.25,0.25,0.25,0.25,0.25]"
+                                                       : "[0.25,0.25,0.25,0.25,0.25,0.25]"));
+            const auto si = checked_case(modified);
+            const auto support =
+                take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+            const auto source = take(take(support.support())->source());
+            const auto triangles = take(source.partition.triangles());
+            const auto result = take(
+                c::evaluate_case_material_collocation_reference(support, 0, 1, limits.chart, plan));
+            CHECK(q(result.reference.s) == Q{5} / 8);
+            CHECK(q(result.reference.t) == Q{3} / 4);
+            REQUIRE(result.alternate_count == 1);
+            CHECK(result.alternate.size() == 1);
+            CHECK(result.alternate.values().front().partition_record !=
+                  result.reference.partition_record);
+            return triangles.size();
+        };
+        const auto original = check_shared_edge(false);
+        CHECK(check_shared_edge(true) > original);
     }
 
     SECTION("Matching point position cannot hide an incorrect material tangent") {
