@@ -305,8 +305,8 @@ std::size_t WakeTransportResult::size() const noexcept {
 core::Result<WakeTransportRow> WakeTransportResult::row(std::size_t i) const noexcept {
     if (i < size()) {
         const auto rows = data_.values().front().rows.values();
-        if (rows[i])
-            return *rows[i];
+        if (const auto& entry = rows[i])
+            return *entry;
     }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
@@ -324,8 +324,10 @@ WakeTransportResult::position_dual(std::size_t i) const noexcept {
 core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
 WakeTransportResult::free_velocity() const& noexcept {
     const auto owner = data_.values();
-    if (!owner.empty() && owner.front().free)
-        return std::cref(*owner.front().free);
+    if (!owner.empty()) {
+        if (const auto& velocity = owner.front().free)
+            return std::cref(*velocity);
+    }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
 
