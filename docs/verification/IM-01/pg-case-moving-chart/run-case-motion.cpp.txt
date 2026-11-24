@@ -90,6 +90,11 @@ core::Result<cc::CasePgChart> prepare_moving(bool coincident, Geometry shape,
                                                    workspace, motion_workspace, empty,
                                                    requested_stop_token()),
                   core::FailureCode::Cancelled);
+    auto nested_cancel = motion_caps;
+    nested_cancel.exact.arithmetic.cancellation = requested_stop_token();
+    check_failure(cc::prepare_case_pg_motion_chart(source, rules, limits, stamp, nested_cancel,
+                                                   workspace, motion_workspace, empty),
+                  core::FailureCode::Cancelled);
     CHECK(empty.allocated_bytes() == 0);
     return cc::prepare_case_pg_motion_chart(source, rules, limits, stamp, motion_caps, workspace,
                                             motion_workspace, plan);

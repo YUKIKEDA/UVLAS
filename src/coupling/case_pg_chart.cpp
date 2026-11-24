@@ -536,6 +536,19 @@ core::Result<CasePgChart> Builder::prepare(const io::SiCase& source,
                     caller.constraints.arithmetic.cancellation, request};
                 const std::stop_callback chart_stop{caller.chart.arithmetic.cancellation, request};
 
+                const std::stop_callback motion_trace_stop{
+                    motion == nullptr ? std::stop_token{}
+                                      : motion->limits.region_trace.arithmetic.cancellation,
+                    request};
+                const std::stop_callback motion_exact_stop{
+                    motion == nullptr ? std::stop_token{}
+                                      : motion->limits.exact.arithmetic.cancellation,
+                    request};
+                const std::stop_callback motion_chart_stop{
+                    motion == nullptr ? std::stop_token{}
+                                      : motion->limits.exact.chart_verification.cancellation,
+                    request};
+
                 const auto token = cancellation.get_token();
                 auto limits = caller;
                 limits.reference.cancellation = token;
