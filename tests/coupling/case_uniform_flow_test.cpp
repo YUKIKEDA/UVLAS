@@ -4127,7 +4127,40 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     auto wrong_state = state;
     wrong_state.context.current = core::GeometryGeneration{999};
     reject(run(map, wrong_state), core::FailureCode::StaleGeneration);
+    auto wider = kinematic_limits;
+    wider.position.maximum_steps = wider.maximum_steps;
+    wider.velocity.maximum_steps = wider.maximum_steps;
+    wider.tangents.maximum_steps = wider.maximum_steps;
+    const auto check_wider = [&](const cf::PgAeroMap& mapping, const cf::PgAeroChart& bound_chart,
+                                 const cf::PgAeroTrial& initial) {
+        const auto again = take(cf::evaluate_pg_aero_trial(
+            mapping, state, bound_chart, wider, scratch, *geometry_work, *global, memory));
+        const auto& initial_geometry = take_global(take(initial.contact()).get().geometry()).get();
+        const auto& again_geometry = take_global(take(again.contact()).get().geometry()).get();
+        CHECK(test_geometry::take(again_geometry.identity()) ==
+              test_geometry::take(initial_geometry.identity()));
+        const auto first = take(initial.collocation(0));
+        const auto second = take(again.collocation(0));
+        const auto first_position = test_geometry::take(a::exact_query_coordinates(
+            initial_geometry, first.query, test_geometry::limits(), *geometry_work));
+        const auto second_position = test_geometry::take(a::exact_query_coordinates(
+            again_geometry, second.query, test_geometry::limits(), *geometry_work));
+        CHECK(first_position.numerator == second_position.numerator);
+        const auto& first_frame = std::get<cf::ExplicitCollocationTangents>(first.tangents);
+        const auto& second_frame = std::get<cf::ExplicitCollocationTangents>(second.tangents);
+        for (std::size_t k = 0; k < 3; ++k) {
+            CHECK(sum_words(first.velocity[k]) == sum_words(second.velocity[k]));
+            CHECK(sum_words(first_frame[0][k]) == sum_words(second_frame[0][k]));
+            CHECK(sum_words(first_frame[1][k]) == sum_words(second_frame[1][k]));
+        }
+    };
+    auto short_position = kinematic_limits;
+    short_position.position.maximum_steps = 1;
+    reject(cf::evaluate_pg_aero_trial(map, state, chart, short_position, scratch, *geometry_work,
+                                      *global, memory),
+           core::FailureCode::ResourceExceeded);
     const auto trial = take(run(map, state));
+    check_wider(map, chart, trial);
     const auto& contact = take(trial.contact()).get();
     const auto& current = take_global(contact.geometry()).get();
     REQUIRE(trial.collocation_count() == 1);
@@ -4293,6 +4326,7 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     const auto mid_trial =
         take(cf::evaluate_pg_aero_trial(material_map, state, mid_chart, kinematic_limits, scratch,
                                         *geometry_work, *global, memory));
+    check_wider(material_map, mid_chart, mid_trial);
     const std::array mid_rows{take(mid_trial.collocation(0))};
     const auto& mid_contact = take(mid_trial.contact()).get();
     const auto& mid_geometry = take_global(mid_contact.geometry()).get();
