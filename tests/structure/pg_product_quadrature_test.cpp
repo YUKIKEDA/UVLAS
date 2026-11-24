@@ -13,7 +13,8 @@ using namespace pg_conditioning_test;
 TEST_CASE("PG common denominators admit guarded work before evaluating any term",
           "[SH-D07][N4-08][verification][negative]") {
     using Reuse = detail::PgRankMonomialPowers::Reuse;
-    constexpr auto limb_bits = std::numeric_limits<detail::RankWord>::digits;
+    constexpr auto limb_bits =
+        static_cast<std::uint64_t>(std::numeric_limits<detail::RankWord>::digits);
     const I denominator = I{1} << (4 * limb_bits);
     Fixture fixture;
     const auto u = rat(fixture, I{1}, denominator);
@@ -39,8 +40,8 @@ TEST_CASE("PG common denominators admit guarded work before evaluating any term"
     limits.algebra.maximum_work_bits = 11 * limb_bits;
     detail::ReferenceArithmetic admitted{limits, plan};
     const auto result = powers.common_sum(admitted, rows, indices, coefficients);
-    REQUIRE(result);
-    CHECK(q(*result) == Q{denominator + 1} / (denominator * denominator));
+    const Q expected = Q{denominator + 1} / (denominator * denominator);
+    CHECK(result.transform([](const ExactRational& sum) { return q(sum); }) == expected);
 }
 
 TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes",

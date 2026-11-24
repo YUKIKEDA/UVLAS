@@ -42,7 +42,7 @@ class PgRankMonomialPowers {
     static constexpr std::size_t degree = *std::ranges::max_element(rank_degree);
 
 public:
-    enum class Reuse { Axis, Mixed, CommonDenominator };
+    enum class Reuse : std::uint8_t { Axis, Mixed, CommonDenominator };
 
     static constexpr std::uint64_t retained_rationals = 2 * (degree - 1);
     static constexpr std::uint64_t retained_mixed = degree * (degree - 1) / 2;
