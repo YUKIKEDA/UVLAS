@@ -6,27 +6,30 @@
     "IO4-01",
     "N4-02",
     "N4-03",
-    "N4-09"
+    "N4-09",
+    "UW-D02",
+    "N4-06"
   ],
   "package": "IM-03",
   "issue": 19,
   "date": "2026-11-24",
-  "source_commit": "1575f34c9332bdad50103b39cf025663bf5fdda3",
-  "claimed_state": "Typed-SI known-flow preparation, spatial and temporal evaluation, bounded component projection, and memory replay qualification, including analytic sine gust.",
+  "source_commit": "fcf71f338e816ffd88ac30ebb64cd213a1e6fabc",
+  "claimed_state": "Typed-SI known-flow preparation, spatial and temporal evaluation, bounded component projection, and memory replay qualification, including analytic sine gust. With prescribed transport, both fields use one qualified transient node, exact time, interval size and requested side.",
   "verification": {
-    "msvc": "Windows 11 x64 MSVC 19.51 Debug and Release. Selected CTest 4/4 each at 8ec68d7c. The Debug coupling suite finished in 40.09 s within the existing 90-s bound. The Release suite finished in 5.03 s. Rebuilt the coupling target and reran the three new cases after the const-only changes.",
-    "gcc": "Ubuntu Noble chroot GCC 14.2 Release, warnings as errors. Selected CTest 4/4 at 8ec68d7c. The coupling suite finished in 3.35 s. Rebuilt the coupling target and reran the three new cases after the const-only changes.",
+    "msvc": "Windows 11 x64 MSVC 19.51 Debug and Release. Selected CTest 4/4 each at fcf71f33. The Debug coupling suite finished in 62.92 s within the existing 90-s bound. The Release suite finished in 4.33 s.",
+    "gcc": "Ubuntu Noble chroot GCC 14.2 Release, warnings as errors. Selected CTest 4/4 at fcf71f33. The coupling suite finished in 5.55 s.",
     "ctest": [
       "coupling.case_uniform_flow",
       "aero.uniform_flow",
       "aero.pchip_curve",
       "io.si_case"
     ],
-    "catch": "All three gust cases and 417 assertions pass, seed 23.",
+    "catch": "All three gust cases and 417 assertions pass, seed 23. The exact-stage join passes 186 assertions on the same three configurations, seed 23.",
     "oracle": "45-degree closed values use sqrt(2)/2 and exact algebraic time and spatial derivatives. A separate rational pi identity and integer square root bound all six 64-digit oracle errors by 2^-205. Reconstruction from the exported binary words checks enclosure and radius (2^-98 in the high-precision fixture). Additional references use quadrant axes, mixed SI source units and exact rational PCHIP knot values.",
     "negative": "Same binary64 phase but altered exact rational value, changed amplitude knot, strict caller projection budget, invalid orthogonality, mismatched gust presence, exhausted work, cancellation.",
-    "mutation": "In a duplicate GCC tree at 8ec68d7c, evaluating the frequency chain-rule term as zero failed six assertions in two cases (exit 42). Restoring byte-identical sources passed all 417 assertions.",
-    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 with MSVC and GCC compile databases on the changed product and test translation units."
+    "mutation": "In a duplicate GCC tree at 8ec68d7c, evaluating the frequency chain-rule term as zero failed six assertions in two cases (exit 42). Restoring byte-identical sources passed all 417 assertions. Replacing the forwarded x component with y in the clock-to-gust call at fcf71f33 failed 19 assertions (exit 42), including value and both partials. The unmodified copy again passed 186 assertions.",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 with MSVC and GCC compile databases on the changed product and test translation units.",
+    "clock": "Two independently prepared typed SI inputs share exact t=1/4 and the two sides of t=1/2. The independent closed examples check the retained x=3/4 or x=1, h=1/4 or h=1/2, endpoints with distinct policies, ambient U_y and both partials when the spatial and temporal phase offsets cancel, and the separate wake speed and slope. Reject changes to the unselected interval, a sub-binary64 phase change, the wake slope, and a left-sided interval start."
   },
   "sources": {
     "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
@@ -37,11 +40,13 @@
     "src/coupling/case_known_flow.hpp": "5c9b5bfc36afe0a2d2026f1c49b6be4455f3a91cf3f38f6082d7d49f700af0f8",
     "src/coupling/case_flow_series_private.hpp": "27878e0659eed84187dca9ce6c5ba9ea9091925c044a38f66a9d6cf993feb595",
     "src/coupling/case_uniform_flow.cpp": "03abc740baa66bdfcd01e3d16167fab502cef01d519578c6c0a2d1fb4865833d",
-    "tests/coupling/case_uniform_flow_test.cpp": "e7312bcee94dc310a028c100d7dca467597214481f2dce811f2007ae765a2fe6"
+    "tests/coupling/case_uniform_flow_test.cpp": "00a50770972b475f497279ba7610f73af7e270358879fa4334676fc5c2328af0",
+    "src/coupling/case_flow_clock.cpp": "a4ecf9c749dc321d1f515d3ba44adc50f7960c7f9b38f48c0a5b33b53e77a407",
+    "src/coupling/case_flow_clock.hpp": "d0531cb5bb94ae82884e83f319bcb66c164b060ef865e2dcd9836d57828aed99"
   },
   "artifacts": {
     "docs/verification/IM-03/case-known-flow-sine-v1/reference.py": "64f93461616b59ceae9cd035a6cccf3c571b1fb14cb0f3def245b402f94d10c3",
-    "docs/verification/IM-03/case-known-flow-sine-v1/verification.md": "e7190eaa8d51fc56829c08c8360d0a958bb4da5bb6fcf7a816813991f1d61a23"
+    "docs/verification/IM-03/case-known-flow-sine-v1/verification.md": "95c1188015ab61eaf00b33ed32287fc7b6d4a8b94fc6be65b66132d5aeea7042"
   },
   "source_records": [
     {
@@ -87,7 +92,17 @@
     {
       "id": "tests/coupling/case_uniform_flow_test.cpp",
       "hint": "tests/coupling/case_uniform_flow_test.cpp",
-      "sha256": "e7312bcee94dc310a028c100d7dca467597214481f2dce811f2007ae765a2fe6"
+      "sha256": "00a50770972b475f497279ba7610f73af7e270358879fa4334676fc5c2328af0"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.cpp",
+      "hint": "src/coupling/case_flow_clock.cpp",
+      "sha256": "a4ecf9c749dc321d1f515d3ba44adc50f7960c7f9b38f48c0a5b33b53e77a407"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.hpp",
+      "hint": "src/coupling/case_flow_clock.hpp",
+      "sha256": "d0531cb5bb94ae82884e83f319bcb66c164b060ef865e2dcd9836d57828aed99"
     }
   ],
   "artifact_records": [
@@ -99,7 +114,7 @@
     {
       "id": "docs/verification/IM-03/case-known-flow-sine-v1/verification.md",
       "hint": "docs/verification/IM-03/case-known-flow-sine-v1/verification.md",
-      "sha256": "e7190eaa8d51fc56829c08c8360d0a958bb4da5bb6fcf7a816813991f1d61a23"
+      "sha256": "95c1188015ab61eaf00b33ed32287fc7b6d4a8b94fc6be65b66132d5aeea7042"
     }
   ]
 }
