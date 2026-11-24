@@ -55,32 +55,30 @@ private:
     std::size_t offset_ = 0;
 };
 
-NastranBulkDeck lexical_deck(std::string_view text, SourceId source) {
+NastranBulkDeck lexical_deck(std::string_view text, const RootSnapshotLocation& location) {
     const auto bytes = std::as_bytes(std::span{text});
     Reader reader{bytes};
     core::ResourcePlan plan{memory};
     auto file = take(read_reference_file(reader, source_digest(bytes),
                                          {text.size(), text.size() + 1, 3, text.size()}, plan, {},
                                          nullptr));
-    AcquiredRootSnapshot root{
-        {{{SourceId{90}, 100, {}}, 1, 1}, source, ReferenceRole::NastranDeck, 31},
-        std::move(file),
-        {}};
+    AcquiredRootSnapshot root{location, std::move(file), {}};
     return take(NastranBulkDeck::prepare(std::move(root), lexical, plan, {}));
 }
 
 constexpr NastranPbeamLimits property_limits{16, 24, 50000};
 constexpr std::string_view beam_source =
     "GRID,11\nGRID,12\nGRID,13\nCBEAM,90,,11,12,13\nMAT1,6,2.0,,.3\n";
-constexpr std::string_view uniform = "PBEAM,90,6,2.9,3.5,5.97\n";
+constexpr RootSnapshotLocation deck_location{
+    {{SourceId{90}, 100, {}}, 1, 1}, SourceId{99}, ReferenceRole::NastranDeck, 31};
 
 struct Parents {
     NastranIsotropicShellCards materials;
     NastranBeamCards beams;
 };
 
-Parents parents(std::string_view text, SourceId source = SourceId{99}) {
-    auto deck = lexical_deck(text, source);
+Parents parents(std::string_view text, const RootSnapshotLocation& location = deck_location) {
+    auto deck = lexical_deck(text, location);
     core::ResourcePlan plan{memory};
     auto coordinates = take(NastranCoordinateCards::prepare(std::move(deck), limits, plan, {}));
     auto shells =
@@ -224,6 +222,46 @@ TEST_CASE("PBEAM distinguishes omitted end-A recovery and explicit empty YES rec
     CHECK(recovery.position.line == 10);
 }
 
+TEST_CASE("PBEAM numeric rows without stations start with the end-A recovery group",
+          "[IO4-03][verification]") {
+    const auto header =
+        std::string{beam_source} + fixed("PBEAM", {"90", "6", "2.0", "3.0", "4.0"}, 8, "+A");
+    const auto recovery_only = parents(header + fixed("+A", {"1.1", "2.1"}));
+    core::ResourcePlan first_plan{memory};
+    const auto parsed = take(NastranPbeamCards::prepare(
+        recovery_only.materials, recovery_only.beams, property_limits, first_plan, {}));
+    const auto first_view = take(parsed.view());
+    REQUIRE(first_view.properties.size() == 1);
+    const auto& uniform_property = first_view.properties[0];
+    CHECK(first_view.sections(uniform_property).empty());
+    CHECK_FALSE(uniform_property.modifiers);
+    const auto recovery = take(uniform_property.recovery_a);
+    const auto first_location = take(recovery.locations[0]);
+    CHECK(first_location.value.decimal() == "1.1");
+
+    const auto with_attributes =
+        parents(header + fixed("+A", {}, 8, "+K") + fixed("+K", {"1.1", "2.1"}, 8, "+M") +
+                fixed("+M", {".25", "-.3"}));
+    core::ResourcePlan second_plan{memory};
+    const auto typed = take(NastranPbeamCards::prepare(
+        with_attributes.materials, with_attributes.beams, property_limits, second_plan, {}));
+    const auto second_view = take(typed.view());
+    REQUIRE(second_view.properties.size() == 1);
+    const auto& property = second_view.properties[0];
+    CHECK_FALSE(property.end_b_station);
+    CHECK(second_view.sections(property).empty());
+    const auto empty_recovery = take(property.recovery_a);
+    CHECK_FALSE(empty_recovery.locations[0]);
+    const auto modifiers = take(property.modifiers);
+    const auto shear = take(modifiers.shear_factor_1);
+    CHECK(shear.value.decimal() == "1.1");
+    CHECK(shear.field.position.line == 8);
+    const auto offsets = take(property.offsets);
+    const auto axis = take(offsets.nonstructural_mass_center[1]);
+    CHECK(axis.value.decimal() == "-0.3");
+    CHECK(axis.field.position.line == 9);
+}
+
 TEST_CASE("PBEAM preserves the full allowed station count without assuming declaration order",
           "[IO4-03][verification]") {
     const auto source_prefix =
@@ -312,10 +350,26 @@ TEST_CASE("PBEAM checks source identity and exact resource limits before returni
     const auto input = parents(source);
     core::ResourcePlan plan{memory};
     std::optional<NastranPbeamDiagnostic> diagnostic;
-    const auto other = parents(source, SourceId{101});
+    auto location = deck_location;
+    location.source = SourceId{101};
+    const auto other = parents(source, location);
     const auto mismatch = NastranPbeamCards::prepare(input.materials, other.beams, property_limits,
                                                      plan, {}, &diagnostic);
     REQUIRE_FALSE(mismatch);
+    CHECK(take(diagnostic).reason == Reason::SourceMismatch);
+    location = deck_location;
+    ++location.declaration_node;
+    const auto distinct_declaration = parents(source, location);
+    const auto misplaced = NastranPbeamCards::prepare(input.materials, distinct_declaration.beams,
+                                                      property_limits, plan, {}, &diagnostic);
+    REQUIRE_FALSE(misplaced);
+    CHECK(take(diagnostic).reason == Reason::SourceMismatch);
+    location = deck_location;
+    ++location.parent.contract_revision;
+    const auto distinct_revision = parents(source, location);
+    const auto old_revision = NastranPbeamCards::prepare(input.materials, distinct_revision.beams,
+                                                         property_limits, plan, {}, &diagnostic);
+    REQUIRE_FALSE(old_revision);
     CHECK(take(diagnostic).reason == Reason::SourceMismatch);
     const auto different = parents(source + "$ additional bytes\n");
     const auto differs = NastranPbeamCards::prepare(input.materials, different.beams,
