@@ -85,4 +85,25 @@ project_case_uniform_flow(CaseUniformFlowEvaluation&& source,
                                     request.limits.steps - remaining.steps};
 }
 
+namespace case_flow_detail {
+struct PrescribedProjection {
+    static core::Result<ProjectedCasePrescribedWake>
+    project(CasePrescribedWakeEvaluation&& source, const CaseFlowProjectionRequest& request,
+            const std::stop_token& stop, core::FailureDetails details) noexcept {
+        auto result = project_case_uniform_flow(std::move(source.value_), request, stop, details);
+        if (!result)
+            return std::unexpected(result.error());
+        return ProjectedCasePrescribedWake{std::move(*result)};
+    }
+};
+} // namespace case_flow_detail
+
+core::Result<ProjectedCasePrescribedWake>
+project_case_prescribed_wake(CasePrescribedWakeEvaluation&& source,
+                             const CaseFlowProjectionRequest& request, const std::stop_token& stop,
+                             core::FailureDetails details) noexcept {
+    return case_flow_detail::PrescribedProjection::project(std::move(source), request, stop,
+                                                           details);
+}
+
 } // namespace uvlas::coupling::detail

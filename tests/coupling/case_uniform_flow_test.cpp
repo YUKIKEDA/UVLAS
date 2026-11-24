@@ -478,6 +478,220 @@ void within(const io::SiEnclosure& enclosure, const Rat& actual, const Rat& allo
 }
 } // namespace
 
+TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient flow",
+          "[AE-07][UW-D02][UW-D08][IO4-01][N4-02][N4-03][N4-06][verification][negative]") {
+    static_assert(!std::is_convertible_v<cf::CasePrescribedWakeReady, cf::CaseUniformFlowReady>);
+    static_assert(
+        !std::is_convertible_v<cf::ProjectedCasePrescribedWake, cf::ProjectedCaseUniformFlow>);
+    a::UniformFlowWorkspace work;
+    const auto case_with = [](std::string_view velocity) {
+        auto input = source(R"({"kind":"constant","value":[100,200,300]})", two_step);
+        input.field("flow").set("events", parse("[1]"));
+        input.field("analysis")
+            .field("wake")
+            .set("convection", parse(std::string{R"({"kind":"prescribed","velocity":)"} +
+                                     std::string{velocity} + "}"));
+        return input;
+    };
+    const auto prepare_transport = [&](const io::SiCase& si) {
+        core::ResourcePlan memory{budget};
+        return take(cf::prepare_case_prescribed_wake(si, stamp, {}, work, limits, memory));
+    };
+    const auto import_transport = [&](const JsonToken& input, io::SourceId id) {
+        const auto si = materialize(input, id);
+        return prepare_transport(si);
+    };
+    const auto evaluate_transport = [&](const cf::CasePrescribedWakeReady& field,
+                                        const cf::CasePrescribedWakeReady& current, const Number& t,
+                                        p::RequestedSide side = p::RequestedSide::Automatic) {
+        const cf::CaseUniformFlowQuery query{stamp, t.view(), side};
+        const auto forecast =
+            take(cf::forecast_case_prescribed_wake(field, current, query, limits.flow));
+        auto admitted = limits.flow;
+        admitted.arithmetic.steps = forecast.reserved_steps;
+        admitted.metadata = numerics::linear::EstimateAdmission{forecast.metadata_estimate_bytes};
+        core::ResourcePlan memory{forecast.payload_bytes};
+        auto result =
+            take(cf::evaluate_case_prescribed_wake(field, current, query, work, admitted, memory));
+        CHECK(result.used_steps() <= forecast.reserved_steps);
+        CHECK(result.requested_side() == side);
+        CHECK(memory.allocated_bytes() == forecast.payload_bytes);
+        return result;
+    };
+
+    const Number t{90}, mid{30}, zero{0}, one{1}, accuracy{1, 1000000000}, knot{60}, late{121};
+    SECTION("Constant input uses transport units after the SI case owner is gone") {
+        const auto input = case_with(R"({"kind":"constant","value":[2,-5,0]})");
+        const auto field = import_transport(input, io::SourceId{301});
+        auto changed_ambient = input;
+        changed_ambient.field("flow").set("uniform",
+                                          parse(R"({"kind":"constant","value":[9,8,7]})"));
+        const auto current = import_transport(changed_ambient, io::SourceId{302});
+        const auto value = evaluate_transport(field, current, t);
+        jet(value.jet(), {Number{127, 12500}, Number{127, 5000, -1}, zero}, {zero, zero, zero}, t);
+        const cf::CaseUniformFlowQuery query{stamp, t.view()};
+        const auto forecast =
+            take(cf::forecast_case_prescribed_wake(field, current, query, limits.flow));
+        auto short_limit = limits.flow;
+        REQUIRE(forecast.reserved_steps > 0);
+        short_limit.arithmetic.steps = forecast.reserved_steps - 1;
+        core::ResourcePlan refused{forecast.payload_bytes};
+        reject(cf::evaluate_case_prescribed_wake(field, current, query, work, short_limit, refused),
+               core::FailureCode::ResourceExceeded);
+        CHECK(refused.allocated_bytes() == 0);
+    }
+
+    SECTION("Polynomial conversion uses the case start and end, origin and scale") {
+        const auto input = case_with(
+            R"({"kind":"polynomial","origin":1,"scale":2,"domain":[0,2],"coefficients":[[3,-2,5],[2,4,0]]})");
+        const auto si_case = materialize(input, io::SourceId{303});
+        const auto field = prepare_transport(si_case);
+        const auto current = prepare_transport(si_case);
+        const auto value = evaluate_transport(field, current, t);
+        jet(value.jet(), {Number{889, 50000}, Number{127, 25000, -1}, Number{127, 5000}},
+            {Number{127, 1500000}, Number{127, 750000}, zero}, t);
+        core::ResourcePlan memory{budget};
+        reject(cf::evaluate_case_prescribed_wake(field, current, {stamp, late.view()}, work,
+                                                 limits.flow, memory),
+               core::FailureCode::InvalidInput);
+
+        auto short_window = input;
+        short_window.field("analysis")
+            .field("wake")
+            .field("convection")
+            .field("velocity")
+            .set("domain", parse("[0,1]"));
+        const auto si = materialize(short_window, io::SourceId{305});
+        reject(cf::prepare_case_prescribed_wake(si, stamp, {}, work, limits, memory),
+               core::FailureCode::InvalidInput);
+    }
+
+    SECTION("The PCHIP result restores by content and can be projected without reuse as ambient") {
+        const auto input = case_with(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,-2,1],[1,-2,-1],[4,-2,-7]],"outside":{"kind":"reject"}})");
+        const auto field = import_transport(input, io::SourceId{306});
+        const auto current = import_transport(input, io::SourceId{307});
+        core::ResourcePlan memory{budget};
+        const auto saved =
+            take(cf::snapshot_case_prescribed_wake(field, work, limits.flow, memory));
+        const auto replay =
+            take(cf::restore_case_prescribed_wake(saved, current, work, limits.flow, memory));
+        auto value = evaluate_transport(replay, current, mid, p::RequestedSide::Right);
+        jet(value.jet(), {Number{127, 80000}, Number{127, 12500, -1}, Number{381, 200000}},
+            {Number{381, 4000000}, zero, Number{381, 2000000, -1}}, mid);
+        for (const auto side :
+             {p::RequestedSide::Automatic, p::RequestedSide::Left, p::RequestedSide::Right}) {
+            const auto at_knot = evaluate_transport(replay, current, knot, side);
+            jet(at_knot.jet(), {Number{127, 25000}, Number{127, 12500, -1}, Number{127, 25000, -1}},
+                {Number{127, 1000000}, zero, Number{127, 500000, -1}}, knot);
+        }
+
+        const cf::CaseFlowComponentBudget strict{one.view(), zero.view(), zero.view()};
+        const cf::CaseFlowComponentBudget allowed{one.view(), accuracy.view(), zero.view()};
+        const std::array strict_components{strict, strict, strict};
+        const std::array components{allowed, allowed, allowed};
+        const auto project = [](cf::CasePrescribedWakeEvaluation& source,
+                                const cf::CaseFlowProjectionRequest& request) {
+            return cf::project_case_prescribed_wake(std::move(source), request);
+        };
+        reject(
+            project(
+                value,
+                {core::Precision::Binary64, strict_components, strict_components, {4096, budget}}),
+            core::FailureCode::PrecisionUnresolved);
+        CHECK(value.jet().active());
+        for (const auto representation : {core::Precision::Binary64, core::Precision::TwoWord}) {
+            auto trial = evaluate_transport(replay, current, mid, p::RequestedSide::Right);
+            const auto projected =
+                take(project(trial, {representation, components, components, {4096, budget}}));
+            CHECK_FALSE(trial.jet().active());
+            CHECK(projected.jet().active());
+            CHECK(projected.requested_side() == p::RequestedSide::Right);
+            CHECK(projected.representation() == representation);
+            CHECK(projected.used_steps() > 0);
+            exact(take(projected.jet().time()), mid);
+            const std::array<Rat, 3> velocity{Rat{127} / 80000, Rat{-127} / 12500,
+                                              Rat{381} / 200000};
+            const std::array<Rat, 3> derivative{Rat{381} / 4000000, Rat{0}, Rat{-381} / 2000000};
+            for (std::size_t i = 0; i < velocity.size(); ++i) {
+                within(take(projected.velocity(i)), velocity[i], Rat{1} / 1000000000);
+                within(take(projected.time_partial(i)), derivative[i], Rat{1} / 1000000000);
+                for (std::size_t j = 0; j < velocity.size(); ++j)
+                    within(take(projected.spatial_partial(i, j)), Rat{0}, Rat{0});
+            }
+        }
+
+        auto changed = input;
+        changed.field("analysis")
+            .field("wake")
+            .field("convection")
+            .field("velocity")
+            .field("values")
+            .elements[1]
+            .elements[0] = parse("2");
+        const auto stale = import_transport(changed, io::SourceId{308});
+        const cf::CaseUniformFlowQuery query{stamp, mid.view()};
+        core::ResourcePlan refused{budget};
+        reject(cf::forecast_case_prescribed_wake(replay, stale, query, limits.flow),
+               core::FailureCode::StaleGeneration);
+        reject(cf::evaluate_case_prescribed_wake(replay, stale, query, work, limits.flow, refused),
+               core::FailureCode::StaleGeneration);
+        reject(cf::restore_case_prescribed_wake(saved, stale, work, limits.flow, refused),
+               core::FailureCode::StaleGeneration);
+        CHECK(refused.allocated_bytes() == 0);
+    }
+
+    SECTION("Outside policy distinguishes explicit endpoint hold from a signed periodic query") {
+        auto input = case_with(
+            R"({"kind":"pchip","times":[0,1,2,3,4],"values":[[0,1,-1],[0,1,-1],[2,1,-3],[0,1,-1],[0,1,-1]],"outside":{"kind":"hold"}})");
+        input.field("flow").set("events", parse("[]"));
+        input.field("analysis")
+            .set("intervals", parse(R"([{"start":0,"end":4,"step":1,"restart":"initial"}])"));
+        const Number before{120, 1, -1};
+        const auto hold_case = materialize(input, io::SourceId{312});
+        const auto held = prepare_transport(hold_case);
+        const auto held_current = prepare_transport(hold_case);
+        const auto held_value = evaluate_transport(held, held_current, before);
+        jet(held_value.jet(), {zero, Number{127, 25000}, Number{127, 25000, -1}},
+            {zero, zero, zero}, before);
+
+        input.field("analysis")
+            .field("wake")
+            .field("convection")
+            .field("velocity")
+            .set("outside", parse(R"({"kind":"periodic","period":4})"));
+        const auto periodic_case = materialize(input, io::SourceId{314});
+        const auto cyclic = prepare_transport(periodic_case);
+        const auto cyclic_current = prepare_transport(periodic_case);
+        const auto wrapped = evaluate_transport(cyclic, cyclic_current, before);
+        jet(wrapped.jet(), {Number{127, 12500}, Number{127, 25000}, Number{381, 25000, -1}},
+            {zero, zero, zero}, before);
+    }
+
+    SECTION("Free and absent wake modes are rejected before allocating a curve") {
+        const auto free = materialize(source(R"({"kind":"constant","value":[2,-5,0]})", one_step),
+                                      io::SourceId{309});
+        const auto none = materialize(root("structural_static"), io::SourceId{310});
+        const auto valid =
+            materialize(case_with(R"({"kind":"constant","value":[2,-5,0]})"), io::SourceId{311});
+        core::ResourcePlan memory{budget};
+        for (const auto* si : std::array{&free, &none})
+            reject(cf::prepare_case_prescribed_wake(*si, stamp, {}, work, limits, memory),
+                   core::FailureCode::Unsupported);
+        auto restricted = limits;
+        restricted.maximum_exact_numbers = 2;
+        reject(cf::prepare_case_prescribed_wake(valid, stamp, {}, work, restricted, memory),
+               core::FailureCode::ResourceExceeded);
+        // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+        std::stop_source cancel;
+        REQUIRE(cancel.request_stop());
+        reject(cf::prepare_case_prescribed_wake(valid, stamp, {}, work, limits, memory,
+                                                cancel.get_token()),
+               core::FailureCode::Cancelled);
+        CHECK(memory.allocated_bytes() == 0);
+    }
+}
+
 TEST_CASE("Typed SI uniform jet projects all components and retains the exact source",
           "[AE-07][N4-06][N4-08][N4-09][property][negative]") {
     const auto input = source(
