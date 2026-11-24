@@ -210,7 +210,7 @@ TEST_CASE("Optional values and a PSHELL bending designation do not invent a 3D m
           "[IO4-03][verification]") {
     const auto source = std::string{isotropic} + "PSHELL,21,52\n"
                                                  "PSHELL,22,52,,-1\n"
-                                                 "PSHELL,23,52,,0\n"
+                                                 "PSHELL,23,52,,0,,52\n"
                                                  "MAT1,53,,2.0,-.99999999999999\n"
                                                  "MAT1,54,5.0,,4.9-1\n"
                                                  "MAT1,55,5.0,,7.0D-18446744073709551616\n"
@@ -242,6 +242,7 @@ TEST_CASE("Optional values and a PSHELL bending designation do not invent a 3D m
     const auto zero = std::get<NastranBendingDesignation>(view.pshell[2].bending);
     CHECK(zero.kind == NastranSpecialBending::Zero);
     CHECK(view.input.input.bulk.text(zero.field) == "0");
+    CHECK(take(view.pshell[2].transverse_shear).id == NastranMaterialId{52});
 }
 
 TEST_CASE("MAT1 and PSHELL diagnostics preserve the shell owner and locate invalid fields",
