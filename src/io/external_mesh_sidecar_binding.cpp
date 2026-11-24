@@ -129,10 +129,9 @@ template <class Sequence>
     return true;
 }
 
-[[nodiscard]] const AcquiredRootSnapshot& authenticated(Binding& b, const ReferencedCase& graph,
-                                                        const SchemaIdentity& parent,
-                                                        const schema::FileReference& file,
-                                                        ReferenceRole role) {
+[[nodiscard]] std::reference_wrapper<const AcquiredRootSnapshot>
+authenticated(Binding& b, const ReferencedCase& graph, const SchemaIdentity& parent,
+              const schema::FileReference& file, ReferenceRole role) {
     const auto source = SourceId{file.source_id.unsigned_value()};
     const auto reference = b.value(graph.find(parent, source, role, b.stop), Reason::Binding);
     const auto& snapshot = reference.get();
