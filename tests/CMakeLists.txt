@@ -948,9 +948,9 @@ target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
 target_compile_definitions(uvlas_test_coupling_case_uniform_flow PRIVATE
     UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json")
 if(MSVC)
-    # The full MSVC Debug test including PG material preparation took 79 s locally.
+    # Debug took 107 s when rerun directly after the 120 s CTest limit expired.
     set_tests_properties(coupling.case_uniform_flow PROPERTIES
-        TIMEOUT "$<IF:$<CONFIG:Debug>,120,60>")
+        TIMEOUT "$<IF:$<CONFIG:Debug>,240,60>")
     # The unoptimized exact-interval test call chain exceeds the default stack.
     target_link_options(uvlas_test_coupling_case_uniform_flow PRIVATE
         "$<$<CONFIG:Debug>:/STACK:8388608>")
