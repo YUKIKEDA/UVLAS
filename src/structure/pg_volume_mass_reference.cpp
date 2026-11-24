@@ -2,6 +2,7 @@
 #include "pg_reference_projection.hpp"
 
 #include <uvlas/structure/pg_boundary_tangents.hpp>
+#include <uvlas/structure/pg_prepared_volume.hpp>
 
 namespace uvlas::structure {
 namespace {
@@ -65,6 +66,10 @@ void project_shapes(ReferenceArithmetic& math, const PgConditionedReferenceBatch
     return std::visit([](const auto& point) -> PgReferencePoint { return point; }, query);
 }
 
+[[nodiscard]] PgReferencePoint reference_query(const PgOwnedDiscreteVolumePoint& query) {
+    return PgReferenceVolumePoint{query.volume, query.u, query.v, query.depth};
+}
+
 template <class Record>
 struct ProjectedRows {
     core::PlannedBuffer<Record> points;
@@ -75,7 +80,8 @@ template <class Record, class Query, class FillRow>
 [[nodiscard]] ProjectedRows<Record>
 project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditioning,
              std::uint64_t rank, std::span<const Query> queries, bool two_word,
-             std::uint64_t prefix, std::uint64_t directions, const FillRow& fill_row) {
+             std::uint64_t prefix, std::uint64_t directions, const FillRow& fill_row,
+             std::uint64_t retained_rationals = 0) {
     if (queries.empty())
         return {};
     auto& plan = math.plan;
@@ -93,7 +99,9 @@ project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditi
     // For two directions, leave 32 additional Rational slots for the two
     // Cartesian vectors and their construction and dot-product temporaries.
     const auto extra = directions == 2 ? 32U : 0U;
-    math.admit(partition_add(reference_live_rationals + 74 + extra, partition_mul(8, rank)));
+    math.admit(
+        partition_add(partition_add(reference_live_rationals + 74 + extra, retained_rationals),
+                      partition_mul(8, rank)));
     const auto words = static_cast<std::uint64_t>(word_count);
     math.visit(partition_add(queries.size(), partition_mul(two_word ? 2 : 1, words)));
     auto points = partition_take(plan.allocate<Record>(rows, partition_operation));
@@ -344,6 +352,63 @@ core::Result<PgBoundaryTangentReference> PgBoundaryTangentReference::prepare(
                                           std::move(result.points),
                                           std::move(result.high),
                                           std::move(result.low)};
+    });
+}
+
+PgPreparedVolumeReference::PgPreparedVolumeReference(
+    PgPreparedPatchIdentity source, std::size_t columns, PgVolumeMassProjection projection,
+    PgReferenceCallInfo call_info, core::PlannedBuffer<PgPreparedVolumeSample> points,
+    core::PlannedBuffer<double> high, core::PlannedBuffer<double> low) noexcept
+    : source_(source),
+      columns_(columns),
+      projection_(projection),
+      call_info_(call_info),
+      points_(std::move(points)),
+      high_(std::move(high)),
+      low_(std::move(low)) {}
+
+core::Result<PgPreparedVolumeReference>
+PgPreparedVolumeReference::prepare(const PgPreparedPatch& patch, std::size_t first,
+                                   std::size_t count, const PgVolumeMassProjection& projection,
+                                   const PgReferenceLimits& limits,
+                                   core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgPreparedVolumeReference> {
+        auto math = ReferenceArithmetic{limits, plan};
+        math.cancel();
+        const auto source = partition_take(patch.info());
+        const auto rule = patch.fixed_rule();
+        if (!rule)
+            partition_fail(core::FailureCode::Unsupported);
+        if (count == 0 || first > rule->size() || count > rule->size() - first)
+            partition_fail(core::FailureCode::InvalidInput);
+        const auto paired = two_word_projection(projection.representation);
+        validate_tolerance(projection.maximum_shape_error);
+        validate_tolerance(projection.maximum_volume_jacobian_error_metres_cubed);
+        const auto queries = rule->subspan(first, count);
+        auto ordinal = first;
+        auto result = project_rows<PgPreparedVolumeSample>(
+            math, patch.conditioning(), source.basis.rank, queries, paired, 1, 1,
+            [&](const PgConditionedReferenceBatch& exact, std::span<double> high,
+                std::span<double> low) {
+                project_mass_point(math, exact, projection, high, low);
+                project_shapes(math, exact, projection.maximum_shape_error,
+                               projection.representation, high.subspan(1),
+                               paired ? low.subspan(1) : low);
+                const auto& reference = exact.points.values().front();
+                const auto current = ordinal++;
+                return PgPreparedVolumeSample{{reference.identity, reference.cell,
+                                               reference.partition_record, reference.layer},
+                                              current,
+                                              math.copy((*rule)[current].weight)};
+            },
+            queries.size());
+        return PgPreparedVolumeReference{source.identity,
+                                         static_cast<std::size_t>(source.basis.rank),
+                                         projection,
+                                         math.info(),
+                                         std::move(result.points),
+                                         std::move(result.high),
+                                         std::move(result.low)};
     });
 }
 

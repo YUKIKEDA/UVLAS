@@ -129,6 +129,11 @@ public:
 
     [[nodiscard]] core::Result<std::span<const PgRankRow>> rows() const& noexcept;
     [[nodiscard]] core::Result<std::span<const PgRankRow>> rows() const&& = delete;
+    /// Borrow sorted canonical row indices of the stored nonzero basis column.
+    [[nodiscard]] core::Result<std::span<const std::uint32_t>>
+        basis_indices(PgRankBasisColumn) const& noexcept;
+    [[nodiscard]] core::Result<std::span<const std::uint32_t>>
+        basis_indices(PgRankBasisColumn) const&& = delete;
     /// The selected ordinal in [G,I,J], in greedy order. J never extends the basis.
     [[nodiscard]] core::Result<std::span<const std::uint32_t>> selected() const& noexcept;
     [[nodiscard]] core::Result<std::span<const std::uint32_t>> selected() const&& = delete;
@@ -185,8 +190,6 @@ public:
 private:
     friend class PgReferenceBasis;
     friend class PgFlatGram;
-    [[nodiscard]] core::Result<std::span<const std::uint32_t>>
-        basis_indices(PgRankBasisColumn) const& noexcept;
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
     basis_cell_jet(detail::ReferenceArithmetic&, PgRankBasisColumn, PgCellIndex,
                    const ExactRational& u, const ExactRational& v,

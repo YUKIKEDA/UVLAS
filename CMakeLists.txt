@@ -66,7 +66,8 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
     src/structure/pg_conditioning.cpp src/structure/pg_flat_gram.cpp
-    src/structure/pg_discrete_gram.cpp
+    src/structure/pg_discrete_gram.cpp src/structure/pg_prepared_patch.cpp
+    src/structure/pg_full_trace.cpp
     src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)

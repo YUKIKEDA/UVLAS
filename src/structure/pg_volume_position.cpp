@@ -3,6 +3,7 @@
 #include <array>
 #include <cstring>
 #include <uvlas/structure/pg_boundary_tangents.hpp>
+#include <uvlas/structure/pg_prepared_volume.hpp>
 
 namespace uvlas::structure {
 namespace {
@@ -232,6 +233,23 @@ core::Result<void> apply_pg_boundary_tangents(const PgBoundaryTangentReference& 
     // Preparation admitted both rows per point before allocating their words.
     return output.apply({nullptr, reference.column_count(), 2 * reference.points().size(),
                          words.high, words.low, 0, reference.projection().maximum_derivative_error},
+                        direction, input, limits, workspace);
+}
+
+core::Result<void> apply_pg_prepared_volume_position(const PgPreparedVolumeReference& reference,
+                                                     PgPreparedPatchIdentity source,
+                                                     PgVolumePositionDirection direction,
+                                                     PgCartesianWords input,
+                                                     const PgVolumePositionLimits& limits,
+                                                     core::Workspace& workspace,
+                                                     PgVolumePositionResult& output) noexcept {
+    if (limits.cancellation.stop_requested())
+        return reject(core::FailureCode::Cancelled);
+    if (source != reference.source())
+        return reject(core::FailureCode::StaleGeneration);
+    const auto words = reference.words();
+    return output.apply({nullptr, reference.column_count(), reference.points().size(), words.high,
+                         words.low, 1, reference.projection().maximum_shape_error},
                         direction, input, limits, workspace);
 }
 
