@@ -117,7 +117,7 @@ target_include_directories(uvlas_test_io_nastran_isotropic_shell_cards PRIVATE "
 uvlas_add_test(io.nastran_laminate_cards
     LABELS unit integration negative verification
     SOURCES io/nastran_laminate_cards_test.cpp
-    LIBS uvlas_io Boost::hash2)
+    LIBS uvlas_io Boost::hash2 nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_io_nastran_laminate_cards PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
 uvlas_add_test(io.nastran_beam_cards
