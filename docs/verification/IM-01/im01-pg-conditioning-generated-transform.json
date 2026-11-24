@@ -1,0 +1,82 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-conditioning-generated-transform",
+  "ids": [
+    "SH-D03",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "492853c63488ed8987986573f818fa256b3af7d9",
+  "claimed_state": "実際に供給された幾何Gram区間から上三角候補を生成し、元区間の全合同誤差と必須場保持を照合した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configurations": [
+        "Debug",
+        "Release"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "physical_model": "n=1 cut flat graph with piecewise-affine thickness",
+    "gram_fractional_bits": 256,
+    "factor_fractional_bits": 512,
+    "candidate_fractional_bits": 256,
+    "congruence_tolerance": "1e-20",
+    "independent_midpoint_comparison_maximum_lattice_units": 1,
+    "mandatory_fields_exactly_reconstructed": 33,
+    "synthetic_exact_congruence_bound": "0",
+    "same_midpoint_widened_enclosure_failure": "PrecisionUnresolved",
+    "windows_release_ctest_passed": 1,
+    "windows_debug_ctest_passed": 1,
+    "linux_release_ctest_passed": 1,
+    "linux_release_overlay": {
+      "commit": "d24162cf48d8885f6931209f82ec4ec4e40b173a",
+      "path": "src/structure/pg_flat_gram_cut_moments.hpp",
+      "git_blob": "6688cea2373a3afd552e90e761fd2bc4cf4a5dd1"
+    },
+    "linux_sanitizer_focused_test_cases": 4,
+    "linux_sanitizer_assertions": 89152,
+    "linux_sanitizer_direct_timeout_seconds": 180,
+    "clang_tidy_translation_units": 3,
+    "rejected_mutation": {
+      "change": "replace original enclosure endpoints with midpoint before certification",
+      "failed_assertions": 1
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-discrete-conditioning-certificate-contract.md": "c30169bc6103ce1e0a5be7e56f5db82b1c4ad0dea64c47c0b9d98ab4e41b10d1",
+    "rd/structure/main-shell/paired-geometry/paired-reference-coefficient-definition.md": "af9d3362717e5c521b567a297ea4777b838a77b831eee20e0d41676830434a20",
+    "rd/structure/main-shell/paired-geometry/experiments/mass_paired_ancf.py": "1b9391eebd52d4c3e203d0cefc9f0cbfffe199c83aef30a021f69b80bc3a1eae",
+    "src/structure/pg_rank_storage.hpp": "baf41ab8cf4a8ee63f11b05a2c4714eff277484bfa38ae352cfe436911ff6e7f",
+    "tests/structure/pg_partition_test_support.hpp": "33246f600d8b6d95492b35b9cf3b4ee2431296cc2aa73c03e3c538f84e2ba79b",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-conditioning-generated-transform-contract.md": "958096412d698175ae470061c7bedb9eab99696d2f258ab7a3493b0fea06aac6",
+    "include/uvlas/structure/pg_conditioning.hpp": "b26df604feb92fa2a58f717dbb6e72dd7762ac8316256e3a35a805e64ab0bc21",
+    "include/uvlas/structure/pg_flat_gram.hpp": "852ff3e7e7c93d5f2dc27cc07e9615ab9b20f04d97c2afb3ab0f30e7e3a521a0",
+    "src/structure/pg_conditioning.cpp": "75c006112d7e923ccc07e436f55c4dcf326c1b266de2576417efb73b922c1a76",
+    "src/structure/pg_conditioning_factor.hpp": "245b9272c6e80f51cbfa7b62525459c0febd78ddd2595bed7025b859049693d3",
+    "src/structure/pg_flat_gram.cpp": "3066a6aa334cbe306c8a9c57dde3ca47112a5289c853fcf2ce222eb68ce6f2bb",
+    "tests/structure/pg_conditioning_test.cpp": "62bc0aa146c9c650b95708745b485c3ca0cca456a03297b35f9b95c5cad51ca6",
+    "docs/verification/IM-01/pg-conditioning-generated-transform.md": "ec777d7850aead143293c192162fa8101c0b2b3e0389f55a7b0be88d9da91ee3"
+  }
+}
