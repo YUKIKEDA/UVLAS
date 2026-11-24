@@ -167,11 +167,13 @@ core::Result<CaseMaterialOriginalLayout> CaseMaterialOriginalLayout::prepare(
                 caps.maximum_partition_visits -= math.partition_visits;
                 return caps;
             };
-            const auto collocation = partition_take(qualify_case_material_collocation_reference(
-                chart, thin, partition_index(chord), partition_index(span), current_limits(),
-                plan));
-            math.charge(collocation.call_info.scalar_operations);
-            math.visit(collocation.call_info.partition_visits);
+            const auto collocation_work =
+                partition_take(qualify_case_material_collocation_reference(
+                                   chart, thin, partition_index(chord), partition_index(span),
+                                   current_limits(), plan))
+                    .call_info;
+            math.charge(collocation_work.scalar_operations);
+            math.visit(collocation_work.partition_visits);
 
             std::array<a::PointId, 4> owners{a::PointId{0}, a::PointId{0}, a::PointId{0},
                                              a::PointId{0}};
