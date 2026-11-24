@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-support-cards",
+  "ids": [
+    "IO4-03"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "e412c930d4dcb0b650044213582856c59ddf0c6a",
+  "scope": "Read typed SPC, SPC1 and SPCADD, retain original field provenance, check direct set membership",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 1
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 1,
+      "clang_tidy": "21.1.1 PASS on the parser and integration test"
+    },
+    "mutation": "Allowing an SPCADD member to identify another SPCADD caused the negative test to fail."
+  },
+  "tested_target_registration": {
+    "commit": "e412c930d4dcb0b650044213582856c59ddf0c6a",
+    "CMakeLists.txt": "9278ab5f16235e4495418cf00cc2f9a4d454f4e4d35721b7e62b3620855c3e96",
+    "tests/CMakeLists.txt": "d84f3c53760e98e0be2e89d9d570a045504c3f4adfca09a81d6b33776aed25c0"
+  },
+  "sources": {
+    "src/io/nastran_support_cards.cpp": "e61060aa8aa9e367a4a3e24eff00b8121725b673d3bf4bb247676bee5d7a8db0",
+    "src/io/nastran_support_cards.hpp": "fed8d3388b0eabd8b23856885a6d346d7d2ed9cbe43db2aa75a9d18cb0b00311",
+    "tests/io/nastran_shell_cards_test.cpp": "399b244db6d2175e04739b66348a9a477de584bb8e02f496aca2cc2b4a816bf3"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-support-cards.md": "e30fd1d72109a2f29c575b64d33f0fef5419fc4346800d1c241be1f5a7342b19"
+  }
+}
