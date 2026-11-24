@@ -523,6 +523,14 @@ TEST_CASE("Frozen controls exercise recursive dictionary key kind and fixed shap
         INFO("hand-written nonempty polynomial continuity and aerodynamic sharing");
         auto value = root("coupled_flutter");
         value.set("restart", fragment("Restart"));
+        value.field("model")
+            .field("aero_surfaces")
+            .elements.at(0)
+            .field("attachment")
+            .set(
+                "material_map",
+                parse(
+                    R"({"pieces":[{"chord_cells":[0,1],"span_cells":[0,1],"layer":"1","side":"interior","terms":[{"powers":[1,0],"coefficient":[{"numerator":"1","denominator":"1"},{"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]}]}]})"));
         value.set(
             "provenance",
             parse(
@@ -557,8 +565,8 @@ TEST_CASE("Frozen controls exercise recursive dictionary key kind and fixed shap
         INFO("record coverage " << record.name);
         CHECK(counts.records.contains(std::string{record.name}));
     }
-    CHECK(counts.records.size() == 191);
-    CHECK(counts.fields.size() == 806);
+    CHECK(counts.records.size() == 194);
+    CHECK(counts.fields.size() == 815);
     CHECK(counts.fields.size() > 600);
     CHECK(counts.shapes.size() > 20);
 }

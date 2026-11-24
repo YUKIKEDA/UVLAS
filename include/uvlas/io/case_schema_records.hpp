@@ -473,6 +473,12 @@ enum class FieldType : std::uint16_t {
     T444, // ExactQuantity
     T445, // PolyTerm<d,3>
     T446, // Closed external-file role
+    T447, // MaterialMap
+    T448, // List<MaterialMapPiece>
+    T449, // MaterialMapPiece
+    T450, // List<MaterialMapTerm>
+    T451, // MaterialMapTerm
+    T452, // Vec<Rational,3>
 };
 inline constexpr std::array field_kinds{
     FieldKind::Enumeration,   FieldKind::Object,      FieldKind::Object,
@@ -624,6 +630,8 @@ inline constexpr std::array field_kinds{
     FieldKind::Identifier,    FieldKind::Identifier,  FieldKind::Identifier,
     FieldKind::Enumeration,   FieldKind::Number,      FieldKind::Number,
     FieldKind::ExactQuantity, FieldKind::Object,      FieldKind::Enumeration,
+    FieldKind::Object,        FieldKind::Array,       FieldKind::Object,
+    FieldKind::Array,         FieldKind::Object,      FieldKind::Array,
 };
 inline constexpr std::array field_is_signed{
     false, false, false, false, false, false, false, false, false, false, false, false, false,
@@ -660,7 +668,7 @@ inline constexpr std::array field_is_signed{
     false, false, false, false, false, false, false, false, false, false, false, false, false,
     false, false, false, false, false, false, false, false, false, false, false, false, false,
     false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false,
+    false, false, false, false, false, false, false, false, false, false, false,
 };
 template <FieldType>
 struct Enumeration {
@@ -1451,7 +1459,8 @@ inline constexpr std::array field_elements{
     FieldType::T429, FieldType::T0,   FieldType::T431, FieldType::T403, FieldType::T0,
     FieldType::T434, FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T0,
     FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T0,
-    FieldType::T0,   FieldType::T0,
+    FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T449, FieldType::T0,
+    FieldType::T451, FieldType::T0,   FieldType::T62,
 };
 template <FieldType>
 struct RecordAccess;
@@ -2938,12 +2947,15 @@ struct AeroAttachmentPrescribed {
 /// Checked AeroAttachment structural payload; all fields retain one immutable case owner.
 struct AeroAttachmentStructural {
     /// Bind every declared field explicitly; no missing value is silently defaulted.
-    AeroAttachmentStructural(Field<detail::FieldType::T176> kind_value,
-                             Field<detail::FieldType::T177> host_value) noexcept
-        : kind(kind_value), host(host_value) {}
+    AeroAttachmentStructural(
+        Field<detail::FieldType::T176> kind_value, Field<detail::FieldType::T177> host_value,
+        std::optional<Field<detail::FieldType::T447>> material_map_value) noexcept
+        : kind(kind_value), host(host_value), material_map(material_map_value) {}
     Field<detail::FieldType::T176> kind; ///< Kind; choose one of structural.
     Field<detail::FieldType::T177>
         host; ///< Host referring to a checked Shell definition in this case.
+    std::optional<Field<detail::FieldType::T447>>
+        material_map; ///< Fixed material chart; absent in legacy host-only inputs.
 };
 /// Checked AeroSharing payload; all fields retain one immutable case owner.
 struct AeroSharing {
@@ -5259,6 +5271,38 @@ struct FileReference {
     Field<detail::FieldType::T446>
         role; ///< Closed external-file purpose; it must match the referring consumer.
 };
+/// Checked MaterialMap payload; all fields retain one immutable case owner.
+struct MaterialMap {
+    explicit MaterialMap(Field<detail::FieldType::T448> pieces_value) noexcept
+        : pieces(pieces_value) {}
+    Field<detail::FieldType::T448> pieces;
+};
+/// Checked MaterialMapPiece payload; all fields retain one immutable case owner.
+struct MaterialMapPiece {
+    MaterialMapPiece(Field<detail::FieldType::T136> chord_cells_value,
+                     Field<detail::FieldType::T136> span_cells_value,
+                     Field<detail::FieldType::T265> layer_value,
+                     Field<detail::FieldType::T32> side_value,
+                     Field<detail::FieldType::T450> terms_value) noexcept
+        : chord_cells(chord_cells_value),
+          span_cells(span_cells_value),
+          layer(layer_value),
+          side(side_value),
+          terms(terms_value) {}
+    Field<detail::FieldType::T136> chord_cells;
+    Field<detail::FieldType::T136> span_cells;
+    Field<detail::FieldType::T265> layer;
+    Field<detail::FieldType::T32> side;
+    Field<detail::FieldType::T450> terms;
+};
+/// Checked MaterialMapTerm payload; all fields retain one immutable case owner.
+struct MaterialMapTerm {
+    MaterialMapTerm(Field<detail::FieldType::T63> powers_value,
+                    Field<detail::FieldType::T452> coefficient_value) noexcept
+        : powers(powers_value), coefficient(coefficient_value) {}
+    Field<detail::FieldType::T63> powers;
+    Field<detail::FieldType::T452> coefficient;
+};
 } // namespace schema
 namespace detail {
 template <>
@@ -5967,6 +6011,21 @@ struct RecordAccess<FieldType::T444> {
 template <>
 struct RecordAccess<FieldType::T445> {
     using Value = schema::PolyTerm;
+    static Value read(const SchemaData*, std::uint64_t) noexcept;
+};
+template <>
+struct RecordAccess<FieldType::T447> {
+    using Value = schema::MaterialMap;
+    static Value read(const SchemaData*, std::uint64_t) noexcept;
+};
+template <>
+struct RecordAccess<FieldType::T449> {
+    using Value = schema::MaterialMapPiece;
+    static Value read(const SchemaData*, std::uint64_t) noexcept;
+};
+template <>
+struct RecordAccess<FieldType::T451> {
+    using Value = schema::MaterialMapTerm;
     static Value read(const SchemaData*, std::uint64_t) noexcept;
 };
 } // namespace detail

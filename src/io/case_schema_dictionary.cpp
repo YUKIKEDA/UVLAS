@@ -437,9 +437,10 @@ constexpr std::array<FieldDefinition, 2> fields_62{{
     {"kind", FieldType::T175, false},
     {"motion", FieldType::T144, false},
 }};
-constexpr std::array<FieldDefinition, 2> fields_63{{
+constexpr std::array<FieldDefinition, 3> fields_63{{
     {"kind", FieldType::T176, false},
     {"host", FieldType::T177, false},
+    {"material_map", FieldType::T447, true},
 }};
 constexpr std::array<FieldDefinition, 4> fields_64{{
     {"other", FieldType::T178, false},
@@ -1191,7 +1192,21 @@ constexpr std::array<FieldDefinition, 4> fields_190{{
     {"sha256", FieldType::T240, false},
     {"role", FieldType::T446, false},
 }};
-const std::array<RecordDefinition, 191> records{{
+constexpr std::array<FieldDefinition, 1> fields_191{{
+    {"pieces", FieldType::T448, false},
+}};
+constexpr std::array<FieldDefinition, 5> fields_192{{
+    {"chord_cells", FieldType::T136, false},
+    {"span_cells", FieldType::T136, false},
+    {"layer", FieldType::T265, false},
+    {"side", FieldType::T32, false},
+    {"terms", FieldType::T450, false},
+}};
+constexpr std::array<FieldDefinition, 2> fields_193{{
+    {"powers", FieldType::T63, false},
+    {"coefficient", FieldType::T452, false},
+}};
+const std::array<RecordDefinition, 194> records{{
     {"Case", "Case", fields_0, "", ""},
     {"Units", "Units", fields_1, "", ""},
     {"Model", "Model", fields_2, "", ""},
@@ -1385,8 +1400,11 @@ const std::array<RecordDefinition, 191> records{{
     {"InitialPointRigid", "InitialPoint", fields_188, "target.kind", "rigid"},
     {"Rational", "Rational", fields_189, "", ""},
     {"FileReference", "FileReference", fields_190, "", ""},
+    {"MaterialMap", "MaterialMap", fields_191, "", ""},
+    {"MaterialMapPiece", "MaterialMapPiece", fields_192, "", ""},
+    {"MaterialMapTerm", "MaterialMapTerm", fields_193, "", ""},
 }};
-const std::array<TypeDefinition, 447> type_table{{
+const std::array<TypeDefinition, 453> type_table{{
     {"Tag{uvlas.case/1}", FieldKind::Enumeration, std::nullopt, 0, "",
      SchemaDimension{{0, 0, 0, 0}}, false, 0},
     {"Units", FieldKind::Object, std::nullopt, 0, "Units", SchemaDimension{{0, 0, 0, 0}}, false, 0},
@@ -2246,6 +2264,18 @@ const std::array<TypeDefinition, 447> type_table{{
     {"Tag{nastran-deck,nastran-sidecar,gmsh-msh4.1-ascii,gmsh-sidecar,reference-geometry,"
      "preparation-history,initial-history,observation-reference}",
      FieldKind::Enumeration, std::nullopt, 0, "", SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"MaterialMap", FieldKind::Object, std::nullopt, 0, "MaterialMap",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"List<MaterialMapPiece>", FieldKind::Array, FieldType::T449, 0, "",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"MaterialMapPiece", FieldKind::Object, std::nullopt, 0, "MaterialMapPiece",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"List<MaterialMapTerm>", FieldKind::Array, FieldType::T451, 0, "",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"MaterialMapTerm", FieldKind::Object, std::nullopt, 0, "MaterialMapTerm",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"Vec<Rational,3>", FieldKind::Array, FieldType::T62, 3, "", SchemaDimension{{0, 0, 0, 0}},
+     false, 0},
 }};
 } // namespace
 std::span<const TypeDefinition> schema_types() noexcept {
@@ -2689,6 +2719,12 @@ std::uint64_t schema_record_bytes(SchemaContext& context) {
                                                 sizeof(std::optional<schema::Rational>)));
     total = context.add(total, context.multiply(context.output->record_counts[190],
                                                 sizeof(std::optional<schema::FileReference>)));
+    total = context.add(total, context.multiply(context.output->record_counts[191],
+                                                sizeof(std::optional<schema::MaterialMap>)));
+    total = context.add(total, context.multiply(context.output->record_counts[192],
+                                                sizeof(std::optional<schema::MaterialMapPiece>)));
+    total = context.add(total, context.multiply(context.output->record_counts[193],
+                                                sizeof(std::optional<schema::MaterialMapTerm>)));
     return total;
 }
 void schema_prepare_records(SchemaContext& context) {
@@ -3122,6 +3158,12 @@ void schema_prepare_records(SchemaContext& context) {
         context.allocate<std::optional<schema::Rational>>(owner.record_counts[189], false);
     owner.records_FileReference =
         context.allocate<std::optional<schema::FileReference>>(owner.record_counts[190], false);
+    owner.records_MaterialMap =
+        context.allocate<std::optional<schema::MaterialMap>>(owner.record_counts[191], false);
+    owner.records_MaterialMapPiece =
+        context.allocate<std::optional<schema::MaterialMapPiece>>(owner.record_counts[192], false);
+    owner.records_MaterialMapTerm =
+        context.allocate<std::optional<schema::MaterialMapTerm>>(owner.record_counts[193], false);
 }
 void schema_build_records(SchemaContext& context) {
     auto& owner = *context.output;
@@ -3775,6 +3817,7 @@ void schema_build_records(SchemaContext& context) {
                 .emplace(schema::AeroAttachmentStructural{
                     SchemaFactory::required_field<FieldType::T176>(context, node, "kind"),
                     SchemaFactory::required_field<FieldType::T177>(context, node, "host"),
+                    SchemaFactory::optional_field<FieldType::T447>(context, node, "material_map"),
                 });
             break;
         case 64:
@@ -4986,6 +5029,29 @@ void schema_build_records(SchemaContext& context) {
                     SchemaFactory::required_field<FieldType::T24>(context, node, "path"),
                     SchemaFactory::required_field<FieldType::T240>(context, node, "sha256"),
                     SchemaFactory::required_field<FieldType::T446>(context, node, "role"),
+                });
+            break;
+        case 191:
+            owner.records_MaterialMap.values()[static_cast<std::size_t>(typed.record_row)].emplace(
+                schema::MaterialMap{
+                    SchemaFactory::required_field<FieldType::T448>(context, node, "pieces"),
+                });
+            break;
+        case 192:
+            owner.records_MaterialMapPiece.values()[static_cast<std::size_t>(typed.record_row)]
+                .emplace(schema::MaterialMapPiece{
+                    SchemaFactory::required_field<FieldType::T136>(context, node, "chord_cells"),
+                    SchemaFactory::required_field<FieldType::T136>(context, node, "span_cells"),
+                    SchemaFactory::required_field<FieldType::T265>(context, node, "layer"),
+                    SchemaFactory::required_field<FieldType::T32>(context, node, "side"),
+                    SchemaFactory::required_field<FieldType::T450>(context, node, "terms"),
+                });
+            break;
+        case 193:
+            owner.records_MaterialMapTerm.values()[static_cast<std::size_t>(typed.record_row)]
+                .emplace(schema::MaterialMapTerm{
+                    SchemaFactory::required_field<FieldType::T63>(context, node, "powers"),
+                    SchemaFactory::required_field<FieldType::T452>(context, node, "coefficient"),
                 });
             break;
         default:
@@ -6434,5 +6500,23 @@ RecordAccess<FieldType::T445>::read(const SchemaData* owner, std::uint64_t node)
     const auto& typed = owner->nodes.values()[static_cast<std::size_t>(node)];
     return ready_record(
         owner->records_PolyTerm.values()[static_cast<std::size_t>(typed.record_row)]);
+}
+RecordAccess<FieldType::T447>::Value
+RecordAccess<FieldType::T447>::read(const SchemaData* owner, std::uint64_t node) noexcept {
+    const auto& typed = owner->nodes.values()[static_cast<std::size_t>(node)];
+    return ready_record(
+        owner->records_MaterialMap.values()[static_cast<std::size_t>(typed.record_row)]);
+}
+RecordAccess<FieldType::T449>::Value
+RecordAccess<FieldType::T449>::read(const SchemaData* owner, std::uint64_t node) noexcept {
+    const auto& typed = owner->nodes.values()[static_cast<std::size_t>(node)];
+    return ready_record(
+        owner->records_MaterialMapPiece.values()[static_cast<std::size_t>(typed.record_row)]);
+}
+RecordAccess<FieldType::T451>::Value
+RecordAccess<FieldType::T451>::read(const SchemaData* owner, std::uint64_t node) noexcept {
+    const auto& typed = owner->nodes.values()[static_cast<std::size_t>(node)];
+    return ready_record(
+        owner->records_MaterialMapTerm.values()[static_cast<std::size_t>(typed.record_row)]);
 }
 } // namespace uvlas::io::detail
