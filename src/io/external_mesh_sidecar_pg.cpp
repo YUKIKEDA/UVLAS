@@ -1,0 +1,462 @@
+#include "external_mesh_sidecar_pg.hpp"
+
+#include <algorithm>
+#include <limits>
+#include <memory_resource>
+#include <utility>
+#include <vector>
+
+namespace uvlas::io::detail {
+namespace {
+
+constexpr auto operation = core::Operation::PrepareModel;
+using Code = core::FailureCode;
+using Reason = MeshSidecarFailure;
+
+struct Rejected {
+    core::Failure error;
+};
+
+class Preparation {
+public:
+    Preparation(const ExternalSidecarPgLimits& configured, core::ResourcePlan& resources,
+                const std::stop_token& token, RootSnapshotLocation location,
+                ExternalSidecarPgDiagnostic* output) noexcept
+        : limits(configured), plan(resources), stop(token), diagnostic(output) {
+        detail.source = location;
+    }
+
+    void step() {
+        if (stop.stop_requested()) {
+            reject(Code::Cancelled, Reason::Resource);
+        }
+        if (work == limits.work) {
+            reject(Code::ResourceExceeded, Reason::Resource);
+        }
+        ++work;
+    }
+
+    [[noreturn]] void reject(Code code, Reason why = Reason::Selection) {
+        propagate({code, operation}, why);
+    }
+
+    template <class T>
+    [[nodiscard]] T value(core::Result<T> result, Reason reason = Reason::Binding) {
+        if (!result) {
+            propagate(result.error(), reason);
+        }
+        return *std::move(result);
+    }
+
+    template <class T>
+    [[nodiscard]] T require(std::optional<T> result, Reason reason = Reason::Snapshot) {
+        if (!result) {
+            reject(Code::InvalidInput, reason);
+        }
+        return *std::move(result);
+    }
+
+    void check(core::Result<void> result) {
+        if (!result) {
+            propagate(result.error(), Reason::Binding);
+        }
+    }
+
+    [[noreturn]] void propagate(core::Failure failure, Reason reason) {
+        if (diagnostic) {
+            if (failure.code == Code::Cancelled) {
+                *diagnostic = {};
+            } else {
+                detail.reason = reason;
+                diagnostic->binding = detail;
+            }
+        }
+        throw Rejected{failure};
+    }
+
+    const ExternalSidecarPgLimits& limits;
+    core::ResourcePlan& plan;
+    const std::stop_token& stop;
+    ExternalSidecarPgDiagnostic* diagnostic;
+    MeshSidecarDiagnostic detail{};
+    std::uint64_t work = 0;
+};
+
+[[nodiscard]] schema::Shell find_shell(Preparation& p, const schema::Model& model, MeshShellId id) {
+    for (core::Index i = 0; std::cmp_less(i, model.shells.size()); ++i) {
+        p.step();
+        const auto shell = p.value(model.shells.at(i), Reason::CaseReference).record();
+        if (shell.id.unsigned_value() == id.value()) {
+            return shell;
+        }
+    }
+    p.reject(Code::InvalidInput, Reason::CaseReference);
+}
+
+[[nodiscard]] schema::GeometryPg find_pg(Preparation& p, const schema::Model& model,
+                                         MeshGeometryId id) {
+    for (core::Index i = 0; std::cmp_less(i, model.geometry.size()); ++i) {
+        p.step();
+        const auto geometry = p.value(model.geometry.at(i), Reason::CaseReference).record();
+        const auto* pg = std::get_if<schema::GeometryPg>(&geometry);
+        if (pg && pg->id.unsigned_value() == id.value()) {
+            return *pg;
+        }
+    }
+    p.reject(Code::InvalidInput, Reason::CaseReference);
+}
+
+[[nodiscard]] ImportedCaseMaterial find_material(Preparation& p, const schema::Model& model,
+                                                 MeshMaterialId id) {
+    for (core::Index i = 0; std::cmp_less(i, model.materials.size()); ++i) {
+        p.step();
+        const auto material = p.value(model.materials.at(i), Reason::CaseReference).record();
+        if (std::visit([&](const auto& record) { return record.id.unsigned_value() == id.value(); },
+                       material)) {
+            return material;
+        }
+    }
+    p.reject(Code::InvalidInput, Reason::CaseReference);
+}
+
+[[nodiscard]] const MeshSidecarChart& chart(const MeshSidecarPayload& payload,
+                                            const BoundExternalFace& face) {
+    if (const auto* gmsh = std::get_if<GmshSidecar>(&payload)) {
+        return gmsh->shells.values()[face.sidecar_row].faces.values()[face.sidecar_face].chart;
+    }
+    return std::get<NastranSidecar>(payload).shells.values()[face.sidecar_row].chart;
+}
+
+[[nodiscard]] std::size_t selected_faces(Preparation& p, const ExternalMeshSidecarBinding& bound,
+                                         MeshShellId shell, MeshGeometryId pg) {
+    std::size_t count = 0;
+    for (const auto& face : bound.faces()) {
+        p.step();
+        if (face.shell == shell) {
+            p.detail.node = face.sidecar_node;
+            p.detail.element = face.element;
+            if (face.pg != pg) {
+                p.reject(Code::InvalidInput, Reason::CaseReference);
+            }
+            ++count;
+        }
+    }
+    if (count == 0) {
+        p.reject(Code::InvalidInput);
+    }
+    if (count > p.limits.geometry.maximum_faces || !std::in_range<core::Index>(count)) {
+        p.reject(Code::ResourceExceeded, Reason::Resource);
+    }
+    return count;
+}
+
+[[nodiscard]] ExternalPlanarPg establish_geometry(Preparation& p,
+                                                  const ExternalMeshSidecarBinding& bound,
+                                                  const structure::PgReferenceGeometry& pg,
+                                                  MeshShellId shell, std::size_t count) {
+    constexpr auto per_face = sizeof(ExternalPgFace) + 4 * sizeof(ExternalPgCorner);
+    constexpr auto alignment = alignof(ExternalPgFace) + alignof(ExternalPgCorner);
+    const auto bytes =
+        p.value(core::checked_byte_count(static_cast<core::Index>(count), per_face, operation),
+                Reason::Resource);
+    const auto limit = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
+    if (bytes > limit - alignment || count > std::numeric_limits<std::size_t>::max() / 4U) {
+        p.reject(Code::ResourceExceeded, Reason::Resource);
+    }
+    auto memory =
+        p.value(p.plan.allocate<std::byte>(static_cast<core::Index>(bytes + alignment), operation),
+                Reason::Resource);
+    // The corner values hold references to the stable exact charts. The PMR allocator
+    // has no upstream and only uses the slab already charged to the resource plan.
+    std::pmr::monotonic_buffer_resource scratch(memory.values().data(), memory.size(),
+                                                std::pmr::null_memory_resource());
+    std::pmr::vector<ExternalPgFace> faces{&scratch};
+    std::pmr::vector<ExternalPgCorner> corners{&scratch};
+    faces.reserve(count);
+    corners.reserve(4U * count);
+    auto tags = p.value(p.plan.allocate<std::uint64_t>(static_cast<core::Index>(count), operation),
+                        Reason::Resource);
+    const auto& payload = bound.sidecar().payload();
+    for (const auto& face : bound.faces()) {
+        p.step();
+        if (face.shell != shell) {
+            continue;
+        }
+        const auto& mapping = chart(payload, face);
+        const auto begin = corners.size();
+        for (std::size_t i = 0; i < face.count; ++i) {
+            corners.emplace_back(face.nodes[i], mapping.vertices[i]);
+        }
+        const auto winding = mapping.orientation == MeshSidecarOrientation::Same
+                                 ? ExternalPgWinding::Forward
+                                 : ExternalPgWinding::Reversed;
+        tags.values()[faces.size()] = face.element;
+        faces.emplace_back(face.element, winding, std::span{corners}.subspan(begin, face.count));
+    }
+
+    auto geometry_limits = p.limits.geometry;
+    geometry_limits.arithmetic.cancellation = p.stop;
+    std::optional<ExternalPgDiagnostic>* geometry = nullptr;
+    if (p.diagnostic) {
+        geometry = &p.diagnostic->geometry;
+    }
+    if (const auto* gmsh = std::get_if<GmshMesh>(&bound.source())) {
+        GmshTopologyDiagnostic detail;
+        auto topology = GmshSurfaceTopology::prepare(*gmsh, tags.values(), p.limits.topology,
+                                                     p.plan, p.stop, &detail);
+        if (!topology && p.diagnostic) {
+            p.diagnostic->topology = detail;
+        }
+        const auto certified = p.value(std::move(topology), Reason::Selection);
+        return p.value(ExternalPlanarPg::prepare(pg, *gmsh, certified,
+                                                 std::get<GmshSidecar>(payload).length, faces,
+                                                 geometry_limits, p.plan, geometry),
+                       Reason::Selection);
+    }
+    const auto& nastran = std::get<NastranShellCards>(bound.source());
+    return p.value(ExternalPlanarPg::prepare(pg, nastran,
+                                             std::get<NastranSidecar>(payload).units.length, faces,
+                                             geometry_limits, p.plan, geometry),
+                   Reason::Selection);
+}
+
+[[nodiscard]] std::optional<ImportedQuantityMismatch>* mismatch(Preparation& p) noexcept {
+    return p.diagnostic == nullptr ? nullptr : &p.diagnostic->quantity;
+}
+
+[[nodiscard]] bool gmsh_quantities(Preparation& p, const GmshSidecar& source,
+                                   const schema::GeometryPg& pg, MeshShellId shell,
+                                   SiLengthUnit case_length) {
+    const structure::ExactRational* full = nullptr;
+    std::optional<core::Index> earliest_declaration;
+    std::optional<GmshKey> earliest_group;
+    bool missing = false;
+    for (const auto& row : source.shells.values()) {
+        p.step();
+        if (row.shell != shell) {
+            continue;
+        }
+        p.detail.node = row.node;
+        p.detail.physical = row.physical;
+        if (const auto& thickness = row.full_thickness) {
+            if (full && *full != *thickness) {
+                p.reject(Code::Unsupported, Reason::Binding);
+            }
+            if (!full) {
+                full = &*thickness;
+                earliest_declaration = row.full_thickness_node;
+                earliest_group = row.physical;
+            }
+        } else {
+            missing = true;
+        }
+    }
+    if (!full) {
+        return false;
+    }
+    if (missing) {
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+    p.detail.node = earliest_declaration;
+    p.detail.physical = earliest_group;
+    p.check(check_imported_uniform_thickness(
+        *full, source.length, pg.thickness.record(), case_length, p.limits.case_thickness_vertices,
+        p.limits.geometry.arithmetic.algebra, p.plan, p.stop, mismatch(p)));
+    return true;
+}
+
+[[nodiscard]] const NastranSidecarMaterial& mapped_material(Preparation& p,
+                                                            const NastranSidecar& source,
+                                                            NastranMaterialId id,
+                                                            MeshMaterialId expected) {
+    const auto materials = source.materials.values();
+    const auto found = std::ranges::find_if(materials, [&](const auto& row) {
+        p.step();
+        return row.mid == id;
+    });
+    if (found == materials.end()) {
+        p.reject(Code::InvalidInput, Reason::CaseReference);
+    }
+    p.detail.node = found->node;
+    p.detail.target_namespace = SchemaNamespace::Material;
+    p.detail.target = expected.value();
+    if (found->material != expected) {
+        p.reject(Code::InvalidInput, Reason::CaseReference);
+    }
+    return *found;
+}
+
+void nastran_material(Preparation& p, const NastranSidecar& source, const NastranLaminateView& deck,
+                      const NastranMaterialReference& use, const schema::Model& model,
+                      MeshMaterialId expected, const SiUnits& case_units) {
+    static_cast<void>(mapped_material(p, source, use.id, expected));
+    const auto target = find_material(p, model, expected);
+    const auto& declaration = deck.input.materials[use.declaration_ordinal];
+    const auto& limits = p.limits.geometry.arithmetic.algebra;
+    p.detail.byte = declaration.id_field.position.byte;
+    if (declaration.kind == NastranMaterialKind::Mat1) {
+        const auto ordinal = p.require(declaration.mat1_ordinal);
+        p.check(check_imported_material(deck.input.mat1[ordinal], target, source.units, case_units,
+                                        limits, p.plan, p.stop, mismatch(p)));
+        return;
+    }
+    const auto found = std::ranges::find_if(deck.mat8, [&](const auto& value) {
+        p.step();
+        return value.declaration_ordinal == use.declaration_ordinal;
+    });
+    if (found == deck.mat8.end()) {
+        p.reject(Code::InvalidInput, Reason::CaseReference);
+    }
+    p.check(check_imported_material(*found, target, source.units, case_units, limits, p.plan,
+                                    p.stop, mismatch(p)));
+}
+
+struct QuantityCounts {
+    bool thickness{};
+    std::uint64_t materials{};
+};
+
+[[nodiscard]] QuantityCounts nastran_quantities(
+    Preparation& p, const ExternalMeshSidecarBinding& bound, const NastranSidecar& source,
+    const NastranShellView& original, const NastranLaminateView& deck, const schema::Model& model,
+    const schema::Shell& shell, const schema::GeometryPg& pg, const SiUnits& case_units) {
+    if (!original.input.bulk.same_snapshot(deck.input.input.input.bulk.location,
+                                           deck.input.input.input.bulk.digest)) {
+        p.reject(Code::StaleGeneration, Reason::Binding);
+    }
+    const auto target = MeshShellId{shell.id.unsigned_value()};
+    const NastranPshell* property = nullptr;
+    for (const auto& face : bound.faces()) {
+        p.step();
+        if (face.shell != target) {
+            continue;
+        }
+        p.detail.element = face.element;
+        p.detail.node = face.sidecar_node;
+        const auto found = std::ranges::find_if(deck.input.input.elements, [&](const auto& value) {
+            p.step();
+            return value.card_ordinal == face.source_ordinal;
+        });
+        if (found == deck.input.input.elements.end()) {
+            p.reject(Code::InvalidInput, Reason::Binding);
+        }
+        const auto ordinal = found->property.property_ordinal;
+        const auto entry = std::ranges::find_if(deck.input.pshell, [&](const auto& value) {
+            p.step();
+            return value.property_ordinal == ordinal;
+        });
+        // This whole-patch comparison needs one uniform PSHELL. Per-corner fields
+        // and PCOMP require an admitted ply/field correspondence on each region.
+        if (entry == deck.input.pshell.end() ||
+            (property && property->property_ordinal != ordinal)) {
+            p.reject(Code::Unsupported, Reason::Binding);
+        }
+        if (std::visit(
+                [](const auto& ring) {
+                    return std::ranges::any_of(
+                        ring, [](const auto& corner) { return corner.thickness.has_value(); });
+                },
+                found->corners)) {
+            p.reject(Code::Unsupported, Reason::Binding);
+        }
+        property = &*entry;
+    }
+    if (!property) {
+        p.reject(Code::InvalidInput);
+    }
+    QuantityCounts out;
+    if (const auto& thickness = property->thickness) {
+        p.detail.byte = thickness->field.position.byte;
+        p.check(check_imported_uniform_thickness(
+            {thickness->value.decimal(), source.units.length, thickness->field.position},
+            pg.thickness.record(), case_units.length, p.limits.case_thickness_vertices,
+            p.limits.geometry.arithmetic.algebra, p.plan, p.stop, mismatch(p)));
+        out.thickness = true;
+    }
+    if (std::holds_alternative<NastranBendingDesignation>(property->bending)) {
+        p.reject(Code::Unsupported, Reason::Binding);
+    }
+    const auto* bending = std::get_if<NastranMaterialReference>(&property->bending);
+    std::array<const NastranMaterialReference*, 4> uses{
+        property->membrane ? &*property->membrane : nullptr, bending,
+        property->transverse_shear ? &*property->transverse_shear : nullptr,
+        property->coupling ? &*property->coupling : nullptr};
+    for (const auto* use : uses) {
+        p.step();
+        if (!use) {
+            continue;
+        }
+        if (shell.layers.size() != 1) {
+            p.reject(Code::Unsupported, Reason::Binding);
+        }
+        const auto layer = p.value(shell.layers.at(0), Reason::CaseReference).record();
+        nastran_material(p, source, deck, *use, model,
+                         MeshMaterialId{layer.material.unsigned_value()}, case_units);
+        ++out.materials;
+    }
+    return out;
+}
+
+} // namespace
+
+core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
+    const SchemaCase& schema, const ExternalMeshSidecarBinding& bound, MeshShellId shell,
+    const structure::PgReferenceGeometry& pg, const SiUnits& case_units,
+    const NastranLaminateCards* quantities, const ExternalSidecarPgLimits& limits,
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    ExternalSidecarPgDiagnostic* diagnosis) noexcept {
+    if (diagnosis) {
+        *diagnosis = {};
+    }
+    return core::guard_entry(
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<QualifiedExternalSidecarPg> {
+            try {
+                Preparation call{limits, plan, stop, bound.sidecar().source(), diagnosis};
+                call.step();
+                const auto parent = call.value(schema.identity());
+                const auto source = bound.sidecar().source();
+                if (parent.source != source.parent.source ||
+                    parent.contract_revision != source.parent.contract_revision ||
+                    parent.representation_revision != source.parent.representation_revision) {
+                    call.reject(Code::StaleGeneration, Reason::Binding);
+                }
+                call.detail.target_namespace = SchemaNamespace::Shell;
+                call.detail.target = shell.value();
+                const auto model = call.value(schema.root(), Reason::CaseReference).model.record();
+                const auto selected = find_shell(call, model, shell);
+                const auto pg_id = MeshGeometryId{selected.geometry.unsigned_value()};
+                const auto pg_record = find_pg(call, model, pg_id);
+                const auto count = selected_faces(call, bound, shell, pg_id);
+                auto geometry = establish_geometry(call, bound, pg, shell, count);
+                const auto& payload = bound.sidecar().payload();
+                QuantityCounts result;
+                if (const auto* gmsh = std::get_if<GmshSidecar>(&payload)) {
+                    result.thickness =
+                        gmsh_quantities(call, *gmsh, pg_record, shell, case_units.length);
+                } else {
+                    if (!quantities) {
+                        call.reject(Code::Unsupported, Reason::Binding);
+                    }
+                    const auto original =
+                        call.require(std::get<NastranShellCards>(bound.source()).view());
+                    const auto deck = call.require(quantities->view());
+                    result =
+                        nastran_quantities(call, bound, std::get<NastranSidecar>(payload), original,
+                                           deck, model, selected, pg_record, case_units);
+                }
+                call.step();
+                return QualifiedExternalSidecarPg{std::move(geometry),
+                                                  shell,
+                                                  pg_id,
+                                                  source,
+                                                  bound.sidecar().digest(),
+                                                  result.thickness,
+                                                  result.materials,
+                                                  call.work};
+            } catch (const Rejected& error) {
+                return std::unexpected(error.error);
+            }
+        });
+}
+
+} // namespace uvlas::io::detail

@@ -1,9 +1,12 @@
+#include "../structure/pg_partition_test_support.hpp"
+#include "external_mesh_sidecar_pg.hpp"
 #include "gmsh_mesh.hpp"
 #include "nastran_coordinate_cards.hpp"
 #include "reference_declarations_fixture.hpp"
 #include "reference_input.hpp"
 #include "reference_resolution.hpp"
 #include "reference_root_snapshot.hpp"
+#include "source_digest.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -1447,4 +1450,438 @@ TEST_CASE("A referenced Nastran deck survives native file removal and release of
     } else {
         FAIL("The card owner did not survive graph release");
     }
+}
+
+TEST_CASE("Authenticated mesh sidecars bind original faces to existing Case PGs",
+          "[FD-03][IO4-01][IO4-03][IO4-04][R-05][integration][verification][negative]") {
+    constexpr std::string_view mesh = R"MSH($MeshFormat
+4.1 0 8
+$EndMeshFormat
+$Entities
+0 1 2 0
+11 0 0 0 1000 0 0 1 7 0
+17 0 0 0 1000 1000 0 1 7 0
+18 0 0 0 1000 1000 0 1 8 0
+$EndEntities
+$Nodes
+1 4 10 99
+2 17 0 4
+10
+20
+40
+99
+0 0 0
+1000 0 0
+1000 1000 0
+0 1000 0
+$EndNodes
+$Elements
+3 4 501 999
+1 11 1 1
+501 10 20
+2 17 2 2
+702 10 40 99
+701 10 20 40
+2 18 2 1
+999 10 20 99
+$EndElements
+)MSH";
+    constexpr std::string_view bulk =
+        "GRID,10,,0.0,0.0,0.0\nGRID,20,,1.0,0.0,0.0\nGRID,40,,1.0,1.0,0.0\n"
+        "GRID,99,,0.0,1.0,0.0\nPSHELL,90,6,0.25\nMAT1,6,1.0,,0.0,1.0\n"
+        "CTRIA3,701,90,10,20,40\nCTRIA3,702,90,10,40,99\n"
+        "SPC,42,10,1,0.0\nSPC1,51,36,10,40\nSPCADD,61,42,51\n";
+    const auto zero = nlohmann::json{{"numerator", "0"}, {"denominator", "1"}};
+    const auto one = nlohmann::json{{"numerator", "1"}, {"denominator", "1"}};
+    const auto chart = [&](bool upper) {
+        nlohmann::json result{{"orientation", "same"}};
+        result["vertices"] = nlohmann::json::array(
+            {nlohmann::json::array({zero, zero}),
+             upper ? nlohmann::json::array({one, one}) : nlohmann::json::array({one, zero}),
+             upper ? nlohmann::json::array({zero, one}) : nlohmann::json::array({one, one})});
+        return result;
+    };
+
+    bool is_gmsh = false;
+    bool omitted = false;
+    bool duplicate = false;
+    bool lexical = false;
+    bool wrong_case = false;
+    bool foreign_element = false;
+    bool wrong_components = false;
+    bool budget_repeat = false;
+    bool wrong_dimension = false;
+    bool wrong_chart = false;
+    bool version = false;
+    bool physical = false;
+    bool thickness_shift = false;
+    bool material_shift = false;
+    bool chart_shift = false;
+    SECTION("Gmsh group expands and preserves the original rings") {
+        is_gmsh = true;
+    }
+    SECTION("One Gmsh group can be partitioned, but the uncovered member is rejected") {
+        is_gmsh = true;
+        omitted = true;
+    }
+    SECTION("Gmsh duplicate ownership is rejected in the declaring row") {
+        is_gmsh = true;
+        duplicate = true;
+    }
+    SECTION("A face in another Gmsh physical group cannot bind") {
+        is_gmsh = true;
+        foreign_element = true;
+    }
+    SECTION("The adopted schema cannot assert a dependency-free leaf with an unknown field") {
+        is_gmsh = true;
+        lexical = true;
+    }
+    SECTION("An unknown revision of the correct sidecar family is unsupported") {
+        is_gmsh = true;
+        lexical = true;
+        version = true;
+    }
+    SECTION("An exact chart denominator cannot be zero") {
+        is_gmsh = true;
+        lexical = true;
+        wrong_chart = true;
+    }
+    SECTION("A physical tag cannot be resolved in a different dimension") {
+        is_gmsh = true;
+        wrong_dimension = true;
+    }
+    SECTION("Case fit and sidecar conversion cannot both supply a budget") {
+        is_gmsh = true;
+        budget_repeat = true;
+    }
+    SECTION("Nastran resolves deck EIDs, MID and the expanded SPCADD component set") {}
+    SECTION("Matching an incomplete Nastran support component set fails") {
+        wrong_components = true;
+    }
+    SECTION("Gmsh admitted planes compare 250 mm with one quarter metre") {
+        is_gmsh = true;
+        physical = true;
+    }
+    SECTION("Gmsh exact thickness detects a sub-ulp difference") {
+        is_gmsh = true;
+        physical = true;
+        thickness_shift = true;
+    }
+    SECTION("Gmsh mismatched chart fails before its different thickness") {
+        is_gmsh = true;
+        physical = true;
+        thickness_shift = true;
+        chart_shift = true;
+    }
+    SECTION("Nastran admitted planes compare PSHELL thickness and explicit MAT1 quantities") {
+        physical = true;
+    }
+    SECTION("Nastran MAT1 mismatch reports the original deck field") {
+        physical = true;
+        material_shift = true;
+    }
+    SECTION("Another checked Case cannot consume the same graph") {
+        wrong_case = true;
+    }
+
+    const auto empty = nlohmann::json::array();
+    nlohmann::json sidecar = {
+        {"schema", is_gmsh ? "uvlas.gmsh-sidecar/1" : "uvlas.nastran-sidecar/1"},
+        {"geometry", "2"},
+        {"shells", empty},
+        {"supports", empty},
+        {"joints", empty}};
+    if (is_gmsh) {
+        sidecar["length"] = "mm";
+        sidecar["shells"].push_back(
+            {{"physical", {{"dimension", 2}, {"tag", 7}}},
+             {"shell", "1"},
+             {"faces", nlohmann::json::array({{{"element", "702"}, {"chart", chart(true)}}})},
+             {"material_layers", nlohmann::json::array({{{"layer", "1"}, {"material", "1"}}})},
+             {"full_thickness", 250}});
+        if (!omitted) {
+            auto row = sidecar["shells"][0];
+            // Reverse MSH and declaration order for the same selected group.
+            row["faces"] = nlohmann::json::array({{{"element", duplicate         ? "702"
+                                                               : foreign_element ? "999"
+                                                                                 : "701"},
+                                                   {"chart", chart(false)}}});
+            sidecar["shells"].push_back(std::move(row));
+        }
+        if (chart_shift) {
+            sidecar["shells"][0]["faces"][0]["chart"]["vertices"][1][1] = {{"numerator", "1"},
+                                                                           {"denominator", "2"}};
+        }
+        sidecar["supports"].push_back(
+            {{"physical", {{"dimension", wrong_dimension ? 0 : 1}, {"tag", 7}}}, {"support", "1"}});
+        if (version) {
+            sidecar["schema"] = "uvlas.gmsh-sidecar/2";
+        } else if (wrong_chart) {
+            sidecar["shells"][0]["faces"][0]["chart"]["vertices"][1][0]["denominator"] = "0";
+        } else if (lexical) {
+            sidecar["include"] = "unread.json";
+        }
+        if (budget_repeat) {
+            sidecar["conversion"] = {{"distance_budget", 0.1},
+                                     {"normal_budget", 0.1},
+                                     {"conversion_observations", {"1"}}};
+        }
+    } else {
+        sidecar["generator"] = "test-deck";
+        sidecar["units"] = {{"length", "m"}, {"mass", "kg"}, {"time", "s"}, {"angle", "deg"}};
+        sidecar["shells"].push_back({{"element", "702"}, {"shell", "1"}, {"chart", chart(true)}});
+        sidecar["shells"].push_back({{"element", "701"}, {"shell", "1"}, {"chart", chart(false)}});
+        sidecar["materials"] = nlohmann::json::array({{{"mid", "6"}, {"material", "1"}}});
+        sidecar["beams"] = empty;
+        sidecar["masses"] = empty;
+        sidecar["supports"] = nlohmann::json::array(
+            {{{"set", "61"},
+              {"grid", "10"},
+              {"support", "1"},
+              {"components", wrong_components ? nlohmann::json::array({1, 3})
+                                              : nlohmann::json::array({1, 3, 6})}}});
+    }
+
+    const auto hex = [](std::string_view body) {
+        constexpr std::string_view digits = "0123456789abcdef";
+        const auto digest = rd::source_digest(bytes_of(body));
+        std::string text;
+        for (const auto byte : digest.bytes) {
+            const auto value = std::to_integer<unsigned>(byte);
+            text.push_back(digits[value >> 4U]);
+            text.push_back(digits[value & 15U]);
+        }
+        return text;
+    };
+    auto sidecar_text = sidecar.dump();
+    if (thickness_shift) {
+        constexpr std::string_view shared = R"("full_thickness":250)";
+        constexpr std::string_view different = R"("full_thickness":250.0000000000000000001)";
+        std::size_t first_position = 0;
+        for (int i = 0; i != 2; ++i) {
+            const auto offset = sidecar_text.find(shared, first_position);
+            REQUIRE(offset != std::string::npos);
+            sidecar_text.replace(offset, shared.size(), different);
+            first_position = offset + different.size();
+        }
+    }
+    std::string source_text{is_gmsh ? mesh : bulk};
+    if (material_shift) {
+        constexpr std::string_view original = "MAT1,6,1.0";
+        const auto offset = source_text.find(original);
+        REQUIRE(offset != std::string::npos);
+        source_text.replace(offset, original.size(), "MAT1,6,1.0000000000000000001");
+    }
+    auto config = fixture::root("coupled_transient");
+    config.field("model")
+        .field("geometry")
+        .elements[0]
+        .field("thickness")
+        .set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    auto external = fixture::fragment(is_gmsh ? "Geometry.gmsh" : "Geometry.nastran");
+    if (is_gmsh) {
+        external.set("reference", fixture::fragment("ReferenceGeometry.fit"));
+    }
+    declare_path(external.field(is_gmsh ? "mesh" : "deck"), "external.dat", hex(source_text));
+    declare_path(external.field("sidecar"), "sidecar.json", hex(sidecar_text));
+    config.field("model").field("geometry").elements.push_back(std::move(external));
+
+    const rd::MeshSidecarBindingLimits binding{
+        {limits().document,
+         {256, 256, 256, 8, 8, 4096, 8192,
+          uvlas::structure::ExactEstimateAdmission{fixture::budget},
+          uvlas::structure::ExactTimingMode::Disabled},
+         32,
+         8,
+         32'000},
+        {4096, 16, 16, 64, 16, 16, 32'000},
+        {4096, 80, 32, 32, 256, 32'000},
+        {32, 32, 8, 32'000},
+        {32, 32, 32'000},
+        {32, 32, 32'000},
+        8,
+        32'000};
+    auto graph = [&] {
+        const Tree tree;
+        write_file(tree.root / "case.json", config.wire());
+        write_file(tree.root / "external.dat", source_text);
+        write_file(tree.root / "sidecar.json", sidecar_text);
+        core::ResourcePlan input_plan{fixture::budget};
+        const auto input = fixture::take(
+            rd::ReferenceInput::from_file(tree.root, "case.json", io::SourceId{12}, manifest_limits,
+                                          limits(), input_plan, {}, nullptr));
+        auto declarations = prepare(input);
+        core::ResourcePlan graph_plan{fixture::budget};
+        rd::LeafReferenceDiagnostic diagnostic;
+        auto result = rd::resolve_leaf_references(
+            input, std::move(declarations),
+            {{{4096, 4097, 2, 4096}, 8, 256}, 2, 8192, 8194, 4, 8192, 8}, {2, 2, 1, 128, 128},
+            {binding.gmsh, binding.nastran, binding.sidecar}, graph_plan, {}, nullptr, &diagnostic);
+        if (lexical) {
+            REQUIRE_FALSE(result);
+            CHECK(result.error().code ==
+                  (version ? core::FailureCode::Unsupported : core::FailureCode::InvalidInput));
+            CHECK(diagnostic.reason == rd::LeafReferenceFailure::Sidecar);
+            CHECK(diagnostic.pointer() == "/model/geometry/1/sidecar");
+            REQUIRE(diagnostic.sidecar);
+            CHECK(diagnostic.sidecar->reason == (version       ? rd::MeshSidecarFailure::Schema
+                                                 : wrong_chart ? rd::MeshSidecarFailure::Scalar
+                                                               : rd::MeshSidecarFailure::Key));
+        }
+        return result;
+    }(); // The graph now owns the exact source bytes. All input files have been removed.
+
+    if (lexical) {
+        return;
+    }
+    REQUIRE(graph);
+    auto case_copy = config;
+    if (wrong_case) {
+        fixture::reverse_keys(case_copy);
+    }
+    const auto schema = fixture::checked(case_copy);
+    core::ResourcePlan plan{fixture::budget};
+    std::optional<rd::MeshSidecarDiagnostic> diagnostic;
+    const auto result = rd::bind_external_mesh_sidecar(schema, *graph, rd::MeshGeometryId{2},
+                                                       binding, plan, {}, &diagnostic);
+    if (omitted || duplicate || foreign_element || wrong_components || budget_repeat ||
+        wrong_case || wrong_dimension) {
+        REQUIRE_FALSE(result);
+        CHECK(result.error().operation == core::Operation::PrepareModel);
+        CHECK(result.error().code ==
+              (wrong_case ? core::FailureCode::StaleGeneration : core::FailureCode::InvalidInput));
+        if (const auto& detail = diagnostic) {
+            if (omitted || duplicate || foreign_element || wrong_components || wrong_dimension) {
+                CHECK(detail->reason == rd::MeshSidecarFailure::Selection);
+                CHECK(detail->node);
+            }
+            if (omitted || duplicate || foreign_element) {
+                CHECK(detail->element == (foreign_element ? 999U : omitted ? 701U : 702U));
+            }
+        } else {
+            FAIL("Expected the sidecar binding diagnostic");
+        }
+        return;
+    }
+
+    REQUIRE(result);
+    REQUIRE(result->faces().size() == 2);
+    CHECK_FALSE(diagnostic);
+    CHECK(result->sidecar().source().source == io::SourceId{2});
+    CHECK(result->sidecar().geometry() == rd::MeshGeometryId{2});
+    const auto faces = result->faces();
+    CHECK(faces[0].element == 702);
+    CHECK(faces[0].pg == rd::MeshGeometryId{1});
+    CHECK(faces[0].shell == rd::MeshShellId{1});
+    CHECK(faces[0].nodes == std::array<std::uint64_t, 4>{10, 40, 99, 0});
+    CHECK(faces[1].element == 701);
+    CHECK(faces[1].nodes == std::array<std::uint64_t, 4>{10, 20, 40, 0});
+    CHECK(faces[1].sidecar_node != faces[0].sidecar_node);
+    CHECK(faces[0].sidecar_row == 0);
+    CHECK(faces[1].sidecar_row == 1);
+    if (physical) {
+        using namespace uvlas::structure;
+        partition_test::Fixture pg_input;
+        for (auto& value : pg_input.heights) {
+            value = pg_input.r("1", "4");
+        }
+        pg_input.layers.clear();
+        pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[2]});
+        const auto unit = pg_input.r("1");
+        const std::array origin{pg_input.r("0"), pg_input.r("0"), pg_input.r("0")};
+        const std::array axes{pg_input.r("1"), pg_input.r("0"), pg_input.r("0"),
+                              pg_input.r("0"), pg_input.r("1"), pg_input.r("0"),
+                              pg_input.r("0"), pg_input.r("0"), pg_input.r("1")};
+        const PgReferenceLimits pg_limits{
+            partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+        core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+        auto coefficients = fixture::take(PgCoefficientDictionary::prepare(
+            pg_input.chart_graph(), {partition_test::exact_limits(), 2000, 20'000'000, 100'000, {}},
+            workspace, plan));
+        auto partition = fixture::take(PgIntegrationPartition::prepare(
+            pg_input.request(), partition_test::limits(), workspace, plan));
+        PgReferenceInputs initial{std::move(pg_input.chart_graph()), std::move(coefficients),
+                                  std::move(partition)};
+        const auto pg = fixture::take(PgReferenceGeometry::prepare(
+            std::move(initial), {axes, origin, unit}, pg_limits, plan));
+        std::optional<rd::NastranLaminateCards> quantities;
+        if (!is_gmsh) {
+            auto from_snapshot = fixture::take(
+                rd::prepare_referenced_nastran_deck(*graph, fixture::take(schema.identity()),
+                                                    io::SourceId{1}, binding.nastran, plan, {}));
+            auto coordinates = fixture::take(rd::NastranCoordinateCards::prepare(
+                std::move(from_snapshot), binding.coordinates, plan, {}));
+            auto cards = fixture::take(
+                rd::NastranShellCards::prepare(std::move(coordinates), binding.shells, plan, {}));
+            auto isotropic = fixture::take(
+                rd::NastranIsotropicShellCards::prepare(std::move(cards), {32, 32'000}, plan, {}));
+            quantities.emplace(fixture::take(
+                rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
+        }
+        const io::SiUnits case_units{io::SiLengthUnit::Metre, io::SiMassUnit::Kilogram,
+                                     io::SiTimeUnit::Second, io::SiAngleUnit::Radian};
+        const rd::ExternalSidecarPgLimits qualification{
+            {pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
+        rd::ExternalSidecarPgDiagnostic failure;
+        const auto qualified = rd::qualify_external_sidecar_planar_pg(
+            schema, *result, rd::MeshShellId{1}, pg, case_units,
+            quantities ? &*quantities : nullptr, qualification, plan, {}, &failure);
+        if (material_shift || thickness_shift) {
+            REQUIRE_FALSE(qualified);
+            CHECK(qualified.error().code == (chart_shift ? core::FailureCode::GeometryInvalid
+                                                         : core::FailureCode::InvalidInput));
+            if (chart_shift) {
+                CHECK(failure.geometry.has_value());
+                CHECK_FALSE(failure.quantity.has_value());
+            } else if (const auto& mismatch = failure.quantity) {
+                CHECK(mismatch->quantity == (material_shift
+                                                 ? rd::ImportedQuantityField::Young1
+                                                 : rd::ImportedQuantityField::FullThickness));
+                if (material_shift) {
+                    CHECK(mismatch->card_position.has_value());
+                } else {
+                    CHECK(mismatch->vertex == 0);
+                }
+            } else {
+                FAIL("Missing exact quantity mismatch");
+            }
+        } else {
+            REQUIRE(qualified);
+            CHECK(qualified->thickness_compared);
+            CHECK(qualified->materials_compared == (is_gmsh ? 0 : 1));
+            CHECK(qualified->pg == rd::MeshGeometryId{1});
+            if (const auto admitted = qualified->geometry.view()) {
+                CHECK(admitted->faces.size() == 2);
+                CHECK(admitted->faces.front().element == 702);
+            } else {
+                FAIL("Missing owned geometric correspondence");
+            }
+        }
+    }
+    auto boundary = binding;
+    boundary.faces = 2;
+    boundary.work = result->work();
+    core::ResourcePlan exact{fixture::budget};
+    CHECK(rd::bind_external_mesh_sidecar(schema, *graph, rd::MeshGeometryId{2}, boundary, exact, {},
+                                         nullptr));
+    auto short_faces = boundary;
+    --short_faces.faces;
+    core::ResourcePlan short_storage{fixture::budget};
+    const auto shortage = rd::bind_external_mesh_sidecar(schema, *graph, rd::MeshGeometryId{2},
+                                                         short_faces, short_storage, {}, nullptr);
+    REQUIRE_FALSE(shortage);
+    CHECK(shortage.error().code == core::FailureCode::ResourceExceeded);
+    --boundary.work;
+    core::ResourcePlan short_work{fixture::budget};
+    const auto short_result = rd::bind_external_mesh_sidecar(schema, *graph, rd::MeshGeometryId{2},
+                                                             boundary, short_work, {}, nullptr);
+    REQUIRE_FALSE(short_result);
+    CHECK(short_result.error().code == core::FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop() is non-const.
+    std::stop_source cancelled;
+    REQUIRE(cancelled.request_stop());
+    const auto stopped = rd::bind_external_mesh_sidecar(
+        schema, *graph, rd::MeshGeometryId{2}, binding, plan, cancelled.get_token(), nullptr);
+    REQUIRE_FALSE(stopped);
+    CHECK(stopped.error().code == core::FailureCode::Cancelled);
 }

@@ -1,15 +1,17 @@
 #pragma once
 
+#include "external_mesh_sidecar.hpp"
 #include "gmsh_mesh.hpp"
 #include "nastran_bulk.hpp"
 
 namespace uvlas::io::detail {
 
-enum class LeafReferenceFailure : std::uint8_t { UnsupportedRole, Format, Graph };
+enum class LeafReferenceFailure : std::uint8_t { UnsupportedRole, Format, Graph, Sidecar };
 
 struct LeafFormatLimits {
-    GmshLimits gmsh;
-    NastranBulkLimits nastran;
+    GmshLimits gmsh{};
+    NastranBulkLimits nastran{};
+    std::optional<MeshSidecarLimits> sidecar{};
 };
 
 struct LeafReferenceDiagnostic {
@@ -19,6 +21,7 @@ struct LeafReferenceDiagnostic {
     std::optional<SourceId> declaring_source;
     std::optional<ReferencePathDiagnostic> path;
     DependencyWalkDiagnostic walk;
+    std::optional<MeshSidecarDiagnostic> sidecar;
     core::PlannedBuffer<char> declaration_pointer;
 
     [[nodiscard]] std::string_view pointer() const& noexcept;
