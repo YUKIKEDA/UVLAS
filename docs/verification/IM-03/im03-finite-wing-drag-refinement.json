@@ -16,7 +16,7 @@
   "verification": {
     "windows": "Windows 11、MSVC 14.51 Releaseの新旧6件が通過した。M2/N4は各563検査、水平13.58秒、上反角5度18.86秒。M4/N8は各1,647検査、水平103.69秒、上反角5度137.87秒。従来の定常2件は各13,447検査。",
     "linux": "Linux、GCC 14.2.0 Releaseの新旧6件が通過した。M2/N4は水平7.69秒、上反角5度10.07秒。M4/N8は水平81.66秒、上反角5度94.40秒。数値検査数はWindowsと一致し、従来の定常・コアと今回の細分の代表3構成でclang-tidyが通過した。",
-    "build_notes": "Windows Debugの上反角5度・M4/N8は先行版でコンパイルした。ここに示す実行時間と確保量はReleaseの観測値である。",
+    "build_notes": "MSVC Debug predecessor 188ba705, FW-V02 M4/N8, 1647 checks, 1320.50 seconds in standalone execution. Only M4/N8 Debug gets 1800 seconds. Every Release trial retains 1200 seconds.",
     "commands": [
       "ctest --test-dir out/issue166-build -C Release -V -R '^coupling\\.finite_wing_(steady|drag_refinement)\\.' -j 2",
       "ctest --test-dir build -V -R '^coupling\\.finite_wing_(steady|drag_refinement)\\.' -j 3",
@@ -40,7 +40,7 @@
     "src/aero/p1_interval_private.hpp": "aa2d6ed189ae13710d07e033f824876c53de4bc13455324f9f341736491c3e57"
   },
   "artifacts": {
-    "docs/verification/IM-03/finite-wing-drag-refinement-v1/verification.md": "5d65389451797bd327d567aef16eff1fdf744398dae5b102188f3d58088e622e",
+    "docs/verification/IM-03/finite-wing-drag-refinement-v1/verification.md": "bc4e3762c209052a6e24f76ed551065ca57eddf3665a1173e5133fe4d243285b",
     "tests/aero/fixtures/finite-wing-drag-refinement-v1.json": "29b7cf5fd5301a0b4ebfc684e81b9cf70a90fa7305f34451a88e9da5cbd15878",
     "docs/verification/IM-03/finite-wing-drag-refinement-v1/independent-larger.json": "2da2d81ba94bf32c021156eb09a33452af5b4a7f4594e75ae57ff053ce725ee9",
     "rd/aero/finite-wing/records/drag-common-limit-result.json": "c875d9a995b4129b61e50a7d0fb1184108a3387f17fda4fd28eeebaaddfc9aa5"

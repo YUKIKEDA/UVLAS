@@ -1027,7 +1027,12 @@ foreach(wing_index RANGE 0 1)
             UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json"
             UVLAS_FINITE_WING_SPAN_LINES_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-span-lines-v1.json"
             UVLAS_FINITE_WING_REFINEMENT_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-drag-refinement-v1.json")
-        set_tests_properties(${test_name} PROPERTIES TIMEOUT 1200)
+        set(drag_timeout 1200)
+        if(grid STREQUAL "m4n8")
+            # FW-V02 took 1321 seconds with MSVC Debug. Keep the Release limit fixed.
+            set(drag_timeout "$<IF:$<CONFIG:Debug>,1800,1200>")
+        endif()
+        set_tests_properties(${test_name} PROPERTIES TIMEOUT ${drag_timeout})
     endforeach()
 endforeach()
 set(multiple_surface_cases steady loads)
