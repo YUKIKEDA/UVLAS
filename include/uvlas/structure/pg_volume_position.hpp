@@ -23,6 +23,8 @@ struct PgVolumePositionLimits {
 
 class PgBoundaryPositionReference;
 class PgBoundaryTangentReference;
+class PgPreparedVolumeReference;
+struct PgPreparedPatchIdentity;
 
 /// Reusable owned destination. Its prior words remain valid after any failed
 /// action. Stage writes in a separate exclusive Workspace before publishing.
@@ -60,6 +62,12 @@ private:
     apply_pg_boundary_tangents(const PgBoundaryTangentReference&, PgVolumePositionDirection,
                                PgCartesianWords, const PgVolumePositionLimits&, core::Workspace&,
                                PgVolumePositionResult&) noexcept;
+
+    friend core::Result<void>
+    apply_pg_prepared_volume_position(const PgPreparedVolumeReference&, PgPreparedPatchIdentity,
+                                      PgVolumePositionDirection, PgCartesianWords,
+                                      const PgVolumePositionLimits&, core::Workspace&,
+                                      PgVolumePositionResult&) noexcept;
 
     struct MatrixView {
         const PgConditioningCertificate* certificate;

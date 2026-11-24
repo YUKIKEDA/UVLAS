@@ -423,6 +423,20 @@ PgReferenceBasis::evaluate(const PgReferencePoint& query, PgRankBasisColumn colu
     });
 }
 
+core::Result<PgReferenceFrame> PgReferenceGeometry::frame() const& noexcept {
+    if (const auto present = identity(); !present)
+        return std::unexpected(present.error());
+    return PgReferenceFrame{rotation_, origin_, length_};
+}
+
+core::Result<PgReferenceIdentity> PgReferenceBasis::reference_identity() const noexcept {
+    return geometry_.identity();
+}
+
+core::Result<PgReferenceFrame> PgReferenceBasis::frame() const& noexcept {
+    return geometry_.frame();
+}
+
 core::Result<std::uint64_t> PgReferenceBasis::size() const noexcept {
     const auto info = rank_.preparation();
     if (!info)

@@ -28,6 +28,24 @@ public:
         magnitude(backend.denom(), value.denominator_bits());
     }
 
+    void word(std::uint64_t value) {
+        std::array<unsigned char, 8> encoding{};
+        for (auto i = encoding.rbegin(); i != encoding.rend(); ++i) {
+            *i = static_cast<unsigned char>(value & 0xffU);
+            value >>= 8U;
+        }
+        math_.charge();
+        bytes(encoding.data(), encoding.size());
+    }
+
+    template <class Backend>
+    void signed_magnitude(const Backend& value, std::uint64_t bits) {
+        math_.charge();
+        const unsigned char sign = value.sign() ? 1 : 0;
+        bytes(&sign, 1);
+        magnitude(value, bits);
+    }
+
     [[nodiscard]] PgReferenceIdentity result() noexcept {
         PgReferenceIdentity result;
         const auto digest = hash_.result();
@@ -37,7 +55,8 @@ public:
     }
 
 private:
-    void magnitude(const IntegerBackend& value, std::uint64_t bits) {
+    template <class Backend>
+    void magnitude(const Backend& value, std::uint64_t bits) {
         auto count = partition_add(bits, 7) / 8;
         std::array<unsigned char, 8> length{};
         auto remaining = count;
@@ -49,7 +68,7 @@ private:
         for (; count > 0; --count) {
             math_.charge();
             const auto bit = (count - 1) * 8;
-            constexpr auto limb_bits = IntegerBackend::limb_bits;
+            constexpr auto limb_bits = Backend::limb_bits;
             const auto word = value.limbs()[static_cast<std::size_t>(bit / limb_bits)];
             const auto byte = static_cast<unsigned char>(
                 (word >> static_cast<unsigned>(bit % limb_bits)) & 0xffU);

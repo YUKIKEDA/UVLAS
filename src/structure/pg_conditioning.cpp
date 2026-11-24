@@ -1,5 +1,6 @@
 #include "pg_conditioning_factor.hpp"
 #include "pg_reference_arithmetic.hpp"
+#include "pg_reference_hash.hpp"
 
 #include <uvlas/structure/pg_conditioning.hpp>
 
@@ -455,6 +456,55 @@ PgConditioningCertificate::coefficient(PgRankBasisColumn column, core::Index row
     });
 }
 
+core::PlannedBuffer<ExactRational>
+PgConditioningCertificate::materialize_required(ReferenceArithmetic& math,
+                                                PgRankRequiredColumn target) const {
+    const auto& accepted = state(state_);
+    if (target.value < 0 || target.value >= rank_required)
+        fail(core::FailureCode::InvalidInput);
+    const auto* rank = partition_take(basis_.rank());
+    auto output = partition_take(
+        math.plan.allocate<ExactRational>(partition_index(accepted.info.rank), operation));
+    auto values = output.values();
+    const auto prefix = static_cast<std::size_t>(accepted.info.protected_rank);
+    for (std::size_t offset = prefix; offset > 0; --offset) {
+        const auto i = offset - 1;
+        math.charge();
+        auto residual = partition_take(
+            rank->required({partition_index(i)}, target, math.leaf_limits, math.plan));
+        for (std::size_t j = i + 1; j < prefix; ++j) {
+            math.visit(1);
+            if (accepted.transform.values()[packed(i, j)] != 0)
+                residual = math.sub(residual, math.mul(entry(math, accepted, i, j), values[j]));
+        }
+        values[i] = math.div(residual, entry(math, accepted, i, i));
+    }
+    math.cancel();
+    return output;
+}
+
+void PgConditioningCertificate::append_basis_identity(ReferenceArithmetic& math,
+                                                      ReferenceHash& stream) const {
+    const auto& accepted = state(state_);
+    const auto geometry = partition_take(basis_.reference_identity());
+    stream.bytes(geometry.bytes.data(), geometry.bytes.size());
+    const auto* rank = partition_take(basis_.rank());
+    const auto recipe = partition_take(rank->witness());
+    stream.word(recipe.recipe_version);
+    stream.word(recipe.reduction_version);
+    stream.word(accepted.info.rank);
+    stream.word(accepted.info.protected_rank);
+    stream.word(accepted.transform_scale);
+    for (const auto ordinal : partition_take(rank->selected())) {
+        math.visit(1);
+        stream.word(ordinal);
+    }
+    for (const auto& value : accepted.transform.values()) {
+        math.visit(1);
+        stream.signed_magnitude(value.backend(), rank_bits(value));
+    }
+}
+
 core::Result<core::PlannedBuffer<ExactRational>> PgConditioningCertificate::required_coordinates(
     PgRankRequiredColumn target, const PgReferenceLimits& limits, core::Workspace& workspace,
     core::ResourcePlan& plan) const noexcept {
@@ -466,26 +516,8 @@ core::Result<core::PlannedBuffer<ExactRational>> PgConditioningCertificate::requ
         const auto& accepted = state(state_);
         if (target.value < 0 || target.value >= rank_required)
             fail(core::FailureCode::InvalidInput);
-        const auto* rank = partition_take(basis_.rank());
         math.admit(reference_live_rationals + accepted.info.rank);
-        auto output = partition_take(
-            plan.allocate<ExactRational>(partition_index(accepted.info.rank), operation));
-        auto values = output.values();
-        const auto prefix = static_cast<std::size_t>(accepted.info.protected_rank);
-        for (std::size_t offset = prefix; offset > 0; --offset) {
-            const auto i = offset - 1;
-            math.charge();
-            auto residual = partition_take(
-                rank->required({partition_index(i)}, target, math.leaf_limits, plan));
-            for (std::size_t j = i + 1; j < prefix; ++j) {
-                math.visit(1);
-                if (accepted.transform.values()[packed(i, j)] != 0)
-                    residual = math.sub(residual, math.mul(entry(math, accepted, i, j), values[j]));
-            }
-            values[i] = math.div(residual, entry(math, accepted, i, i));
-        }
-        math.cancel();
-        return output;
+        return materialize_required(math, target);
     });
 }
 

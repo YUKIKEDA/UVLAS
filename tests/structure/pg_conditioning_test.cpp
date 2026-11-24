@@ -658,20 +658,6 @@ void check_reference_points(Fixture& f, const PgConditioningCertificate& certifi
     check_reference_batch(certificate, terms, transform, partition, queries);
 }
 
-Q independent_double(double value) {
-    const auto bits = std::bit_cast<std::uint64_t>(value);
-    const auto biased = static_cast<unsigned>((bits >> 52U) & 0x7ffU);
-    REQUIRE(biased != 0x7ffU);
-    const auto fraction = bits & 0x000fffffffffffffULL;
-    const auto significand = biased == 0 ? fraction : fraction | (1ULL << 52U);
-    const auto exponent = biased == 0 ? -1074 : static_cast<int>(biased) - 1075;
-    I n{significand};
-    if ((bits >> 63U) != 0)
-        n = -n;
-    const auto shift = static_cast<unsigned>(std::abs(exponent));
-    return exponent >= 0 ? Q{n * (I{1} << shift)} : Q{n} / (I{1} << shift);
-}
-
 template <class Reference, class Apply>
 void check_position_action(const Reference& reference, std::span<const Q> exact_shapes,
                            const Apply& apply, std::size_t rows_per_point = 1) {

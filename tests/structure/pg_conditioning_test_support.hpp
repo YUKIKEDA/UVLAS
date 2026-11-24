@@ -6,6 +6,7 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
 #include <array>
+#include <bit>
 #include <cstdint>
 #include <span>
 #include <uvlas/structure/pg_conditioning.hpp>
@@ -30,26 +31,31 @@ inline PgReferenceLimits query_limits() {
     return {a, 20'000'000, 10'000'000, {}};
 }
 
-inline PgReferenceBasis make_basis(Fixture& f, const ExactRational& length, core::Workspace& ws,
-                                   core::ResourcePlan& plan, bool cyclic_frame = false) {
+inline PgReferenceBasis make_basis(Fixture& f, const PgReferenceFrame& frame, core::Workspace& ws,
+                                   core::ResourcePlan& plan) {
     auto dictionary = take(PgCoefficientDictionary::prepare(
         f.chart_graph(), {exact_limits(), 2000, 20000000, 100000, {}}, ws, plan));
     auto partition = take(PgIntegrationPartition::prepare(f.request(), limits(), ws, plan));
     PgReferenceInputs input{std::move(f.chart_graph()), std::move(dictionary),
                             std::move(partition)};
-    std::array<ExactRational, 9> rotation;
-    rotation[cyclic_frame ? 2 : 0] = f.r("1");
-    rotation[cyclic_frame ? 3 : 4] = f.r("1");
-    rotation[cyclic_frame ? 7 : 8] = f.r("1");
-    const std::array<ExactRational, 3> origin{};
-    auto geometry = take(PgReferenceGeometry::prepare(std::move(input), {rotation, origin, length},
-                                                      query_limits(), plan));
+    auto geometry =
+        take(PgReferenceGeometry::prepare(std::move(input), frame, query_limits(), plan));
     const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
     const auto source = take(geometry.source());
     auto rank = take(
         PgRankPreparation::prepare(source.dictionary, source.partition, rank_limits, ws, plan));
     return take(
         PgReferenceBasis::prepare(std::move(geometry), std::move(rank), rank_limits, ws, plan));
+}
+
+inline PgReferenceBasis make_basis(Fixture& f, const ExactRational& length, core::Workspace& ws,
+                                   core::ResourcePlan& plan, bool cyclic_frame = false) {
+    std::array<ExactRational, 9> rotation;
+    rotation[cyclic_frame ? 2 : 0] = f.r("1");
+    rotation[cyclic_frame ? 3 : 4] = f.r("1");
+    rotation[cyclic_frame ? 7 : 8] = f.r("1");
+    const std::array<ExactRational, 3> origin{};
+    return make_basis(f, {rotation, origin, length}, ws, plan);
 }
 
 inline const Q& q(const ExactRational& value) {
@@ -167,6 +173,20 @@ inline Q power(const Q& x, core::Index exponent) {
     for (core::Index i = 0; i < exponent; ++i)
         result *= x;
     return result;
+}
+
+inline Q independent_double(double value) {
+    const auto bits = std::bit_cast<std::uint64_t>(value);
+    const auto biased = static_cast<unsigned>((bits >> 52U) & 0x7ffU);
+    REQUIRE(biased != 0x7ffU);
+    const auto fraction = bits & 0x000fffffffffffffULL;
+    const auto significand = biased == 0 ? fraction : fraction | (1ULL << 52U);
+    const auto exponent = biased == 0 ? -1074 : static_cast<int>(biased) - 1075;
+    I n{significand};
+    if ((bits >> 63U) != 0)
+        n = -n;
+    const auto shift = static_cast<unsigned>(std::abs(exponent));
+    return exponent >= 0 ? Q{n * (I{1} << shift)} : Q{n} / (I{1} << shift);
 }
 
 } // namespace pg_conditioning_test
