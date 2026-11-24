@@ -4,6 +4,8 @@
 #include <string>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_full_trace.hpp>
+#include <uvlas/structure/pg_global_constraints.hpp>
+#include <uvlas/structure/pg_sparse_chart.hpp>
 
 namespace {
 using namespace uvlas;
@@ -322,4 +324,394 @@ TEST_CASE("PG nonconforming full trace owns coefficient rows and the original du
     CHECK(std::ranges::any_of(mismatch.values(), [](const auto& row) {
         return std::ranges::any_of(row, [](const auto& x) { return x.sign() != 0; });
     }));
+}
+
+TEST_CASE("PG global constraints retain original rows, right-hand sides and exact work",
+          "[SH-D05][SH-D06][N4-03][N4-04][N4-08][verification]") {
+    Fixture f, fb, fc;
+    const auto zero = f.r("0"), one = f.r("1");
+    std::array<ExactRational, 9> rotation;
+    for (const auto i : {0U, 4U, 8U})
+        rotation[i] = f.r("1");
+    const std::array<ExactRational, 3> oa{};
+    std::array<ExactRational, 3> ob, oc;
+    ob[0] = f.r("1");
+    oc[0] = f.r("2");
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    auto a = patch(f, {rotation, oa, one}, workspace, plan);
+    auto b = patch(fb, {rotation, ob, one}, workspace, plan);
+    auto c = patch(fc, {rotation, oc, one}, workspace, plan);
+    const auto ai = take(a.info()).identity, bi = take(b.info()).identity,
+               ci = take(c.info()).identity;
+
+    const auto a_right = vertical_edges(f, a, Q{1}, Q{1});
+    const auto b_left = vertical_edges(f, b, Q{0}, Q{1});
+    const auto b_right = vertical_edges(f, b, Q{1}, Q{1});
+    const auto c_left = vertical_edges(f, c, Q{0}, Q{1});
+    const auto ar = edge_spans(a_right, zero, one), bl = edge_spans(b_left, zero, one),
+               br = edge_spans(b_right, zero, one), cl = edge_spans(c_left, zero, one);
+    PgGlobalConstraintLimits limits{query_limits(), 3, 4, 8192, 100'000};
+    limits.arithmetic.maximum_scalar_operations = 300'000'000;
+    limits.arithmetic.maximum_partition_visits = 100'000'000;
+    const PgTraceLimits trace_limits{limits.arithmetic, limits.maximum_nonzeros};
+    auto ab = take(PgFullTrace::prepare(a, ar, b, bl, trace_limits, workspace, plan));
+    auto bc = take(PgFullTrace::prepare(b, br, c, cl, trace_limits, workspace, plan));
+    const auto prescribed = states(f, c.reference_coordinates().size(), 8);
+    auto fixed = take(PgFullTrace::prepare_support(c, std::span{cl}.first(1), ci, prescribed,
+                                                   trace_limits, workspace, plan));
+    const std::array patches{PgConstraintPatchBinding{numerics::PatchId{72}, b},
+                             PgConstraintPatchBinding{numerics::PatchId{45}, c},
+                             PgConstraintPatchBinding{numerics::PatchId{17}, a}};
+    const std::array bindings{PgConstraintTraceBinding{PgConstraintId{240}, fixed, 1, {}},
+                              PgConstraintTraceBinding{PgConstraintId{118}, ab, 2, core::Index{0}},
+                              PgConstraintTraceBinding{PgConstraintId{315}, bc, 0, core::Index{1}},
+                              PgConstraintTraceBinding{PgConstraintId{660}, ab, 2, core::Index{0}}};
+    const auto prepare = [&](const auto& p, const auto& t, const PgGlobalConstraintLimits& bound,
+                             core::ResourcePlan& budget) {
+        return PgGlobalConstraints::prepare(p, t, bound, workspace, budget);
+    };
+    core::ResourcePlan none{0};
+    auto cancelled = limits;
+    cancelled.arithmetic.cancellation = requested_stop_token();
+    check_failure(prepare(patches, bindings, cancelled, none), core::FailureCode::Cancelled);
+    check_failure(prepare(patches, bindings, limits, none), core::FailureCode::ResourceExceeded);
+    CHECK(none.allocated_bytes() == 0);
+    const std::array duplicates{patches[0], PgConstraintPatchBinding{patches[0].id, c}, patches[2]};
+    check_failure(prepare(duplicates, bindings, limits, plan), core::FailureCode::InvalidInput);
+    const std::array reversed{PgConstraintTraceBinding{PgConstraintId{118}, ab, 0, core::Index{2}}};
+    check_failure(prepare(patches, reversed, limits, plan), core::FailureCode::StaleGeneration);
+    const std::array bad_support{
+        PgConstraintTraceBinding{PgConstraintId{240}, fixed, 1, core::Index{0}}};
+    check_failure(prepare(patches, bad_support, limits, plan), core::FailureCode::InvalidInput);
+    const std::array repeated_id{bindings[1], bindings[1]};
+    check_failure(prepare(patches, repeated_id, limits, plan), core::FailureCode::InvalidInput);
+
+    auto global = take(prepare(patches, bindings, limits, plan));
+    const auto layout = global.layout();
+    const auto sources = global.sources();
+    const auto info = take(global.info());
+    REQUIRE(layout.size() == 3);
+    REQUIRE(sources.size() == bindings.size());
+    CHECK(layout[0].first == 0);
+    CHECK(layout[1].first == layout[0].count);
+    CHECK(layout[2].first == layout[0].count + layout[1].count);
+    CHECK(info.columns == layout[2].first + layout[2].count);
+    CHECK(layout[0].id == patches[0].id);
+    CHECK(layout[1].basis == ci);
+    CHECK(layout[2].basis == ai);
+    CHECK(sources[0].left == patches[1].id);
+    CHECK_FALSE(sources[0].right.has_value());
+    CHECK(sources[1].left == patches[2].id);
+    CHECK(sources[1].right == patches[0].id);
+    CHECK(sources[2].left == patches[0].id);
+    CHECK(sources[2].right == patches[1].id);
+    CHECK(sources[3].first_row == sources[2].first_row + sources[2].rows);
+    CHECK(info.rows == sources.back().first_row + sources.back().rows);
+
+    const std::array reordered_patches{patches[2], patches[0], patches[1]};
+    const std::array reordered_bindings{
+        PgConstraintTraceBinding{bindings[2].id, bc, 1, core::Index{2}},
+        PgConstraintTraceBinding{bindings[1].id, ab, 0, core::Index{1}},
+        PgConstraintTraceBinding{bindings[0].id, fixed, 2, {}}};
+    auto reordered = take(prepare(reordered_patches, reordered_bindings, limits, plan));
+    const auto earlier_duplicate =
+        std::array{PgConstraintTraceBinding{PgConstraintId{4}, ab, 2, core::Index{0}}, bindings[0],
+                   bindings[1], bindings[2]};
+    auto priority_changed = take(prepare(patches, earlier_duplicate, limits, plan));
+    const std::vector<PgCartesianExactPosition> zero_support(c.reference_coordinates().size());
+    const auto conflicting = take(PgFullTrace::prepare_support(
+        c, std::span{cl}.first(1), ci, zero_support, trace_limits, workspace, plan));
+    const std::array conflicting_bindings{
+        bindings[0], PgConstraintTraceBinding{PgConstraintId{990}, conflicting, 1, {}}};
+    auto incompatible = take(prepare(patches, conflicting_bindings, limits, plan));
+
+    auto exact_count = limits;
+    exact_count.maximum_rows = static_cast<std::uint64_t>(info.rows);
+    exact_count.maximum_nonzeros = static_cast<std::uint64_t>(info.nonzeros);
+    auto just_enough = take(prepare(patches, bindings, exact_count, plan));
+    CHECK(take(just_enough.info()).nonzeros == info.nonzeros);
+    const std::array<PgConstraintTraceBinding, 0> no_traces{};
+    auto unconstrained = take(prepare(patches, no_traces, limits, plan));
+    CHECK(take(unconstrained.info()).rows == 0);
+    CHECK(take(unconstrained.info()).columns == info.columns);
+    CHECK(unconstrained.original_rows().empty());
+
+    auto short_rows = exact_count;
+    --short_rows.maximum_rows;
+    check_failure(prepare(patches, bindings, short_rows, plan),
+                  core::FailureCode::ResourceExceeded);
+    auto short_terms = exact_count;
+    --short_terms.maximum_nonzeros;
+    check_failure(prepare(patches, bindings, short_terms, plan),
+                  core::FailureCode::ResourceExceeded);
+
+    const auto column_count = static_cast<std::size_t>(info.columns);
+    const auto values = states(f, column_count, 5);
+    const auto lambda = states(f, static_cast<std::size_t>(info.rows), 3);
+    const auto blocks = [&](std::size_t i) {
+        return std::span{values}.subspan(static_cast<std::size_t>(layout[i].first),
+                                         static_cast<std::size_t>(layout[i].count));
+    };
+    const std::array local_inputs{PgTraceCoordinates{ci, {}, blocks(1), {}},
+                                  PgTraceCoordinates{ai, bi, blocks(2), blocks(0)},
+                                  PgTraceCoordinates{bi, ci, blocks(0), blocks(1)},
+                                  PgTraceCoordinates{ai, bi, blocks(2), blocks(0)}};
+    const PgGlobalConstraintCoordinates state{layout, values};
+    const auto forward = take(global.apply(state, limits.arithmetic, workspace, plan));
+    const auto residual = take(global.residual(state, limits.arithmetic, workspace, plan));
+    const auto force = take(global.transpose(lambda, limits.arithmetic, workspace, plan));
+    std::vector<std::array<Q, 3>> expected_force(column_count);
+    bool have_zero_row = false, have_nonzero_right_hand_side = false;
+    for (std::size_t i = 0; i < bindings.size(); ++i) {
+        const auto& local = bindings[i].trace;
+        const auto first = static_cast<std::size_t>(sources[i].first_row);
+        const auto count = static_cast<std::size_t>(sources[i].rows);
+        const auto baseline =
+            take(local.apply(local_inputs[i], limits.arithmetic, workspace, plan));
+        const auto local_residual =
+            take(local.residual(local_inputs[i], limits.arithmetic, workspace, plan));
+        const auto local_force = take(local.transpose(std::span{lambda}.subspan(first, count),
+                                                      limits.arithmetic, workspace, plan));
+        const auto local_left = static_cast<std::size_t>(bindings[i].left_patch);
+        const auto left_count = static_cast<std::size_t>(layout[local_left].count);
+        const auto global_col = [&](core::Index column) {
+            if (static_cast<std::size_t>(column) < left_count)
+                return layout[local_left].first + column;
+            return layout[static_cast<std::size_t>(bindings[i].right_patch.value())].first +
+                   column - static_cast<core::Index>(left_count);
+        };
+        CHECK(sources[i].id == bindings[i].id);
+        REQUIRE(sources[i].overlaps == static_cast<core::Index>(local.overlaps().size()));
+        const auto overlap_start = static_cast<std::size_t>(sources[i].first_overlap);
+        for (std::size_t j = 0; j < local.overlaps().size(); ++j) {
+            const auto& reference = local.overlaps()[j];
+            const auto& stored = global.overlaps()[overlap_start + j];
+            CHECK(stored.left_edge == reference.left_edge);
+            CHECK(stored.right_edge == reference.right_edge);
+            CHECK(stored.first == reference.first);
+            CHECK(stored.last == reference.last);
+            CHECK(stored.left_depth.lower_first == reference.left_depth.lower_first);
+            CHECK(stored.right_depth.upper_last == reference.right_depth.upper_last);
+        }
+        for (std::size_t j = 0; j < count; ++j) {
+            const auto raw = take(global.row(static_cast<core::Index>(first + j)));
+            const auto& original = local.original_rows()[j];
+            const auto& gathered = global.original_rows()[first + j];
+            CHECK(gathered.source == static_cast<core::Index>(i));
+            CHECK(gathered.source_row == static_cast<core::Index>(j));
+            CHECK(gathered.source_overlap == original.overlap);
+            CHECK(gathered.field == original.field);
+            CHECK(gathered.power == original.power);
+            CHECK(gathered.local_representative == original.unique_row);
+            CHECK(gathered.local_scale == original.scale);
+            CHECK(gathered.prescribed == original.prescribed);
+            CHECK(forward.values()[first + j] == baseline.values()[j]);
+            CHECK(residual.values()[first + j] == local_residual.values()[j]);
+            have_nonzero_right_hand_side |= std::ranges::any_of(
+                gathered.prescribed, [](const auto& x) { return x.sign() != 0; });
+            if (original.unique_row < 0) {
+                CHECK(raw.empty());
+                have_zero_row = true;
+                continue;
+            }
+            const auto local_row = take(local.unique_row(original.unique_row));
+            REQUIRE(raw.size() == local_row.size());
+            CHECK(std::ranges::is_sorted(raw, std::ranges::less{}, &PgTraceSparseEntry::column));
+            for (const auto& term : local_row) {
+                const auto column = global_col(term.column);
+                const auto found = std::ranges::lower_bound(raw, column, std::ranges::less{},
+                                                            &PgTraceSparseEntry::column);
+                REQUIRE(found != raw.end());
+                CHECK(found->column == column);
+                CHECK(q(found->coefficient) == q(original.scale) * q(term.coefficient));
+            }
+        }
+        for (std::size_t j = 0; j < local_force.size(); ++j)
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                expected_force[static_cast<std::size_t>(global_col(static_cast<core::Index>(j)))]
+                              [axis] += q(local_force.values()[j][axis]);
+    }
+    CHECK(have_zero_row);
+    CHECK(have_nonzero_right_hand_side);
+    for (std::size_t j = 0; j < column_count; ++j)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            CHECK(q(force.values()[j][axis]) == expected_force[j][axis]);
+    CHECK(work(forward.values(), lambda) == work(force.values(), values));
+
+    const auto stale = std::array{layout[1], layout[0], layout[2]};
+    check_failure(global.apply({stale, values}, limits.arithmetic, workspace, none),
+                  core::FailureCode::StaleGeneration);
+    check_failure(global.transpose(std::span{lambda}.first(1), limits.arithmetic, workspace, none),
+                  core::FailureCode::InvalidInput);
+    {
+        const auto discard_ab = std::move(ab);
+        const auto discard_bc = std::move(bc);
+        const auto discard_support = std::move(fixed);
+        const auto discard_a = std::move(a);
+        const auto discard_b = std::move(b);
+        const auto discard_c = std::move(c);
+        CHECK(discard_ab.info().has_value());
+        CHECK(discard_bc.info().has_value());
+        CHECK(discard_support.info().has_value());
+        CHECK(discard_a.info().has_value());
+        CHECK(discard_b.info().has_value());
+        CHECK(discard_c.info().has_value());
+    }
+    const auto independent = take(global.apply(state, limits.arithmetic, workspace, plan));
+    CHECK(std::ranges::equal(independent.values(), forward.values()));
+
+    auto chart_limits = PgSparseChartLimits{limits.arithmetic, 300, 400, 30'000, true};
+    chart_limits.arithmetic.algebra.maximum_value_bits = 65536;
+    chart_limits.arithmetic.algebra.maximum_work_bits = 262144;
+    const auto prepare_chart = [&](PgGlobalConstraints& candidate,
+                                   const PgSparseChartLimits& chart_bounds) {
+        return PgSparseChart::prepare(std::move(candidate), chart_bounds, workspace, plan);
+    };
+    check_failure(prepare_chart(incompatible, chart_limits), core::FailureCode::InvalidInput);
+    REQUIRE(incompatible.info().has_value());
+    auto no_pivots = chart_limits;
+    no_pivots.maximum_pivots = 0;
+    const auto no_factors = PgSparseChartLimits{chart_limits.arithmetic, 0, 0, 0};
+    const auto empty_chart =
+        take(PgSparseChart::prepare(std::move(unconstrained), no_factors, workspace, plan));
+    CHECK(empty_chart.pivots().empty());
+    CHECK(empty_chart.free_columns().size() == column_count);
+    CHECK_FALSE(take(empty_chart.preparation()).timing.has_value());
+    check_failure(prepare_chart(global, no_pivots), core::FailureCode::ResourceExceeded);
+    REQUIRE(global.info().has_value());
+    auto chart = take(PgSparseChart::prepare(std::move(global), chart_limits, workspace, plan));
+    auto permuted =
+        take(PgSparseChart::prepare(std::move(reordered), chart_limits, workspace, plan));
+    auto preferred =
+        take(PgSparseChart::prepare(std::move(priority_changed), chart_limits, workspace, plan));
+    const auto& original = chart.original();
+    REQUIRE_FALSE(chart.pivots().empty());
+    const auto report = take(chart.preparation());
+    CHECK(report.rank == chart.pivots().size());
+    CHECK(report.original_nonzeros == static_cast<std::uint64_t>(info.nonzeros));
+    CHECK(report.lower_terms > 0);
+    CHECK(report.upper_terms >= report.rank);
+    CHECK(report.lower_terms + report.upper_terms <= report.factor_term_capacity);
+    CHECK(report.pivot_capacity <= chart_limits.maximum_pivots);
+    CHECK(report.work_row_capacity <= chart_limits.maximum_row_terms);
+    CHECK(report.arithmetic.allocated_owned_payload_bytes > 0);
+    CHECK(report.timing.value_or(core::StageTiming{}).calls == 1);
+    CHECK(report.timing.value_or(core::StageTiming{}).elapsed_nanoseconds > 0);
+    CHECK(
+        chart.original()
+            .sources()[static_cast<std::size_t>(
+                original
+                    .original_rows()[static_cast<std::size_t>(chart.pivots().front().original_row)]
+                    .source)]
+            .kind == PgTraceKind::Support);
+    REQUIRE(chart.free_columns().size() + chart.pivots().size() == column_count);
+    REQUIRE(chart.pivots().size() == permuted.pivots().size());
+    REQUIRE(chart.pivots().size() == preferred.pivots().size());
+    const auto physical = [](const PgGlobalConstraints& equations, core::Index column) {
+        const auto physical_layout = equations.layout();
+        const auto block = std::ranges::find_if(physical_layout, [column](const auto& candidate) {
+            return column >= candidate.first && column < candidate.first + candidate.count;
+        });
+        REQUIRE(block != physical_layout.end());
+        return std::pair{block->id.value(), column - block->first};
+    };
+    const auto raw_key = [](const PgGlobalConstraints& equations, core::Index row) {
+        const auto& metadata = equations.original_rows()[static_cast<std::size_t>(row)];
+        return std::pair{equations.sources()[static_cast<std::size_t>(metadata.source)].id.value(),
+                         metadata.source_row};
+    };
+    bool changed_priority = false;
+    for (std::size_t i = 0; i < chart.pivots().size(); ++i) {
+        const auto x = chart.pivots()[i], y = permuted.pivots()[i], z = preferred.pivots()[i];
+        const auto key = raw_key(original, x.original_row);
+        CHECK(key == raw_key(permuted.original(), y.original_row));
+        CHECK(physical(original, x.dependent_column) ==
+              physical(permuted.original(), y.dependent_column));
+        CHECK(physical(original, x.dependent_column) ==
+              physical(preferred.original(), z.dependent_column));
+        const auto changed = raw_key(preferred.original(), z.original_row);
+        if (key.first == 118) {
+            CHECK(changed == (std::pair{std::uint64_t{4}, key.second}));
+            changed_priority = true;
+        } else {
+            CHECK(changed == key);
+        }
+        CHECK(key.first != 660);
+    }
+    CHECK(changed_priority);
+    REQUIRE(chart.free_columns().size() == permuted.free_columns().size());
+    for (std::size_t i = 0; i < chart.free_columns().size(); ++i)
+        CHECK(physical(original, chart.free_columns()[i]) ==
+              physical(permuted.original(), permuted.free_columns()[i]));
+
+    const auto& limits_for_action = chart_limits.arithmetic;
+    std::vector<PgCartesianExactPosition> independent_state(chart.free_columns().size());
+    for (std::size_t i = 0; i < independent_state.size(); ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            const auto column = static_cast<std::size_t>(chart.free_columns()[i]);
+            const auto& exact = q(values[column][axis]);
+            independent_state[i][axis] = rat(f, numerator(exact), denominator(exact));
+        }
+    const auto identity = take(chart.identity());
+    const auto other_identity = take(permuted.identity());
+    CHECK(identity != other_identity);
+    const PgSparseChartInput rb{identity, independent_state};
+    check_failure(
+        chart.lift({other_identity, independent_state}, limits_for_action, workspace, none),
+        core::FailureCode::StaleGeneration);
+    {
+        const auto lease = take(workspace.acquire());
+        static_cast<void>(lease);
+        check_failure(chart.lift(rb, limits_for_action, workspace, none),
+                      core::FailureCode::InvalidInput);
+    }
+    const auto lifted = take(chart.lift(rb, limits_for_action, workspace, plan));
+    const auto dispatched = take(original.residual({original.layout(), lifted.values()},
+                                                   limits_for_action, workspace, plan));
+    for (const auto& row : dispatched.values())
+        CHECK(std::ranges::all_of(row, [](const auto& value) { return value.sign() == 0; }));
+
+    const auto tangent = take(chart.tangent(rb, limits_for_action, workspace, plan));
+    const auto full_force = states(f, column_count, 9);
+    const auto dual =
+        take(chart.transpose({identity, full_force}, limits_for_action, workspace, plan));
+    CHECK(work(full_force, tangent.values()) ==
+          work(dual.independent_force.values(), independent_state));
+    const auto reaction = take(
+        original.transpose(dual.original_multipliers.values(), limits_for_action, workspace, plan));
+    std::vector<std::array<Q, 3>> recomposed(column_count);
+    for (std::size_t i = 0; i < column_count; ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            recomposed[i][axis] = q(reaction.values()[i][axis]);
+    for (std::size_t i = 0; i < chart.free_columns().size(); ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            recomposed[static_cast<std::size_t>(chart.free_columns()[i])][axis] +=
+                q(dual.independent_force.values()[i][axis]);
+    for (std::size_t i = 0; i < column_count; ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            CHECK(recomposed[i][axis] == q(full_force[i][axis]));
+    const auto combined = static_cast<std::size_t>(original.sources().back().first_row);
+    for (const auto& multiplier : dual.original_multipliers.values().subspan(combined))
+        CHECK(std::ranges::all_of(multiplier, [](const auto& value) { return value.sign() == 0; }));
+
+    // For an exact time coefficient, the raw value must satisfy every equation.
+    // C*values is a compatible coefficient. A ramp on only the repeated AB row
+    // agrees with zero at t=0, but must be rejected for its nonzero coefficient.
+    const auto compatible =
+        take(chart.lift_rhs(rb, {identity, forward.values()}, limits_for_action, workspace, plan));
+    CHECK(std::ranges::equal(compatible.values(), values));
+    std::vector<PgCartesianExactPosition> inconsistent(static_cast<std::size_t>(info.rows));
+    const auto original_ab = original.sources().back();
+    bool have_duplicate = false;
+    for (core::Index j = original_ab.first_row; j < original_ab.first_row + original_ab.rows; ++j) {
+        if (!take(original.row(j)).empty()) {
+            inconsistent[static_cast<std::size_t>(j)][0] = f.r("1");
+            have_duplicate = true;
+            break;
+        }
+    }
+    REQUIRE(have_duplicate);
+    check_failure(chart.lift_rhs(rb, {identity, inconsistent}, limits_for_action, workspace, plan),
+                  core::FailureCode::InvalidInput);
 }
