@@ -2,7 +2,7 @@
 
 namespace {
 using Json = nlohmann::json;
-enum class Geometry { Flat, FrozenCurve };
+enum class Geometry : std::uint8_t { Flat, FrozenCurve };
 
 Json moving_case(bool coincident, Geometry shape) {
     auto document = Json::parse(frozen_interface(0));

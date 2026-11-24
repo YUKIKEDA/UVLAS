@@ -1,0 +1,99 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-case-moving-chart",
+  "ids": [
+    "CN-D01",
+    "CN-D03",
+    "SH-D05",
+    "N4-04",
+    "V-PG"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-25",
+  "source_commit": "73ec551244f520b8b333fce16b227df6a3ac1f0c",
+  "scope": "凍結R4の二曲面と平面対照の静止・動く全厚支持を、同じ所有パッチ・疎チャートと時計で評価した。",
+  "source_case_sha256": "81f37f427ffe8bfe08db9335fb3c9147331e018cb93f5655c6231f0ead310ae7",
+  "compiled_driver_sha256": "97ae86d8d9afd06d05befd822b10b73dbec4158b2df1769cfd1fa6b6f7b64f0a",
+  "point_selection_source_commit": "3c82bef6c98f775f01ce9d8ce01c8364ae73ef38",
+  "point_selection_source_sha256": "50ef3f768f97d7ceb8d808e12f5563fda2965e126553f50875e42e2de27054b2",
+  "static_case_driver_source_commit": "004d873b54ea4288729c220ec75f70229e2a846c",
+  "profile_bytes": 51539607552,
+  "time_seconds": "1",
+  "derivative_orders": [
+    0,
+    1,
+    2
+  ],
+  "exact_rhs_component_checks": 10368,
+  "positive_projection_radius_upper": "2^-44",
+  "results": {
+    "msvc_release": {
+      "flat": {
+        "original_rows": 288,
+        "rank": 111,
+        "cumulative_bytes": 600878042
+      },
+      "curve": {
+        "original_rows": 288,
+        "rank": 172,
+        "cumulative_bytes": 4737034498
+      },
+      "assertions": 228134,
+      "targeted_ctests": 2,
+      "stationary_control_assertions": 6499
+    },
+    "gcc14_release": {
+      "flat": {
+        "original_rows": 288,
+        "rank": 111,
+        "cumulative_bytes": 606196698
+      },
+      "curve": {
+        "original_rows": 288,
+        "rank": 172,
+        "cumulative_bytes": 4757961842
+      },
+      "assertions": 228134,
+      "targeted_ctests": 2,
+      "stationary_control_assertions": 6499
+    }
+  },
+  "raw_log_sha256": {
+    "msvc_release": {
+      "msvc-moving-enclosures.log": "558da1305b18aa039c312c390d3586810ab3bb51ba21af6c32c4d480f7ac8c34",
+      "msvc-moving-confirmed-ctest.log": "64e69217ccbd151a916c63943ff1e826c42c0b1c190366429c3a2b116246137d",
+      "msvc-moving-static-control.log": "acb64a78dbc7f395d5d204bfcf3d683ad9f7f3d2ff15cf813d6b92abe2bb5cbe"
+    },
+    "gcc14_release": {
+      "gcc-moving-enclosures.log": "743d4ae19679fb94c10759ed4e7cb292bfa34573b43dd9f2f3d9f340b0f4c0c1",
+      "gcc-moving-enclosures-ctest.log": "ab485f7df8096c5f9e5dc262854d01a172584a0d148342c58ac177a202ceafc6",
+      "gcc-moving-static-control.log": "675a8de42b0e06a2d924e6d6282fd793c3e349e77f76be6aa2c26367110caa43"
+    }
+  },
+  "mutated_stationary_velocity": {
+    "source_sha256": "c46f7e2d0f2a3bb82b63207bf28bf2c5ec0c8d1628ff8e051f7bc5bfaae375f7",
+    "raw_log_sha256": "b5d1f9431623749a7d586465b3b3debd3b8445666717c3493141ce50623b325f",
+    "first_absolute_difference_metres_per_second": "1",
+    "observed_reported_radius_metres_per_second": "0",
+    "failed_assertions": 1
+  },
+  "sources": {
+    "src/coupling/case_pg_chart.cpp": "0046843c5c1e496619f4857c53fdee40e3a84c71d749d44cb5e71e7bf2f303b4",
+    "src/coupling/case_pg_chart.hpp": "eabca59e1e491a865173dace443ba31c8956aa706db5c7b1e75d6f1c59e74e14",
+    "src/coupling/case_pg_support_input.hpp": "9674288e0c9c884f7d36539c39b37d408d5ca3efae0e3f6e2475eb7c6a0bfda6",
+    "src/coupling/case_pg_support_motion.cpp": "b8d6aacce315c95a3a2b10fbf74d58bcde6f277bf281b354fa0e694fd28098ea",
+    "src/coupling/case_pg_support_motion.hpp": "0b8000ed26adb1800cab4a7a5c198be5b50e2a0118bff65d1e7deb0495c7649b",
+    "src/coupling/case_pg_reference.cpp": "7e5d9f5a7e8edc07fa509ff7a0578f36baf8cb5ab46867d18f3b6ae384652044",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "src/structure/pg_rigid_support_rows.cpp": "502470331a4d35894b079f8182c4cff8caedb698324bbb3c9f738db8c0d6dea6",
+    "docs/specs/structure/pg-case-chart-contract.md": "e9ada056b1b53795a558b8c50e597356688764c35c4e7fcdd5b186ec9bab4eb2",
+    "docs/specs/structure/pg-case-structural-support-contract.md": "3eb2701d7fe8b7da37b56da219d947dddca8e46c3142e5a57a0dfe28fe2b547d",
+    "tools/qa/vpg_case_reference.py": "29fb7a9908bfd1143bb14ccfed2d21fc9fb6f84acd7b02272caf39842785f322",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-case-moving-chart/run-case-motion.cpp.txt": "36c97df761606a19a1f5e8b530071c382e9392a8e61a9b02f086e925d5b25211",
+    "docs/verification/IM-01/pg-case-moving-chart/verification.md": "0fd0235b5ba062e1ad4a1be91142a5016792d63af5c7258f5bef91ddfb6138b7"
+  }
+}
