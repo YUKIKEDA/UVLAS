@@ -130,7 +130,7 @@ TEST_CASE("Regional exterior thickness is compared only over positive exact over
     core::ResourcePlan plan{partition_test::cap};
     const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
     const ExternalPgLimits geometric{arithmetic, 4};
-    const ExternalPgThicknessLimits limits{arithmetic, 2};
+    const ExternalPgThicknessLimits limits{arithmetic, 2, crossing ? 4U : 3U};
     const auto reference = pg(input, true, arithmetic, plan);
     const auto evidence = geometry(reference, input, crossing, reversed, geometric, plan);
     const auto one = input.r("1");
@@ -175,6 +175,12 @@ TEST_CASE("Regional exterior thickness is compared only over positive exact over
         compare_external_pg_regional_thickness(evidence, reference, claim, exact, plan);
     REQUIRE_FALSE(shortage);
     CHECK(shortage.error().code == Code::ResourceExceeded);
+    exact = limits;
+    exact.case_vertices = 2;
+    const auto vertices =
+        compare_external_pg_regional_thickness(evidence, reference, claim, exact, plan);
+    REQUIRE_FALSE(vertices);
+    CHECK(vertices.error().code == Code::ResourceExceeded);
     exact = limits;
     exact.maximum_claims = 0;
     const auto layouts =

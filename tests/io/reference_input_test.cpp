@@ -1529,6 +1529,8 @@ $EndElements
     bool partial_group = false;
     bool shared_group_thickness = false;
     bool contradictory_group_thickness = false;
+    bool partial_pshell = false;
+    bool wrong_pshell_thickness = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1651,6 +1653,15 @@ $EndElements
     SECTION("Two conflicting thickness declarations for one Gmsh group fail") {
         is_gmsh = true;
         contradictory_group_thickness = true;
+    }
+    SECTION("A PSHELL with no explicit T leaves its own adjacent region unclaimed") {
+        physical = true;
+        partial_pshell = true;
+    }
+    SECTION("A distinct PSHELL T is checked on its own positive-area element") {
+        physical = true;
+        partial_pshell = true;
+        wrong_pshell_thickness = true;
     }
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
@@ -1775,6 +1786,13 @@ $EndElements
         replace_group("2 17 2 2\n702 10 40 99\n701 10 20 40\n",
                       "2 17 2 1\n702 10 40 99\n2 19 2 1\n701 10 20 40\n");
     }
+    if (partial_pshell) {
+        constexpr std::string_view original = "CTRIA3,701,90";
+        const auto offset = source_text.find(original);
+        REQUIRE(offset != std::string::npos);
+        source_text.replace(offset, original.size(), "CTRIA3,701,92");
+        source_text += wrong_pshell_thickness ? "PSHELL,92,6,0.5\n" : "PSHELL,92,6\n";
+    }
     if (pcomp) {
         constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
         const auto offset = source_text.find(pshell);
@@ -1838,7 +1856,7 @@ $EndElements
         }
         layers.push_back(std::move(top));
     }
-    if (partial_group || shared_group_thickness) {
+    if (partial_group || shared_group_thickness || partial_pshell) {
         config.field("model")
             .field("geometry")
             .elements[0]
@@ -2064,7 +2082,8 @@ $EndElements
             } else {
                 FAIL("Missing mapped material disagreement");
             }
-        } else if (material_shift || thickness_shift || shared_group_thickness || frame_shift) {
+        } else if (material_shift || thickness_shift || shared_group_thickness ||
+                   wrong_pshell_thickness || frame_shift) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == ((chart_shift || frame_shift)
                                                  ? core::FailureCode::GeometryInvalid
@@ -2080,7 +2099,9 @@ $EndElements
                     CHECK(mismatch->card_position.has_value());
                 } else if (const auto& local = failure.regional_thickness) {
                     CHECK(local->reason == rd::ExternalPgThicknessFailure::Difference);
-                    CHECK(local->element == (shared_group_thickness ? 701U : 702U));
+                    CHECK(local->element ==
+                          ((shared_group_thickness || wrong_pshell_thickness) ? 701U : 702U));
+                    CHECK(local->field.has_value() == wrong_pshell_thickness);
                     CHECK(local->sidecar_node);
                     CHECK(local->case_triangle);
                     CHECK(local->overlap_vertex);
@@ -2094,20 +2115,25 @@ $EndElements
             REQUIRE(qualified);
             const auto& matched_case = qualified->match;
             CHECK(matched_case.thickness_compared);
-            if (is_gmsh) {
+            if (!pcomp) {
                 if (const auto& regional = matched_case.thickness_regions) {
                     const auto claims = regional->matches.values();
-                    REQUIRE(claims.size() == (partial_group ? 1 : 2));
+                    REQUIRE(claims.size() == ((partial_group || partial_pshell) ? 1U : 2U));
                     CHECK(claims.front().element == 702);
                     CHECK(claims.front().value_metres == pg_input.r("1", "4"));
-                    if (claims.size() == 2) {
+                    if (claims.size() == 2 && is_gmsh) {
                         CHECK(claims[1].sidecar_node == claims[0].sidecar_node);
+                    }
+                    if (claims.size() == 2 && !is_gmsh) {
+                        CHECK(claims[1].field == claims[0].field);
                     }
                 } else {
                     FAIL("Missing whole-face regional thickness evidence");
                 }
             }
-            CHECK(matched_case.materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
+            CHECK(matched_case.materials_compared == (is_gmsh                     ? 0
+                                                      : (pcomp || partial_pshell) ? 2
+                                                                                  : 1));
             if (pcomp) {
                 REQUIRE_FALSE(matched_case.laminate[reversed ? 0U : 1U]);
                 if (const auto& matched = matched_case.laminate[reversed ? 1U : 0U]) {

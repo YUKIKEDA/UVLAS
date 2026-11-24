@@ -62,21 +62,43 @@ positive_ring(const ExternalPgOwnedFace& face) noexcept {
 }
 
 struct CasePlanes {
-    explicit CasePlanes(const structure::PgIntegrationPartition& partition)
+    explicit CasePlanes(const structure::PgIntegrationPartition& partition,
+                        core::ResourcePlan& plan, std::uint64_t maximum)
         : triangles(partition_take(partition.triangles())),
           vertices(partition_take(partition.vertices())),
           pieces(partition_take(partition.pieces())),
-          thickness(partition_take(partition.thickness())) {}
+          thickness(partition_take(partition.thickness())),
+          visited(partition_take(
+              plan.allocate<bool>(ref::partition_index(thickness.values.size()), operation))),
+          vertex_limit(maximum) {}
+
+    void admit(ref::ReferenceArithmetic& math, core::Index original) {
+        for (const auto vertex : ref::reference_at(thickness.triangles, original)) {
+            math.visit(1);
+            const auto ordinal = static_cast<std::size_t>(vertex);
+            if (!visited.values()[ordinal]) {
+                if (used == vertex_limit) {
+                    partition_fail(Code::ResourceExceeded);
+                }
+                ++used;
+                visited.values()[ordinal] = true;
+            }
+        }
+    }
 
     std::span<const structure::PgPartitionTriangle> triangles;
     std::span<const chart::Point> vertices;
     std::span<const structure::PgPartitionPiece> pieces;
     structure::PgPartitionThicknessView thickness;
+    core::PlannedBuffer<bool> visited;
+    std::uint64_t vertex_limit;
+    std::uint64_t used{};
 };
 
-[[nodiscard]] ExternalPgThicknessMatch
-compare_claim(ref::ReferenceArithmetic& math, const CasePlanes& pg, const ExternalPgOwnedFace& face,
-              const ExternalPgThicknessClaim& claim, Diagnosis& diagnosis) {
+[[nodiscard]] ExternalPgThicknessMatch compare_claim(ref::ReferenceArithmetic& math, CasePlanes& pg,
+                                                     const ExternalPgOwnedFace& face,
+                                                     const ExternalPgThicknessClaim& claim,
+                                                     Diagnosis& diagnosis) {
     const auto* value = claim.value_metres;
     if (!value || value->sign() <= 0) {
         diagnosis.fail(Reason::Selection, Code::InvalidInput);
@@ -96,6 +118,7 @@ compare_claim(ref::ReferenceArithmetic& math, const CasePlanes& pg, const Extern
             continue;
         }
         const auto original = ref::reference_at(pg.pieces, triangle.piece).thickness_triangle;
+        pg.admit(math, original);
         const auto plane = ref::thickness_plane(math, pg.thickness, original);
         // The difference is affine on the entire clipped piece. Matching all
         // its exact vertices proves the full piece, including the chosen trace.
@@ -151,7 +174,7 @@ core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
                 if (!claims.empty()) {
                     math.admit();
                     const auto input = partition_take(reference.source());
-                    const CasePlanes pg{input.partition};
+                    CasePlanes pg{input.partition, plan, limits.case_vertices};
                     for (std::size_t i = 0; i < claims.size(); ++i) {
                         math.visit(1);
                         const auto& claim = claims[i];

@@ -400,6 +400,37 @@ void compare_conversion_bounds(Preparation& p, const ConversionGeometry& geometr
 }
 
 [[nodiscard]] std::optional<ExternalPgThicknessReport>
+compare_thickness_regions(Preparation& p, const ExternalPlanarPg& corresponding,
+                          const structure::PgReferenceGeometry& reference,
+                          std::span<const ExternalPgThicknessClaim> claims) {
+    if (claims.empty()) {
+        return {};
+    }
+    auto exact = p.limits.geometry.arithmetic;
+    exact.cancellation = p.stop;
+    const ExternalPgThicknessLimits limits{exact, p.limits.geometry.maximum_faces,
+                                           p.limits.case_thickness_vertices};
+    std::optional<ExternalPgThicknessDiagnostic> detail;
+    auto verified = compare_external_pg_regional_thickness(corresponding, reference, claims, limits,
+                                                           p.plan, &detail);
+    if (detail) {
+        if (const auto position = detail->field) {
+            p.detail.byte = position->byte;
+        }
+        p.detail.node = detail->sidecar_node;
+        p.detail.element = detail->element;
+        if (p.diagnostic) {
+            p.diagnostic->regional_thickness = detail;
+            if (detail->reason == ExternalPgThicknessFailure::Difference) {
+                p.diagnostic->quantity = ImportedQuantityMismatch{
+                    ImportedQuantityField::FullThickness, detail->field, {}};
+            }
+        }
+    }
+    return p.value(std::move(verified), Reason::Binding);
+}
+
+[[nodiscard]] std::optional<ExternalPgThicknessReport>
 gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const GmshSidecar& source,
                 MeshShellId shell, const structure::PgReferenceGeometry& reference,
                 const ExternalPlanarPg& corresponding) {
@@ -450,27 +481,7 @@ gmsh_quantities(Preparation& p, const ExternalMeshSidecarBinding& bound, const G
         }
         claims.values()[declared++] = {face.element, value, definition->full_thickness_node};
     }
-    if (declared == 0) {
-        return {};
-    }
-    auto exact = p.limits.geometry.arithmetic;
-    exact.cancellation = p.stop;
-    const ExternalPgThicknessLimits limits{exact, p.limits.geometry.maximum_faces};
-    std::optional<ExternalPgThicknessDiagnostic> detail;
-    auto verified = compare_external_pg_regional_thickness(
-        corresponding, reference, claims.values().first(declared), limits, p.plan, &detail);
-    if (detail) {
-        p.detail.node = detail->sidecar_node;
-        p.detail.element = detail->element;
-        if (p.diagnostic) {
-            p.diagnostic->regional_thickness = detail;
-            if (detail->reason == ExternalPgThicknessFailure::Difference) {
-                p.diagnostic->quantity =
-                    ImportedQuantityMismatch{ImportedQuantityField::FullThickness, {}, {}};
-            }
-        }
-    }
-    return p.value(std::move(verified), Reason::Binding);
+    return compare_thickness_regions(p, corresponding, reference, claims.values().first(declared));
 }
 
 [[nodiscard]] const NastranSidecarMaterial& mapped_material(Preparation& p,
@@ -523,40 +534,52 @@ struct QuantityCounts {
     bool thickness{};
     std::uint64_t materials{};
     std::array<std::optional<NastranPcompGeometryMatch>, 2> laminate{};
+    std::optional<ExternalPgThicknessReport> regional{};
 };
 
-[[nodiscard]] std::size_t same_property(Preparation& p, const ExternalMeshSidecarBinding& bound,
-                                        const NastranShellView& deck, MeshShellId target) {
-    std::optional<std::size_t> selected;
+struct NastranRegionalFace {
+    const NastranShellElement* element{};
+    core::Index node{};
+};
+
+[[nodiscard]] core::PlannedBuffer<NastranRegionalFace>
+nastran_faces(Preparation& p, const ExternalMeshSidecarBinding& bound, const NastranShellView& deck,
+              MeshShellId target, std::size_t count) {
+    if (!std::in_range<core::Index>(count)) {
+        p.reject(Code::ResourceExceeded, Reason::Resource);
+    }
+    auto selected =
+        p.value(p.plan.allocate<NastranRegionalFace>(static_cast<core::Index>(count), operation),
+                Reason::Resource);
+    std::size_t next = 0;
     for (const auto& face : bound.faces()) {
         p.step();
         if (face.shell != target) {
             continue;
         }
-        p.detail.element = face.element;
         p.detail.node = face.sidecar_node;
-        const auto found = std::ranges::find_if(deck.elements, [&](const auto& element) {
+        p.detail.element = face.element;
+        const auto element = std::ranges::find_if(deck.elements, [&](const auto& value) {
             p.step();
-            return element.card_ordinal == face.source_ordinal;
+            return value.card_ordinal == face.source_ordinal;
         });
-        if (found == deck.elements.end()) {
+        if (element == deck.elements.end() || next == count) {
             p.reject(Code::InvalidInput, Reason::Binding);
-        }
-        const auto ordinal = found->property.property_ordinal;
-        if (selected && *selected != ordinal) {
-            p.reject(Code::Unsupported, Reason::Binding);
         }
         if (std::visit(
                 [](const auto& ring) {
                     return std::ranges::any_of(
                         ring, [](const auto& corner) { return corner.thickness.has_value(); });
                 },
-                found->corners)) {
+                element->corners)) {
             p.reject(Code::Unsupported, Reason::Binding);
         }
-        selected = ordinal;
+        selected.values()[next++] = {&*element, face.sidecar_node};
     }
-    return p.require(selected, Reason::Binding);
+    if (next != count) {
+        p.reject(Code::InvalidInput, Reason::Binding);
+    }
+    return selected;
 }
 
 [[nodiscard]] NastranPcompGeometryMatch
@@ -632,46 +655,32 @@ laminate_quantities(Preparation& p, const NastranLaminateCards& cards,
     return out;
 }
 
-[[nodiscard]] QuantityCounts nastran_quantities(
-    Preparation& p, const ExternalMeshSidecarBinding& bound, const NastranSidecar& source,
-    const NastranShellView& original, const NastranLaminateCards& cards, const schema::Model& model,
-    const schema::Shell& shell, const schema::GeometryPg& pg, const SiUnits& case_units,
-    const structure::PgReferenceGeometry& reference, const ExternalPlanarPg& corresponding) {
-    const auto deck = p.require(cards.view());
-    if (!original.input.bulk.same_snapshot(deck.input.input.input.bulk.location,
-                                           deck.input.input.input.bulk.digest)) {
-        p.reject(Code::StaleGeneration, Reason::Binding);
-    }
-    const auto target = MeshShellId{shell.id.unsigned_value()};
-    const auto ordinal = same_property(p, bound, deck.input.input, target);
-    if (deck.input.input.properties[ordinal].kind == NastranShellPropertyKind::Pcomp) {
-        return laminate_quantities(p, cards, deck, source, ordinal, model, bound.faces(), shell,
-                                   reference, corresponding, case_units);
-    }
-    const auto property = std::ranges::find_if(deck.input.pshell, [&](const auto& entry) {
-        p.step();
-        return entry.property_ordinal == ordinal;
-    });
-    if (property == deck.input.pshell.end()) {
+struct PshellRegion {
+    const NastranPshell* property{};
+    std::uint64_t first_element{};
+    core::Index node{};
+    structure::ExactRational metres;
+};
+
+[[nodiscard]] std::uint64_t check_pshell_materials(Preparation& p, const NastranSidecar& source,
+                                                   const NastranLaminateView& deck,
+                                                   const PshellRegion& region,
+                                                   const schema::Model& model,
+                                                   const schema::Shell& shell,
+                                                   const SiUnits& case_units) {
+    p.detail.element = region.first_element;
+    p.detail.node = region.node;
+    p.detail.byte.reset();
+    const auto& property = *region.property;
+    if (std::holds_alternative<NastranBendingDesignation>(property.bending)) {
         p.reject(Code::Unsupported, Reason::Binding);
     }
-    QuantityCounts out;
-    if (const auto& thickness = property->thickness) {
-        p.detail.byte = thickness->field.position.byte;
-        p.check(check_imported_uniform_thickness(
-            {thickness->value.decimal(), source.units.length, thickness->field.position},
-            pg.thickness.record(), case_units.length, p.limits.case_thickness_vertices,
-            p.limits.geometry.arithmetic.algebra, p.plan, p.stop, mismatch(p)));
-        out.thickness = true;
-    }
-    if (std::holds_alternative<NastranBendingDesignation>(property->bending)) {
-        p.reject(Code::Unsupported, Reason::Binding);
-    }
-    const auto* bending = std::get_if<NastranMaterialReference>(&property->bending);
+    const auto* bending = std::get_if<NastranMaterialReference>(&property.bending);
     const std::array<const NastranMaterialReference*, 4> uses{
-        property->membrane ? &*property->membrane : nullptr, bending,
-        property->transverse_shear ? &*property->transverse_shear : nullptr,
-        property->coupling ? &*property->coupling : nullptr};
+        property.membrane ? &*property.membrane : nullptr, bending,
+        property.transverse_shear ? &*property.transverse_shear : nullptr,
+        property.coupling ? &*property.coupling : nullptr};
+    std::uint64_t comparisons = 0;
     for (const auto* use : uses) {
         p.step();
         if (!use) {
@@ -683,9 +692,110 @@ laminate_quantities(Preparation& p, const NastranLaminateCards& cards,
         const auto layer = p.value(shell.layers.at(0), Reason::CaseReference).record();
         nastran_material(p, source, deck, *use, model,
                          MeshMaterialId{layer.material.unsigned_value()}, case_units);
-        ++out.materials;
+        ++comparisons;
+    }
+    return comparisons;
+}
+
+[[nodiscard]] QuantityCounts
+pshell_quantities(Preparation& p, const NastranSidecar& source, const NastranLaminateView& deck,
+                  std::span<const NastranRegionalFace> faces, const schema::Model& model,
+                  const schema::Shell& shell, const SiUnits& case_units,
+                  const structure::PgReferenceGeometry& reference,
+                  const ExternalPlanarPg& corresponding) {
+    const auto size = static_cast<core::Index>(faces.size());
+    auto regions = p.value(p.plan.allocate<PshellRegion>(size, operation), Reason::Resource);
+    auto claims =
+        p.value(p.plan.allocate<ExternalPgThicknessClaim>(size, operation), Reason::Resource);
+    structure::ExactRational unit;
+    std::size_t groups = 0, comparisons = 0;
+    for (const auto& face : faces) {
+        p.step();
+        p.detail.element = face.element->id.value();
+        p.detail.node = face.node;
+        const auto ordinal = face.element->property.property_ordinal;
+        const auto previous = regions.values().first(groups);
+        auto group = std::ranges::find_if(previous, [&](const PshellRegion& candidate) {
+            p.step();
+            return candidate.property->property_ordinal == ordinal;
+        });
+        if (group == previous.end()) {
+            const auto property = std::ranges::find_if(deck.input.pshell, [&](const auto& entry) {
+                p.step();
+                return entry.property_ordinal == ordinal;
+            });
+            if (property == deck.input.pshell.end()) {
+                p.reject(Code::Unsupported, Reason::Binding);
+            }
+            auto& new_group = regions.values()[groups++];
+            new_group.property = &*property;
+            new_group.first_element = face.element->id.value();
+            new_group.node = face.node;
+            if (const auto& declared = property->thickness) {
+                if (unit.sign() == 0) {
+                    unit = length_scale(p, source.units.length);
+                }
+                const auto& exact = p.limits.geometry.arithmetic.algebra;
+                const auto input = p.value(structure::ExactRational::from_decimal(
+                    declared->value.decimal(), exact, p.plan));
+                new_group.metres = p.value(input.multiply(unit, exact, p.plan));
+            }
+            group = regions.values().begin() + static_cast<std::ptrdiff_t>(groups - 1);
+        }
+        if (const auto& declared = group->property->thickness) {
+            claims.values()[comparisons++] = {face.element->id.value(), group->metres, face.node,
+                                              declared->field.position};
+        }
+    }
+    QuantityCounts out;
+    out.regional =
+        compare_thickness_regions(p, corresponding, reference, claims.values().first(comparisons));
+    out.thickness = out.regional.has_value();
+    for (const auto& group : regions.values().first(groups)) {
+        p.step();
+        const auto count = check_pshell_materials(p, source, deck, group, model, shell, case_units);
+        if (count > std::numeric_limits<std::uint64_t>::max() - out.materials) {
+            p.reject(Code::ResourceExceeded, Reason::Resource);
+        }
+        out.materials += count;
     }
     return out;
+}
+
+[[nodiscard]] QuantityCounts nastran_quantities(
+    Preparation& p, const ExternalMeshSidecarBinding& bound, const NastranSidecar& source,
+    const NastranShellView& original, const NastranLaminateCards& cards, const schema::Model& model,
+    const schema::Shell& shell, const SiUnits& case_units,
+    const structure::PgReferenceGeometry& reference, const ExternalPlanarPg& corresponding) {
+    const auto deck = p.require(cards.view());
+    if (!original.input.bulk.same_snapshot(deck.input.input.input.bulk.location,
+                                           deck.input.input.input.bulk.digest)) {
+        p.reject(Code::StaleGeneration, Reason::Binding);
+    }
+    const auto target = MeshShellId{shell.id.unsigned_value()};
+    const auto shape = p.require(corresponding.view(), Reason::Binding);
+    const auto selected = nastran_faces(p, bound, deck.input.input, target, shape.faces.size());
+    const auto faces = selected.values();
+    const auto pcomp = std::ranges::find_if(faces, [&](const NastranRegionalFace& face) {
+        p.step();
+        const auto ordinal = face.element->property.property_ordinal;
+        return deck.input.input.properties[ordinal].kind == NastranShellPropertyKind::Pcomp;
+    });
+    if (pcomp == faces.end()) {
+        return pshell_quantities(p, source, deck, faces, model, shell, case_units, reference,
+                                 corresponding);
+    }
+    const auto ordinal = pcomp->element->property.property_ordinal;
+    for (const auto& face : faces) {
+        p.step();
+        if (face.element->property.property_ordinal != ordinal) {
+            p.detail.element = face.element->id.value();
+            p.detail.node = face.node;
+            p.reject(Code::Unsupported, Reason::Binding);
+        }
+    }
+    return laminate_quantities(p, cards, deck, source, ordinal, model, bound.faces(), shell,
+                               reference, corresponding, case_units);
 }
 
 } // namespace
@@ -710,24 +820,23 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                 const auto model = root.model.record();
                 const auto selected = find_shell(call, model, shell);
                 const auto pg_id = MeshGeometryId{selected.geometry.unsigned_value()};
-                const auto pg_record = find_pg(call, model, pg_id);
+                static_cast<void>(find_pg(call, model, pg_id));
                 const auto count = selected_faces(call, bound, shell, pg_id);
                 auto geometry = establish_geometry(call, bound, pg, shell, count);
                 const auto& payload = bound.sidecar().payload();
                 QuantityCounts result;
-                std::optional<ExternalPgThicknessReport> thickness_regions;
                 if (const auto* gmsh = std::get_if<GmshSidecar>(&payload)) {
-                    thickness_regions = gmsh_quantities(call, bound, *gmsh, shell, pg, geometry);
-                    result.thickness = thickness_regions.has_value();
+                    result.regional = gmsh_quantities(call, bound, *gmsh, shell, pg, geometry);
+                    result.thickness = result.regional.has_value();
                 } else {
                     if (!quantities) {
                         call.reject(Code::Unsupported, Reason::Binding);
                     }
                     const auto original =
                         call.require(std::get<NastranShellCards>(bound.source()).view());
-                    result = nastran_quantities(call, bound, std::get<NastranSidecar>(payload),
-                                                original, *quantities, model, selected, pg_record,
-                                                case_units, pg, geometry);
+                    result =
+                        nastran_quantities(call, bound, std::get<NastranSidecar>(payload), original,
+                                           *quantities, model, selected, case_units, pg, geometry);
                 }
                 call.step();
                 return QualifiedExternalSidecarPg{std::move(geometry),
@@ -739,7 +848,7 @@ core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
                                                   result.materials,
                                                   call.work,
                                                   std::move(result.laminate),
-                                                  std::move(thickness_regions)};
+                                                  std::move(result.regional)};
             } catch (const Rejected& error) {
                 return std::unexpected(error.error);
             }
