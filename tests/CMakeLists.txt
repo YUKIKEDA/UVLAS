@@ -171,6 +171,13 @@ add_test(NAME cli.validate
         -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli_validate.cmake")
 set_tests_properties(cli.validate PROPERTIES TIMEOUT 30 LABELS "integration")
 
+add_test(NAME cli.inspect
+    COMMAND "${CMAKE_COMMAND}"
+        "-DUVLAS_EXECUTABLE=$<TARGET_FILE:uvlas_cli>"
+        "-DCASE_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}/cli-inspect-$<CONFIG>"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli_inspect.cmake")
+set_tests_properties(cli.inspect PROPERTIES TIMEOUT 30 LABELS "integration")
+
 # QA-04: results must equal the baseline of this platform bit for bit.
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
 add_test(NAME tools.trace

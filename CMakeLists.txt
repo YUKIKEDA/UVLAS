@@ -144,7 +144,7 @@ target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/s
 target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero
     PRIVATE uvlas_numerics Boost::multiprecision)
 
-add_executable(uvlas_cli src/app/main.cpp src/app/validate_case.cpp)
+add_executable(uvlas_cli src/app/main.cpp src/app/validate_case.cpp src/app/inspect_result.cpp)
 uvlas_configure_target(uvlas_cli)
 set_target_properties(uvlas_cli PROPERTIES OUTPUT_NAME uvlas)
 target_include_directories(uvlas_cli PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/io")
