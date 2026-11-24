@@ -50,6 +50,7 @@ public:
 private:
     friend class PgConditioningCertificate;
     friend class PgFlatGram;
+    friend class PgDiscreteGram;
     [[nodiscard]] const ExactRational& length_metres() const& noexcept;
     [[nodiscard]] detail::BasisReferencePoint locate(detail::ReferenceArithmetic&,
                                                      const PgReferencePoint&) const;
