@@ -16,14 +16,15 @@ namespace {
 using namespace io::detail;
 
 // Host admission limits apply before the manifest's own quotas can be trusted.
-constexpr std::uint64_t mib = 1024 * 1024;
+constexpr std::uint64_t kib = 1024;
+constexpr std::uint64_t mib = 1024 * kib;
 constexpr std::uint64_t payload_cap = 256 * mib;
 constexpr std::uint64_t manifest_cap = 8 * mib;
 constexpr std::uint64_t reference_cap = 32 * mib;
 constexpr std::uint64_t reference_total_cap = 64 * mib;
 constexpr std::uint64_t maximum_references = 1024;
 constexpr std::uint64_t maximum_work = 64 * mib;
-constexpr std::uint64_t maximum_nodes = 256 * 1024;
+constexpr std::uint64_t maximum_nodes = 256 * kib;
 constexpr std::size_t maximum_path = 4096;
 
 ReferenceInputLimits input_limits() noexcept {
@@ -32,12 +33,12 @@ ReferenceInputLimits input_limits() noexcept {
          128,
          maximum_nodes,
          maximum_nodes,
-         64 * 1024,
+         64 * kib,
          1024,
          manifest_cap,
          {io::ParserAllocationMode::EstimateAdmission, payload_cap}},
         io::SchemaLimits{{
-            manifest_cap,  128,           maximum_nodes, maximum_nodes, 64 * 1024,
+            manifest_cap,  128,           maximum_nodes, maximum_nodes, 64 * kib,
             1024,          manifest_cap,  64 * mib,      maximum_nodes, maximum_nodes,
             maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes,
             128,           1024,          maximum_nodes, maximum_path,  64 * mib,
@@ -119,7 +120,7 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
                                  maximum_references,
                                  reference_total_cap,
                                  reference_total_cap + maximum_references,
-                                 32 * 1024,
+                                 32 * kib,
                                  reference_total_cap,
                                  maximum_references * maximum_references},
                                 plan, stop, &snapshot_diagnostic);
