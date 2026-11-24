@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <optional>
 #include <stdexcept>
+#include <stop_token>
 #include <string>
 #include <string_view>
 #include <uvlas/structure/pg_integration_partition.hpp>
@@ -36,6 +37,13 @@ T take(core::Result<T> value) {
                                  std::to_string(static_cast<unsigned>(value.error().code)));
     return std::move(*value);
 }
+/// Keep a mutable source because MSVC's request_stop() is non-const.
+[[nodiscard]] inline std::stop_token
+requested_stop_token(std::stop_source&& source = std::stop_source{}) {
+    REQUIRE(source.request_stop());
+    return source.get_token();
+}
+
 struct Fixture {
     core::ResourcePlan input_plan{cap};
     std::optional<PgGraph> graph;
@@ -70,6 +78,11 @@ struct Fixture {
     }
     PgPartitionPoint point(std::string_view s, std::string_view t) {
         return {r(s), r(t)};
+    }
+    [[nodiscard]] PgGraph& chart_graph() & {
+        if (!graph)
+            throw std::runtime_error("Partition fixture graph is absent");
+        return *graph;
     }
     [[nodiscard]] PgPartitionRequest request() const {
         if (!graph)
