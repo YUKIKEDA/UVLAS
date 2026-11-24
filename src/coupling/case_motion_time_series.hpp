@@ -1,0 +1,116 @@
+#pragma once
+
+#include "aero/pchip_curve.hpp"
+#include "io/si_exact_words.hpp"
+
+#include <array>
+#include <uvlas/io/si_case.hpp>
+
+namespace uvlas::coupling::detail {
+namespace motion_time_detail {
+struct Owner;
+struct Builder;
+} // namespace motion_time_detail
+
+using CaseMotionField = decltype(io::schema::AeroAttachmentPrescribed::motion);
+
+struct CaseMotionTimeWindow {
+    const structure::ExactRational& begin;
+    const structure::ExactRational& end;
+};
+
+struct CaseMotionTimeLimits {
+    structure::ExactLimits conversion;
+    aero::detail::pchip::CurveLimits curve;
+    std::uint64_t maximum_exact_numbers{};
+    std::uint64_t maximum_rational_operations{};
+};
+
+struct CaseMotionTimeQuery {
+    aero::detail::pchip::PchipInputStamp stamp;
+    const structure::ExactRational& time;
+    aero::detail::pchip::JetOrder order = aero::detail::pchip::JetOrder::Value;
+    aero::detail::pchip::RequestedSide side = aero::detail::pchip::RequestedSide::Automatic;
+};
+
+/// Owns both time curves and the original event times. Frame qualification is separate.
+class CaseMotionTimeSeries {
+public:
+    CaseMotionTimeSeries(CaseMotionTimeSeries&&) noexcept;
+    CaseMotionTimeSeries& operator=(CaseMotionTimeSeries&&) noexcept;
+    ~CaseMotionTimeSeries();
+    CaseMotionTimeSeries(const CaseMotionTimeSeries&) = delete;
+    CaseMotionTimeSeries& operator=(const CaseMotionTimeSeries&) = delete;
+
+    [[nodiscard]] core::Result<io::SiQuantityKey> declaration() const noexcept;
+    [[nodiscard]] std::span<const aero::detail::pchip::RationalView> events() const& noexcept;
+    [[nodiscard]] std::span<const aero::detail::pchip::RationalView> events() const&& = delete;
+
+private:
+    friend struct motion_time_detail::Builder;
+    explicit CaseMotionTimeSeries(core::PlannedBuffer<motion_time_detail::Owner>) noexcept;
+    core::PlannedBuffer<motion_time_detail::Owner> owner_;
+};
+
+/// All requested derivatives in SI seconds. Rotation words carry the same pi factor at each order.
+class CaseMotionTimeJet {
+public:
+    CaseMotionTimeJet(CaseMotionTimeJet&&) noexcept = default;
+    CaseMotionTimeJet& operator=(CaseMotionTimeJet&&) noexcept = default;
+    CaseMotionTimeJet(const CaseMotionTimeJet&) = delete;
+    CaseMotionTimeJet& operator=(const CaseMotionTimeJet&) = delete;
+
+    [[nodiscard]] std::int16_t rotation_pi_power() const noexcept {
+        return pi_power_;
+    }
+    [[nodiscard]] aero::detail::pchip::JetOrder order() const noexcept {
+        return order_;
+    }
+    [[nodiscard]] aero::detail::pchip::RequestedSide requested_side() const noexcept {
+        return side_;
+    }
+    [[nodiscard]] aero::detail::pchip::RationalView time() const& noexcept;
+    [[nodiscard]] aero::detail::pchip::RationalView time() const&& = delete;
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView>
+    translation(std::uint64_t component, aero::detail::pchip::JetOrder) const& noexcept;
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView>
+    translation(std::uint64_t, aero::detail::pchip::JetOrder) const&& = delete;
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView>
+    rotation_coefficient(std::uint64_t component, aero::detail::pchip::JetOrder) const& noexcept;
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView>
+    rotation_coefficient(std::uint64_t, aero::detail::pchip::JetOrder) const&& = delete;
+    [[nodiscard]] core::Result<aero::detail::pchip::PchipJetLocation>
+    translation_location() const noexcept;
+    [[nodiscard]] core::Result<aero::detail::pchip::PchipJetLocation>
+    rotation_location() const noexcept;
+
+private:
+    friend struct motion_time_detail::Builder;
+    using FormulaValues = std::array<io::detail::SiRationalWords, 9>;
+    using SeriesJet = std::variant<FormulaValues, aero::detail::pchip::ExactPchipJet>;
+    CaseMotionTimeJet(SeriesJet, SeriesJet, io::detail::SiRationalWords, std::int16_t,
+                      aero::detail::pchip::JetOrder, aero::detail::pchip::RequestedSide) noexcept;
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView>
+    component(const SeriesJet&, std::uint64_t, aero::detail::pchip::JetOrder) const noexcept;
+    [[nodiscard]] core::Result<aero::detail::pchip::PchipJetLocation>
+    location(const SeriesJet&) const noexcept;
+    SeriesJet translation_;
+    SeriesJet rotation_;
+    io::detail::SiRationalWords time_;
+    std::int16_t pi_power_;
+    aero::detail::pchip::JetOrder order_;
+    aero::detail::pchip::RequestedSide side_;
+};
+
+[[nodiscard]] core::Result<CaseMotionTimeSeries> prepare_case_motion_time_series(
+    const io::SiCase&, CaseMotionField, CaseMotionTimeWindow, aero::detail::pchip::PchipInputStamp,
+    aero::detail::pchip::CurveWorkspace&, const CaseMotionTimeLimits&, core::ResourcePlan&,
+    const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+[[nodiscard]] core::Result<CaseMotionTimeJet>
+evaluate_case_motion_time_series(const CaseMotionTimeSeries&, const CaseMotionTimeSeries& current,
+                                 CaseMotionTimeQuery, aero::detail::pchip::CurveWorkspace&,
+                                 const CaseMotionTimeLimits&, core::ResourcePlan&,
+                                 const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+} // namespace uvlas::coupling::detail
