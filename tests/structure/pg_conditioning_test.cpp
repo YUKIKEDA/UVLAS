@@ -623,7 +623,7 @@ void check_volume_position(const PgVolumeMassReference& reference,
         return value;
     };
     const auto compare_run = [&](PgVolumePositionDirection direction, PgCartesianWords input,
-                                 PgVolumePositionLimits caps) {
+                                 const PgVolumePositionLimits& caps) {
         AllocationAudit audit{cpp_backend, AuditThreadDomain::CallingThread};
         const auto applied =
             apply_pg_volume_position(reference, direction, input, caps, workspace, output);
@@ -634,7 +634,7 @@ void check_volume_position(const PgVolumeMassReference& reference,
         return output.words();
     };
     const auto evaluate = [&](PgVolumePositionDirection direction, PgCartesianWords input,
-                              PgVolumePositionLimits caps) {
+                              const PgVolumePositionLimits& caps) {
         const auto words = compare_run(direction, input, caps);
         const bool to_points = direction == forward;
         const auto outer = to_points ? points : rank;
@@ -678,7 +678,7 @@ void check_volume_position(const PgVolumeMassReference& reference,
 
     auto caps = trans_caps;
     --caps.maximum_steps;
-    const auto rejected = [&](PgCartesianWords input, PgVolumePositionLimits bounds,
+    const auto rejected = [&](PgCartesianWords input, const PgVolumePositionLimits& bounds,
                               core::Workspace& scratch, core::FailureCode failure) {
         check_failure(
             apply_pg_volume_position(reference, transpose, input, bounds, scratch, output),
