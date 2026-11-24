@@ -1,0 +1,36 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-case-nastran-planar-pg",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "MAT-D05",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "98cfb03817359f16fd21d538607647794d9dd793",
+  "claimed_state": "認証済みNastranデッキと同じCaseから、所有PG・局所厚さと積層・材料軸の証拠を一つの入口で返す。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "real_file_assertions": 1559
+  },
+  "artifacts": {
+    "CMakeLists.txt": "765b3a369b9d032120440b1f58611be07c2e8b13144e5716a3cc99d7edf261d1",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/case-nastran-planar-pg.md": "08d29120f633e5da6ba07873a31d93d77c2651387668229e6c3ac8164aed1125",
+    "src/coupling/case_external_pg.cpp": "921e9261998bb07dc28355a517d659b497c327a84d043a385464cc23ae81d3ec",
+    "src/coupling/case_external_pg.hpp": "b51b2c686d9b33242a4536e524ac1951d51fd9d37bc871540185b885043b65f1",
+    "src/coupling/case_pg_reference.cpp": "7e5d9f5a7e8edc07fa509ff7a0578f36baf8cb5ab46867d18f3b6ae384652044",
+    "src/io/external_mesh_sidecar_pg.cpp": "0d11744a47d16756f254fb3cce4fc043d8667aa9e9225f319c7e49e0fdd5d726",
+    "src/io/external_pg_regional_thickness.hpp": "bf789a338d86e5ca6a8a9d79c2d4194ab0dee58a4c1487a042eb759970770c48",
+    "src/io/nastran_pg_material_axes.cpp": "9ce084494abd4903f3d53a87f1c2e43b04126c2546c9546a2acc3911360e2459",
+    "src/io/nastran_pg_material_axes.hpp": "f680ecea58ba3c61602d3f73e24b159ddfa54dbae25ecedba9d13cf7d867d705",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "tests/io/reference_input_test.cpp": "79ae1a9eac4fa0183dcf913b0ff83510133117b0b7231662ebf0082fbce2b7ed"
+  }
+}
