@@ -174,6 +174,9 @@ public:
                           original.declaration_pointer);
         }
         if (const auto setup = configure_roots(report); !setup) {
+            if (diagnostic_) {
+                diagnostic_->reason = LeafReferenceFailure::Graph;
+            }
             return setup;
         }
         for (core::Index i = 0; i < static_cast<core::Index>(report.declarations); ++i) {
@@ -264,7 +267,7 @@ private:
                               std::string_view) noexcept;
     core::Result<void> authenticate(Vertex&, const DependencyEdge&, std::string_view) noexcept;
     core::Result<core::PlannedBuffer<char>> copy_text(std::string_view) noexcept;
-    core::Result<std::string_view> original_path(core::Index) const noexcept;
+    [[nodiscard]] core::Result<std::string_view> original_path(core::Index) const noexcept;
     core::Result<std::reference_wrapper<const NormalizedReferencePath>>
         normalized_path(core::Index) const noexcept;
     std::unexpected<core::Failure> reject(core::Failure, const DependencyEdge&, SourceId,
@@ -368,11 +371,17 @@ ReferenceGraphBuilder::admit_child(const ChildReferenceDeclaration& child,
         child.root_relative_path.size() > limits_.child_path.input_bytes) {
         return reject_child({Code::ResourceExceeded, operation});
     }
-    // Bound the original UTF-8 check and the forward/backward normalization passes.
-    for (const auto amount : {child.original_path.size(), child.original_path.size(),
-                              child.root_relative_path.size(), child.root_relative_path.size(),
-                              child.root_relative_path.size(), child.root_relative_path.size(),
-                              child.root_relative_path.size(), child.root_relative_path.size()}) {
+    // Account for the original UTF-8/NUL checks, and use the root normalizer's
+    // conservative byte-pass allowance plus the UTF-8 check on the resolved spelling.
+    constexpr std::uint64_t original_passes = 2;
+    constexpr std::uint64_t root_passes = 17;
+    const auto original_size = child.original_path.size();
+    const auto root_size = child.root_relative_path.size();
+    constexpr auto work_max = std::numeric_limits<std::uint64_t>::max();
+    if (original_size > work_max / original_passes || root_size > work_max / root_passes) {
+        return reject_child({Code::ResourceExceeded, operation});
+    }
+    for (const auto amount : {original_size * original_passes, root_size * root_passes}) {
         if (const auto work = walk_.charge(amount); !work) {
             return reject_child(work.error());
         }
@@ -467,6 +476,9 @@ core::Result<void> ReferenceGraphBuilder::descend() noexcept {
         if (frame.next == frame.children.declarations.size()) {
             frame = {};
             if (const auto finished = walk_.finish(parent, stop_); !finished) {
+                if (diagnostic_) {
+                    diagnostic_->reason = LeafReferenceFailure::Graph;
+                }
                 return finished;
             }
             continue;
@@ -802,7 +814,7 @@ core::Result<ReferencedCase> resolve_reference_graph(
     if (!same_parent(*actual, *parent)) {
         return fail(Code::StaleGeneration);
     }
-    const auto graph_failure = [&](core::Failure error) {
+    const auto graph_failure = [&](core::Failure error, bool graph = true) {
         if (stop.stop_requested() || error.code == Code::Cancelled) {
             if (diagnostic) {
                 diagnostic->reset();
@@ -812,7 +824,7 @@ core::Result<ReferencedCase> resolve_reference_graph(
             }
             return fail(Code::Cancelled);
         }
-        if (diagnostic && !diagnostic->reason && (!acquisition || !acquisition->reason)) {
+        if (graph && diagnostic && !diagnostic->reason) {
             diagnostic->reason = LeafReferenceFailure::Graph;
         }
         return std::unexpected(error);
@@ -831,7 +843,7 @@ core::Result<ReferencedCase> resolve_reference_graph(
     ReferenceGraphBuilder builder{*origin,   *parent, prepared, limits,      std::move(*walk),
                                   extractor, plan,    stop,     acquisition, diagnostic};
     if (const auto collected = builder.collect(*report); !collected) {
-        return graph_failure(collected.error());
+        return graph_failure(collected.error(), false);
     }
     auto result = builder.publish(std::move(prepared));
     if (!result) {
