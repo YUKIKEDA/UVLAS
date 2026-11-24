@@ -299,6 +299,9 @@ public:
     [[nodiscard]] bool active() const noexcept;
     [[nodiscard]] AeroResult<QueryRequest> definition() const noexcept;
     [[nodiscard]] AeroResult<CanonicalSupport> support() const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return active() ? steps_ : 0;
+    }
     [[nodiscard]] GeometryContext context() const noexcept {
         return context_;
     }
@@ -308,10 +311,11 @@ private:
     friend class GeometryEngine;
     friend class SharedP1Engine;
     ResolvedQuery(std::shared_ptr<const GeometryData>, core::PlannedBuffer<QueryStorage>,
-                  GeometryContext) noexcept;
+                  GeometryContext, std::uint64_t steps) noexcept;
     std::shared_ptr<const GeometryData> geometry_;
     core::PlannedBuffer<QueryStorage> query_;
     GeometryContext context_;
+    std::uint64_t steps_;
 };
 /// The underlying predicate lease protects both predicate and interpolation scratch.
 class GeometryWorkspace {

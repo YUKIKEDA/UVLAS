@@ -3716,6 +3716,15 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto nominal = take(run(canonical, nullptr, {}, cap_velocity));
     near(center(take(nominal.row(0)).velocity[2]), vz[0]);
     CHECK_FALSE(take(nominal.row(0)).direction.has_value());
+    auto generous_coordinates = flow;
+    generous_coordinates.coordinate_limits.max_steps = cap_velocity.action.steps;
+    const auto with_generous_cap = take(cf::evaluate_discrete_free_wake_velocity(
+        input, generous_coordinates, canonical, nullptr, {}, cap_velocity, shared, *local, *kernel,
+        memory));
+    const auto nominal_velocity = take(nominal.row(0)).velocity;
+    const auto generous_velocity = take(with_generous_cap.row(0)).velocity;
+    for (std::size_t axis = 0; axis < nominal_velocity.size(); ++axis)
+        CHECK(center(generous_velocity[axis]) == center(nominal_velocity[axis]));
     reject(nominal.field_dual(), core::FailureCode::InvalidInput);
     const std::array duplicate{alias, id[3]};
     reject(run(duplicate, nullptr, {}, cap_velocity), core::FailureCode::InvalidInput);
