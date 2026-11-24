@@ -1,0 +1,53 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-coordinate-cards",
+  "ids": [
+    "IO4-01",
+    "IO4-03",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "1b98b9672be1f2a10bde730f84ce653187d2be58",
+  "scope": "Typed MSC Nastran 2022.1 GRID and CORD2R/C/S ownership, defaults and checked coordinate reference order",
+  "verification": {
+    "ctest_regex": "^io\\.nastran_(coordinate_cards|bulk|number_fields)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 3,
+      "coordinate_card_cases": 5,
+      "coordinate_card_assertions": 233
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 3,
+      "coordinate_card_cases": 5,
+      "coordinate_card_assertions": 233,
+      "clang_tidy": "21.1.1 PASS on parser normal/audit and test"
+    }
+  },
+  "reference": {
+    "title": "MSC Nastran 2022.1 Quick Reference Guide",
+    "printed_pages": "1578-1583, 2078-2080",
+    "pdf_sha256": "c0675eed07f664ee985bc0cb3f1e1c00cc138b3a9a0ec1bf538ef345a172fcef"
+  },
+  "tested_target_registration": {
+    "commit": "1b98b9672be1f2a10bde730f84ce653187d2be58",
+    "CMakeLists.txt": "852f3da78e0381bc36bda33126789b7228d2724b559604398c7908b1b915e229",
+    "tests/CMakeLists.txt": "3502d80224e9ab661df49e8a8bcce28c67f66f11a7af2f98971622a14a93c43f"
+  },
+  "sources": {
+    "src/io/nastran_coordinate_cards.cpp": "442ba4521fe9682defc9e56aa8182ba1a3599f7e9b3b1051248d7a20a1a3a066",
+    "src/io/nastran_coordinate_cards.hpp": "03c2979bc2c3cd07de477d00bcceac7756e2268cc23d38c0366b07b0c0af6926",
+    "src/io/nastran_bulk.hpp": "1d62aac4a4d953c3316f3b73e1eea31c2f5f14b84446e943d507c9c8d3086d6d",
+    "src/io/nastran_number_fields.hpp": "4195101ae455ed6069baaa652d071e0edca17d3dd39db9365aa62dde6e3fb03e",
+    "tests/io/nastran_coordinate_cards_test.cpp": "7b5a0d2bdcc641bae27dee0760f3d4cc1622065bc187528117fcb06d4096bbd4"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-coordinate-cards.md": "3f176b8a6d521a5dd016fc2df93dd865c00f9ea3f98447678736b1a24b5abf60"
+  }
+}
