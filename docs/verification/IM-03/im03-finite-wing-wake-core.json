@@ -1,0 +1,47 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-wake-core-v1",
+  "ids": [
+    "IM-03",
+    "A5-02",
+    "V-AERO",
+    "AE-02",
+    "UW-D03",
+    "UW-D05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "source_commit": "c06ac1e3055b0efa33683c73c41ef75a92e6d856",
+  "claimed_state": "The two frozen coarse wings at +1 degree match independent finite-core circulation and vector load observations at three added closure lengths and two added radii. At the same finite closure, positive-core product observations resolve the sign of the ideal-kernel difference where the component tolerance allows.",
+  "verification": {
+    "windows": "MSVC 19.51 Release は既存の迎角系列と新しい感度系列の6件が通過した。合計24,750アサーション。新規の最長は上反角5度の後流長系列で81.44秒だった。",
+    "linux": "GCC 14.2 Release も同じ6件が通過した。合計24,750アサーション。新規の最長は同じ系列の61.57秒だった。6構成のコンパイルデータで対象ソースの clang-tidy も通過した。",
+    "debug": "MSVC Debug で条件数が最多の上反角5度・後流長系列を計時した。計時に使ったソースは `b7f4c31c` で、4,347アサーションが583.87秒で通過した。CTest の制限は各 Release 150秒、Debug 720秒。最終ソース `c06ac1e3` では全呼び出しで明示する試験条件に既定初期化を加えた。",
+    "mutation": "GCC の隔離複製で、幾何に渡すコア半径だけを10倍にした。FW-V01、閉端512 m、入力半径 $10^{-4}$ m の定常行列の係数(0,0)で独立参照との差を検出し、同じ seed 23 の原本で2,998アサーションが通過した。独立理想核では自己辺の除外を外す負対照で源線分内の照会を拒否した。",
+    "commands": [
+      "ctest --test-dir out/issue166-build -C Release -V -R '^coupling\\.finite_wing_(steady|wake_length|core_radius)\\.fw_v0[12]$' -j 3",
+      "ctest --test-dir build -V -R '^coupling\\.finite_wing_(steady|wake_length|core_radius)\\.fw_v0[12]$' -j 3",
+      "clang-tidy -p build --quiet source/tests/coupling/finite_wing_steady_test.cpp",
+      "python -X utf8 -B docs/verification/IM-03/finite-wing-wake-core-v1/reference.py --output <separate-output>/finite-wing-wake-core-v1.json",
+      "ctest --test-dir out/issue166-build -C Debug -V -R '^coupling\\.finite_wing_wake_length\\.fw_v02$'",
+      "just trace-check"
+    ],
+    "fixture": "Recreated in a separate output directory with identical SHA-256 e80f1a1a1229b5458481a7cc7a014958372d9de4c79219870b29ae5b52e5943c.",
+    "scope": "Fixed M2/N4 geometries, finite closures and +1 degree. The ideal oracle uses the same M2/N4 grid at a finite 512 m closure. The spatial, wake and core budgets of the adopted larger studies and the unsteady acceptance require separate product observations."
+  },
+  "sources": {
+    "tests/coupling/finite_wing_steady_test.cpp": "302f5faaa4bbb4e3e37be1cb0ce12e692a7948c5e591a1b426e9871206133b33",
+    "docs/verification/IM-03/finite-wing-wake-core-v1/reference.py": "51c1b6f46774544fcd3b889e1a58febc686809797fa080fde31a2acd17d85376",
+    "docs/verification/IM-03/finite-wing-steady-v1/reference.py": "7cd47141282ee114900b939405185feacb61fc782a269ca7c8b7d172aa7ead43",
+    "docs/verification/IM-03/finite-wing-case-v1/reference.py": "18d84c7def0ee7a40426a4dcab71e6537b686e9f2addec5c5e972d81a3835950",
+    "rd/aero/finite-wing/records/finite-wing-span-extension-protocol.md": "0cf5e7dc4ff0483af6fe16dec289cbf5f50f0bf708eb1a7711b1126b23d40886",
+    "rd/aero/finite-wing/records/finite-wing-specialization-result.json": "56da441111e16b149f6030916cb3decd3c091ba1744fa9073c22077188dca719",
+    "tests/aero/fixtures/finite-wing-case-v1.json": "0fa3597ffecbddba915652af463b5475a98e32a625d0cba2c3ab5b56093c6e01",
+    "tests/aero/fixtures/finite-wing-steady-v1.json": "e4c0246d5ef9ddd978294d753e03ddc8831f44d0aac62824f04ca3707da9d667"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/finite-wing-wake-core-v1/verification.md": "12c3f60aca55579c138425d2993c493f22ca0b31dbfcb569055535a08cd757e2",
+    "tests/aero/fixtures/finite-wing-wake-core-v1.json": "e80f1a1a1229b5458481a7cc7a014958372d9de4c79219870b29ae5b52e5943c",
+    "rd/aero/finite-wing/records/finite-wing-extended-campaign-result.json": "046bff5c6d808dc130c5bc993b3a0e9f56ae26d48a3e4380edd90c01a11e74bc"
+  }
+}
