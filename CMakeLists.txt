@@ -69,7 +69,7 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_discrete_gram.cpp src/structure/pg_prepared_patch.cpp
     src/structure/pg_full_trace.cpp src/structure/pg_global_constraints.cpp
     src/structure/pg_sparse_chart.cpp src/structure/pg_chart_candidate.cpp
-    src/structure/pg_support_history.cpp
+    src/structure/pg_support_history.cpp src/structure/pg_rigid_support_rows.cpp
     src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
@@ -150,7 +150,7 @@ endif()
 add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
     src/coupling/case_known_flow.cpp
     src/coupling/case_aero_attachment.cpp
-    src/coupling/case_motion.cpp
+    src/coupling/case_motion.cpp src/coupling/case_pg_support_motion.cpp
     src/coupling/case_motion_frame.cpp
     src/coupling/case_motion_time_series.cpp
     src/coupling/case_uniform_flow.cpp
