@@ -5,6 +5,7 @@
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_full_trace.hpp>
 #include <uvlas/structure/pg_global_constraints.hpp>
+#include <uvlas/structure/pg_sparse_chart.hpp>
 
 namespace {
 using namespace uvlas;
@@ -408,13 +409,30 @@ TEST_CASE("PG global constraints retain original rows, right-hand sides and exac
     CHECK(sources[3].first_row == sources[2].first_row + sources[2].rows);
     CHECK(info.rows == sources.back().first_row + sources.back().rows);
 
+    const std::array reordered_patches{patches[2], patches[0], patches[1]};
+    const std::array reordered_bindings{
+        PgConstraintTraceBinding{bindings[2].id, bc, 1, core::Index{2}},
+        PgConstraintTraceBinding{bindings[1].id, ab, 0, core::Index{1}},
+        PgConstraintTraceBinding{bindings[0].id, fixed, 2, {}}};
+    auto reordered = take(prepare(reordered_patches, reordered_bindings, limits, plan));
+    const auto earlier_duplicate =
+        std::array{PgConstraintTraceBinding{PgConstraintId{4}, ab, 2, core::Index{0}}, bindings[0],
+                   bindings[1], bindings[2]};
+    auto priority_changed = take(prepare(patches, earlier_duplicate, limits, plan));
+    const std::vector<PgCartesianExactPosition> zero_support(c.reference_coordinates().size());
+    const auto conflicting = take(PgFullTrace::prepare_support(
+        c, std::span{cl}.first(1), ci, zero_support, trace_limits, workspace, plan));
+    const std::array conflicting_bindings{
+        bindings[0], PgConstraintTraceBinding{PgConstraintId{990}, conflicting, 1, {}}};
+    auto incompatible = take(prepare(patches, conflicting_bindings, limits, plan));
+
     auto exact_count = limits;
     exact_count.maximum_rows = static_cast<std::uint64_t>(info.rows);
     exact_count.maximum_nonzeros = static_cast<std::uint64_t>(info.nonzeros);
     auto just_enough = take(prepare(patches, bindings, exact_count, plan));
     CHECK(take(just_enough.info()).nonzeros == info.nonzeros);
     const std::array<PgConstraintTraceBinding, 0> no_traces{};
-    const auto unconstrained = take(prepare(patches, no_traces, limits, plan));
+    auto unconstrained = take(prepare(patches, no_traces, limits, plan));
     CHECK(take(unconstrained.info()).rows == 0);
     CHECK(take(unconstrained.info()).columns == info.columns);
     CHECK(unconstrained.original_rows().empty());
@@ -542,4 +560,156 @@ TEST_CASE("PG global constraints retain original rows, right-hand sides and exac
     }
     const auto independent = take(global.apply(state, limits.arithmetic, workspace, plan));
     CHECK(std::ranges::equal(independent.values(), forward.values()));
+
+    auto chart_limits = PgSparseChartLimits{limits.arithmetic, 300, 400, 30'000, true};
+    chart_limits.arithmetic.algebra.maximum_value_bits = 65536;
+    chart_limits.arithmetic.algebra.maximum_work_bits = 262144;
+    check_failure(PgSparseChart::prepare(std::move(incompatible), chart_limits, workspace, plan),
+                  core::FailureCode::InvalidInput);
+    REQUIRE(incompatible.info().has_value());
+    auto no_pivots = chart_limits;
+    no_pivots.maximum_pivots = 0;
+    const auto no_factors = PgSparseChartLimits{chart_limits.arithmetic, 0, 0, 0};
+    const auto empty_chart =
+        take(PgSparseChart::prepare(std::move(unconstrained), no_factors, workspace, plan));
+    CHECK(empty_chart.pivots().empty());
+    CHECK(empty_chart.free_columns().size() == column_count);
+    CHECK_FALSE(take(empty_chart.preparation()).timing.has_value());
+    check_failure(PgSparseChart::prepare(std::move(global), no_pivots, workspace, plan),
+                  core::FailureCode::ResourceExceeded);
+    REQUIRE(global.info().has_value());
+    auto chart = take(PgSparseChart::prepare(std::move(global), chart_limits, workspace, plan));
+    auto permuted =
+        take(PgSparseChart::prepare(std::move(reordered), chart_limits, workspace, plan));
+    auto preferred =
+        take(PgSparseChart::prepare(std::move(priority_changed), chart_limits, workspace, plan));
+    const auto& original = chart.original();
+    REQUIRE_FALSE(chart.pivots().empty());
+    const auto report = take(chart.preparation());
+    CHECK(report.rank == chart.pivots().size());
+    CHECK(report.original_nonzeros == static_cast<std::uint64_t>(info.nonzeros));
+    CHECK(report.lower_terms > 0);
+    CHECK(report.upper_terms >= report.rank);
+    CHECK(report.lower_terms + report.upper_terms <= report.factor_term_capacity);
+    CHECK(report.pivot_capacity <= chart_limits.maximum_pivots);
+    CHECK(report.work_row_capacity <= chart_limits.maximum_row_terms);
+    CHECK(report.arithmetic.allocated_owned_payload_bytes > 0);
+    CHECK(report.timing.value_or(core::StageTiming{}).calls == 1);
+    CHECK(report.timing.value_or(core::StageTiming{}).elapsed_nanoseconds > 0);
+    CHECK(
+        chart.original()
+            .sources()[static_cast<std::size_t>(
+                original
+                    .original_rows()[static_cast<std::size_t>(chart.pivots().front().original_row)]
+                    .source)]
+            .kind == PgTraceKind::Support);
+    REQUIRE(chart.free_columns().size() + chart.pivots().size() == column_count);
+    REQUIRE(chart.pivots().size() == permuted.pivots().size());
+    REQUIRE(chart.pivots().size() == preferred.pivots().size());
+    const auto physical = [](const PgGlobalConstraints& equations, core::Index column) {
+        const auto physical_layout = equations.layout();
+        const auto block = std::ranges::find_if(physical_layout, [column](const auto& candidate) {
+            return column >= candidate.first && column < candidate.first + candidate.count;
+        });
+        REQUIRE(block != physical_layout.end());
+        return std::pair{block->id.value(), column - block->first};
+    };
+    const auto raw_key = [](const PgGlobalConstraints& equations, core::Index row) {
+        const auto& metadata = equations.original_rows()[static_cast<std::size_t>(row)];
+        return std::pair{equations.sources()[static_cast<std::size_t>(metadata.source)].id.value(),
+                         metadata.source_row};
+    };
+    bool changed_priority = false;
+    for (std::size_t i = 0; i < chart.pivots().size(); ++i) {
+        const auto x = chart.pivots()[i], y = permuted.pivots()[i], z = preferred.pivots()[i];
+        const auto key = raw_key(original, x.original_row);
+        CHECK(key == raw_key(permuted.original(), y.original_row));
+        CHECK(physical(original, x.dependent_column) ==
+              physical(permuted.original(), y.dependent_column));
+        CHECK(physical(original, x.dependent_column) ==
+              physical(preferred.original(), z.dependent_column));
+        const auto changed = raw_key(preferred.original(), z.original_row);
+        if (key.first == 118) {
+            CHECK(changed == (std::pair{std::uint64_t{4}, key.second}));
+            changed_priority = true;
+        } else {
+            CHECK(changed == key);
+        }
+        CHECK(key.first != 660);
+    }
+    CHECK(changed_priority);
+    REQUIRE(chart.free_columns().size() == permuted.free_columns().size());
+    for (std::size_t i = 0; i < chart.free_columns().size(); ++i)
+        CHECK(physical(original, chart.free_columns()[i]) ==
+              physical(permuted.original(), permuted.free_columns()[i]));
+
+    const auto& limits_for_action = chart_limits.arithmetic;
+    std::vector<PgCartesianExactPosition> independent_state(chart.free_columns().size());
+    for (std::size_t i = 0; i < independent_state.size(); ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            const auto column = static_cast<std::size_t>(chart.free_columns()[i]);
+            const auto& exact = q(values[column][axis]);
+            independent_state[i][axis] = rat(f, numerator(exact), denominator(exact));
+        }
+    const auto identity = take(chart.identity());
+    const auto other_identity = take(permuted.identity());
+    CHECK(identity != other_identity);
+    const PgSparseChartInput rb{identity, independent_state};
+    check_failure(
+        chart.lift({other_identity, independent_state}, limits_for_action, workspace, none),
+        core::FailureCode::StaleGeneration);
+    {
+        const auto lease = take(workspace.acquire());
+        static_cast<void>(lease);
+        check_failure(chart.lift(rb, limits_for_action, workspace, none),
+                      core::FailureCode::InvalidInput);
+    }
+    const auto lifted = take(chart.lift(rb, limits_for_action, workspace, plan));
+    const auto dispatched = take(original.residual({original.layout(), lifted.values()},
+                                                   limits_for_action, workspace, plan));
+    for (const auto& row : dispatched.values())
+        CHECK(std::ranges::all_of(row, [](const auto& value) { return value.sign() == 0; }));
+
+    const auto tangent = take(chart.tangent(rb, limits_for_action, workspace, plan));
+    const auto full_force = states(f, column_count, 9);
+    const auto dual =
+        take(chart.transpose({identity, full_force}, limits_for_action, workspace, plan));
+    CHECK(work(full_force, tangent.values()) ==
+          work(dual.independent_force.values(), independent_state));
+    const auto reaction = take(
+        original.transpose(dual.original_multipliers.values(), limits_for_action, workspace, plan));
+    std::vector<std::array<Q, 3>> recomposed(column_count);
+    for (std::size_t i = 0; i < column_count; ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            recomposed[i][axis] = q(reaction.values()[i][axis]);
+    for (std::size_t i = 0; i < chart.free_columns().size(); ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            recomposed[static_cast<std::size_t>(chart.free_columns()[i])][axis] +=
+                q(dual.independent_force.values()[i][axis]);
+    for (std::size_t i = 0; i < column_count; ++i)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            CHECK(recomposed[i][axis] == q(full_force[i][axis]));
+    const auto combined = static_cast<std::size_t>(original.sources().back().first_row);
+    for (const auto& multiplier : dual.original_multipliers.values().subspan(combined))
+        CHECK(std::ranges::all_of(multiplier, [](const auto& value) { return value.sign() == 0; }));
+
+    // For an exact time coefficient, the raw value must satisfy every equation.
+    // C*values is a compatible coefficient. A ramp on only the repeated AB row
+    // agrees with zero at t=0, but must be rejected for its nonzero coefficient.
+    const auto compatible =
+        take(chart.lift_rhs(rb, {identity, forward.values()}, limits_for_action, workspace, plan));
+    CHECK(std::ranges::equal(compatible.values(), values));
+    std::vector<PgCartesianExactPosition> inconsistent(static_cast<std::size_t>(info.rows));
+    const auto original_ab = original.sources().back();
+    bool have_duplicate = false;
+    for (core::Index j = original_ab.first_row; j < original_ab.first_row + original_ab.rows; ++j) {
+        if (!take(original.row(j)).empty()) {
+            inconsistent[static_cast<std::size_t>(j)][0] = f.r("1");
+            have_duplicate = true;
+            break;
+        }
+    }
+    REQUIRE(have_duplicate);
+    check_failure(chart.lift_rhs(rb, {identity, inconsistent}, limits_for_action, workspace, plan),
+                  core::FailureCode::InvalidInput);
 }
