@@ -770,6 +770,10 @@ target_include_directories(uvlas_test_structure_pg_product_quadrature
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 if(UVLAS_SANITIZERS AND NOT MSVC)
     set_tests_properties(structure.pg_product_quadrature PROPERTIES TIMEOUT 420)
+elseif(MSVC)
+    # Debug evaluates the powered, explicit and narrow-limit curved Gram paths.
+    set_tests_properties(structure.pg_product_quadrature PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,600,300>")
 endif()
 
 uvlas_add_test(structure.pg_prepared_patch
