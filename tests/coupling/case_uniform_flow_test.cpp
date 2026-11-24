@@ -1942,16 +1942,16 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
 TEST_CASE("Discrete circulation loads keep midpoint and triangle force and moment",
           "[UW-D01][UW-D03][UW-D05][UW-D06][N4-06][verification][negative]") {
     const auto source_case = source(R"({"kind":"constant","value":[0,0,100]})", one_step);
-    auto flow_workspace = std::make_unique<a::UniformFlowWorkspace>();
-    const auto provider = import(source_case, io::SourceId{120}, *flow_workspace);
-    const auto current = import(source_case, io::SourceId{121}, *flow_workspace);
+    a::UniformFlowWorkspace flow_workspace;
+    const auto provider = import(source_case, io::SourceId{120}, flow_workspace);
+    const auto current = import(source_case, io::SourceId{121}, flow_workspace);
     const Number one{1}, zero{0}, absolute{1, 1000000000}, time{5, 4};
     const cf::CaseFlowComponentBudget component{one.view(), absolute.view(), zero.view()};
     const std::array budgets{component, component, component};
     const cf::CaseFlowProjectionRequest projection{
         core::Precision::TwoWord, budgets, budgets, {4096, budget}};
     const auto flow_at = [&] {
-        auto exact = evaluate(provider, current, *flow_workspace, time);
+        auto exact = evaluate(provider, current, flow_workspace, time);
         return take(cf::project_case_uniform_flow(std::move(exact), projection));
     };
     const auto expected = [](const cf::DiscreteLoadVector& value, std::array<double, 3> reference) {
@@ -3798,7 +3798,10 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     near(center(transported.residual[0]), 1.);
     near(center(transported.residual[1]), 0.);
     near(center(transported.residual[2]), -vz[1]);
-    REQUIRE(transported.direction);
+    if (!transported.direction) {
+        FAIL("Expected the free transport direction");
+        return;
+    }
     const auto& tangent = transported.direction.value();
     near(center(tangent[0]), -1.125);
     near(center(tangent[1]), .0625);
@@ -3889,11 +3892,12 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK(row.release == release);
     residual_expected(row.residual[0], Rat{-1, 2});
     residual_expected(row.residual[2], Rat{0});
-    REQUIRE(row.prescribed_position);
+    if (!row.prescribed_position || !row.direction || !row.prescribed_position_direction) {
+        FAIL("Expected the prescribed position and both transport directions");
+        return;
+    }
     residual_expected(row.prescribed_position.value()[0], Rat{49, 24});
-    REQUIRE(row.direction);
     residual_expected(row.direction.value()[0], Rat{-3, 2});
-    REQUIRE(row.prescribed_position_direction);
     residual_expected(row.prescribed_position_direction.value()[0], Rat{1, 4});
     const auto prescribed_dual = take(prescribed.position_dual(0));
     residual_expected(take(prescribed.prescribed_time_dual()), Rat{-4});

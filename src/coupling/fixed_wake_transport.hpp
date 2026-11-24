@@ -18,6 +18,11 @@ struct WakeMaterialSnapshot {
 };
 
 struct WakeTransportClock {
+    WakeTransportClock(const case_clock_detail::Grid& grid,
+                       const case_clock_detail::Grid& current_grid,
+                       CaseFlowClockQuery address) noexcept
+        : clock(grid), current(current_grid), destination(address) {}
+
     const case_clock_detail::Grid& clock;
     const case_clock_detail::Grid& current;
     CaseFlowClockQuery destination;
