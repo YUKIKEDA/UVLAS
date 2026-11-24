@@ -314,8 +314,10 @@ core::Result<WakeTransportPositionDual>
 WakeTransportResult::position_dual(std::size_t i) const noexcept {
     if (data_.size() != 0) {
         const auto dual = data_.values().front().dual.values();
-        if (i < dual.size() && dual[i])
-            return *dual[i];
+        if (i < dual.size()) {
+            if (const auto& entry = dual[i])
+                return *entry;
+        }
     }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
