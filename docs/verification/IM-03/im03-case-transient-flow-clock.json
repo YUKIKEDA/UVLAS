@@ -1,0 +1,112 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-transient-flow-clock-v1",
+  "ids": [
+    "AE-07",
+    "UW-D02",
+    "IO4-01",
+    "N4-03",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "8a69b27e1d19cab79279d346fae1a699545f5f3d",
+  "claimed_state": "One checked transient SI grid, with common exact rational stage address and side for the no-gust ambient and prescribed convection projections, retaining original prepared case provenance.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51 Debug and Release, 4/4 in each.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2 Release, warnings as errors. Selected CTest 4/4.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.uniform_flow",
+      "aero.pchip_curve",
+      "io.si_case"
+    ],
+    "registration": "5677b1cb93ac8d2a943d4447b86ff108c811e287 gives only the MSVC Debug coupling test 90 seconds. Whole-suite measurements at the earlier 60-second cap were 54.44 s and 42.03 s. CTest JSON confirms Debug 90, Release 60; after the change the same Debug test finished in 51.16 s.",
+    "catch": "A typed transient clock binds both flow fields to one exact stage; 1 case with 173 assertions in MSVC and GCC Release, seed 23.",
+    "oracle": "Direct rational conversion from ft/min and min to SI, interior t=0.09 s, two sided event coordinates at t=0.12 s with h=0.03 and h=0.015 s, analytic linear polynomial and collinear PCHIP velocities and time derivatives, and exact reconstruction of finite words and radius.",
+    "negative": "Same binary64 time words but different actual schedules, a changed unselected interval, changed wake coefficients, wrong stamp or side, invalid addresses, interval/step limits, strict projection and retry. Match source stamp and schema revisions, exact interval content and both fields. Output SchemaIdentity belongs to the prepared side.",
+    "mutation": "Byte-identical control at 8a69b27: 173 assertions pass. Omitting exact beginning and end comparisons lets the same-binary64 schedule through and fails one assertion (Catch2 exit 42).",
+    "static": "clang-format 21.1.2 and clang-tidy 21.1.1 on the product and regression translation units in MSVC and GCC databases."
+  },
+  "sources": {
+    "docs/specs/foundation/case-schema-fields.md": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b",
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "src/io/case_schema_exact.cpp": "8b18eefd6c7869a12480784bdf315711d190c398a2ed8d26b3b336b0968d6f78",
+    "src/io/si_exact_words.hpp": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177",
+    "include/uvlas/structure/exact_polynomial.hpp": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b",
+    "src/coupling/case_uniform_flow.cpp": "636407dc2d4c1c01a227284e158196495a91afc26c2d50370764f5f3eed693ca",
+    "src/coupling/case_uniform_flow_projection.cpp": "ea87abef779e6e530a28099c9a00cf21a26feefddb9f1a2fd0875042183593e3",
+    "src/coupling/case_flow_clock.cpp": "de8bda386d60d85b7431815665f1f356d53b66d250cf6b68e6742dc8c533367c",
+    "src/coupling/case_flow_clock.hpp": "ca1aee8edaf9ce7cae2c760a0d0182887cdbd1100cecfe1fe7c1d6de60f81640",
+    "tests/coupling/case_uniform_flow_test.cpp": "da6f9277c821ea81cae01f8e39e34745e53b2c604b3fd478910ff12c162877b7"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-transient-flow-clock-v1/verification.md": "063d2b67bb1e19a33eec2b104408ee8555318e81206b7aa661779b233c78d361"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "41c7fce84f673b50e05e679334e38792677793a7d12a0ff6280ae03119ecf94b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "src/io/case_schema_exact.cpp",
+      "hint": "src/io/case_schema_exact.cpp",
+      "sha256": "8b18eefd6c7869a12480784bdf315711d190c398a2ed8d26b3b336b0968d6f78"
+    },
+    {
+      "id": "src/io/si_exact_words.hpp",
+      "hint": "src/io/si_exact_words.hpp",
+      "sha256": "54b77da8e829c63097ccbc5aa67c5b5134a420ba5df1fc61b601da66cf6f5177"
+    },
+    {
+      "id": "include/uvlas/structure/exact_polynomial.hpp",
+      "hint": "include/uvlas/structure/exact_polynomial.hpp",
+      "sha256": "f42e7cace2b170c99bd47e2b347042426c8f925566d077bcdb14211af69e411b"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.cpp",
+      "hint": "src/coupling/case_uniform_flow.cpp",
+      "sha256": "636407dc2d4c1c01a227284e158196495a91afc26c2d50370764f5f3eed693ca"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow_projection.cpp",
+      "hint": "src/coupling/case_uniform_flow_projection.cpp",
+      "sha256": "ea87abef779e6e530a28099c9a00cf21a26feefddb9f1a2fd0875042183593e3"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.cpp",
+      "hint": "src/coupling/case_flow_clock.cpp",
+      "sha256": "de8bda386d60d85b7431815665f1f356d53b66d250cf6b68e6742dc8c533367c"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.hpp",
+      "hint": "src/coupling/case_flow_clock.hpp",
+      "sha256": "ca1aee8edaf9ce7cae2c760a0d0182887cdbd1100cecfe1fe7c1d6de60f81640"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "da6f9277c821ea81cae01f8e39e34745e53b2c604b3fd478910ff12c162877b7"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/case-transient-flow-clock-v1/verification.md",
+      "hint": "docs/verification/IM-03/case-transient-flow-clock-v1/verification.md",
+      "sha256": "063d2b67bb1e19a33eec2b104408ee8555318e81206b7aa661779b233c78d361"
+    }
+  ]
+}

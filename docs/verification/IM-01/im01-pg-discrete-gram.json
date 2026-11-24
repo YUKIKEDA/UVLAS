@@ -1,0 +1,99 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-discrete-gram",
+  "ids": [
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-03",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "bc632e0f1f8a49e4234bb72bc1cc46217c7473e9",
+  "claimed_state": "入力した固定有限則の曲面Gramを包絡し、準備に使った点と重みを保持したまま130列の基底変換と必須場を認定した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260"
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "volume_records": 16,
+    "fixed_rule_points": 1008,
+    "conditioned_columns": 130,
+    "selected_exact_gram_entries": 13,
+    "irrational_rule_entries": 2,
+    "independent_transform_entries": 8515,
+    "required_fields": 33,
+    "gram_working_bits": 352,
+    "gram_output_bits": 272,
+    "factor_bits": 512,
+    "candidate_bits": 216,
+    "windows_release_seconds": {
+      "conditioning": 21.85,
+      "discrete_gram": 29.72
+    },
+    "windows_debug_seconds": {
+      "conditioning": 101.32,
+      "discrete_gram": 167.79
+    },
+    "linux_sanitizer_seconds": {
+      "conditioning": 157.57,
+      "discrete_gram": 340.1
+    },
+    "linux_legacy_concurrent_timed_out_seconds": 180.15,
+    "test_cases": {
+      "conditioning": 13,
+      "discrete_gram": 2
+    },
+    "assertions": {
+      "conditioning": 193162,
+      "discrete_gram": 24063
+    },
+    "curved_ctest_timeout_seconds": {
+      "windows": 300,
+      "linux_sanitizer": 420
+    },
+    "clang_tidy_translation_units": 3,
+    "rejected_mutation": {
+      "change": "omit division by reference length cubed",
+      "failed_assertions": 2
+    }
+  },
+  "sources": {
+    "CMakeLists.txt": "cae322e6ba3edff4ac4db8553702c2506d9f12ec4eeb3cd2035f8c0e21baa455",
+    "tests/CMakeLists.txt": "f94ac964ec0f979da2683667711359d8d8f6ef3f98ca7c9b6a97a7b88f3f5ef1",
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-reference-geometry-contract.md": "2cf03ea466b44914018ff6f391cb49c85ef46fde29f393e3ff72ec37b7550439",
+    "docs/specs/structure/pg-discrete-conditioning-certificate-contract.md": "c30169bc6103ce1e0a5be7e56f5db82b1c4ad0dea64c47c0b9d98ab4e41b10d1",
+    "include/uvlas/structure/pg_reference_basis.hpp": "2ed0d2c94bfb26dae7bdb807599879ae9d2bc8d831573a130e994c4ea0c108bb",
+    "src/structure/pg_reference_geometry.cpp": "6460eb186635738a5b1a49031d6db474bd1c0a567b2534acbe8cc681132c1274",
+    "src/structure/pg_conditioning.cpp": "75c006112d7e923ccc07e436f55c4dcf326c1b266de2576417efb73b922c1a76",
+    "src/structure/pg_conditioning_factor.hpp": "245b9272c6e80f51cbfa7b62525459c0febd78ddd2595bed7025b859049693d3",
+    "src/structure/pg_rank_storage.hpp": "baf41ab8cf4a8ee63f11b05a2c4714eff277484bfa38ae352cfe436911ff6e7f",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-discrete-gram-contract.md": "1b535628f546cae177517a9377a148c6dcb47818e740ebbb525b2f87bac2420b",
+    "docs/verification/IM-01/pg-discrete-gram.md": "00c5fb20100a3fc04e23087593202c882370e6a1c1000c54df4a703864fc9ac7",
+    "include/uvlas/structure/pg_discrete_gram.hpp": "dc0db993f7a54d77d39a0bb315f5a2285b6f52d6d7e8a051df6d3d874cb3d117",
+    "src/structure/pg_discrete_gram.cpp": "c818a39bb8c26b065bb7c302df4dba97095b2e6a28308708387ed912f5e07ba6",
+    "tests/structure/pg_conditioning_test.cpp": "da2eccb273591b907652cb08fb3547c91265d1989011cb397218535fc83cb439",
+    "tests/structure/pg_conditioning_test_support.hpp": "bb398c31d0afcd93abf0a641dd33ca0cc027e35622701bb1b0074edcf81fd658",
+    "tests/structure/pg_discrete_gram_test.cpp": "99c905cf95dadc72e053d676b66a5af16e4f3e8ff7fd7e9fae84ed4a301a8609"
+  }
+}

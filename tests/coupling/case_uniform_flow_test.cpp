@@ -1,4 +1,5 @@
 #include "aero/geometry_snapshot_fixture.hpp"
+#include "coupling/case_flow_clock.hpp"
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
@@ -689,6 +690,158 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
                                                 cancel.get_token()),
                core::FailureCode::Cancelled);
         CHECK(memory.allocated_bytes() == 0);
+    }
+}
+
+TEST_CASE("A typed transient clock binds both flow fields to one exact stage",
+          "[AE-07][UW-D02][IO4-01][N4-03][N4-06][verification][negative]") {
+    a::UniformFlowWorkspace work;
+    const cf::CaseFlowClockLimits clock_limits{limits, 2, 4};
+    const auto transport = [](JsonToken input, std::string_view velocity) {
+        input.field("analysis")
+            .field("wake")
+            .set("convection", parse(std::string{R"({"kind":"prescribed","velocity":)"} +
+                                     std::string{velocity} + "}"));
+        return input;
+    };
+    const Number one{1}, zero{0}, absolute{1, 1000000000};
+    const cf::CaseFlowComponentBudget allowed{one.view(), absolute.view(), zero.view()};
+    const std::array components{allowed, allowed, allowed};
+    const cf::CaseFlowProjectionRequest projection{
+        core::Precision::TwoWord, components, components, {4096, budget}};
+    const auto prepare_clock = [&](const JsonToken& input, io::SourceId id) {
+        const auto si = materialize(input, id);
+        core::ResourcePlan memory{budget};
+        return take(cf::prepare_case_clocked_flows(si, stamp, work, clock_limits, memory));
+    };
+
+    SECTION("Both projections share a non-dyadic instant and each endpoint side keeps its own h") {
+        auto input = transport(
+            source(
+                R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[1,0,0],[1000,0,0]]})",
+                R"([{"start":0.001,"end":0.002,"step":0.0005,"restart":"initial"},{"start":0.002,"end":0.003,"step":0.00025,"restart":"event"}])"),
+            R"({"kind":"pchip","times":[0.001,0.002,0.003],"values":[[2,0,0],[4,0,0],[6,0,0]],"outside":{"kind":"reject"}})");
+        input.field("flow").set("events", parse("[0.002]"));
+        const auto field = prepare_clock(input, io::SourceId{401});
+        const auto current = prepare_clock(input, io::SourceId{402});
+        CHECK(field.interval_count() == 2);
+        CHECK(take(field.interval_steps(0)) == 2);
+        CHECK(take(field.interval_steps(1)) == 4);
+        reject(field.interval_steps(2), core::FailureCode::InvalidInput);
+        const auto run = [&](cf::CaseFlowClockQuery address) {
+            core::ResourcePlan memory{budget};
+            return take(cf::evaluate_case_clocked_flows(field, current, address, projection,
+                                                        projection, work, clock_limits, memory));
+        };
+        const auto compare = [&](const cf::CaseClockedFlowSample& result, const Number& time,
+                                 const Number& step, p::RequestedSide side, const Rat& ambient,
+                                 const Rat& wake) {
+            exact(take(result.time()), time);
+            exact(take(result.step_seconds()), step);
+            exact(take(result.ambient().source().jet.time()), time);
+            exact(take(result.prescribed().jet().time()), time);
+            CHECK(result.ambient().source().requested_side == side);
+            CHECK(result.prescribed().requested_side() == side);
+            CHECK(result.address().stamp == stamp);
+            CHECK(result.address().side == side);
+            CHECK(result.source().source.source == io::SourceId{401});
+            within(take(result.ambient().velocity(0)), ambient, Rat{1} / 1000000000);
+            within(take(result.prescribed().velocity(0)), wake, Rat{1} / 1000000000);
+            within(take(result.ambient().time_partial(0)), Rat{127} / 1500, Rat{1} / 1000000000);
+            within(take(result.prescribed().time_partial(0)), Rat{127} / 750, Rat{1} / 1000000000);
+        };
+        const auto middle = run({stamp, 0, 1, p::RequestedSide::Automatic});
+        compare(middle, Number{9, 100}, Number{3, 100}, p::RequestedSide::Automatic,
+                Rat{127} / 10000, Rat{381} / 25000);
+        CHECK(middle.restart() == cf::CaseClockRestart::ItemInitial);
+        const auto left = run({stamp, 0, 2, p::RequestedSide::Left});
+        const auto right = run({stamp, 1, 0, p::RequestedSide::Right});
+        compare(left, Number{3, 25}, Number{3, 100}, p::RequestedSide::Left, Rat{381} / 25000,
+                Rat{127} / 6250);
+        compare(right, Number{3, 25}, Number{3, 200}, p::RequestedSide::Right, Rat{381} / 25000,
+                Rat{127} / 6250);
+        CHECK(left.restart() == cf::CaseClockRestart::ItemInitial);
+        CHECK(right.restart() == cf::CaseClockRestart::ItemEvent);
+        CHECK(right.address().interval == 1);
+        CHECK(right.address().step == 0);
+
+        core::ResourcePlan refused{budget};
+        const auto refuse = [&](const cf::CaseClockedFlows& supplied,
+                                cf::CaseFlowClockQuery query) {
+            return cf::evaluate_case_clocked_flows(field, supplied, query, projection, projection,
+                                                   work, clock_limits, refused);
+        };
+        const auto next = p::PchipInputStamp{stamp.issuer, p::PchipInputGeneration{9}};
+        reject(refuse(current, {next, 0, 1, p::RequestedSide::Left}),
+               core::FailureCode::StaleGeneration);
+        for (const auto& bad :
+             {cf::CaseFlowClockQuery{stamp, 2, 0, p::RequestedSide::Right},
+              cf::CaseFlowClockQuery{stamp, 0, 3, p::RequestedSide::Left},
+              cf::CaseFlowClockQuery{stamp, 0, 2, p::RequestedSide::Right},
+              cf::CaseFlowClockQuery{stamp, 1, 0, p::RequestedSide::Left},
+              cf::CaseFlowClockQuery{stamp, 1, 0, p::RequestedSide::Automatic},
+              cf::CaseFlowClockQuery{stamp, 0, 1, static_cast<p::RequestedSide>(255)}})
+            reject(refuse(current, bad), core::FailureCode::InvalidInput);
+        auto changed_grid = input;
+        changed_grid.field("analysis").field("intervals").elements[1].set("step", parse("0.0005"));
+        const auto other_grid = prepare_clock(changed_grid, io::SourceId{403});
+        reject(refuse(other_grid, {stamp, 0, 1, p::RequestedSide::Left}),
+               core::FailureCode::StaleGeneration);
+        CHECK(refused.allocated_bytes() == 0);
+
+        auto altered_wake = input;
+        altered_wake.field("analysis")
+            .field("wake")
+            .field("convection")
+            .field("velocity")
+            .field("values")
+            .elements[1]
+            .elements[0] = parse("5");
+        const auto other_wake = prepare_clock(altered_wake, io::SourceId{404});
+        reject(refuse(other_wake, {stamp, 0, 1, p::RequestedSide::Left}),
+               core::FailureCode::StaleGeneration);
+        const cf::CaseFlowComponentBudget exact_bound{one.view(), zero.view(), zero.view()};
+        const std::array exact_bounds{exact_bound, exact_bound, exact_bound};
+        const cf::CaseFlowProjectionRequest exact_only{
+            core::Precision::Binary64, exact_bounds, exact_bounds, {4096, budget}};
+        reject(cf::evaluate_case_clocked_flows(field, current,
+                                               {stamp, 0, 1, p::RequestedSide::Left}, projection,
+                                               exact_only, work, clock_limits, refused),
+               core::FailureCode::PrecisionUnresolved);
+        const auto retry = run({stamp, 0, 1, p::RequestedSide::Left});
+        CHECK(retry.prescribed().jet().active());
+    }
+
+    SECTION("Exact time identity distinguishes schedules with the same binary64 time words") {
+        constexpr auto velocity = R"({"kind":"constant","value":[2,0,0]})";
+        constexpr auto ambient = R"({"kind":"constant","value":[1,0,0]})";
+        static_assert(.1 == .100000000000000001);
+        const auto first = transport(
+            source(ambient, R"([{"start":0.1,"end":0.2,"step":0.1,"restart":"initial"}])"),
+            velocity);
+        const auto second = transport(
+            source(
+                ambient,
+                R"([{"start":0.100000000000000001,"end":0.200000000000000001,"step":0.1,"restart":"initial"}])"),
+            velocity);
+        const auto old = prepare_clock(first, io::SourceId{405});
+        const auto different = prepare_clock(second, io::SourceId{406});
+        core::ResourcePlan memory{budget};
+        reject(cf::evaluate_case_clocked_flows(old, different,
+                                               {stamp, 0, 0, p::RequestedSide::Right}, projection,
+                                               projection, work, clock_limits, memory),
+               core::FailureCode::StaleGeneration);
+        CHECK(memory.allocated_bytes() == 0);
+        const auto si = materialize(first, io::SourceId{407});
+        auto narrow = clock_limits;
+        narrow.maximum_intervals = 0;
+        reject(cf::prepare_case_clocked_flows(si, stamp, work, narrow, memory),
+               core::FailureCode::ResourceExceeded);
+        CHECK(memory.allocated_bytes() == 0);
+        narrow = clock_limits;
+        narrow.maximum_steps_per_interval = 0;
+        reject(cf::prepare_case_clocked_flows(si, stamp, work, narrow, memory),
+               core::FailureCode::ResourceExceeded);
     }
 }
 

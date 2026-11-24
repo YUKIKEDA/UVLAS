@@ -66,6 +66,7 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
     src/structure/pg_conditioning.cpp src/structure/pg_flat_gram.cpp
+    src/structure/pg_discrete_gram.cpp
     src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
@@ -143,7 +144,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_sources(uvlas_io PRIVATE src/io/linux_reference_root.cpp src/io/checkpoint_publication.cpp)
 endif()
 
-add_library(uvlas_coupling STATIC src/coupling/case_uniform_flow.cpp
+add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
+    src/coupling/case_uniform_flow.cpp
     src/coupling/case_uniform_flow_projection.cpp src/coupling/discrete_nonpenetration.cpp)
 uvlas_configure_target(uvlas_coupling)
 target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")

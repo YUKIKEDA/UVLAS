@@ -729,6 +729,17 @@ target_include_directories(uvlas_test_structure_pg_conditioning
 uvlas_enable_allocation_audit(uvlas_test_structure_pg_conditioning)
 uvlas_require_audited_dependencies(uvlas_test_structure_pg_conditioning)
 
+uvlas_add_test(structure.pg_discrete_gram
+    LABELS property negative verification V-PG
+    TIMEOUT 300
+    SOURCES structure/pg_discrete_gram_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_discrete_gram
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 420)
+endif()
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
@@ -866,6 +877,11 @@ uvlas_add_test(coupling.case_uniform_flow
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+if(MSVC)
+    # The full MSVC Debug test ran in 42–55 s locally. Allow headroom on loaded hosts.
+    set_tests_properties(coupling.case_uniform_flow PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,90,60>")
+endif()
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
