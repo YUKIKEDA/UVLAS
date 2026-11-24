@@ -496,19 +496,10 @@ core::Result<void> ReferenceGraphBuilder::authenticate(Vertex& vertex, const Dep
     if (!path) {
         return reject(path.error(), edge, vertex.id, pointer);
     }
-    auto& total = limits_.inventory;
-    const auto& per = total.per_source;
-    const RootSnapshotLimits admitted{
-        {std::min(per.file.maximum_file_bytes, total.total_payload_bytes),
-         std::min(per.file.maximum_read_bytes, total.total_read_bytes),
-         std::min(per.file.maximum_read_calls, total.total_read_calls),
-         std::min(per.file.maximum_hash_bytes, total.total_hash_bytes)},
-        std::min(per.maximum_identity_comparisons, total.total_identity_comparisons),
-        per.diagnostic_bytes};
     auto snapshot = acquire_reference_snapshot(
         origin_, path->get(), {parent_, vertex.id, vertex.role, edge.declaration_node},
-        vertex.digest, pointer, identities_.values().first(acquired_), admitted, plan_, stop_,
-        acquisition_);
+        vertex.digest, pointer, identities_.values().first(acquired_),
+        limits_.inventory.next_file(), plan_, stop_, acquisition_);
     if (!snapshot) {
         if (diagnostic_ && edge.consumer && snapshot.error().code != Code::Cancelled) {
             diagnostic_->declaring_source = edge.declaring_source;
@@ -519,12 +510,7 @@ core::Result<void> ReferenceGraphBuilder::authenticate(Vertex& vertex, const Dep
     if (!file) {
         return reject({Code::InvalidInput, operation}, edge, vertex.id, pointer);
     }
-    const auto count = file->file_info.byte_count;
-    total.total_payload_bytes -= count;
-    total.total_read_bytes -= count + 1;
-    total.total_read_calls -= file->read_calls;
-    total.total_hash_bytes -= count;
-    total.total_identity_comparisons -= acquired_ + origin_.manifest_identity.has_value();
+    limits_.inventory.charge(*file, acquired_ + origin_.manifest_identity.has_value());
     identities_.values()[acquired_++] = file->file_info.identity;
     vertex.snapshot.emplace(std::move(*snapshot));
     return {};
@@ -639,8 +625,9 @@ std::unexpected<core::Failure> ReferenceGraphBuilder::reject(core::Failure error
                                                              SourceId target,
                                                              std::string_view pointer) noexcept {
     if (diagnostic_ && error.code != Code::Cancelled) {
-        describe(*diagnostic_, {parent_, target, edge.role, edge.declaration_node}, pointer,
-                 LeafReferenceFailure::Graph, limits_.walk.diagnostic_bytes, plan_);
+        const auto declaring = edge.consumer ? std::optional{edge.declaring_source} : std::nullopt;
+        describe(*diagnostic_, {parent_, target, edge.role, edge.declaration_node, declaring},
+                 pointer, LeafReferenceFailure::Graph, limits_.walk.diagnostic_bytes, plan_);
         diagnostic_->declaring_source = edge.declaring_source;
     }
     if (stop_.stop_requested() || error.code == Code::Cancelled) {

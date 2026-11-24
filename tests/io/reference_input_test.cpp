@@ -1264,6 +1264,7 @@ TEST_CASE("Reference DFS rejects the first child failure and publishes no partia
     if (const auto location = acquisition.location) {
         CHECK(location->source == io::SourceId{901});
         CHECK(location->declaration_node == 0);
+        CHECK(location->declaring_file == io::SourceId{300});
     } else {
         FAIL("Missing first child location");
     }
@@ -1310,6 +1311,7 @@ TEST_CASE("Reference DFS rejects the first child failure and publishes no partia
     CHECK(diagnostic.declaring_source == io::SourceId{302});
     if (const auto position = diagnostic.location) {
         CHECK(position->declaration_node == 2);
+        CHECK(position->declaring_file == io::SourceId{302});
     } else {
         FAIL("Missing child cycle position");
     }

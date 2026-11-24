@@ -18,7 +18,9 @@ struct RootSnapshotLocation {
     SchemaIdentity parent;
     SourceId source;
     ReferenceRole role;
+    // Manifest JSON node ordinal, or the byte in declaring_file for a child declaration.
     std::uint64_t declaration_node;
+    std::optional<SourceId> declaring_file{};
 };
 
 enum class RootSnapshotFailure : std::uint8_t {
@@ -80,14 +82,10 @@ struct RootInventoryLimits {
     std::uint64_t total_read_calls;
     std::uint64_t total_hash_bytes;
     std::uint64_t total_identity_comparisons;
-};
 
-// Internal role inspection of authenticated bytes. Invoked in first declaration order after
-// each file's handle has closed, before the next distinct source is opened.
-class RootSnapshotInspector {
-public:
-    virtual ~RootSnapshotInspector() = default;
-    [[nodiscard]] virtual core::Result<void> inspect(const AcquiredRootSnapshot&) noexcept = 0;
+    [[nodiscard]] RootSnapshotLimits next_file() const noexcept;
+    // Debit only a file authenticated under next_file(), with the same earlier IDs.
+    void charge(const ReferenceFileView&, std::uint64_t identity_checks) noexcept;
 };
 
 // Owns all authenticated files declared directly by one manifest and their declaration records.
@@ -119,8 +117,8 @@ public:
 private:
     friend core::Result<AcquiredRootReferences>
     acquire_root_references(const ReferenceInput&, PreparedRootReferences&&, RootInventoryLimits,
-                            core::ResourcePlan&, const std::stop_token&, RootSnapshotDiagnostic*,
-                            RootSnapshotInspector*) noexcept;
+                            core::ResourcePlan&, const std::stop_token&,
+                            RootSnapshotDiagnostic*) noexcept;
     AcquiredRootReferences(
         PreparedRootReferences declarations,
         core::PlannedBuffer<std::optional<AcquiredRootSnapshot>> sources) noexcept;
@@ -134,8 +132,7 @@ private:
 [[nodiscard]] core::Result<AcquiredRootReferences>
 acquire_root_references(const ReferenceInput& input, PreparedRootReferences&& prepared,
                         RootInventoryLimits limits, core::ResourcePlan& plan,
-                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic,
-                        RootSnapshotInspector* inspector = nullptr) noexcept;
+                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic) noexcept;
 
 enum class ReferenceWalkStartFailure : std::uint8_t {
     Binding,
