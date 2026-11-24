@@ -1,11 +1,15 @@
+#include "aero/local_geometry_bounds_private.hpp"
+#include "aero/p1_shared_kernel.hpp"
 #include "coupling/case_material_chart.hpp"
 #include "coupling/case_material_reference.hpp"
+#include "coupling/case_material_rows.hpp"
 #include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "structure/pg_conditioning_test_support.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -394,6 +398,148 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
             row.field("terms").elements.push_back(quadratic);
         wrong(core::FailureCode::GeometryInvalid);
     }
+    SECTION("The conditioned original row carries position velocity and transpose work") {
+        const auto si = checked_case(wire);
+        auto physical = take(c::prepare_case_pg_reference(si, 1, limits.support, workspace, plan));
+        INFO("Case PG physical reference prepared");
+        const auto original = take(physical.source());
+        const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
+        auto rank = take(PgRankPreparation::prepare(original.dictionary, original.partition,
+                                                    rank_limits, workspace, plan));
+        auto basis = take(PgReferenceBasis::prepare(std::move(physical), std::move(rank),
+                                                    rank_limits, workspace, plan));
+        auto gram = take(
+            PgFlatGram::prepare(std::move(basis), 256, {limits.chart, steps}, workspace, plan));
+        auto accepted = take(std::move(gram).generate_and_certify({320, 246}, {profile, steps, {}},
+                                                                  workspace, plan));
+        const auto prepared =
+            take(PgPreparedPatch::prepare(std::move(accepted), limits.chart, workspace, plan));
+        const auto patch_id = take(prepared.info()).identity;
+        constexpr auto max_error = 1e-9;
+        for (const auto precision : {core::Precision::Binary64, core::Precision::TwoWord}) {
+            CAPTURE(static_cast<int>(precision));
+            const PgPreparedReferenceProjection projection{precision, 1e-13, 1e-13,
+                                                           1e-13,     1e-13, 1e-13};
+            const auto rows = take(c::CaseMaterialRows::prepare(
+                ready, thin, prepared, c::CaseMaterialCollocationSite{0, 1}, projection, 1e-13,
+                limits.chart, plan));
+            INFO("Collocation rows prepared");
+            const auto original_vertex = take(c::CaseMaterialRows::prepare(
+                ready, thin, prepared, c::CaseMaterialVertexSite{0, 1, 1}, projection, 1e-13,
+                limits.chart, plan));
+            INFO("Original vertex row prepared");
+            const bool paired = precision == core::Precision::TwoWord;
+            const auto capacity =
+                static_cast<core::Index>(prepared.reference_coordinates().size() * 3);
+            const auto destination =
+                take(PgVolumePositionResult::allocate(capacity, precision, plan));
+            const auto memory = std::max(destination.workspace_bytes(), core::Index{65536});
+            core::Workspace action_workspace{
+                take(plan.allocate<std::byte>(memory, core::Operation::EvaluateStep))};
+            std::vector<double> q_high, q_low, v_high, v_low;
+            const std::array speed{Q{1}, Q{-2}, Q{3}};
+            const auto append = [&](const Q& exact, std::vector<double>& high,
+                                    std::vector<double>& low) {
+                high.push_back(exact.convert_to<double>());
+                if (paired) {
+                    const auto first =
+                        take(ExactRational::from_binary64(high.back(), limits.chart.algebra, plan));
+                    const Q residual = exact - q(first);
+                    low.push_back(residual.convert_to<double>());
+                }
+            };
+            for (std::size_t j = 0; j < prepared.reference_coordinates().size(); ++j)
+                for (std::size_t axis = 0; axis < speed.size(); ++axis) {
+                    append(q(prepared.reference_coordinates()[j][axis]), q_high, q_low);
+                    append(q(prepared.translation()[j]) * speed[axis], v_high, v_low);
+                }
+            const PgCartesianWords q_state{precision, q_high, q_low};
+            const PgCartesianWords v_state{precision, v_high, v_low};
+            const c::CaseMaterialActionLimits apply{steps, max_error, max_error, max_error, {}};
+            const auto position =
+                take(rows.evaluate(patch_id, q_state, v_state, apply, action_workspace, plan));
+            const auto word = [](PgCartesianWords words, std::size_t index) {
+                return words.high[index] + (words.low.empty() ? 0.0 : words.low[index]);
+            };
+            CHECK(std::abs(word(position.position.words(), 0) - 17. / 4.) < max_error);
+            CHECK(std::abs(word(position.position.words(), 1) + 5. / 2.) < max_error);
+            CHECK(std::abs(word(position.position.words(), 2) - 161. / 32.) < max_error);
+            CHECK(std::abs(word(position.velocity.words(), 0) - 1.) < max_error);
+            CHECK(std::abs(word(position.velocity.words(), 1) + 2.) < max_error);
+            CHECK(std::abs(word(position.velocity.words(), 2) - 3.) < max_error);
+            if (!position.tangents) {
+                FAIL("Prepared rows must retain the collocation tangent pair");
+                return;
+            }
+            CHECK(std::abs(word(position.tangents->words(), 0) - 1.) < max_error);
+            CHECK(std::abs(word(position.tangents->words(), 4) - 2.) < max_error);
+            CHECK(std::abs(word(position.tangents->words(), 5) - 1. / 8.) < max_error);
+            const std::array force{0., 0., 2.};
+            const std::array zero{0., 0., 0.};
+            const PgCartesianWords loads{precision, force,
+                                         paired ? std::span<const double>{zero}
+                                                : std::span<const double>{}};
+            const auto back = take(original_vertex.pullback(patch_id, loads, {steps, max_error, {}},
+                                                            action_workspace, plan));
+            CHECK(std::get<c::CaseMaterialVertexSite>(back.original_site).original_span_cell == 1);
+            CHECK(back.surface.shell_id == 1);
+            CHECK(back.patch == patch_id);
+            const auto dual_words = back.force.words();
+            double work = 0;
+            for (std::size_t k = 0; k < dual_words.high.size(); ++k)
+                work += word(dual_words, k) * word(v_state, k);
+            CHECK(std::abs(work - 6.) < max_error);
+            namespace aero = uvlas::aero::detail;
+            namespace interval = aero::p1;
+            constexpr auto force_radius = 0x1p-35;
+            aero::LocalRootScratch enclosure_scratch;
+            const auto zero_force =
+                aero::enclose_p1_value(interval::integer(0), precision, enclosure_scratch);
+            const interval::Interval z_force{aero::decode_p1_word(2. - force_radius).lower,
+                                             aero::decode_p1_word(2. + force_radius).upper};
+            const c::DiscreteLoadVector enclosed_force{
+                zero_force, zero_force,
+                aero::enclose_p1_value(z_force, precision, enclosure_scratch)};
+            const auto enclosed = take(original_vertex.pullback_enclosed(
+                patch_id, enclosed_force, {steps, max_error, {}}, plan));
+            CHECK(enclosed.original_site.original_span_cell == 1);
+            double center_work = 0., work_radius = 0.;
+            const auto scaled = [](const aero::ScaledEnclosure& value) {
+                const auto center = std::visit(
+                    [](const auto& x) {
+                        if constexpr (std::is_same_v<std::remove_cvref_t<decltype(x)>,
+                                                     aero::SingleWord>)
+                            return x.value;
+                        else
+                            return x.high + x.low;
+                    },
+                    value.center());
+                return std::scalbn(center, value.exponent());
+            };
+            for (std::size_t column = 0; column < enclosed.force.size(); ++column) {
+                const auto& row = enclosed.force.values()[column];
+                if (!row) {
+                    FAIL("A structural column force must hold its enclosure");
+                    return;
+                }
+                for (std::size_t axis = 0; axis < row->size(); ++axis) {
+                    const auto& value = (*row)[axis];
+                    const auto motion = word(v_state, 3 * column + axis);
+                    center_work += motion * scaled(value);
+                    work_radius += std::abs(motion) * std::scalbn(value.radius(), value.exponent());
+                }
+            }
+            CHECK(std::abs(center_work - 6.) < max_error);
+            CHECK(work_radius >= 3 * force_radius);
+
+            auto stale = patch_id;
+            stale.bytes.front() ^= std::byte{1};
+            check_failure(original_vertex.pullback(stale, loads, {steps, max_error, {}},
+                                                   action_workspace, plan),
+                          core::FailureCode::StaleGeneration);
+        }
+    }
+
     SECTION("Matching point position cannot hide an incorrect material tangent") {
         auto& independent = model.field("geometry").elements.at(1);
         independent.set("coefficients", a::parse(R"([

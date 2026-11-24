@@ -2222,7 +2222,7 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             cf::EdgeMidpointVelocity{a::EdgeId{17}, coordinates(.125, .25, -.125)}};
         const std::array wake_force_edges{midpoint_velocities[0], midpoint_velocities[1],
                                           midpoint_velocities[3]};
-        const cf::DiscreteVectorLoadInput load_input{
+        cf::DiscreteVectorLoadInput load_input{
             input.trial_stamp,
             request.retained_generation,
             has_wake ? std::span<const cf::EdgeMidpointVelocity>{wake_force_edges}
@@ -2230,6 +2230,8 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             std::span{rates}.first(count),
             a::SingleWord{1.25},
             moment_origin};
+        if (mode == LoadCase::AliasedShared)
+            load_input.retention = cf::DiscreteLoadRetention::OriginalRows;
         a::SharedP1Workspace shared;
         auto local = take(a::LocalPacketWorkspace::create(memory));
         auto kernel = take(a::P1Workspace::create(memory));
@@ -2340,6 +2342,44 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             CHECK(abs(nodal_force[axis] - unpack(force[axis])) <= rational_word(1e-24));
             CHECK(abs(nodal_moment[axis] - unpack(moment[axis])) <= rational_word(1e-24));
         }
+        if (mode == LoadCase::AliasedShared) {
+            REQUIRE(result.original_count() == 28);
+            std::array<Rat, 3> original_sum{};
+            std::array<std::array<Rat, 3>, 2> shared_edge_face{};
+            std::array<std::size_t, 2> shared_edge_ends{};
+            for (std::size_t i = 0; i < result.original_count(); ++i) {
+                const auto contribution = take(result.original(i));
+                REQUIRE(contribution.local_vertex < 3);
+                const auto points = test_geometry::take(geometry.facet_points(contribution.facet));
+                CHECK(test_geometry::take(geometry.owner(points[contribution.local_vertex])) ==
+                      contribution.canonical);
+                const auto panel =
+                    contribution.face == fixture.faces[0].id ? std::size_t{0} : std::size_t{1};
+                CHECK(contribution.face == fixture.faces[panel].id);
+                if (contribution.edge == a::EdgeId{12})
+                    ++shared_edge_ends[panel];
+                for (std::size_t axis = 0; axis < original_sum.size(); ++axis) {
+                    const auto actual = unpack(contribution.force[axis]);
+                    original_sum[axis] += actual;
+                    if (contribution.edge == a::EdgeId{12})
+                        shared_edge_face[panel][axis] += actual;
+                }
+                if (!contribution.edge && contribution.facet == a::FacetId{200})
+                    residual_expected(contribution.force[2], exact_force / Rat{3});
+            }
+            CHECK(shared_edge_ends == std::array<std::size_t, 2>{2, 2});
+            // Each side has its own signed contribution before cancellation. The
+            // sum is the independently frozen force on the physical shared edge.
+            CHECK(shared_edge_face[0][0] * shared_edge_face[1][0] < 0);
+            const auto shared_edge = take(result.edge(2)).force;
+            for (std::size_t axis = 0; axis < original_sum.size(); ++axis) {
+                CHECK(abs(original_sum[axis] - unpack(force[axis])) <= rational_word(1e-24));
+                CHECK(abs(shared_edge_face[0][axis] + shared_edge_face[1][axis] -
+                          unpack(shared_edge[axis])) <= rational_word(1e-24));
+            }
+        } else
+            CHECK(result.original_count() == 0);
+        reject(result.original(result.original_count()), core::FailureCode::InvalidInput);
         reject(result.edge(result.edge_count()), core::FailureCode::InvalidInput);
         reject(result.point(result.point_count()), core::FailureCode::InvalidInput);
         reject(result.facet(result.facet_count()), core::FailureCode::InvalidInput);

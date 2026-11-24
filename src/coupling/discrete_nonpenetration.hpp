@@ -473,6 +473,8 @@ struct BoundCirculationRate {
 
 class FixedBdf2Circulation;
 
+enum class DiscreteLoadRetention : std::uint8_t { Aggregates, OriginalRows };
+
 struct DiscreteVectorLoadInput {
     DiscreteVectorLoadInput(aero::detail::P1ActionStamp trial,
                             core::NumericalGeneration circulation_generation,
@@ -493,6 +495,7 @@ struct DiscreteVectorLoadInput {
     aero::detail::ScalarWords density;           ///< kg/m³, finite and strictly positive.
     NonpenetrationVector moment_origin;          ///< Reference point in the geometry's SI frame.
     const FixedBdf2Circulation* fixed_bdf2 = nullptr; ///< Alternative to independent rates.
+    DiscreteLoadRetention retention = DiscreteLoadRetention::Aggregates;
 };
 
 struct DiscreteCirculatoryLoad {
@@ -512,6 +515,17 @@ struct DiscreteNoncirculatoryLoad {
 
 struct DiscreteNodalLoad {
     aero::detail::PointId point;
+    DiscreteLoadVector force;
+};
+
+/// One already weighted contribution to an original facet vertex. The canonical
+/// point is for global work checks; face, facet and local vertex select the original row.
+struct DiscreteOriginalLoadContribution {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::FacetId facet;
+    std::uint8_t local_vertex{};
+    aero::detail::PointId canonical;
+    std::optional<aero::detail::EdgeId> edge; ///< Empty for triangle area loads.
     DiscreteLoadVector force;
 };
 
@@ -559,6 +573,9 @@ public:
     [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t original_count() const noexcept;
+    [[nodiscard]] core::Result<DiscreteOriginalLoadContribution>
+    original(std::size_t) const noexcept;
     [[nodiscard]] std::size_t bdf2_rate_count() const noexcept {
         return bdf2_rates_.size();
     }
@@ -579,13 +596,17 @@ private:
                              const DiscreteLoadVector& force, const DiscreteLoadVector& moment,
                              const DiscreteLoadVector& origin,
                              core::PlannedBuffer<std::optional<RetainedBdf2Rate>>,
-                             DiscreteLoadSource, std::uint64_t) noexcept;
+                             core::PlannedBuffer<std::optional<DiscreteOriginalLoadContribution>>,
+                             std::size_t original_count, DiscreteLoadSource,
+                             std::uint64_t) noexcept;
     DiscreteCirculation primal_;
     core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges_;
     core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets_;
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points_;
     DiscreteLoadVector force_, moment_, origin_;
     core::PlannedBuffer<std::optional<RetainedBdf2Rate>> bdf2_rates_;
+    core::PlannedBuffer<std::optional<DiscreteOriginalLoadContribution>> original_;
+    std::size_t original_count_{};
     DiscreteLoadSource source_;
     std::uint64_t steps_;
 };
@@ -1001,6 +1022,9 @@ public:
     [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t original_count() const noexcept;
+    [[nodiscard]] core::Result<DiscreteOriginalLoadContribution>
+    original(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_force() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_moment() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> moment_origin() const noexcept;

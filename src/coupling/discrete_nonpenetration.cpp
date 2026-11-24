@@ -609,6 +609,7 @@ struct LoadEdgeOccurrence {
     std::size_t panel = 0;
     int vortex_sign = 0;
     bool trailing = false;
+    std::uint8_t child{}, side{};
 };
 struct LoadEdge {
     a::EdgeId edge{0};
@@ -820,6 +821,8 @@ struct LoadValues {
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points;
     DiscreteLoadVector force, moment, origin;
     core::PlannedBuffer<std::optional<RetainedBdf2Rate>> bdf2_rates;
+    core::PlannedBuffer<std::optional<DiscreteOriginalLoadContribution>> original;
+    std::size_t original_count{};
 };
 
 struct ComputedLoads {
@@ -1810,8 +1813,9 @@ struct NonpenetrationBuilder {
                                                       std::span<NodalLoad> nodes, p::Work& work) {
         std::size_t k = 0;
         for (std::size_t panel = 0; panel < bound.size(); ++panel)
-            for (const auto facet : bound[panel].panel.facets) {
+            for (std::size_t child = 0; child < bound[panel].panel.facets.size(); ++child) {
                 work.step();
+                const auto facet = bound[panel].panel.facets[child];
                 const auto points = require(geometry.facet_points(facet));
                 const auto edges = require(geometry.facet_edges(facet));
                 const auto incidence = require(geometry.incidence(facet));
@@ -1819,8 +1823,13 @@ struct NonpenetrationBuilder {
                     const auto edge =
                         require(contact.uvlm_load_edge(edges[side], remaining(work), work.stop));
                     account(work, edge.used_steps);
-                    occurrences[k] = {edge.edge, edge.endpoints, panel,
-                                      -static_cast<int>(incidence[side]), edge.trailing};
+                    occurrences[k] = {edge.edge,
+                                      edge.endpoints,
+                                      panel,
+                                      -static_cast<int>(incidence[side]),
+                                      edge.trailing,
+                                      static_cast<std::uint8_t>(child),
+                                      static_cast<std::uint8_t>(side)};
                     nodes[k].point = points[side].value();
                     ++k;
                 }
@@ -2117,6 +2126,10 @@ struct NonpenetrationBuilder {
         p::Work work{0, limits.steps, stop};
         work.step();
         const auto order = input.collocations.size();
+        if (loads.retention != DiscreteLoadRetention::Aggregates &&
+            loads.retention != DiscreteLoadRetention::OriginalRows)
+            reject(core::FailureCode::InvalidInput);
+        const bool retain_original = loads.retention == DiscreteLoadRetention::OriginalRows;
         if (implicit != nullptr) {
             match_linearization_context(implicit->request.scales.context, request.scales.context,
                                         true);
@@ -2198,6 +2211,14 @@ struct NonpenetrationBuilder {
                 rates.values()[i] = import(loads.rates[i].rate, work);
             }
 
+        core::PlannedBuffer<std::optional<DiscreteOriginalLoadContribution>> original_loads;
+        if (retain_original) {
+            if (order > static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max()) / 18)
+                reject(core::FailureCode::ResourceExceeded);
+            original_loads =
+                allocate<std::optional<DiscreteOriginalLoadContribution>>(memory, 18 * order);
+        }
+        std::size_t original_count = 0;
         auto occurrences = allocate<LoadEdgeOccurrence>(memory, 6 * order);
         auto nodes = allocate<NodalLoad>(memory, 6 * order);
         auto edge_loads =
@@ -2222,6 +2243,14 @@ struct NonpenetrationBuilder {
         };
         const auto half = p::scale(p::integer(1), -1);
         const auto third = p::divide(p::integer(1), p::integer(3), work);
+        const auto emit_original =
+            [&](a::PhysicalFaceId face, a::FacetId facet, std::uint8_t corner, a::PointId vertex,
+                std::optional<a::EdgeId> edge, const DiscreteLoadVector& contribution) {
+                work.step();
+                original_loads.values()[original_count++].emplace(DiscreteOriginalLoadContribution{
+                    face, facet, corner, require(geometry.owner(vertex)), edge, contribution});
+            };
+        std::size_t original_edge_cursor = 0;
         LoadTotals totals;
         const auto ambient = flow != nullptr ? ambient_velocity(*flow, work) : Vector{};
         for (std::size_t i = 0; i < edges.size(); ++i) {
@@ -2278,6 +2307,36 @@ struct NonpenetrationBuilder {
             const auto velocity_cross_edge = cross(effective, edge_vector, work);
             const auto factor = p::multiply(density, edge.strength, work);
             const auto force = scale_vector(velocity_cross_edge, factor, work);
+            if (retain_original) {
+                const auto sorted = occurrences.values();
+                while (original_edge_cursor < sorted.size() &&
+                       sorted[original_edge_cursor].edge < edge.edge) {
+                    work.step();
+                    ++original_edge_cursor;
+                }
+                while (original_edge_cursor < sorted.size() &&
+                       sorted[original_edge_cursor].edge == edge.edge) {
+                    const auto original = sorted[original_edge_cursor];
+                    const auto [panel, orientation] =
+                        take_edge_panel(sorted, original_edge_cursor, work);
+                    if (orientation == 0)
+                        continue;
+                    const auto facet = bound[panel].panel.facets[original.child];
+                    const auto points = require(geometry.facet_points(facet));
+                    const auto gamma = import(retained_word(primal.solution.values(), panel), work);
+                    const auto signed_gamma =
+                        orientation > 0 ? gamma : p::subtract({}, gamma, work);
+                    const auto half_strength =
+                        p::multiply(half, p::multiply(density, signed_gamma, work), work);
+                    const auto contribution =
+                        finish(scale_vector(velocity_cross_edge, half_strength, work));
+                    const auto next = static_cast<std::uint8_t>((original.side + 1) % 3);
+                    emit_original(bound[panel].panel.face, facet, original.side,
+                                  points[original.side], edge.edge, contribution);
+                    emit_original(bound[panel].panel.face, facet, next, points[next], edge.edge,
+                                  contribution);
+                }
+            }
             if (direction != nullptr) {
                 const auto da = point_direction(*direction, edge.endpoints[0], work);
                 const auto db = point_direction(*direction, edge.endpoints[1], work);
@@ -2396,6 +2455,12 @@ struct NonpenetrationBuilder {
                 }
                 totals.add(center, force, origin, work);
                 distribute_load(vertex_loads, points, force, third, work);
+                if (retain_original) {
+                    const auto contribution = finish(scale_vector(force, third, work));
+                    for (std::size_t corner = 0; corner < points.size(); ++corner)
+                        emit_original(bound[i].panel.face, facet, static_cast<std::uint8_t>(corner),
+                                      points[corner], std::nullopt, contribution);
+                }
                 facet_loads.values()[2 * i + child].emplace(DiscreteNoncirculatoryLoad{
                     bound[i].panel.face, facet, points, finish(center), finish(force)});
             }
@@ -2433,7 +2498,8 @@ struct NonpenetrationBuilder {
         work.step();
         return {std::move(primal),
                 {std::move(edge_loads), std::move(facet_loads), std::move(point_loads), force,
-                 moment, reference, std::move(bdf2_rates)},
+                 moment, reference, std::move(bdf2_rates), std::move(original_loads),
+                 original_count},
                 work.used};
     }
 
@@ -2460,6 +2526,8 @@ struct NonpenetrationBuilder {
                 values.moment,
                 values.origin,
                 std::move(values.bdf2_rates),
+                std::move(values.original),
+                values.original_count,
                 source,
                 result.steps};
     }
@@ -3192,8 +3260,9 @@ DiscreteCirculationLoads::DiscreteCirculationLoads(
     core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets,
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points, const DiscreteLoadVector& force,
     const DiscreteLoadVector& moment, const DiscreteLoadVector& origin,
-    core::PlannedBuffer<std::optional<RetainedBdf2Rate>> rates, DiscreteLoadSource source,
-    std::uint64_t steps) noexcept
+    core::PlannedBuffer<std::optional<RetainedBdf2Rate>> rates,
+    core::PlannedBuffer<std::optional<DiscreteOriginalLoadContribution>> original,
+    std::size_t original_count, DiscreteLoadSource source, std::uint64_t steps) noexcept
     : primal_(std::move(primal)),
       edges_(std::move(edges)),
       facets_(std::move(facets)),
@@ -3202,6 +3271,8 @@ DiscreteCirculationLoads::DiscreteCirculationLoads(
       moment_(moment),
       origin_(origin),
       bdf2_rates_(std::move(rates)),
+      original_(std::move(original)),
+      original_count_(original_count),
       source_(source),
       steps_(steps) {}
 
@@ -3227,6 +3298,15 @@ DiscreteCirculationLoads::facet(std::size_t i) const noexcept {
 }
 core::Result<DiscreteNodalLoad> DiscreteCirculationLoads::point(std::size_t i) const noexcept {
     return load_row(points_, i);
+}
+
+std::size_t DiscreteCirculationLoads::original_count() const noexcept {
+    return original_.size() == 0 ? 0 : original_count_;
+}
+
+core::Result<DiscreteOriginalLoadContribution>
+DiscreteCirculationLoads::original(std::size_t i) const noexcept {
+    return load_row(original_, i);
 }
 
 core::Result<RetainedBdf2Rate> DiscreteCirculationLoads::bdf2_rate(std::size_t i) const noexcept {
@@ -3583,6 +3663,25 @@ core::Result<DiscreteCirculatoryLoad> DiscreteKnownLoads::edge(std::size_t i) co
     if (!values)
         return std::unexpected(absent());
     return known_load_item(values->edges, i);
+}
+
+std::size_t DiscreteKnownLoads::original_count() const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return 0;
+    const auto& values = records.front().values;
+    return values ? values->original_count : 0;
+}
+
+core::Result<DiscreteOriginalLoadContribution>
+DiscreteKnownLoads::original(std::size_t i) const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(absent());
+    const auto& values = records.front().values;
+    if (!values || i >= values->original_count)
+        return std::unexpected(absent());
+    return known_load_item(values->original, i);
 }
 
 core::Result<DiscreteNoncirculatoryLoad> DiscreteKnownLoads::facet(std::size_t i) const noexcept {

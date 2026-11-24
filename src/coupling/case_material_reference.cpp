@@ -128,7 +128,9 @@ evaluate(const CaseMaterialChart& chart, const structure::PgReferenceLimits& lim
                     auto remaining = limits;
                     remaining.maximum_scalar_operations -= m.scalar_operations;
                     remaining.maximum_partition_visits -= m.partition_visits;
-                    m.reserve_nested_rationals(remaining.algebra, 128);
+                    const auto retained = result ? result->alternate_count : 0;
+                    m.reserve_nested_rationals(
+                        remaining.algebra, pg::partition_add(128, pg::partition_mul(3, retained)));
                     auto reference =
                         partition_take(support->evaluate(query, std::nullopt, remaining, plan));
                     m.charge(reference.call_info.scalar_operations);
@@ -142,6 +144,8 @@ evaluate(const CaseMaterialChart& chart, const structure::PgReferenceLimits& lim
                                                                    std::move(tangents),
                                                                    partition_index(i),
                                                                    std::move(local),
+                                                                   {},
+                                                                   0,
                                                                    {}});
                         continue;
                     }
@@ -157,6 +161,13 @@ evaluate(const CaseMaterialChart& chart, const structure::PgReferenceLimits& lim
                         (!equal(algebra, (*result->tangents)[0], (*tangents)[0]) ||
                          !equal(algebra, (*result->tangents)[1], (*tangents)[1])))
                         partition_fail(FailureCode::GeometryInvalid);
+                    if (result->alternate.size() == 0)
+                        result->alternate =
+                            partition_take(plan.allocate<CaseMaterialReferenceCandidate>(
+                                partition_index(triangles.size() - 1), operation));
+                    result->alternate.values()[result->alternate_count++] = {
+                        reference.partition_record, std::move(local)};
+                    m.reserve_nested_rationals(m.leaf_limits, 3);
                 }
                 if (!result)
                     partition_fail(FailureCode::GeometryInvalid);

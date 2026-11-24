@@ -7,6 +7,11 @@
 
 namespace uvlas::coupling::detail {
 
+struct CaseMaterialReferenceCandidate {
+    core::Index partition_record{};
+    std::array<structure::ExactRational, 3> local;
+};
+
 /// The exact reference point and the two chained physical tangent vectors use
 /// its single owned radicand. The original layer face remains explicit.
 struct CaseMaterialReferenceSample {
@@ -15,6 +20,8 @@ struct CaseMaterialReferenceSample {
     std::optional<std::array<structure::PgReferenceVector, 2>> tangents; ///< Collocations only.
     core::Index triangle;
     std::array<structure::ExactRational, 3> triangle_coordinates; ///< u, v, layer depth.
+    core::PlannedBuffer<CaseMaterialReferenceCandidate> alternate;
+    std::size_t alternate_count{};
     structure::PgReferenceCallInfo call_info;
 };
 
