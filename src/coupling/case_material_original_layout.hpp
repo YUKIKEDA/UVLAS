@@ -57,8 +57,8 @@ private:
 /// Two original vertices selected from the same checked canonical point.
 struct CaseMaterialOriginalAliasPoint {
     const CaseMaterialOriginalLayout& layout;
-    aero::detail::FacetId facet;
-    std::uint8_t local_vertex;
+    aero::detail::FacetId facet{0};
+    std::uint8_t local_vertex{};
     const CaseMaterialChart& chart;
     const CaseReferenceSurface& thin;
     const structure::PgPreparedPatch& patch;

@@ -100,8 +100,8 @@ struct UvlmQuad {
 struct UvlmOriginalQuad {
     PhysicalFaceId face{0};
     AeroFaceRole role{};
-    std::array<PointId, 4> corners;
-    std::array<FacetId, 2> facets;
+    std::array<PointId, 4> corners{PointId{0}, PointId{0}, PointId{0}, PointId{0}};
+    std::array<FacetId, 2> facets{FacetId{0}, FacetId{0}};
     std::uint64_t used_steps{};
 };
 /// Canonical edge in the checked topology, with endpoints in the stored D2 order.
