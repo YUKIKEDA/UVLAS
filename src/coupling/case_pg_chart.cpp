@@ -473,7 +473,7 @@ pg::PgFullTrace support(const pg::PgPreparedPatch& patch, core::Index ordinal,
 }
 
 struct MotionPreparation {
-    aero::detail::pchip::PchipInputStamp stamp;
+    const aero::detail::pchip::PchipInputStamp& stamp;
     const CaseStructuralSupportLimits& limits;
     aero::detail::pchip::CurveWorkspace& workspace;
 };
@@ -490,13 +490,13 @@ core::Result<const pg::PgPreparedPatch*> CasePgChart::patch(core::Index index) c
 }
 
 const CaseStructuralSupport* CasePgChart::motion() const& noexcept {
-    return std::get_if<CaseStructuralSupport>(&chart_);
+    return motion_ ? &*motion_ : nullptr;
 }
 
 const pg::PgSparseChart& CasePgChart::chart() const& noexcept {
     if (const auto* ready = motion())
         return ready->support().chart();
-    return std::get<pg::PgSparseChart>(chart_);
+    return chart_;
 }
 
 namespace case_pg_chart_detail {
@@ -518,7 +518,7 @@ core::Result<CasePgChart> Builder::prepare(const io::SiCase& source,
             try {
                 std::stop_source cancellation;
                 const auto request = [&]() noexcept { cancellation.request_stop(); };
-                const std::stop_callback caller_stop{stop, request};
+                const std::stop_callback caller_stop{std::move(stop), request};
                 const std::stop_callback reference_stop{caller.reference.cancellation, request};
                 const std::stop_callback graph_stop{caller.reference.graph.cancellation, request};
                 const std::stop_callback coefficient_stop{
@@ -681,10 +681,9 @@ core::Result<CasePgChart> Builder::prepare(const io::SiCase& source,
                         {support_ids, moving_count},
                         {support_ids + stationary_start, support_count - stationary_start}};
                     auto support = partition_take(prepare_case_structural_pg_support(
-                        source, std::move(std::get<pg::PgSparseChart>(result.chart_)),
-                        {patch_bindings, rules.size()}, selection, motion->stamp, workspace,
-                        motion->workspace, motion->limits, plan, token));
-                    result.chart_.emplace<CaseStructuralSupport>(std::move(support));
+                        source, std::move(result.chart_), {patch_bindings, rules.size()}, selection,
+                        motion->stamp, workspace, motion->workspace, motion->limits, plan, token));
+                    result.motion_.emplace(std::move(support));
                 }
                 input.step(0);
                 return result;
@@ -701,7 +700,7 @@ prepare_case_pg_chart(const io::SiCase& source, std::span<const CasePgRuleBindin
                       const CasePgChartLimits& limits, core::Workspace& workspace,
                       core::ResourcePlan& plan, std::stop_token stop) noexcept {
     return case_pg_chart_detail::Builder::prepare(source, rules, limits, nullptr, workspace, plan,
-                                                  stop);
+                                                  std::move(stop));
 }
 
 core::Result<CasePgChart> prepare_case_pg_motion_chart(
@@ -712,7 +711,7 @@ core::Result<CasePgChart> prepare_case_pg_motion_chart(
     std::stop_token stop) noexcept {
     const MotionPreparation motion{stamp, support_limits, motion_workspace};
     return case_pg_chart_detail::Builder::prepare(source, rules, limits, &motion, workspace, plan,
-                                                  stop);
+                                                  std::move(stop));
 }
 
 } // namespace uvlas::coupling::detail

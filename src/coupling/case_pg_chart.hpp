@@ -62,7 +62,9 @@ private:
         : patches_(std::move(patches)), chart_(std::move(chart)) {}
 
     core::PlannedBuffer<std::optional<structure::PgPreparedPatch>> patches_;
-    std::variant<structure::PgSparseChart, CaseStructuralSupport> chart_;
+    // The fixed owner moves into the motion result only after successful qualification.
+    structure::PgSparseChart chart_;
+    std::optional<CaseStructuralSupport> motion_;
 };
 
 /// Prepare every PG shell, fixed full-position edge support and compatible

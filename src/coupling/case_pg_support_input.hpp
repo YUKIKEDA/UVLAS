@@ -1,6 +1,5 @@
 #pragma once
 
-#include <type_traits>
 #include <uvlas/io/si_case.hpp>
 
 namespace uvlas::coupling::detail {
@@ -23,17 +22,17 @@ stationary_case_pg_motion(const io::SiCase& source, const io::schema::Motion& mo
             const auto quantity = source.quantity(*input);
             if (!quantity)
                 return std::unexpected(quantity.error());
-            const auto zero = std::visit(
-                [](const auto& value) {
-                    if constexpr (std::is_same_v<std::remove_cvref_t<decltype(value)>,
-                                                 io::SiDecimalView>)
-                        return value.sign == 0;
-                    else
-                        return value.numerator.sign == 0;
-                },
-                quantity->recipe.value);
-            if (!zero)
-                return false;
+            const auto& value = quantity->recipe.value;
+            if (const auto* decimal = std::get_if<io::SiDecimalView>(&value)) {
+                if (decimal->sign != 0)
+                    return false;
+            } else if (const auto* rational = std::get_if<io::SiRationalView>(&value)) {
+                if (rational->numerator.sign != 0)
+                    return false;
+            } else {
+                return std::unexpected(
+                    core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
+            }
         }
         return true;
     };
