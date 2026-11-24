@@ -10,6 +10,7 @@
 #include "coupling/case_material_surface_model.hpp"
 #include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
+#include "coupling/case_uniform_flow_projection.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "structure/pg_conditioning_test_support.hpp"
 
@@ -379,6 +380,163 @@ uvlas::aero::detail::GlobalContactState material_quad_contact(core::ResourcePlan
     if (!contact)
         throw std::runtime_error("Case panel fixture contact failed");
     return std::move(*contact);
+}
+
+void verify_surface_original_loads(const io::SiCase& typed,
+                                   const c::CaseMaterialSurfaceModel& material,
+                                   const aero::detail::GlobalContactState& contact,
+                                   const PgPreparedPatch& patch_ready,
+                                   const PgReferenceLimits& preparation, core::ResourcePlan& plan) {
+    namespace ae = aero::detail;
+    namespace ls = numerics::linear;
+    const auto owner = contact.geometry();
+    if (!owner)
+        FAIL("The material fixture needs the qualified geometry owner");
+    const auto& geometry = owner->get();
+    const auto vector = [](double x, double y, double z) -> c::NonpenetrationVector {
+        return {ae::SingleWord{x}, ae::SingleWord{y}, ae::SingleWord{z}};
+    };
+    const auto zero = vector(0, 0, 0);
+    const c::ExplicitCollocationTangents tangents{vector(1, 0, 0), vector(0, 1, 1. / 16.)};
+    const auto geometry_limits = test_geometry::limits();
+    auto geometry_work = test_geometry::workspace(plan);
+    const auto point = [&](ae::QueryId id, double y, double z) {
+        return test_geometry::take(
+            ae::resolve_query(geometry, {id, ae::FreePoint{ae::FreeSingle{{4.125, y, z}}}},
+                              geometry.context(), geometry_limits, *geometry_work, plan));
+    };
+    const auto left = point(ae::QueryId{1}, -3.5, 4.96875);
+    const auto right = point(ae::QueryId{2}, -2.5, 5.03125);
+    const std::array rows{c::DiscreteCollocation{ae::FacetId{200}, left, tangents, zero,
+                                                 ae::SingleWord{0}, ae::SingleWord{0}},
+                          c::DiscreteCollocation{ae::FacetId{202}, right, tangents, zero,
+                                                 ae::SingleWord{0}, ae::SingleWord{0}}};
+    const std::array rates{c::BoundCirculationRate{ae::PhysicalFaceId{8}, ae::SingleWord{1}},
+                           c::BoundCirculationRate{ae::PhysicalFaceId{17}, ae::SingleWord{2}}};
+    const std::array edges{
+        c::EdgeMidpointVelocity{ae::EdgeId{1}, zero}, c::EdgeMidpointVelocity{ae::EdgeId{2}, zero},
+        c::EdgeMidpointVelocity{ae::EdgeId{3}, zero}, c::EdgeMidpointVelocity{ae::EdgeId{4}, zero},
+        c::EdgeMidpointVelocity{ae::EdgeId{6}, zero}, c::EdgeMidpointVelocity{ae::EdgeId{7}, zero},
+        c::EdgeMidpointVelocity{ae::EdgeId{8}, zero}};
+    constexpr ae::P1ActionStamp trial{713, 3};
+    constexpr core::NumericalGeneration retained{31};
+    const c::DiscreteNonpenetrationInput boundary{contact,
+                                                  rows,
+                                                  {},
+                                                  {core::AcceptedStateId{2}, {}},
+                                                  trial,
+                                                  stamp,
+                                                  p::RequestedSide::Automatic};
+    c::DiscreteVectorLoadInput load_spec{trial, retained, edges, rates, ae::SingleWord{1}, zero};
+    load_spec.retention = c::DiscreteLoadRetention::OriginalRows;
+    const c::CaseUniformFlowLimits uniform{motion_exact_limits(), motion_limits.curve, 100};
+    ae::UniformFlowWorkspace flow_work;
+    const auto field =
+        take(c::prepare_case_uniform_flow(typed, stamp, {}, flow_work, uniform, plan));
+    constexpr std::array<std::uint32_t, 1> one{1}, four{4}, five{5}, billion{1000000000};
+    const p::RationalView instant{1, five, four}, unit{1, one, one}, error{1, one, billion},
+        no_relative{0, {}, one};
+    const c::CaseFlowComponentBudget component{unit, error, no_relative};
+    const std::array budgets{component, component, component};
+    auto sampled = take(c::evaluate_case_uniform_flow(field, field, {stamp, instant}, flow_work,
+                                                      uniform.flow, plan));
+    auto ambient = take(c::project_case_uniform_flow(
+        std::move(sampled), {core::Precision::TwoWord, budgets, budgets, {4096, case_budget}}));
+
+    const c::DiscreteNonpenetrationLimits limits{
+        {core::Precision::TwoWord, 1e-12},
+        {core::Precision::TwoWord, 1e-12, 1e-12},
+        {geometry_limits,
+         {ls::EstimateAdmission{65536}, UINT64_C(1000000000)},
+         UINT64_C(32000000000)},
+        1000000,
+        UINT64_C(1000000000000)};
+    const auto context = geometry.context();
+    const ls::Context solve_context{
+        {context.fingerprint, context.model, context.current, core::ChartGeneration{1},
+         core::SparsityGeneration{2}, core::NumericalGeneration{3}, core::ScaleGeneration{4},
+         context.precision, core::Precision::Binary64, core::WakePolicyGeneration{5},
+         core::TimeIntervalGeneration{6}, core::BackendGeneration{7}},
+        core::TrialId{3},
+        core::ScopeId{8},
+        core::ScopeId{9},
+        context.time};
+    constexpr std::array scale{1., 1.};
+    constexpr ls::UnitDimensions gamma_unit{2, 0, -1, 0, 0, 0, 0},
+        velocity_unit{1, 0, -1, 0, 0, 0, 0};
+    constexpr std::array gamma_units{gamma_unit, gamma_unit};
+    constexpr std::array velocity_units{velocity_unit, velocity_unit};
+    const ls::Limits dense{2, 1, 0, 5, ls::EstimateAdmission{1U << 20U}};
+    const ls::Accuracy accuracy{ls::Norm::Infinity,     1e-24, 0., 1e-22, core::ObservationId{20},
+                                core::ObservationId{21}};
+    const c::DiscreteCirculationRequest request{
+        {scale, scale, gamma_units, velocity_units, solve_context},
+        dense,
+        accuracy,
+        core::RhsGeneration{4},
+        retained,
+        1e-13,
+        1e-13,
+        1e-11,
+        0.};
+    ae::SharedP1Workspace shared;
+    auto local = take(ae::LocalPacketWorkspace::create(plan));
+    auto kernel = take(ae::P1Workspace::create(plan));
+    const auto loads = take(c::solve_discrete_circulation_loads(
+        boundary, load_spec, std::move(ambient), limits, request, *geometry_work, shared, *local,
+        *kernel, plan));
+
+    const PgPreparedReferenceProjection projection{
+        core::Precision::TwoWord, 1e-13, 1e-13, 1e-13, 1e-13, 1e-13};
+    const PgVolumePositionLimits apply{steps, 1e-9, {}};
+    const auto encode = [](const ae::ScaledEnclosure& value) {
+        const auto mantissa = std::visit(
+            [](const auto& word) -> Q {
+                if constexpr (std::is_same_v<std::remove_cvref_t<decltype(word)>, ae::SingleWord>)
+                    return Q{word.value};
+                else
+                    return Q{word.high} + Q{word.low};
+            },
+            value.center());
+        const Q exponent{std::scalbn(1., value.exponent())};
+        return std::pair<Q, Q>{mantissa * exponent, Q{value.radius()} * exponent};
+    };
+    std::size_t checked = 0;
+    for (std::size_t index = 0; index < loads.original_count(); ++index) {
+        const auto load = take(loads.original(index));
+        const bool on_left = load.facet == ae::FacetId{200} && load.local_vertex == 2;
+        const bool on_right = load.facet == ae::FacetId{202} && load.local_vertex == 0;
+        if (load.edge || (!on_left && !on_right))
+            continue;
+        CAPTURE(index, on_left);
+        CHECK(load.canonical == ae::PointId{102});
+        const auto result = take(
+            material.pullback(loads, index, patch_ready, projection, preparation, apply, plan));
+        CHECK(result.surface.surface_id == (on_left ? 1U : 2U));
+        CHECK(result.original_site.span_knot == (on_left ? 1 : 0));
+        CHECK(result.patch == take(patch_ready.info()).identity);
+        REQUIRE(result.force.size() == patch_ready.translation().size());
+        Q work{}, radius{};
+        for (std::size_t column = 0; column < result.force.size(); ++column) {
+            const auto& row = result.force.values()[column];
+            if (!row) {
+                FAIL("The routed force must own each structure column");
+                return;
+            }
+            const auto [center, width] = encode((*row)[2]);
+            const auto z = q(patch_ready.translation()[column]);
+            work += z * center;
+            radius += abs(z) * width;
+        }
+        const auto [expected, tolerance] = encode(load.force[2]);
+        REQUIRE(abs(expected) > Q{1} / 100);
+        CHECK(abs(work - expected) <= radius + tolerance + Q{1e-9});
+        ++checked;
+    }
+    CHECK(checked == 2);
+    check_failure(material.pullback(loads, loads.original_count(), patch_ready, projection,
+                                    preparation, apply, plan),
+                  core::FailureCode::InvalidInput);
 }
 } // namespace
 
@@ -1341,6 +1499,7 @@ TEST_CASE("Case material assembly qualifies every surface and its shared origina
     CHECK(original_right.original.canonical == original_left.original.canonical);
     CHECK(original_left.original.site.span_knot == 1);
     CHECK(original_right.original.site.span_knot == 0);
+    verify_surface_original_loads(typed, prepared, contact, patch_ready, exact, plan);
     check_failure(c::CaseMaterialSurfaceModel::prepare(typed, std::span{mapping}.first(1), contact,
                                                        support, patches, limits, workspace, plan),
                   core::FailureCode::InvalidInput);
