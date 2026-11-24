@@ -2,7 +2,7 @@
 
 #include <array>
 #include <cstring>
-#include <uvlas/structure/pg_boundary_position.hpp>
+#include <uvlas/structure/pg_boundary_tangents.hpp>
 
 namespace uvlas::structure {
 namespace {
@@ -112,8 +112,12 @@ core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
         volume_operation, core::FailureCode::InvalidInput, {}, [&]() -> core::Result<void> {
             if (limits.cancellation.stop_requested())
                 return reject(core::FailureCode::Cancelled);
-            if (const auto accepted = reference.certificate.info(); !accepted)
-                return std::unexpected(accepted.error());
+            if (reference.certificate != nullptr) {
+                if (const auto accepted = reference.certificate->info(); !accepted)
+                    return std::unexpected(accepted.error());
+            } else if (reference.rank == 0) {
+                return reject(core::FailureCode::InvalidInput);
+            }
             if (!valid_precision(input.representation))
                 return reject(core::FailureCode::PrecisionUnsupported);
             const auto input_paired = input.representation == core::Precision::TwoWord;
@@ -127,7 +131,7 @@ core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
             if (!forward && direction != PgVolumePositionDirection::TransposeToColumns)
                 return reject(core::FailureCode::InvalidInput);
             const auto rank = reference.rank;
-            const auto points = reference.points;
+            const auto points = reference.rows;
             const auto inner = forward ? rank : points;
             const auto outer = forward ? points : rank;
             if (std::max(inner, outer) > std::numeric_limits<std::size_t>::max() / 3)
@@ -156,7 +160,7 @@ core::Result<void> PgVolumePositionResult::apply(const MatrixView& reference,
             if (const auto valid = validate_plane(input.low, limits); !valid)
                 return valid;
 
-            const auto epsilon = volume_decode(reference.maximum_shape_error);
+            const auto epsilon = volume_decode(reference.maximum_coefficient_error);
             const auto stride = rank + reference.prefix;
             for (std::size_t i = 0; i < outer; ++i)
                 for (std::size_t axis = 0; axis < 3; ++axis) {
@@ -199,7 +203,7 @@ core::Result<void> apply_pg_volume_position(const PgVolumeMassReference& referen
                                             core::Workspace& workspace,
                                             PgVolumePositionResult& output) noexcept {
     const auto words = reference.words();
-    return output.apply({reference.conditioning(), reference.column_count(),
+    return output.apply({&reference.conditioning(), reference.column_count(),
                          reference.points().size(), words.high, words.low, 1,
                          reference.projection().maximum_shape_error},
                         direction, input, limits, workspace);
@@ -212,9 +216,22 @@ core::Result<void> apply_pg_boundary_position(const PgBoundaryPositionReference&
                                               core::Workspace& workspace,
                                               PgVolumePositionResult& output) noexcept {
     const auto words = reference.words();
-    return output.apply({reference.conditioning(), reference.column_count(),
+    return output.apply({&reference.conditioning(), reference.column_count(),
                          reference.points().size(), words.high, words.low, 0,
                          reference.projection().maximum_shape_error},
+                        direction, input, limits, workspace);
+}
+
+core::Result<void> apply_pg_boundary_tangents(const PgBoundaryTangentReference& reference,
+                                              PgVolumePositionDirection direction,
+                                              PgCartesianWords input,
+                                              const PgVolumePositionLimits& limits,
+                                              core::Workspace& workspace,
+                                              PgVolumePositionResult& output) noexcept {
+    const auto words = reference.words();
+    // Preparation admitted both rows per point before allocating their words.
+    return output.apply({nullptr, reference.column_count(), 2 * reference.points().size(),
+                         words.high, words.low, 0, reference.projection().maximum_derivative_error},
                         direction, input, limits, workspace);
 }
 

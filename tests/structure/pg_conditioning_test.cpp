@@ -10,7 +10,7 @@
 #include <bit>
 #include <cmath>
 #include <limits>
-#include <uvlas/structure/pg_boundary_position.hpp>
+#include <uvlas/structure/pg_boundary_tangents.hpp>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_volume_mass_reference.hpp>
 #include <uvlas/structure/pg_volume_position.hpp>
@@ -34,16 +34,16 @@ PgReferenceLimits query_limits() {
 }
 
 PgReferenceBasis make_basis(Fixture& f, const ExactRational& length, core::Workspace& ws,
-                            core::ResourcePlan& plan) {
+                            core::ResourcePlan& plan, bool cyclic_frame = false) {
     auto dictionary = take(PgCoefficientDictionary::prepare(
         f.chart_graph(), {exact_limits(), 2000, 20000000, 100000, {}}, ws, plan));
     auto partition = take(PgIntegrationPartition::prepare(f.request(), limits(), ws, plan));
     PgReferenceInputs input{std::move(f.chart_graph()), std::move(dictionary),
                             std::move(partition)};
     std::array<ExactRational, 9> rotation;
-    rotation[0] = f.r("1");
-    rotation[4] = f.r("1");
-    rotation[8] = f.r("1");
+    rotation[cyclic_frame ? 2 : 0] = f.r("1");
+    rotation[cyclic_frame ? 3 : 4] = f.r("1");
+    rotation[cyclic_frame ? 7 : 8] = f.r("1");
     const std::array<ExactRational, 3> origin{};
     auto geometry = take(PgReferenceGeometry::prepare(std::move(input), {rotation, origin, length},
                                                       query_limits(), plan));
@@ -55,12 +55,13 @@ PgReferenceBasis make_basis(Fixture& f, const ExactRational& length, core::Works
         PgReferenceBasis::prepare(std::move(geometry), std::move(rank), rank_limits, ws, plan));
 }
 
-PgReferenceBasis flat_basis(core::Workspace& ws, core::ResourcePlan& plan) {
+PgReferenceBasis flat_basis(core::Workspace& ws, core::ResourcePlan& plan,
+                            bool cyclic_frame = false) {
     Fixture f;
     for (auto& value : f.heights)
         value = f.r("2");
     const auto length = f.r("1");
-    return make_basis(f, length, ws, plan);
+    return make_basis(f, length, ws, plan, cyclic_frame);
 }
 
 const Q& q(const ExactRational& value) {
@@ -825,9 +826,9 @@ Q independent_double(double value) {
 
 template <class Reference, class Apply>
 void check_position_action(const Reference& reference, std::span<const Q> exact_shapes,
-                           const Apply& apply) {
+                           const Apply& apply, std::size_t rows_per_point = 1) {
     using namespace test_support;
-    const auto points = reference.points().size();
+    const auto points = rows_per_point * reference.points().size();
     const auto rank = reference.column_count();
     REQUIRE(exact_shapes.size() == points * rank);
     const auto n = 3 * rank;
@@ -843,7 +844,10 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
     for (std::size_t i = 0; i < m; ++i)
         f_hi[i] = static_cast<double>(i + 1) / 8;
     if (paired) {
-        q_lo[0] = 0x1p-50;
+        const auto active = std::ranges::find_if(exact_shapes, [](const Q& x) { return x != 0; });
+        REQUIRE(active != exact_shapes.end());
+        const auto column = static_cast<std::size_t>(active - exact_shapes.begin()) % rank;
+        q_lo[3 * column] = 0x1p-50;
         f_lo[0] = -0x1p-51;
     }
     const PgCartesianWords q_input{precision, q_hi, q_lo}, f_input{precision, f_hi, f_lo};
@@ -969,6 +973,83 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
     CHECK(std::ranges::equal(output.words().high, before));
 }
 
+PgBoundaryTangentReference
+check_tangent_preparation(PgBoundaryPositionReference&& position,
+                          std::span<const PgBoundaryPositionPoint> queries,
+                          std::span<const Q> derivatives) {
+    // Keep the position and tangent results simultaneously usable. The position
+    // and its certificate leave scope before the caller applies the tangent map.
+    auto owner = std::move(position);
+    const auto& certificate = owner.conditioning();
+    const auto original = owner.projection();
+    const PgBoundaryTangentProjection projection{original.representation,
+                                                 original.maximum_shape_error};
+    const auto caps = query_limits();
+    const auto build = [&](std::span<const PgBoundaryPositionPoint> input,
+                           const PgBoundaryTangentProjection& accuracy,
+                           const PgReferenceLimits& limits, core::ResourcePlan& plan) {
+        return PgBoundaryTangentReference::prepare(certificate, input, accuracy, limits, plan);
+    };
+    core::ResourcePlan none{0};
+    auto stopped = caps;
+    stopped.cancellation = requested_stop_token();
+    check_failure(build(queries, projection, stopped, none), core::FailureCode::Cancelled);
+    check_failure(build(queries, projection, caps, none), core::FailureCode::ResourceExceeded);
+    const auto empty = take(build({}, projection, caps, none));
+    REQUIRE(empty.points().empty());
+    CHECK(empty.column_count() == owner.column_count());
+    CHECK(none.allocated_bytes() == 0);
+    {
+        core::ResourcePlan plan{profile};
+        auto strict = projection;
+        strict.maximum_derivative_error = 0;
+        check_failure(build(queries, strict, caps, plan), core::FailureCode::PrecisionUnresolved);
+        auto limited = caps;
+        limited.maximum_partition_visits = 1;
+        check_failure(build(queries, projection, limited, plan),
+                      core::FailureCode::ResourceExceeded);
+        REQUIRE(certificate.info());
+    }
+    core::ResourcePlan plan{profile};
+    auto result = take(build(queries, projection, caps, plan));
+    CHECK(result.call_info().allocated_owned_payload_bytes == plan.allocated_bytes());
+    REQUIRE(result.column_count() == owner.column_count());
+    REQUIRE(result.points().size() == owner.points().size());
+    for (std::size_t p = 0; p < result.points().size(); ++p) {
+        CAPTURE(p);
+        const auto& reference = owner.points()[p];
+        const auto& derivative = result.points()[p];
+        CHECK(derivative.identity == reference.identity);
+        CHECK(derivative.cell == reference.cell);
+        CHECK(derivative.layer == reference.layer);
+        CHECK(derivative.partition_record == reference.partition_record);
+        CHECK(derivative.side == reference.side);
+    }
+
+    const auto words = result.words();
+    const bool paired = projection.representation == core::Precision::TwoWord;
+    REQUIRE(words.high.size() == derivatives.size());
+    REQUIRE(words.low.size() == (paired ? words.high.size() : 0));
+    const auto tolerance = independent_double(projection.maximum_derivative_error);
+    for (std::size_t i = 0; i < derivatives.size(); ++i) {
+        const auto hi = independent_double(words.high[i]);
+        const auto value = paired ? hi + independent_double(words.low[i]) : hi;
+        CHECK(abs(value - derivatives[i]) <= tolerance);
+    }
+
+    const auto check_moved = [&] {
+        auto output = take(PgVolumePositionResult::allocate(0, projection.representation, none));
+        core::Workspace scratch{core::PlannedBuffer<std::byte>{}};
+        check_failure(apply_pg_boundary_tangents(result, PgVolumePositionDirection::ToPoints,
+                                                 {projection.representation, {}, {}}, {0, 0, {}},
+                                                 scratch, output),
+                      core::FailureCode::InvalidInput);
+    };
+    auto moved = std::move(result);
+    check_moved();
+    return moved;
+}
+
 void check_boundary_position(Fixture& f, PgConditioningCertificate& certificate,
                              const std::vector<std::vector<Term>>& terms,
                              std::span<const ExactRational> transform,
@@ -1002,14 +1083,19 @@ void check_boundary_position(Fixture& f, PgConditioningCertificate& certificate,
     const Q face_zeta = q(layers[0].upper);
     REQUIRE(face_zeta == q(layers[1].lower));
 
-    const auto lateral = take(partition.lateral_faces()).front();
-    const auto edge = take(partition.edges())[static_cast<std::size_t>(lateral.edge)];
-    const auto piece = (lateral.canonical_direction ? edge.left : edge.right).value_or(-1);
+    // Choose a record whose CCW direction reverses its stored edge.
+    const auto lateral = take(partition.lateral_faces());
+    const auto reverse =
+        std::ranges::find_if(lateral, [](const auto& face) { return !face.canonical_direction; });
+    REQUIRE(reverse != lateral.end());
+    const auto lateral_id = static_cast<core::Index>(reverse - lateral.begin());
+    const auto edge = take(partition.edges())[static_cast<std::size_t>(reverse->edge)];
+    const auto piece = edge.right.value_or(-1);
     REQUIRE(piece >= 0);
     const auto edge_cell = pieces[static_cast<std::size_t>(piece)].cell;
     const auto a = static_cast<std::size_t>(edge.vertices[0]);
     const auto b = static_cast<std::size_t>(edge.vertices[1]);
-    const auto lateral_layer = static_cast<std::size_t>(lateral.layer);
+    const auto lateral_layer = static_cast<std::size_t>(reverse->layer);
     const auto& layer = layers[lateral_layer];
     const std::array<Q, 3> edge_position{(q(vertices[a].s) + q(vertices[b].s)) / 2,
                                          (q(vertices[a].t) + q(vertices[b].t)) / 2,
@@ -1017,13 +1103,22 @@ void check_boundary_position(Fixture& f, PgConditioningCertificate& certificate,
     using Vertex = std::remove_cvref_t<decltype(vertices.front())>;
     const std::array<Q, 3> face_position{face_coordinate(&Vertex::s), face_coordinate(&Vertex::t),
                                          face_zeta};
+    const auto& root = vertices[static_cast<std::size_t>(triangle.vertices[0])];
+    const auto& e1 = vertices[static_cast<std::size_t>(triangle.vertices[1])];
+    const auto& e2 = vertices[static_cast<std::size_t>(triangle.vertices[2])];
+    const std::array<std::array<Q, 3>, 2> triangle_steps{
+        {{q(e1.s) - q(root.s), q(e1.t) - q(root.t), Q{}},
+         {q(e2.s) - q(root.s), q(e2.t) - q(root.t), Q{}}}};
+    const std::array<std::array<Q, 3>, 2> lateral_steps{
+        {{q(vertices[a].s) - q(vertices[b].s), q(vertices[a].t) - q(vertices[b].t), Q{}},
+         {Q{}, Q{}, q(layer.upper) - q(layer.lower)}}};
     const auto quarter = f.r("1", "4"), half = f.r("1", "2");
     const PgReferenceHorizontalPoint lower_query{lower_id, quarter, quarter};
     const std::array<PgBoundaryPositionPoint, 4> queries{
-        lower_query, PgReferenceLateralPoint{0, half, half},
+        lower_query, PgReferenceLateralPoint{lateral_id, half, half},
         PgReferenceHorizontalPoint{upper_id, quarter, quarter}, lower_query};
     const std::array<PgCellIndex, 4> cells{face_cell, edge_cell, face_cell, face_cell};
-    const std::array<core::Index, 4> records{lower_id, 0, upper_id, lower_id};
+    const std::array<core::Index, 4> records{lower_id, lateral_id, upper_id, lower_id};
     const std::array<core::LayerId, 4> expected_layers{layers[1].id, layer.id, layers[0].id,
                                                        layers[1].id};
     const std::array<PgBoundaryPositionSide, 4> sides{
@@ -1070,7 +1165,7 @@ void check_boundary_position(Fixture& f, PgConditioningCertificate& certificate,
     const bool paired = projection.representation == core::Precision::TwoWord;
     REQUIRE(words.low.size() == (paired ? words.high.size() : 0));
     const auto tolerance = independent_double(projection.maximum_shape_error);
-    std::vector<Q> exact_shapes;
+    std::vector<Q> exact_shapes, exact_derivatives;
     for (std::size_t p = 0; p < queries.size(); ++p) {
         CAPTURE(p);
         const auto& row = result.points()[p];
@@ -1080,9 +1175,18 @@ void check_boundary_position(Fixture& f, PgConditioningCertificate& certificate,
         CHECK(row.layer == expected_layers[p]);
         CHECK(row.side == sides[p]);
         const auto& [s, t, z] = p == 1 ? edge_position : face_position;
+        const auto& directions = p == 1 ? lateral_steps : triangle_steps;
+        const auto first = 2 * p * terms.size();
+        exact_derivatives.resize(first + 2 * terms.size());
         for (std::size_t j = 0; j < terms.size(); ++j) {
-            const auto expected = conditioned_jet(terms, transform, j, cells[p], s, t, z)[0];
+            const auto jet = conditioned_jet(terms, transform, j, cells[p], s, t, z);
+            const auto& expected = jet[0];
             exact_shapes.push_back(expected);
+            for (std::size_t d = 0; d < directions.size(); ++d) {
+                const auto& step = directions[d];
+                exact_derivatives[first + d * terms.size() + j] =
+                    jet[1] * step[0] + jet[2] * step[1] + jet[3] * step[2];
+            }
             const auto k = p * terms.size() + j;
             const auto hi = independent_double(words.high[k]);
             const auto value = paired ? hi + independent_double(words.low[k]) : hi;
@@ -1090,6 +1194,8 @@ void check_boundary_position(Fixture& f, PgConditioningCertificate& certificate,
         }
     }
     check_position_action(result, exact_shapes, apply_pg_boundary_position);
+    const auto tangent = check_tangent_preparation(std::move(result), queries, exact_derivatives);
+    check_position_action(tangent, exact_derivatives, apply_pg_boundary_tangents, 2);
 }
 
 void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certificate,
@@ -1224,7 +1330,7 @@ void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certifi
 } // namespace
 
 TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory fields",
-          "[SH-D02][SH-D03][SH-D05][N4-02][N4-06][N4-08][verification]") {
+          "[SH-D02][SH-D03][SH-D05][N4-02][N4-03][N4-06][N4-08][N4-09][verification]") {
     Fixture f;
     core::Workspace ws{core::PlannedBuffer<std::byte>{}};
     core::ResourcePlan plan{profile};
@@ -1316,7 +1422,8 @@ TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory
                                  {core::Precision::Binary64, 0x1p-43, 0x1p-53}, false);
     for (const auto boundary_projection : std::array<PgBoundaryPositionProjection, 2>{
              {{core::Precision::Binary64, 0x1p-43}, {core::Precision::TwoWord, 0x1p-90}}}) {
-        auto owned_basis = flat_basis(ws, plan);
+        const auto cyclic_frame = boundary_projection.representation == core::Precision::TwoWord;
+        auto owned_basis = flat_basis(ws, plan, cyclic_frame);
         auto boundary =
             take(verify(owned_basis, enclosure, transform, {profile, steps, {}}, ws, plan));
         check_boundary_position(f, boundary, terms, transform, boundary_projection);
