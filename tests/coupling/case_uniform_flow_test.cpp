@@ -790,13 +790,16 @@ struct WorkEnclosure {
     Rat value{};
     Rat radius{};
 
+    void add(const a::ScaledEnclosure& dual, const a::ScalarWords& direction) {
+        const auto scale = two_power(dual.exponent());
+        const auto displacement = sum_words(direction);
+        value += sum_words(dual.center()) * scale * displacement;
+        radius += rational_word(dual.radius()) * scale * abs(displacement);
+    }
+
     void add(const cf::CirculationVectorCovector& dual, const cf::NonpenetrationVector& direction) {
-        for (std::size_t axis = 0; axis < dual.size(); ++axis) {
-            const auto scale = two_power(dual[axis].exponent());
-            const auto displacement = sum_words(direction[axis]);
-            value += sum_words(dual[axis].center()) * scale * displacement;
-            radius += rational_word(dual[axis].radius()) * scale * abs(displacement);
-        }
+        for (std::size_t axis = 0; axis < dual.size(); ++axis)
+            add(dual[axis], direction[axis]);
     }
 };
 
@@ -1581,6 +1584,104 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
         reject(jvp.edge(result.edge_count()), core::FailureCode::InvalidInput);
         reject(jvp.point(result.point_count()), core::FailureCode::InvalidInput);
         reject(jvp.facet(result.facet_count()), core::FailureCode::InvalidInput);
+
+        const auto zeros = coordinates(0, 0, 0);
+        const cf::DiscreteLoadSampleWeights no_weight{zeros, zeros};
+        const std::array edge_weights{cf::DiscreteLoadSampleWeights{coordinates(.125, .0625, -.125),
+                                                                    coordinates(.25, -.125, .5)},
+                                      no_weight,
+                                      no_weight,
+                                      no_weight,
+                                      no_weight,
+                                      no_weight,
+                                      no_weight};
+        const std::array facet_weights{
+            cf::DiscreteLoadSampleWeights{coordinates(-.25, .125, .0625),
+                                          coordinates(.0625, .25, -.125)},
+            no_weight, no_weight, no_weight};
+        const std::array node_weights{
+            coordinates(-.375, .125, .25), zeros, zeros, zeros, zeros, zeros};
+        const cf::NonpenetrationVector total_weight{a::SingleWord{.125}, a::SingleWord{-.25},
+                                                    a::DoubleWord{.375, 0x1p-57}};
+        const cf::DiscreteVectorLoadWeights weights{
+            input.trial_stamp,
+            request.retained_generation,
+            std::span{edge_weights}.first(result.edge_count()),
+            std::span{facet_weights}.first(result.facet_count()),
+            std::span{node_weights}.first(result.point_count()),
+            total_weight,
+            coordinates(-.125, .25, .0625)};
+        auto vjp_flow = flow_at();
+        const auto run_pullback = [&](const cf::DiscreteVectorLoadWeights& dual) {
+            return cf::solve_discrete_circulation_load_pullback(
+                input, load_input, dual, std::move(vjp_flow), load_limits, request, *geometry_work,
+                shared, *local, *kernel, memory);
+        };
+        if (mode == LoadCase::Wake) {
+            auto invalid = weights;
+            invalid.circulation = core::NumericalGeneration{903};
+            const auto before = memory.allocated_bytes();
+            reject(run_pullback(invalid), core::FailureCode::StaleGeneration);
+            CHECK(memory.allocated_bytes() == before);
+            invalid = weights;
+            invalid.facets = {};
+            reject(run_pullback(invalid), core::FailureCode::InvalidInput);
+            invalid = weights;
+            invalid.points = std::span{node_weights}.first(3);
+            reject(run_pullback(invalid), core::FailureCode::InvalidInput);
+            invalid = weights;
+            invalid.moment[0] = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+            reject(run_pullback(invalid), core::FailureCode::Nonfinite);
+            CHECK(vjp_flow.source().jet.active());
+        }
+        const auto vjp = take(run_pullback(weights));
+        CHECK_FALSE(vjp_flow.source().jet.active());
+        CHECK(vjp.loads().primal().flow().source().jet.active());
+        CHECK(vjp.loads().used_steps() <= load_limits.steps);
+        WorkEnclosure forward;
+        forward.add(jvp.total_force_direction(), weights.force);
+        forward.add(jvp.total_moment_direction(), weights.moment);
+        for (std::size_t i = 0; i < weights.edges.size(); ++i) {
+            const auto delta = take(jvp.edge(i));
+            forward.add(delta.position, weights.edges[i].position);
+            forward.add(delta.force, weights.edges[i].force);
+        }
+        for (std::size_t i = 0; i < weights.facets.size(); ++i) {
+            const auto delta = take(jvp.facet(i));
+            forward.add(delta.position, weights.facets[i].position);
+            forward.add(delta.force, weights.facets[i].force);
+        }
+        for (std::size_t i = 0; i < weights.points.size(); ++i)
+            forward.add(take(jvp.point(i)).force, weights.points[i]);
+
+        WorkEnclosure reverse;
+        reverse.add(vjp.uniform_flow(), variation.uniform_flow);
+        REQUIRE(vjp.point_count() == variation.points.size());
+        for (std::size_t i = 0; i < vjp.point_count(); ++i) {
+            const auto dual = take(vjp.point(i));
+            CHECK(dual.point == variation.points[i]);
+            reverse.add(dual.position, variation.displacements[i]);
+        }
+        for (std::size_t i = 0; i < variation.edges.size(); ++i) {
+            const auto dual = take(vjp.midpoint_velocity(i));
+            CHECK(dual.edge == variation.edges[i].edge);
+            reverse.add(dual.velocity, variation.edges[i].velocity);
+        }
+        for (std::size_t i = 0; i < variation.bound.size(); ++i) {
+            const auto dual = take(vjp.bound(i));
+            CHECK(dual.face == variation.bound[i].face);
+            reverse.add(dual.circulation, variation.bound[i].circulation);
+            reverse.add(dual.circulation_rate, variation.bound[i].circulation_rate);
+        }
+        CHECK(abs(forward.value - reverse.value) <= forward.radius + reverse.radius);
+        CHECK(forward.radius < rational_word(1e-24));
+        CHECK(reverse.radius < rational_word(1e-24));
+        const auto independent =
+            rational_word(has_wake ? -.0958978088767875470302 : -.120307262620136262701);
+        CHECK(abs(reverse.value - independent) <= reverse.radius + rational_word(1e-16));
+        reject(vjp.point(vjp.point_count()), core::FailureCode::InvalidInput);
+        reject(vjp.midpoint_velocity(weights.edges.size()), core::FailureCode::InvalidInput);
+        reject(vjp.bound(count), core::FailureCode::InvalidInput);
     }
 }
 
