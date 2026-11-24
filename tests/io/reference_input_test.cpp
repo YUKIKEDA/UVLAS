@@ -1,4 +1,5 @@
 #include "../structure/pg_partition_test_support.hpp"
+#include "coupling/case_external_pg.hpp"
 #include "external_mesh_sidecar_pg.hpp"
 #include "gmsh_mesh.hpp"
 #include "nastran_coordinate_cards.hpp"
@@ -1908,50 +1909,20 @@ $EndElements
     if (physical) {
         using namespace uvlas::structure;
         partition_test::Fixture pg_input;
-        for (auto& value : pg_input.heights) {
-            value = pg_input.r("1", "4");
-        }
-        pg_input.layers.clear();
-        if (pcomp) {
-            pg_input.zeta[1] = pg_input.r(reversed ? "1" : "-1", "2");
-            pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[1]});
-            pg_input.layers.push_back({core::LayerId{2}, pg_input.zeta[1], pg_input.zeta[2]});
-        } else {
-            pg_input.layers.push_back({core::LayerId{1}, pg_input.zeta[0], pg_input.zeta[2]});
-        }
-        const auto unit = pg_input.r("1");
-        const std::array origin{pg_input.r("0"), pg_input.r("0"), pg_input.r("0")};
-        const std::array axes{pg_input.r("1"), pg_input.r("0"), pg_input.r("0"),
-                              pg_input.r("0"), pg_input.r("1"), pg_input.r("0"),
-                              pg_input.r("0"), pg_input.r("0"), pg_input.r("1")};
         const PgReferenceLimits pg_limits{
             partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
-        if (conversion) {
-            const auto linear = pg_input.r("1", "10");
-            const auto quadratic = pg_input.r("-1", "10");
-            const std::array terms{ExactInputTerm{{1, 0}, linear},
-                                   ExactInputTerm{{2, 0}, quadratic}};
-            const auto height =
-                fixture::take(ExactChartPolynomial::make(terms, pg_limits.algebra, plan));
-            const auto graph_zero = pg_input.r("0");
-            pg_input.graph = fixture::take(PgGraph::prepare(
-                {graph_zero, unit, graph_zero, height, 1, PgGraphConvention::Version1},
-                {pg_limits.algebra, 4, {}}, plan));
-        }
+        const uvlas::coupling::detail::CasePgReferenceLimits preparation{
+            {pg_limits.algebra, 4, {}},
+            {pg_limits.algebra, 2000, 20'000'000, 100'000, {}},
+            partition_test::limits(),
+            pg_limits,
+            100'000,
+            {}};
         core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
-        auto coefficients = fixture::take(PgCoefficientDictionary::prepare(
-            pg_input.chart_graph(), {partition_test::exact_limits(), 2000, 20'000'000, 100'000, {}},
-            workspace, plan));
-        auto partition = fixture::take(PgIntegrationPartition::prepare(
-            pg_input.request(), partition_test::limits(), workspace, plan));
-        PgReferenceInputs initial{std::move(pg_input.chart_graph()), std::move(coefficients),
-                                  std::move(partition)};
-        const auto pg = fixture::take(PgReferenceGeometry::prepare(
-            std::move(initial), {axes, origin, unit}, pg_limits, plan));
         const rd::ExternalSidecarPgLimits qualification{
             {pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
         rd::ExternalSidecarPgDiagnostic failure;
-        if (conversion) {
+        const auto si = [&] {
             std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
             si_caps.fill(fixture::budget);
             const io::SiLimits si_limits{si_caps, pg_limits.algebra};
@@ -1967,19 +1938,23 @@ $EndElements
             }
             const auto request =
                 fixture::take(io::make_si_request(catalog, requirements, si_limits, plan, nullptr));
-            const auto si = fixture::take(
+            return fixture::take(
                 io::convert_case_to_si(schema, catalog, request, si_limits, plan, nullptr));
-            const auto admitted = rd::certify_external_sidecar_pg_bounds(
-                si, *result, rd::MeshShellId{1}, pg, qualification, 200'000, plan, {}, &failure);
+        }();
+        if (conversion) {
+            const auto prepared = uvlas::coupling::detail::prepare_case_external_pg_bounds(
+                si, *result, rd::MeshShellId{1}, preparation, qualification, 200'000, workspace,
+                plan, &failure);
             if (distance_short || normal_short) {
-                REQUIRE_FALSE(admitted);
-                CHECK(admitted.error().code == core::FailureCode::PrecisionUnresolved);
+                REQUIRE_FALSE(prepared);
+                CHECK(prepared.error().code == core::FailureCode::PrecisionUnresolved);
                 REQUIRE(failure.binding);
                 CHECK(failure.binding->reason == rd::MeshSidecarFailure::Chart);
                 CHECK(failure.binding->element.has_value());
                 return;
             }
-            REQUIRE(admitted);
+            REQUIRE(prepared);
+            const auto* admitted = &prepared->match;
             CHECK(admitted->distance_budget_metres == pg_input.r("13", "500"));
             REQUIRE(admitted->observations.size() == 1);
             CHECK(admitted->observations.values()[0].id == core::ObservationId{1});
@@ -1987,6 +1962,7 @@ $EndElements
                 [&](const auto& original) {
                     const auto view = original.view();
                     REQUIRE(view);
+                    CHECK(view->patch == fixture::take(prepared->reference.identity()));
                     REQUIRE(view->faces.size() == 2);
                     const auto interior_distance = pg_input.r("1", "40");
                     for (const auto& face : view->faces) {
@@ -2012,11 +1988,9 @@ $EndElements
             quantities.emplace(fixture::take(
                 rd::NastranLaminateCards::prepare(std::move(isotropic), {32, 32'000}, plan, {})));
         }
-        const io::SiUnits case_units{io::SiLengthUnit::Metre, io::SiMassUnit::Kilogram,
-                                     io::SiTimeUnit::Second, io::SiAngleUnit::Radian};
-        const auto qualified = rd::qualify_external_sidecar_planar_pg(
-            schema, *result, rd::MeshShellId{1}, pg, case_units,
-            quantities ? &*quantities : nullptr, qualification, plan, {}, &failure);
+        const auto qualified = uvlas::coupling::detail::prepare_case_external_planar_pg(
+            si, *result, rd::MeshShellId{1}, quantities ? &*quantities : nullptr, preparation,
+            qualification, workspace, plan, &failure);
         if (wrong_layer_material) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == core::FailureCode::InvalidInput);
@@ -2048,24 +2022,26 @@ $EndElements
             }
         } else {
             REQUIRE(qualified);
-            CHECK(qualified->thickness_compared);
-            CHECK(qualified->materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
+            const auto& matched_case = qualified->match;
+            CHECK(matched_case.thickness_compared);
+            CHECK(matched_case.materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
             if (pcomp) {
-                REQUIRE_FALSE(qualified->laminate[reversed ? 0U : 1U]);
-                if (const auto& matched = qualified->laminate[reversed ? 1U : 0U]) {
+                REQUIRE_FALSE(matched_case.laminate[reversed ? 0U : 1U]);
+                if (const auto& matched = matched_case.laminate[reversed ? 1U : 0U]) {
                     const auto plies = matched->layers.values();
                     REQUIRE(plies.size() == 2);
                     CHECK(plies.front().material.id == rd::NastranMaterialId{reversed ? 9U : 6U});
                     CHECK(plies.front().ply_thickness_metres ==
                           pg_input.r(reversed ? "3" : "1", "16"));
                     CHECK(plies.back().material.id == rd::NastranMaterialId{reversed ? 6U : 9U});
-                    CHECK(matched->pg == fixture::take(pg.identity()));
+                    CHECK(matched->pg == fixture::take(qualified->reference.identity()));
                 } else {
                     FAIL("Missing exact PCOMP layer comparison");
                 }
             }
-            CHECK(qualified->pg == rd::MeshGeometryId{1});
-            if (const auto admitted = qualified->geometry.view()) {
+            CHECK(matched_case.pg == rd::MeshGeometryId{1});
+            if (const auto admitted = matched_case.geometry.view()) {
+                CHECK(admitted->patch == fixture::take(qualified->reference.identity()));
                 CHECK(admitted->faces.size() == 2);
                 CHECK(admitted->faces.front().element == 702);
             } else {

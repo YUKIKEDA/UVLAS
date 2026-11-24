@@ -187,8 +187,9 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.reference_input
         LABELS integration property negative verification
         SOURCES io/reference_input_test.cpp
-        LIBS uvlas_io nlohmann_json::nlohmann_json)
-    target_include_directories(uvlas_test_io_reference_input PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+        LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+    target_include_directories(uvlas_test_io_reference_input PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 endif()
 
 if(WIN32)
