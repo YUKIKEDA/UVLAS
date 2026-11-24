@@ -16,7 +16,7 @@ struct NastranBulkPosition {
 
 struct NastranBulkLexeme {
     NastranBulkPosition position;
-    std::size_t size = 0; // Zero for a blank field. Implied padding points at physical end.
+    std::size_t size = 0; // Zero for a blank field. Implied padding points at the end of data.
 };
 
 struct NastranBulkCard {

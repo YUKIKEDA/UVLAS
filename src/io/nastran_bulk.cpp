@@ -323,6 +323,11 @@ void connect(std::string_view bytes, std::span<Row> rows, std::span<Continuation
         if (row.kind == RowKind::Automatic) {
             if (i == 0 || rows[i - 1].tail.size != 0)
                 reject(Code::InvalidInput, Reason::Continuation, row.first.position);
+            const auto& prior = rows[i - 1];
+            // The documented free-field continuation starts after a complete eight-field group.
+            // A partial group could require implied padding before the next physical line.
+            if (prior.format == Format::Free && row.format == Format::Free && prior.count % 8 != 0)
+                reject(Code::Unsupported, Reason::UnsupportedForm, row.first.position);
             link(rows, i - 1, i);
         }
     }
