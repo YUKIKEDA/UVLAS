@@ -1,18 +1,18 @@
 # IM-01・IM-03・IM-06の進捗と残作業
 
-実装中の3パッケージは **20／43段階（約47%）が完了**した。残り23段階のうち20段階が実装・検証、3段階が終了審査。下表は現在の成果と次の完了条件を示す。
+実装中の3パッケージは **21／43段階（約49%）が完了**した。残り22段階のうち19段階が実装・検証、3段階が終了審査。下表は現在の成果と次の完了条件を示す。
 
 | パッケージ | 完了／全体 | 残り | 統合済みの成果 | 次に完了させる成果と判定条件 |
 |---|---:|---:|---|---|
-| [IM-01 構造](#im-01-構造) | 8／12（67%） | 4 | 準備済みパッチから参照量と両語の射影を受け取り、厚さ段差と非整合面の原拘束・双対を照合できる。 [準備と全厚拘束の検証](../verification/IM-01/pg-prepared-patch-trace.md) | 製品求積則で連続積分への収束を確かめ、同じ原拘束から固定ピボットの疎チャートを作る。実接続で R-02 の容量を測る。 |
-| [IM-03 空力](#im-03-空力) | 6／13（46%） | 7 | 局所P1核、大域幾何、後縁所有、共有辺の誘導・全微分を実装した。定数・多項式・PCHIPの一様流は厳密なSI入力から速度と微分を返し、復元時に入力と係数を照合する。 [一様流の検証](../verification/IM-03/exact-uniform-flow-v1/verification.md) | ケースからの受渡しと必要な精度投影を閉じ、突風と指定運動を同じ時刻・座標規則で照合する。 |
+| [IM-01 構造](#im-01-構造) | 9／12（75%） | 3 | 準備済みパッチから参照量と両語の射影を受け取り、原拘束を保持したまま固定支持優先の疎チャートを作る。R-02の早期計測では非整合辺と閉路を持つ実パッチで準備と再利用を測った。 [疎チャートの検証](../verification/IM-01/pg-sparse-chart.md)・[R-02の計測](../verification/IM-01/pg-sparse-chart-series.md) | 曲面の連続内積を使う求積を認定し、物理時系列の全係数と片側導関数を同じ疎チャートに渡す。V-PGで曲面・切断・非整合を照合する。 |
+| [IM-03 空力](#im-03-空力) | 6／13（46%） | 7 | 局所P1核、大域幾何、後縁所有、共有辺の誘導・全微分を実装した。非一様な既知流れを同じ試行の循環・荷重とその微分に使う。指定剛体運動は共通時計から離散空力取付へ渡す。 | PGの物質点写像と循環時間微分を接続し、自由後流の時間更新とJ1の状態確定・再開を検証する。 |
 | [IM-06 入出力](#im-06-入出力) | 6／18（33%） | 12 | 型付きschemaとSI変換、マニフェスト直下の全参照の取得、Gmshメッシュの読取り、チェックポイント容器を実装した。容器は既存番号を保護して保存し、検証を通った最新番号のチャンクを復元する。 [チェックポイントの検証](../verification/IM-06/checkpoint-manifest.md) | Gmshのsidecarで部材、材料、支持、接続、参照面への対応を定め、役割ごとの参照を解決する。実行再開にはJ1と探索の受理済み状態が必要。 |
 
 割合は[作業分解](next-package-work-breakdown.md)の完了段階数を全段階数で割って求める。各段階の完了は、採用仕様、後続が受け取る成果、独立した検証根拠で確かめる。段階ごとに規模が異なるため、この数字から残りの工数は見積もれない。
 
 ## IM-01 構造
 
-[#17](https://github.com/YUKIKEDA/UVLAS/issues/17) の終了審査まで4段階。準備済みパッチの位置・勾配・測度と、非整合面の全位置拘束を使える。製品求積則の認定と、原拘束を使う疎チャート・R-02 の容量測定が残る。
+[#17](https://github.com/YUKIKEDA/UVLAS/issues/17) の終了審査まで3段階。R-02では、同じ製品入口で準備と因子再利用の容量を測った。固定支持を優先する疎チャートへ実際の時間依存支持を結び、製品求積則を認定してからV-PGへ進む。
 
 | 段階 | 状態 | 到達点と残作業 |
 |---|---|---|
@@ -22,11 +22,11 @@
 | 多角形と全積分分割 | 完了 | 被覆を検査した分割と資源計画。 [分割](https://github.com/YUKIKEDA/UVLAS/pull/128)・[資源計画](https://github.com/YUKIKEDA/UVLAS/pull/149) |
 | 局所独立化 | 完了 | 局所rank、基底、写像と来歴を所有する。再利用時にグラフ・領域・活動面積・辞書を照合し、B/T/S/W/Zを全活動行で厳密に再検証する。全12系列を独立参照と照合した。 [準備の検証](../verification/IM-01/pg-rank-bounded-preparation/verification.md)・[再検証と資源](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) |
 | 参照幾何と微分 | 完了 | グラフ・辞書・共通分割を所有する入口から参照Jacobian、可変法線、実法線厚さ、高階・片側微分と物理測度を返す。全活動片の局所正則性を厳密に検査する。 [実装 `09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)・[検証](../verification/IM-01/pg-reference-geometry/verification.md) |
-| 保証付き条件付け | 実装中 | 一定厚と区分一次厚さの平板は、内部格子n=1、2、4で切断領域の幾何内積を厳密に積分する。元の区間に対する合同誤差と必須場を検査する変換の生成入口を用意し、変厚切断n=1で認定した。放物柱面では、130列の基底に固定した1,008点の求積を適用し、幾何内積の区間と合同変換を認定した。認定結果は同じ点と重みを所有する。製品求積則の適格性と連続積分への収束が残る。 [切断領域](../verification/IM-01/pg-flat-gram-cut.md)・[区分一次厚さ](../verification/IM-01/pg-flat-gram-affine-thickness.md)・[変換生成](../verification/IM-01/pg-conditioning-generated-transform.md)・[曲面の固定求積](../verification/IM-01/pg-discrete-gram.md) |
+| 保証付き条件付け | 実装中 | 一定厚と区分一次厚さの平板は、内部格子n=1、2、4で切断領域の幾何内積を厳密に積分する。曲面では130列の基底に固定した1,008点の求積で幾何内積と合同変換を認定した。正重みの積則を切断した変厚曲面に適用し、幾何体積を独立な連続積分と無次元絶対差 $10^{-12}$ 以内で照合した。解析条件による求積次数の選択と、連続内積の全基底組の照合が残る。 [変換生成](../verification/IM-01/pg-conditioning-generated-transform.md)・[曲面の固定求積](../verification/IM-01/pg-discrete-gram.md)・[曲面の積則](../verification/IM-01/pg-product-volume-rule.md) |
 | PreparedPatchと参照作用 | 完了 | 認定済み基底と物理参照を所有する。体積点、層界面の上下、外周側面で、参照位置、正の測度、形状値、Cartesian 勾配を取得し、成分別の誤差枠で Binary64／TwoWord に射影する。固定則の点・重みを保持し、同じ Workspace で体積位置と転置を作用させる。 [物理参照量の射影](../verification/IM-01/pg-prepared-reference-projection.md) |
 | 全位置traceと拘束 | 完了 | 非整合面を共通細分し、厚さ段差、指定層と部分面、向きを検査する。原拘束と固定支持の指定値を保持し、厳密な重複行の尺度と双対仕事を照合した。時間依存の指定値と複数接続の閉路処理は固定ピボットの疎チャートで扱う。 [全厚拘束の検証](../verification/IM-01/pg-prepared-patch-trace.md) |
-| 固定pivot疎chart | 残 | 元拘束と疎解法から写像と微分・転置作用を実装し、拘束と仕事を照合する |
-| 早期R-02 | 残 | 実拘束グラフができた時点で、疎分解のfillと準備・再利用の容量を測る |
+| 固定pivot疎chart | 実装中 | 固定支持、物理拘束ID、元行順で代表を選び、同じ疎因子で位置、接線、転置と元行の反力を計算する。独立な仕事と、時刻零でだけ一致する右辺係数の拒否を確認した。時系列の共通区間・全係数・片側導関数の受渡しが残る。 [固定チャートの検証](../verification/IM-01/pg-sparse-chart.md) |
+| 早期R-02 | 完了 | 非整合を含む2・3・4パッチ、接続1・2・4本の系列で、原行の非零数、rank、L/U、準備・再利用の課金と常駐量を測った。4パッチの閉路はrank 248、因子23,503項。実項数ちょうどで同一結果を得て、1項不足で元拘束を保持した。実務規模の性能はA5-06で確認する。 [R-02の計測](../verification/IM-01/pg-sparse-chart-series.md) |
 | 終了審査 | 残 | V-PGで曲面・切断・非整合を通し、IM-02へ引き渡す |
 
 ## IM-03 空力
@@ -41,10 +41,10 @@
 | P1核と全13変数の微分 | 完了 | 3基底の局所誘導核と全Jacobian。 [#129](https://github.com/YUKIKEDA/UVLAS/pull/129) |
 | 共有辺・四辺形・全作用 | 完了 | 固定分割に従って全出現に散布し、核半径と強度トレースが一致する逆向きの解析辺を相殺する。値とJVPを独立面積分、VJPを双対内積で照合した。 [共有辺と四辺形の検証](../verification/IM-03/p1-shared-action-v1/verification.md) |
 | 大域幾何と後縁所有 | 完了 | 大域接触・不適格の検査、alias運動学、後縁の放出所有。 [#153](https://github.com/YUKIKEDA/UVLAS/pull/153) |
-| 既知流れと指定運動 | 実装中 | 型付き SI ケースから一様流と解析突風の速度、空間偏微分、時間偏微分を返す。既知流れと指定移流は同じ厳密な時刻と片側で評価する。復元時は入力と補間係数を照合する。指定剛体運動の座標規約、非一様流を使う循環・荷重、J1 の永続化と再開時照合が残る。 [既知流れと時刻の検証](../verification/IM-03/case-known-flow-sine-v1/verification.md) |
-| 循環と全微分 | 実装中 | 接触済みの離散照会点で実数の非貫通式を解き、接線と転置を投影前の作用で検査する。点・物質接線・面速度・一様流の明示方向から循環の接線を求め、転置を通して循環の種を同じ入力へ戻せる。PG物質写像への接続、時刻・後流輸送・接触切替えを含む微分、複素更新が残る。 [接線・転置](../verification/IM-03/discrete-circulation-linearization-v1/verification.md)・[明示方向からの接線](../verification/IM-03/discrete-circulation-direction-v1/verification.md)・[明示入力への転置](../verification/IM-03/discrete-circulation-pullback-v1/verification.md) |
-| 全ベクトル荷重 | 実装中 | 同じ試行の循環、循環時間微分、中点速度から束縛辺と三角形の力を求める。循環、循環時間微分、位置、速度の明示方向から、節点力・合力・基準点モーメントの方向まで評価する。同じ試行の原残差から循環の方向を求め、点と一様流の直接寄与と合わせて荷重の方向を返す。荷重の双対からは循環の転置を解き、点と一様流の直接寄与へ加える。循環時間微分は独立入力として保持する。時間法・PG構造への接続が残る。 [離散荷重](../verification/IM-03/discrete-vector-loads-v1/verification.md)・[荷重の方向微分](../verification/IM-03/discrete-vector-load-direction-v1/verification.md)・[循環を介した荷重の転置](../verification/IM-03/discrete-vector-load-implicit-pullback-v1/verification.md)・[循環を介した荷重の方向微分](../verification/IM-03/discrete-vector-load-implicit-direction-v1/verification.md) |
-| 後流値・移流・試行 | 実装中 | 型付き SI ケースの指定移流速度を定数・多項式・PCHIP で評価し、時間微分、現行入力との照合、Binary64／TwoWord への投影を検査した。同じ循環・荷重状態からの自由／指定輸送、全履歴、試行の親不変性と全微分が残る。 [指定移流速度](../verification/IM-03/case-prescribed-wake-velocity-v1/verification.md) |
+| 既知流れと指定運動 | 実装中 | 一様流・解析突風、指定移流、選んだ指定剛体運動を同じ過渡節点の厳密時刻と片側で評価する。周期延長でイベントをまたぐ区間を拒否する。空力取付では同じ姿勢から照会位置と点速度を求め、登録済みの別名を保持したBinary64とTwoWordの幾何を接触検査と離散非貫通へ渡した。全運動と励振のイベント時刻表、全既知入力のJ1永続化と再開時の同一性確認が残る。 [既知流れ](../verification/IM-03/case-known-flow-sine-v1/verification.md)・[指定運動](../verification/IM-03/case-prescribed-rigid-motion.md)・[共通時計](../verification/IM-03/case-clocked-prescribed-inputs.md)・[指定空力取付](../verification/IM-03/clocked-prescribed-aero-attachment-v1/verification.md) |
+| 循環と全微分 | 実装中 | 接触済みの離散照会点ごとに非一様な既知流れを評価し、実数の非貫通式を解く。同じ試行の原残差を再評価し、位置と既知流れの時刻への接線・転置を独立参照と照合した。PGの物質点写像、幾何と後流輸送も含む時間微分、接触切替え、複素更新が残る。 [非一様流での循環と微分の検証](../verification/IM-03/discrete-known-flow-circulation-v1/verification.md) |
+| 全ベクトル荷重 | 実装中 | 同じ試行の循環と束縛辺の中点ごとの非一様な既知流れから、辺の力、節点力、合力、基準点モーメントを評価する。循環を介する寄与と中点からの直接寄与を接線・転置の双方で照合した。循環時間微分は独立入力として三角形の非定常荷重に使う。循環時間微分の時間法とPG構造への荷重の返却が残る。 [非一様流での中点荷重と微分の検証](../verification/IM-03/discrete-known-flow-loads-v1/verification.md) |
+| 後流値・移流・試行 | 実装中 | 型付きSIケースの指定移流速度は定数・多項式・PCHIPに対応する。接触済みの一つの離散状態では、束縛渦輪、先頭・旧後流、既知流れを合わせた自由後流の粒子速度と、その接線・転置を独立参照で照合した。登録済みの後縁別名は正準点を使う。親確定状態からの自由・指定輸送、放出IDの発行、全履歴と試行の一括受理・棄却、時間積分を通じた全微分とJ1再開が残る。 [指定移流速度](../verification/IM-03/case-prescribed-wake-velocity-v1/verification.md)・[自由後流の粒子速度](../verification/IM-03/discrete-free-wake-velocity-v1/verification.md) |
 | J1状態への接続 | 残 | IM-04側とstep契約を共有し、BDF2と新生台形、輸送別の初期微分、受理済み循環の時間微分、全履歴、一回限りの状態確定を検証する。強連成Newtonの実装はIM-04が担当 |
 | 参照と数値予算 | 一部検証済み | [局所核の独立参照](https://github.com/YUKIKEDA/UVLAS/pull/129)を確認済み。全経路を組み立て、V-AERO・V-MULTIの観測量と数値予算を照合する。参照準備は並行可能 |
 | 費用と終了審査 | 残 | 全履歴の相互作用数、資源、並列時の結果一致とR-03を確認し、パッケージを審査する |

@@ -149,6 +149,10 @@ endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
     src/coupling/case_known_flow.cpp
+    src/coupling/case_aero_attachment.cpp
+    src/coupling/case_motion.cpp
+    src/coupling/case_motion_frame.cpp
+    src/coupling/case_motion_time_series.cpp
     src/coupling/case_uniform_flow.cpp
     src/coupling/case_uniform_flow_projection.cpp src/coupling/discrete_nonpenetration.cpp)
 uvlas_configure_target(uvlas_coupling)

@@ -741,6 +741,17 @@ if(UVLAS_SANITIZERS AND NOT MSVC)
     set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 540)
 endif()
 
+uvlas_add_test(structure.pg_product_quadrature
+    LABELS property negative verification V-PG
+    TIMEOUT 300
+    SOURCES structure/pg_product_quadrature_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_product_quadrature
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_product_quadrature PROPERTIES TIMEOUT 420)
+endif()
+
 uvlas_add_test(structure.pg_prepared_patch
     LABELS property negative verification V-PG
     TIMEOUT 120
@@ -907,6 +918,27 @@ if(MSVC)
     set_tests_properties(coupling.case_uniform_flow PROPERTIES
         TIMEOUT "$<IF:$<CONFIG:Debug>,90,60>")
 endif()
+
+uvlas_add_test(coupling.case_motion
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision)
+target_include_directories(uvlas_test_coupling_case_motion PRIVATE
+    "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(coupling.case_motion_time_series
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_time_series_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_motion_time_series PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+
+uvlas_add_test(coupling.case_motion_frame
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_frame_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_motion_frame PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification

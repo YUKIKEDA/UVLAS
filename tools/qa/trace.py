@@ -45,7 +45,7 @@ CANON = [
 ]
 KINDS = [
     ("requirement", r"(?:GEO|STR|MAT|PHY|SOL|RUN|QUAL|IO|API|ENV|DIST|OUT|BC|LOAD|PERF)-\d{2}"),
-    ("decision", r"(?:SH-D|ST-|AE-|J1-D|MAT-D|UI-D|UW-D|BM-D|CN-D|SI-D|N4-|EIG-|IO4-|QA-)\d{2}"),
+    ("decision", r"(?:SH-D|ST-|AE-|J1-D|MAT-D|UI-D|UW-D|BM-D|CN-D|SI-D|N4-|EIG-|FD-|IO4-|QA-)\d{2}"),
     ("acceptance", r"A5-\d{2}|PERF-FL-\d{2}|[VXP]-[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*"),
     ("package", r"IM-\d{2}"),
     ("risk", r"R-\d{2}"),
