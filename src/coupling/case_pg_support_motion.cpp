@@ -605,11 +605,11 @@ struct Builder {
             const auto& current_motion = current.motions_.values()[group];
             if (!motion || !current_motion)
                 case_components::reject(StaleGeneration);
-            result.values()[group].emplace(take(evaluate_case_motion(
+            const auto& published = result.values()[group].emplace(take(evaluate_case_motion(
                 *motion, *current_motion, {address.stamp, node.seconds, order, address.side},
                 {projection.representation, projection.motion, probes}, motion_workspace,
                 limits.clock.motion, plan, stop, details)));
-            fill_jet(jets.values()[group], *result.values()[group], orders, work);
+            fill_jet(jets.values()[group], published, orders, work);
         }
         auto rhs = take(plan.allocate<io::SiEnclosure>(
             static_cast<core::Index>(map.size() * axes * orders), operation));
