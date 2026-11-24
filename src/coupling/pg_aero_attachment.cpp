@@ -403,20 +403,21 @@ struct PgAeroBuilder {
         const auto apply = [&](s::PgCartesianWords coefficients, s::PgVolumePositionResult& result,
                                s::PgVolumePositionLimits budget) {
             work.step();
-            account(work, budget.maximum_steps);
+            budget.maximum_steps = std::min(budget.maximum_steps, remaining(work));
             if (budget.cancellation.stop_requested())
                 reject(Cancelled);
             budget.cancellation = stop;
             take(s::apply_pg_prepared_reference_position(map.data_->position, state.patch,
                                                          s::PgVolumePositionDirection::ToPoints,
                                                          coefficients, budget, scratch, result));
+            account(work, result.used_steps());
         };
         apply(state.position, positions, limits.position);
         apply(state.velocity, velocities, limits.velocity);
-        account(work, limits.tangents.maximum_steps);
         if (limits.tangents.cancellation.stop_requested())
             reject(Cancelled);
         auto tangent_limits = limits.tangents;
+        tangent_limits.maximum_steps = std::min(tangent_limits.maximum_steps, remaining(work));
         tangent_limits.cancellation = stop;
         std::visit(
             [&](const auto& map_tangents) {
@@ -431,6 +432,7 @@ struct PgAeroBuilder {
                                                        tangents));
             },
             map.data_->tangents);
+        account(work, tangents.used_steps());
 
         const auto& base = take(chart.topology.geometry()).get();
         const auto word_count = static_cast<std::size_t>(components(original.points.size()));
