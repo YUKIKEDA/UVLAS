@@ -1,0 +1,48 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-drag-refinement-v1",
+  "ids": [
+    "IM-03",
+    "A5-02",
+    "V-AERO",
+    "UW-D03",
+    "UW-D05",
+    "N4-05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "source_commit": "c7b7b178716cef891d29c3067da2a021c0f65005",
+  "claimed_state": "Both frozen finite wings were evaluated on M2/N4 and M4/N8 at the same accepted closure length and finite core. The product coefficients and original residuals agree with their corresponding independent finite solutions. The larger independent observations and the native dense-interval payload quantify separate open common-limit and resource requirements.",
+  "verification": {
+    "windows": "Windows 11、MSVC 14.51 Releaseの新旧6件が通過した。M2/N4は各563検査、水平13.58秒、上反角5度18.86秒。M4/N8は各1,647検査、水平103.69秒、上反角5度137.87秒。従来の定常2件は各13,447検査。",
+    "linux": "Linux、GCC 14.2.0 Releaseの新旧6件が通過した。M2/N4は水平7.69秒、上反角5度10.07秒。M4/N8は水平81.66秒、上反角5度94.40秒。数値検査数はWindowsと一致し、従来の定常・コアと今回の細分の代表3構成でclang-tidyが通過した。",
+    "build_notes": "Windows Debugの上反角5度・M4/N8は先行版でコンパイルした。ここに示す実行時間と確保量はReleaseの観測値である。",
+    "commands": [
+      "ctest --test-dir out/issue166-build -C Release -V -R '^coupling\\.finite_wing_(steady|drag_refinement)\\.' -j 2",
+      "ctest --test-dir build -V -R '^coupling\\.finite_wing_(steady|drag_refinement)\\.' -j 3",
+      "clang-tidy --quiet with the fixed compile command for representative steady, core-radius and M4/N8 refinement tests",
+      "python -X utf8 -B docs/verification/IM-03/finite-wing-drag-refinement-v1/reference.py --output <separate-output>/finite-wing-drag-refinement-v1.json",
+      "python -X utf8 -B docs/verification/IM-03/finite-wing-drag-refinement-v1/reference.py --grid 4x12 --grid 8x24 --summary --output <separate-output>/independent-larger.json",
+      "GCC 14 sizeof(uvlas::aero::detail::p1::Interval) == 320",
+      "just trace-check"
+    ],
+    "mutation": "With the retained downstream strengths replaced by zero in a separate binary, the fixed-point original residual exceeded the threshold. Unchanged binary passes.",
+    "scope": "Native fixed-tail load solve followed by fixed-point re-evaluation with its own retained strengths. Near/far comparison on the same geometry and comparison to the frozen reference limit remain separate. No full-grid timing or process peak is inferred."
+  },
+  "sources": {
+    "tests/coupling/finite_wing_steady_test.cpp": "ff4303c907badb0087835ffaa143ff34e1e52cb98c801153a1c39d0bccf633a8",
+    "docs/verification/IM-03/finite-wing-drag-refinement-v1/reference.py": "5a62eb6ff117b17b760d407d42fe1e9e9d011ff7202ee9053a4fdf958971a69e",
+    "docs/verification/IM-03/finite-wing-case-v1/reference.py": "18d84c7def0ee7a40426a4dcab71e6537b686e9f2addec5c5e972d81a3835950",
+    "docs/verification/IM-03/finite-wing-span-lines-v1/reference.py": "6cdc1161e8e6a011fdf3a642e5bdc5f019730c6c3c5083937c01dadf8869c3a8",
+    "rd/aero/finite-wing/records/drag-common-limit-assessment-policy.md": "f573ce4f677f175161aca26c1e26ad678b9e88e58f798cdff9c0dbb517a38ea0",
+    "rd/aero/finite-wing/records/induced-drag-common-limit-protocol.md": "662a9773f3378615a92d07f19fba1c1cf7bb918d0b97fd8650b434c936579c6c",
+    "src/coupling/discrete_nonpenetration.cpp": "87e9d6e7bf3b1b94e9864e8ec5b13a3b2c3f19f8e324ec6f3b1c2f27ff1a4dfb",
+    "src/aero/p1_interval_private.hpp": "aa2d6ed189ae13710d07e033f824876c53de4bc13455324f9f341736491c3e57"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/finite-wing-drag-refinement-v1/verification.md": "5d65389451797bd327d567aef16eff1fdf744398dae5b102188f3d58088e622e",
+    "tests/aero/fixtures/finite-wing-drag-refinement-v1.json": "29b7cf5fd5301a0b4ebfc684e81b9cf70a90fa7305f34451a88e9da5cbd15878",
+    "docs/verification/IM-03/finite-wing-drag-refinement-v1/independent-larger.json": "2da2d81ba94bf32c021156eb09a33452af5b4a7f4594e75ae57ff053ce725ee9",
+    "rd/aero/finite-wing/records/drag-common-limit-result.json": "c875d9a995b4129b61e50a7d0fb1184108a3387f17fda4fd28eeebaaddfc9aa5"
+  }
+}
