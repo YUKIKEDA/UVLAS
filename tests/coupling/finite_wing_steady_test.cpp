@@ -823,9 +823,9 @@ struct WingCondition {
     const nlohmann::json* span_reference{};
 };
 
-void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
-              const nlohmann::json& reference_metadata, const nlohmann::json& polar,
-              const WingCondition& condition) {
+[[maybe_unused]] void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
+                               const nlohmann::json& reference_metadata,
+                               const nlohmann::json& polar, const WingCondition& condition) {
     auto recipe = finite_wing_case(wing, condition.core_radius);
     const auto si = materialize(recipe, io::SourceId{532});
     core::ResourcePlan memory{1024ULL * 1024 * 1024};
@@ -1224,6 +1224,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
     }
     const FiniteWingMesh mesh{grid.vertices, nx, ny};
     std::vector<a::BandId> bands;
+    bands.reserve(ny);
     for (std::size_t i = 0; i < ny; ++i)
         bands.emplace_back(50 + i);
     auto geometry_caps = test_geometry::limits();
@@ -1270,8 +1271,11 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             geometry, {a::QueryId{i + 1}, a::FreePoint{a::FreeSingle{grid.collocation[i]}}},
             geometry.context(), geometry_caps, *geometry_work, memory)));
     std::vector<cf::DiscreteCollocation> rows;
+    rows.reserve(count);
     std::vector<cf::BoundCirculationRate> rates;
+    rates.reserve(count);
     std::vector<a::EdgeId> physical_edges;
+    physical_edges.reserve(4 * count);
     for (std::size_t i = 0; i < count; ++i) {
         rows.emplace_back(mesh.quads[i].facets[0], queries[i], grid.tangents[i], xyz({}),
                           a::SingleWord{0}, a::SingleWord{0});
@@ -1283,12 +1287,14 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
     const auto duplicate = std::ranges::unique(physical_edges);
     physical_edges.erase(duplicate.begin(), duplicate.end());
     std::vector<cf::EdgeMidpointVelocity> midpoint;
+    midpoint.reserve(nx * (2 * ny + 1));
     for (const auto edge : physical_edges)
         if (!std::ranges::any_of(mesh.trailing,
                                  [edge](const auto& row) { return row.edge == edge; }))
             midpoint.emplace_back(edge, xyz({}));
     REQUIRE(midpoint.size() == nx * (2 * ny + 1));
     std::vector<cf::DiscreteWakePanel> wake;
+    wake.reserve(ny);
     for (std::size_t i = 0; i < ny; ++i)
         wake.emplace_back(mesh.quads[count + i].facets[0], cf::AttachedWakeFront{},
                           a::P1StrengthId{700 + i});
@@ -1342,6 +1348,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
         // The independent fixed point supplies the downstream trace to the native
         // conditional solve. Verify closure below with the retained native values.
         std::vector<cf::FrozenWakeTrace> traces;
+        traces.reserve(ny);
         for (std::size_t k = 0; k < ny; ++k) {
             const Rat value =
                 sin[sample] * rational_word(gamma_prime.at(count - ny + k).get<double>());
@@ -1465,8 +1472,8 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
         REQUIRE(reference.at("closure_m") == 1024.);
         REQUIRE(reference.at("core_m") == 1.114285714285714e-5);
         const auto& polar = polars.at("cases").at(wing_index);
-        const auto& fixture =
-            reference.at("cases").at(2 * UVLAS_FINITE_WING_REFINEMENT_LEVEL + wing_index);
+        const auto& fixture = reference.at("cases").at(
+            2 * static_cast<std::size_t>(UVLAS_FINITE_WING_REFINEMENT_LEVEL) + wing_index);
         REQUIRE(fixture.at("dihedral_degrees") == wing.at("dihedral_degrees"));
         run_refined_drag(wing, polar, fixture, reference.at("closure_m").get<double>(),
                          reference.at("core_m").get<double>());
