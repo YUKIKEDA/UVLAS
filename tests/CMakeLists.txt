@@ -982,6 +982,15 @@ foreach(wing_index RANGE 0 1)
             TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
     endforeach()
 endforeach()
+uvlas_add_test(coupling.multiple_surface_steady
+    LABELS V-MULTI verification
+    SOURCES coupling/multiple_surface_steady_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_multiple_surface_steady PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+target_compile_definitions(uvlas_test_coupling_multiple_surface_steady PRIVATE
+    UVLAS_MULTIPLE_SURFACE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/multiple-surface-steady-v1.json")
+set_tests_properties(coupling.multiple_surface_steady PROPERTIES TIMEOUT 900)
 uvlas_add_test(coupling.case_motion
     LABELS V-AERO property negative verification
     SOURCES coupling/case_motion_test.cpp
