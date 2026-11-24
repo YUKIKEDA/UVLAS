@@ -1,0 +1,79 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-boundary-position",
+  "ids": [
+    "SH-D02",
+    "SH-D05",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "2de8b54f225efda72575530a15739f422d9715b9",
+  "claimed_state": "認定基底から層境界の片側と外周側面のNを準備し、固定した点列の位置写像と転置を両形式で評価した。2層平板で両作用と仕事の差を独立照合した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configurations": [
+        "Debug",
+        "Release"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "points": 4,
+    "conditioned_columns": 109,
+    "independent_shape_values": 872,
+    "independent_cartesian_components": 678,
+    "audited_success_calls": 9,
+    "audited_precision_rejections": 2,
+    "cpp_allocation_attempts": 0,
+    "windows_debug_ctest_passed": 1,
+    "windows_release_ctest_passed": 1,
+    "linux_sanitizer_test_cases": 13,
+    "linux_sanitizer_assertions": 149520,
+    "linux_sanitizer_direct_timeout_seconds": 210,
+    "clang_tidy_translation_units": 3,
+    "rejected_mutation": {
+      "change": "record horizontal Upper as Lower and Lower as Upper",
+      "failed_assertions": 6
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-conditioned-reference-batch-contract.md": "15b7d8a4044fbfbe1cb351b04eced857e2ede1eaa8e482e4a42db1f269e14509",
+    "docs/specs/structure/pg-volume-position-contract.md": "dfe235ba43570c8189e44c9012b1a127a359e30ee4689d162d8ae5a554b5feb9",
+    "include/uvlas/structure/pg_volume_mass_reference.hpp": "c46477b607fd2c52028548886e0c7672aeb810cf0338cd720a9012b3f1192a2a",
+    "src/structure/pg_reference_projection.hpp": "25fd5056d7536fac52ab1f4cff4a3c288ffb1ccc4966c067e2216bba33a88a80",
+    "src/structure/pg_volume_position_arithmetic.hpp": "b430b347ef64d35719d55883b932743413f4a670d980b450124cd8df9955d7c0",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "tests/support/allocation_audit.hpp": "43dbcee0598effdd3765a4d20c3bd2f844dddcb08d3b7d259989d09c276b0ba8",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-boundary-position-contract.md": "17d79cd7f4bf1367fd32aff14391eb4efcb17e54ecb72ab935133447b0f28b6f",
+    "docs/verification/IM-01/pg-boundary-position.md": "51a5edade52fcbd4db3ac91661fd4a67f3c03669a8f3b2630ba3bdad33e0df37",
+    "include/uvlas/structure/pg_boundary_position.hpp": "d1b3b1aec137d337621d5855f781dee057d7f21e901c9c5e889460b42d88b7f1",
+    "include/uvlas/structure/pg_volume_position.hpp": "4bfeccb4955557a2d11c5e26ff9ddff4935759b9e8eea1a2049bfc0c4b1514cf",
+    "src/structure/pg_volume_mass_reference.cpp": "db02fc81aad7050b82365f56167793551c6683033cb087292b45ec4f92866ce3",
+    "src/structure/pg_volume_position.cpp": "ae470dae8cae704d7223635c8b3fa43694038ade51545814d546de86a4869efe",
+    "tests/structure/pg_conditioning_test.cpp": "ef8e92742511acd39df8e2ffddc7866409fa7ae0a9e3f30b1a6df26f828af9de"
+  }
+}
