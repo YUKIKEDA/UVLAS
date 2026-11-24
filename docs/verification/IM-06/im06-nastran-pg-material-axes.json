@@ -1,0 +1,41 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-pg-material-axes",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "MAT-D05",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "8c8f082768bc156fbf7a7eeabb7afa323a028154",
+  "claimed_state": "一定全厚の認証済みNastran平面に対し、採用範囲の層材料軸を同じCaseの一定軸と厳密に照合する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "real_file_assertions": 1404,
+    "missing_winding_angle_conversion_failures": 1,
+    "restored_real_file_assertions": 1404
+  },
+  "artifacts": {
+    "CMakeLists.txt": "765b3a369b9d032120440b1f58611be07c2e8b13144e5716a3cc99d7edf261d1",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/specs/structure/material-layer-adoption-contract.md": "cafea600ef53cb76426b6b980c9cac463eb73c96eb3223cd9a2950c33a2b8155",
+    "docs/verification/IM-06/nastran-pg-material-axes.md": "ee7c3471583892e1ec17b1dec43384e5bbfc160c8a9663ce796d4f178f8fd360",
+    "src/coupling/case_external_pg.cpp": "5858290149f7b88316a7f19497c2e25febb2ae8dbcdd6bc65087e4c56ff23969",
+    "src/io/external_mesh_sidecar_pg.cpp": "0d11744a47d16756f254fb3cce4fc043d8667aa9e9225f319c7e49e0fdd5d726",
+    "src/io/external_mesh_sidecar_pg.hpp": "78fe75ba9197bf65749606913630d789b5847da2ae9a1367c6339de3c43d2279",
+    "src/io/external_pg_regional_thickness.hpp": "bf789a338d86e5ca6a8a9d79c2d4194ab0dee58a4c1487a042eb759970770c48",
+    "src/io/external_planar_pg.hpp": "942b4c9e8cc906865b21cda5e4e3a339b204efc86e9e1341c8703e37f88a5b5b",
+    "src/io/nastran_pcomp_physical.hpp": "2a6cfb962bd005d55bff967c1009ff8bd78bc807334bf64b4a0757990540f944",
+    "src/io/nastran_pg_material_axes.cpp": "5f12b2527b2baa31a79bdaac4465e6c6ab461591522f6234c3d428271c411b1b",
+    "src/io/nastran_pg_material_axes.hpp": "6aa88ab1622a4765063ecc2155017c57dd78de054718c9ade5ee29f5a8fb9ef6",
+    "src/io/nastran_shell_cards.cpp": "a48b567d637649309f1fe9fe42fd49e77f6457f50796e91c8475df4aefefab07",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "tests/io/reference_input_test.cpp": "d9df4aa285c2efb0a35ac35315b46c0c9dba8d8edc3853bdb6a6716c69627017"
+  }
+}
