@@ -3226,7 +3226,8 @@ TEST_CASE("Two discrete circulation rows consume their own known-flow values and
     exact(take(take(tangent.flow(1)).get().position(0)), Number{5, 8});
     exact(take(take(tangent.flow(1)).get().position(1)), Number{19, 8});
     const auto free = take(dual.collocation(0)).free_query;
-    REQUIRE(free);
+    if (!free)
+        FAIL("Expected a covector for the free collocation point");
     CHECK_FALSE(take(dual.collocation(1)).free_query.has_value());
     const auto point = take(dual.point(6));
     CHECK(point.point == a::PointId{7});
