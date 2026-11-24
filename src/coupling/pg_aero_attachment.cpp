@@ -403,20 +403,21 @@ struct PgAeroBuilder {
         const auto apply = [&](s::PgCartesianWords coefficients, s::PgVolumePositionResult& result,
                                s::PgVolumePositionLimits budget) {
             work.step();
-            account(work, budget.maximum_steps);
+            budget.maximum_steps = std::min(budget.maximum_steps, remaining(work));
             if (budget.cancellation.stop_requested())
                 reject(Cancelled);
             budget.cancellation = stop;
             take(s::apply_pg_prepared_reference_position(map.data_->position, state.patch,
                                                          s::PgVolumePositionDirection::ToPoints,
                                                          coefficients, budget, scratch, result));
+            account(work, result.used_steps());
         };
         apply(state.position, positions, limits.position);
         apply(state.velocity, velocities, limits.velocity);
-        account(work, limits.tangents.maximum_steps);
         if (limits.tangents.cancellation.stop_requested())
             reject(Cancelled);
         auto tangent_limits = limits.tangents;
+        tangent_limits.maximum_steps = std::min(tangent_limits.maximum_steps, remaining(work));
         tangent_limits.cancellation = stop;
         std::visit(
             [&](const auto& map_tangents) {
@@ -431,6 +432,7 @@ struct PgAeroBuilder {
                                                        tangents));
             },
             map.data_->tangents);
+        account(work, tangents.used_steps());
 
         const auto& base = take(chart.topology.geometry()).get();
         const auto word_count = static_cast<std::size_t>(components(original.points.size()));
@@ -498,9 +500,14 @@ struct PgAeroBuilder {
         candidate.current = single != nullptr
                                 ? a::PositionView{a::SinglePositions{high.values()}}
                                 : a::PositionView{a::DoublePositions{high.values(), low.values()}};
-        account(work, limits.geometry.max_steps);
-        const auto geometry =
-            take(a::prepare_owned_geometry(candidate, limits.geometry, coordinates, memory, stop));
+        const auto geometry_budget = [&] {
+            auto budget = limits.geometry;
+            budget.max_steps = std::min(budget.max_steps, remaining(work));
+            return budget;
+        };
+        const auto geometry = take(
+            a::prepare_owned_geometry(candidate, geometry_budget(), coordinates, memory, stop));
+        account(work, take(geometry.used_preparation_steps()));
         auto contact_limits = limits.contact;
         contact_limits.max_steps = std::min(contact_limits.max_steps, remaining(work));
         auto contact = take(a::check_global_geometry(chart.topology, geometry, contact_limits,
@@ -512,9 +519,10 @@ struct PgAeroBuilder {
         out.midpoints =
             allocate<std::optional<EdgeMidpointVelocity>>(memory, chart.load_edges.size());
         const auto resolve = [&](a::QueryId id, a::QueryDefinition definition) {
-            account(work, limits.geometry.max_steps);
-            return take(a::resolve_query(geometry, {id, definition}, state.context, limits.geometry,
-                                         coordinates, memory, stop));
+            auto query = take(a::resolve_query(geometry, {id, definition}, state.context,
+                                               geometry_budget(), coordinates, memory, stop));
+            account(work, query.used_steps());
+            return query;
         };
         for (std::size_t i = 0; i < map.data_->rows.size(); ++i) {
             work.step();

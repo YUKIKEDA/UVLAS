@@ -26,7 +26,7 @@
 | PreparedPatchと参照作用 | 完了 | 認定済み基底と物理参照を所有する。体積点、層界面の上下、外周側面で、参照位置、正の測度、形状値、Cartesian 勾配を取得し、成分別の誤差枠で Binary64／TwoWord に射影する。固定則の点・重みを保持し、同じ Workspace で体積位置と転置を作用させる。 [物理参照量の射影](../verification/IM-01/pg-prepared-reference-projection.md) |
 | 全位置traceと拘束 | 完了 | 非整合面を共通細分し、厚さ段差、指定層と部分面、向きを検査する。原拘束と固定支持の指定値を保持し、厳密な重複行の尺度と双対仕事を照合した。時間依存の指定値と複数接続の閉路処理は固定ピボットの疎チャートで扱う。 [全厚拘束の検証](../verification/IM-01/pg-prepared-patch-trace.md) |
 | 固定pivot疎chart | 完了 | 固定支持、物理拘束ID、元行順で代表を選ぶ。同じ因子で位置・接線・転置・元行反力を計算し、独立に作ったKKT解と照合した。Caseの複数Motionは各群の元行を個別認定し、共通時計で片側の位置・速度・加速度を評価する。R-02の2・3・4パッチでは元有理CSRによる補正後、全厚位置差を全域で $1.153\times10^{-16}$ m以下と確認した。 [複数Motion](../verification/IM-01/pg-structural-motion-groups.md)・[実空間の残差](../verification/IM-01/pg-chart-refinement-series/physical-trace-verification.md) |
-| 早期R-02 | 完了 | 非整合を含む2・3・4パッチ、接続1・2・4本の系列で、原行の非零数、rank、L/U、準備・再利用の課金と常駐量を測った。4パッチの閉路はrank 248、因子23,503項。実項数ちょうどで同一結果を得て、1項不足で元拘束を保持した。実務規模の性能はA5-06で確認する。 [R-02の計測](../verification/IM-01/pg-sparse-chart-series.md) |
+| 早期R-02 | 完了 | 非整合を含む2・3・4パッチ、接続1・2・4本の系列で、原行の非零数、rank、L/U、準備・再利用の課金と常駐量を測った。4パッチの閉路はrank 248、因子23,503項。実項数ちょうどで準備に成功し、チャート識別子、rank、L/U各項数が一致した。1項不足では元拘束を保持して拒否した。実務規模の性能はA5-06で確認する。 [R-02の計測](../verification/IM-01/pg-sparse-chart-series.md) |
 | 終了審査 | 残 | R4の全28配置で位置・Jacobian、R5の後退・テーパ全4配置で体積と全外面の独立荷重・仕事を照合した。V-PGの製品証拠を終了審査でまとめ、IM-02へ引き渡す。 [R4の参照幾何](../verification/IM-01/pg-r4-reference-geometries.md)・[R5の参照幾何と独立荷重](../verification/IM-01/pg-r5-swept-taper-reference.md) |
 
 ## IM-03 空力

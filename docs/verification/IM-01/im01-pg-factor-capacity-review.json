@@ -1,0 +1,35 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-factor-capacity-review",
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "ids": [
+    "R-02",
+    "SH-D07"
+  ],
+  "source_commit": "703ab52de84aa6c1cb4a60f0f1705380fa2054a4",
+  "claimed_state": "4パッチ疎チャートの2つの因子容量で位置、独立力、元行乗数を厳密比較した。",
+  "sources": {
+    "docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt": "78ef8a8e65259b473d0201efe94b7b22fa3d0c2b953a033434310aea34f3f384"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-sparse-chart-series/run-factor-capacity.patch": "10e94bdcdfd8777c393230e6745982d223c4820b8eafe711d246a003e969ec98",
+    "docs/verification/IM-01/pg-sparse-chart-series/factor-capacity-review.md": "d926decae8e88ff40618d425e3cbcb24b9c9ba14007af524239177bc3bcfa148"
+  },
+  "checks": {
+    "msvc_release_assertions": 64,
+    "msvc_release_nonzero_control_assertions": 67,
+    "capacities_equal": [
+      65000,
+      23503
+    ],
+    "capacity_rejected": 23502,
+    "compared_position_components": 1653,
+    "compared_independent_force_components": 909,
+    "compared_original_multiplier_components": 2016,
+    "nonzero_position_components": 1552,
+    "nonzero_independent_force_components": 905,
+    "nonzero_original_multiplier_components": 743,
+    "replayed_source_sha256": "b9645d1e2ebe8e96666e9e000066bd714da065c3832aed41fbe6b016b5caa669"
+  }
+}

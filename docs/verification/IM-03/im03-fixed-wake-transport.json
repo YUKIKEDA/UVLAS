@@ -14,7 +14,7 @@
   "package": "IM-03",
   "issue": 19,
   "date": "2026-11-24",
-  "source_commit": "9e9033b54b5d46ea93aa55fdf35df00e9766a2dc",
+  "source_commit": "cf6437db427f38e96bd0080871bce2622ce0252a",
   "input_baseline": "d6751d51",
   "claimed_state": "Fixed-step old-particle position residual on three exact clock nodes and contact-qualified material rows. Includes the actual free-velocity action and its residual derivatives, plus prescribed endpoint velocity, position candidate, and residual derivatives. The material history correspondence comes from caller-supplied snapshots.",
   "verification": {
@@ -32,7 +32,11 @@
     "mutation": "In the separate Linux build, supplying the positive velocity seed instead of the negative seed failed the physical transpose pairing (1 of 518 assertions, exit 42). Restoring byte-identical product source and rebuilding passed all 518 assertions.",
     "stack": "The existing load transpose's zero-RHS-budget rejection nested two fixed-width rounding scratch blocks. Reusing its caller's block removed the duplicate while preserving the unchanged projection checks and a 1 MiB MSVC test stack.",
     "static": "Pinned clang-format 21.1.2, clang-tidy 21.1.1 on affected units in both environments, reference regeneration, Ruff and Japanese prose lint, trace-check, and source/artifact hash comparison.",
-    "msvc_debug": "Windows x64 MSVC 19.51 Debug, four affected CTests passed. coupling.case_uniform_flow completed in 65.53 s (120 s limit), and the focused case passed 518 assertions with seed 23."
+    "msvc_debug": "Windows x64 MSVC 19.51 Debug, four affected CTests passed. coupling.case_uniform_flow completed in 65.53 s (120 s limit), and the focused case passed 518 assertions with seed 23.",
+    "review_base": "e518c6c4e496998510ad177bf7d629e56ecda20b",
+    "review_case": "With h=1/8 s, positions (2, 15/8, 13/8) and directions (1/8, 1/4, 1/2) give distinct exact BDF2 (1/2,-1/2) and backward Euler (1,-1) time derivatives. Both production transport paths use rational comparisons of residuals, JVPs and three stencil covectors.",
+    "review_msvc_release": "Windows x64 MSVC 19.51 Release; 548 focused assertions passed with seed 23.",
+    "review_backward_euler_mutation": "Only transport_rate was replaced with (current-previous)/h. The focused MSVC Release run rejected 7 of 548 assertions, exit 42. The byte-identical restored product source rebuilt and passed all 548 assertions."
   },
   "sources": {
     "src/aero/global_geometry.cpp": "a9abfc3492a8f638150fcfcea76ed65ceceae632d9a401c2324280d9d70bbfa0",
@@ -43,7 +47,7 @@
     "src/coupling/discrete_nonpenetration.hpp": "7f9d05ba8561cc52ff1f4e101acb0aac6f651138e60553e7d976175a468beffb",
     "src/coupling/fixed_wake_transport.cpp": "b65b21923b5f3d5979be1fb6f8e27b147b27d050ada1bf20b67bfaaef681d423",
     "src/coupling/fixed_wake_transport.hpp": "ed13c49754374977a11b2b20557c0b2692e951401a2432588fe5c56e05c10941",
-    "tests/coupling/case_uniform_flow_test.cpp": "8cb7c98417627b9d49f2df064dc74c3791700be1929b7337ddd4ef5c20136bc0",
+    "tests/coupling/case_uniform_flow_test.cpp": "1d524252ac7537f8691d78a221f89083caeffbecc933b7a88ab2f349f2b95068",
     "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
     "docs/specs/coupled/coupled-adopted-specification.md": "e58792bfc857af73166ea596724a66a7dcd08f43ba083b642f538dfecf56dc3d",
     "src/coupling/case_flow_clock.cpp": "d7a6007e4d50bcbf11462ad40a5893e388faa9eaf884591568d4a00a23cb46c5",
@@ -95,7 +99,7 @@
     {
       "id": "tests/coupling/case_uniform_flow_test.cpp",
       "hint": "tests/coupling/case_uniform_flow_test.cpp",
-      "sha256": "8cb7c98417627b9d49f2df064dc74c3791700be1929b7337ddd4ef5c20136bc0"
+      "sha256": "1d524252ac7537f8691d78a221f89083caeffbecc933b7a88ab2f349f2b95068"
     },
     {
       "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
@@ -129,25 +133,26 @@
     }
   ],
   "artifacts": {
-    "docs/verification/IM-03/fixed-wake-transport-v1/reference.py": "88523e2bcfe6ccf36efb79a25872fcd4179b62021e1c9f1304901f9f7f6a8887",
-    "docs/verification/IM-03/fixed-wake-transport-v1/reference.json": "49321f950ec6dd5b5bb25c11edf7943cdab7042910fa2f4fa16c0450dc750326",
-    "docs/verification/IM-03/fixed-wake-transport-v1/verification.md": "fca5fa2c3fcf7d6d2a8141de90b0b28f9cbaf7d52837e01241124a8c02843bfd"
+    "docs/verification/IM-03/fixed-wake-transport-v1/reference.py": "f432e7e31e8b8e5a6ddc9ddc43adfa93b5479bee7479e550fa7043642e6943c0",
+    "docs/verification/IM-03/fixed-wake-transport-v1/reference.json": "b916faca3b9dc1079079be80fc6e5369615b61aea339cfb507916e93ef424a06",
+    "docs/verification/IM-03/fixed-wake-transport-v1/verification.md": "cc907322c011afb4dea54a070771fb4a2b8fd09b87cdb3fac5cacd3c4842d745"
   },
   "artifact_records": [
     {
       "id": "docs/verification/IM-03/fixed-wake-transport-v1/reference.py",
       "hint": "docs/verification/IM-03/fixed-wake-transport-v1/reference.py",
-      "sha256": "88523e2bcfe6ccf36efb79a25872fcd4179b62021e1c9f1304901f9f7f6a8887"
+      "sha256": "f432e7e31e8b8e5a6ddc9ddc43adfa93b5479bee7479e550fa7043642e6943c0"
     },
     {
       "id": "docs/verification/IM-03/fixed-wake-transport-v1/reference.json",
       "hint": "docs/verification/IM-03/fixed-wake-transport-v1/reference.json",
-      "sha256": "49321f950ec6dd5b5bb25c11edf7943cdab7042910fa2f4fa16c0450dc750326"
+      "sha256": "b916faca3b9dc1079079be80fc6e5369615b61aea339cfb507916e93ef424a06"
     },
     {
       "id": "docs/verification/IM-03/fixed-wake-transport-v1/verification.md",
       "hint": "docs/verification/IM-03/fixed-wake-transport-v1/verification.md",
-      "sha256": "fca5fa2c3fcf7d6d2a8141de90b0b28f9cbaf7d52837e01241124a8c02843bfd"
+      "sha256": "cc907322c011afb4dea54a070771fb4a2b8fd09b87cdb3fac5cacd3c4842d745"
     }
-  ]
+  ],
+  "initial_verified_source_commit": "9e9033b54b5d46ea93aa55fdf35df00e9766a2dc"
 }
