@@ -1366,13 +1366,18 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                                                  *geometry_work, shared, *local, *kernel, memory));
         if (count == 8 && sample == 1) {
             core::ResourcePlan replay_memory{UINT64_C(2000000000)};
+            const auto retained_contact = take_global(contact.retain_checked(replay_memory));
+            const auto contact_bytes = replay_memory.allocated_bytes();
+            const cf::DiscreteNonpenetrationInput replay_input{
+                retained_contact, rows, wake, input.history, trial, stamp, input.flow_side};
             const auto evidence = take(cf::verify_discrete_circulation_row_replay(
-                input, loads.primal(), caps, request, shared, *local, *kernel, replay_memory));
+                replay_input, loads.primal(), caps, request, shared, *local, *kernel,
+                replay_memory));
             CHECK(evidence.rows == count);
             CHECK(evidence.coefficients == count * count);
             CHECK(evidence.replay_row_bytes > 0);
             CHECK(evidence.retained_dense_bytes == evidence.replay_row_bytes * count);
-            CHECK(evidence.allocated_bytes == replay_memory.allocated_bytes());
+            CHECK(evidence.allocated_bytes == replay_memory.allocated_bytes() - contact_bytes);
             CHECK(evidence.used_steps > 0);
             std::cout << "Native coefficient replay, row bytes=" << evidence.replay_row_bytes
                       << ", dense bytes=" << evidence.retained_dense_bytes

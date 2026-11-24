@@ -356,22 +356,23 @@ GlobalEngine::check(const GlobalTopology& topology, const OwnedGeometry& source,
         const auto before = plan.allocated_bytes();
         core::PlannedBuffer<GlobalContactData> payload;
         core::PlannedBuffer<NodePair> stack;
+        core::PlannedBuffer<Node> current_nodes;
         allocate(payload, 1, plan, context);
         allocate(stack, stack_size, plan, context);
         auto& data = payload.values()[0];
         data.geometry.emplace(retain(source));
         data.topology = topology.data_;
-        allocate(data.nodes, n, plan, context);
+        allocate(current_nodes, n, plan, context);
         if (n != 0)
             std::copy(topology.data_->nodes.values().begin(), topology.data_->nodes.values().end(),
-                      data.nodes.values().begin());
+                      current_nodes.values().begin());
         nondegenerate(g, Configuration::Current, run);
-        refit_tree(g, data.nodes.values(), run);
+        refit_tree(g, current_nodes.values(), run);
         const auto candidates =
-            traverse(g, *topology.data_, data.nodes.values(), stack.values(), false, run);
+            traverse(g, *topology.data_, current_nodes.values(), stack.values(), false, run);
         run.admit(times(candidates.candidates, narrow_cost));
         const auto repeated =
-            traverse(g, *topology.data_, data.nodes.values(), stack.values(), true, run);
+            traverse(g, *topology.data_, current_nodes.values(), stack.values(), true, run);
         if (candidates.candidates != repeated.candidates || candidates.steps != repeated.steps)
             reject(core::FailureCode::InvalidInput);
         data.plan = {plan.allocated_bytes() - before, run.reserved, run.used, candidates.candidates,
@@ -462,6 +463,30 @@ core::Result<bool> PreparedTopologyOwner::is_trailing_point(PointId canonical) c
 
 std::size_t PreparedTopologyOwner::trailing_point_count() const noexcept {
     return topology_ ? static_cast<std::size_t>(topology_->trailing_point_size) : 0;
+}
+
+GlobalResult<GlobalContactState>
+GlobalContactState::retain_checked(core::ResourcePlan& plan,
+                                   const std::stop_token& stop) const noexcept {
+    return guarded(context_, [&]() -> GlobalResult<GlobalContactState> {
+        if (stop.stop_requested())
+            reject(core::FailureCode::Cancelled);
+        if (!active())
+            reject(core::FailureCode::InvalidInput);
+        const auto& source = data_.values()[0];
+        if (!source.geometry || !source.topology)
+            reject(core::FailureCode::InvalidInput);
+        byte_admit(bytes<GlobalContactData>(1), plan, context_);
+        core::PlannedBuffer<GlobalContactData> payload;
+        allocate(payload, 1, plan, context_);
+        auto& result = payload.values()[0];
+        result.geometry.emplace(GlobalEngine::retain(*source.geometry));
+        result.topology = source.topology;
+        result.plan = source.plan;
+        if (stop.stop_requested())
+            reject(core::FailureCode::Cancelled);
+        return GlobalContactState{std::move(payload), context_};
+    });
 }
 
 core::Result<PreparedTopologyOwner> GlobalContactState::reference_topology() const noexcept {
