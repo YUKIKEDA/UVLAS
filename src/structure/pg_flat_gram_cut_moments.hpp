@@ -8,7 +8,7 @@
 
 namespace uvlas::structure::detail {
 
-inline constexpr std::size_t cut_degree = 2 * rank_degree[1];
+inline constexpr std::size_t cut_degree = 2 * std::size_t{rank_degree[1]};
 inline constexpr std::size_t cut_slots = (cut_degree + 1) * (cut_degree + 2) / 2;
 inline constexpr std::size_t cut_edge_degree = cut_degree + 1;
 inline constexpr std::size_t cut_denominator_power = cut_degree + 2;
