@@ -2,6 +2,7 @@
 
 #include "case_motion_frame.hpp"
 #include "case_pg_reference.hpp"
+#include "case_pg_support_motion.hpp"
 
 #include <uvlas/structure/pg_prepared_patch.hpp>
 #include <uvlas/structure/pg_sparse_chart.hpp>
@@ -29,6 +30,10 @@ struct CasePgChartLimits {
     std::uint64_t maximum_input_work;
 };
 
+namespace case_pg_chart_detail {
+struct Builder;
+}
+
 /// Owns the exact same references and column order used in the chart.
 class CasePgChart {
 public:
@@ -45,23 +50,21 @@ public:
     [[nodiscard]] core::Result<const structure::PgPreparedPatch*>
         patch(core::Index) const&& = delete;
 
-    [[nodiscard]] const structure::PgSparseChart& chart() const& noexcept {
-        return chart_;
-    }
+    [[nodiscard]] const structure::PgSparseChart& chart() const& noexcept;
     [[nodiscard]] const structure::PgSparseChart& chart() const&& = delete;
+    [[nodiscard]] const CaseStructuralSupport* motion() const& noexcept;
+    [[nodiscard]] const CaseStructuralSupport* motion() const&& = delete;
 
 private:
-    friend core::Result<CasePgChart> prepare_case_pg_chart(const io::SiCase&,
-                                                           std::span<const CasePgRuleBinding>,
-                                                           const CasePgChartLimits&,
-                                                           core::Workspace&, core::ResourcePlan&,
-                                                           std::stop_token) noexcept;
+    friend struct case_pg_chart_detail::Builder;
     CasePgChart(core::PlannedBuffer<std::optional<structure::PgPreparedPatch>>&& patches,
                 structure::PgSparseChart&& chart) noexcept
         : patches_(std::move(patches)), chart_(std::move(chart)) {}
 
     core::PlannedBuffer<std::optional<structure::PgPreparedPatch>> patches_;
+    // The fixed owner moves into the motion result only after successful qualification.
     structure::PgSparseChart chart_;
+    std::optional<CaseStructuralSupport> motion_;
 };
 
 /// Prepare every PG shell, fixed full-position edge support and compatible
@@ -72,5 +75,11 @@ private:
                                                               const CasePgChartLimits&,
                                                               core::Workspace&, core::ResourcePlan&,
                                                               std::stop_token = {}) noexcept;
+
+/// Prepare the same fixed chart and bind every actual moving support to the Case clock.
+[[nodiscard]] core::Result<CasePgChart> prepare_case_pg_motion_chart(
+    const io::SiCase&, std::span<const CasePgRuleBinding>, const CasePgChartLimits&,
+    aero::detail::pchip::PchipInputStamp, const CaseStructuralSupportLimits&, core::Workspace&,
+    aero::detail::pchip::CurveWorkspace&, core::ResourcePlan&, std::stop_token = {}) noexcept;
 
 } // namespace uvlas::coupling::detail

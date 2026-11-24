@@ -40,6 +40,11 @@ struct CasePgSupportSample {
     const CasePgSupportLimits&, core::ResourcePlan&, const std::stop_token& = {},
     core::FailureDetails = {}) noexcept;
 
+struct CasePgSupportSelection {
+    std::span<const structure::PgConstraintId> moving;
+    std::span<const structure::PgConstraintId> stationary;
+};
+
 struct CaseStructuralSupportLimits {
     CasePgSupportLimits evaluation;
     structure::PgRigidSupportLimits exact;
@@ -152,6 +157,15 @@ private:
     std::span<const structure::PgConstraintId>, aero::detail::pchip::PchipInputStamp,
     core::Workspace&, aero::detail::pchip::CurveWorkspace&, const CaseStructuralSupportLimits&,
     core::ResourcePlan&, const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+/// Leave verified stationary supports in the same chart's constant RHS.
+[[nodiscard]] core::Result<CaseStructuralSupport>
+prepare_case_structural_pg_support(const io::SiCase&, structure::PgSparseChart&&,
+                                   std::span<const structure::PgConstraintPatchBinding>,
+                                   CasePgSupportSelection, aero::detail::pchip::PchipInputStamp,
+                                   core::Workspace&, aero::detail::pchip::CurveWorkspace&,
+                                   const CaseStructuralSupportLimits&, core::ResourcePlan&,
+                                   const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
 [[nodiscard]] core::Result<CaseStructuralSupportSample> evaluate_case_structural_pg_support(
     const CaseStructuralSupport&, const CaseStructuralSupport& current, CaseFlowClockQuery,

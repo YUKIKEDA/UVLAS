@@ -1,5 +1,6 @@
 #include "case_pg_chart.hpp"
 
+#include "case_pg_support_input.hpp"
 #include "structure/pg_reference_domain.hpp"
 
 #include <algorithm>
@@ -408,35 +409,14 @@ pg::PgFullTrace connection(const s::JointAdhesive& joint, const pg::PgPreparedPa
     return trace;
 }
 
-bool zero_series(const auto& field, Input& input) {
-    const auto series = field.record();
-    const auto* constant = std::get_if<s::TimeSeriesConstant>(&series);
-    if (constant == nullptr || constant->value.size() != 3)
-        return false;
-    for (core::Index i = 0; i < 3; ++i) {
-        input.step();
-        const auto recipe =
-            partition_take(input.source.quantity(partition_take(constant->value.at(i)))).recipe;
-        const bool zero = std::visit(
-            [](const auto& value) {
-                if constexpr (std::is_same_v<std::remove_cvref_t<decltype(value)>,
-                                             io::SiDecimalView>)
-                    return value.sign == 0;
-                else
-                    return value.numerator.sign == 0;
-            },
-            recipe.value);
-        if (!zero)
-            return false;
-    }
-    return true;
-}
-
-void validate_support(const s::SupportTraceConstraint& declaration,
-                      const CaseMotionFrameLimits& limits, Input& input) {
-    const auto motion = declaration.motion.record();
-    if (declaration.components.size() != 3 || motion.events.size() != 0 ||
-        !zero_series(motion.translation, input) || !zero_series(motion.rotation_vector, input))
+bool validate_support(const s::SupportTraceConstraint& declaration,
+                      const CaseMotionFrameLimits& limits, bool motion_enabled, Input& input) {
+    if (declaration.components.size() != 3)
+        partition_fail(FailureCode::Unsupported);
+    input.step(7); // The event count and at most six component lookups.
+    const auto stationary =
+        partition_take(stationary_case_pg_motion(input.source, declaration.motion.record()));
+    if (!motion_enabled && !stationary)
         partition_fail(FailureCode::Unsupported);
     std::array<bool, 3> seen{};
     for (core::Index i = 0; i < 3; ++i) {
@@ -446,9 +426,13 @@ void validate_support(const s::SupportTraceConstraint& declaration,
             partition_fail(FailureCode::InvalidInput);
         seen[d] = true;
     }
-    const auto frame = partition_take(CaseMotionFrame::prepare(
-        input.source, declaration.motion, limits, input.math.plan, input.math.limits.cancellation));
-    static_cast<void>(frame);
+    if (!motion_enabled) {
+        const auto frame = partition_take(CaseMotionFrame::prepare(input.source, declaration.motion,
+                                                                   limits, input.math.plan,
+                                                                   input.math.limits.cancellation));
+        static_cast<void>(frame);
+    }
+    return stationary;
 }
 
 pg::PgFullTrace support(const pg::PgPreparedPatch& patch, core::Index ordinal,
@@ -488,6 +472,12 @@ pg::PgFullTrace support(const pg::PgPreparedPatch& patch, core::Index ordinal,
         workspace, math.plan));
 }
 
+struct MotionPreparation {
+    const aero::detail::pchip::PchipInputStamp& stamp;
+    const CaseStructuralSupportLimits& limits;
+    aero::detail::pchip::CurveWorkspace& workspace;
+};
+
 } // namespace
 
 core::Result<const pg::PgPreparedPatch*> CasePgChart::patch(core::Index index) const& noexcept {
@@ -499,16 +489,36 @@ core::Result<const pg::PgPreparedPatch*> CasePgChart::patch(core::Index index) c
     return &*patch;
 }
 
-core::Result<CasePgChart>
-prepare_case_pg_chart(const io::SiCase& source, std::span<const CasePgRuleBinding> rules,
-                      const CasePgChartLimits& caller, core::Workspace& workspace,
-                      core::ResourcePlan& plan, std::stop_token stop) noexcept {
+const CaseStructuralSupport* CasePgChart::motion() const& noexcept {
+    return motion_ ? &*motion_ : nullptr;
+}
+
+const pg::PgSparseChart& CasePgChart::chart() const& noexcept {
+    if (const auto* ready = motion())
+        return ready->support().chart();
+    return chart_;
+}
+
+namespace case_pg_chart_detail {
+struct Builder {
+    static core::Result<CasePgChart> prepare(const io::SiCase&, std::span<const CasePgRuleBinding>,
+                                             const CasePgChartLimits&, const MotionPreparation*,
+                                             core::Workspace&, core::ResourcePlan&,
+                                             std::stop_token) noexcept;
+};
+
+core::Result<CasePgChart> Builder::prepare(const io::SiCase& source,
+                                           std::span<const CasePgRuleBinding> rules,
+                                           const CasePgChartLimits& caller,
+                                           const MotionPreparation* motion,
+                                           core::Workspace& workspace, core::ResourcePlan& plan,
+                                           std::stop_token stop) noexcept {
     return core::guard_entry(
         operation, FailureCode::InvalidInput, {}, [&]() -> core::Result<CasePgChart> {
             try {
                 std::stop_source cancellation;
                 const auto request = [&]() noexcept { cancellation.request_stop(); };
-                const std::stop_callback caller_stop{stop, request};
+                const std::stop_callback caller_stop{std::move(stop), request};
                 const std::stop_callback reference_stop{caller.reference.cancellation, request};
                 const std::stop_callback graph_stop{caller.reference.graph.cancellation, request};
                 const std::stop_callback coefficient_stop{
@@ -525,6 +535,19 @@ prepare_case_pg_chart(const io::SiCase& source, std::span<const CasePgRuleBindin
                 const std::stop_callback constraints_stop{
                     caller.constraints.arithmetic.cancellation, request};
                 const std::stop_callback chart_stop{caller.chart.arithmetic.cancellation, request};
+
+                const std::stop_callback motion_trace_stop{
+                    motion == nullptr ? std::stop_token{}
+                                      : motion->limits.region_trace.arithmetic.cancellation,
+                    request};
+                const std::stop_callback motion_exact_stop{
+                    motion == nullptr ? std::stop_token{}
+                                      : motion->limits.exact.arithmetic.cancellation,
+                    request};
+                const std::stop_callback motion_chart_stop{
+                    motion == nullptr ? std::stop_token{}
+                                      : motion->limits.exact.chart_verification.cancellation,
+                    request};
 
                 const auto token = cancellation.get_token();
                 auto limits = caller;
@@ -554,6 +577,23 @@ prepare_case_pg_chart(const io::SiCase& source, std::span<const CasePgRuleBindin
                     if (rules[i].shell != shell.id.unsigned_value() || rules[i].points.empty())
                         partition_fail(FailureCode::InvalidInput);
                 }
+                const auto support_count = static_cast<std::size_t>(model.supports.size());
+                core::PlannedBuffer<std::byte> support_storage;
+                if (motion != nullptr) {
+                    if (support_count > motion->limits.maximum_group_supports)
+                        partition_fail(FailureCode::ResourceExceeded);
+                    support_storage = input.views<pg::PgConstraintId>(support_count);
+                }
+                std::pmr::monotonic_buffer_resource support_arena(support_storage.values().data(),
+                                                                  support_storage.values().size(),
+                                                                  std::pmr::null_memory_resource());
+                auto* support_ids =
+                    motion == nullptr
+                        ? nullptr
+                        : std::pmr::polymorphic_allocator<pg::PgConstraintId>{&support_arena}
+                              .allocate(support_count);
+                std::size_t moving_count = 0;
+                std::size_t stationary_start = support_count;
                 for (core::Index i = 0; i < partition_index(model.supports.size()); ++i) {
                     input.step();
                     const auto constraint = partition_take(model.supports.at(i)).record();
@@ -561,8 +601,16 @@ prepare_case_pg_chart(const io::SiCase& source, std::span<const CasePgRuleBindin
                     if (fixed == nullptr)
                         partition_fail(FailureCode::Unsupported);
                     static_cast<void>(endpoint(fixed->region.record(), model, input));
-                    validate_support(*fixed, limits.support_frame, input);
+                    const bool stationary =
+                        validate_support(*fixed, limits.support_frame, motion != nullptr, input);
+                    if (support_ids != nullptr) {
+                        const auto id = pg::PgConstraintId{fixed->id.unsigned_value()};
+                        const auto offset = stationary ? --stationary_start : moving_count++;
+                        std::construct_at(support_ids + offset, id);
+                    }
                 }
+                if (motion != nullptr && moving_count == 0)
+                    partition_fail(FailureCode::InvalidInput);
                 auto patches = input.allocate<std::optional<pg::PgPreparedPatch>>(rules.size());
                 auto traces = input.allocate<std::optional<pg::PgFullTrace>>(source_count);
                 auto patch_storage = input.views<pg::PgConstraintPatchBinding>(rules.size());
@@ -625,12 +673,45 @@ prepare_case_pg_chart(const io::SiCase& source, std::span<const CasePgRuleBindin
                     workspace, plan));
                 auto chart = partition_take(
                     pg::PgSparseChart::prepare(std::move(original), limits.chart, workspace, plan));
+                auto result = CasePgChart{std::move(patches), std::move(chart)};
+                if (motion != nullptr) {
+                    // Bind the very chart and patch owners used in row assembly. No new trace
+                    // or factorization replaces this chart during evaluation.
+                    const CasePgSupportSelection selection{
+                        {support_ids, moving_count},
+                        {support_ids + stationary_start, support_count - stationary_start}};
+                    auto support = partition_take(prepare_case_structural_pg_support(
+                        source, std::move(result.chart_), {patch_bindings, rules.size()}, selection,
+                        motion->stamp, workspace, motion->workspace, motion->limits, plan, token));
+                    result.motion_.emplace(std::move(support));
+                }
                 input.step(0);
-                return CasePgChart{std::move(patches), std::move(chart)};
+                return result;
             } catch (const pg::detail::PartitionAbort& error) {
                 return std::unexpected(error.failure);
             }
         });
+}
+
+} // namespace case_pg_chart_detail
+
+core::Result<CasePgChart>
+prepare_case_pg_chart(const io::SiCase& source, std::span<const CasePgRuleBinding> rules,
+                      const CasePgChartLimits& limits, core::Workspace& workspace,
+                      core::ResourcePlan& plan, std::stop_token stop) noexcept {
+    return case_pg_chart_detail::Builder::prepare(source, rules, limits, nullptr, workspace, plan,
+                                                  std::move(stop));
+}
+
+core::Result<CasePgChart> prepare_case_pg_motion_chart(
+    const io::SiCase& source, std::span<const CasePgRuleBinding> rules,
+    const CasePgChartLimits& limits, aero::detail::pchip::PchipInputStamp stamp,
+    const CaseStructuralSupportLimits& support_limits, core::Workspace& workspace,
+    aero::detail::pchip::CurveWorkspace& motion_workspace, core::ResourcePlan& plan,
+    std::stop_token stop) noexcept {
+    const MotionPreparation motion{stamp, support_limits, motion_workspace};
+    return case_pg_chart_detail::Builder::prepare(source, rules, limits, &motion, workspace, plan,
+                                                  std::move(stop));
 }
 
 } // namespace uvlas::coupling::detail
