@@ -226,6 +226,9 @@ jobs:
         os: [windows-2025, ubuntu-24.04]
     steps:
       - uses: actions/checkout@v7
+      - name: Select qualified MSVC 14.51
+        if: runner.os == 'Windows'
+        run: pwsh -NoProfile -File tools/dev/ci-msvc.ps1
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
