@@ -19,30 +19,30 @@ using namespace io::detail;
 constexpr std::uint64_t kib = 1024;
 constexpr std::uint64_t mib = 1024 * kib;
 constexpr std::uint64_t payload_cap = 256 * mib;
-constexpr std::uint64_t manifest_cap = 8 * mib;
+constexpr auto manifest_cap = case_manifest_max_bytes;
 constexpr std::uint64_t reference_cap = 32 * mib;
 constexpr std::uint64_t reference_total_cap = 64 * mib;
 constexpr std::uint64_t maximum_references = 1024;
 constexpr std::uint64_t maximum_work = 64 * mib;
-constexpr std::uint64_t maximum_nodes = 256 * kib;
+constexpr auto maximum_nodes = case_manifest_max_nodes;
 constexpr std::size_t maximum_path = 4096;
 
 ReferenceInputLimits input_limits() noexcept {
     return {
         {manifest_cap,
-         128,
+         case_manifest_max_depth,
          maximum_nodes,
          maximum_nodes,
-         64 * kib,
-         1024,
+         case_manifest_max_string_bytes,
+         case_manifest_max_number_bytes,
          manifest_cap,
          {io::ParserAllocationMode::EstimateAdmission, payload_cap}},
         io::SchemaLimits{{
-            manifest_cap,  128,           maximum_nodes, maximum_nodes, 64 * kib,
-            1024,          manifest_cap,  64 * mib,      maximum_nodes, maximum_nodes,
-            maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes,
-            128,           1024,          maximum_nodes, maximum_path,  64 * mib,
-            maximum_work,  4096,          4096,
+            manifest_cap, case_manifest_max_depth, maximum_nodes, maximum_nodes,
+            case_manifest_max_string_bytes, case_manifest_max_number_bytes, manifest_cap,
+            64 * mib, maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes, maximum_nodes,
+            maximum_nodes, maximum_nodes, 128, 1024, maximum_nodes, maximum_path, 64 * mib,
+            maximum_work, 4096, 4096,
         }},
     };
 }
@@ -152,24 +152,13 @@ validate_references(const ReferenceInput& input, const ReferenceInputView& view,
     return std::move(*closed);
 }
 
-} // namespace
-
+template <class Acquire>
 std::expected<ValidatedCase, CaseValidationFailure>
-validate_case_file(const std::filesystem::path& path, const std::stop_token& stop) noexcept {
+validate_case_input(Acquire acquire, const std::stop_token& stop) noexcept {
     try {
-        auto parent = path.parent_path();
-        if (parent.empty()) {
-            parent = ".";
-        }
-        const auto filename = path.filename().u8string();
-        const std::string_view name{reinterpret_cast<const char*>(filename.data()),
-                                    filename.size()};
         core::ResourcePlan plan{payload_cap};
         ReferenceInputDiagnostic diagnostic;
-        auto input = ReferenceInput::from_file(
-            parent, name, io::SourceId{0},
-            {maximum_path, {manifest_cap, manifest_cap + 1, 4096, manifest_cap}}, input_limits(),
-            plan, stop, &diagnostic);
+        auto input = acquire(plan, diagnostic);
         if (!input) {
             return reject_manifest(input.error(), diagnostic);
         }
@@ -199,6 +188,53 @@ validate_case_file(const std::filesystem::path& path, const std::stop_token& sto
                                   {},
                                   {}});
     }
+}
+
+} // namespace
+
+std::expected<ValidatedCase, CaseValidationFailure>
+validate_case_file(const std::filesystem::path& path, const std::stop_token& stop) noexcept {
+    return validate_case_input(
+        [&](core::ResourcePlan& plan, ReferenceInputDiagnostic& diagnostic) {
+            auto parent = path.parent_path();
+            if (parent.empty()) {
+                parent = ".";
+            }
+            const auto filename = path.filename().u8string();
+            const std::string_view name{reinterpret_cast<const char*>(filename.data()),
+                                        filename.size()};
+            return ReferenceInput::from_file(
+                parent, name, io::SourceId{0},
+                {maximum_path, {manifest_cap, manifest_cap + 1, 4096, manifest_cap}}, input_limits(),
+                plan, stop, &diagnostic);
+        },
+        stop);
+}
+
+std::expected<ValidatedCase, CaseValidationFailure>
+validate_case_memory(std::span<const std::byte> bytes,
+                     const std::optional<std::filesystem::path>& directory,
+                     const std::stop_token& stop) noexcept {
+    return validate_case_input(
+        [&](core::ResourcePlan& plan, ReferenceInputDiagnostic& diagnostic)
+            -> core::Result<ReferenceInput> {
+            std::optional<ReadRoot> root;
+            if (directory) {
+#if defined(_WIN32) || defined(__linux__)
+                auto opened = ReadRoot::open(*directory, stop);
+                if (!opened) {
+                    return std::unexpected(opened.error());
+                }
+                root.emplace(std::move(*opened));
+#else
+                return std::unexpected(
+                    core::Failure{core::FailureCode::Unsupported, core::Operation::PrepareModel});
+#endif
+            }
+            return ReferenceInput::from_memory(bytes, io::SourceId{0}, std::move(root),
+                                               input_limits(), plan, stop, &diagnostic);
+        },
+        stop);
 }
 
 int validate_case(const std::filesystem::path& path) {

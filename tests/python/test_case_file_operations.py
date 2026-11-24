@@ -83,6 +83,51 @@ class CaseFileOperations(unittest.TestCase):
             external.write_bytes(b"abc")
             self.assertIn(b"dependency validation is unsupported", cli("validate", path).stderr)
             self.assert_failure(uvlas.load_case(path), uvlas.FailureCode.Unsupported)
+            self.assert_failure(uvlas.case_from_dict(case), uvlas.FailureCode.InvalidInput)
+            self.assert_failure(
+                uvlas.case_from_dict(case, reference_root=path.parent),
+                uvlas.FailureCode.Unsupported,
+            )
+
+    def test_dictionary_checks_schema_and_owns_the_copied_input(self):
+        case = copy.deepcopy(EXAMPLES["schema_examples"]["structural_static"])
+        result = uvlas.case_from_dict(case)
+        self.assertTrue(result.ok)
+        checked = result.value
+        expected = json.dumps(case, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        with tempfile.TemporaryDirectory() as workspace:
+            path = Path(workspace) / "expected.json"
+            path.write_bytes(expected)
+            file_case = uvlas.load_case(path)
+            self.assertTrue(file_case.ok)
+            self.assertEqual(checked.source_sha256, file_case.value.source_sha256)
+            self.assertEqual(checked.source_byte_count, file_case.value.source_byte_count)
+        case["schema"] = "uvlas.invalid/1"
+        self.assert_failure(uvlas.case_from_dict(case), uvlas.FailureCode.InvalidInput)
+        self.assertEqual(checked.source_sha256, hashlib.sha256(expected).digest())
+        self.assertEqual(checked.source_byte_count, len(expected))
+
+    def test_dictionary_rejects_non_json_values_and_over_budget_input(self):
+        cycle = []
+        cycle.append(cycle)
+
+        class CustomDictionary(dict):
+            pass
+
+        for value in (None, CustomDictionary(), {1: True}, {"x": cycle}, {"x": (1,)},
+                      {"x": "\ud800"}, {"x": float("nan")}, {"x": float("inf")}):
+            with self.subTest(value=repr(value)):
+                self.assert_failure(uvlas.case_from_dict(value), uvlas.FailureCode.InvalidInput)
+
+        nested = []
+        for _ in range(128):
+            nested = [nested]
+        for value in (nested, "あ" * 22_000, 1 << 4_097, [None] * 262_144,
+                      ["x" * 65_536] * 128):
+            with self.subTest(kind=type(value).__name__):
+                self.assert_failure(
+                    uvlas.case_from_dict({"x": value}), uvlas.FailureCode.ResourceExceeded
+                )
 
     def test_inspection_returns_owned_original_bytes_and_rejects_disagreement(self):
         with tempfile.TemporaryDirectory() as workspace:

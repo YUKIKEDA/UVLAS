@@ -1,3 +1,4 @@
+#include "case_dictionary.hpp"
 #include "inspect_result.hpp"
 #include "validate_case.hpp"
 
@@ -902,6 +903,27 @@ PYBIND11_MODULE(_uvlas, module) {
         },
         py::arg("path").none(false),
         "Validate a case file and own its checked input and references.");
+    module.def(
+        "case_from_dict",
+        [](py::handle document, const std::optional<std::filesystem::path>& reference_root) {
+            return boundary(core::Operation::PrepareModel, [&] {
+                auto encoded = uvlas::python::copy_case_dictionary(document);
+                if (!encoded) {
+                    return Reply{encoded.error()};
+                }
+                const auto bytes = std::as_bytes(std::span{encoded->data(), encoded->size()});
+                auto result = [&] {
+                    const py::gil_scoped_release release;
+                    return uvlas::app::validate_case_memory(bytes, reference_root);
+                }();
+                if (!result) {
+                    return Reply{result.error().failure};
+                }
+                return Reply{py::cast(std::move(*result))};
+            });
+        },
+        py::arg("document"), py::arg("reference_root") = py::none(),
+        "Copy a schema dictionary and validate it with an optional external-reference root.");
     module.def(
         "inspect_result",
         [](const std::filesystem::path& directory) {
