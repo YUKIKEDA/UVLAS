@@ -1,0 +1,40 @@
+param([Parameter(Mandatory)] [string]$Build, [Parameter(Mandatory)] [string]$Dependencies)
+$ErrorActionPreference = 'Stop'
+$out = 'out/pg-chart-candidate-series-' + [Guid]::NewGuid().ToString('N')
+New-Item -ItemType Directory $out | Out-Null
+Write-Output ("R02_OUTPUT=$out")
+$original = 'docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt'
+$addition = 'docs/verification/IM-01/pg-chart-candidate-series/measure-candidate.cpp.txt'
+$source = "$out/series.cpp"
+$t = [IO.File]::ReadAllText((Join-Path $pwd $original))
+$headers = @(
+    '#include "pg_conditioning_test_support.hpp"',
+    '#include "numerics/sparse_test_support.hpp"',
+    '#include <uvlas/structure/pg_chart_candidate.hpp>'
+)
+$t = $t.Replace($headers[0], ($headers -join "`n"))
+$i = $t.IndexOf('void run(std::size_t patch_count,')
+$begin = $t.IndexOf('        measure_reuse(', $i)
+$end = $t.IndexOf('        return;', $begin)
+if ($i -lt 0 -or $begin -lt 0 -or $end -le $begin) { throw 'Frozen driver shape changed' }
+$call = '        measure_candidate(patch_count, contact_count, std::move(chart), original_info, limits.arithmetic, workspace, plan);'
+$t = $t.Remove($begin, $end - $begin).Insert($begin, $call + "`n")
+$t = $t.Replace('        const auto chart = take(prepare(original));','        auto chart = take(prepare(original));')
+$t = $t.Insert($i,[IO.File]::ReadAllText((Join-Path $pwd $addition)) + "`n")
+$t = $t.Replace('void measure_reuse(', '[[maybe_unused]] void measure_reuse(')
+[IO.File]::WriteAllText((Join-Path $pwd $source),$t,[Text.UTF8Encoding]::new($false))
+pwsh tools/dev/msvc.ps1 cl /nologo /std:c++23preview /utf-8 /EHsc /TP /O2 /MD /W4 /WX /fp:strict /DNDEBUG /DNOMINMAX /DUVLAS_R02_MEASURE_REUSE /Iinclude /Isrc/structure /Itests /Itests/structure "/external:I$Dependencies/include" /external:W0 "/Fo$out/series.obj" $source "/Fe$out/series.exe" /link /STACK:67108864 "$Build/Release/uvlas_structure.lib" "$Build/Release/uvlas_numerics.lib" "$Build/Release/uvlas_core.lib" "$Dependencies/lib/manual-link/Catch2Main.lib" "$Dependencies/lib/Catch2.lib" psapi.lib /SUBSYSTEM:CONSOLE
+if ($LASTEXITCODE) { exit $LASTEXITCODE }
+$env:PATH = "$Dependencies/bin;$env:PATH"
+$runner = [System.Diagnostics.Process]::GetCurrentProcess()
+$prior = $runner.ProcessorAffinity
+try {
+    $runner.ProcessorAffinity = [IntPtr]4
+    $cases = @('R02 two patches','R02 three patches','R02 four patch loop')
+    for ($i = 0; $i -lt $cases.Count; $i++) {
+        & "$out/series.exe" $cases[$i] --colour-mode none 2>&1 | Tee-Object "$out/case-$($i + 2).log"
+        if ($LASTEXITCODE) { exit $LASTEXITCODE }
+    }
+} finally {
+    $runner.ProcessorAffinity = $prior
+}
