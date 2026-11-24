@@ -34,21 +34,23 @@ public:
 
 private:
     friend core::Result<ReferencedCase>
-    close_leaf_reference_inventory(AcquiredRootReferences&&, DependencyWalkLimits, GmshLimits,
-                                   core::ResourcePlan&, const std::stop_token&,
-                                   LeafReferenceDiagnostic*) noexcept;
+    resolve_leaf_references(const ReferenceInput&, PreparedRootReferences&&, RootInventoryLimits,
+                            DependencyWalkLimits, GmshLimits, core::ResourcePlan&,
+                            const std::stop_token&, RootSnapshotDiagnostic*,
+                            LeafReferenceDiagnostic*) noexcept;
 
     ReferencedCase(AcquiredRootReferences&&, core::PlannedBuffer<core::Index>&&) noexcept;
     AcquiredRootReferences roots_;
     core::PlannedBuffer<core::Index> dependency_first_;
 };
 
-// Qualify an already authenticated inventory. A source is finished only when its role
-// proves that its accepted format declares no children. Preserve repeated manifest edges.
-// Consume the inventory only on success. The result owns bytes, paths, edges and order.
+// Admit the direct graph, then authenticate and inspect each distinct source in order.
+// A source is accepted only if its role proves that it declares no children. Preserve
+// repeated manifest edges. Move the declarations only on success.
 [[nodiscard]] core::Result<ReferencedCase>
-close_leaf_reference_inventory(AcquiredRootReferences&&, DependencyWalkLimits, GmshLimits,
-                               core::ResourcePlan&, const std::stop_token&,
-                               LeafReferenceDiagnostic*) noexcept;
+resolve_leaf_references(const ReferenceInput&, PreparedRootReferences&&, RootInventoryLimits,
+                        DependencyWalkLimits, GmshLimits, core::ResourcePlan&,
+                        const std::stop_token&, RootSnapshotDiagnostic*,
+                        LeafReferenceDiagnostic*) noexcept;
 
 } // namespace uvlas::io::detail

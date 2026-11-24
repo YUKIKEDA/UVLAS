@@ -933,10 +933,8 @@ TEST_CASE("Only format-proven root leaves enter a closed reference graph",
             bytes_of(static_case()), source, std::nullopt, limits(), input_plan, {}, nullptr));
         auto roots = prepare(input);
         core::ResourcePlan no_storage{0};
-        auto inventory = fixture::take(
-            rd::acquire_root_references(input, std::move(roots), {}, no_storage, {}, nullptr));
-        auto closed = fixture::take(rd::close_leaf_reference_inventory(std::move(inventory), {}, {},
-                                                                       no_storage, {}, nullptr));
+        auto closed = fixture::take(rd::resolve_leaf_references(input, std::move(roots), {}, {}, {},
+                                                                no_storage, {}, nullptr, nullptr));
         CHECK(no_storage.allocated_bytes() == 0);
         return closed;
     }();
@@ -955,15 +953,17 @@ TEST_CASE("Only format-proven root leaves enter a closed reference graph",
     auto acquisition = memory_inventory_bounds;
     acquisition.total_identity_comparisons += inventory_ids.size();
     core::ResourcePlan inventory_plan{fixture::budget};
-    auto inventory = fixture::take(rd::acquire_root_references(input, std::move(roots), acquisition,
-                                                               inventory_plan, {}, nullptr));
     constexpr rd::GmshLimits gmsh{1024, 16, 16, 32, 16, 16, 4096};
     constexpr rd::DependencyWalkLimits closure{8, 9, 1, 128, 128};
     core::ResourcePlan graph_plan{fixture::budget};
     rd::LeafReferenceDiagnostic diagnostic;
-    check_acquisition_failure(rd::close_leaf_reference_inventory(std::move(inventory), closure,
-                                                                 gmsh, graph_plan, {}, &diagnostic),
-                              core::FailureCode::Unsupported);
+    rd::RootSnapshotDiagnostic file_diagnostic;
+    const auto resolve = [&](rd::PreparedRootReferences& pending, rd::DependencyWalkLimits bounds) {
+        return rd::resolve_leaf_references(input, std::move(pending), acquisition, bounds, gmsh,
+                                           graph_plan, {}, &file_diagnostic, &diagnostic);
+    };
+    check_acquisition_failure(resolve(roots, closure), core::FailureCode::Unsupported);
+    CHECK_FALSE(file_diagnostic.reason);
     CHECK(diagnostic.reason == rd::LeafReferenceFailure::UnsupportedRole);
     CHECK(diagnostic.pointer() == "/model/geometry/0/sidecar");
     if (const auto location = diagnostic.location) {
@@ -972,16 +972,9 @@ TEST_CASE("Only format-proven root leaves enter a closed reference graph",
     } else {
         FAIL("Missing unsupported declaration");
     }
-    CHECK(fixture::take(inventory.source(0)).path.text() == "skin.msh");
-    const auto mesh = fixture::take(inventory.snapshot(0));
-    CHECK(mesh.get().location.source == io::SourceId{300});
-    CHECK_FALSE(inventory.snapshot(-1));
-
     auto first_edge = closure;
     first_edge.edges = 1;
-    check_acquisition_failure(rd::close_leaf_reference_inventory(std::move(inventory), first_edge,
-                                                                 gmsh, graph_plan, {}, &diagnostic),
-                              core::FailureCode::ResourceExceeded);
+    check_acquisition_failure(resolve(roots, first_edge), core::FailureCode::ResourceExceeded);
     CHECK(diagnostic.reason == rd::LeafReferenceFailure::Graph);
     CHECK(diagnostic.walk.reason == rd::DependencyWalkFailure::EdgeLimit);
     if (const auto edge = diagnostic.walk.edge) {
@@ -991,6 +984,12 @@ TEST_CASE("Only format-proven root leaves enter a closed reference graph",
         FAIL("Missing original manifest edge");
     }
     CHECK(diagnostic.pointer() == "/model/geometry/0/sidecar");
+    auto inventory = fixture::take(rd::acquire_root_references(input, std::move(roots), acquisition,
+                                                               inventory_plan, {}, nullptr));
+    CHECK(fixture::take(inventory.source(0)).path.text() == "skin.msh");
+    const auto mesh = fixture::take(inventory.snapshot(0));
+    CHECK(mesh.get().location.source == io::SourceId{300});
+    CHECK_FALSE(inventory.snapshot(-1));
 }
 
 TEST_CASE("Root walk applies preflight, snapshot, and edge failures in order",

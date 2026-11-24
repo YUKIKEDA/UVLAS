@@ -73,6 +73,14 @@ struct RootInventoryLimits {
     std::uint64_t total_identity_comparisons;
 };
 
+// Internal role inspection of authenticated bytes. Invoked in first declaration order after
+// each file's handle has closed, before the next distinct source is opened.
+class RootSnapshotInspector {
+public:
+    virtual ~RootSnapshotInspector() = default;
+    [[nodiscard]] virtual core::Result<void> inspect(const AcquiredRootSnapshot&) noexcept = 0;
+};
+
 // Owns all authenticated files declared directly by one manifest and their declaration records.
 // Views borrow this inventory until it moves or is destroyed. Dependency extraction and
 // role-specific qualification are separate operations.
@@ -102,8 +110,8 @@ public:
 private:
     friend core::Result<AcquiredRootReferences>
     acquire_root_references(const ReferenceInput&, PreparedRootReferences&&, RootInventoryLimits,
-                            core::ResourcePlan&, const std::stop_token&,
-                            RootSnapshotDiagnostic*) noexcept;
+                            core::ResourcePlan&, const std::stop_token&, RootSnapshotDiagnostic*,
+                            RootSnapshotInspector*) noexcept;
     AcquiredRootReferences(
         PreparedRootReferences declarations,
         core::PlannedBuffer<std::optional<AcquiredRootSnapshot>> sources) noexcept;
@@ -117,7 +125,8 @@ private:
 [[nodiscard]] core::Result<AcquiredRootReferences>
 acquire_root_references(const ReferenceInput& input, PreparedRootReferences&& prepared,
                         RootInventoryLimits limits, core::ResourcePlan& plan,
-                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic) noexcept;
+                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic,
+                        RootSnapshotInspector* inspector = nullptr) noexcept;
 
 enum class ReferenceWalkStartFailure : std::uint8_t {
     Binding,

@@ -102,32 +102,22 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
         return reject(prepared.error(), "reference paths", plan_diagnostic.pointer().value_or(""));
     }
     RootSnapshotDiagnostic snapshot_diagnostic;
-    auto inventory =
-        acquire_root_references(input, std::move(*prepared),
-                                {{{reference_cap, reference_cap + 1, 8192, reference_cap},
-                                  maximum_references,
-                                  maximum_path},
-                                 maximum_references,
-                                 reference_total_cap,
-                                 reference_total_cap + maximum_references,
-                                 32 * kib,
-                                 reference_total_cap,
-                                 maximum_references * maximum_references},
-                                plan, stop, &snapshot_diagnostic);
-    if (!inventory) {
-        const auto message = snapshot_diagnostic.read && snapshot_diagnostic.read->reason ==
-                                                             ReferenceFileFailure::DigestMismatch
-                                 ? "reference SHA-256 mismatch"
-                                 : "reference acquisition";
-        return reject(inventory.error(), message, snapshot_diagnostic.pointer());
-    }
     LeafReferenceDiagnostic diagnostic;
-    const auto closed = close_leaf_reference_inventory(
-        std::move(*inventory),
+    const auto closed = resolve_leaf_references(
+        input, std::move(*prepared),
+        {{{reference_cap, reference_cap + 1, 8192, reference_cap},
+          maximum_references,
+          maximum_path},
+         maximum_references,
+         reference_total_cap,
+         reference_total_cap + maximum_references,
+         32 * kib,
+         reference_total_cap,
+         maximum_references * maximum_references},
         {maximum_references, maximum_references, 1, maximum_work, maximum_path},
         {reference_cap, maximum_nodes, maximum_nodes, 4 * maximum_nodes, maximum_nodes,
          maximum_nodes, maximum_work},
-        plan, stop, &diagnostic);
+        plan, stop, &snapshot_diagnostic, &diagnostic);
     if (!closed) {
         if (diagnostic.reason == LeafReferenceFailure::UnsupportedRole) {
             return reject(closed.error(), "external reference dependency validation is unsupported",
@@ -140,7 +130,15 @@ int validate_references(const ReferenceInput& input, const ReferenceInputView& v
                     : "Gmsh mesh format";
             return reject(closed.error(), message, diagnostic.pointer());
         }
-        return reject(closed.error(), "external reference dependency graph", diagnostic.pointer());
+        if (diagnostic.reason == LeafReferenceFailure::Graph) {
+            return reject(closed.error(), "external reference dependency graph",
+                          diagnostic.pointer());
+        }
+        const auto message = snapshot_diagnostic.read && snapshot_diagnostic.read->reason ==
+                                                             ReferenceFileFailure::DigestMismatch
+                                 ? "reference SHA-256 mismatch"
+                                 : "reference acquisition";
+        return reject(closed.error(), message, snapshot_diagnostic.pointer());
     }
     std::cout << "Case validation succeeded.\n";
     return 0;

@@ -104,9 +104,9 @@ file(WRITE "${CASE_DIRECTORY}/skin.msh" "${bad_mesh}")
 file(SHA256 "${CASE_DIRECTORY}/skin.msh" mesh_digest)
 string(JSON external SET "${external}" model geometry 1 mesh sha256 "\"${mesh_digest}\"")
 file(WRITE "${case_path}" "${external}")
+file(REMOVE "${CASE_DIRECTORY}/sidecar.json")
 check(2 "Gmsh mesh format at byte" "${case_name}")
-file(REMOVE "${CASE_DIRECTORY}/skin.msh" "${CASE_DIRECTORY}/sidecar.json"
-    "${CASE_DIRECTORY}/reference.dat")
+file(REMOVE "${CASE_DIRECTORY}/skin.msh" "${CASE_DIRECTORY}/reference.dat")
 
 math(EXPR oversized "8 * 1024 * 1024 + 1")
 string(REPEAT " " ${oversized} invalid)

@@ -273,7 +273,8 @@ AcquiredRootReferences::find(const SchemaIdentity& parent, SourceId source, Refe
 core::Result<AcquiredRootReferences>
 acquire_root_references(const ReferenceInput& input, PreparedRootReferences&& prepared,
                         RootInventoryLimits limits, core::ResourcePlan& plan,
-                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic) noexcept {
+                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic,
+                        RootSnapshotInspector* inspector) noexcept {
     using Code = core::FailureCode;
     if (diagnostic) {
         diagnostic->reset();
@@ -327,6 +328,11 @@ acquire_root_references(const ReferenceInput& input, PreparedRootReferences&& pr
                                                     stop, diagnostic);
         if (!acquired) {
             return std::unexpected(acquired.error());
+        }
+        if (inspector) {
+            if (const auto inspected = inspector->inspect(*acquired); !inspected) {
+                return std::unexpected(inspected.error());
+            }
         }
         const auto file = acquired->file.view();
         if (!file) {
