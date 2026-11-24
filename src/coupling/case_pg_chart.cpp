@@ -493,7 +493,10 @@ pg::PgFullTrace support(const pg::PgPreparedPatch& patch, core::Index ordinal,
 core::Result<const pg::PgPreparedPatch*> CasePgChart::patch(core::Index index) const& noexcept {
     if (index < 0 || static_cast<std::uint64_t>(index) >= patches_.values().size())
         return std::unexpected(core::Failure{FailureCode::InvalidInput, operation});
-    return &*patches_.values()[static_cast<std::size_t>(index)];
+    const auto& patch = patches_.values()[static_cast<std::size_t>(index)];
+    if (!patch)
+        return std::unexpected(core::Failure{FailureCode::InvalidInput, operation});
+    return &*patch;
 }
 
 core::Result<CasePgChart>
