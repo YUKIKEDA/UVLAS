@@ -585,7 +585,7 @@ struct PrimalCirculationData {
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows;
     std::optional<a::P1ActionValue> geometry_owner;
     core::PlannedBuffer<p::Interval> influence;
-    CirculationPhysicalSource source;
+    a::PreparedTopologyOwner source;
     std::uint64_t steps;
 };
 
@@ -1529,7 +1529,7 @@ struct NonpenetrationBuilder {
                 std::move(results),
                 std::move(geometry_parent),
                 std::move(influence),
-                {geometry.context(), require(input.contact.reference_topology())},
+                require(input.contact.reference_topology()),
                 work.used};
     }
 
@@ -2071,6 +2071,39 @@ struct NonpenetrationBuilder {
             loads.flow_time = p::add(loads.flow_time, implicit.flow_time, work);
     }
 
+    static void evaluate_fixed_bdf2_rates(const FixedBdf2Circulation& stencil,
+                                          const PrimalCirculationData& primal,
+                                          std::span<const PanelRow> bound,
+                                          std::span<p::Interval> rates, p::Work& work) {
+        const auto& values = primal.solution.values();
+        for (std::size_t i = 0; i < bound.size(); ++i) {
+            work.step();
+            rates[i] =
+                stencil.value(i, bound[i].panel.face, import(retained_word(values, i), work), work);
+        }
+    }
+
+    static void chain_bdf2_pullback(const FixedBdf2Circulation& stencil, LoadPullbackData& target,
+                                    p::Work& work) {
+        const auto rate = target.rate.values();
+        auto gamma = target.gamma.values();
+        for (std::size_t i = 0; i < rate.size(); ++i)
+            gamma[i] = p::add(gamma[i], stencil.current_action(rate[i], work), work);
+    }
+
+    static core::PlannedBuffer<std::optional<RetainedBdf2Rate>>
+    retain_bdf2_rates(std::span<const PanelRow> bound, std::span<const p::Interval> rates,
+                      core::Precision precision, a::LocalRootScratch& rounding,
+                      core::ResourcePlan& memory, p::Work& work) {
+        auto output = allocate<std::optional<RetainedBdf2Rate>>(memory, rates.size());
+        for (std::size_t i = 0; i < rates.size(); ++i) {
+            work.step();
+            output.values()[i].emplace(RetainedBdf2Rate{
+                bound[i].panel.face, a::enclose_p1_value(rates[i], precision, rounding)});
+        }
+        return output;
+    }
+
     static ComputedLoads
     compute_loads(const DiscreteNonpenetrationInput& input, const DiscreteVectorLoadInput& loads,
                   const ProjectedCaseUniformFlow* flow, const DiscreteNonpenetrationLimits& limits,
@@ -2117,7 +2150,7 @@ struct NonpenetrationBuilder {
         const auto snapshot = require(input.contact.geometry());
         const auto& geometry = snapshot.get();
         if (stencil != nullptr && flow != nullptr)
-            stencil->bind({geometry.context(), require(input.contact.reference_topology())}, *flow,
+            stencil->bind(require(input.contact.reference_topology()), *flow,
                           request.retained_generation, order, work);
         const auto radius = import(require(geometry.core_radius()), work);
         if (!loads.edges.empty() && p::compare(radius.lower, {}) <= 0)
@@ -2154,18 +2187,15 @@ struct NonpenetrationBuilder {
         auto& assembly = *retained;
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
         auto rates = allocate<p::Interval>(memory, order);
-        for (std::size_t i = 0; i < order; ++i) {
-            work.step();
-            const auto face = bound[i].panel.face;
-            if (stencil != nullptr) {
-                rates.values()[i] = stencil->value(
-                    i, face, import(retained_word(primal.solution.values(), i), work), work);
-            } else {
-                if (loads.rates[i].face != face)
+        if (stencil != nullptr)
+            evaluate_fixed_bdf2_rates(*stencil, primal, bound, rates.values(), work);
+        else
+            for (std::size_t i = 0; i < order; ++i) {
+                work.step();
+                if (loads.rates[i].face != bound[i].panel.face)
                     reject(core::FailureCode::InvalidInput);
                 rates.values()[i] = import(loads.rates[i].rate, work);
             }
-        }
 
         auto occurrences = allocate<LoadEdgeOccurrence>(memory, 6 * order);
         auto nodes = allocate<NodalLoad>(memory, 6 * order);
@@ -2385,10 +2415,7 @@ struct NonpenetrationBuilder {
         if (pullback != nullptr) {
             scatter_force_edge_strength(*pullback, occurrences.values(), edges.values(), work);
             if (stencil != nullptr)
-                for (std::size_t i = 0; i < order; ++i)
-                    pullback->gamma.values()[i] =
-                        p::add(pullback->gamma.values()[i],
-                               stencil->current_action(pullback->rate.values()[i], work), work);
+                chain_bdf2_pullback(*stencil, *pullback, work);
             if (implicit != nullptr)
                 propagate_load_circulation(*pullback, *implicit, primal, assembly, input, ambient,
                                            known, limits, shared, local, kernel, memory, rounding,
@@ -2399,15 +2426,9 @@ struct NonpenetrationBuilder {
         const auto moment = finish(totals.moment);
         const auto reference = finish(origin);
         core::PlannedBuffer<std::optional<RetainedBdf2Rate>> bdf2_rates;
-        if (stencil != nullptr) {
-            bdf2_rates = allocate<std::optional<RetainedBdf2Rate>>(memory, order);
-            for (std::size_t i = 0; i < order; ++i) {
-                work.step();
-                bdf2_rates.values()[i].emplace(RetainedBdf2Rate{
-                    bound[i].panel.face,
-                    a::enclose_p1_value(rates.values()[i], representation, rounding)});
-            }
-        }
+        if (stencil != nullptr)
+            bdf2_rates =
+                retain_bdf2_rates(bound, rates.values(), representation, rounding, memory, work);
         work.step();
         return {std::move(primal),
                 {std::move(edge_loads), std::move(facet_loads), std::move(point_loads), force,
@@ -2982,7 +3003,7 @@ DiscreteCirculation::DiscreteCirculation(
     linear::Solution<double> solution, ProjectedCaseUniformFlow&& flow,
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows,
     std::optional<a::P1ActionValue> geometry_owner, core::PlannedBuffer<p::Interval> influence,
-    CirculationPhysicalSource source, std::uint64_t steps) noexcept
+    a::PreparedTopologyOwner source, std::uint64_t steps) noexcept
     : solution_(std::move(solution)),
       flow_(std::move(flow)),
       rows_(std::move(rows)),

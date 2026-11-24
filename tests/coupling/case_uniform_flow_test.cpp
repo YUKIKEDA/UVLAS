@@ -4482,6 +4482,7 @@ TEST_CASE("Fixed case BDF2 circulation feeds loads and the live-history dual pai
     reject(cf::FixedBdf2Circulation::prepare(std::move(skipped), t0, t1, previous, earlier, 4096,
                                              10000, memory),
            core::FailureCode::StaleGeneration);
+    // NOLINTNEXTLINE(bugprone-use-after-move) Rejected preparation keeps the node owner active.
     CHECK(skipped.ambient().source().jet.active());
     reject(
         cf::FixedBdf2Circulation::prepare(node(2), t1, t0, earlier, previous, 4096, 10000, memory),

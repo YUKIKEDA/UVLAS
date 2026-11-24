@@ -47,15 +47,6 @@ bool same_case(const CaseClockedFlowSample& a, const CaseClockedFlowSample& b) {
            ax.interval == ay.interval && a.restart() == b.restart();
 }
 
-bool same_reference(const CirculationPhysicalSource& a, const CirculationPhysicalSource& b) {
-    const auto& x = a.geometry;
-    const auto& y = b.geometry;
-    return a.topology.same_owner(b.topology) && x.fingerprint == y.fingerprint &&
-           x.model == y.model && x.reference == y.reference && x.mapping == y.mapping &&
-           x.connectivity == y.connectivity && x.policy == y.policy && x.kernel == y.kernel &&
-           x.radius == y.radius;
-}
-
 void verify_ambient(const CaseClockedFlowSample& clock, const ProjectedCaseUniformFlow& flow,
                     m::Work& work) {
     const auto& x = clock.ambient().source();
@@ -93,7 +84,7 @@ struct FixedBdf2Circulation::Data {
     };
 
     std::optional<CaseClockedFlowSample> destination;
-    std::optional<CirculationPhysicalSource> source;
+    std::optional<a::PreparedTopologyOwner> source;
     std::array<core::NumericalGeneration, 2> history{core::NumericalGeneration{0},
                                                      core::NumericalGeneration{0}};
     core::PlannedBuffer<Row> rows;
@@ -127,7 +118,7 @@ core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare(
                 (void)read(destination.time());
                 verify_ambient(previous, previous_solution.flow(), work);
                 verify_ambient(older, older_solution.flow(), work);
-                if (!same_reference(previous_solution.source(), older_solution.source()))
+                if (!previous_solution.source().same_owner(older_solution.source()))
                     reject(StaleGeneration);
                 const auto twice_h =
                     m::scale(case_components::rational(h, maximum_integer_bits, work), 1);
@@ -165,7 +156,7 @@ core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare(
         });
 }
 
-void FixedBdf2Circulation::bind(const CirculationPhysicalSource& current,
+void FixedBdf2Circulation::bind(const a::PreparedTopologyOwner& current,
                                 const ProjectedCaseUniformFlow& flow,
                                 core::NumericalGeneration generation, std::size_t size,
                                 m::Work& work) const {
@@ -176,7 +167,7 @@ void FixedBdf2Circulation::bind(const CirculationPhysicalSource& current,
     const auto& owner = storage.front();
     if (!owner.source || !owner.destination)
         reject(InvalidInput);
-    if (!same_reference(current, *owner.source) || owner.rows.size() != size ||
+    if (!current.same_owner(*owner.source) || owner.rows.size() != size ||
         generation == owner.history[0] || generation == owner.history[1])
         reject(StaleGeneration);
     verify_ambient(*owner.destination, flow, work);

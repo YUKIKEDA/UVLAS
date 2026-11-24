@@ -197,11 +197,6 @@ struct CirculationResidualRow {
     bool includes_wake_quadrature{};
 };
 
-struct CirculationPhysicalSource {
-    aero::detail::GeometryContext geometry;
-    aero::detail::PreparedTopologyOwner topology;
-};
-
 /// Own both the LU-qualified retained words and the independent native residual
 /// check. No physical mapping or continuous wake-integral accuracy is inferred.
 class DiscreteCirculation {
@@ -220,10 +215,10 @@ public:
         return flow_;
     }
     [[nodiscard]] const ProjectedCaseUniformFlow& flow() const&& = delete;
-    [[nodiscard]] const CirculationPhysicalSource& source() const& noexcept {
+    [[nodiscard]] const aero::detail::PreparedTopologyOwner& source() const& noexcept {
         return source_;
     }
-    [[nodiscard]] const CirculationPhysicalSource& source() const&& = delete;
+    [[nodiscard]] const aero::detail::PreparedTopologyOwner& source() const&& = delete;
     [[nodiscard]] std::uint64_t used_steps() const noexcept {
         return steps_;
     }
@@ -233,14 +228,14 @@ private:
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
                         std::optional<aero::detail::P1ActionValue>,
-                        core::PlannedBuffer<aero::detail::p1::Interval>, CirculationPhysicalSource,
-                        std::uint64_t) noexcept;
+                        core::PlannedBuffer<aero::detail::p1::Interval>,
+                        aero::detail::PreparedTopologyOwner, std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
     std::optional<aero::detail::P1ActionValue> geometry_owner_;
     core::PlannedBuffer<aero::detail::p1::Interval> influence_;
-    CirculationPhysicalSource source_;
+    aero::detail::PreparedTopologyOwner source_;
     std::uint64_t steps_;
 };
 

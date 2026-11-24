@@ -34,7 +34,7 @@ private:
     core::PlannedBuffer<Data> data_;
 
     /// These internal actions use the load routine's same bounded arithmetic.
-    void bind(const CirculationPhysicalSource&, const ProjectedCaseUniformFlow&,
+    void bind(const aero::detail::PreparedTopologyOwner&, const ProjectedCaseUniformFlow&,
               core::NumericalGeneration, std::size_t, aero::detail::p1::Work&) const;
     [[nodiscard]] aero::detail::p1::Interval value(std::size_t, aero::detail::PhysicalFaceId,
                                                    const aero::detail::p1::Interval&,
