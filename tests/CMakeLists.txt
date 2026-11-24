@@ -144,6 +144,12 @@ uvlas_add_test(io.external_planar_pg
     LIBS uvlas_io Boost::hash2)
 target_include_directories(uvlas_test_io_external_planar_pg PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.external_pg_regional_thickness
+    LABELS integration
+    SOURCES io/external_pg_regional_thickness_test.cpp
+    LIBS uvlas_io)
+target_include_directories(uvlas_test_io_external_pg_regional_thickness PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.gmsh_mesh
     LABELS unit property negative verification
     SOURCES io/gmsh_mesh_test.cpp support/allocation_audit.cpp
