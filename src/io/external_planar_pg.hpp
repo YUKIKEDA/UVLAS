@@ -162,9 +162,9 @@ struct NastranPlanarPgBoundView {
     std::uint64_t directed_work;
 };
 
-// Bounds the same-chart reference-surface distance and oriented normal chord
-// on each complete planar face. Geometry bounds do not confer exact equivalence
-// or acceptance under a physical conversion budget.
+// Bounds the same-chart distance and oriented normal chord between complete
+// planar Nastran faces and a prepared PG reference graph of degree at most four.
+// Geometry bounds are an input to physical conversion acceptance.
 class NastranPlanarPgBounds {
 public:
     NastranPlanarPgBounds(NastranPlanarPgBounds&&) noexcept = default;
