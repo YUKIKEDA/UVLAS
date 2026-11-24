@@ -640,6 +640,12 @@ private:
 
 /// Shared fixed-chart circulation directions, with independent load-only inputs.
 struct DiscreteImplicitVectorLoadDirection {
+    DiscreteImplicitVectorLoadDirection(aero::detail::P1ActionStamp trial,
+                                        core::NumericalGeneration generation,
+                                        const DiscreteCirculationDirection& variation,
+                                        std::span<const EdgeMidpointVelocity> midpoint,
+                                        std::span<const BoundCirculationRate> rate) noexcept
+        : stamp(trial), circulation(generation), state(variation), edges(midpoint), rates(rate) {}
     aero::detail::P1ActionStamp stamp;
     core::NumericalGeneration circulation; ///< Retained primal generation.
     DiscreteCirculationDirection
