@@ -1,0 +1,35 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-pcomp-pg-quantities",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "N4-02",
+    "R-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "2e8a6059b31028fa9f2ed76ef37dc2084a85944e",
+  "claimed_state": "認証済み PCOMP の全厚・層順・界面を平面 PG と照合し、各層に対応する Case 材料の明示値を厳密に比較する。",
+  "checks": {
+    "windows_debug_targets_passed": 2,
+    "windows_release_targets_passed": 2,
+    "gcc_asan_ubsan_targets_passed": 2,
+    "ply_assertions_per_configuration": 269,
+    "real_file_assertions_per_configuration": 448,
+    "removed_reflection_ply_failures": 2,
+    "removed_reflection_real_file_failures": 4,
+    "clang_tidy_translation_units_passed": 4
+  },
+  "artifacts": {
+    "CMakeLists.txt": "c677101ab4f38b5c83a0042b7c8f13491dcabc3b85fc78d2c450d1fc670924a6",
+    "docs/verification/IM-06/nastran-pcomp-pg-quantities.md": "7ea7e87195175ee0774feeaa8726b37c363d0663aeb845a84143335c1b460066",
+    "src/io/external_mesh_sidecar_pg.cpp": "8232b336218261994206a08747fadaa2941eb3eb783011f6a788ae66e8071499",
+    "src/io/external_mesh_sidecar_pg.hpp": "642ff1b9d81634542acba2bf1c735426e10891135d9fc0b52dc64e0eef80f398",
+    "src/io/nastran_pcomp_physical.cpp": "60e98e161380a8d9a5d5e7246eb7c5865492b46b630a5887ea556129bac25d7d",
+    "src/io/nastran_pcomp_physical.hpp": "90c373ffacdf00241282e05d83f02d956a4949572ff9e68f568d5303072e07b8",
+    "tests/io/nastran_laminate_cards_test.cpp": "2238b194dc3165bfdc02a1eb58984a67ad59ea62e528f990ed562e8214a169f2",
+    "tests/io/reference_input_test.cpp": "46fd70410ef74f22db087cd7bdbc35c01c36465a4692aa73fce11f588f7dbfe8"
+  }
+}
