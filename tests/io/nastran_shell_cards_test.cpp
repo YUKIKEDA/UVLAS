@@ -1,4 +1,5 @@
 #include "nastran_shell_cards.hpp"
+#include "nastran_support_cards.hpp"
 #include "source_digest.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -306,6 +307,127 @@ TEST_CASE("Nastran shell identities, work and memory obey the supplied plan",
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == ResourceExceeded);
     CHECK(short_work.remaining_bytes() < memory);
+}
+
+TEST_CASE("Nastran structural supports preserve prescribed motion, THRU and set membership",
+          "[IO4-03][verification]") {
+    const auto source = std::string{grids} + "SPC,10,17,135,-2.5D+1,8,46,\n"
+                                             "SPC1,30,26,7,THRU,24\n"
+                                             "SPC1,30,126,41,22\n"
+                                             "SPCADD,100,30,10\n";
+    const auto parent = coordinates(source);
+    const auto parent_view = take(parent.view());
+    core::ResourcePlan plan{memory};
+    auto resolved = take(NastranSupportCards::prepare(parent, {5, 2, 10000}, plan, {}));
+    const auto initial = take(resolved.view());
+    CHECK(initial.source.digest == parent_view.bulk.digest);
+    CHECK(initial.source.location.source == parent_view.bulk.location.source);
+    REQUIRE(initial.terms.size() == 5);
+    REQUIRE(initial.union_members.size() == 2);
+    CHECK(initial.terms[0].set == NastranSupportSetId{10});
+    CHECK(initial.terms[0].components == 0b010101);
+    const auto& point = std::get<NastranSupportPoint>(initial.terms[0].target);
+    CHECK(point.grid == NastranGridId{17});
+    CHECK(parent_view.grids[point.grid_ordinal].id == point.grid);
+    const auto prescribed = take(initial.terms[0].prescribed_motion);
+    CHECK(prescribed.decimal() == "-2.5e+1");
+    CHECK(parent_view.bulk.text(take(initial.terms[0].motion_field)) == "-2.5D+1");
+    CHECK(initial.terms[1].components == 0b101000);
+    CHECK_FALSE(initial.terms[1].prescribed_motion);
+    CHECK(parent_view.bulk.text(take(initial.terms[1].motion_field)).empty());
+    const auto& range = std::get<NastranSupportRange>(initial.terms[2].target);
+    CHECK(range.first == NastranGridId{7});
+    CHECK(range.last == NastranGridId{24});
+    CHECK(parent_view.bulk.text(range.thru_field) == "THRU");
+    CHECK(std::get<NastranSupportPoint>(initial.terms[3].target).grid == NastranGridId{41});
+    CHECK(std::get<NastranSupportPoint>(initial.terms[4].target).grid == NastranGridId{22});
+    CHECK(initial.union_members[0].combination == NastranSupportSetId{100});
+    CHECK(initial.union_members[0].member == NastranSupportSetId{30});
+    CHECK(initial.union_members[1].member == NastranSupportSetId{10});
+    CHECK(take(parent.view()).bulk.bytes == source);
+
+    const auto moved = std::move(resolved);
+    // NOLINTNEXTLINE(bugprone-use-after-move): moving invalidates the old support view.
+    CHECK_FALSE(resolved.view());
+    CHECK(take(moved.view()).terms.size() == 5);
+
+    core::ResourcePlan exact{plan.allocated_bytes()};
+    CHECK(NastranSupportCards::prepare(parent, {5, 2, initial.work}, exact, {}));
+    core::ResourcePlan constrained{plan.allocated_bytes() - 1};
+    const auto short_memory =
+        NastranSupportCards::prepare(parent, {5, 2, initial.work}, constrained, {});
+    REQUIRE_FALSE(short_memory);
+    CHECK(short_memory.error().code == ResourceExceeded);
+    core::ResourcePlan enough{memory};
+    const auto short_work =
+        NastranSupportCards::prepare(parent, {5, 2, initial.work - 1}, enough, {});
+    REQUIRE_FALSE(short_work);
+    CHECK(short_work.error().code == ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop is non-const.
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    core::ResourcePlan no_memory{0};
+    const auto cancelled =
+        NastranSupportCards::prepare(parent, {5, 2, initial.work}, no_memory, stop.get_token());
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == Cancelled);
+    CHECK(no_memory.allocated_bytes() == 0);
+    CHECK(take(parent.view()).bulk.bytes == source);
+}
+
+TEST_CASE("Nastran structural supports diagnose invalid references before returning a set",
+          "[IO4-03][negative]") {
+    using SupportIssue = NastranSupportFailure;
+    std::string_view input;
+    SupportIssue reason{};
+    std::size_t expected_line = 5;
+    std::optional<std::size_t> expected_column;
+    SECTION("unknown explicit point") {
+        input = "SPC1,10,2,12";
+        reason = SupportIssue::UnknownGrid;
+    }
+    SECTION("repeated component digit") {
+        input = "SPC,10,17,122,0.0";
+        reason = SupportIssue::InvalidField;
+    }
+    SECTION("invalid range direction") {
+        input = "SPC1,10,123,24,THRU,7";
+        reason = SupportIssue::InvalidField;
+    }
+    SECTION("invalid prescribed real") {
+        input = "SPC,10,17,1,TRU";
+        reason = SupportIssue::InvalidField;
+    }
+    SECTION("unsupported nesting") {
+        input = "SPCADD,30,20\nSPCADD,20,10\nSPC1,10,2,17";
+        reason = SupportIssue::NestedCombination;
+    }
+    SECTION("unresolved union member") {
+        input = "SPCADD,30,10";
+        reason = SupportIssue::UnknownSet;
+    }
+    SECTION("duplicate union member") {
+        input = "SPCADD,30,10,10\nSPC1,10,2,17";
+        reason = SupportIssue::DuplicateMember;
+        expected_column = 14;
+    }
+    SECTION("duplicate set combination") {
+        input = "SPCADD,30,20\nSPCADD,30,10\nSPC1,10,2,17\nSPC1,20,2,8";
+        reason = SupportIssue::DuplicateCombination;
+        expected_line = 6;
+    }
+    const auto source = std::string{grids} + std::string{input};
+    const auto parent = coordinates(source);
+    core::ResourcePlan plan{memory};
+    std::optional<NastranSupportDiagnostic> diagnostic;
+    const auto result = NastranSupportCards::prepare(parent, {8, 8, 10000}, plan, {}, &diagnostic);
+    REQUIRE_FALSE(result);
+    REQUIRE(diagnostic);
+    CHECK(diagnostic->reason == reason);
+    CHECK(diagnostic->position.line == expected_line);
+    if (expected_column)
+        CHECK(diagnostic->position.column == *expected_column);
+    CHECK(take(parent.view()).bulk.bytes == source);
 }
 
 } // namespace
