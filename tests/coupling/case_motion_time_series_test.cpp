@@ -1,3 +1,4 @@
+#include "coupling/case_flow_clock.hpp"
 #include "coupling/case_motion.hpp"
 #include "coupling/case_motion_time_series.hpp"
 #include "io/case_schema_test_adapter.hpp"
@@ -6,6 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
+#include <cmath>
 
 namespace {
 using namespace uvlas;
@@ -83,13 +85,17 @@ io::SiCase checked_case(const a::JsonToken& input) {
     return take(io::convert_case_to_si(*checked, catalog, request, bounds, plan, nullptr));
 }
 
-c::CaseMotionField motion_field(const io::SiCase& source) {
+io::schema::AeroAttachmentPrescribed attachment_field(const io::SiCase& source) {
     const auto root = take(take(source.source_case()).get().root());
     const auto model = root.model.record();
     const auto object = take(model.aero_surfaces.at(0)).record().attachment.record();
     if (const auto* motion = std::get_if<io::schema::AeroAttachmentPrescribed>(&object))
-        return motion->motion;
+        return *motion;
     FAIL("Missing prescribed attachment");
+}
+
+c::CaseMotionField motion_field(const io::SiCase& source) {
+    return attachment_field(source).motion;
 }
 
 a::JsonToken& motion_json(a::JsonToken& root) {
@@ -284,6 +290,160 @@ TEST_CASE("Typed Motion retains Hold and periodic knot accelerations in SI time"
     exact(repeated_left.rotation_coefficient(0, Second), 2);
     exact(repeated_right.rotation_coefficient(0, Second), 2, 1, -1);
     exact(repeated_right.translation(0, Second), 0);
+}
+
+TEST_CASE("Clocked prescribed inputs share one exact node and event side",
+          "[AE-07][FD-02][N4-03][N4-06][verification][negative]") {
+    auto input = a::root("aerodynamic_prescribed_transient");
+    input.field("analysis")
+        .set(
+            "intervals",
+            a::parse(
+                R"([{"start":0,"end":1,"step":0.5,"restart":"initial"},{"start":1,"end":2,"step":0.5,"restart":"event"}])"));
+    input.field("analysis")
+        .field("wake")
+        .set(
+            "convection",
+            a::parse(
+                R"({"kind":"prescribed","velocity":{"kind":"polynomial","origin":0,"scale":1,"domain":[0,2],"coefficients":[[4,0,0],[2,0,0]]}})"));
+    input.field("flow").set(
+        "uniform",
+        a::parse(
+            R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,2],"coefficients":[[1,0,0],[3,0,0]]})"));
+    auto& motion = motion_json(input);
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[1,0,0],[3,0,0]],"outside":{"kind":"reject"}})"));
+    motion.set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"pchip","times":[0,2],"values":[[0,0,0],[0,0,1]],"outside":{"kind":"reject"}})"));
+    motion.set("events", a::parse("[0,1,2]"));
+
+    core::ResourcePlan memory{budget};
+    aero::detail::UniformFlowWorkspace flow_workspace;
+    p::CurveWorkspace motion_workspace;
+    const c::CaseUniformFlowLimits uniform{exact_limits(), limits.curve, 100};
+    const c::CaseClockedPrescribedLimits clock_limits{
+        {{uniform, 8, 8}, {uniform, 2048, 50'000}},
+        {{exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+         limits,
+         2048,
+         50'000},
+        budget};
+    const auto prepare = [&](const a::JsonToken& json, const c::CaseClockedPrescribedLimits& caps) {
+        const auto source = checked_case(json);
+        return c::prepare_case_clocked_prescribed_inputs(source, attachment_field(source), stamp,
+                                                         flow_workspace, motion_workspace, caps,
+                                                         memory);
+    };
+    const std::array<std::uint32_t, 1> one_word{1};
+    const std::array<std::uint32_t, 2> denominator{0, 1U << 12U};
+    const p::RationalView one{1, one_word, one_word}, zero{0, {}, one_word};
+    const c::CaseFlowComponentBudget component{one, {1, one_word, denominator}, zero};
+    std::array<c::CaseFlowComponentBudget, 36> pose{};
+    std::array<c::CaseFlowComponentBudget, 9> gradient{};
+    pose.fill(component);
+    gradient.fill(component);
+    const std::array vector{component, component, component};
+    const c::CaseKnownFlowProjection ambient{core::Precision::TwoWord, vector, vector, gradient};
+    const std::optional<c::CaseFlowProjectionRequest> wake{
+        std::in_place, core::Precision::TwoWord, vector, vector,
+        c::CaseFlowProjectionLimits{2048, 50'000}};
+    const c::CaseMotionProjection projection{core::Precision::TwoWord, pose, {}};
+    const auto evaluate = [&](const c::CaseClockedPrescribedInputs& ready,
+                              const c::CaseClockedPrescribedInputs& current,
+                              c::CaseFlowClockQuery query,
+                              const std::optional<c::CaseFlowProjectionRequest>& prescribed) {
+        return c::evaluate_case_clocked_prescribed_inputs(
+            ready, current, query, {zero, zero, zero}, ambient, prescribed, Second, projection,
+            flow_workspace, motion_workspace, clock_limits, memory);
+    };
+
+    SECTION("the arrival and departure agree in time and retain different accelerations") {
+        const auto ready = take(prepare(input, clock_limits));
+        const auto current = take(prepare(input, clock_limits));
+        const auto middle = take(evaluate(ready, current, {stamp, 0, 1, Automatic}, wake));
+        exact(middle.ambient.time(), 1, 2);
+        const auto left = take(evaluate(ready, current, {stamp, 0, 2, Left}, wake));
+        const auto right = take(evaluate(ready, current, {stamp, 1, 0, Right}, wake));
+        const auto verify = [](const c::CaseClockedPrescribedSample& sample, p::RequestedSide side,
+                               std::uint32_t acceleration) {
+            const auto& time = take(sample.motion.time()).get();
+            exact(sample.ambient.time(), 1);
+            exact(time.time(), 1);
+            exact(time.translation(0, First), 4, 3);
+            exact(time.translation(0, Second), acceleration, 3);
+            exact(time.rotation_coefficient(2, First), 1, 2);
+            exact(time.rotation_coefficient(2, Second), 0);
+            REQUIRE(sample.prescribed);
+            exact(sample.prescribed->jet().time(), 1);
+            exact(sample.prescribed->jet().velocity(0), 6);
+            const auto velocity = take(sample.ambient.velocity(0));
+            const auto& enclosed = std::get<io::ScaledTwoWord>(velocity);
+            CHECK(std::ldexp(enclosed.high + enclosed.low, static_cast<int>(enclosed.exponent2)) ==
+                  4.0);
+            CHECK(time.requested_side() == side);
+            CHECK(sample.ambient.requested_side() == side);
+            CHECK(sample.prescribed->requested_side() == side);
+        };
+        verify(left, Left, 1);
+        verify(right, Right, 5);
+        rejected(evaluate(ready, current, {stamp, 0, 2, Right}, wake),
+                 core::FailureCode::InvalidInput);
+        const p::PchipInputStamp stale{p::PchipIssuerId{71}, p::PchipInputGeneration{9}};
+        rejected(evaluate(ready, current, {stale, 0, 2, Left}, wake),
+                 core::FailureCode::StaleGeneration);
+        input.field("analysis").field("intervals").elements[1].set("step", a::parse("0.25"));
+        const auto changed_grid = take(prepare(input, clock_limits));
+        rejected(evaluate(ready, changed_grid, {stamp, 0, 2, Left}, wake),
+                 core::FailureCode::StaleGeneration);
+        input.field("analysis").field("intervals").elements[1].set("step", a::parse("0.5"));
+        motion.set("rotation_vector", a::parse(R"({"kind":"constant","value":[0,0,0]})"));
+        const auto changed_motion = take(prepare(input, clock_limits));
+        rejected(evaluate(ready, changed_motion, {stamp, 0, 2, Left}, wake),
+                 core::FailureCode::StaleGeneration);
+        input.field("analysis").field("wake").set("convection", a::parse(R"({"kind":"free"})"));
+        const auto free = take(prepare(input, clock_limits));
+        const auto free_sample = take(evaluate(free, free, {stamp, 0, 2, Left}, std::nullopt));
+        exact(free_sample.ambient.time(), 1);
+        CHECK_FALSE(free_sample.prescribed);
+        rejected(evaluate(free, free, {stamp, 0, 2, Left}, wake), core::FailureCode::InvalidInput);
+        rejected(evaluate(ready, free, {stamp, 0, 2, Left}, wake),
+                 core::FailureCode::StaleGeneration);
+    }
+
+    SECTION("a negative periodic extension cannot cross an undeclared event") {
+        motion.set(
+            "translation",
+            a::parse(
+                R"({"kind":"pchip","times":[0,1,2,3],"values":[[0,0,0],[1,0,0],[-1,0,0],[0,0,0]],"outside":{"kind":"periodic","period":3}})"));
+        motion.set("events", a::parse("[0,1,2,3]"));
+        motion.set("rotation_vector", a::parse(R"({"kind":"constant","value":[0,0,0]})"));
+        input.field("flow").set("uniform", a::parse(R"({"kind":"constant","value":[1,0,0]})"));
+        input.field("analysis")
+            .field("wake")
+            .set("convection",
+                 a::parse(
+                     R"({"kind":"prescribed","velocity":{"kind":"constant","value":[4,0,0]}})"));
+        auto& analysis = input.field("analysis");
+        analysis.set("intervals",
+                     a::parse(R"([{"start":-3.5,"end":-2.5,"step":0.5,"restart":"initial"}])"));
+        rejected(prepare(input, clock_limits), core::FailureCode::InvalidInput);
+        analysis.set(
+            "intervals",
+            a::parse(
+                R"([{"start":-3.5,"end":-3,"step":0.5,"restart":"initial"},{"start":-3,"end":-2.5,"step":0.5,"restart":"event"}])"));
+        const auto ready = take(prepare(input, clock_limits));
+        const auto left = take(evaluate(ready, ready, {stamp, 0, 1, Left}, wake));
+        const auto right = take(evaluate(ready, ready, {stamp, 1, 0, Right}, wake));
+        exact(take(left.motion.time()).get().translation(0, Second), 4);
+        exact(take(right.motion.time()).get().translation(0, Second), 4, 1, -1);
+        auto capped = clock_limits;
+        capped.maximum_event_work = 1;
+        rejected(prepare(input, capped), core::FailureCode::ResourceExceeded);
+    }
 }
 
 TEST_CASE("Prepared Motion projects a rotated Frame and PCHIP side accelerations together",

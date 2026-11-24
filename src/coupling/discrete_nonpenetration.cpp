@@ -4,6 +4,7 @@
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
 #include "aero/query_coordinates_private.hpp"
+#include "case_dyadic_words_private.hpp"
 
 #include <algorithm>
 #include <bit>
@@ -116,6 +117,15 @@ Vector difference(const Vector& a, const Vector& b, p::Work& work) {
     return {p::subtract(a[0], b[0], work), p::subtract(a[1], b[1], work),
             p::subtract(a[2], b[2], work)};
 }
+std::array<Vector, 2> import_collocation_tangents(const DiscreteCollocation& row, p::Work& work) {
+    if (const auto* explicit_words = std::get_if<ExplicitCollocationTangents>(&row.tangents))
+        return {import((*explicit_words)[0], work), import((*explicit_words)[1], work)};
+    const auto& points = std::get<RoundedFacetTangents>(row.tangents).points;
+    const auto x0 = import(points[0], work);
+    return {difference(import(points[1], work), x0, work),
+            difference(import(points[2], work), x0, work)};
+}
+
 void require_positive(const p::Interval& interval) {
     if (p::compare(interval.upper, {}) <= 0)
         reject(core::FailureCode::GeometryInvalid);
@@ -124,8 +134,7 @@ void require_positive(const p::Interval& interval) {
 }
 Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel,
                       const DiscreteCollocation& input, p::Work& work) {
-    const auto tx = import(input.tangents[0], work);
-    const auto ty = import(input.tangents[1], work);
+    const auto [tx, ty] = import_collocation_tangents(input, work);
     auto normal = cross(tx, ty, work);
     const auto length2 = dot(normal, normal, work);
     require_positive(length2);
@@ -451,8 +460,7 @@ p::Interval fixed_circulation_direction(const DiscreteCollocation& row,
                                         const Vector& normal, const Vector& relative,
                                         const Vector& ambient_direction,
                                         const a::P1ActionValue& induced, p::Work& work) {
-    const auto x = import(row.tangents[0], work);
-    const auto y = import(row.tangents[1], work);
+    const auto [x, y] = import_collocation_tangents(row, work);
     const auto dx = import(direction.tangents[0], work);
     const auto dy = import(direction.tangents[1], work);
     const auto length = tangent_length(x, y, work);
@@ -472,44 +480,6 @@ p::Interval fixed_circulation_direction(const DiscreteCollocation& row,
     return p::add(dot(d_normal, native_velocity(relative, induced, work), work),
                   dot(normal, d_total, work), work);
 }
-
-struct DyadicWords {
-    std::array<std::uint32_t, 128> numerator{}, denominator{};
-    std::size_t numerator_size = 0, denominator_size = 1;
-    int sign = 0;
-
-    DyadicWords(a::ExactInteger number, unsigned shift, p::Work& work) {
-        work.step();
-        denominator[0] = 1;
-        if (number == 0)
-            return;
-        sign = number < 0 ? -1 : 1;
-        if (sign < 0)
-            number = -number;
-        const auto trim =
-            std::min(shift, static_cast<unsigned>(boost::multiprecision::lsb(number)));
-        number >>= trim;
-        shift -= trim;
-        const auto word = shift / 32U;
-        if (word >= denominator.size())
-            reject(core::FailureCode::ResourceExceeded);
-        denominator[0] = 0;
-        denominator[word] = std::uint32_t{1} << (shift % 32U);
-        denominator_size = static_cast<std::size_t>(word) + 1;
-        while (number != 0) {
-            work.step();
-            if (numerator_size == numerator.size())
-                reject(core::FailureCode::ResourceExceeded);
-            numerator[numerator_size++] = (number & 0xffffffffU).convert_to<std::uint32_t>();
-            number >>= 32U;
-        }
-    }
-
-    [[nodiscard]] a::pchip::RationalView view() const noexcept {
-        return {sign, std::span{numerator}.first(numerator_size),
-                std::span{denominator}.first(denominator_size)};
-    }
-};
 
 struct KnownRowData {
     std::optional<CaseKnownFlowJet> jet;
@@ -1290,8 +1260,7 @@ struct NonpenetrationBuilder {
         const auto weight =
             p::negate(import(retained_word(transpose->solution().values(), i), work), work);
         const auto velocity_dual = scale_vector(data.normal, weight, work);
-        const auto x = import(row.tangents[0], work);
-        const auto y = import(row.tangents[1], work);
+        const auto [x, y] = import_collocation_tangents(row, work);
         const auto direction = native_velocity(data.relative, primal, work);
         const auto area_dual = scale_vector(
             normal_projection(data.normal, direction, tangent_length(x, y, work), work), weight,

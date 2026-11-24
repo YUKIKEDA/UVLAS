@@ -18,6 +18,7 @@ struct ExactQueryCoordinates {
 
 [[nodiscard]] AeroResult<ExactQueryCoordinates>
 exact_query_coordinates(const OwnedGeometry&, const ResolvedQuery&, const GeometryLimits&,
-                        GeometryWorkspace&, std::stop_token = {}) noexcept;
+                        GeometryWorkspace&, std::stop_token = {},
+                        Configuration = Configuration::Current) noexcept;
 
 } // namespace uvlas::aero::detail
