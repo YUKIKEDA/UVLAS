@@ -2634,9 +2634,11 @@ struct NonpenetrationBuilder {
         std::span<const a::PointId> particles, const DiscreteFreeWakeDirection* direction,
         std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits& limits,
         a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
-        core::ResourcePlan& memory, const std::stop_token& stop) {
+        core::ResourcePlan& memory, const std::stop_token& stop, FreeWakeSeedSign seed_sign) {
         p::Work work{0, limits.action.steps, stop};
         work.step();
+        if (seed_sign != FreeWakeSeedSign::Positive && seed_sign != FreeWakeSeedSign::Negative)
+            reject(core::FailureCode::InvalidInput);
         if (particles.empty() || input.wake.empty() ||
             (!seeds.empty() && seeds.size() != particles.size()))
             reject(core::FailureCode::InvalidInput);
@@ -2711,9 +2713,16 @@ struct NonpenetrationBuilder {
                     known_direction(sample, dx, ambient_direction, time_direction, work);
                 jvp.emplace(finish(add_vectors(known, induction_direction(induced, work), work)));
             }
-            if (!seeds.empty())
-                accumulate_wake_dual(dual, sample, seeds[i], action, source, assembly,
-                                     limits.action, shared, memory, work);
+            if (!seeds.empty()) {
+                const auto& requested = seeds[i];
+                const auto seed =
+                    seed_sign == FreeWakeSeedSign::Positive
+                        ? requested
+                        : NonpenetrationVector{negative(requested[0]), negative(requested[1]),
+                                               negative(requested[2])};
+                accumulate_wake_dual(dual, sample, seed, action, source, assembly, limits.action,
+                                     shared, memory, work);
+            }
             if (!sample.jet)
                 reject(core::FailureCode::InvalidInput);
             out.rows.values()[i].emplace(
@@ -3831,10 +3840,11 @@ core::Result<DiscreteFreeWakeVelocity> evaluate_discrete_free_wake_velocity(
     std::span<const a::PointId> particles, const DiscreteFreeWakeDirection* direction,
     std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits& limits,
     a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
-    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    core::ResourcePlan& memory, const std::stop_token& stop, FreeWakeSeedSign seed_sign) noexcept {
     try {
-        return NonpenetrationBuilder::evaluate_wake_velocity(
-            input, flow, particles, direction, seeds, limits, shared, local, kernel, memory, stop);
+        return NonpenetrationBuilder::evaluate_wake_velocity(input, flow, particles, direction,
+                                                             seeds, limits, shared, local, kernel,
+                                                             memory, stop, seed_sign);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {

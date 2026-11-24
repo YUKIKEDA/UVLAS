@@ -1103,6 +1103,9 @@ private:
     core::PlannedBuffer<DiscreteFreeWakeRun> data_;
 };
 
+/// Compose the velocity pullback directly into a signed residual.
+enum class FreeWakeSeedSign : std::uint8_t { Positive, Negative };
+
 /// Use a fixed contact-qualified source state and its positive common SI radius.
 /// Each selected particle belongs to a retained wake face. The listed IDs can be
 /// explicit aliases of wake points, with one evaluation per canonical owner.
@@ -1115,6 +1118,7 @@ private:
     std::span<const aero::detail::PointId> particles, const DiscreteFreeWakeDirection*,
     std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits&,
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
-    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {},
+    FreeWakeSeedSign = FreeWakeSeedSign::Positive) noexcept;
 
 } // namespace uvlas::coupling::detail
