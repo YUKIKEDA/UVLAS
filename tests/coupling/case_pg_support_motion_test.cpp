@@ -1138,6 +1138,11 @@ TEST_CASE(
 TEST_CASE("Case material assembly qualifies every surface and its shared original vertices",
           "[verification][negative][AE-02][SH-D05][SH-D06][V-MULTI]") {
     namespace ae = uvlas::aero::detail;
+    bool displaced = false;
+    SECTION("The two qualified sides share the same exact row") {}
+    SECTION("Individually qualified nearby sides cannot share one canonical point") {
+        displaced = true;
+    }
     auto wire = a::root("coupled_transient");
     wire.field("units").set("length", a::string("m"));
     wire.field("numerics").field("patch").set("geometry_error", a::parse("0.000001"));
@@ -1148,7 +1153,8 @@ TEST_CASE("Case material assembly qualifies every surface and its shared origina
     first_geometry.set("width", a::parse(R"({"numerator":"1","denominator":"1"})"));
     auto second_geometry = first_geometry;
     second_geometry.set("id", a::string("3"));
-    second_geometry.field("frame").set("origin", a::parse("[3.5,-3,5]"));
+    second_geometry.field("frame").set(
+        "origin", a::parse(displaced ? "[3.5,-3,5.00000011920928955078125]" : "[3.5,-3,5]"));
     model.field("geometry").elements.push_back(std::move(second_geometry));
 
     auto& first_surface = model.field("aero_surfaces").elements.front();
@@ -1167,8 +1173,14 @@ TEST_CASE("Case material assembly qualifies every surface and its shared origina
         terms[0].field("coefficient").elements[1].set("numerator", a::string(second ? "1" : "0"));
         terms[0].field("coefficient").elements[1].set("denominator", a::string(second ? "2" : "1"));
         if (second) {
-            terms[0].field("coefficient").elements[2].set("numerator", a::string("0"));
-            terms[0].field("coefficient").elements[2].set("denominator", a::string("1"));
+            terms[0]
+                .field("coefficient")
+                .elements[2]
+                .set("numerator", a::string(displaced ? "1" : "0"));
+            terms[0]
+                .field("coefficient")
+                .elements[2]
+                .set("denominator", a::string(displaced ? "1048576" : "1"));
         }
         terms[2].field("coefficient").elements[1].set("denominator", a::string("2"));
         terms[2].field("coefficient").elements[2].set("denominator", a::string("2"));
@@ -1240,8 +1252,22 @@ TEST_CASE("Case material assembly qualifies every surface and its shared origina
     constexpr std::array left{ae::PhysicalFaceId{17}}, right{ae::PhysicalFaceId{8}};
     const std::array mapping{c::CaseAeroSurfacePanels{2, right}, c::CaseAeroSurfacePanels{1, left}};
     const c::CaseMaterialSurfaceModelLimits limits{material, exact, 2, 2, 16, 1000};
-    const auto prepared = take(c::CaseMaterialSurfaceModel::prepare(
-        typed, mapping, contact, support, patches, limits, workspace, plan));
+    auto candidate = c::CaseMaterialSurfaceModel::prepare(typed, mapping, contact, support, patches,
+                                                          limits, workspace, plan);
+    if (displaced) {
+        for (const auto& by_surface : mapping) {
+            const auto selected = take(c::CaseMaterialChart::prepare(typed, by_surface.surface,
+                                                                     material, workspace, plan));
+            const auto geometry = take(selected.identity()).geometry_id;
+            const auto thin =
+                take(c::CaseReferenceSurface::prepare(typed, geometry, material.chart, plan));
+            REQUIRE(c::CaseMaterialOriginalLayout::prepare(
+                selected, thin, contact, by_surface.physical_panels, material.chart, plan));
+        }
+        check_failure(candidate, core::FailureCode::GeometryInvalid);
+        return;
+    }
+    const auto prepared = take(std::move(candidate));
     CHECK(prepared.surface_count() == 2);
     const auto original_left = take(prepared.corner(ae::FacetId{200}, 2));
     const auto original_right = take(prepared.corner(ae::FacetId{202}, 0));

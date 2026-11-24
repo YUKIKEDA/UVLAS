@@ -85,7 +85,7 @@ struct CaseMaterialSurfaceModel::Surface {
     CaseMaterialChart chart;
     CaseReferenceSurface thin;
     CaseMaterialOriginalLayout layout;
-    CaseMaterialChartIdentity id{};
+    CaseMaterialChartIdentity id;
     s::PgPreparedPatchIdentity patch{};
     std::size_t patch_ordinal{};
 };
