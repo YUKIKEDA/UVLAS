@@ -47,6 +47,13 @@ public:
             return inspect_gmsh(snapshot);
         case ReferenceRole::NastranDeck:
             return inspect_nastran(snapshot);
+        case ReferenceRole::NastranSidecar:
+        case ReferenceRole::GmshSidecar:
+            if (auto& limit = limits_.sidecar) {
+                return inspect_sidecar(snapshot, *limit);
+            }
+            return reject({Code::Unsupported, operation}, snapshot,
+                          LeafReferenceFailure::UnsupportedRole);
         default:
             return reject({Code::Unsupported, operation}, snapshot,
                           LeafReferenceFailure::UnsupportedRole);
@@ -77,6 +84,20 @@ private:
                                  }));
         }
         limits_.nastran.work -= *work;
+        return ExtractedReferenceDependencies{};
+    }
+
+    [[nodiscard]] core::Result<ExtractedReferenceDependencies>
+    inspect_sidecar(const AcquiredRootSnapshot& snapshot, MeshSidecarLimits& limit) noexcept {
+        std::optional<MeshSidecarDiagnostic> detail;
+        const auto parsed = read_mesh_sidecar(snapshot, limit, plan_, stop_, &detail);
+        if (!parsed) {
+            if (diagnostic_) {
+                diagnostic_->sidecar = detail;
+            }
+            return reject(parsed.error(), snapshot, LeafReferenceFailure::Sidecar);
+        }
+        limit.maximum_work -= parsed->work();
         return ExtractedReferenceDependencies{};
     }
 
@@ -668,6 +689,7 @@ void LeafReferenceDiagnostic::reset() noexcept {
     format_offset.reset();
     declaring_source.reset();
     path.reset();
+    sidecar.reset();
     walk.reset();
     declaration_pointer = {};
 }
