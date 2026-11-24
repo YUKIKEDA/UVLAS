@@ -3825,7 +3825,7 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     auto geometry_work = test_geometry::workspace(memory);
     auto global = take(a::GlobalWorkspace::create(memory, contact_caps.metadata));
     auto old_words = coordinates0;
-    for (const auto row : {0U, 1U, 2U, 3U, 5U})
+    for (const auto row : std::array<std::size_t, 5>{0, 1, 2, 3, 5})
         old_words[3 * row] += 4;
     auto previously_moved = original;
     previously_moved.current = a::SinglePositions{old_words};
