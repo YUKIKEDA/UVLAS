@@ -204,7 +204,38 @@ TEST_CASE("PG support history qualifies complete common intervals of dependent r
         stopped.arithmetic.cancellation = requested_stop_token();
         check_failure(prepare_history(chart, tracks, stopped), core::FailureCode::Cancelled);
         CHECK(take(chart.identity()) == identity);
-        return take(prepare_history(chart, tracks, caps));
+        // Independently derive the two live sets and leaf allowance for this
+        // full-width product trial. Working bytes at the two stages overlap.
+        constexpr std::uint64_t word_bytes = sizeof(boost::multiprecision::limb_type);
+        const auto limbs = caps.arithmetic.algebra.maximum_work_bits / (8 * word_bytes);
+        constexpr std::uint64_t helper_rationals = 256;
+        constexpr std::uint64_t event_slots = 10;
+        const auto held = [&](std::uint64_t rationals) {
+            return (2 * rationals + 1) * 4 * limbs * word_bytes;
+        };
+        const auto event_bytes = held(helper_rationals + event_slots);
+        const auto combined_bytes =
+            held(helper_rationals + event_slots + 3 * caps.maximum_coefficient_triples);
+        const auto leaf_bytes = (51 * limbs + 6) * word_bytes;
+        const auto minimum = combined_bytes + leaf_bytes;
+        auto short_external = caps;
+        short_external.arithmetic.algebra.external_memory = ExactEstimateAdmission{minimum - 1};
+        check_failure(prepare_history(chart, tracks, short_external),
+                      core::FailureCode::ResourceExceeded);
+        CHECK(take(chart.identity()) == identity);
+
+        auto combined_only = caps;
+        combined_only.arithmetic.algebra.external_memory = ExactEstimateAdmission{minimum};
+        auto double_subtraction_boundary = caps;
+        double_subtraction_boundary.arithmetic.algebra.external_memory =
+            ExactEstimateAdmission{combined_bytes + event_bytes};
+        {
+            auto repeat = prepare_chart();
+            const auto alternative =
+                take(prepare_history(repeat, tracks, double_subtraction_boundary));
+            CHECK(alternative.events_seconds().size() == 5);
+        }
+        return take(prepare_history(chart, tracks, combined_only));
     }();
     const auto events = prepared.events_seconds();
     const std::array expected_events{Q{1} / 4, Q{1} / 2, Q{1}, Q{3} / 2, Q{7} / 4};

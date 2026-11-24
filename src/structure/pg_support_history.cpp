@@ -216,7 +216,12 @@ core::Result<PgSupportHistory> PgSupportHistory::prepare(PgSparseChart&& chart,
             const auto count = partition_mul(partition_mul(data.event_count - 1, 4), data.rows);
             if (count > limits.maximum_coefficient_triples)
                 partition_fail(core::FailureCode::ResourceExceeded);
-            math.admit(partition_add(reference_live_rationals, Data::live(events.size(), count)));
+            // The combined allowance already includes events. Replace the leaf envelope
+            // from the original limits while preserving the whole call's work counters.
+            ReferenceArithmetic combined{limits.arithmetic, plan};
+            combined.admit(
+                partition_add(reference_live_rationals, Data::live(events.size(), count)));
+            math.leaf_limits = combined.leaf_limits;
             data.rhs = allocate<Position>(math, count);
             const Constants k{math.constant("2"), math.constant("3"), math.constant("6")};
 
