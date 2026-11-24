@@ -1004,6 +1004,32 @@ foreach(wing_index RANGE 0 1)
             TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
     endforeach()
 endforeach()
+set(finite_wing_drag_grids m2n4 m4n8)
+foreach(wing_index RANGE 0 1)
+    list(GET finite_wing_shapes ${wing_index} wing_shape)
+    foreach(level RANGE 0 1)
+        list(GET finite_wing_drag_grids ${level} grid)
+        set(test_name coupling.finite_wing_drag_refinement.${wing_shape}.${grid})
+        set(target uvlas_test_coupling_finite_wing_drag_refinement_${wing_shape}_${grid})
+        uvlas_add_test(${test_name}
+            LABELS V-AERO verification
+            SOURCES coupling/finite_wing_steady_test.cpp
+            LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+        target_include_directories(${target} PRIVATE
+            "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+        target_compile_definitions(${target} PRIVATE
+            UVLAS_FINITE_WING_INDEX=${wing_index}
+            UVLAS_FINITE_WING_SERIES=3
+            UVLAS_FINITE_WING_REFINEMENT_LEVEL=${level}
+            UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json"
+            UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json"
+            UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json"
+            UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json"
+            UVLAS_FINITE_WING_SPAN_LINES_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-span-lines-v1.json"
+            UVLAS_FINITE_WING_REFINEMENT_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-drag-refinement-v1.json")
+        set_tests_properties(${test_name} PROPERTIES TIMEOUT 1200)
+    endforeach()
+endforeach()
 set(multiple_surface_cases steady loads)
 foreach(native_loads RANGE 0 1)
     list(GET multiple_surface_cases ${native_loads} mode)

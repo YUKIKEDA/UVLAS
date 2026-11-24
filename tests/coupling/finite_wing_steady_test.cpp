@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <numbers>
@@ -141,9 +143,10 @@ T take_global(a::GlobalResult<T> result) {
 }
 
 struct FiniteWingMesh {
-    explicit FiniteWingMesh(const std::array<std::array<double, 3>, 20>& coordinates) {
-        const auto point = [](std::size_t chord, std::size_t span) {
-            return a::PointId{1 + 5 * chord + span};
+    explicit FiniteWingMesh(std::span<const std::array<double, 3>> coordinates,
+                            std::size_t chord_count = 2, std::size_t span_count = 4) {
+        const auto point = [span_count](std::size_t chord, std::size_t span) {
+            return a::PointId{1 + (span_count + 1) * chord + span};
         };
         for (std::size_t i = 0; i < coordinates.size(); ++i) {
             ids.emplace_back(i + 1);
@@ -162,9 +165,9 @@ struct FiniteWingMesh {
             }
             return found->second;
         };
-        for (std::size_t chord = 0; chord < 3; ++chord) {
-            for (std::size_t span = 0; span < 4; ++span) {
-                const auto index = 4 * chord + span;
+        for (std::size_t chord = 0; chord <= chord_count; ++chord) {
+            for (std::size_t span = 0; span < span_count; ++span) {
+                const auto index = span_count * chord + span;
                 const a::PhysicalFaceId face{100 + index};
                 const a::BandId band{50 + span};
                 const std::array vertex{point(chord, span), point(chord, span + 1),
@@ -173,11 +176,11 @@ struct FiniteWingMesh {
                                          edge(vertex[2], vertex[3]), edge(vertex[3], vertex[0])};
                 faces.push_back({face, band});
                 roles.push_back(
-                    {face, chord == 2 ? a::AeroFaceRole::Wake : a::AeroFaceRole::Bound});
+                    {face, chord == chord_count ? a::AeroFaceRole::Wake : a::AeroFaceRole::Bound});
                 quads.emplace_back(
                     face, vertex, outline, edge(vertex[0], vertex[2]),
                     std::array{a::FacetId{200 + 2 * index}, a::FacetId{201 + 2 * index}});
-                if (chord == 2)
+                if (chord == chord_count)
                     trailing.push_back({outline[0], {vertex[0], vertex[1]}});
             }
         }
@@ -259,20 +262,13 @@ cf::NonpenetrationVector xyz(const Point& point) {
 }
 
 struct CaseLattice {
-    std::array<Point, 20> vertices{};
-    std::array<Point, columns> collocation{};
-    std::array<cf::ExplicitCollocationTangents, columns> tangents{
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})},
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})},
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})},
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})},
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})},
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})},
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})},
-        cf::ExplicitCollocationTangents{xyz({}), xyz({})}};
+    std::vector<Point> vertices;
+    std::vector<Point> collocation;
+    std::vector<cf::ExplicitCollocationTangents> tangents;
 };
 
-CaseLattice lattice(const io::SiCase& si, double wake_length, core::ResourcePlan& plan) {
+CaseLattice lattice(const io::SiCase& si, double wake_length, core::ResourcePlan& plan,
+                    core::Index chord_count = 2, core::Index half_span = 2) {
     const auto root_case = take(take(si.source_case()).get().root());
     const auto model = root_case.model.record();
     const structure::PgReferenceLimits bounds{exact_limits(), 1'000'000, 1'000'000, {}};
@@ -280,14 +276,20 @@ CaseLattice lattice(const io::SiCase& si, double wake_length, core::ResourcePlan
         return take(Exact::from_decimal(number, exact_limits(), plan));
     };
     const auto center = make("0.5"), quarter = make("0.25"), three_quarters = make("0.75");
+    const auto span_count = 2 * half_span;
+    const auto vertex_width = span_count + 1;
+    const auto panel_count = static_cast<std::size_t>(chord_count * span_count);
     CaseLattice result;
+    result.vertices.resize(static_cast<std::size_t>((chord_count + 2) * vertex_width));
+    result.collocation.resize(panel_count);
+    result.tangents.resize(panel_count, {xyz({}), xyz({})});
     REQUIRE(model.aero_surfaces.size() == 2);
     REQUIRE(model.geometry.size() == 2);
     for (core::Index side = 0; side < 2; ++side) {
         const auto shape = take(model.aero_surfaces.at(side)).record();
         REQUIRE(std::holds_alternative<io::schema::AeroAttachmentFixed>(shape.attachment.record()));
-        REQUIRE(shape.chord.size() == 3);
-        REQUIRE(shape.span.size() == 3);
+        REQUIRE(shape.chord.size() == static_cast<std::uint64_t>(chord_count + 1));
+        REQUIRE(shape.span.size() == static_cast<std::uint64_t>(half_span + 1));
         REQUIRE(shape.sharing.size() == 1);
         REQUIRE(shape.orientation.text() == "positive");
         const auto definition = take(model.geometry.at(side)).record();
@@ -317,13 +319,14 @@ CaseLattice lattice(const io::SiCase& si, double wake_length, core::ResourcePlan
         const auto span = [&](core::Index i) {
             return exact_quantity(si, take(shape.span.at(i)), plan);
         };
-        for (core::Index c = 0; c < 3; ++c) {
+        for (core::Index c = 0; c <= chord_count; ++c) {
             const auto first = chord(c);
-            const auto xi = c == 2 ? take(first.clone(exact_limits(), plan))
-                                   : mix(first, chord(c + 1), quarter, plan);
-            for (core::Index s = 0; s < 3; ++s) {
+            const auto xi = c == chord_count ? take(first.clone(exact_limits(), plan))
+                                             : mix(first, chord(c + 1), quarter, plan);
+            for (core::Index s = 0; s <= half_span; ++s) {
                 const auto location = project(sample(xi, span(s)).position, plan);
-                const auto index = static_cast<std::size_t>(5 * c + 2 * side + s);
+                const auto index =
+                    static_cast<std::size_t>(vertex_width * c + half_span * side + s);
                 if (side == 1 && s == 0) {
                     CHECK(location == result.vertices[index]);
                 } else {
@@ -331,20 +334,22 @@ CaseLattice lattice(const io::SiCase& si, double wake_length, core::ResourcePlan
                 }
             }
         }
-        for (core::Index c = 0; c < 2; ++c) {
+        for (core::Index c = 0; c < chord_count; ++c) {
             const auto xi = mix(chord(c), chord(c + 1), three_quarters, plan);
-            for (core::Index s = 0; s < 2; ++s) {
+            for (core::Index s = 0; s < half_span; ++s) {
                 const auto point = sample(xi, mix(span(s), span(s + 1), center, plan));
-                const auto index = static_cast<std::size_t>(4 * c + 2 * side + s);
+                const auto index = static_cast<std::size_t>(span_count * c + half_span * side + s);
                 result.collocation[index] = project(point.position, plan);
                 result.tangents[index] = {xyz(project(point.chord_tangent, plan)),
                                           xyz(project(point.span_tangent, plan))};
             }
         }
     }
-    for (std::size_t i = 0; i < 5; ++i) {
-        result.vertices[15 + i] = result.vertices[10 + i];
-        result.vertices[15 + i][0] += wake_length;
+    for (core::Index i = 0; i < vertex_width; ++i) {
+        const auto tail = static_cast<std::size_t>((chord_count + 1) * vertex_width + i);
+        result.vertices[tail] =
+            result.vertices[static_cast<std::size_t>(chord_count * vertex_width + i)];
+        result.vertices[tail][0] += wake_length;
     }
     return result;
 }
@@ -666,13 +671,13 @@ check_span_lines(const cf::DiscreteCirculationLoads& loads, std::span<const Poin
 
 Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh& mesh,
                      const a::GlobalContactState& contact, std::span<const Point> vertices,
-                     const Rat& density) {
-    constexpr std::size_t strips = 4;
-    std::array<RationalPoint, strips + 1> edge{};
-    std::array<Rat, strips> trace{};
+                     const Rat& density, std::size_t bound_count = columns,
+                     std::size_t strips = 4) {
+    std::vector<RationalPoint> edge(strips + 1);
+    std::vector<Rat> trace(strips);
     for (std::size_t i = 0; i < strips; ++i) {
         const auto wake =
-            take_global(contact.uvlm_quad(mesh.quads[columns + i].facets[0], 1000000));
+            take_global(contact.uvlm_quad(mesh.quads[bound_count + i].facets[0], 1000000));
         const auto& owner = wake.attachment;
         if (!owner)
             FAIL("The Trefftz trace must come from a qualified trailing owner");
@@ -681,11 +686,11 @@ Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh
             CHECK(edge[i] == first);
         edge[i] = first;
         edge[i + 1] = endpoint(vertices, wake.corners[1]);
-        const auto row = columns - strips + i;
+        const auto row = bound_count - strips + i;
         REQUIRE(take(solved.row(row)).face == owner->bound_face);
         trace[i] = exact_word(words(solved.solution(), row)) * owner->coefficient;
     }
-    std::array<Rat, strips + 1> jumps{};
+    std::vector<Rat> jumps(strips + 1);
     for (std::size_t i = 0; i < strips; ++i) {
         jumps[i] -= trace[i];
         jumps[i + 1] += trace[i];
@@ -1187,6 +1192,221 @@ void run_wing(const nlohmann::json& wing, const nlohmann::json& expected,
         }
     }
 }
+#ifdef UVLAS_FINITE_WING_REFINEMENT_FIXTURE
+void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
+                      const nlohmann::json& oracle, double length, double radius) {
+    const auto m = oracle.at("chord_panels").get<core::Index>();
+    const auto n = oracle.at("span_panels").get<core::Index>();
+    CAPTURE(m, n);
+    REQUIRE(((m == 2 && n == 4) || (m == 4 && n == 8) || (m == 4 && n == 12)));
+    const auto nx = static_cast<std::size_t>(m);
+    const auto ny = static_cast<std::size_t>(n);
+    const auto order = m * n;
+    const auto count = static_cast<std::size_t>(order);
+    auto recipe = finite_wing_case(wing, radius);
+    auto& surfaces = recipe.field("model").field("aero_surfaces");
+    for (auto& surface : surfaces.elements) {
+        surface.set("chord", parse(oracle.at("chord_fractions").dump()));
+        surface.set("span", parse(oracle.at("half_span_fractions").dump()));
+    }
+    const auto si = materialize(recipe, io::SourceId{534});
+    core::ResourcePlan memory{UINT64_C(2000000000)};
+    const auto grid = lattice(si, length, memory, m, n / 2);
+    for (std::size_t i = 0; i < grid.vertices.size(); ++i) {
+        const auto expected = oracle.at("vertices_m").at(i).get<Point>();
+        for (std::size_t axis = 0; axis < expected.size(); ++axis)
+            CHECK(std::abs(grid.vertices[i][axis] - expected[axis]) <= 2e-14);
+    }
+    for (std::size_t i = 0; i < count; ++i) {
+        const auto expected = oracle.at("collocations_m").at(i).get<Point>();
+        for (std::size_t axis = 0; axis < expected.size(); ++axis)
+            CHECK(std::abs(grid.collocation[i][axis] - expected[axis]) <= 2e-14);
+    }
+    const FiniteWingMesh mesh{grid.vertices, nx, ny};
+    std::vector<a::BandId> bands;
+    for (std::size_t i = 0; i < ny; ++i)
+        bands.emplace_back(50 + i);
+    auto geometry_caps = test_geometry::limits();
+    geometry_caps.counts = {mesh.ids.size(), mesh.edges.size(),     mesh.faces.size(),
+                            bands.size(),    2 * mesh.faces.size(), mesh.quads.size()};
+    geometry_caps.max_steps = 20000000;
+    geometry_caps.predicate.max_steps = 1000000;
+    auto geometry_work = test_geometry::workspace(memory);
+    const Number instant{5, 4};
+    const a::SinglePositions positions{mesh.xyz};
+    const a::GeometryInput input_geometry{mesh.ids,
+                                          mesh.bindings,
+                                          positions,
+                                          positions,
+                                          mesh.edges,
+                                          mesh.faces,
+                                          bands,
+                                          {},
+                                          mesh.quads,
+                                          a::SingleWord{radius},
+                                          test_geometry::context(),
+                                          instant.view()};
+    const auto geometry = test_geometry::take(
+        a::prepare_owned_geometry(input_geometry, geometry_caps, *geometry_work, memory));
+    const a::GlobalLimits contact_caps{std::numeric_limits<std::uint64_t>::max() / 4,
+                                       ls::EstimateAdmission{65536}};
+    auto global = take(a::GlobalWorkspace::create(memory, contact_caps.metadata));
+    const auto topology = take_global(a::build_global_topology(
+        geometry, {mesh.roles, mesh.owners, mesh.trailing}, contact_caps, *global, memory));
+    const auto contact =
+        take_global(a::check_global_geometry(topology, geometry, contact_caps, *global, memory));
+    REQUIRE(topology.trailing_edges().size() == ny);
+
+    const cf::DiscreteNonpenetrationLimits caps{
+        {core::Precision::TwoWord, 1e-12},
+        {core::Precision::TwoWord, 1e-12, 1e-12},
+        {geometry_caps, {ls::EstimateAdmission{65536}, 1000000000}, UINT64_C(150000000000)},
+        20000000,
+        UINT64_C(70000000000000)};
+    std::vector<a::ResolvedQuery> queries;
+    queries.reserve(count);
+    for (std::size_t i = 0; i < count; ++i)
+        queries.push_back(test_geometry::take(a::resolve_query(
+            geometry, {a::QueryId{i + 1}, a::FreePoint{a::FreeSingle{grid.collocation[i]}}},
+            geometry.context(), geometry_caps, *geometry_work, memory)));
+    std::vector<cf::DiscreteCollocation> rows;
+    std::vector<cf::BoundCirculationRate> rates;
+    std::vector<a::EdgeId> physical_edges;
+    for (std::size_t i = 0; i < count; ++i) {
+        rows.emplace_back(mesh.quads[i].facets[0], queries[i], grid.tangents[i], xyz({}),
+                          a::SingleWord{0}, a::SingleWord{0});
+        rates.emplace_back(mesh.faces[i].id, a::SingleWord{0});
+        const auto& edges = mesh.quads[i].edges;
+        physical_edges.insert(physical_edges.end(), edges.begin(), edges.end());
+    }
+    std::ranges::sort(physical_edges);
+    const auto duplicate = std::ranges::unique(physical_edges);
+    physical_edges.erase(duplicate.begin(), duplicate.end());
+    std::vector<cf::EdgeMidpointVelocity> midpoint;
+    for (const auto edge : physical_edges)
+        if (!std::ranges::any_of(mesh.trailing,
+                                 [edge](const auto& row) { return row.edge == edge; }))
+            midpoint.emplace_back(edge, xyz({}));
+    REQUIRE(midpoint.size() == nx * (2 * ny + 1));
+    std::vector<cf::DiscreteWakePanel> wake;
+    for (std::size_t i = 0; i < ny; ++i)
+        wake.emplace_back(mesh.quads[count + i].facets[0], cf::AttachedWakeFront{},
+                          a::P1StrengthId{700 + i});
+
+    const std::vector<double> scales(count, 20.);
+    const std::vector<ls::UnitDimensions> gamma_units(count, {2, 0, -1, 0, 0, 0, 0});
+    const std::vector<ls::UnitDimensions> speed_units(count, {1, 0, -1, 0, 0, 0, 0});
+    const cf::DiscreteCirculationRequest request{
+        {scales, scales, gamma_units, speed_units, context(geometry.context())},
+        {order, 1, 0, 5, ls::EstimateAdmission{1U << 20U}},
+        {ls::Norm::Infinity, 1e-25, 0., 1e-23, core::ObservationId{20}, core::ObservationId{21}},
+        core::RhsGeneration{3},
+        core::NumericalGeneration{4},
+        1e-13,
+        1e-13,
+        1e-11,
+        0.};
+    constexpr a::P1ActionStamp trial{815, 6};
+    const cf::DiscreteVectorLoadInput write_loads{
+        trial, request.retained_generation, midpoint,
+        rates, a::SingleWord{1.2},          xyz({.375, 0., 0.})};
+    a::UniformFlowWorkspace flow_work;
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const auto& gamma_prime = oracle.at("gamma_derivative_m2_s_per_rad");
+    REQUIRE(gamma_prime.size() == count);
+    std::array<Enclosure, 2> near{};
+    std::array<Rat, 2> far{}, sin{}, cos{};
+    for (std::size_t sample = 0; sample < 2; ++sample) {
+        const auto& angle = polar.at("angles").at(1 + 2 * sample);
+        REQUIRE(angle.at("alpha_degrees") == (sample == 0 ? -1 : 1));
+        auto angled = recipe;
+        angled.field("flow").field("uniform").set("value", parse(angle.at("flow_m_s").dump()));
+        const auto angled_si = materialize(angled, io::SourceId{534});
+        const auto field =
+            take(cf::prepare_case_uniform_flow(angled_si, stamp, {}, flow_work, limits, memory));
+        const auto project_flow = [&] {
+            auto evaluated = take(cf::evaluate_case_uniform_flow(
+                field, field, {stamp, instant.view()}, flow_work, limits.flow, memory));
+            const Number one{1}, absolute{1, 1000000000}, zero{0};
+            const cf::CaseFlowComponentBudget component{one.view(), absolute.view(), zero.view()};
+            const std::array bounds{component, component, component};
+            return take(cf::project_case_uniform_flow(
+                std::move(evaluated), {core::Precision::TwoWord, bounds, bounds, {4096, budget}}));
+        };
+        auto flow = project_flow();
+        sin[sample] = rational_from_view(take(flow.source().jet.velocity(2))) / 20;
+        cos[sample] = rational_from_view(take(flow.source().jet.velocity(0))) / 20;
+
+        // The independent fixed point supplies the downstream trace to the native
+        // conditional solve. Verify closure below with the retained native values.
+        std::vector<cf::FrozenWakeTrace> traces;
+        for (std::size_t k = 0; k < ny; ++k) {
+            const Rat value =
+                sin[sample] * rational_word(gamma_prime.at(count - ny + k).get<double>());
+            traces.push_back({a::P1StrengthId{700 + k}, a::SingleWord{value.convert_to<double>()}});
+        }
+        const cf::DiscreteNonpenetrationInput input{contact,
+                                                    rows,
+                                                    wake,
+                                                    {core::AcceptedStateId{2}, traces},
+                                                    trial,
+                                                    stamp,
+                                                    p::RequestedSide::Automatic};
+        const auto loads = take(
+            cf::solve_discrete_circulation_loads(input, write_loads, std::move(flow), caps, request,
+                                                 *geometry_work, shared, *local, *kernel, memory));
+        const auto tolerance = rational_word(2e-10);
+        for (std::size_t k = 0; k < count; ++k) {
+            const auto held = words(loads.primal().solution(), k);
+            const Rat expected = sin[sample] * rational_word(gamma_prime.at(k).get<double>());
+            CHECK(abs(exact_word(held) - expected) <= tolerance);
+            check_within(unpack(take(loads.primal().row(k)).original_residual), 0, tolerance);
+            rows[k].circulation = held;
+            if (k >= count - ny)
+                traces[k - (count - ny)].strength = held;
+        }
+        const auto closure = take(cf::evaluate_discrete_nonpenetration(
+            input, project_flow(), caps, shared, *local, *kernel, memory));
+        for (std::size_t k = 0; k < count; ++k)
+            check_within(unpack(take(closure.row(k)).residual), 0, tolerance);
+
+        REQUIRE(loads.edge_count() == midpoint.size());
+        for (std::size_t k = 0; k < loads.edge_count(); ++k)
+            CHECK(take(loads.edge(k)).excluded_bound_occurrences > 0);
+        const auto force = unpack_vector(loads.total_force());
+        near[sample] = add(scale(force[0], cos[sample]), scale(force[2], sin[sample]));
+        far[sample] = trefftz_midpoint(loads.primal(), mesh, contact, grid.vertices,
+                                       rational_word(1.2), count, ny);
+    }
+    REQUIRE(sin[0] == -sin[1]);
+    REQUIRE(cos[0] == cos[1]);
+    const Rat far_factor = 2 * sin[1] * sin[1];
+    const Rat near_factor = far_factor * cos[1];
+    REQUIRE(near_factor > 0);
+    const auto near_coefficient = scale(add(near[0], near[1]), 1 / near_factor);
+    const Rat far_coefficient = (far[0] + far[1]) / far_factor;
+    const Rat finite_force_tolerance =
+        rational_word(2e-11) * rational_word(1.2) * 20 * 20 * rational_word(8.4) / 2;
+    check_within(near_coefficient, rational_word(oracle.at("near_drag_N_per_rad2").get<double>()),
+                 4 * finite_force_tolerance / near_factor);
+    check_within({far_coefficient, 0},
+                 rational_word(oracle.at("trefftz_drag_N_per_rad2").get<double>()),
+                 4 * finite_force_tolerance / far_factor);
+    CHECK(far_coefficient > 0);
+    std::cout << std::setprecision(16)
+              << "Midpoint drag N/rad^2, near=" << near_coefficient.center.convert_to<double>()
+              << ", near radius=" << near_coefficient.radius.convert_to<double>()
+              << ", Trefftz=" << far_coefficient.convert_to<double>()
+              << ", planned payload bytes=" << memory.allocated_bytes() << '\n';
+    const Rat gap = abs(near_coefficient.center / far_coefficient - 1);
+    const auto expected_gap = rational_word(oracle.at("relative_near_far_gap").get<double>());
+    CHECK(abs(gap - expected_gap) <=
+          (4 * finite_force_tolerance / near_factor + 4 * finite_force_tolerance / far_factor) /
+              far_coefficient);
+}
+#endif
 } // namespace
 
 TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
@@ -1207,7 +1427,7 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
     REQUIRE(wing.at("dihedral_degrees") == row.at("dihedral_degrees"));
 
     constexpr int series = UVLAS_FINITE_WING_SERIES;
-    static_assert(series >= 0 && series <= 2);
+    static_assert(series >= 0 && series <= 3);
     if constexpr (series == 0) {
         std::ifstream polar_file{UVLAS_FINITE_WING_POLARS_FIXTURE};
         REQUIRE(polar_file);
@@ -1233,6 +1453,24 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
         run_wing(wing, row, expected, polar,
                  {frozen.at("wake_length_m").get<double>(),
                   frozen.at("core_radius_m").get<double>(), true, nullptr, &line});
+#ifdef UVLAS_FINITE_WING_REFINEMENT_FIXTURE
+    } else if constexpr (series == 3) {
+        std::ifstream polar_file{UVLAS_FINITE_WING_POLARS_FIXTURE};
+        std::ifstream reference_file{UVLAS_FINITE_WING_REFINEMENT_FIXTURE};
+        REQUIRE(polar_file);
+        REQUIRE(reference_file);
+        const auto polars = nlohmann::json::parse(polar_file);
+        const auto reference = nlohmann::json::parse(reference_file);
+        REQUIRE(reference.at("id") == "finite-wing-drag-refinement-v1");
+        REQUIRE(reference.at("closure_m") == 1024.);
+        REQUIRE(reference.at("core_m") == 1.114285714285714e-5);
+        const auto& polar = polars.at("cases").at(wing_index);
+        const auto& fixture =
+            reference.at("cases").at(2 * UVLAS_FINITE_WING_REFINEMENT_LEVEL + wing_index);
+        REQUIRE(fixture.at("dihedral_degrees") == wing.at("dihedral_degrees"));
+        run_refined_drag(wing, polar, fixture, reference.at("closure_m").get<double>(),
+                         reference.at("core_m").get<double>());
+#endif
     } else {
         std::ifstream sensitivity_file{UVLAS_FINITE_WING_SENSITIVITY_FIXTURE};
         REQUIRE(sensitivity_file);
