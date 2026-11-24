@@ -54,7 +54,6 @@
     ]
   },
   "sources": {
-    "docs/specs/structure/structural-adopted-specification.md": "5e2e8ae0229fbdbf9cbb1a35dee1be9b5ea867611e3c9e1de42c5a554d00e325",
     "docs/specs/structure/connection-adopted-specification.md": "dbe318730a5024f9095e10f4ad1bbe5c70d2033f4e8ae812edb466a5ef5f7056",
     "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
     "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
@@ -69,5 +68,11 @@
     "include/uvlas/structure/pg_support_history.hpp": "cd3eea3bca96bf5ea1bd1d1d16c2a1a008a81396654a3a977c5f13f2a4aee96d",
     "src/structure/pg_support_history.cpp": "cb19f67bbfd8a928f01cb68d5365087893cf3f66f1d81decc39db3a8ee382a5a",
     "tests/structure/pg_support_history_test.cpp": "f0bed62e7b3ee65cfea4888bb83a5bc5dabca593b62099f1b1ab2cfe0592ead2"
+  },
+  "sources_at_tested_commit": {
+    "docs/specs/structure/structural-adopted-specification.md": {
+      "commit": "9df5cc1a13094ff7a32647a5474e0ba163c7b608",
+      "sha256": "5e2e8ae0229fbdbf9cbb1a35dee1be9b5ea867611e3c9e1de42c5a554d00e325"
+    }
   }
 }
