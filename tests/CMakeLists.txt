@@ -877,6 +877,11 @@ uvlas_add_test(coupling.case_uniform_flow
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+if(MSVC)
+    # The full MSVC Debug test ran in 42–55 s locally. Allow headroom on loaded hosts.
+    set_tests_properties(coupling.case_uniform_flow PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,90,60>")
+endif()
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
