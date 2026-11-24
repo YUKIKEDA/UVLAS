@@ -55,6 +55,14 @@ struct Input {
     }
 };
 
+bool missing_rule(const CasePgRuleBinding& rule) noexcept {
+    if (const auto* points =
+            std::get_if<std::span<const pg::PgDiscreteVolumePoint>>(&rule.quadrature))
+        return points->empty();
+    const auto* product = std::get_if<pg::PgVolumeProductRule>(&rule.quadrature);
+    return product == nullptr || product->radial.empty() || product->transverse.empty() ||
+           product->depth.empty();
+}
 pg::PgPreparedPatch prepare_patch(const io::SiCase& source, const CasePgRuleBinding& rule,
                                   const CasePgChartLimits& limits, core::Workspace& workspace,
                                   core::ResourcePlan& plan) {
@@ -65,8 +73,14 @@ pg::PgPreparedPatch prepare_patch(const io::SiCase& source, const CasePgRuleBind
                                                               limits.rank, workspace, plan));
     auto basis = partition_take(pg::PgReferenceBasis::prepare(std::move(geometry), std::move(rank),
                                                               limits.rank, workspace, plan));
-    auto gram = partition_take(pg::PgDiscreteGram::prepare(
-        std::move(basis), rule.points, limits.gram_grid, limits.gram, workspace, plan));
+    const auto* points = std::get_if<std::span<const pg::PgDiscreteVolumePoint>>(&rule.quadrature);
+    auto gram = partition_take(
+        points != nullptr
+            ? pg::PgDiscreteGram::prepare(std::move(basis), *points, limits.gram_grid, limits.gram,
+                                          workspace, plan)
+            : pg::PgDiscreteGram::prepare_product(
+                  std::move(basis), std::get<pg::PgVolumeProductRule>(rule.quadrature),
+                  limits.gram_grid, limits.gram, workspace, plan));
     auto certificate = partition_take(
         std::move(gram).generate_and_certify(limits.factor_grid, limits.factor, workspace, plan));
     return partition_take(
@@ -624,7 +638,7 @@ core::Result<CasePgChart> Builder::prepare(const io::SiCase& source,
                 for (std::size_t i = 0; i < rules.size(); ++i) {
                     input.step();
                     const auto shell = partition_take(model.shells.at(partition_index(i))).record();
-                    if (rules[i].shell != shell.id.unsigned_value() || rules[i].points.empty())
+                    if (rules[i].shell != shell.id.unsigned_value() || missing_rule(rules[i]))
                         partition_fail(FailureCode::InvalidInput);
                 }
                 const auto support_count = static_cast<std::size_t>(model.supports.size());

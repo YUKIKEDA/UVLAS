@@ -1,0 +1,111 @@
+#include "run-r5-handoff.cpp.txt"
+
+namespace {
+
+struct ProductNode {
+    ExactRational u, v, depth, weight;
+};
+
+} // namespace
+
+TEST_CASE("A Case keeps the actual mapped product rule and its full support",
+          "[.case-pg-product-rule][V-PG][SH-D05][verification][negative]") {
+    std::ifstream stream("r5-taper-00/case.json", std::ios::binary);
+    REQUIRE(stream);
+    auto input = nlohmann::json::parse(stream);
+    auto& geometry = input.at("model").at("geometry").front();
+    geometry.at("coefficients") = nlohmann::json::array();
+    geometry.at("degree") = {0, 0};
+    const auto source = checked_case_wire(input.dump());
+    const auto limits = chart_limits(2);
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan product_plan{profile}, invalid_plan{profile};
+    Fixture f;
+    constexpr std::size_t plane_order = 7;
+    constexpr std::size_t depth_order = 3;
+    const auto weight_plane = owned(f, Q{1, plane_order});
+    const auto weight_depth = owned(f, Q{1, depth_order});
+    std::array<ExactRational, plane_order> coordinates;
+    std::vector<PgLineQuadratureNode> plane;
+    for (std::size_t i = 0; i < coordinates.size(); ++i) {
+        coordinates[i] = owned(f, Q{2 * i + 1, 2 * plane_order});
+        plane.push_back({coordinates[i], weight_plane});
+    }
+    const std::array depths{owned(f, Q{1, 4}), owned(f, Q{1, 2}), owned(f, Q{3, 4})};
+    const std::array depth{PgLineQuadratureNode{depths[0], weight_depth},
+                           PgLineQuadratureNode{depths[1], weight_depth},
+                           PgLineQuadratureNode{depths[2], weight_depth}};
+    const std::array product{cc::CasePgRuleBinding{1, PgVolumeProductRule{plane, plane, depth}}};
+    std::vector<PgLineQuadratureNode> invalid_plane{plane.begin(), plane.end() - 1};
+    const ExactRational zero;
+    invalid_plane.push_back({coordinates.back(), zero});
+    const std::array invalid{
+        cc::CasePgRuleBinding{1, PgVolumeProductRule{invalid_plane, plane, depth}}};
+    check_failure(cc::prepare_case_pg_chart(source, invalid, limits, workspace, invalid_plan),
+                  core::FailureCode::InvalidInput);
+    core::ResourcePlan none{0};
+    check_failure(cc::prepare_case_pg_chart(source, product, limits, workspace, none),
+                  core::FailureCode::ResourceExceeded);
+    check_failure(
+        cc::prepare_case_pg_chart(source, product, limits, workspace, none, requested_stop_token()),
+        core::FailureCode::Cancelled);
+    CHECK(none.allocated_bytes() == 0);
+
+    const auto product_chart =
+        take(cc::prepare_case_pg_chart(source, product, limits, workspace, product_plan));
+    const auto shell = take(product_chart.shell_reference(numerics::PatchId{1}, 1));
+    const auto& partition =
+        take(take(shell.patch().conditioning().reference_basis())->source()).partition;
+    const auto volumes = take(partition.volumes());
+    std::vector<ProductNode> independent;
+    for (const auto& radial : plane) {
+        const Q u = q(radial.coordinate);
+        for (const auto& transverse : plane) {
+            const Q v = (1 - u) * q(transverse.coordinate);
+            for (const auto& layer : depth) {
+                const Q w = (1 - u) / (plane_order * plane_order * depth_order);
+                independent.push_back(
+                    {owned(f, u), owned(f, v), owned(f, q(layer.coordinate)), owned(f, w)});
+            }
+        }
+    }
+    std::vector<PgDiscreteVolumePoint> explicit_points;
+    const auto retained = shell.fixed_rule();
+    REQUIRE(retained.size() == volumes.size() * independent.size());
+    for (std::size_t volume = 0; volume < volumes.size(); ++volume) {
+        const auto record = static_cast<core::Index>(volume);
+        Q mass{};
+        for (std::size_t i = 0; i < independent.size(); ++i) {
+            const auto& expected = independent[i];
+            const auto& actual = retained[volume * independent.size() + i];
+            CHECK(actual.volume == record);
+            CHECK(q(actual.u) == q(expected.u));
+            CHECK(q(actual.v) == q(expected.v));
+            CHECK(q(actual.depth) == q(expected.depth));
+            CHECK(q(actual.weight) == q(expected.weight));
+            mass += q(actual.weight);
+            explicit_points.push_back(
+                {{record, expected.u, expected.v, expected.depth}, expected.weight});
+        }
+        CHECK(mass == Q{1} / 2);
+    }
+    const std::array explicit_rule{cc::CasePgRuleBinding{1, explicit_points}};
+    core::ResourcePlan comparison_plan{profile};
+    const auto explicit_chart =
+        take(cc::prepare_case_pg_chart(source, explicit_rule, limits, workspace, comparison_plan));
+    const auto explicit_shell = take(explicit_chart.shell_reference(numerics::PatchId{1}, 1));
+    CHECK(shell.chart_identity() == explicit_shell.chart_identity());
+    CHECK(shell.columns().basis == explicit_shell.columns().basis);
+    const auto& original = shell.chart().original();
+    REQUIRE(original.sources().size() == 1);
+    CHECK(original.sources()[0].kind == PgTraceKind::Support);
+    const auto x0 = shell.patch().reference_coordinates();
+    const auto residual = take(original.residual({original.layout(), x0}, limits.chart.arithmetic,
+                                                 workspace, product_plan));
+    for (const auto& item : residual.values())
+        for (const auto& x : item)
+            CHECK(x.sign() == 0);
+    std::clog << "CASE_PG_PRODUCT," << volumes.size() << ',' << retained.size() << ','
+              << original.original_rows().size() << ',' << shell.chart().pivots().size() << ','
+              << product_plan.allocated_bytes() << ',' << comparison_plan.allocated_bytes() << '\n';
+}

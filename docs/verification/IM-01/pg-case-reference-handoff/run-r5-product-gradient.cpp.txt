@@ -1,0 +1,97 @@
+#include "r5-product-rule.hpp"
+#include "run-r5-handoff.cpp.txt"
+
+namespace {
+template <std::size_t N>
+struct LineRule {
+    std::array<ExactRational, N> coordinate, weight;
+    std::vector<PgLineQuadratureNode> views;
+    explicit LineRule(Fixture& f, const std::array<std::array<std::string_view, 2>, N>& data) {
+        views.reserve(N);
+        for (std::size_t i = 0; i < N; ++i) {
+            coordinate[i] = f.r(data[i][0], rule_denominator);
+            weight[i] = f.r(data[i][1], rule_denominator);
+            views.push_back({coordinate[i], weight[i]});
+        }
+    }
+};
+} // namespace
+
+TEST_CASE("R5 tensor product conditioning at the same troublesome physical points",
+          "[.r5-product-g]") {
+    std::ifstream stream("r5-taper-00/case.json", std::ios::binary);
+    REQUIRE(stream);
+    const std::string wire{std::istreambuf_iterator<char>{stream},
+                           std::istreambuf_iterator<char>{}};
+    const auto source = checked_case_wire(wire);
+    auto limits = chart_limits(2);
+    limits.gram.arithmetic.maximum_scalar_operations = 50'000'000'000;
+    limits.gram.arithmetic.maximum_partition_visits = 20'000'000'000;
+    limits.gram.arithmetic.algebra.external_memory = ExactEstimateAdmission{profile};
+    limits.gram.arithmetic.algebra.maximum_value_bits =
+        limits.chart.arithmetic.algebra.maximum_value_bits;
+    limits.gram.arithmetic.algebra.maximum_work_bits =
+        limits.chart.arithmetic.algebra.maximum_work_bits;
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    core::ResourcePlan select_plan{profile};
+    Fixture f;
+    auto geometry =
+        take(cc::prepare_case_pg_reference(source, 1, limits.reference, workspace, plan));
+    const auto owners = take(geometry.source());
+    const auto volume_count = take(owners.partition.volumes()).size();
+    auto rank = take(PgRankPreparation::prepare(owners.dictionary, owners.partition, limits.rank,
+                                                workspace, plan));
+    auto basis = take(PgReferenceBasis::prepare(std::move(geometry), std::move(rank), limits.rank,
+                                                workspace, plan));
+    const auto nodes = finite_rule(f);
+    std::vector<ExactRational> weights;
+    const auto selected = select_rule(f, basis, 1, nodes, weights, select_plan);
+    REQUIRE(selected.size() == 282);
+    const std::array<PgReferencePoint, 2> points{selected[280].point, selected[281].point};
+    const LineRule plane(f, g17);
+    const LineRule depth(f, g3);
+    std::clog << "R5_PRODUCT_BEGIN," << volume_count << ',' << plan.allocated_bytes() << '\n'
+              << std::flush;
+    const auto begin = std::chrono::steady_clock::now();
+    auto result =
+        PgDiscreteGram::prepare_product(std::move(basis), {plane.views, plane.views, depth.views},
+                                        limits.gram_grid, limits.gram, workspace, plan);
+    if (!result)
+        FAIL("Product rule failure " << static_cast<unsigned>(result.error().code) << " after "
+                                     << plan.allocated_bytes() << " bytes");
+    auto gram = std::move(*result);
+    std::clog << "R5_PRODUCT_GRAM," << gram.info().points << ',' << gram.info().integer_steps << ','
+              << plan.allocated_bytes() << ','
+              << std::chrono::duration<double>(std::chrono::steady_clock::now() - begin).count()
+              << '\n'
+              << std::flush;
+    auto cert = take(
+        std::move(gram).generate_and_certify(limits.factor_grid, limits.factor, workspace, plan));
+    auto patch = take(PgPreparedPatch::prepare(std::move(cert), limits.patch, workspace, plan));
+    const auto& evaluation_limits = limits.chart.arithmetic;
+    const auto exact = take(patch.evaluate_reference(points, evaluation_limits, plan));
+    Decimal max_error = 0, max_magnitude = 0;
+    for (std::size_t row = 0; row < exact.points.size(); ++row) {
+        const Decimal root = sqrt(decimal(exact.points.values()[row].g));
+        for (const auto& col :
+             exact.columns.values().subspan(row * exact.column_count, exact.column_count)) {
+            for (const auto& component : col.physical_gradient_per_metre) {
+                const Decimal val = evaluate(component, root);
+                const double hi = val.convert_to<double>();
+                const double lo = (val - decimal(Q{hi})).convert_to<double>();
+                max_error = (std::max)(max_error, Decimal(abs(val - decimal(Q{hi} + Q{lo}))));
+                max_magnitude = (std::max)(max_magnitude, Decimal(abs(val)));
+            }
+        }
+    }
+    constexpr PgPreparedReferenceProjection strict{core::Precision::TwoWord, projection_error,
+                                                   projection_error,         projection_error,
+                                                   projection_error,         projection_error};
+    const auto projected = patch.project_reference(points, strict, evaluation_limits, plan);
+    std::clog << "R5_PRODUCT_G," << exact.column_count << ',' << max_magnitude << ',' << max_error
+              << ',' << (projected.has_value() ? 1 : 0) << ',' << plan.allocated_bytes() << '\n'
+              << std::flush;
+    CHECK(max_magnitude < Decimal("9.95e24"));
+    REQUIRE(projected.has_value());
+}
