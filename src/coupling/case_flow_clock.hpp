@@ -1,6 +1,6 @@
 #pragma once
 
-#include "case_uniform_flow_projection.hpp"
+#include "case_known_flow.hpp"
 #include "io/si_exact_words.hpp"
 
 namespace uvlas::coupling::detail {
@@ -25,7 +25,18 @@ struct CaseFlowClockQuery {
 
 namespace case_clock_detail {
 struct Builder;
-}
+struct Grid {
+    struct Interval {
+        structure::ExactRational begin, end, step;
+        std::uint64_t steps = 0;
+        CaseClockRestart restart = CaseClockRestart::ItemInitial;
+    };
+    io::SchemaIdentity source;
+    aero::detail::pchip::PchipInputStamp stamp;
+    core::PlannedBuffer<Interval> intervals;
+    [[nodiscard]] core::Result<std::uint64_t> interval_steps(std::uint64_t) const noexcept;
+};
+} // namespace case_clock_detail
 
 class CaseClockedFlows {
 public:
@@ -35,24 +46,16 @@ public:
     CaseClockedFlows& operator=(const CaseClockedFlows&) = delete;
 
     [[nodiscard]] std::size_t interval_count() const noexcept {
-        return intervals_.size();
+        return grid_.intervals.size();
     }
     [[nodiscard]] core::Result<std::uint64_t> interval_steps(std::uint64_t) const noexcept;
 
 private:
     friend struct case_clock_detail::Builder;
-    struct Interval {
-        structure::ExactRational begin, end, step;
-        std::uint64_t steps = 0;
-        CaseClockRestart restart = CaseClockRestart::ItemInitial;
-    };
-    CaseClockedFlows(io::SchemaIdentity source, aero::detail::pchip::PchipInputStamp stamp,
-                     core::PlannedBuffer<Interval>&& intervals, CaseUniformFlowReady&& ambient,
-                     CasePrescribedWakeReady&& wake) noexcept;
+    CaseClockedFlows(case_clock_detail::Grid&&, CaseUniformFlowReady&&,
+                     CasePrescribedWakeReady&&) noexcept;
 
-    io::SchemaIdentity source_;
-    aero::detail::pchip::PchipInputStamp stamp_;
-    core::PlannedBuffer<Interval> intervals_;
+    case_clock_detail::Grid grid_;
     CaseUniformFlowReady ambient_;
     CasePrescribedWakeReady wake_;
 };
@@ -116,6 +119,105 @@ prepare_case_clocked_flows(const io::SiCase&, aero::detail::pchip::PchipInputSta
     const CaseClockedFlows&, const CaseClockedFlows& current, CaseFlowClockQuery,
     const CaseFlowProjectionRequest& ambient, const CaseFlowProjectionRequest& wake,
     aero::detail::UniformFlowWorkspace&, const CaseFlowClockLimits&, core::ResourcePlan&,
+    const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+/// The exact clock and prescribed wake share one set of limits. Ambient caps apply to each
+/// known-flow input series and to its separate interval-arithmetic projection.
+struct CaseClockedKnownFlowLimits {
+    CaseFlowClockLimits clock_and_wake;
+    CaseKnownFlowLimits ambient;
+};
+
+class CaseClockedKnownFlows {
+public:
+    CaseClockedKnownFlows(CaseClockedKnownFlows&&) noexcept = default;
+    CaseClockedKnownFlows& operator=(CaseClockedKnownFlows&&) noexcept = default;
+    CaseClockedKnownFlows(const CaseClockedKnownFlows&) = delete;
+    CaseClockedKnownFlows& operator=(const CaseClockedKnownFlows&) = delete;
+
+    [[nodiscard]] std::size_t interval_count() const noexcept {
+        return grid_.intervals.size();
+    }
+    [[nodiscard]] core::Result<std::uint64_t> interval_steps(std::uint64_t i) const noexcept {
+        return grid_.interval_steps(i);
+    }
+
+private:
+    friend struct case_clock_detail::Builder;
+    CaseClockedKnownFlows(case_clock_detail::Grid&& grid, CaseKnownFlowReady&& ambient,
+                          CasePrescribedWakeReady&& wake) noexcept
+        : grid_(std::move(grid)), ambient_(std::move(ambient)), wake_(std::move(wake)) {}
+    case_clock_detail::Grid grid_;
+    CaseKnownFlowReady ambient_;
+    CasePrescribedWakeReady wake_;
+};
+
+/// Known-flow value and derivatives at a global position, paired with the independent
+/// prescribed wake sample at the same qualified stage.
+class CaseClockedKnownFlowSample {
+public:
+    CaseClockedKnownFlowSample(CaseClockedKnownFlowSample&&) noexcept = default;
+    CaseClockedKnownFlowSample& operator=(CaseClockedKnownFlowSample&&) noexcept = default;
+    CaseClockedKnownFlowSample(const CaseClockedKnownFlowSample&) = delete;
+    CaseClockedKnownFlowSample& operator=(const CaseClockedKnownFlowSample&) = delete;
+
+    [[nodiscard]] io::SchemaIdentity source() const noexcept {
+        return source_;
+    }
+    [[nodiscard]] CaseFlowClockQuery address() const noexcept {
+        return address_;
+    }
+    [[nodiscard]] CaseClockRestart restart() const noexcept {
+        return restart_;
+    }
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView> time() const& noexcept {
+        return ambient_.time();
+    }
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView> time() const&& = delete;
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView> step_seconds() const& noexcept;
+    [[nodiscard]] core::Result<aero::detail::pchip::RationalView> step_seconds() const&& = delete;
+    [[nodiscard]] const CaseKnownFlowJet& ambient() const& noexcept {
+        return ambient_;
+    }
+    [[nodiscard]] const CaseKnownFlowJet& ambient() const&& = delete;
+    [[nodiscard]] const ProjectedCasePrescribedWake& prescribed() const& noexcept {
+        return wake_;
+    }
+    [[nodiscard]] const ProjectedCasePrescribedWake& prescribed() const&& = delete;
+
+private:
+    friend struct case_clock_detail::Builder;
+    CaseClockedKnownFlowSample(io::SchemaIdentity source, CaseFlowClockQuery address,
+                               CaseClockRestart restart, io::detail::SiRationalWords&& step,
+                               CaseKnownFlowJet&& ambient,
+                               ProjectedCasePrescribedWake&& wake) noexcept
+        : source_(source),
+          address_(address),
+          restart_(restart),
+          step_(std::move(step)),
+          ambient_(std::move(ambient)),
+          wake_(std::move(wake)) {}
+
+    io::SchemaIdentity source_;
+    CaseFlowClockQuery address_;
+    CaseClockRestart restart_;
+    io::detail::SiRationalWords step_;
+    CaseKnownFlowJet ambient_;
+    ProjectedCasePrescribedWake wake_;
+};
+
+[[nodiscard]] core::Result<CaseClockedKnownFlows>
+prepare_case_clocked_known_flows(const io::SiCase&, aero::detail::pchip::PchipInputStamp,
+                                 aero::detail::UniformFlowWorkspace&,
+                                 const CaseClockedKnownFlowLimits&, core::ResourcePlan&,
+                                 const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+/// Compare the entire current schedule and resolve its exact node and requested side.
+[[nodiscard]] core::Result<CaseClockedKnownFlowSample> evaluate_case_clocked_known_flows(
+    const CaseClockedKnownFlows&, const CaseClockedKnownFlows& current, CaseFlowClockQuery,
+    const std::array<aero::detail::pchip::RationalView, 3>& position,
+    const CaseKnownFlowProjection& ambient, const CaseFlowProjectionRequest& wake,
+    aero::detail::UniformFlowWorkspace&, const CaseClockedKnownFlowLimits&, core::ResourcePlan&,
     const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
 } // namespace uvlas::coupling::detail

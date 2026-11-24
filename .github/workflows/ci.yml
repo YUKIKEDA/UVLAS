@@ -254,10 +254,10 @@ jobs:
           $bindingPython=(Get-Command python).Source
           pwsh -NoProfile -File tools/dev/msvc.ps1 cmake -S . -B out/build/python -G 'Ninja Multi-Config' -DUVLAS_BUILD_PYTHON=ON -DUVLAS_WARNINGS_AS_ERRORS=ON -DBUILD_TESTING=ON '-DVCPKG_MANIFEST_FEATURES=tests;python' -D "Python3_EXECUTABLE=$bindingPython" -D "CMAKE_TOOLCHAIN_FILE=$env:GITHUB_WORKSPACE/out/vcpkg/scripts/buildsystems/vcpkg.cmake" -D "VCPKG_INSTALLED_DIR=$env:GITHUB_WORKSPACE/out/vcpkg_python_installed"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build out/build/python --config Release --target uvlas_python
+          pwsh -NoProfile -File tools/dev/msvc.ps1 cmake --build out/build/python --config Release --target uvlas_python uvlas_cli
       - name: Test (Windows)
         if: runner.os == 'Windows'
-        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --test-dir out/build/python -C Release -R '^python.ownership$' --output-on-failure
+        run: pwsh -NoProfile -File tools/dev/msvc.ps1 ctest --test-dir out/build/python -C Release -R '^python\.(ownership|case_file_operations)$' --output-on-failure
       - name: Configure, build and test (Linux)
         if: runner.os == 'Linux'
         env:
@@ -270,8 +270,8 @@ jobs:
             -DPython3_EXECUTABLE="$(command -v python)" \
             -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/out/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             -DVCPKG_INSTALLED_DIR="$GITHUB_WORKSPACE/out/vcpkg_python_installed"
-          cmake --build out/build/python --target uvlas_python
-          ctest --test-dir out/build/python -R '^python.ownership$' --output-on-failure
+          cmake --build out/build/python --target uvlas_python uvlas_cli
+          ctest --test-dir out/build/python -R '^python\.(ownership|case_file_operations)$' --output-on-failure
       - name: clang-tidy configured Python module (Linux)
         if: runner.os == 'Linux'
         run: |

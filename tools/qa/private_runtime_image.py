@@ -154,7 +154,13 @@ def venv_python(venv: Path) -> Path:
 
 
 def rehearse(
-    image: Path, work: Path, numpy_wheel: Path, ownership_test: Path, commit: str
+    image: Path,
+    work: Path,
+    numpy_wheel: Path,
+    ownership_test: Path,
+    commit: str,
+    *,
+    case_validation_suite: tuple[Path, Path] | None = None,
 ) -> dict[str, object]:
     # Hash before copying, then verify the copied image before loading a binary.
     files = validate_image(image)
@@ -223,7 +229,7 @@ def rehearse(
     cases = re.search(r"\bRan ([1-9]\d*) tests? in ", result.stderr)
     if result.returncode != 0 or cases is None:
         raise RuntimeError(f"Installed ownership suite failed:\n{result.stderr}")
-    return {
+    report: dict[str, object] = {
         "build_info": banner,
         "files": len(files),
         "inventory_sha256": digest(runtime / INVENTORY),
@@ -234,6 +240,30 @@ def rehearse(
         "ownership_cases": int(cases.group(1)),
         **runtime_info,
     }
+    if case_validation_suite is not None:
+        case_script, examples = case_validation_suite
+        copied_script = work / "case-validation.py"
+        copied_examples = work / "case-examples.json"
+        shutil.copyfile(case_script, copied_script)
+        shutil.copyfile(examples, copied_examples)
+        result = run(
+            [
+                python,
+                "-I",
+                "-B",
+                str(copied_script),
+                str(empty),
+                str(cli_path(runtime)),
+                str(copied_examples),
+            ],
+            work,
+            env,
+        )
+        cases = re.search(r"\bRan ([1-9]\d*) tests? in ", result.stderr)
+        if result.returncode != 0 or cases is None:
+            raise RuntimeError(f"Installed case validation suite failed:\n{result.stderr}")
+        report["case_validation_cases"] = int(cases.group(1))
+    return report
 
 
 def publish_directory(source: Path, destination: Path) -> None:
@@ -279,6 +309,7 @@ def stage(
     numpy_wheel: Path,
     ownership_test: Path,
     commit: str,
+    case_validation_suite: tuple[Path, Path] | None = None,
 ) -> dict[str, object]:
     require(not os.path.lexists(destination), DESTINATION_EXISTS)
     require(not destination.is_relative_to(build), "Image destination must be outside the build")
@@ -325,7 +356,14 @@ def stage(
             files = inventory(image)
             validate_layout(image, files)
             write_json(image / INVENTORY, {"schema": SCHEMA, "files": files})
-            result = rehearse(image, work, numpy_wheel, ownership_test, commit)
+            result = rehearse(
+                image,
+                work,
+                numpy_wheel,
+                ownership_test,
+                commit,
+                case_validation_suite=case_validation_suite,
+            )
         publish_directory(image, destination)
         return result
 
@@ -347,6 +385,13 @@ def parse_args() -> argparse.Namespace:
         mode.add_argument("--commit", required=True)
         mode.add_argument("--numpy-wheel", required=True, type=Path)
         mode.add_argument("--ownership-test", required=True, type=Path)
+        mode.add_argument(
+            "--case-validation-suite",
+            nargs=2,
+            type=Path,
+            metavar=("SCRIPT", "EXAMPLES"),
+            help="exercise CLI and Python case validation and result inspection after relocation",
+        )
     return parser.parse_args()
 
 
@@ -362,6 +407,10 @@ def main() -> None:
         image = args.image.parent.resolve(strict=True) / args.image.name
         numpy_wheel = args.numpy_wheel.resolve(strict=True)
         ownership_test = args.ownership_test.resolve(strict=True)
+        case_validation_suite: tuple[Path, Path] | None = None
+        if args.case_validation_suite is not None:
+            script, examples = args.case_validation_suite
+            case_validation_suite = (script.resolve(strict=True), examples.resolve(strict=True))
         if args.operation == "stage":
             result = stage(
                 args.build.resolve(strict=True),
@@ -371,6 +420,7 @@ def main() -> None:
                 numpy_wheel=numpy_wheel,
                 ownership_test=ownership_test,
                 commit=args.commit,
+                case_validation_suite=case_validation_suite,
             )
         else:
             require(
@@ -379,7 +429,12 @@ def main() -> None:
             )
             with tempfile.TemporaryDirectory(prefix="uvlas-image-rehearsal-") as temporary:
                 result = rehearse(
-                    image, Path(temporary).resolve(), numpy_wheel, ownership_test, args.commit
+                    image,
+                    Path(temporary).resolve(),
+                    numpy_wheel,
+                    ownership_test,
+                    args.commit,
+                    case_validation_suite=case_validation_suite,
                 )
         print(json.dumps(result, indent=2, sort_keys=True))
     except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as error:

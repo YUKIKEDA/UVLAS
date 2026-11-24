@@ -1,0 +1,49 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-shared-case-frontends",
+  "ids": [
+    "IO4-01",
+    "IO4-02",
+    "IO4-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "39c55917beedc496a90b777c2e9822538d0f90b2",
+  "claimed_state": "CLI と Python の共有入力検査と結果照合を、Windows・Linux の移設済み非公開ランタイムで検証した。",
+  "checks": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "cpython": "3.12.8",
+      "numpy": "2.3.5",
+      "ctest_targets": 5,
+      "relocated_case_validation_cases": 6,
+      "relocated_ownership_cases": 10,
+      "inventory_sha256": "3a5d184a04c274337bf8176f95278a564adb08ccad5e0c94c867ed4d17264a17",
+      "producer_manifest_sha256": "e53a5d780da260c82b23813959f7c56f9c382b7417a5d3770529f34bd4a34ad0"
+    },
+    "linux": {
+      "compiler": "GNU 14.2.0",
+      "configuration": "Release",
+      "cpython": "3.12.3",
+      "numpy": "2.3.5",
+      "ctest_targets": 5,
+      "relocated_case_validation_cases": 6,
+      "relocated_ownership_cases": 10,
+      "inventory_sha256": "97ca8adcc7a89f74d616ddaa9b26ea1a998de5a0f55b24abcd86d75e969b982c",
+      "producer_manifest_sha256": "c0b5a4a348e9ea6870348afce2081398cf2f2f5f577a54102c5f4c03a0ace80a"
+    },
+    "image_files": 43,
+    "rejected_prior_behavior": "shortest-round-trip binary64 decimal changes equality with an exact integer"
+  },
+  "artifacts": {
+    "src/app/validate_case.cpp": "51ce6ebccc215f38d95c2c93fea4509cf74e993fc3b669596a5eadc1682a8211",
+    "src/app/inspect_result.cpp": "aa0c9a4286b4b304cb8d662ff4a0577cf98cbe33212613ad32c838d3b0da1050",
+    "src/python/case_dictionary.cpp": "c40e6b19fb317d7116a04cfaf528ef5179338220683c7d6568a81fef31905ba0",
+    "src/python/module.cpp": "03c6ea013f2808305abaf8f65544d35d4c0aed9b0a781885c9dfbe1c4d26605b",
+    "tests/python/test_case_file_operations.py": "2271157c77e1b9b93edb172bc63b9092bea4562d9a5a521b6b641b93de8578a0",
+    "tools/qa/private_runtime_image.py": "94f74bd2ae0b1f9ebe5058e531490fb3d01c0e5da711a0a4b0e2ce8fa1c2834c",
+"docs/verification/IM-06/shared-case-frontends.md": "cff8720d1d4bf7ec1d2ff8fa9c259d1ff7169f2305872a605eed1f8cb4f88408"
+  }
+}

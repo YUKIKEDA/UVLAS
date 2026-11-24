@@ -1,0 +1,45 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-scalar-amplitude-recipe-limits",
+  "ids": [
+    "AE-07",
+    "IO4-01",
+    "N4-02"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "0d60d5ed6134e17f3e7f6b4c61276cda22f5764e",
+  "claimed_state": "スカラー突風振幅の SI 入力レシピと内部格納枠を別々に計上した。",
+  "checks": {
+    "pchip": {
+      "time_recipes": 3,
+      "amplitude_recipes": 3,
+      "coverage_recipes": 2,
+      "admitted": 8,
+      "rejected": 7
+    },
+    "polynomial": {
+      "admitted": 7,
+      "rejected": 6
+    },
+    "old_code_positive_failures": 2,
+    "windows": {
+      "compiler": "MSVC 19.51.36260",
+      "configuration": "Release",
+      "ctest_passed": 4,
+      "boundary_assertions_passed": 4
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_passed": 4,
+      "boundary_assertions_passed": 4
+    }
+  },
+  "artifacts": {
+    "src/coupling/case_uniform_flow.cpp": "9fbb604bd7f757beb937db913590cf0a9591235493cae3e35b62a7c040d8d964",
+    "src/coupling/case_uniform_flow.hpp": "aaa13640c5ee5c5576cd0498efab80bb9825aac37325018f1f577e90ce0305cf",
+    "tests/coupling/case_uniform_flow_test.cpp": "377b2d567dee6cd9ee4225dd545b293e230b2dbf6f98ac2e67a412487f38c206"
+  }
+}
