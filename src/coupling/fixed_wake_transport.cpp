@@ -424,7 +424,117 @@ core::Result<a::ScaledEnclosure> WakeTransportResult::prescribed_time_dual() con
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
 
+core::Result<FirstFreeWakePoint> GrowingWakeTransition::row(std::size_t i) const noexcept {
+    const auto rows = rows_.values();
+    if (i < rows.size() && rows[i])
+        return *rows[i];
+    return std::unexpected(core::Failure{InvalidInput, operation});
+}
+
 struct WakeTransportBuilder {
+    static GrowingWakeTransition
+    growing_transition(const io::SiCase& si, const WakeTransportClock& clock,
+                       const WakeMaterialSnapshot& parent, const WakeMaterialSnapshot& trial,
+                       a::ReleaseEpoch epoch, const WakeTransportLimits& limits,
+                       core::ResourcePlan& memory, const std::stop_token& stop) {
+        m::Work work{0, limits.maximum_steps, stop};
+        work.step();
+        if (clock.destination.step == 0 || parent.preceding_births || trial.preceding_births)
+            reject(InvalidInput);
+        if (parent.points.size() > limits.maximum_particles ||
+            trial.points.size() > limits.maximum_particles)
+            reject(ResourceExceeded);
+
+        const auto& source = read(si.source_case()).get();
+        if (!io::detail::same_identity(read(source.identity()), clock.clock.source))
+            reject(StaleGeneration);
+        const auto input = read(source.root());
+        const auto analysis = input.analysis.record();
+        const auto* transient = std::get_if<io::schema::AnalysisTransient>(&analysis);
+        if (!transient)
+            reject(Unsupported);
+        const auto wake = transient->wake.record();
+        const auto* active = std::get_if<io::schema::WakeActive>(&wake);
+        if (!active ||
+            !std::holds_alternative<io::schema::RetentionAll>(active->retention.record()))
+            reject(Unsupported);
+
+        auto earlier = clock.destination;
+        --earlier.step;
+        earlier.side = earlier.step == 0 ? p::RequestedSide::Right : p::RequestedSide::Automatic;
+        const auto& x = read(trial.contact.geometry()).get();
+        const auto& y = read(parent.contact.geometry()).get();
+        const auto check_geometry_time = [&](const a::OwnedGeometry& geometry,
+                                             CaseFlowClockQuery address) {
+            const auto instant = read(evaluate_case_reference_clock(
+                clock.clock, clock.current, address, limits.clock, memory, stop));
+            const auto exact = read(io::detail::copy_rational_words(instant.seconds, memory, stop));
+            const auto owned = read(geometry.exact_time());
+            if (!owned || !same_time(view(exact), *owned, work))
+                reject(StaleGeneration);
+        };
+        check_geometry_time(y, earlier);
+        check_geometry_time(x, clock.destination);
+        if (!same_model(x.context(), y.context()))
+            reject(StaleGeneration);
+
+        const auto from = read(parent.contact.reference_topology());
+        const auto to = read(trial.contact.reference_topology());
+        const auto births = from.trailing_point_count();
+        if (births != to.trailing_point_count() || parent.points.size() > trial.points.size() ||
+            trial.points.size() - parent.points.size() != births)
+            reject(StaleGeneration);
+
+        auto visited = allocate<std::uint64_t>(memory, trial.points.size());
+        const auto unique_owners = [&](std::span<std::uint64_t> points) {
+            std::ranges::sort(points, [&](auto lhs, auto rhs) {
+                work.step();
+                return lhs < rhs;
+            });
+            const auto duplicate = std::ranges::adjacent_find(points, [&](auto lhs, auto rhs) {
+                work.step();
+                return lhs == rhs;
+            });
+            if (duplicate != points.end())
+                reject(InvalidInput);
+        };
+        for (std::size_t i = 0; i < parent.points.size(); ++i) {
+            work.step();
+            const auto& row = parent.points[i];
+            if (row.release.epoch >= epoch ||
+                (i != 0 && parent.points[i - 1].release >= row.release))
+                reject(StaleGeneration);
+            visited.values()[i] = certify_particle(row, y, parent.contact, from, work).value();
+        }
+        unique_owners(visited.values().first(parent.points.size()));
+
+        auto output = allocate<std::optional<FirstFreeWakePoint>>(memory, trial.points.size());
+        std::size_t previous = 0;
+        for (std::size_t i = 0; i < trial.points.size(); ++i) {
+            work.step();
+            const auto& row = trial.points[i];
+            if (i != 0 && trial.points[i - 1].release >= row.release)
+                reject(StaleGeneration);
+            visited.values()[i] = certify_particle(row, x, trial.contact, to, work).value();
+            if (row.release.epoch == epoch) {
+                if (!trailing_point(from, row.release.point, work))
+                    reject(StaleGeneration);
+                output.values()[i].emplace(row, std::nullopt);
+            } else {
+                if (previous == parent.points.size() ||
+                    row.release != parent.points[previous].release)
+                    reject(StaleGeneration);
+                output.values()[i].emplace(row, parent.points[previous]);
+                ++previous;
+            }
+        }
+        if (previous != parent.points.size())
+            reject(StaleGeneration);
+        unique_owners(visited.values());
+        work.step();
+        return GrowingWakeTransition{std::move(output)};
+    }
+
     static const a::OwnedGeometry& first_geometry(const WakeTransportClock& clock,
                                                   CaseFlowClockQuery address,
                                                   const FirstFreeWakeEndpoint& endpoint,
@@ -783,6 +893,16 @@ core::Result<WakeTransportResult> evaluate_fixed_free_wake_transport(
         return WakeTransportBuilder::free(clock, snapshots, source, flow, particle, direction,
                                           history, seeds, limits, velocity_limits, shared, local,
                                           kernel, memory, stop);
+    });
+}
+
+core::Result<GrowingWakeTransition> prepare_growing_wake_transition(
+    const io::SiCase& si, const WakeTransportClock& clock, const WakeMaterialSnapshot& parent,
+    const WakeMaterialSnapshot& trial, a::ReleaseEpoch epoch, const WakeTransportLimits& limits,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    return guarded([&] {
+        return WakeTransportBuilder::growing_transition(si, clock, parent, trial, epoch, limits,
+                                                        memory, stop);
     });
 }
 

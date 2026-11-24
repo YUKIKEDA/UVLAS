@@ -119,6 +119,33 @@ struct FirstFreeWakePoint {
     std::optional<WakeMaterialPoint> parent;
 };
 
+/// Complete material correspondence between a parent and its growing-wake trial.
+/// Each row pairs a retained owner with its parent, or identifies a new trailing-edge release.
+class GrowingWakeTransition {
+public:
+    GrowingWakeTransition(GrowingWakeTransition&&) noexcept = default;
+    GrowingWakeTransition& operator=(GrowingWakeTransition&&) noexcept = default;
+
+    [[nodiscard]] std::size_t size() const noexcept {
+        return rows_.size();
+    }
+    [[nodiscard]] core::Result<FirstFreeWakePoint> row(std::size_t) const noexcept;
+
+private:
+    friend struct WakeTransportBuilder;
+    explicit GrowingWakeTransition(
+        core::PlannedBuffer<std::optional<FirstFreeWakePoint>>&& rows) noexcept
+        : rows_(std::move(rows)) {}
+    core::PlannedBuffer<std::optional<FirstFreeWakePoint>> rows_;
+};
+
+/// Check complete material-key coverage at the next Case clock node. This identifies
+/// the rows to transport; the resulting positions and solver state are still a trial.
+[[nodiscard]] core::Result<GrowingWakeTransition> prepare_growing_wake_transition(
+    const io::SiCase&, const WakeTransportClock&, const WakeMaterialSnapshot& parent,
+    const WakeMaterialSnapshot& trial, aero::detail::ReleaseEpoch, const WakeTransportLimits&,
+    core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 /// Trapezoidal transport for newly released points, and for retained free
 /// points on the first accepted interval step. Each fluid action and its
 /// tangent/pullback are evaluated at that endpoint's own geometry and clock.

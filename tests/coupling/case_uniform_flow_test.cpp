@@ -4146,6 +4146,49 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const cf::FirstFreeWakeEndpoint trailing_start{start_source, start_flow, trailing_point, &d};
     const auto interval_birth =
         take(first(first_interval, retained_previous, trailing_start, release.epoch, born));
+    const auto second_release = take_global(topology.release_key(id[3], release.epoch));
+    const std::array growth_points{material[0],
+                                   cf::WakeMaterialPoint{second_release, id[5], a::FacetId{202}}};
+    const cf::WakeMaterialSnapshot growth_parent{older, {}};
+    const cf::WakeMaterialSnapshot growth_trial{previous, growth_points};
+    auto growth_limits = transport_limits;
+    growth_limits.maximum_particles = 2;
+    const auto growth = [&](const auto& parent_sample, const auto& trial_sample, auto epoch) {
+        return cf::prepare_growing_wake_transition(wake_si, first_interval, parent_sample,
+                                                   trial_sample, epoch, growth_limits, memory);
+    };
+    const auto transition = take(growth(growth_parent, growth_trial, release.epoch));
+    REQUIRE(transition.size() == 2);
+    const std::array classified{take(transition.row(0)), take(transition.row(1))};
+    CHECK(classified[0].current.release == release);
+    CHECK(classified[1].current.release == second_release);
+    CHECK_FALSE(classified[0].parent);
+    CHECK_FALSE(classified[1].parent);
+    const std::array departing{id[4], id[5]};
+    const std::array origins{id[2], id[3]};
+    const cf::FirstFreeWakeEndpoint growing_trial{previous_source, previous_flow, departing, {}};
+    const cf::FirstFreeWakeEndpoint growing_parent{start_source, start_flow, origins, {}};
+    const auto growth_residual = take(cf::evaluate_first_free_wake_transport(
+        first_interval, growing_trial, growing_parent, release.epoch, classified, {}, growth_limits,
+        cap_velocity, shared, *local, *kernel, memory));
+    residual_expected(take(growth_residual.row(0)).residual[0], Rat{7});
+    residual_expected(take(growth_residual.row(1)).residual[0], Rat{8});
+    const cf::WakeMaterialSnapshot missing_release{previous, material};
+    reject(growth(growth_parent, missing_release, release.epoch),
+           core::FailureCode::StaleGeneration);
+    auto aliased = growth_points;
+    aliased[1].point = id[4];
+    const cf::WakeMaterialSnapshot repeated_owner{previous, aliased};
+    reject(growth(growth_parent, repeated_owner, release.epoch), core::FailureCode::InvalidInput);
+    const cf::WakeMaterialSnapshot already_released{older, material};
+    reject(growth(already_released, growth_trial, release.epoch),
+           core::FailureCode::StaleGeneration);
+    reject(growth(growth_parent, growth_trial, a::ReleaseEpoch{9}),
+           core::FailureCode::StaleGeneration);
+    reject(cf::prepare_growing_wake_transition(wake_si, first_interval, growth_parent, growth_trial,
+                                               release.epoch, transport_limits, memory),
+           core::FailureCode::ResourceExceeded);
+
     const std::array birth_origin{cf::WakeMaterialPoint{release, release.point, std::nullopt}};
     auto from_origin = stages;
     from_origin[2].points = birth_origin;

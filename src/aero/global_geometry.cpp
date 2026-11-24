@@ -460,6 +460,10 @@ core::Result<bool> PreparedTopologyOwner::is_trailing_point(PointId canonical) c
     return std::ranges::binary_search(ids, canonical.value());
 }
 
+std::size_t PreparedTopologyOwner::trailing_point_count() const noexcept {
+    return topology_ ? static_cast<std::size_t>(topology_->trailing_point_size) : 0;
+}
+
 core::Result<PreparedTopologyOwner> GlobalContactState::reference_topology() const noexcept {
     const auto state = data_.values();
     if (state.empty() || !state.front().topology)

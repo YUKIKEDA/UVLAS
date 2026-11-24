@@ -172,6 +172,7 @@ private:
 class PreparedTopologyOwner {
 public:
     [[nodiscard]] core::Result<bool> is_trailing_point(PointId) const noexcept;
+    [[nodiscard]] std::size_t trailing_point_count() const noexcept;
     [[nodiscard]] bool same_owner(const PreparedTopologyOwner& other) const noexcept {
         return topology_ && topology_ == other.topology_;
     }
