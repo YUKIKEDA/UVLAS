@@ -247,15 +247,19 @@ struct CirculationRowData {
     p::Interval rhs;
 };
 
-void validate_circulation(const DiscreteCirculationRequest& request, const a::GeometryContext& geo,
-                          std::size_t order, p::Work& work) {
+void match_circulation_geometry(const DiscreteCirculationRequest& request,
+                                const a::GeometryContext& geo) {
     const auto& context = request.scales.context;
     const auto& key = context.cache;
     if ((geo.diagnostics.trial && *geo.diagnostics.trial != context.trial) ||
         key.fingerprint != geo.fingerprint || key.model != geo.model ||
         key.geometry != geo.current || key.precision != geo.precision || context.time != geo.time)
         reject(core::FailureCode::StaleGeneration);
-    if (key.representation != core::Precision::Binary64)
+}
+
+void validate_circulation(const DiscreteCirculationRequest& request, std::size_t order,
+                          p::Work& work, bool transposed = false) {
+    if (request.scales.context.cache.representation != core::Precision::Binary64)
         reject(core::FailureCode::PrecisionUnsupported);
     if (request.solver_limits.maximum_order < 0 || request.solver_limits.maximum_rhs_columns < 0)
         reject(core::FailureCode::InvalidInput);
@@ -278,13 +282,17 @@ void validate_circulation(const DiscreteCirculationRequest& request, const a::Ge
     }
     constexpr linear::UnitDimensions circulation_units{2, 0, -1, 0, 0, 0, 0};
     constexpr linear::UnitDimensions speed_units{1, 0, -1, 0, 0, 0, 0};
+    constexpr linear::UnitDimensions dual_circulation{-2, 0, 1, 0, 0, 0, 0};
+    constexpr linear::UnitDimensions dual_speed{-1, 0, 1, 0, 0, 0, 0};
+    const auto& unknown_units = transposed ? dual_speed : circulation_units;
+    const auto& residual_units = transposed ? dual_circulation : speed_units;
     for (std::size_t i = 0; i < order; ++i) {
         work.step();
         const auto& scales = request.scales;
         if (!std::isfinite(scales.unknown[i]) || !std::isfinite(scales.residual[i]))
             reject(core::FailureCode::Nonfinite);
         if (scales.unknown[i] <= 0 || scales.residual[i] <= 0 ||
-            scales.unknown_units[i] != circulation_units || scales.residual_units[i] != speed_units)
+            scales.unknown_units[i] != unknown_units || scales.residual_units[i] != residual_units)
             reject(core::FailureCode::InvalidInput);
     }
 }
@@ -301,6 +309,82 @@ public:
         return core::ErrorCertificate::unevaluated(context, request.budget);
     }
 };
+
+std::pair<numerics::DenseReal, numerics::DenseReal> dense_inputs(std::size_t order,
+                                                                 core::ResourcePlan& memory) {
+    const auto maximum = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
+    if (order != 0 && order > maximum / order)
+        reject(core::FailureCode::ResourceExceeded);
+    const auto n = static_cast<core::Index>(order);
+    const auto zeros = allocate<double>(memory, sum_budget(order * order, order));
+    return {require(numerics::DenseReal::copy({n, n, n}, zeros.values().first(order * order),
+                                              memory, core::Operation::SolveLinear)),
+            require(numerics::DenseReal::copy({n, 1, n}, zeros.values().subspan(order * order),
+                                              memory, core::Operation::SolveLinear))};
+}
+
+linear::Solution<double> solve_projected(const numerics::DenseReal& matrix, numerics::DenseReal rhs,
+                                         const DiscreteCirculationRequest& request,
+                                         core::ResourcePlan& memory, p::Work& work) {
+    work.step();
+    const auto& context = request.scales.context;
+    const linear::DenseOperator op{matrix, context};
+    const auto rhs_values = require(numerics::PrecisionBuffer<double>::binary64(
+        std::move(rhs), core::NumericalGeneration{request.rhs_generation.value()}));
+    const linear::Rhs<double> right{rhs_values, context, request.rhs_generation};
+    auto factor =
+        require(linear::DensePrepared::prepare(op, request.scales, request.solver_limits, memory));
+    work.step();
+    const NoDenseConsumerChecks no_checks;
+    const linear::Precision<double> precision{
+        linear::RetainedPrecision{request.retained_generation}, {}, no_checks};
+    return require(linear::solve_linear(op, right, request.scales, precision, request.algebraic,
+                                        request.solver_limits, factor, memory));
+}
+
+void match_linearization_context(linear::Context actual, const linear::Context& primal,
+                                 bool transposed) {
+    const bool is_distinct_matrix = actual.cache.matrix != primal.cache.matrix;
+    if (transposed != is_distinct_matrix)
+        reject(core::FailureCode::StaleGeneration);
+    if (transposed) {
+        if (actual.cache.scales == primal.cache.scales)
+            reject(core::FailureCode::StaleGeneration);
+        const auto is_primal_layout = [&](core::ScopeId layout) {
+            return layout == primal.unknown_layout || layout == primal.residual_layout;
+        };
+        if (is_primal_layout(actual.unknown_layout) || is_primal_layout(actual.residual_layout) ||
+            actual.unknown_layout == actual.residual_layout)
+            reject(core::FailureCode::StaleGeneration);
+        actual.cache.matrix = primal.cache.matrix;
+        actual.unknown_layout = primal.unknown_layout;
+        actual.residual_layout = primal.residual_layout;
+    }
+    actual.cache.scales = primal.cache.scales;
+    if (actual != primal)
+        reject(core::FailureCode::StaleGeneration);
+}
+
+void match_reused_scales(const linear::Scales& actual, const linear::Certificate& primal,
+                         p::Work& work) {
+    if (actual.context.cache.scales != primal.context().cache.scales)
+        return;
+    const auto equal = [&](auto supplied, auto certified) {
+        if (supplied.size() != certified.size())
+            return false;
+        for (std::size_t i = 0; i < supplied.size(); ++i) {
+            work.step();
+            if (supplied[i] != certified[i])
+                return false;
+        }
+        return true;
+    };
+    if (!equal(actual.unknown, primal.unknown_scales()) ||
+        !equal(actual.residual, primal.residual_scales()) ||
+        !equal(actual.unknown_units, primal.unknown_units()) ||
+        !equal(actual.residual_units, primal.residual_units()))
+        reject(core::FailureCode::StaleGeneration);
+}
 
 double project_binary64(const p::Interval& source, double budget, a::LocalRootScratch& scratch,
                         p::Work& work) {
@@ -746,24 +830,14 @@ struct NonpenetrationBuilder {
         const auto geometry_owner = require(input.contact.geometry());
         const auto& geometry = geometry_owner.get();
         const auto order = input.collocations.size();
-        validate_circulation(request, geometry.context(), order, work);
-        const auto maximum = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
-        if (order != 0 && order > maximum / order)
-            reject(core::FailureCode::ResourceExceeded);
-        const auto n = static_cast<core::Index>(order);
+        match_circulation_geometry(request, geometry.context());
+        validate_circulation(request, order, work);
+        auto [matrix, rhs] = dense_inputs(order, memory);
         auto assembly = assemble(input, flow, limits, memory, work, true);
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
         auto data = allocate<CirculationRowData>(memory, order);
         auto results = allocate<std::optional<CirculationResidualRow>>(memory, order);
-        auto influence = allocate<p::Interval>(memory, order);
-        auto [matrix, rhs] = [&] {
-            const auto zeros = allocate<double>(memory, sum_budget(order * order, order));
-            return std::pair{
-                require(numerics::DenseReal::copy({n, n, n}, zeros.values().first(order * order),
-                                                  memory, core::Operation::SolveLinear)),
-                require(numerics::DenseReal::copy({n, 1, n}, zeros.values().subspan(order * order),
-                                                  memory, core::Operation::SolveLinear))};
-        }();
+        auto influence = allocate<p::Interval>(memory, order * order);
         admit(assembly, input, limits, memory, 2, 5, work);
 
         const auto ambient = ambient_velocity(flow, work);
@@ -788,28 +862,15 @@ struct NonpenetrationBuilder {
             record.rhs =
                 p::negate(native_residual(record.normal, record.relative, old_wake, work), work);
             rhs.values()[i] = project_binary64(record.rhs, request.rhs_absolute, rounding, work);
+            auto native_row = influence.values().subspan(i * order, order);
             assemble_influence(assembly, action, source, record.normal, shared, memory, limits,
-                               influence.values(), work);
+                               native_row, work);
             for (std::size_t col = 0; col < order; ++col)
-                matrix.values()[col * order + i] = project_binary64(
-                    influence.values()[col], request.matrix_absolute, rounding, work);
+                matrix.values()[col * order + i] =
+                    project_binary64(native_row[col], request.matrix_absolute, rounding, work);
         }
 
-        work.step();
-        const auto& context = request.scales.context;
-        const linear::DenseOperator op{matrix, context};
-        const auto rhs_values = require(numerics::PrecisionBuffer<double>::binary64(
-            std::move(rhs), core::NumericalGeneration{request.rhs_generation.value()}));
-        const linear::Rhs<double> right{rhs_values, context, request.rhs_generation};
-        auto factor = require(
-            linear::DensePrepared::prepare(op, request.scales, request.solver_limits, memory));
-        work.step();
-        const NoDenseConsumerChecks no_checks;
-        const linear::Precision<double> precision{
-            linear::RetainedPrecision{request.retained_generation}, {}, no_checks};
-        auto solution =
-            require(linear::solve_linear(op, right, request.scales, precision, request.algebraic,
-                                         request.solver_limits, factor, memory));
+        auto solution = solve_projected(matrix, std::move(rhs), request, memory, work);
 
         for (std::size_t i = 0; i < assembly.ids.size(); ++i) {
             work.step();
@@ -843,8 +904,70 @@ struct NonpenetrationBuilder {
         }
         check.finish();
         work.step();
-        return {std::move(solution), std::move(flow), std::move(results),
-                std::move(geometry_parent), work.used};
+        return {std::move(solution),        std::move(flow),      std::move(results),
+                std::move(geometry_parent), std::move(influence), work.used};
+    }
+
+    static DiscreteCirculationLinearization
+    linearize(const DiscreteCirculation& primal, CirculationSense sense,
+              std::span<const CirculationLinearRhs> input,
+              const DiscreteCirculationRequest& request, std::uint64_t max_steps,
+              core::ResourcePlan& memory, const std::stop_token& stop) {
+        p::Work work{0, max_steps, stop};
+        work.step();
+        if (sense != CirculationSense::Tangent && sense != CirculationSense::Transpose)
+            reject(core::FailureCode::InvalidInput);
+        const bool transposed = sense == CirculationSense::Transpose;
+        const auto order = primal.rows_.size();
+        const auto shape = primal.solution_.values().shape();
+        if (input.size() != order || shape.columns != 1 || !std::cmp_equal(shape.rows, order))
+            reject(core::FailureCode::InvalidInput);
+        const auto& previous = primal.solution_.certificate();
+        match_linearization_context(request.scales.context, previous.context(), transposed);
+        match_reused_scales(request.scales, previous, work);
+        validate_circulation(request, order, work, transposed);
+        const auto native = primal.influence_.values();
+        auto right = allocate<p::Interval>(memory, order);
+        for (std::size_t i = 0; i < order; ++i) {
+            work.step();
+            const auto source = require(primal.row(i));
+            if (input[i].face != source.face)
+                reject(core::FailureCode::InvalidInput);
+            const auto value = import(input[i].value, work);
+            right.values()[i] = transposed ? value : p::negate(value, work);
+        }
+        const auto coefficient = [&](std::size_t row, std::size_t column) -> const p::Interval& {
+            return transposed ? native[column * order + row] : native[row * order + column];
+        };
+        auto [matrix, rhs] = dense_inputs(order, memory);
+        auto rows = allocate<std::optional<CirculationLinearRow>>(memory, order);
+        auto retained = allocate<p::Interval>(memory, order);
+        a::LocalRootScratch rounding;
+        for (std::size_t i = 0; i < order; ++i) {
+            rhs.values()[i] =
+                project_binary64(right.values()[i], request.rhs_absolute, rounding, work);
+            for (std::size_t j = 0; j < order; ++j)
+                matrix.values()[j * order + i] =
+                    project_binary64(coefficient(i, j), request.matrix_absolute, rounding, work);
+        }
+        auto solution = solve_projected(matrix, std::move(rhs), request, memory, work);
+        for (std::size_t i = 0; i < order; ++i)
+            retained.values()[i] = import(retained_word(solution.values(), i), work);
+
+        NativeResidualCheck check{request};
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& original_rhs = right.values()[i];
+            auto original = p::negate(original_rhs, work);
+            for (std::size_t j = 0; j < order; ++j)
+                original = p::add(original,
+                                  p::multiply(coefficient(i, j), retained.values()[j], work), work);
+            check.add(original, original_rhs, i, work);
+            rows.values()[i].emplace(CirculationLinearRow{
+                input[i].face, a::enclose_p1_value(original, core::Precision::TwoWord, rounding)});
+        }
+        check.finish();
+        work.step();
+        return {std::move(solution), std::move(rows), sense, work.used};
     }
 };
 
@@ -870,12 +993,18 @@ core::Result<DiscreteNonpenetration> evaluate_discrete_nonpenetration(
 DiscreteCirculation::DiscreteCirculation(
     linear::Solution<double> solution, ProjectedCaseUniformFlow&& flow,
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows,
-    std::optional<a::P1ActionValue> geometry_owner, std::uint64_t steps) noexcept
+    std::optional<a::P1ActionValue> geometry_owner, core::PlannedBuffer<p::Interval> influence,
+    std::uint64_t steps) noexcept
     : solution_(std::move(solution)),
       flow_(std::move(flow)),
       rows_(std::move(rows)),
       geometry_owner_(std::move(geometry_owner)),
+      influence_(std::move(influence)),
       steps_(steps) {}
+
+DiscreteCirculation::DiscreteCirculation(DiscreteCirculation&&) noexcept = default;
+DiscreteCirculation& DiscreteCirculation::operator=(DiscreteCirculation&&) noexcept = default;
+DiscreteCirculation::~DiscreteCirculation() = default;
 
 core::Result<CirculationResidualRow> DiscreteCirculation::row(std::size_t i) const noexcept {
     if (i >= rows_.size() || !geometry_owner_)
@@ -894,6 +1023,40 @@ core::Result<DiscreteCirculation> solve_discrete_circulation(
     try {
         return NonpenetrationBuilder::solve(input, std::move(flow), limits, request, shared, local,
                                             kernel, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+DiscreteCirculationLinearization::DiscreteCirculationLinearization(
+    linear::Solution<double> solution,
+    core::PlannedBuffer<std::optional<CirculationLinearRow>> rows, CirculationSense sense,
+    std::uint64_t steps) noexcept
+    : solution_(std::move(solution)), rows_(std::move(rows)), sense_(sense), steps_(steps) {}
+
+core::Result<CirculationLinearRow>
+DiscreteCirculationLinearization::row(std::size_t i) const noexcept {
+    if (i >= rows_.size())
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    const auto& result = rows_.values()[i];
+    if (!result)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
+    return *result;
+}
+
+core::Result<DiscreteCirculationLinearization> solve_discrete_circulation_linearization(
+    const DiscreteCirculation& primal, CirculationSense sense,
+    std::span<const CirculationLinearRhs> rhs, const DiscreteCirculationRequest& request,
+    std::uint64_t max_steps, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::linearize(primal, sense, rhs, request, max_steps, memory,
+                                                stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {

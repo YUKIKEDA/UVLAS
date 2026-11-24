@@ -171,6 +171,13 @@ add_test(NAME cli.validate
         -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli_validate.cmake")
 set_tests_properties(cli.validate PROPERTIES TIMEOUT 30 LABELS "integration")
 
+add_test(NAME cli.inspect
+    COMMAND "${CMAKE_COMMAND}"
+        "-DUVLAS_EXECUTABLE=$<TARGET_FILE:uvlas_cli>"
+        "-DCASE_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}/cli-inspect-$<CONFIG>"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/check_cli_inspect.cmake")
+set_tests_properties(cli.inspect PROPERTIES TIMEOUT 30 LABELS "integration")
+
 # QA-04: results must equal the baseline of this platform bit for bit.
 find_package(Python3 3.10 REQUIRED COMPONENTS Interpreter)
 add_test(NAME tools.trace
@@ -667,10 +674,12 @@ target_include_directories(uvlas_test_structure_pg_reference_geometry
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG
     TIMEOUT 180
-    SOURCES structure/pg_conditioning_test.cpp
-    LIBS uvlas_structure Boost::multiprecision)
+    SOURCES structure/pg_conditioning_test.cpp support/allocation_audit.cpp
+    LIBS uvlas_structure_audit Boost::headers uvlas::eigen)
 target_include_directories(uvlas_test_structure_pg_conditioning
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+uvlas_enable_allocation_audit(uvlas_test_structure_pg_conditioning)
+uvlas_require_audited_dependencies(uvlas_test_structure_pg_conditioning)
 
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO

@@ -23,7 +23,7 @@
 | 局所独立化 | 完了 | 局所rank、基底、写像と来歴を所有する。再利用時にグラフ・領域・活動面積・辞書を照合し、B/T/S/W/Zを全活動行で厳密に再検証する。全12系列を独立参照と照合した。 [準備の検証](../verification/IM-01/pg-rank-bounded-preparation/verification.md)・[再検証と資源](../verification/IM-01/pg-rank-bounded-preparation/validation-verification.md) |
 | 参照幾何と微分 | 完了 | グラフ・辞書・共通分割を所有する入口から参照Jacobian、可変法線、実法線厚さ、高階・片側微分と物理測度を返す。全活動片の局所正則性を厳密に検査する。 [実装 `09e983f`](https://github.com/YUKIKEDA/UVLAS/commit/09e983ff5d63d9ab95e0b2c75883687b64f219b1)・[検証](../verification/IM-01/pg-reference-geometry/verification.md) |
 | 保証付き条件付け | 実装中 | 一定高さ・一定厚さ・全被覆の平板は、内部格子n=1、2、4の幾何内積を解析積分し、外向き区間を返す。n=1で合同変換の認定と層・面側の基底評価を照合した。曲面・変厚・切断領域への保証付き積分と変換候補の製品生成が残る。 [平板内積の検証](../verification/IM-01/pg-flat-gram/verification.md) |
-| PreparedPatchと参照作用 | 実装中 | 認定済み基底の全列について、位置、Jacobian、測度、値と物理勾配を体積・層界面の片側・側面の点列から一括で取得できる。次は質量・材料・荷重の参照作用と反復用Workspaceへつなぐ。 [点列評価の検証](../verification/IM-01/pg-conditioned-reference-batch.md) |
+| PreparedPatchと参照作用 | 実装中 | 認定済み基底の全列について、位置、Jacobian、測度、値と物理勾配を体積・層界面の片側・側面の点列から一括で取得できる。体積質量の準備に渡す基底値と正の体積Jacobianは、Binary64またはTwoWordの格納誤差を認定して保持できる。次は層密度と求積を結ぶ質量作用、材料・荷重の参照作用と反復用Workspaceへつなぐ。 [点列評価](../verification/IM-01/pg-conditioned-reference-batch.md)・[体積質量に渡す参照値](../verification/IM-01/pg-volume-mass-reference.md) |
 | 全位置traceと拘束 | 残 | 辞書・分割・基底を使い、非整合界面の全厚位置、元拘束、双対量を保持する |
 | 固定pivot疎chart | 残 | 元拘束と疎解法から写像と微分・転置作用を実装し、拘束と仕事を照合する |
 | 早期R-02 | 残 | 実拘束グラフができた時点で、疎分解のfillと準備・再利用の容量を測る |
@@ -42,7 +42,7 @@
 | 共有辺・四辺形・全作用 | 完了 | 固定分割に従って全出現に散布し、核半径と強度トレースが一致する逆向きの解析辺を相殺する。値とJVPを独立面積分、VJPを双対内積で照合した。 [共有辺と四辺形の検証](../verification/IM-03/p1-shared-action-v1/verification.md) |
 | 大域幾何と後縁所有 | 完了 | 大域接触・不適格の検査、alias運動学、後縁の放出所有。 [#153](https://github.com/YUKIKEDA/UVLAS/pull/153) |
 | 既知流れと指定運動 | 実装中 | [PCHIP係数](https://github.com/YUKIKEDA/UVLAS/pull/179)は統合済み。指定区間の値・時間微分も [#187](https://github.com/YUKIKEDA/UVLAS/pull/187) で統合済み。閉定義域内の節点検索と左右区間候補の取得は [#197](https://github.com/YUKIKEDA/UVLAS/pull/197) で統合済み。[#205](https://github.com/YUKIKEDA/UVLAS/pull/205) で、範囲外のRejectとHold、およびHold端点の内外候補の取得を統合した。[#211](https://github.com/YUKIKEDA/UVLAS/pull/211) で、宣言した周期と節点幅の一致を検査し、負時刻を含む周期時刻の厳密な正規化を統合した。[#218](https://github.com/YUKIKEDA/UVLAS/pull/218) で、要求区間、Hold端点のゼロ傾き、周期端の値と時間微分の一致を厳密に検査する部品を統合した。[#228](https://github.com/YUKIKEDA/UVLAS/pull/228) で、微分を評価する側の選択と、Automaticで必要になる導関数の厳密な一致判定を統合した。[#237](https://github.com/YUKIKEDA/UVLAS/pull/237) で、準備入力を所有し、発行元・世代・実内容を照合する部品を統合した。[#244](https://github.com/YUKIKEDA/UVLAS/pull/244) で、係数準備と境界検査の確保量・処理量を係数の確保前に見積もる部品を統合した。[#251](https://github.com/YUKIKEDA/UVLAS/pull/251) で、確定済みの準備入力を読み取り専用で共有する部品を統合した。[#263](https://github.com/YUKIKEDA/UVLAS/pull/263) で、曲線の一括受入・評価と実内容を照合する復元までを検証した。既知流れ・指定運動への接続、空間・時間微分と再開時の一致の検証が残る |
-| 循環と全微分 | 実装中 | 接触済みの離散照会点と明示した法線・面速度から、先頭後流を含む実数の循環方程式を組み立てて解く。求解器が返した循環を既知流れ、束縛渦、先頭後流、旧履歴を含む非貫通の原式へ戻して残差を検査する。PG物質写像に基づくコロケーション、全微分、複素循環更新が残る。 [離散循環の検証](../verification/IM-03/discrete-circulation-v1/verification.md)・[離散非貫通残差の検証](../verification/IM-03/discrete-nonpenetration-v1/verification.md)・[束縛渦と後流の検証](../verification/IM-03/bound-wake-induction-v1/verification.md) |
+| 循環と全微分 | 実装中 | 接触済みの離散照会点と明示した法線・面速度から、先頭後流を含む実数の循環方程式を組み立てて解き、非貫通の原式で循環を検査する。固定幾何の循環作用は接線と転置も求解し、投影前の作用で保持した解の残差を検査する。PG物質写像に基づくコロケーション、幾何・時刻を含む全微分、複素循環更新が残る。 [離散循環の検証](../verification/IM-03/discrete-circulation-v1/verification.md)・[接線・転置の検証](../verification/IM-03/discrete-circulation-linearization-v1/verification.md) |
 | 全ベクトル荷重 | 残 | 循環・共有核・幾何から全荷重と微分を実装する。構造への双対写像にはIM-01／02の成果が必要 |
 | 後流値・移流・試行 | 残 | 同じ循環・荷重状態から自由／指定輸送、全履歴、試行の親不変性と全微分を検証する |
 | J1状態への接続 | 残 | IM-04側とstep契約を共有し、BDF2と新生台形、輸送別の初期微分、受理済み循環の時間微分、全履歴、一回限りの状態確定を検証する。強連成Newtonの実装はIM-04が担当 |
@@ -69,7 +69,7 @@
 | 結果と診断 | 実装中 | 状態と来歴のJSON、確定観測のCSV、適格な可視化標本のVTU・PVDを内部で生成できる。VTU・PVDは層界面の両側と再始動区間を保つ。型検査・SI変換済みケースから、元入力、保持値、誤差半径、現時点で解決した既定値を出力し、その指紋を来歴に結び付けられる。物理回復から可視化標本を作り、物理準備で確定する設定とともに実行結果の保存へつなぐ工程が残る。 [解決済みケース](../verification/IM-06/resolved-case-document.md)・[観測CSV](../verification/IM-06/observation-csv.md)・[VTU・PVD](../verification/IM-06/visualization-series.md) |
 | checkpoint容器 | 完了 | 型付きチャンクと指紋からマニフェストを作り、既存番号を保持したまま確定する。中断した保存を除外し、型、長さ、SHA-256、指紋が一致する最新番号を復元する。 [マニフェストと確定ディレクトリの検証](../verification/IM-06/checkpoint-manifest.md) |
 | 実状態とresume | 残 | 全BDF2ステンシル、受理済みの微分・荷重・後流履歴、探索状態などを保存する。IM-04／05の実状態を使い、同版・同環境での再開結果のビット一致と非互換の拒否を確認する |
-| CLI | 実装中 | `validate` は全スキーマと参照を検査する。外部ファイルはマニフェスト直下の取得と SHA-256 の照合を行い、MSH 4.1 ASCII は節とタグも検査する。未対応の宣言は位置を診断する。形式別の子依存の検査、prepare／run／resume／inspect、実行終了時の状態記録が残る。 [開発用CLI](../build.md#開発用cliの終了規約)・[検証](../verification/IM-06/im06-cli-case-validation.json) |
+| CLI | 実装中 | `validate` は全スキーマと参照を検査する。直下の外部ファイルは SHA-256 を照合し、MSH 4.1 ASCII は節とタグも検査する。`inspect` は保存済み状態と来歴を照合し、来歴に指紋がある場合は解決済みケースも確認する。形式別の子依存の検査、prepare／run／resume、実行終了時の状態記録が残る。 [開発用CLI](../build.md#開発用cliの終了規約) |
 | Python | 残 | 同じC++処理にPythonの辞書・ファイル・実行・再開と所有権を接続する |
 | ランタイムと新規環境 | 基盤あり | CLIとbindingの基盤は [IM-00](im00-package-acceptance.md) にある。実際に配布するCLI／wheelの依存・ABIと、開発環境に依存しない導入・実行を確認する |
 | 終了審査 | 残 | V-USE・V-STATEで3入力経路とCLI／Pythonの物理結果、両OSの導入・中断・再開を照合する |
