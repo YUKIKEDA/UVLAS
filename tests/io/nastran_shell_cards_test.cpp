@@ -1,6 +1,6 @@
 #include "../../src/structure/exact_polynomial_detail.hpp"
 #include "nastran_lumped_mass_geometry.hpp"
-#include "nastran_rigid_link_cards.hpp"
+#include "nastran_rigid_attachment.hpp"
 #include "nastran_shell_cards.hpp"
 #include "nastran_support_cards.hpp"
 #include "source_digest.hpp"
@@ -706,7 +706,7 @@ constexpr SiUnits mass_geometry_units{SiLengthUnit::Millimetre, SiMassUnit::Gram
     return structure::detail::ExactFactory::value(r);
 }
 
-void mass_contains(const NastranCartesianInterval& enclosure, const MassQ& exact) {
+void si_contains(const NastranCartesianInterval& enclosure, const MassQ& exact) {
     const auto& lower = mass_q(enclosure.lower);
     const auto& upper = mass_q(enclosure.upper);
     CHECK(lower <= exact);
@@ -778,9 +778,9 @@ TEST_CASE("CONM2 basic offset and absolute centre preserve independent rigid kin
         CHECK(original_i21.decimal() == "2.0e7");
         CHECK(original_i32.decimal() == "-3.0e7");
         for (std::size_t i = 0; i < grid.size(); ++i) {
-            mass_contains(row.grid_metres[i], grid[i]);
-            mass_contains(row.centre_metres[i], centre[i]);
-            mass_contains(row.grid_to_centre_metres[i], lever[i]);
+            si_contains(row.grid_metres[i], grid[i]);
+            si_contains(row.centre_metres[i], centre[i]);
+            si_contains(row.grid_to_centre_metres[i], lever[i]);
         }
         for (std::size_t i = 0; i < expected_inertia.size(); ++i) {
             CHECK(mass_q(row.centre_inertia_kg_m2[i]) == expected_inertia[i]);
@@ -815,7 +815,7 @@ TEST_CASE("CONM2 basic offset and absolute centre preserve independent rigid kin
     CHECK(point_mass.kind == NastranBasicMassKind::Particle);
     CHECK(mass_q(point_mass.mass_kg) == MassQ("1/2"));
     for (const auto& value : point_mass.grid_inertia_kg_m2) {
-        mass_contains(value, MassQ{0});
+        si_contains(value, MassQ{0});
     }
 }
 
@@ -874,6 +874,220 @@ TEST_CASE("CONM2 SI preparation rejects unsupported frames and unphysical inerti
     REQUIRE_FALSE(stale);
     CHECK(stale.error().code == StaleGeneration);
     CHECK(take(diagnostic).reason == MassGeometryReason::Source);
+}
+
+constexpr std::string_view rigid_geometry_fixture =
+    "CORD2C,20,0,1000.0,2000.0,3000.0,1000.0,2000.0,3100.0,1100.0,2000.0,3000.0\n"
+    "GRID,8,0,1000.0,2000.0,3000.0\n"
+    "GRID,10,20,2000.0,90.0,0.0,20\n"
+    "GRID,12,0,1000.0,2000.0,4000.0\n"
+    "GRID,13,20,0.0,40.0,2000.0,20\n"
+    "RBE2,200,8,123456,10,12,0.0,293.15\n"
+    "RBE2,201,8,26,10,12\n"
+    "RBE2,202,8,1,10,0.00001,293.15\n"
+    "RBE2,203,8,36,13\n"
+    "RBE2,204,8,13,13\n";
+
+[[nodiscard]] NastranRigidAttachmentLimits rigid_limits() noexcept {
+    const auto base = mass_geometry_limits();
+    return {base.arithmetic, 150000, 4};
+}
+
+[[nodiscard]] NastranRigidAttachment rigid_reference(std::uint64_t id, core::ResourcePlan& plan) {
+    const auto shells = take(
+        NastranShellCards::prepare(coordinates(rigid_geometry_fixture), shell_limits, plan, {}));
+    const auto links = take(NastranRigidLinkCards::prepare(shells, {8, 16, 20000}, plan, {}));
+    return take(NastranRigidAttachment::prepare(shells, links, NastranElementId{id},
+                                                SiLengthUnit::Millimetre, rigid_limits(), plan));
+}
+
+struct RigidFixture {
+    core::ResourcePlan& plan;
+
+    [[nodiscard]] structure::ExactRational integer(std::string_view text) const {
+        return take(structure::ExactRational::from_integer_pair(
+            text, "1", rigid_limits().arithmetic.algebra, plan));
+    }
+
+    [[nodiscard]] NastranRigidExactVector vector(std::string_view x, std::string_view y,
+                                                 std::string_view z) const {
+        return {integer(x), integer(y), integer(z)};
+    }
+
+    [[nodiscard]] std::array<structure::ExactRational, 9> rotation() const {
+        return {integer("0"), integer("-1"), integer("0"), integer("1"), integer("0"),
+                integer("0"), integer("0"),  integer("0"), integer("1")};
+    }
+};
+
+void rigid_contains(const NastranRigidIntervalVector& values, std::array<int, 3> expected) {
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        si_contains(values[i], MassQ{expected[i]});
+    }
+}
+
+void rigid_lanes(const std::array<std::optional<NastranCartesianInterval>, 3>& values,
+                 const std::array<std::optional<int>, 3>& expected) {
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        CHECK(values[i].has_value() == expected[i].has_value());
+        if (const auto& actual = values[i]; actual && expected[i]) {
+            si_contains(*actual, MassQ{*expected[i]});
+        }
+    }
+}
+
+TEST_CASE("RBE2 projects all selected point motions and their world wrench transpose",
+          "[IO4-03][CN-D02][CN-D03][R-05][integration][verification]") {
+    core::ResourcePlan plan{mass_geometry_budget};
+    const auto owned = rigid_reference(200, plan);
+    const auto reference = take(owned.view());
+    CHECK(reference.source.digest ==
+          source_digest(std::as_bytes(std::span{rigid_geometry_fixture})));
+    CHECK(reference.card.dependent_components == 0b111111);
+    const auto temperature = take(reference.card.reference_temperature);
+    CHECK(temperature.value.decimal() == "293.15");
+    rigid_contains(reference.master_metres, {1, 2, 3});
+    REQUIRE(reference.dependents.size() == 2);
+    CHECK(reference.dependents[0].source.id == NastranGridId{10});
+    CHECK(reference.dependents[1].source.id == NastranGridId{12});
+    rigid_contains(reference.dependents[0].offset_from_master_metres, {0, 2, 0});
+    rigid_contains(reference.dependents[1].offset_from_master_metres, {0, 0, 1});
+
+    const RigidFixture r{plan};
+    const auto origin = r.vector("10", "20", "30");
+    const auto v = r.vector("1", "2", "3");
+    const auto w = r.vector("2", "-1", "4");
+    const auto rotation = r.rotation();
+    const NastranRigidMotion motion{origin, rotation, v, w};
+    const std::array loads{
+        NastranRigidPointLoad{NastranGridId{10}, r.vector("2", "3", "4"), r.vector("5", "6", "7")},
+        NastranRigidPointLoad{NastranGridId{12}, r.vector("1", "-2", "3"),
+                              r.vector("-4", "5", "2")}};
+    const auto projected =
+        take(evaluate_nastran_rigid_attachment(owned, motion, loads, rigid_limits(), plan));
+    CHECK(projected.link == NastranElementId{200});
+    const auto rows = projected.dependents.values();
+    REQUIRE(rows.size() == 2);
+    rigid_contains(rows[0].rigid_target_metres, {8, 20, 30});
+    rigid_contains(rows[1].rigid_target_metres, {10, 20, 31});
+    // CD at GRID 10 is (Y,-X,Z). The current lever is (-2,0,0), so
+    // omega x lever is (0,-8,-2). GRID 12 uses basic axes.
+    rigid_lanes(rows[0].translation_target, {20, -8, 30});
+    rigid_lanes(rows[0].translational_velocity, {-6, -1, 1});
+    rigid_lanes(rows[0].spin, {-1, -2, 4});
+    rigid_lanes(rows[1].translation_target, {10, 20, 31});
+    rigid_lanes(rows[1].translational_velocity, {0, 0, 3});
+    rigid_lanes(rows[1].spin, {2, -1, 4});
+    if (const auto& orientation = rows[0].rigid_target_orientation) {
+        rigid_contains((*orientation)[0], {-1, 0, 0});
+        rigid_contains((*orientation)[1], {0, -1, 0});
+        rigid_contains((*orientation)[2], {0, 0, 1});
+    } else {
+        FAIL("A complete rotational mask lost its finite target frame");
+    }
+    // Independent sum: F=(-3,2,4)+(1,-2,3); M=(-6,13,3)+(-2,6,2).
+    rigid_contains(projected.world_force_n, {-2, 0, 7});
+    rigid_contains(projected.world_moment_about_master_nm, {-8, 19, 5});
+
+    // Compare the master-side power enclosure to the independent sum of the
+    // six dependent per-GRID component products, first 0 and then 4 watts.
+    MassQ lower{}, upper{};
+    const auto accumulate = [&](const NastranRigidIntervalVector& wrench,
+                                const NastranRigidExactVector& motion_vector) {
+        for (std::size_t i = 0; i < wrench.size(); ++i) {
+            const auto& q = mass_q(motion_vector[i]);
+            lower += q * mass_q(q < 0 ? wrench[i].upper : wrench[i].lower);
+            upper += q * mass_q(q < 0 ? wrench[i].lower : wrench[i].upper);
+        }
+    };
+    accumulate(projected.world_force_n, v);
+    accumulate(projected.world_moment_about_master_nm, w);
+    CHECK(lower <= 4);
+    CHECK(upper >= 4);
+    CHECK(upper - lower < MassQ("1/10000000000000000000000000000000000000000"));
+}
+
+TEST_CASE("RBE2 partial selection preserves independent directions and diagnoses unsupported input",
+          "[IO4-03][CN-D03][integration][negative][verification]") {
+    core::ResourcePlan plan{mass_geometry_budget};
+    const auto partial = rigid_reference(201, plan);
+    const RigidFixture r{plan};
+    const auto origin = r.vector("10", "20", "30");
+    const auto v = r.vector("1", "2", "3");
+    const auto w = r.vector("2", "-1", "4");
+    const auto rotation = r.rotation();
+    const NastranRigidMotion motion{origin, rotation, v, w};
+    std::array loads{
+        NastranRigidPointLoad{NastranGridId{10}, r.vector("0", "3", "0"), r.vector("0", "0", "7")},
+        NastranRigidPointLoad{NastranGridId{12}, r.vector("0", "-2", "0"),
+                              r.vector("0", "0", "2")}};
+    const auto good =
+        take(evaluate_nastran_rigid_attachment(partial, motion, loads, rigid_limits(), plan));
+    const auto& first = good.dependents.values().front();
+    rigid_lanes(first.translation_target, {std::nullopt, -8, std::nullopt});
+    rigid_lanes(first.translational_velocity, {std::nullopt, -1, std::nullopt});
+    rigid_lanes(first.spin, {std::nullopt, std::nullopt, 4});
+    CHECK_FALSE(first.rigid_target_orientation);
+    rigid_contains(good.world_force_n, {-3, -2, 0});
+    rigid_contains(good.world_moment_about_master_nm, {2, 0, 9});
+
+    std::optional<NastranAttachmentDiagnostic> problem;
+    loads[0].force_n[0] = r.integer("1");
+    const auto off_component =
+        evaluate_nastran_rigid_attachment(partial, motion, loads, rigid_limits(), plan, &problem);
+    REQUIRE_FALSE(off_component);
+    CHECK(off_component.error().code == InvalidInput);
+    CHECK(take(problem).reason == NastranAttachmentFailure::LoadSelection);
+    CHECK(take(problem).grid == NastranGridId{10});
+    CHECK(take(problem).position == take(partial.view()).card.components_field.position);
+    loads[0].force_n[0] = r.integer("0");
+    const std::array reflection{r.integer("-1"), r.integer("0"), r.integer("0"),
+                                r.integer("0"),  r.integer("1"), r.integer("0"),
+                                r.integer("0"),  r.integer("0"), r.integer("1")};
+    const auto improper = evaluate_nastran_rigid_attachment(partial, {origin, reflection, v, w},
+                                                            loads, rigid_limits(), plan, &problem);
+    REQUIRE_FALSE(improper);
+    CHECK(improper.error().code == GeometryInvalid);
+    CHECK(take(problem).reason == NastranAttachmentFailure::Pose);
+
+    const auto shell = take(
+        NastranShellCards::prepare(coordinates(rigid_geometry_fixture), shell_limits, plan, {}));
+    const auto links = take(NastranRigidLinkCards::prepare(shell, {8, 16, 20000}, plan, {}));
+    const auto prepare = [&](std::uint64_t link, const NastranRigidAttachmentLimits& input_limits) {
+        return NastranRigidAttachment::prepare(shell, links, NastranElementId{link},
+                                               SiLengthUnit::Millimetre, input_limits, plan,
+                                               &problem);
+    };
+    const auto hot = prepare(202, rigid_limits());
+    REQUIRE_FALSE(hot);
+    CHECK(hot.error().code == Unsupported);
+    CHECK(take(problem).reason == NastranAttachmentFailure::Thermal);
+    CHECK(take(take(problem).position).line == 8);
+    const auto axial = take(prepare(203, rigid_limits()));
+    if (const auto& axis = take(axial.view()).dependents[0].component_axes[2]) {
+        rigid_contains(*axis, {0, 0, 1});
+    } else {
+        FAIL("The cylindrical axial component is defined at the pole");
+    }
+    const auto pole = prepare(204, rigid_limits());
+    REQUIRE_FALSE(pole);
+    CHECK(pole.error().code == Unsupported);
+    CHECK(take(problem).reason == NastranAttachmentFailure::DisplacementAxes);
+    CHECK(take(problem).coordinate == NastranCoordinateId{20});
+    CHECK(take(take(problem).position).line == 5);
+    auto bounded = rigid_limits();
+    bounded.maximum_dependents = 1;
+    const auto limited = prepare(200, bounded);
+    REQUIRE_FALSE(limited);
+    CHECK(limited.error().code == ResourceExceeded);
+    CHECK(take(shell.view()).input.bulk.bytes == rigid_geometry_fixture);
+    const auto other = take(NastranShellCards::prepare(
+        coordinates(std::string{rigid_geometry_fixture} + "$ other\n"), shell_limits, plan, {}));
+    const auto stale =
+        NastranRigidAttachment::prepare(other, links, NastranElementId{200},
+                                        SiLengthUnit::Millimetre, rigid_limits(), plan, &problem);
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == StaleGeneration);
 }
 
 } // namespace

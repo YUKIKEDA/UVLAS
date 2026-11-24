@@ -36,7 +36,7 @@ enum class NastranRigidLinkFailure : std::uint8_t {
 };
 
 struct NastranRigidLinkDiagnostic {
-    NastranRigidLinkFailure reason;
+    NastranRigidLinkFailure reason = NastranRigidLinkFailure::Input;
     NastranBulkPosition position;
 };
 

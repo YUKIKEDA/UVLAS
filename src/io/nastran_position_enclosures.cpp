@@ -408,18 +408,20 @@ NastranPositionEnclosures::prepare(const NastranIsotropicShellCards& input, SiLe
                         diagnostic);
 }
 
-core::Result<NastranGridDisplacementAxes>
-prepare_nastran_displacement_axes(const NastranIsotropicShellCards& input, NastranGridId id,
-                                  std::uint8_t required_axes,
-                                  const NastranSpcDirectionLimits& limits, core::ResourcePlan& plan,
-                                  std::optional<NastranPositionDiagnostic>* diagnostic) noexcept {
+static core::Result<NastranGridDisplacementAxes>
+prepare_displacement_view(const NastranCoordinateView* source, NastranGridId id,
+                          std::uint8_t required_axes, const NastranSpcDirectionLimits& limits,
+                          core::ResourcePlan& plan,
+                          std::optional<NastranPositionDiagnostic>* diagnostic) noexcept {
     if (diagnostic) {
         diagnostic->reset();
     }
     NastranPositionDiagnostic active;
     auto result = g::partition_entry([&]() -> core::Result<NastranGridDisplacementAxes> {
         try {
-            const auto source = input.view();
+            if (limits.stop.stop_requested()) {
+                partition_fail(Code::Cancelled);
+            }
             if (!source || required_axes == 0 || required_axes > 7) {
                 partition_fail(Code::InvalidInput);
             }
@@ -428,7 +430,7 @@ prepare_nastran_displacement_axes(const NastranIsotropicShellCards& input, Nastr
                                                          limits.maximum_work, limits.stop};
             g::ReferenceArithmetic budget{admission, plan};
             budget.admit(18 + 16);
-            Transform transform{source->input.input, budget.leaf_limits, plan, work, active};
+            Transform transform{*source, budget.leaf_limits, plan, work, active};
             auto axes = transform.component_axes(transform.select(id), required_axes);
             work.step();
             return NastranGridDisplacementAxes{std::move(axes), work.used};
@@ -444,6 +446,26 @@ prepare_nastran_displacement_axes(const NastranIsotropicShellCards& input, Nastr
         *diagnostic = active;
     }
     return result;
+}
+
+core::Result<NastranGridDisplacementAxes>
+prepare_nastran_displacement_axes(const NastranIsotropicShellCards& input, NastranGridId id,
+                                  std::uint8_t required_axes,
+                                  const NastranSpcDirectionLimits& limits, core::ResourcePlan& plan,
+                                  std::optional<NastranPositionDiagnostic>* diagnostic) noexcept {
+    const auto source = input.view();
+    return prepare_displacement_view(source ? &source->input.input : nullptr, id, required_axes,
+                                     limits, plan, diagnostic);
+}
+
+core::Result<NastranGridDisplacementAxes>
+prepare_nastran_displacement_axes(const NastranShellCards& input, NastranGridId id,
+                                  std::uint8_t required_axes,
+                                  const NastranSpcDirectionLimits& limits, core::ResourcePlan& plan,
+                                  std::optional<NastranPositionDiagnostic>* diagnostic) noexcept {
+    const auto source = input.view();
+    return prepare_displacement_view(source ? &source->input : nullptr, id, required_axes, limits,
+                                     plan, diagnostic);
 }
 
 NastranSpcDirections::NastranSpcDirections(const NastranSpcDirectionOrigin& origin,

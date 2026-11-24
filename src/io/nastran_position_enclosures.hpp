@@ -130,6 +130,12 @@ prepare_nastran_displacement_axes(const NastranIsotropicShellCards&, NastranGrid
                                   core::ResourcePlan&,
                                   std::optional<NastranPositionDiagnostic>* = nullptr) noexcept;
 
+[[nodiscard]] core::Result<NastranGridDisplacementAxes>
+prepare_nastran_displacement_axes(const NastranShellCards&, NastranGridId,
+                                  std::uint8_t required_axes, const NastranSpcDirectionLimits&,
+                                  core::ResourcePlan&,
+                                  std::optional<NastranPositionDiagnostic>* = nullptr) noexcept;
+
 struct NastranSpcComponentDirection {
     NastranSpcComponentKind kind;
     const NastranComponentAxis& basic;
