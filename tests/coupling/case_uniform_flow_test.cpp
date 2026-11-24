@@ -5339,6 +5339,19 @@ JsonToken finite_wing_case(const nlohmann::json& fixture, const nlohmann::json& 
     return recipe;
 }
 
+bool entire_wing_enclosure_fits(const Rat& center, const Rat& radius, const Rat& oracle,
+                                const Rat& tolerance) {
+    return abs(center - oracle) + radius <= tolerance;
+}
+
+void check_frozen_wing_enclosure(const a::ScaledEnclosure& value, const Rat& oracle,
+                                 const Rat& tolerance) {
+    const auto scale = two_power(value.exponent());
+    const Rat center = sum_words(value.center()) * scale;
+    const Rat radius = rational_word(value.radius()) * scale;
+    CHECK(entire_wing_enclosure_fits(center, radius, oracle, tolerance));
+}
+
 void verify_finite_wing(const nlohmann::json& fixture, const nlohmann::json& wing) {
     const auto recipe = finite_wing_case(fixture, wing);
     const auto si = materialize(recipe, io::SourceId{532});
@@ -5467,8 +5480,8 @@ void verify_finite_wing(const nlohmann::json& fixture, const nlohmann::json& win
         CAPTURE(i);
         const auto row = take(result.row(i));
         CHECK(row.face == mesh.faces[i].id);
-        residual_expected(row.residual, Rat{0}, tolerance);
-        residual_expected(row.circulation_action, rational_word(reference[i]), tolerance);
+        check_frozen_wing_enclosure(row.residual, Rat{0}, tolerance);
+        check_frozen_wing_enclosure(row.circulation_action, rational_word(reference[i]), tolerance);
     }
 }
 } // namespace
@@ -5486,5 +5499,20 @@ TEST_CASE("Frozen finite wing closes all discrete residual rows and a bound dire
         const auto angle = wing.at("dihedral_degrees").get<int>();
         CAPTURE(angle);
         verify_finite_wing(fixture, wing);
+    }
+}
+
+TEST_CASE("A frozen-wing reference window bounds both enclosure endpoints",
+          "[V-AERO][AE-02][UW-D03][N4-06][verification][negative]") {
+    const Rat oracle{5, 4};
+    const Rat tolerance{1, 8};
+    const Rat radius{1, 16};
+    for (const int sign : {-1, 1}) {
+        CAPTURE(sign);
+        const Rat center = oracle + Rat{3 * sign, 32};
+        REQUIRE(abs(center - oracle) < tolerance);
+        REQUIRE(radius < tolerance);
+        CHECK_FALSE(entire_wing_enclosure_fits(center, radius, oracle, tolerance));
+        CHECK(entire_wing_enclosure_fits(center, Rat{1, 32}, oracle, tolerance));
     }
 }
