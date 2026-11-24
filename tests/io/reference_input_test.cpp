@@ -1526,6 +1526,9 @@ $EndElements
     bool pcomp = false;
     bool reversed = false;
     bool wrong_layer_material = false;
+    bool partial_group = false;
+    bool shared_group_thickness = false;
+    bool contradictory_group_thickness = false;
     SECTION("Gmsh group expands and preserves the original rings") {
         is_gmsh = true;
     }
@@ -1635,6 +1638,20 @@ $EndElements
         reversed = true;
         wrong_layer_material = true;
     }
+    SECTION("A Gmsh group's declared thickness excludes a neighboring unclaimed group") {
+        is_gmsh = true;
+        physical = true;
+        partial_group = true;
+    }
+    SECTION("A second row of the same Gmsh group inherits the declared thickness") {
+        is_gmsh = true;
+        physical = true;
+        shared_group_thickness = true;
+    }
+    SECTION("Two conflicting thickness declarations for one Gmsh group fail") {
+        is_gmsh = true;
+        contradictory_group_thickness = true;
+    }
     SECTION("Another checked Case cannot consume the same graph") {
         wrong_case = true;
     }
@@ -1661,6 +1678,15 @@ $EndElements
                                                                : foreign_element ? "999"
                                                                                  : "701"},
                                                    {"chart", chart(false)}}});
+            if (partial_group) {
+                row["physical"]["tag"] = 9;
+            }
+            if (partial_group || shared_group_thickness) {
+                row.erase("full_thickness");
+            }
+            if (contradictory_group_thickness) {
+                row["full_thickness"] = 251;
+            }
             sidecar["shells"].push_back(std::move(row));
         }
         if (chart_shift) {
@@ -1737,6 +1763,18 @@ $EndElements
         }
     }
     std::string source_text{is_gmsh ? mesh : bulk};
+    if (partial_group) {
+        const auto replace_group = [&](std::string_view old_text, std::string_view new_text) {
+            const auto offset = source_text.find(old_text);
+            REQUIRE(offset != std::string::npos);
+            source_text.replace(offset, old_text.size(), new_text);
+        };
+        replace_group("$Entities\n0 1 2 0\n", "$Entities\n0 1 3 0\n");
+        replace_group("$EndEntities\n", "19 0 0 0 1000 1000 0 1 9 0\n$EndEntities\n");
+        replace_group("$Elements\n3 4 501 999\n", "$Elements\n4 4 501 999\n");
+        replace_group("2 17 2 2\n702 10 40 99\n701 10 20 40\n",
+                      "2 17 2 1\n702 10 40 99\n2 19 2 1\n701 10 20 40\n");
+    }
     if (pcomp) {
         constexpr std::string_view pshell = "PSHELL,90,6,0.25\n";
         const auto offset = source_text.find(pshell);
@@ -1799,6 +1837,13 @@ $EndElements
             top.set("material", fixture::json(R"("2")"));
         }
         layers.push_back(std::move(top));
+    }
+    if (partial_group || shared_group_thickness) {
+        config.field("model")
+            .field("geometry")
+            .elements[0]
+            .field("thickness")
+            .set("values", fixture::json("[0.25,0.5,0.25,0.25]"));
     }
     auto external = fixture::fragment(is_gmsh ? "Geometry.gmsh" : "Geometry.nastran");
     if (is_gmsh) {
@@ -1883,12 +1928,17 @@ $EndElements
     const auto result = rd::bind_external_mesh_sidecar(schema, *graph, rd::MeshGeometryId{2},
                                                        binding, plan, {}, &diagnostic);
     if (omitted || duplicate || foreign_element || wrong_components || budget_repeat ||
-        wrong_case || wrong_dimension) {
+        wrong_case || wrong_dimension || contradictory_group_thickness) {
         REQUIRE_FALSE(result);
         CHECK(result.error().operation == core::Operation::PrepareModel);
         CHECK(result.error().code ==
               (wrong_case ? core::FailureCode::StaleGeneration : core::FailureCode::InvalidInput));
         if (const auto& detail = diagnostic) {
+            if (contradictory_group_thickness) {
+                CHECK(detail->reason == rd::MeshSidecarFailure::Binding);
+                CHECK(detail->physical == rd::GmshKey{2, 7});
+                CHECK(detail->node);
+            }
             if (omitted || duplicate || foreign_element || wrong_components || wrong_dimension) {
                 CHECK(detail->reason == rd::MeshSidecarFailure::Selection);
                 CHECK(detail->node);
@@ -2019,7 +2069,7 @@ $EndElements
             } else {
                 FAIL("Missing mapped material disagreement");
             }
-        } else if (material_shift || thickness_shift || frame_shift) {
+        } else if (material_shift || thickness_shift || shared_group_thickness || frame_shift) {
             REQUIRE_FALSE(qualified);
             CHECK(qualified.error().code == ((chart_shift || frame_shift)
                                                  ? core::FailureCode::GeometryInvalid
@@ -2033,8 +2083,14 @@ $EndElements
                                                  : rd::ImportedQuantityField::FullThickness));
                 if (material_shift) {
                     CHECK(mismatch->card_position.has_value());
+                } else if (const auto& local = failure.regional_thickness) {
+                    CHECK(local->reason == rd::ExternalPgThicknessFailure::Difference);
+                    CHECK(local->element == (shared_group_thickness ? 701U : 702U));
+                    CHECK(local->sidecar_node);
+                    CHECK(local->case_triangle);
+                    CHECK(local->overlap_vertex);
                 } else {
-                    CHECK(mismatch->vertex == 0);
+                    FAIL("Missing regional thickness provenance");
                 }
             } else {
                 FAIL("Missing exact quantity mismatch");
@@ -2043,6 +2099,19 @@ $EndElements
             REQUIRE(qualified);
             const auto& matched_case = qualified->match();
             CHECK(matched_case.thickness_compared);
+            if (is_gmsh) {
+                if (const auto& regional = matched_case.thickness_regions) {
+                    const auto claims = regional->matches.values();
+                    REQUIRE(claims.size() == (partial_group ? 1 : 2));
+                    CHECK(claims.front().element == 702);
+                    CHECK(claims.front().value_metres == pg_input.r("1", "4"));
+                    if (claims.size() == 2) {
+                        CHECK(claims[1].sidecar_node == claims[0].sidecar_node);
+                    }
+                } else {
+                    FAIL("Missing whole-face regional thickness evidence");
+                }
+            }
             CHECK(matched_case.materials_compared == (is_gmsh ? 0 : pcomp ? 2 : 1));
             if (pcomp) {
                 REQUIRE_FALSE(matched_case.laminate[reversed ? 0U : 1U]);

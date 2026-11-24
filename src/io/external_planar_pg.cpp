@@ -2,6 +2,7 @@
 
 #include "../structure/pg_conditioning_factor.hpp"
 #include "../structure/pg_reference_arithmetic.hpp"
+#include "external_pg_chart_clip.hpp"
 #include "nastran_position_arithmetic.hpp"
 #include "nastran_position_enclosures.hpp"
 
@@ -258,55 +259,15 @@ rectangular(ReferenceArithmetic& math, const Diagnostic& diag, const NastranCoor
     return false;
 }
 
-[[nodiscard]] Point crossing(ReferenceArithmetic& math, const Point& p, const Point& q,
-                             const Rational& from, const Rational& to) {
-    const auto fraction = math.div(from, math.sub(from, to));
-    return {math.add(p.s, math.mul(fraction, math.sub(q.s, p.s))),
-            math.add(p.t, math.mul(fraction, math.sub(q.t, p.t)))};
-}
-
-// A convex triangle clipped by at most four half-planes has at most seven vertices.
 [[nodiscard]] Rational intersect_area2(ReferenceArithmetic& math, const Triangle& triangle,
                                        const auto& face) {
-    std::array<Point, 7> ring;
-    std::size_t size = triangle.size();
-    for (std::size_t i = 0; i < size; ++i) {
-        ring[i] = copy(math, *triangle[i]);
+    std::array<const Point*, 4> outer{};
+    const auto count = static_cast<std::size_t>(face.count);
+    for (std::size_t edge = 0; edge < count; ++edge) {
+        outer[edge] = &positive_corner(face, edge);
     }
-    for (std::size_t edge = 0; edge < face.count; ++edge) {
-        if (size < 3) {
-            return {};
-        }
-        const auto& a = positive_corner(face, edge);
-        const auto& b = positive_corner(face, (edge + 1) % face.count);
-        std::array<Point, 7> clipped;
-        std::size_t count = 0;
-        auto previous = orient(math, a, b, ring[size - 1]);
-        for (std::size_t i = 0; i < size; ++i) {
-            auto current = orient(math, a, b, ring[i]);
-            if (previous.sign() * current.sign() < 0) {
-                if (count == clipped.size()) {
-                    partition_fail(Code::GeometryInvalid);
-                }
-                clipped[count++] =
-                    crossing(math, ring[(i + size - 1) % size], ring[i], previous, current);
-            }
-            if (current.sign() >= 0) {
-                if (count == clipped.size()) {
-                    partition_fail(Code::GeometryInvalid);
-                }
-                clipped[count++] = copy(math, ring[i]);
-            }
-            previous = std::move(current);
-        }
-        ring = std::move(clipped);
-        size = count;
-    }
-    Rational sum;
-    for (std::size_t i = 0; i < size; ++i) {
-        sum = math.add(sum, cross(math, ring[i], ring[(i + 1) % size]));
-    }
-    return sum;
+    const auto overlap = external_pg_chart::clip(math, triangle, std::span{outer}.first(count));
+    return external_pg_chart::area2(math, overlap);
 }
 
 [[nodiscard]] bool same_chart_point(ReferenceArithmetic& math, const Point& a, const Point& b) {
