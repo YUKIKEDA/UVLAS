@@ -68,7 +68,7 @@ io::SiCase checked_case(const a::JsonToken& input) {
     std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
     si_caps.fill(budget);
     const io::SiLimits bounds{si_caps, exact_limits()};
-    const auto catalog = take(io::make_si_catalog(*checked, bounds, plan));
+    const auto catalog = take(io::make_si_catalog(*checked, bounds, plan, nullptr));
     std::vector<io::SiRequirementRow> requirements;
     for (std::uint64_t i = 0; i < take(catalog.size()); ++i) {
         const auto entry = take(catalog.entry(i));
@@ -77,8 +77,8 @@ io::SiCase checked_case(const a::JsonToken& input) {
                                 io::SiDecimalInput{"1e-25"},
                                 io::SiDecimalInput{"1e-25"}});
     }
-    const auto request = take(io::make_si_request(catalog, requirements, bounds, plan));
-    return take(io::convert_case_to_si(*checked, catalog, request, bounds, plan));
+    const auto request = take(io::make_si_request(catalog, requirements, bounds, plan, nullptr));
+    return take(io::convert_case_to_si(*checked, catalog, request, bounds, plan, nullptr));
 }
 
 c::CaseMotionField motion_field(const io::SiCase& source) {
