@@ -924,7 +924,7 @@ struct NonpenetrationBuilder {
         const auto x_dual = cross(y, area_dual, work);
         const auto y_dual = cross(area_dual, x, work);
         return {panel.panel.face,
-                std::move(enclosed_query),
+                enclosed_query,
                 {enclose_vector(x_dual, representation, rounding, work),
                  enclose_vector(y_dual, representation, rounding, work)},
                 enclose_vector(scale_vector(velocity_dual, p::integer(-1), work), representation,

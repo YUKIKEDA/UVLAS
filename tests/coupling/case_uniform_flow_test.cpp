@@ -1628,15 +1628,15 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     std::stop_source stop;
     REQUIRE(stop.request_stop());
     core::ResourcePlan no_pullback_bytes{0};
-    reject(cf::solve_discrete_circulation_pullback(
-               pullback_input, seed, std::move(objective_flow), solve_limits, request,
-               transpose_request, shared, *local, *kernel, no_pullback_bytes, stop.get_token()),
-           core::FailureCode::Cancelled);
+    const auto pullback = [&](core::ResourcePlan& arena, const std::stop_token& cancel = {}) {
+        return cf::solve_discrete_circulation_pullback(
+            pullback_input, seed, std::move(objective_flow), solve_limits, request,
+            transpose_request, shared, *local, *kernel, arena, cancel);
+    };
+    reject(pullback(no_pullback_bytes, stop.get_token()), core::FailureCode::Cancelled);
     CHECK(no_pullback_bytes.allocated_bytes() == 0);
     CHECK(objective_flow.source().jet.active());
-    const auto dual_pullback = take(cf::solve_discrete_circulation_pullback(
-        pullback_input, seed, std::move(objective_flow), solve_limits, request, transpose_request,
-        shared, *local, *kernel, memory));
+    const auto dual_pullback = take(pullback(memory));
     const auto lambda_a = solution_word(transpose.solution(), 0);
     const auto lambda_b = solution_word(transpose.solution(), 1);
     const auto flow_dual = dual_pullback.uniform_flow();
