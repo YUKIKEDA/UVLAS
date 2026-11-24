@@ -262,9 +262,10 @@ core::Result<CaseMaterialOriginalEnclosedForce> CaseMaterialOriginalLayout::pull
             if (row.face != load.face || row.canonical != load.canonical)
                 partition_fail(FailureCode::StaleGeneration);
             const auto material = partition_take(CaseMaterialRows::prepare(
-                chart, thin, patch, row.site, projection, 0., preparation, plan));
-            return material.pullback_enclosed(partition_take(patch.info()).identity, load.force,
-                                              apply, plan);
+                chart, thin, patch, row.site, projection, 0., preparation, plan,
+                CaseMaterialLoadKey{row.face, row.facet, row.local_vertex, row.canonical}));
+            return material.pullback_enclosed(partition_take(patch.info()).identity, load, apply,
+                                              plan);
         });
 }
 
