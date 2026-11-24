@@ -27,10 +27,17 @@ struct CaseMotionTimeLimits {
 };
 
 struct CaseMotionTimeQuery {
+    CaseMotionTimeQuery(
+        aero::detail::pchip::PchipInputStamp identity, const structure::ExactRational& instant,
+        aero::detail::pchip::JetOrder requested = aero::detail::pchip::JetOrder::Value,
+        aero::detail::pchip::RequestedSide direction =
+            aero::detail::pchip::RequestedSide::Automatic) noexcept
+        : stamp(identity), time(instant), order(requested), side(direction) {}
+
     aero::detail::pchip::PchipInputStamp stamp;
     const structure::ExactRational& time;
-    aero::detail::pchip::JetOrder order = aero::detail::pchip::JetOrder::Value;
-    aero::detail::pchip::RequestedSide side = aero::detail::pchip::RequestedSide::Automatic;
+    aero::detail::pchip::JetOrder order;
+    aero::detail::pchip::RequestedSide side;
 };
 
 /// Owns both time curves and the original event times. Frame qualification is separate.

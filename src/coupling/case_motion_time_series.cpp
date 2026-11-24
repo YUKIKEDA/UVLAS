@@ -535,8 +535,9 @@ CaseMotionTimeSeries& CaseMotionTimeSeries::operator=(CaseMotionTimeSeries&&) no
 CaseMotionTimeSeries::~CaseMotionTimeSeries() = default;
 
 core::Result<io::SiQuantityKey> CaseMotionTimeSeries::declaration() const noexcept {
-    if (owner_.size() != 0) {
-        const auto& declaration = owner_.values().front().declaration;
+    const auto owners = owner_.values();
+    if (!owners.empty()) {
+        const auto& declaration = owners.front().declaration;
         if (declaration)
             return *declaration;
     }
