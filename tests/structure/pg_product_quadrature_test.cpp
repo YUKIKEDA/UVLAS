@@ -10,6 +10,39 @@ using namespace uvlas::structure;
 using namespace partition_test;
 using namespace pg_conditioning_test;
 
+TEST_CASE("PG common denominators admit guarded work before evaluating any term",
+          "[SH-D07][N4-08][verification][negative]") {
+    using Reuse = detail::PgRankMonomialPowers::Reuse;
+    constexpr auto limb_bits = std::numeric_limits<detail::RankWord>::digits;
+    const I denominator = I{1} << (4 * limb_bits);
+    Fixture fixture;
+    const auto u = rat(fixture, I{1}, denominator);
+    const auto v = fixture.r("0");
+    const std::array rows{PgRankRow{PgCoefficientField::R, {0, 0}, {1, 0}},
+                          PgRankRow{PgCoefficientField::R, {0, 0}, {2, 0}}};
+    const std::array<std::uint32_t, 2> indices{0, 1};
+    using Coefficient = detail::RankFraction<detail::RankCell>;
+    const std::array coefficients{Coefficient{1, 1}, Coefficient{1, 1}};
+    core::ResourcePlan plan{profile};
+    auto limits = query_limits();
+    limits.algebra.maximum_value_bits = 11 * limb_bits;
+
+    // The bound is 8 limbs plus 5 bits. The next limb and both guard limbs
+    // must fit, even though the final reduced fraction has a smaller width.
+    limits.algebra.maximum_work_bits = 10 * limb_bits;
+    detail::ReferenceArithmetic rejected{limits, plan};
+    detail::PgRankMonomialPowers powers{u, v, Reuse::CommonDenominator};
+    CHECK_FALSE(powers.common_sum(rejected, rows, indices, coefficients));
+    CHECK(rejected.info().scalar_operations == 0);
+    CHECK(plan.allocated_bytes() == 0);
+
+    limits.algebra.maximum_work_bits = 11 * limb_bits;
+    detail::ReferenceArithmetic admitted{limits, plan};
+    const auto result = powers.common_sum(admitted, rows, indices, coefficients);
+    REQUIRE(result);
+    CHECK(q(*result) == Q{denominator + 1} / (denominator * denominator));
+}
+
 TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes",
           "[SH-D03][SH-D07][N4-02][N4-08][verification][negative]") {
     Fixture fixture;
@@ -136,13 +169,31 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
         CHECK(product_entries[i].upper == explicit_entries[i].upper);
     }
 
-    // Retain the exact axis powers, with spare capacity for leaf operations,
-    // while excluding the additional array of mixed powers from the estimate.
+    // Admit mixed powers while excluding the integer powers and scratch used
+    // by the common-denominator sum.
     auto axis_limits = limits;
     const auto held = detail::basis_live_rationals + 16 + 4 * low_gram.rule().size() +
                       2 * product_entries.size() + 3 * size +
                       detail::PgRankMonomialPowers::retained_rationals;
     const auto bytes_per_integer = 4 * (axis_limits.arithmetic.algebra.maximum_work_bits / 8);
+    auto mixed_limits = limits;
+    const auto mixed_held = held + detail::PgRankMonomialPowers::retained_mixed;
+    mixed_limits.arithmetic.algebra.external_memory =
+        ExactEstimateAdmission{(2 * (mixed_held + 32) + 1) * bytes_per_integer};
+    auto mixed_basis = make_curve_basis();
+    core::ResourcePlan mixed_plan{profile};
+    const auto mixed_gram = take(PgDiscreteGram::prepare_product(
+        std::move(mixed_basis), {low, low, depth_pair}, grid, mixed_limits, scratch, mixed_plan));
+    const auto mixed_entries = take(mixed_gram.enclosure()).upper_triangle;
+    REQUIRE(mixed_entries.size() == product_entries.size());
+    CHECK(low_gram.info().arithmetic.allocated_owned_payload_bytes <
+          mixed_gram.info().arithmetic.allocated_owned_payload_bytes);
+    for (std::size_t i = 0; i < product_entries.size(); ++i) {
+        CHECK(product_entries[i].lower == mixed_entries[i].lower);
+        CHECK(product_entries[i].upper == mixed_entries[i].upper);
+    }
+
+    // Admit axis powers while excluding the additional array of mixed powers.
     axis_limits.arithmetic.algebra.external_memory =
         ExactEstimateAdmission{(2 * (held + 64) + 1) * bytes_per_integer};
     auto axis_basis = make_curve_basis();

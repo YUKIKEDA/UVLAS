@@ -85,10 +85,18 @@ struct Interval {
 
 [[nodiscard]] Interval interval_product(IntegerWork& work, const Interval& left,
                                         const Interval& right) {
-    if (left.lower == 0 && left.upper == 0)
-        return {};
-    if (right.lower == 0 && right.upper == 0)
-        return {};
+    if (right.lower >= 0)
+        return with_positive(work, left, right);
+    if (left.lower >= 0)
+        return with_positive(work, right, left);
+    if (left.upper <= 0) {
+        const auto& minimum = right.upper <= 0 ? left.upper : left.lower;
+        return {rank_product(work, minimum, right.upper),
+                rank_product(work, left.lower, right.lower)};
+    }
+    if (right.upper <= 0)
+        return {rank_product(work, left.upper, right.lower),
+                rank_product(work, left.lower, right.lower)};
     const std::array endpoints{
         rank_product(work, left.lower, right.lower), rank_product(work, left.lower, right.upper),
         rank_product(work, left.upper, right.lower), rank_product(work, left.upper, right.upper)};
@@ -192,15 +200,19 @@ void fill_product(ReferenceArithmetic& math, PgVolumeProductRule input, core::In
 
 void accumulate_sample(IntegerWork& work, std::span<Interval> entries,
                        std::span<const Interval> values, const Interval& weight) {
-    for (std::size_t j = 0; j < values.size(); ++j)
+    for (std::size_t j = 0; j < values.size(); ++j) {
+        const auto& right = values[j];
+        // No rounding occurs on these integer grids. Interval multiplication
+        // is associative, so the weighted column can be shared by the row.
+        const auto weighted =
+            right.lower == 0 && right.upper == 0 ? Interval{} : with_positive(work, right, weight);
         for (std::size_t i = 0; i <= j; ++i) {
             work.charge();
             const auto& left = values[i];
-            const auto& right = values[j];
-            if ((left.lower == 0 && left.upper == 0) || (right.lower == 0 && right.upper == 0))
+            if ((left.lower == 0 && left.upper == 0) ||
+                (weighted.lower == 0 && weighted.upper == 0))
                 continue;
-            const auto contribution =
-                with_positive(work, interval_product(work, left, right), weight);
+            const auto contribution = interval_product(work, left, weighted);
             auto& entry = entries[packed(i, j)];
             work.charge(
                 std::max(entry.lower.backend().size(), contribution.lower.backend().size()) +
@@ -208,6 +220,7 @@ void accumulate_sample(IntegerWork& work, std::span<Interval> entries,
             entry.lower += contribution.lower;
             entry.upper += contribution.upper;
         }
+    }
 }
 
 } // namespace
@@ -306,8 +319,8 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             using Numerators = std::array<ExactRational, 3>;
             core::PlannedBuffer<Numerators> cached;
             std::size_t depth_group = 1;
-            bool use_monomial_powers = false;
-            bool use_mixed_powers = false;
+            using PowerReuse = PgRankMonomialPowers::Reuse;
+            std::optional<PowerReuse> power_reuse;
             if (product != nullptr && product->depth.size() > 1) {
                 auto cache_arithmetic = ReferenceArithmetic{limits.arithmetic, plan};
                 const auto cache_rationals = partition_add(live_rationals, partition_mul(rank, 3));
@@ -324,14 +337,20 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 if (depth_group > 1) {
                     const auto axis_slots =
                         partition_add(cache_rationals, PgRankMonomialPowers::retained_rationals);
-                    for (const bool mixed : {true, false}) {
+                    const auto mixed_slots =
+                        partition_add(axis_slots, PgRankMonomialPowers::retained_mixed);
+                    const std::array preferences{
+                        std::pair{
+                            PowerReuse::CommonDenominator,
+                            partition_add(mixed_slots, PgRankMonomialPowers::retained_common)},
+                        std::pair{PowerReuse::Mixed, mixed_slots},
+                        std::pair{PowerReuse::Axis, axis_slots}};
+                    for (const auto& [reuse, slots] : preferences) {
                         cache_arithmetic.leaf_limits = limits.arithmetic.algebra;
                         try {
-                            cache_arithmetic.admit(partition_add(
-                                axis_slots, mixed ? PgRankMonomialPowers::retained_mixed : 0));
+                            cache_arithmetic.admit(slots);
                             math.leaf_limits = cache_arithmetic.leaf_limits;
-                            use_monomial_powers = true;
-                            use_mixed_powers = mixed;
+                            power_reuse = reuse;
                             break;
                         } catch (const PartitionAbort& unavailable) {
                             if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
@@ -370,9 +389,9 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                     return radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
                 };
                 std::optional<PgRankMonomialPowers> monomials;
-                if (depth_slot == 0 && use_monomial_powers &&
+                if (depth_slot == 0 && power_reuse &&
                     PgRankMonomialPowers::fits(located.u, located.v, math.leaf_limits))
-                    monomials.emplace(located.u, located.v, use_mixed_powers);
+                    monomials.emplace(located.u, located.v, *power_reuse);
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);
