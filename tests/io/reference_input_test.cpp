@@ -2104,7 +2104,9 @@ $EndElements
                     const auto claims = regional->matches.values();
                     REQUIRE(claims.size() == (partial_group ? 1 : 2));
                     CHECK(claims.front().element == 702);
-                    CHECK(claims.front().value_metres == pg_input.r("1", "4"));
+                    CHECK(claims.front().value_metres ==
+                          fixture::take(
+                              ExactRational::from_integer_pair("1", "4", pg_limits.algebra, plan)));
                     if (claims.size() == 2) {
                         CHECK(claims[1].sidecar_node == claims[0].sidecar_node);
                     }
