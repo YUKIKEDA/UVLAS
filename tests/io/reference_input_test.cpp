@@ -5,7 +5,7 @@
 #include "gmsh_mesh.hpp"
 #include "nastran_coordinate_cards.hpp"
 #include "nastran_pg_material_axes.hpp"
-#include "reference_declarations_fixture.hpp"
+#include "reference_file_test_fixture.hpp"
 #include "reference_input.hpp"
 #include "reference_resolution.hpp"
 #include "reference_root_snapshot.hpp"
@@ -26,59 +26,22 @@ namespace rd = uvlas::io::detail;
 namespace fixture = uvlas::test::declaration_fixture;
 namespace fs = std::filesystem;
 
+using uvlas::test::reference_file_fixture::bytes_of;
+using uvlas::test::reference_file_fixture::declare_path;
+using uvlas::test::reference_file_fixture::limits;
+using uvlas::test::reference_file_fixture::manifest_limits;
+using uvlas::test::reference_file_fixture::prepare;
+using uvlas::test::reference_file_fixture::root_limits;
+using uvlas::test::reference_file_fixture::Tree;
+using uvlas::test::reference_file_fixture::write_file;
+
 constexpr io::SourceId source{19};
-constexpr rd::ManifestLimits manifest_limits{
-    128, {fixture::budget, fixture::budget, fixture::budget, fixture::budget}};
 constexpr std::string_view name = "\xc3\xa9.json";
 constexpr char8_t native_name[] = u8"\u00e9.json";
 
 static_assert(!std::is_constructible_v<rd::ReferenceInput, io::SchemaCase, rd::ReadRoot,
                                        rd::ReferenceFileId>);
 static_assert(!std::is_copy_constructible_v<rd::ReferenceInput>);
-
-struct Tree {
-    fs::path root;
-
-    Tree() {
-        const auto tick = std::chrono::steady_clock::now().time_since_epoch().count();
-        for (int attempt = 0; attempt < 16; ++attempt) {
-            root = fs::temp_directory_path() / ("uvlas-reference-input-" + std::to_string(tick) +
-                                                "-" + std::to_string(attempt));
-            if (fs::create_directory(root)) {
-                return;
-            }
-        }
-        FAIL("Could not create a private test directory");
-    }
-    ~Tree() {
-        std::error_code ignore;
-        fs::remove_all(root, ignore);
-    }
-    Tree(const Tree&) = delete;
-    Tree& operator=(const Tree&) = delete;
-};
-
-void write_file(const fs::path& target, std::string_view bytes) {
-    std::ofstream out(target, std::ios::binary);
-    out << bytes;
-    out.close();
-    REQUIRE(out.good());
-}
-
-std::span<const std::byte> bytes_of(std::string_view text) noexcept {
-    return std::as_bytes(std::span{text});
-}
-
-rd::ReferenceInputLimits limits() {
-    const io::InputLimits input{
-        10'000'000, 256,
-        1'000'000,  1'000'000,
-        10'000'000, 10'000'000,
-        10'000'000, {io::ParserAllocationMode::EstimateAdmission, fixture::budget}};
-    std::array<std::uint64_t, static_cast<std::size_t>(io::SchemaQuota::Count)> caps{};
-    caps.fill(fixture::budget);
-    return {input, io::SchemaLimits{caps}};
-}
 
 constexpr std::string_view static_case() {
     for (const auto& example : uvlas::test::case_schema_corpus::roots) {
@@ -375,14 +338,6 @@ constexpr std::string_view abc_hex =
 constexpr std::string_view valid_manifest_hex =
     "ecfba5a3cdf129b195b7e1504c74c2981852f6ee57617ac320ea14420ffd9a38";
 constexpr rd::RootSnapshotLimits acquisition_limits{{3, 4, 2, 3}, 3, 256};
-constexpr rd::RootReferenceLimits root_limits{
-    fixture::budget, fixture::budget, fixture::budget, fixture::budget, 64, fixture::budget, 0};
-
-void declare_path(fixture::JsonToken& file, std::string_view path, std::string_view hash) {
-    file.set("path", fixture::string(path));
-    file.set("sha256", fixture::string(hash));
-}
-
 fixture::JsonToken manifest_with_reference(std::string_view first, std::string_view digest) {
     auto model = fixture::all_roles();
     auto& geometry = model.field("model").field("geometry").elements;
@@ -391,15 +346,6 @@ fixture::JsonToken manifest_with_reference(std::string_view first, std::string_v
     declare_path(geometry[0].field("reference").field("file"), "copy.bin", abc_hex);
     declare_path(geometry[1].field("sidecar"), "wrong.bin", abc_hex);
     return model;
-}
-
-rd::PreparedRootReferences prepare(const rd::ReferenceInput& input) {
-    core::ResourcePlan plan{fixture::budget};
-    const auto view = fixture::take(input.view());
-    auto declared = fixture::take(
-        rd::collect_case_file_references(view.schema, fixture::limits(), plan, {}, nullptr));
-    return fixture::take(
-        rd::prepare_root_references(std::move(declared), root_limits, plan, {}, nullptr));
 }
 
 rd::ReferenceInput from_memory(const fs::path& directory, std::string_view wire,

@@ -196,6 +196,13 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
         LIBS uvlas_coupling nlohmann_json::nlohmann_json)
     target_include_directories(uvlas_test_io_reference_input PRIVATE
         "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+
+    uvlas_add_test(io.gmsh_shell_reference_set
+        LABELS integration negative verification
+        SOURCES io/gmsh_shell_reference_set_test.cpp
+        LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
+    target_include_directories(uvlas_test_io_gmsh_shell_reference_set PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 endif()
 
 if(WIN32)
