@@ -138,6 +138,12 @@ uvlas_add_test(io.gmsh_surface_topology
     LIBS uvlas_io Boost::hash2)
 target_include_directories(uvlas_test_io_gmsh_surface_topology PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.external_planar_pg
+    LABELS unit integration negative verification
+    SOURCES io/external_planar_pg_test.cpp
+    LIBS uvlas_io Boost::hash2)
+target_include_directories(uvlas_test_io_external_planar_pg PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.gmsh_mesh
     LABELS unit property negative verification
     SOURCES io/gmsh_mesh_test.cpp support/allocation_audit.cpp
