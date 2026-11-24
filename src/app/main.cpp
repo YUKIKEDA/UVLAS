@@ -1,20 +1,34 @@
 #include "uvlas/core/build_info.hpp"
+#include "validate_case.hpp"
 
+#include <filesystem>
 #include <iostream>
 #include <string_view>
 
 namespace {
 
 constexpr std::string_view usage = "Usage: uvlas --help | --version | --build-info\n"
-                                   "Development build: solver commands are not implemented.\n";
+                                   "       uvlas validate case.json\n";
 
-int run(int argc, char* argv[]) {
-    if (argc != 2) {
+int run(int argc, std::filesystem::path::value_type* argv[]) {
+    if (argc < 2) {
         std::cerr << "Expected exactly one option.\n" << usage;
         return 2;
     }
 
-    const std::string_view option{argv[1]};
+    const auto argument = std::filesystem::path{argv[1]}.u8string();
+    const std::string_view option{reinterpret_cast<const char*>(argument.data()), argument.size()};
+    if (option == "validate") {
+        if (argc != 3) {
+            std::cerr << "Expected one case path.\n" << usage;
+            return 2;
+        }
+        return uvlas::app::validate_case(std::filesystem::path{argv[2]});
+    }
+    if (argc != 2) {
+        std::cerr << "Expected exactly one option.\n" << usage;
+        return 2;
+    }
     if (option == "--help") {
         std::cout << usage;
         return 0;
@@ -41,7 +55,11 @@ int run(int argc, char* argv[]) {
 } // namespace
 
 // No exception leaves the process: an unexpected one ends it with exit code 1.
+#if defined(_WIN32)
+int wmain(int argc, wchar_t* argv[]) {
+#else
 int main(int argc, char* argv[]) {
+#endif
     try {
         return run(argc, argv);
     } catch (...) {
