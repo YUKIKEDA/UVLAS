@@ -11,7 +11,9 @@ struct CaseUniformFlowLimits {
     structure::ExactLimits conversion; ///< Existing SI materialization limits for each recipe.
     aero::detail::pchip::CurveLimits
         flow; ///< Aggregate exact uniform evaluation/preparation limits.
-    std::uint64_t maximum_exact_numbers = 0; ///< Total SI recipes imported in one preparation.
+    /// SI recipes imported for one time curve, including typed coverage endpoints.
+    /// Provider padding is accounted for by the storage budget.
+    std::uint64_t maximum_exact_numbers = 0;
 };
 
 /// Required C1 window in exact SI seconds, supplied by the consumer for non-transient PCHIP.

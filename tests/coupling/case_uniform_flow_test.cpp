@@ -664,6 +664,31 @@ TEST_CASE("A typed gust restores PCHIP amplitude and checks the current knot con
            core::FailureCode::StaleGeneration);
 }
 
+TEST_CASE("Scalar gust preparation caps imported SI recipes independently of provider padding",
+          "[AE-07][IO4-01][N4-02][verification][negative]") {
+    constexpr std::string_view pchip =
+        R"({"kind":"pchip","times":[0,0.5,1],"values":[[1],[2],[5]],"outside":{"kind":"reject"}})";
+    constexpr std::string_view polynomial =
+        R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[1]]})";
+    // PCHIP imports 3 times, 3 amplitudes and 2 analysis endpoints. Polynomial
+    // imports origin, scale, domain, 2 coverage endpoints and 1 coefficient.
+    for (const auto& [series, recipes] :
+         std::array{std::pair{pchip, 8U}, std::pair{polynomial, 7U}}) {
+        CAPTURE(recipes);
+        auto input = gust_case("rad", series);
+        input.field("flow").set("events", parse("[]"));
+        const auto si = materialize(input, io::SourceId{60});
+        a::UniformFlowWorkspace work;
+        core::ResourcePlan memory{budget};
+        auto exact = gust_limits;
+        exact.time_curves.maximum_exact_numbers = recipes;
+        CHECK(cf::prepare_case_known_flow(si, stamp, {}, work, exact, memory));
+        --exact.time_curves.maximum_exact_numbers;
+        reject(cf::prepare_case_known_flow(si, stamp, {}, work, exact, memory),
+               core::FailureCode::ResourceExceeded);
+    }
+}
+
 TEST_CASE("Known flow uses SI offsets and returns zero spatial partials without a gust",
           "[AE-07][IO4-01][N4-03][verification][negative]") {
     auto input = gust_case("deg", R"({"kind":"constant","value":[1]})");

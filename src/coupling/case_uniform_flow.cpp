@@ -54,11 +54,16 @@ std::uint64_t add_count(std::uint64_t left, std::uint64_t right, core::FailureDe
     return left + right;
 }
 
-std::uint64_t components(std::uint64_t rows, core::FailureDetails details) {
-    if (rows > index_max / xyz)
+std::uint64_t components(std::uint64_t rows, std::size_t columns, core::FailureDetails details) {
+    if (rows > index_max / columns)
         fail(ResourceExceeded, preparation, details);
-    return rows * xyz;
+    return rows * columns;
 }
+
+struct SeriesSize {
+    std::uint64_t imported_recipes;
+    std::uint64_t provider_slots;
+};
 
 struct TimeWindowFields {
     decltype(s::TimeInterval::start) begin, end;
@@ -95,9 +100,8 @@ TimeWindow window_for(const s::Case& root, std::optional<CaseUniformTimeWindow> 
 /// Holds every exact SI recipe result until the velocity provider copies or retains it.
 class SiSeries {
 public:
-    SiSeries(const io::SiCase& source, std::uint64_t count, const CaseUniformFlowLimits& limits,
-             core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details,
-             std::uint64_t comparison_numbers = 0)
+    SiSeries(const io::SiCase& source, SeriesSize size, const CaseUniformFlowLimits& limits,
+             core::ResourcePlan& memory, const std::stop_token& stop, core::FailureDetails details)
         : source_(source),
           limits_(limits.conversion),
           memory_(memory),
@@ -105,14 +109,13 @@ public:
           details_(details) {
         constexpr auto element_bytes = sizeof(io::detail::SiRationalWords) + sizeof(RationalView);
         check_stop();
-        if (add_count(count, comparison_numbers, details_) > limits.maximum_exact_numbers ||
-            count > memory.remaining_bytes() / element_bytes)
+        if (size.imported_recipes > limits.maximum_exact_numbers ||
+            size.provider_slots > memory.remaining_bytes() / element_bytes)
             fail(ResourceExceeded, preparation, details_);
-        values_ = take(memory_.allocate<io::detail::SiRationalWords>(
-            static_cast<core::Index>(count), preparation));
+        const auto count = static_cast<core::Index>(size.provider_slots);
+        values_ = take(memory_.allocate<io::detail::SiRationalWords>(count, preparation));
         check_stop();
-        records_ =
-            take(memory_.allocate<RationalView>(static_cast<core::Index>(count), preparation));
+        records_ = take(memory_.allocate<RationalView>(count, preparation));
     }
 
     template <class Field>
@@ -246,21 +249,28 @@ struct ImportContext {
         return values.sequence(*events, seconds);
     }
 
+    [[nodiscard]] SeriesSize series_size(std::uint64_t common, std::uint64_t sample_rows,
+                                         std::uint64_t comparisons = 0) const {
+        // A scalar file supplies one recipe per row. The provider still takes
+        // three slots, with two exact zero channels added internally.
+        const auto retained_recipes =
+            add_count(common, components(sample_rows, columns, details), details);
+        return {add_count(retained_recipes, comparisons, details),
+                add_count(common, components(sample_rows, xyz, details), details)};
+    }
+
     template <class Series>
     a::UniformFlowReady operator()(const Series& series) const {
         if constexpr (std::is_same_v<Series, s::TimeSeriesConstant>) {
-            SiSeries values{source, add_count(event_count(), xyz, details), limits, memory, stop,
-                            details};
+            SiSeries values{source, series_size(event_count(), 1), limits, memory, stop, details};
             const auto declared = read_events(values);
             return prepare(
                 {stamp, declared, a::ConstantUniformFlow{values.row(series.value, columns)}});
         } else if constexpr (std::is_same_v<Series, s::TimeSeriesPolynomial>) {
-            const auto count = add_count(
-                4,
-                add_count(event_count(), components(series.coefficients.size(), details), details),
-                details);
             const auto required = transient_window(root, details);
-            SiSeries values{source, count, limits, memory, stop, details, required ? 2U : 0U};
+            const auto size = series_size(add_count(event_count(), 4, details),
+                                          series.coefficients.size(), required ? 2U : 0U);
+            SiSeries values{source, size, limits, memory, stop, details};
             const auto domain = [&] {
                 const auto lower = values.number(take(series.domain.at(0)), seconds);
                 const auto upper = values.number(take(series.domain.at(1)), seconds);
@@ -277,13 +287,13 @@ struct ImportContext {
         } else if constexpr (std::is_same_v<Series, s::TimeSeriesPchip>) {
             const auto requested = window_for(root, window, details);
             const auto outside = series.outside.record();
-            auto count = add_count(event_count(), series.times.size(), details);
-            count = add_count(count, components(series.values.size(), details), details);
+            auto common = add_count(event_count(), series.times.size(), details);
             if (std::holds_alternative<TimeWindowFields>(requested))
-                count = add_count(count, 2, details);
+                common = add_count(common, 2, details);
             if (std::holds_alternative<s::OutsidePeriodic>(outside))
-                count = add_count(count, 1, details);
-            SiSeries values{source, count, limits, memory, stop, details};
+                common = add_count(common, 1, details);
+            SiSeries values{source, series_size(common, series.values.size()), limits, memory, stop,
+                            details};
             const auto declared = read_events(values);
             const auto times = values.sequence(series.times, seconds);
             const auto samples = values.grid(series.values, columns);
