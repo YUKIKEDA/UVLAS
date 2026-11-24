@@ -40,7 +40,6 @@
     "src/coupling/case_motion.cpp": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058",
     "src/coupling/case_motion.hpp": "b85214d88aeca06a1f75cbf565f28e465acd37213f7929f395988eaed2dd24d6",
     "src/coupling/case_motion_frame.cpp": "d45056f342fca0a9f13471e065e73341c5d790737a87c5d619110ebe3369a790",
-    "src/coupling/case_motion_frame.hpp": "c1263f05a87609b6b908427fb3ef3e7fcc127feb2c35d0d4ca1d1f834d48861f",
     "src/coupling/case_motion_time_series.cpp": "24dd8654e113f2ea7bbceafca81aac0a015ec9c6de335f77fa551b2d3a70b906",
     "src/coupling/case_motion_time_series.hpp": "164d0443a23b99f0565b1e081ff46d38c0a689d845f766eac4bd5cd176fd671f",
     "src/io/si_exact.cpp": "f348fa5f86812cd0d1e109ffdab02dcc89e5e535045584a68190291adf27a97b",
@@ -123,5 +122,11 @@
       "hint": "docs/verification/IM-03/prescribed-motion-resume-v1/verification.md",
       "sha256": "2feb4b3ba09c6ca5ffc8d135cd4ab234fc92bf708c2e9f2ed339f6bf95ad928a"
     }
-  ]
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_motion_frame.hpp": {
+      "commit": "c9f0f8f396462db1ec07d4e665a409e697725bd3",
+      "sha256": "c1263f05a87609b6b908427fb3ef3e7fcc127feb2c35d0d4ca1d1f834d48861f"
+    }
+  }
 }
