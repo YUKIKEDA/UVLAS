@@ -108,6 +108,7 @@ TEST_CASE("Nastran shells preserve ordered corner identities, PSHELL and PCOMP a
         auto input = coordinates(source);
         original_bytes = take(input.view()).bulk.bytes.data();
         auto parsed = take(NastranShellCards::prepare(std::move(input), shell_limits, plan, {}));
+        // NOLINTNEXTLINE(bugprone-use-after-move): success leaves the input view absent.
         CHECK_FALSE(input.view());
         return parsed;
     }();
@@ -239,6 +240,7 @@ TEST_CASE("Nastran shell failures preserve the coordinate owner and report the s
         CHECK(failure.reason == test.reason);
         CHECK(failure.position.line == 4 + test.relative_line);
         CHECK(failure.position.column == test.column);
+        // NOLINTNEXTLINE(bugprone-use-after-move): rejection leaves the original owner intact.
         CHECK(take(owner.view()).bulk.bytes == source);
         CHECK(plan.remaining_bytes() < memory);
     }
@@ -252,8 +254,10 @@ TEST_CASE("Nastran shell identities, work and memory obey the supplied plan",
                              const std::stop_token& stop = {}) {
         auto input = coordinates(source);
         auto result = NastranShellCards::prepare(std::move(input), bounds, plan, stop);
-        if (!result)
+        if (!result) {
+            // NOLINTNEXTLINE(bugprone-use-after-move): rejected calls preserve input.
             CHECK(take(input.view()).bulk.bytes == source);
+        }
         return result;
     };
     core::ResourcePlan unused{0};
