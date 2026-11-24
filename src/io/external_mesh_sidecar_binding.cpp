@@ -1,6 +1,7 @@
 #include "external_mesh_sidecar_binding.hpp"
 
 #include "gmsh_entity_physical.hpp"
+#include "nastran_support_selection.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -10,8 +11,9 @@ namespace uvlas::io::detail {
 struct ExternalMeshSidecarBindingFactory {
     [[nodiscard]] static ExternalMeshSidecarBinding
     make(ParsedMeshSidecar&& sidecar, ExternalMeshSidecarBinding::Source&& source,
-         core::PlannedBuffer<BoundExternalFace>&& faces, std::uint64_t work) noexcept {
-        return {std::move(sidecar), std::move(source), std::move(faces), work};
+         core::PlannedBuffer<BoundExternalFace>&& faces, std::uint64_t work,
+         std::optional<NastranSupportCards>&& supports = {}) noexcept {
+        return {std::move(sidecar), std::move(source), std::move(faces), work, std::move(supports)};
     }
 };
 
@@ -538,41 +540,13 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
             })) {
             b.reject(Reason::Selection);
         }
-        const bool combination =
-            std::ranges::any_of(supports.union_members, [&](const auto& member) {
-                b.step();
-                return member.combination == row.set;
-            });
-        const auto in_set = [&](NastranSupportSetId set) {
-            // A selected SPCADD takes precedence over direct terms with the same SID.
-            if (!combination) {
-                return set == row.set;
-            }
-            return std::ranges::any_of(supports.union_members, [&](const auto& member) {
-                b.step();
-                return member.combination == row.set && member.member == set;
-            });
-        };
         unsigned components = 0;
-        for (const auto& term : supports.terms) {
-            b.step();
-            if (!in_set(term.set)) {
-                continue;
-            }
-            const bool includes = std::visit(
-                [&](const auto& grid) {
-                    if constexpr (requires { grid.grid; }) {
-                        return grid.grid == row.grid;
-                    } else {
-                        return row.grid >= grid.first && row.grid <= grid.last;
-                    }
-                },
-                term.target);
-            if (includes) {
+        visit_nastran_support_terms(
+            supports, row.set, row.grid, [&] { b.step(); },
+            [&](const auto& term) {
                 components |= term.components;
                 b.detail.byte = term.component_field.position.byte;
-            }
-        }
+            });
         if (components != row.component_bits) {
             b.reject(Reason::Selection);
         }
@@ -620,12 +594,13 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
         Reason::Snapshot);
     const auto& declaration = std::get<NastranSidecar>(sidecar.payload());
     const auto model = root.model.record();
+    std::optional<NastranSupportCards> supports;
     if (declaration.supports.size() != 0) {
-        auto supports =
+        supports.emplace(
             b.value(NastranSupportCards::prepare(coordinates, b.limits.support, b.plan, b.stop),
-                    Reason::Snapshot);
+                    Reason::Snapshot));
         b.detail.source = sidecar_file.get().location;
-        const auto view = b.require(supports.view(), Reason::Snapshot);
+        const auto view = b.require(supports->view(), Reason::Snapshot);
         const auto coordinate = b.require(coordinates.view(), Reason::Snapshot);
         for (const auto& row : declaration.supports.values()) {
             b.row(row.node);
@@ -647,7 +622,7 @@ void nastran_supports(Binding& b, const schema::Model& model, const NastranSidec
     auto faces = nastran_faces(b, model, declaration, view);
     nastran_other(b, model, declaration, view.input.bulk);
     return ExternalMeshSidecarBindingFactory::make(std::move(sidecar), std::move(shells),
-                                                   std::move(faces), b.work);
+                                                   std::move(faces), b.work, std::move(supports));
 }
 
 } // namespace
