@@ -1,0 +1,348 @@
+#include "run-case-chart.cpp.txt"
+
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+#include <uvlas/structure/pg_prepared_volume.hpp>
+
+namespace {
+using Decimal = boost::multiprecision::cpp_dec_float_100;
+using Vector = std::array<Decimal, 3>;
+using Point = std::array<Decimal, 2>;
+constexpr double projection_error = 0x1p-60;
+
+Decimal decimal(const Q& q_) {
+    return Decimal(numerator(q_).convert_to<std::string>()) /
+           Decimal(denominator(q_).convert_to<std::string>());
+}
+Decimal decimal(const ExactRational& value) {
+    return decimal(q(value));
+}
+
+Vector cross(const Vector& a, const Vector& b) {
+    return {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
+}
+Decimal dot(const Vector& a, const Vector& b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+struct PhysicalPoint {
+    Vector xyz, along_s, along_t, along_depth;
+    Decimal volume_density;
+};
+
+PhysicalPoint physical_r5(const Point& xy, const Decimal& zeta, const Decimal& h) {
+    const auto& [s, t] = xy;
+    // Independently differentiate the frozen physical R5 height polynomial.
+    const Decimal f = s * s / 5 + t * t / 10 + s * s * s / 30 - t * t * t / 50 + s * s * t * t / 40;
+    const Decimal fs = (40 * s + 10 * s * s + 5 * s * t * t) / 100;
+    const Decimal ft = (20 * t - 6 * t * t + 5 * s * s * t) / 100;
+    const Decimal fss = (40 + 20 * s + 5 * t * t) / 100;
+    const Decimal ftt = (20 - 12 * t + 5 * s * s) / 100;
+    const Decimal fst = s * t / 10;
+    const Vector v{-fs, -ft, 1}, vs{-fss, -fst, 0}, vt{-fst, -ftt, 0};
+    const Decimal g = dot(v, v), root = sqrt(g);
+    const Decimal H = h * (1 + s / 10 + t / 20);
+    const Decimal z = zeta * H / 2;
+    const Decimal mean2 =
+        ((1 + ft * ft) * fss - 2 * fs * ft * fst + (1 + fs * fs) * ftt) / (g * root);
+    const Decimal gaussian = (fss * ftt - fst * fst) / (g * g);
+    PhysicalPoint result{
+        {s, t, f}, {1, 0, fs}, {0, 1, ft}, {}, root * (1 - z * mean2 + z * z * gaussian) * H};
+    for (std::size_t d = 0; d < v.size(); ++d) {
+        const Decimal n = v[d] / root;
+        const Decimal ns = (vs[d] - v[d] * dot(v, vs) / g) / root;
+        const Decimal nt = (vt[d] - v[d] * dot(v, vt) / g) / root;
+        result.xyz[d] += z * n;
+        result.along_s[d] += zeta * h * n / 20 + z * ns;
+        result.along_t[d] += zeta * h * n / 40 + z * nt;
+        result.along_depth[d] = H * n;
+    }
+    return result;
+}
+
+Point point(const PgPartitionPoint& p_) {
+    return {decimal(p_.s), decimal(p_.t)};
+}
+
+Point barycentric(std::span<const PgPartitionPoint> vertices, const PgPartitionTriangle& triangle,
+                  const Decimal& u, const Decimal& v) {
+    const auto a = point(vertices[static_cast<std::size_t>(triangle.vertices[0])]);
+    const auto b = point(vertices[static_cast<std::size_t>(triangle.vertices[1])]);
+    const auto c = point(vertices[static_cast<std::size_t>(triangle.vertices[2])]);
+    return {(1 - u - v) * a[0] + u * b[0] + v * c[0], (1 - u - v) * a[1] + u * b[1] + v * c[1]};
+}
+
+cc::CasePgChart prepare_r5(std::string_view wire, core::Index n, core::Workspace& workspace,
+                           core::ResourcePlan& plan) {
+    const auto source = checked_case_wire(wire);
+    const auto limits = chart_limits(2); // Existing frozen R4 preparation envelope.
+    Fixture f;
+    core::ResourcePlan audit{profile};
+    const auto nodes = finite_rule(f);
+    auto geometry =
+        take(cc::prepare_case_pg_reference(source, 1, limits.reference, workspace, audit));
+    const auto owners = take(geometry.source());
+    auto rank = take(PgRankPreparation::prepare(owners.dictionary, owners.partition, limits.rank,
+                                                workspace, audit));
+    auto basis = take(PgReferenceBasis::prepare(std::move(geometry), std::move(rank), limits.rank,
+                                                workspace, audit));
+    std::vector<ExactRational> weights;
+    const auto points = select_rule(f, basis, n, nodes, weights, audit);
+    const std::array rules{cc::CasePgRuleBinding{1, points}};
+    auto result = take(cc::prepare_case_pg_chart(source, rules, limits, workspace, plan));
+    const auto passed = take(result.shell_reference(numerics::PatchId{1}, 1));
+    REQUIRE(passed.fixed_rule().size() == points.size());
+    for (std::size_t i = 0; i < points.size(); ++i) {
+        const auto& a = passed.fixed_rule()[i];
+        const auto& b = points[i];
+        CHECK(a.volume == b.point.volume);
+        CHECK(q(a.u) == q(b.point.u));
+        CHECK(q(a.v) == q(b.point.v));
+        CHECK(q(a.depth) == q(b.point.depth));
+        CHECK(q(a.weight) == q(b.weight));
+    }
+    return result;
+}
+
+void verify_projection(const PgProjectedReferenceBatch& projected, std::size_t index,
+                       const cc::CasePgShellReference& shell, const PhysicalPoint& expected,
+                       const Decimal& measure) {
+    REQUIRE(projected.source() == shell.columns().basis);
+    REQUIRE(projected.column_count() == static_cast<std::size_t>(shell.columns().count));
+    const auto cols = projected.column_count();
+    const auto stride = 4 + 4 * cols;
+    REQUIRE(projected.high_words().size() == stride * projected.points().size());
+    REQUIRE(projected.low_words().size() == projected.high_words().size());
+    const auto value = [&](std::size_t col) -> Decimal {
+        const auto i = index * stride + col;
+        return decimal(Q{projected.high_words()[i]} + Q{projected.low_words()[i]});
+    };
+    const Decimal tolerance = decimal(Q{projection_error});
+    for (std::size_t d = 0; d < expected.xyz.size(); ++d)
+        CHECK(abs(value(d) - expected.xyz[d]) <= tolerance);
+    CHECK(value(3) > 0);
+    CHECK(abs(value(3) - measure) <= tolerance);
+
+    const auto q0 = shell.patch().reference_coordinates();
+    const auto translation = shell.patch().translation();
+    REQUIRE(q0.size() == cols);
+    REQUIRE(translation.size() == cols);
+    // A check on the actual N/G column order using the adopted affine fields.
+    std::array<Vector, 4> sum{};
+    std::array<Vector, 4> bound{};
+    Vector xyz{};
+    Vector xyz_bound{};
+    Decimal constant = 0, constant_bound = 0;
+    for (std::size_t i = 0; i < cols; ++i) {
+        const auto tr = decimal(translation[i]);
+        const auto N = value(4 + 4 * i);
+        constant += N * tr;
+        constant_bound += abs(tr);
+        for (std::size_t d = 0; d < 3; ++d) {
+            xyz[d] += N * decimal(q0[i][d]);
+            xyz_bound[d] += abs(decimal(q0[i][d]));
+            const auto G = value(5 + 4 * i + d);
+            sum[3][d] += G * tr;
+            bound[3][d] += abs(tr);
+            for (std::size_t a = 0; a < 3; ++a) {
+                sum[a][d] += G * decimal(q0[i][a]);
+                bound[a][d] += abs(decimal(q0[i][a]));
+            }
+        }
+    }
+    const Decimal independent_rounding("1e-75");
+    CHECK(abs(constant - 1) <= tolerance * constant_bound + independent_rounding);
+    for (std::size_t d = 0; d < 3; ++d) {
+        CHECK(abs(xyz[d] - expected.xyz[d]) <= tolerance * xyz_bound[d] + independent_rounding);
+        CHECK(abs(sum[3][d]) <= tolerance * bound[3][d] + independent_rounding);
+        for (std::size_t a = 0; a < 3; ++a) {
+            const Decimal identity = a == d ? 1 : 0;
+            CHECK(abs(sum[a][d] - identity) <= tolerance * bound[a][d] + independent_rounding);
+        }
+    }
+}
+
+void verify_handoff(const cc::CasePgChart& ready, const Decimal& h, core::Workspace& workspace,
+                    core::ResourcePlan& plan) {
+    const auto shell = take(ready.shell_reference(numerics::PatchId{1}, 1));
+    CHECK(shell.columns().first == 0);
+    CHECK(shell.chart_identity() == take(ready.chart().identity()));
+    CHECK(&shell.chart() == &ready.chart());
+    CHECK(&shell.patch() == take(ready.patch(0)));
+    check_failure(ready.shell_reference(numerics::PatchId{2}, 1), core::FailureCode::InvalidInput);
+    check_failure(ready.shell_reference(numerics::PatchId{1}, 0),
+                  core::FailureCode::ResourceExceeded);
+    check_failure(ready.shell_reference(numerics::PatchId{1}, 0, requested_stop_token()),
+                  core::FailureCode::Cancelled);
+    const auto& chart = shell.chart();
+    const auto& original = chart.original();
+    REQUIRE(original.sources().size() == 1);
+    CHECK(original.sources()[0].kind == PgTraceKind::Support);
+    CHECK(original.sources()[0].id == PgConstraintId{1});
+    CHECK(original.sources()[0].left == shell.columns().id);
+    const auto limits = chart_limits(2).chart.arithmetic;
+    const auto x0 = shell.patch().reference_coordinates();
+    const auto residual = take(original.residual({original.layout(), x0}, limits, workspace, plan));
+    REQUIRE_FALSE(residual.values().empty());
+    for (const auto& at : residual.values())
+        for (const auto& x : at)
+            CHECK(x.sign() == 0);
+
+    Fixture f;
+    std::vector<PgCartesianExactPosition> probe(x0.size()), multiplier(residual.values().size());
+    for (std::size_t i = 0; i < probe.size(); ++i)
+        probe[i][i % 3] = owned(f, Q{static_cast<unsigned>(i % 11 + 1), 13});
+    for (std::size_t i = 0; i < multiplier.size(); ++i)
+        multiplier[i][i % 3] = owned(f, Q{-static_cast<int>(i % 7 + 1), 19});
+    const auto applied = take(original.apply({original.layout(), probe}, limits, workspace, plan));
+    const auto dual = take(original.transpose(multiplier, limits, workspace, plan));
+    const auto original_work = work(applied.values(), multiplier);
+    CHECK(original_work != 0);
+    CHECK(work(probe, dual.values()) == original_work);
+
+    const auto basis = take(shell.patch().conditioning().reference_basis());
+    const auto& partition = take(basis->source()).partition;
+    const auto triangles = take(partition.triangles());
+    const auto edges = take(partition.edges());
+    const auto vertices = take(partition.vertices());
+    const auto volumes = take(partition.volumes());
+    constexpr PgPreparedReferenceProjection projection{core::Precision::TwoWord, projection_error,
+                                                       projection_error,         projection_error,
+                                                       projection_error,         projection_error};
+    constexpr PgVolumeMassProjection volume_projection{core::Precision::TwoWord, projection_error,
+                                                       projection_error};
+    const auto rule = shell.fixed_rule();
+    REQUIRE(rule.size() > 2);
+    const auto first = rule.size() - 2;
+    core::ResourcePlan none{0};
+    check_failure(shell.patch().project_fixed_reference(rule.size(), 1, projection, limits, none),
+                  core::FailureCode::InvalidInput);
+    check_failure(shell.patch().project_fixed_reference(first, 2, projection, limits, none),
+                  core::FailureCode::ResourceExceeded);
+    auto cancelled = limits;
+    cancelled.cancellation = requested_stop_token();
+    check_failure(shell.patch().project_fixed_reference(first, 2, projection, cancelled, none),
+                  core::FailureCode::Cancelled);
+    CHECK(none.allocated_bytes() == 0);
+    const auto fixed =
+        take(shell.patch().project_fixed_reference(first, 2, projection, limits, plan));
+    const auto quadrature_reference = take(PgPreparedVolumeReference::prepare(
+        shell.patch(), first, 2, volume_projection, limits, plan));
+    CHECK(fixed.first_rule_ordinal() == first);
+    CHECK(quadrature_reference.source() == shell.columns().basis);
+    CHECK(quadrature_reference.column_count() == fixed.column_count());
+    REQUIRE(fixed.points().size() == 2);
+    REQUIRE(quadrature_reference.points().size() == 2);
+    const auto cols = fixed.column_count();
+    const auto words = quadrature_reference.words();
+    for (std::size_t i = 0; i < fixed.points().size(); ++i) {
+        const auto& chosen = rule[first + i];
+        const auto& volume = volumes[static_cast<std::size_t>(chosen.volume)];
+        const auto& triangle = triangles[static_cast<std::size_t>(volume.triangle)];
+        const auto xy = barycentric(vertices, triangle, decimal(chosen.u), decimal(chosen.v));
+        const auto expected = physical_r5(xy, 2 * decimal(chosen.depth) - 1, h);
+        verify_projection(fixed, i, shell, expected,
+                          expected.volume_density * decimal(triangle.twice_area));
+        CHECK(fixed.points()[i].domain == PgProjectedReferenceDomain::Volume);
+        CHECK(fixed.points()[i].partition_record == chosen.volume);
+        CHECK(fixed.points()[i].layer == core::LayerId{1});
+        const auto& physical_point = quadrature_reference.points()[i];
+        CHECK(physical_point.rule_ordinal == first + i);
+        CHECK(physical_point.reference.partition_record == chosen.volume);
+        CHECK(physical_point.reference.layer == fixed.points()[i].layer);
+        CHECK(q(physical_point.weight) == q(chosen.weight));
+        for (std::size_t c_ = 0; c_ <= cols; ++c_) {
+            const auto a_ = i * (1 + cols) + c_;
+            const auto b_ = i * (4 + 4 * cols) + (c_ == 0 ? 3 : 4 * c_);
+            CHECK(words.high[a_] == fixed.high_words()[b_]);
+            CHECK(words.low[a_] == fixed.low_words()[b_]);
+        }
+    }
+
+    const auto one_third = f.r("1", "3");
+    const auto half = f.r("1", "2");
+    const std::array<PgReferencePoint, 3> queries{
+        PgReferenceHorizontalPoint{0, one_third, one_third},
+        PgReferenceHorizontalPoint{1, one_third, one_third},
+        PgReferenceLateralPoint{0, half, half}};
+    const auto surfaces = take(shell.patch().project_reference(queries, projection, limits, plan));
+    REQUIRE(surfaces.points().size() == queries.size());
+    CHECK_FALSE(surfaces.first_rule_ordinal().has_value());
+    const auto faces = take(partition.horizontal_faces());
+    REQUIRE(faces.size() >= 2);
+    CHECK(faces[0].side != faces[1].side);
+    for (std::size_t i = 0; i < 2; ++i) {
+        const auto& face = faces[i];
+        const auto& tri = triangles[static_cast<std::size_t>(face.triangle)];
+        const auto xy = barycentric(vertices, tri, Decimal(1) / 3, Decimal(1) / 3);
+        const bool lower = face.side == PgPartitionFaceSide::Lower;
+        CHECK(surfaces.points()[i].domain ==
+              (lower ? PgProjectedReferenceDomain::Lower : PgProjectedReferenceDomain::Upper));
+        CHECK(surfaces.points()[i].layer == core::LayerId{1});
+        CHECK(surfaces.points()[i].partition_record == static_cast<core::Index>(i));
+        const auto expected = physical_r5(xy, lower ? Decimal(-1) : Decimal(1), h);
+        const auto area_vector = cross(expected.along_s, expected.along_t);
+        verify_projection(surfaces, i, shell, expected,
+                          sqrt(dot(area_vector, area_vector)) * decimal(tri.twice_area));
+    }
+    const auto& lateral = take(partition.lateral_faces()).front();
+    const auto& edge = edges[static_cast<std::size_t>(lateral.edge)];
+    const auto a_ = point(vertices[static_cast<std::size_t>(edge.vertices[0])]);
+    const auto b_ = point(vertices[static_cast<std::size_t>(edge.vertices[1])]);
+    const auto expected = physical_r5({(a_[0] + b_[0]) / 2, (a_[1] + b_[1]) / 2}, Decimal(0), h);
+    Vector tangent;
+    for (std::size_t a = 0; a < tangent.size(); ++a)
+        tangent[a] = (b_[0] - a_[0]) * expected.along_s[a] + (b_[1] - a_[1]) * expected.along_t[a];
+    const auto area_vector = cross(tangent, expected.along_depth);
+    CHECK(surfaces.points()[2].domain == PgProjectedReferenceDomain::Lateral);
+    CHECK(surfaces.points()[2].layer == core::LayerId{1});
+    verify_projection(surfaces, 2, shell, expected, sqrt(dot(area_vector, area_vector)));
+}
+} // namespace
+
+TEST_CASE("R5 crop and taper is handed to reference consumers with its original fixed support",
+          "[.r5-case-handoff][V-PG][SH-D02][SH-D05][SH-D07][verification]") {
+    for (core::Index i = 0; i < 4; ++i) {
+        DYNAMIC_SECTION("R5 " << i) {
+            const auto path = std::string("r5-taper-0") + char('0' + i) + "/case.json";
+            std::ifstream stream(path, std::ios::binary);
+            REQUIRE(stream);
+            const std::string wire{std::istreambuf_iterator<char>{stream},
+                                   std::istreambuf_iterator<char>{}};
+            core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+            core::ResourcePlan plan{profile};
+            const auto n = i < 2 ? 1 : 2;
+            const auto h = i % 2 == 0 ? Decimal("0.01") : Decimal("0.0001");
+            const auto ready = prepare_r5(wire, n, workspace, plan);
+            verify_handoff(ready, h, workspace, plan);
+            std::clog << "R5_CASE_HANDOFF_ACCEPT," << i << ',' << n << ','
+                      << ready.chart().original().original_rows().size() << ','
+                      << ready.chart().pivots().size() << ',' << plan.allocated_bytes() << '\n'
+                      << std::flush;
+        }
+    }
+}
+
+TEST_CASE("The Case handoff selects the physical Shell and its actual column window",
+          "[.r4-paired-handoff][V-PG][SH-D05][verification][negative]") {
+    auto input = nlohmann::json::parse(frozen_interface(0));
+    for (auto& geometry : input.at("model").at("geometry")) {
+        geometry.at("coefficients") = nlohmann::json::array();
+        geometry.at("degree") = {0, 0};
+    }
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    const auto ready = take(prepare_fixture(input.dump(), 1, workspace, plan));
+    check_failure(ready.shell_reference(numerics::PatchId{2}, 1),
+                  core::FailureCode::ResourceExceeded);
+    const auto left = take(ready.shell_reference(numerics::PatchId{1}, 1));
+    const auto right = take(ready.shell_reference(numerics::PatchId{2}, 2));
+    CHECK(left.columns().id == numerics::PatchId{1});
+    CHECK(right.columns().id == numerics::PatchId{2});
+    CHECK(left.columns().first == 0);
+    CHECK(right.columns().first == left.columns().count);
+    CHECK(left.columns().basis != right.columns().basis);
+    CHECK(left.chart_identity() == right.chart_identity());
+    CHECK(&right.patch() == take(ready.patch(1)));
+    CHECK(right.chart().original().sources()[0].right == right.columns().id);
+}

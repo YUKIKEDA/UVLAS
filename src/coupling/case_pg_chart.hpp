@@ -34,6 +34,42 @@ namespace case_pg_chart_detail {
 struct Builder;
 }
 
+/// Synchronous borrow from a CasePgChart. Keep its owner live and do not move it while borrowed.
+class CasePgShellReference {
+public:
+    [[nodiscard]] const structure::PgPreparedPatch& patch() const noexcept {
+        return patch_;
+    }
+    [[nodiscard]] const structure::PgSparseChart& chart() const noexcept {
+        return chart_;
+    }
+    [[nodiscard]] structure::PgConstraintPatchLayout columns() const noexcept {
+        return columns_;
+    }
+    [[nodiscard]] structure::PgSparseChartIdentity chart_identity() const noexcept {
+        return chart_id_;
+    }
+    [[nodiscard]] std::span<const structure::PgOwnedDiscreteVolumePoint>
+    fixed_rule() const noexcept {
+        return rule_;
+    }
+
+private:
+    friend class CasePgChart;
+    CasePgShellReference(const structure::PgPreparedPatch& patch,
+                         const structure::PgSparseChart& chart,
+                         structure::PgConstraintPatchLayout columns,
+                         structure::PgSparseChartIdentity chart_id,
+                         std::span<const structure::PgOwnedDiscreteVolumePoint> rule) noexcept
+        : patch_(patch), chart_(chart), columns_(columns), chart_id_(chart_id), rule_(rule) {}
+
+    const structure::PgPreparedPatch& patch_;
+    const structure::PgSparseChart& chart_;
+    structure::PgConstraintPatchLayout columns_;
+    structure::PgSparseChartIdentity chart_id_;
+    std::span<const structure::PgOwnedDiscreteVolumePoint> rule_;
+};
+
 /// Owns the exact same references and column order used in the chart.
 class CasePgChart {
 public:
@@ -49,6 +85,13 @@ public:
     patch(core::Index index) const& noexcept;
     [[nodiscard]] core::Result<const structure::PgPreparedPatch*>
         patch(core::Index) const&& = delete;
+
+    /// Resolve one physical Shell ID and reconcile its actual basis with the original columns.
+    [[nodiscard]] core::Result<CasePgShellReference>
+    shell_reference(numerics::PatchId, std::uint64_t maximum_patch_visits,
+                    std::stop_token = {}) const& noexcept;
+    [[nodiscard]] core::Result<CasePgShellReference>
+    shell_reference(numerics::PatchId, std::uint64_t, std::stop_token = {}) const&& = delete;
 
     [[nodiscard]] const structure::PgSparseChart& chart() const& noexcept;
     [[nodiscard]] const structure::PgSparseChart& chart() const&& = delete;

@@ -489,6 +489,56 @@ core::Result<const pg::PgPreparedPatch*> CasePgChart::patch(core::Index index) c
     return &*patch;
 }
 
+core::Result<CasePgShellReference>
+CasePgChart::shell_reference(numerics::PatchId shell, std::uint64_t maximum_patch_visits,
+                             std::stop_token stop) const& noexcept {
+    return core::guard_entry(
+        operation, FailureCode::InvalidInput, {}, [&]() -> core::Result<CasePgShellReference> {
+            const auto failure = [](FailureCode code) {
+                return std::unexpected(core::Failure{code, operation});
+            };
+            if (stop.stop_requested())
+                return failure(FailureCode::Cancelled);
+            const auto& owner = chart();
+            const auto id = owner.identity();
+            if (!id)
+                return std::unexpected(id.error());
+            const auto& original = owner.original();
+            const auto system = original.info();
+            if (!system)
+                return std::unexpected(system.error());
+            const auto layout = original.layout();
+            if (layout.size() != patch_count())
+                return failure(FailureCode::StaleGeneration);
+            for (std::size_t i = 0; i < layout.size(); ++i) {
+                if (stop.stop_requested())
+                    return failure(FailureCode::Cancelled);
+                if (maximum_patch_visits == 0)
+                    return failure(FailureCode::ResourceExceeded);
+                --maximum_patch_visits;
+                const auto& columns = layout[i];
+                if (columns.id != shell)
+                    continue;
+                const auto actual = patch(static_cast<core::Index>(i));
+                if (!actual)
+                    return std::unexpected(actual.error());
+                const auto& reference = **actual;
+                const auto qualified = reference.info();
+                if (!qualified)
+                    return std::unexpected(qualified.error());
+                const auto rule = reference.fixed_rule();
+                if (columns.basis != qualified->identity || columns.first < 0 ||
+                    columns.first > system->columns || columns.count <= 0 ||
+                    columns.count > system->columns - columns.first ||
+                    static_cast<std::uint64_t>(columns.count) != qualified->basis.rank || !rule ||
+                    rule->empty())
+                    return failure(FailureCode::StaleGeneration);
+                return CasePgShellReference{reference, owner, columns, *id, *rule};
+            }
+            return failure(FailureCode::InvalidInput);
+        });
+}
+
 const CaseStructuralSupport* CasePgChart::motion() const& noexcept {
     return motion_ ? &*motion_ : nullptr;
 }
