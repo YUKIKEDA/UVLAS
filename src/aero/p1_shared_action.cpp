@@ -762,23 +762,23 @@ public:
                 const auto prepare_packet =
                     facet.bound ? prepare_bound_local_packet : prepare_local_packet;
                 const auto& original = geometry.facets.values()[i];
-                std::optional<EdgeId> alias;
+                bool has_alias = false;
                 if (excluded) {
                     for (const auto edge : original.edges) {
                         work.step();
                         const auto raw = static_cast<std::size_t>(edge);
                         if (raw != *excluded &&
                             data.topology->edges.values()[raw].owner == *excluded)
-                            alias = EdgeId{geometry.edges.values()[raw].id};
+                            has_alias = true;
                     }
                 }
                 const auto id = FacetId{original.id};
                 auto packet = needed(
-                    alias ? prepare_aliased_midpoint_packet(*verified.geometry, source.query, id,
-                                                            *alias, facet.bound, local_accuracy,
-                                                            limits.geometry, local, memory, stop)
-                          : prepare_packet(*verified.geometry, source.query, id, local_accuracy,
-                                           limits.geometry, local, memory, stop));
+                    has_alias ? prepare_aliased_midpoint_packet(
+                                    source.contact, source.query, id, facet.bound, local_accuracy,
+                                    limits.geometry, local, memory, stop)
+                              : prepare_packet(*verified.geometry, source.query, id, local_accuracy,
+                                               limits.geometry, local, memory, stop));
                 charge(work, needed(packet.steps()));
                 const bool far = !facet.bound && needed(packet.far()) == FarRelation::Far;
                 facet.far = far;
