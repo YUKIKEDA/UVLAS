@@ -474,6 +474,9 @@ core::Result<void> ReferenceGraphBuilder::descend() noexcept {
         // Copy the descriptor before following it. Descending can grow the frame array.
         const auto child = frame.children.declarations.values()[frame.next++];
         const auto& vertex = vertices_.values()[static_cast<std::size_t>(parent)];
+        if (!vertex.snapshot) {
+            return fail(Code::InvalidInput);
+        }
         const auto bytes = vertex.snapshot->file.view();
         if (!bytes) {
             return fail(Code::InvalidInput);
@@ -496,8 +499,9 @@ core::Result<void> ReferenceGraphBuilder::authenticate(Vertex& vertex, const Dep
     if (!path) {
         return reject(path.error(), edge, vertex.id, pointer);
     }
+    const auto declaring = edge.consumer ? std::optional{edge.declaring_source} : std::nullopt;
     auto snapshot = acquire_reference_snapshot(
-        origin_, path->get(), {parent_, vertex.id, vertex.role, edge.declaration_node},
+        origin_, path->get(), {parent_, vertex.id, vertex.role, edge.declaration_node, declaring},
         vertex.digest, pointer, identities_.values().first(acquired_),
         limits_.inventory.next_file(), plan_, stop_, acquisition_);
     if (!snapshot) {
@@ -552,12 +556,15 @@ core::Result<void> ReferenceGraphBuilder::follow(const DependencyEdge& edge,
     if (*step == DependencyStep::Shared) {
         return {};
     }
+    if (!vertex.snapshot) {
+        return reject_edge({Code::InvalidInput, operation});
+    }
     auto extracted = extractor_.extract(*vertex.snapshot);
     if (!extracted) {
         return std::unexpected(extracted.error());
     }
     const auto state = walk_.view();
-    if (!state) {
+    if (!state || state->active.empty()) {
         return reject_edge({Code::InvalidInput, operation});
     }
     const auto depth = state->active.size();
