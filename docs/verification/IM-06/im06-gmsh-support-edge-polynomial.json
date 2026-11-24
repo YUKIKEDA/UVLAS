@@ -23,7 +23,7 @@
   "artifacts": {
     "docs/specs/foundation/case-schema-fields.md": "4325a13a77499aa9ab4a9d300f55320839d301c0e916d03378ad7bd27d47cfa9",
     "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
-    "docs/verification/IM-06/gmsh-support-edge-polynomial.md": "94bb31c1f01fa24fed05c64ad9e3ef6259ba38dd6db54cbd7c2ef8687ec0727c",
+    "docs/verification/IM-06/gmsh-support-edge-polynomial.md": "77f47e6cd08bf68e263a14546ea7a0c0e310c3f63ad0d6626deee75d90a3bac8",
     "src/coupling/case_gmsh_support_boundary.cpp": "21c82ecba280dd6f1751c0f7fbdff6c38c4e609d65c1bb9318c98facb5e999bd",
     "src/coupling/case_gmsh_support_boundary.hpp": "ad08e30ed41be9e60979ec8780bce26d6b13bc9cc3031872ac27290488f52151",
     "src/structure/pg_trace_polynomial.hpp": "e0a1047aa131eb053eb0cb962ba8ef1bcfe56b428b3f54b091f9f4da8a9bcce3",

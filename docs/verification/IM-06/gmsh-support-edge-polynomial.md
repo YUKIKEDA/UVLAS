@@ -12,6 +12,8 @@ $x_0$、幅 $w$、スキュー $k$ は Case のチャートに属する。高さ
 
 ## 非零の面上界を使った実ファイル対照
 
+元 MSH は試験内で生成する。対象の試験名は `A Gmsh support group covers the exact named Case boundary`。[元 MSH の生成](../../../tests/io/gmsh_case_support_boundary_test.cpp#L28)・[試験の定義](../../../tests/io/gmsh_case_support_boundary_test.cpp#L118)
+
 両対照で同じ元 MSH を用いた。Case の参照長は 2 m、原点は $(1,2,3)$ m、局所軸を世界の $+Y,+Z,+X$ に対応させた。両面とも `fit` の距離上界は正である。
 
 - $f(s,t)=s(1-s)/10$ の曲面では、元面の内部に 1/20 m の位置差がある。支持線501と502を置く $s=0$ では高さが恒等的に零になるため、両線を全区間で受理した。501 の元節点順は逆向きのまま保持した。
