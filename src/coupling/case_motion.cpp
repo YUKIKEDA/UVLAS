@@ -16,6 +16,7 @@ using enum core::FailureCode;
 constexpr auto preparation = core::Operation::PrepareModel;
 constexpr auto evaluation = core::Operation::EvaluateStep;
 constexpr auto axes = std::size_t{3};
+constexpr std::uint64_t motion_formula_version = 1;
 
 template <class T>
 T take(core::Result<T> result) {
@@ -60,6 +61,34 @@ struct Builder {
         auto pi = m::pi_constant(work);
         work.step();
         return CaseMotionReady{std::move(frame), std::move(curves), std::move(pi)};
+    }
+
+    static CaseMotionSnapshot save(const CaseMotionReady& requested, p::CurveWorkspace& workspace,
+                                   const CaseMotionLimits& limits, core::ResourcePlan& memory,
+                                   const std::stop_token& stop, core::FailureDetails details) {
+        m::Work work{0, limits.maximum_interval_work, stop};
+        work.step();
+        auto frame = take(requested.frame_.snapshot(limits.frame, memory, stop, details));
+        auto time = take(snapshot_case_motion_time_series(
+            requested.curves_, workspace, limits.time_series, memory, stop, details));
+        work.step();
+        return CaseMotionSnapshot{std::move(frame), std::move(time)};
+    }
+
+    static CaseMotionReady restore(const CaseMotionSnapshotView& saved,
+                                   const CaseMotionReady& current, p::CurveWorkspace& workspace,
+                                   const CaseMotionLimits& limits, core::ResourcePlan& memory,
+                                   const std::stop_token& stop, core::FailureDetails details) {
+        m::Work work{0, limits.maximum_interval_work, stop};
+        work.step();
+        if (saved.formula_version != motion_formula_version)
+            case_components::reject(CheckpointIncompatible);
+        auto frame = take(current.frame_.restore(saved.frame, limits.frame, memory, stop, details));
+        auto time = take(restore_case_motion_time_series(
+            saved.time, current.curves_, workspace, limits.time_series, memory, stop, details));
+        auto pi = m::pi_constant(work);
+        work.step();
+        return CaseMotionReady{std::move(frame), std::move(time), std::move(pi)};
     }
 
     static CaseMotionEvaluation evaluate(const CaseMotionReady& prepared,
@@ -156,6 +185,20 @@ struct Builder {
 };
 } // namespace case_motion_detail
 
+CaseMotionSnapshot::CaseMotionSnapshot(CaseMotionFrameSnapshot&& frame,
+                                       CaseMotionTimeSnapshot&& time) noexcept
+    : frame_(std::move(frame)), time_(std::move(time)) {}
+
+core::Result<CaseMotionSnapshotView> CaseMotionSnapshot::view() const& noexcept {
+    const auto frame = frame_.view();
+    if (!frame)
+        return std::unexpected(frame.error());
+    const auto time = time_.view();
+    if (!time)
+        return std::unexpected(time.error());
+    return CaseMotionSnapshotView{motion_formula_version, *frame, *time};
+}
+
 CaseMotionReady::CaseMotionReady(CaseMotionFrame frame, CaseMotionTimeSeries curves,
                                  m::Interval pi) noexcept
     : frame_(std::move(frame)), curves_(std::move(curves)), pi_(std::move(pi)) {}
@@ -235,6 +278,26 @@ prepare_case_motion(const io::SiCase& source, CaseMotionField field, CaseMotionT
     return guarded<CaseMotionReady>(preparation, details, [&] {
         return case_motion_detail::Builder::prepare(source, field, window, stamp, workspace, limits,
                                                     memory, stop, details);
+    });
+}
+
+core::Result<CaseMotionSnapshot>
+snapshot_case_motion(const CaseMotionReady& source, p::CurveWorkspace& workspace,
+                     const CaseMotionLimits& limits, core::ResourcePlan& memory,
+                     const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return guarded<CaseMotionSnapshot>(preparation, details, [&] {
+        return case_motion_detail::Builder::save(source, workspace, limits, memory, stop, details);
+    });
+}
+
+core::Result<CaseMotionReady>
+restore_case_motion(const CaseMotionSnapshotView& saved, const CaseMotionReady& current,
+                    p::CurveWorkspace& workspace, const CaseMotionLimits& limits,
+                    core::ResourcePlan& memory, const std::stop_token& stop,
+                    core::FailureDetails details) noexcept {
+    return guarded<CaseMotionReady>(preparation, details, [&] {
+        return case_motion_detail::Builder::restore(saved, current, workspace, limits, memory, stop,
+                                                    details);
     });
 }
 

@@ -9,6 +9,7 @@
 namespace uvlas::coupling::detail {
 namespace motion_time_detail {
 struct Owner;
+struct SnapshotOwner;
 struct Builder;
 } // namespace motion_time_detail
 
@@ -38,6 +39,45 @@ struct CaseMotionTimeQuery {
     const structure::ExactRational& time;
     aero::detail::pchip::JetOrder order;
     aero::detail::pchip::RequestedSide side;
+};
+
+/// Original constant or polynomial in ascending coefficient order, xyz per term.
+struct CaseMotionFormulaSnapshotView {
+    std::span<const aero::detail::pchip::RationalView> coefficients;
+    /// When present: time origin, time scale, domain begin, domain end, in SI seconds.
+    std::optional<std::array<aero::detail::pchip::RationalView, 4>> domain;
+};
+
+using CaseMotionSeriesSnapshotView =
+    std::variant<CaseMotionFormulaSnapshotView, aero::detail::pchip::PchipSnapshotView>;
+
+/// Borrowed model-input save. Events and the demand window retain absolute SI time.
+struct CaseMotionTimeSnapshotView {
+    io::SchemaIdentity source;
+    std::uint64_t declaration_ordinal{};
+    aero::detail::pchip::PchipInputStamp stamp;
+    std::int16_t pi_power{};
+    aero::detail::pchip::RationalView begin, end;
+    std::span<const aero::detail::pchip::RationalView> events;
+    CaseMotionSeriesSnapshotView translation, rotation;
+};
+
+class CaseMotionTimeSnapshot {
+public:
+    CaseMotionTimeSnapshot(CaseMotionTimeSnapshot&&) noexcept;
+    CaseMotionTimeSnapshot& operator=(CaseMotionTimeSnapshot&&) noexcept;
+    CaseMotionTimeSnapshot(const CaseMotionTimeSnapshot&) = delete;
+    CaseMotionTimeSnapshot& operator=(const CaseMotionTimeSnapshot&) = delete;
+    ~CaseMotionTimeSnapshot();
+
+    [[nodiscard]] core::Result<CaseMotionTimeSnapshotView> view() const& noexcept;
+    [[nodiscard]] core::Result<CaseMotionTimeSnapshotView> view() const&& = delete;
+
+private:
+    friend struct motion_time_detail::Builder;
+    explicit CaseMotionTimeSnapshot(
+        core::PlannedBuffer<motion_time_detail::SnapshotOwner>) noexcept;
+    core::PlannedBuffer<motion_time_detail::SnapshotOwner> owner_;
 };
 
 /// Owns both time curves and the original event times. Frame qualification is separate.
@@ -111,6 +151,15 @@ private:
 
 [[nodiscard]] core::Result<CaseMotionTimeSeries> prepare_case_motion_time_series(
     const io::SiCase&, CaseMotionField, CaseMotionTimeWindow, aero::detail::pchip::PchipInputStamp,
+    aero::detail::pchip::CurveWorkspace&, const CaseMotionTimeLimits&, core::ResourcePlan&,
+    const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+[[nodiscard]] core::Result<CaseMotionTimeSnapshot>
+snapshot_case_motion_time_series(const CaseMotionTimeSeries&, aero::detail::pchip::CurveWorkspace&,
+                                 const CaseMotionTimeLimits&, core::ResourcePlan&,
+                                 const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+[[nodiscard]] core::Result<CaseMotionTimeSeries> restore_case_motion_time_series(
+    const CaseMotionTimeSnapshotView&, const CaseMotionTimeSeries& current,
     aero::detail::pchip::CurveWorkspace&, const CaseMotionTimeLimits&, core::ResourcePlan&,
     const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
