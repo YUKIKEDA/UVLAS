@@ -3,6 +3,7 @@
 #include "aero/local_geometry_bounds_private.hpp"
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
+#include "case_material_alias.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
 
 #include <cmath>
@@ -356,6 +357,41 @@ core::Result<CaseMaterialOriginalEnclosedForce> CaseMaterialRows::pullback_enclo
                     core::Failure{rejected.failure.code, operation, rejected.failure.details});
             }
         });
+}
+
+CaseMaterialAliasRow::CaseMaterialAliasRow(
+    CaseMaterialChartIdentity surface, s::PgPreparedPatchIdentity patch,
+    s::ExactRational&& radicand, core::PlannedBuffer<s::PgConditionedReferenceColumn>&& row,
+    s::PgReferenceCallInfo info) noexcept
+    : info_(info),
+      surface_(surface),
+      patch_(patch),
+      radicand_(std::move(radicand)),
+      row_(std::move(row)) {}
+
+core::Result<CaseMaterialAliasRow>
+CaseMaterialAliasRow::prepare(const CaseMaterialChart& chart, const CaseReferenceSurface& reference,
+                              const s::PgPreparedPatch& patch, CaseMaterialVertexSite site,
+                              const s::PgReferenceLimits& limits,
+                              core::ResourcePlan& plan) noexcept {
+    return run(core::Operation::PrepareModel, [&]() -> core::Result<CaseMaterialAliasRow> {
+        pg::ReferenceArithmetic m{limits, plan};
+        m.cancel();
+        match_reference(chart, patch, m);
+        auto selected = partition_take(qualify_case_material_vertex_reference(
+            chart, reference, site.chord_column, site.span_knot, site.original_span_cell,
+            remaining(m), plan));
+        use(m, selected.call_info);
+        const std::array points{query_for(selected.chart.side, selected.reference.partition_record,
+                                          selected.triangle_coordinates)};
+        qualify_shared_rows(patch, selected, points, m);
+        auto exact = partition_take(patch.evaluate_reference(points, remaining(m), plan));
+        use(m, exact.call_info);
+        m.cancel();
+        return CaseMaterialAliasRow{
+            partition_take(chart.identity()), partition_take(patch.info()).identity,
+            std::move(selected.reference.g), std::move(exact.columns), m.info()};
+    });
 }
 
 } // namespace uvlas::coupling::detail

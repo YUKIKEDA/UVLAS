@@ -1,7 +1,10 @@
+#include "aero/geometry_snapshot_fixture.hpp"
 #include "aero/local_geometry_bounds_private.hpp"
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
+#include "coupling/case_material_alias.hpp"
 #include "coupling/case_material_chart.hpp"
+#include "coupling/case_material_original_layout.hpp"
 #include "coupling/case_material_reference.hpp"
 #include "coupling/case_material_rows.hpp"
 #include "coupling/case_pg_reference.hpp"
@@ -251,8 +254,8 @@ TEST_CASE("An explicit Case PG shell owns its exact reference geometry in SI",
     CHECK(take(ready.identity()) == identity);
 }
 
-TEST_CASE("Case material chart owns the selected PG and preserves both sides at a shared vertex",
-          "[verification][negative][AE-02][SH-D02][FD-06][V-MULTI]") {
+namespace {
+a::JsonToken material_chart_fixture() {
     auto wire = a::root("coupled_flutter");
     wire.field("units").set("length", a::string("m"));
     auto& model = wire.field("model");
@@ -303,6 +306,16 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
     auto map = a::parse(R"({"pieces":[]})");
     map.field("pieces").elements = {piece, other};
     attachment.set("material_map", map);
+    return wire;
+}
+} // namespace
+
+TEST_CASE("Case material chart owns the selected PG and preserves both sides at a shared vertex",
+          "[verification][negative][AE-02][SH-D02][FD-06][V-MULTI]") {
+    auto wire = material_chart_fixture();
+    auto& model = wire.field("model");
+    auto& surface = model.field("aero_surfaces").elements.at(0);
+    auto& attachment = surface.field("attachment");
     core::ResourcePlan plan{profile};
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
     const c::CaseMaterialChartLimits limits{case_pg_reference_limits(), query_limits(), 8};
@@ -379,6 +392,111 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
         REQUIRE_FALSE(failure);
         CHECK(failure.error().code == expected);
     };
+    SECTION("The owned quad derives both original seam roles") {
+        namespace ae = uvlas::aero::detail;
+        constexpr std::array ids{ae::PointId{101}, ae::PointId{102}, ae::PointId{103},
+                                 ae::PointId{104}, ae::PointId{105}, ae::PointId{106}};
+        const auto binding = test_geometry::binding();
+        const std::array bindings{binding, binding, binding, binding, binding, binding};
+        constexpr std::array<double, 18> xyz{3.75, -4., 4.9375, 3.75, -3., 5., 3.75, -2., 5.0625,
+                                             4.5,  -4., 4.9375, 4.5,  -3., 5., 4.5,  -2., 5.0625};
+        constexpr auto band = ae::BandId{12};
+        constexpr std::array faces{ae::PhysicalFaceId{17}, ae::PhysicalFaceId{8}};
+        const std::array face_data{ae::FaceInput{faces[0], band}, ae::FaceInput{faces[1], band}};
+        constexpr std::array roles{ae::FaceRoleInput{faces[0], ae::AeroFaceRole::Bound},
+                                   ae::FaceRoleInput{faces[1], ae::AeroFaceRole::Bound}};
+        constexpr std::array<std::array<std::size_t, 2>, 9> links{
+            {{0, 1}, {1, 4}, {4, 3}, {3, 0}, {0, 4}, {1, 2}, {2, 5}, {5, 4}, {1, 5}}};
+        const std::array edges{ae::EdgeInput{ae::EdgeId{1}, {ids[links[0][0]], ids[links[0][1]]}},
+                               ae::EdgeInput{ae::EdgeId{2}, {ids[links[1][0]], ids[links[1][1]]}},
+                               ae::EdgeInput{ae::EdgeId{3}, {ids[links[2][0]], ids[links[2][1]]}},
+                               ae::EdgeInput{ae::EdgeId{4}, {ids[links[3][0]], ids[links[3][1]]}},
+                               ae::EdgeInput{ae::EdgeId{5}, {ids[links[4][0]], ids[links[4][1]]}},
+                               ae::EdgeInput{ae::EdgeId{6}, {ids[links[5][0]], ids[links[5][1]]}},
+                               ae::EdgeInput{ae::EdgeId{7}, {ids[links[6][0]], ids[links[6][1]]}},
+                               ae::EdgeInput{ae::EdgeId{8}, {ids[links[7][0]], ids[links[7][1]]}},
+                               ae::EdgeInput{ae::EdgeId{9}, {ids[links[8][0]], ids[links[8][1]]}}};
+        const std::array edge_roles{ae::EdgeBindingInput{edges[0].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[1].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[2].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[3].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[4].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[5].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[6].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[7].id, ae::CanonicalEdge{}},
+                                    ae::EdgeBindingInput{edges[8].id, ae::CanonicalEdge{}}};
+        constexpr auto facet_left = ae::FacetId{200}, facet_right = ae::FacetId{202};
+        const std::array quads{ae::QuadInput{faces[0],
+                                             {ids[0], ids[1], ids[4], ids[3]},
+                                             {edges[0].id, edges[1].id, edges[2].id, edges[3].id},
+                                             edges[4].id,
+                                             {facet_left, ae::FacetId{201}}},
+                               ae::QuadInput{faces[1],
+                                             {ids[1], ids[2], ids[5], ids[4]},
+                                             {edges[5].id, edges[6].id, edges[7].id, edges[1].id},
+                                             edges[8].id,
+                                             {facet_right, ae::FacetId{203}}}};
+        const std::array bands{band};
+        const ae::SinglePositions points{xyz};
+        const ae::GeometryInput input{ids,
+                                      bindings,
+                                      points,
+                                      points,
+                                      edges,
+                                      face_data,
+                                      bands,
+                                      {},
+                                      quads,
+                                      ae::SingleWord{.125},
+                                      test_geometry::context()};
+        auto geometry_work = test_geometry::workspace(plan);
+        const auto owned = test_geometry::take(
+            ae::prepare_owned_geometry(input, test_geometry::limits(), *geometry_work, plan));
+        const ae::GlobalLimits bounds{steps, numerics::linear::EstimateAdmission{4096}};
+        auto global = take(ae::GlobalWorkspace::create(plan, bounds.metadata));
+        const auto topology = ae::build_global_topology(
+            owned, ae::GlobalTopologyInput{roles, edge_roles, {}}, bounds, *global, plan);
+        if (!topology) {
+            FAIL(static_cast<int>(topology.error().origin.cause.code));
+            return;
+        }
+        const auto contact = ae::check_global_geometry(*topology, owned, bounds, *global, plan);
+        if (!contact) {
+            FAIL(static_cast<int>(contact.error().origin.cause.code));
+            return;
+        }
+        const auto layout = take(c::CaseMaterialOriginalLayout::prepare(ready, thin, *contact,
+                                                                        faces, limits.chart, plan));
+        const auto old_left = take(layout.corner(facet_left, 2));
+        const auto old_right = take(layout.corner(facet_right, 0));
+        CHECK(old_left.face == faces[0]);
+        CHECK(old_right.face == faces[1]);
+        CHECK(old_left.canonical == ids[1]);
+        CHECK(old_right.canonical == ids[1]);
+        CHECK(old_left.site.chord_column == 0);
+        CHECK(old_left.site.span_knot == 1);
+        CHECK(old_left.site.original_span_cell == 0);
+        CHECK(old_right.site.original_span_cell == 1);
+        const auto arow = take(ready.vertex(old_left.site.chord_column, old_left.site.span_knot,
+                                            old_left.site.original_span_cell, limits.chart, plan));
+        const auto brow = take(ready.vertex(old_right.site.chord_column, old_right.site.span_knot,
+                                            old_right.site.original_span_cell, limits.chart, plan));
+        CHECK(arow.material == left.material);
+        CHECK(arow.layer == left.layer);
+        CHECK(arow.side == left.side);
+        CHECK(brow.material == right.material);
+        CHECK(brow.layer == right.layer);
+        CHECK(brow.side == right.side);
+        check_failure(c::CaseMaterialOriginalLayout::prepare(ready, thin, *contact,
+                                                             std::array{faces[1], faces[0]},
+                                                             limits.chart, plan),
+                      core::FailureCode::GeometryInvalid);
+        check_failure(c::CaseMaterialOriginalLayout::prepare(ready, thin, *contact,
+                                                             std::array{faces[0], faces[0]},
+                                                             limits.chart, plan),
+                      core::FailureCode::InvalidInput);
+        check_failure(layout.corner(facet_right, 3), core::FailureCode::InvalidInput);
+    }
     SECTION("Legacy syntax needs an explicit map at physical preparation") {
         attachment.erase("material_map");
         wrong(core::FailureCode::InvalidInput);
@@ -889,4 +1007,128 @@ TEST_CASE("Clocked rigid PG supports preserve original rows and reaction power",
             }
         }
     }
+}
+
+TEST_CASE(
+    "Distinct Case material hosts must agree after constraints and for each prescribed motion",
+    "[verification][negative][AE-02][SH-D05][SH-D06][V-MULTI]") {
+    auto wire = material_chart_fixture();
+    auto& model = wire.field("model");
+    auto& surface = model.field("aero_surfaces").elements.at(0);
+    auto& attachment = surface.field("attachment");
+    core::ResourcePlan plan{profile};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const c::CaseMaterialChartLimits limits{case_pg_reference_limits(), query_limits(), 8};
+
+    auto& wire_thin = model.field("geometry").elements.at(1);
+    wire_thin.set("frame",
+                  a::parse(R"({"origin":[3,-4,4.9375],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    wire_thin.set("width", a::parse(R"({"numerator":"1","denominator":"1"})"));
+    auto boundary_map = attachment.field("material_map");
+    for (auto& row : boundary_map.field("pieces").elements) {
+        auto& terms = row.field("terms").elements;
+        terms[0].field("coefficient").elements[0].set("numerator", a::string("0"));
+        terms[0].field("coefficient").elements[0].set("denominator", a::string("1"));
+        terms[1].field("coefficient").elements[0].set("denominator", a::string("1"));
+    }
+    attachment.set("material_map", boundary_map);
+    auto other_shell = model.field("shells").elements.at(0);
+    other_shell.set("id", a::string("2"));
+    other_shell.field("layers").elements[0].set("id", a::string("11"));
+    other_shell.field("layers").elements[1].set("id", a::string("12"));
+    model.field("shells").elements.push_back(std::move(other_shell));
+    auto other_surface = surface;
+    other_surface.set("id", a::string("2"));
+    auto& other_attachment = other_surface.field("attachment");
+    other_attachment.set("host", a::string("2"));
+    auto& other_map = other_attachment.field("material_map").field("pieces").elements;
+    other_map[0].set("layer", a::string("11"));
+    other_map[1].set("layer", a::string("12"));
+    model.field("aero_surfaces").elements.push_back(std::move(other_surface));
+    const auto si = checked_case(wire);
+    const auto make_patch = [&](std::uint64_t shell) {
+        auto reference =
+            take(c::prepare_case_pg_reference(si, shell, limits.support, workspace, plan));
+        const auto source = take(reference.source());
+        const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
+        auto rank = take(PgRankPreparation::prepare(source.dictionary, source.partition,
+                                                    rank_limits, workspace, plan));
+        auto basis = take(PgReferenceBasis::prepare(std::move(reference), std::move(rank),
+                                                    rank_limits, workspace, plan));
+        auto gram = take(
+            PgFlatGram::prepare(std::move(basis), 256, {limits.chart, steps}, workspace, plan));
+        auto conditioning = take(std::move(gram).generate_and_certify(
+            {320, 246}, {profile, steps, {}}, workspace, plan));
+        return take(
+            PgPreparedPatch::prepare(std::move(conditioning), limits.chart, workspace, plan));
+    };
+    const auto pa = make_patch(1), pb = make_patch(2);
+    const auto ca = take(c::CaseMaterialChart::prepare(si, 1, limits, workspace, plan));
+    const auto cb = take(c::CaseMaterialChart::prepare(si, 2, limits, workspace, plan));
+    const auto ts = take(c::CaseReferenceSurface::prepare(si, 2, limits.chart, plan));
+    const auto ea =
+        take(c::CaseMaterialAliasRow::prepare(ca, ts, pa, {1, 1, 0}, limits.chart, plan));
+    const auto eb =
+        take(c::CaseMaterialAliasRow::prepare(cb, ts, pb, {1, 1, 0}, limits.chart, plan));
+    Fixture fixture;
+    const auto zero = fixture.r("0"), one = fixture.r("1");
+    const auto ra = vertical_edges(fixture, pa, Q{1}, Q{1});
+    const auto rb = vertical_edges(fixture, pb, Q{1}, Q{1});
+    const auto sa = edge_spans(ra, zero, one);
+    const auto sb = edge_spans(rb, zero, one);
+    auto arithmetic = limits.chart;
+    arithmetic.maximum_scalar_operations = 300'000'000;
+    arithmetic.maximum_partition_visits = 100'000'000;
+    auto exact = arithmetic;
+    exact.algebra.maximum_value_bits = 65536;
+    exact.algebra.maximum_work_bits = 262144;
+    constexpr PgConstraintId first{55}, second{56};
+    const std::array patches{PgConstraintPatchBinding{numerics::PatchId{1}, pa},
+                             PgConstraintPatchBinding{numerics::PatchId{2}, pb}};
+    const auto make_chart = [&](std::span<const PgConstraintTraceBinding> selected) {
+        auto original = take(PgGlobalConstraints::prepare(
+            patches, selected, {arithmetic, 2, 2, 4096, 30000}, workspace, plan));
+        return take(
+            PgSparseChart::prepare(std::move(original), {exact, 320, 480, 30000}, workspace, plan));
+    };
+    const auto support = [&](std::span<const PgConstraintTraceBinding> selected,
+                             std::span<const PgRigidSupportBinding> groups, std::size_t count) {
+        auto chart = make_chart(selected);
+        const PgRigidSupportLimits bounds{exact, exact, chart.original().original_rows().size()};
+        return take(PgRigidSupportRows::prepare_groups(std::move(chart), patches, groups, count,
+                                                       bounds, workspace, plan));
+    };
+    const auto check = [&](const PgRigidSupportRows& active) {
+        return c::qualify_case_material_constraint_alias(ea, eb, active, exact, workspace, plan);
+    };
+
+    // Separate free coordinates at the same reference point do not define the same row.
+    const auto free = support({}, {}, 0);
+    check_failure(check(free), core::FailureCode::GeometryInvalid);
+
+    const auto fa = take(PgFullTrace::prepare_support(pa, sa, take(pa.info()).identity,
+                                                      pa.reference_coordinates(),
+                                                      {arithmetic, 30000}, workspace, plan));
+    const auto fb = take(PgFullTrace::prepare_support(pb, sb, take(pb.info()).identity,
+                                                      pb.reference_coordinates(),
+                                                      {arithmetic, 30000}, workspace, plan));
+    const std::array fixed{PgConstraintTraceBinding{first, fa, 0, {}},
+                           PgConstraintTraceBinding{second, fb, 1, {}}};
+    const auto still = support(fixed, {}, 0);
+    REQUIRE(check(still));
+    const std::array shared_motion{PgRigidSupportBinding{first, 0},
+                                   PgRigidSupportBinding{second, 0}};
+    const auto shared = support(fixed, shared_motion, 1);
+    REQUIRE(check(shared));
+    const std::array separate_motions{PgRigidSupportBinding{first, 0},
+                                      PgRigidSupportBinding{second, 1}};
+    const auto separate = support(fixed, separate_motions, 2);
+    check_failure(check(separate), core::FailureCode::GeometryInvalid);
+
+    auto no_work = exact;
+    no_work.maximum_scalar_operations = 0;
+    check_failure(
+        c::qualify_case_material_constraint_alias(ea, eb, shared, no_work, workspace, plan),
+        core::FailureCode::ResourceExceeded);
+    REQUIRE(check(shared));
 }

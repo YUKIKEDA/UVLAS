@@ -549,7 +549,7 @@ core::Result<PgSparseChartDual> PgSparseChart::transpose(PgSparseChartInput inpu
                 std::move(work.values()[static_cast<std::size_t>(data.free.values()[i])]);
         }
         math.cancel();
-        return PgSparseChartDual{std::move(reduced), std::move(multipliers)};
+        return PgSparseChartDual{std::move(reduced), std::move(multipliers), math.info()};
     });
 }
 

@@ -43,6 +43,7 @@ public:
     prepare(const io::SiCase&, std::uint64_t surface_id, const CaseMaterialChartLimits&,
             core::Workspace&, core::ResourcePlan&) noexcept;
     [[nodiscard]] core::Result<CaseMaterialChartIdentity> identity() const noexcept;
+    [[nodiscard]] core::Result<std::array<core::Index, 2>> panel_shape() const noexcept;
     [[nodiscard]] core::Result<const structure::ExactRational*>
     geometry_error_metres() const& noexcept;
     [[nodiscard]] core::Result<const structure::ExactRational*>

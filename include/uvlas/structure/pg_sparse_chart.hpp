@@ -34,6 +34,7 @@ struct PgSparseChartInput {
 struct PgSparseChartDual {
     core::PlannedBuffer<PgCartesianExactPosition> independent_force;
     core::PlannedBuffer<PgCartesianExactPosition> original_multipliers;
+    PgReferenceCallInfo call_info;
 };
 
 /// Exact affine fixed-pivot chart with sparse factors shared by lift and transpose.

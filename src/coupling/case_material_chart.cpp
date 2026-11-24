@@ -587,6 +587,15 @@ core::Result<CaseMaterialChartIdentity> CaseMaterialChart::identity() const noex
     return data_.values().front().identity;
 }
 
+core::Result<std::array<core::Index, 2>> CaseMaterialChart::panel_shape() const noexcept {
+    if (data_.size() != 1)
+        return std::unexpected(core::Failure{FailureCode::InvalidInput, operation});
+    const auto& data = data_.values().front();
+    // Storage counts were checked against core::Index during preparation.
+    return std::array{static_cast<core::Index>(data.chord.size() - 1),
+                      static_cast<core::Index>(data.span.size() - 1)};
+}
+
 core::Result<const R*> CaseMaterialChart::geometry_error_metres() const& noexcept {
     if (data_.size() != 1)
         return std::unexpected(core::Failure{FailureCode::InvalidInput, operation});
