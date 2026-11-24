@@ -1,5 +1,7 @@
 #include "external_mesh_sidecar_binding.hpp"
 
+#include "gmsh_entity_physical.hpp"
+
 #include <algorithm>
 #include <limits>
 #include <utility>
@@ -209,23 +211,7 @@ void gmsh_layer_ids(Binding& b, const schema::Shell& target, const GmshSidecarSh
 
 [[nodiscard]] bool member(Binding& b, const GmshMeshView& mesh, const GmshElement& element,
                           GmshKey group) {
-    if (element.entity.dimension != group.dimension) {
-        return false;
-    }
-    const auto compare = [&b](const auto& lhs, const auto& rhs) {
-        b.step();
-        return lhs < rhs;
-    };
-    const auto entity =
-        std::ranges::lower_bound(mesh.entities, element.entity, compare, &GmshEntity::key);
-    if (entity == mesh.entities.end() || entity->key != element.entity) {
-        return false;
-    }
-    const auto links = mesh.entity_links.subspan(entity->first_physical, entity->physical_count);
-    return std::ranges::any_of(links, [&](const auto& link) {
-        b.step();
-        return link.key == group;
-    });
+    return gmsh_element_in_physical_group(mesh, element, group, [&] { b.step(); });
 }
 
 [[nodiscard]] std::size_t element_index(Binding& b, const GmshMeshView& mesh, std::uint64_t tag) {
