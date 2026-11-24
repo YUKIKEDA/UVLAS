@@ -1629,6 +1629,25 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
                               curved_rule_planar_count * curved_rule_depth_count)),
                           grid, caps, empty),
                   core::FailureCode::InvalidInput);
+    // Keep the full volume coverage and change only the weight or order.
+    const std::array invalid_weights{f.r("0"), f.r("-1")};
+    for (const auto& invalid_weight : invalid_weights) {
+        std::vector<PgDiscreteVolumePoint> invalid;
+        invalid.reserve(points.size());
+        invalid.push_back({points.front().point, invalid_weight});
+        for (const auto& point : std::span{points}.subspan(1))
+            invalid.push_back(point);
+        check_failure(prepare(invalid, grid, caps, empty), core::FailureCode::InvalidInput);
+        REQUIRE(basis.size());
+    }
+    std::vector<PgDiscreteVolumePoint> reversed;
+    reversed.reserve(points.size());
+    constexpr auto block =
+        static_cast<std::size_t>(curved_rule_planar_count * curved_rule_depth_count);
+    for (std::size_t k = 0; k < points.size(); ++k)
+        reversed.push_back(points[k == block + 1 ? 0 : k]);
+    check_failure(prepare(reversed, grid, caps, empty), core::FailureCode::InvalidInput);
+    REQUIRE(basis.size());
     CHECK(empty.allocated_bytes() == 0);
     REQUIRE(basis.size());
 
