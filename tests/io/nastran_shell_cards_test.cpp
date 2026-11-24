@@ -753,10 +753,15 @@ TEST_CASE("CONM2 basic offset and absolute centre preserve independent rigid kin
                                MassVector{MassQ{0}, MassQ("-1/10"), MassQ("3/10")}};
     const MassVector omega{MassQ{2}, MassQ{-1}, MassQ{3}};
     const MassVector velocity{MassQ("-1/5"), MassQ("2/5"), MassQ("1/10")};
-    MassQ particle_energy{};
+    const MassVector acceleration{MassQ("1/10"), MassQ("1/5"), MassQ("3/10")};
+    const MassVector alpha{MassQ{0}, MassQ{2}, MassQ{1}};
+    MassQ particle_energy{}, particle_work{};
     for (const auto& relative : particles) {
-        const auto v = mv_add(velocity, mv_cross(omega, mv_add(lever, relative)));
+        const auto position = mv_add(lever, relative);
+        const auto v = mv_add(velocity, mv_cross(omega, position));
+        const auto a = mv_add(acceleration, mv_cross(alpha, position));
         particle_energy += mv_dot(v, v) / 4; // Each particle has mass 1/2 kg.
+        particle_work += mv_dot(v, a) / 2;
     }
     const std::array expected_inertia{MassQ("7/50"), MassQ("-1/50"), MassQ("1/10"),
                                       MassQ{0},      MassQ("3/100"), MassQ("3/50")};
@@ -781,23 +786,30 @@ TEST_CASE("CONM2 basic offset and absolute centre preserve independent rigid kin
             CHECK(mass_q(row.centre_inertia_kg_m2[i]) == expected_inertia[i]);
         }
 
-        // Evaluate the kinetic energy from GRID-referenced quantities. Only
-        // the tensor entries below are produced by the parallel-axis formula.
-        const auto translation =
-            mv_dot(velocity, velocity) + 2 * mv_dot(velocity, mv_cross(omega, lever));
-        MassQ lower = translation, upper = translation;
-        std::size_t entry = 0;
-        for (std::size_t i = 0; i < omega.size(); ++i) {
-            for (std::size_t j = 0; j <= i; ++j) {
-                const MassQ weight = omega[i] * omega[j] / (i == j ? 2 : 1);
-                const auto& value = row.grid_inertia_kg_m2[entry++];
-                lower += weight * mass_q(weight < 0 ? value.upper : value.lower);
-                upper += weight * mass_q(weight < 0 ? value.lower : value.upper);
+        // Compare the mass bilinear form with particle velocities/accelerations,
+        // both on the diagonal (twice the energy) and with an independent pair.
+        const auto compare_grid_work = [&](const MassVector& linear, const MassVector& angular,
+                                           const MassQ& expected) {
+            const auto translation =
+                2 * (mv_dot(velocity, linear) + mv_dot(velocity, mv_cross(angular, lever)) +
+                     mv_dot(linear, mv_cross(omega, lever)));
+            MassQ lower = translation, upper = translation;
+            std::size_t entry = 0;
+            for (std::size_t i = 0; i < omega.size(); ++i) {
+                for (std::size_t j = 0; j <= i; ++j) {
+                    const MassQ weight = i == j ? omega[i] * angular[i]
+                                                : omega[i] * angular[j] + omega[j] * angular[i];
+                    const auto& value = row.grid_inertia_kg_m2[entry++];
+                    lower += weight * mass_q(weight < 0 ? value.upper : value.lower);
+                    upper += weight * mass_q(weight < 0 ? value.lower : value.upper);
+                }
             }
-        }
-        CHECK(lower <= particle_energy);
-        CHECK(upper >= particle_energy);
-        CHECK(upper - lower < MassQ("1/10000000000000000000000000000000000000000"));
+            CHECK(lower <= expected);
+            CHECK(upper >= expected);
+            CHECK(upper - lower < MassQ("1/10000000000000000000000000000000000000000"));
+        };
+        compare_grid_work(velocity, omega, 2 * particle_energy);
+        compare_grid_work(acceleration, alpha, particle_work);
     }
     const auto& point_mass = projections[2];
     CHECK(point_mass.kind == NastranBasicMassKind::Particle);
