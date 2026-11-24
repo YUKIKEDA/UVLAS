@@ -5279,7 +5279,7 @@ struct FiniteWingMesh {
         }
         std::map<std::array<a::PointId, 2>, a::EdgeId> by_ends;
         const auto edge = [&](a::PointId from, a::PointId to) {
-            std::array key{std::min(from, to), std::max(from, to)};
+            const std::array key{std::min(from, to), std::max(from, to)};
             const a::EdgeId new_id{1000 + edges.size()};
             const auto [found, inserted] = by_ends.try_emplace(key, new_id);
             if (inserted) {
