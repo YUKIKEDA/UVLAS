@@ -1,4 +1,4 @@
-#include "pg_flat_gram_cut_moments.hpp"
+#include "pg_flat_gram_thickness_moments.hpp"
 #include "pg_rank_storage.hpp"
 #include "pg_reference_polynomials.hpp"
 
@@ -34,6 +34,7 @@ struct GramTerm {
 struct FlatProfile {
     const ExactRational& thickness;
     GramCutLayout cuts;
+    bool variable_thickness;
 };
 
 [[nodiscard]] FlatProfile flat_profile(ReferenceArithmetic& math, const PgReferenceSource& source,
@@ -64,12 +65,13 @@ struct FlatProfile {
     const auto thickness = partition_take(source.partition.thickness()).values;
     if (thickness.empty())
         partition_fail(core::FailureCode::InvalidInput);
+    bool variable = false;
     for (const auto& value : thickness) {
         charge(value, thickness.front());
         if (value != thickness.front())
-            partition_fail(core::FailureCode::Unsupported);
+            variable = true;
     }
-    return {thickness.front(), cuts};
+    return {thickness.front(), cuts, variable};
 }
 
 [[nodiscard]] auto cell_key(const GramTerm& term) {
@@ -133,7 +135,8 @@ struct GramScale {
 
 [[nodiscard]] RankWide integrate(GramWork& work, const GramScale& scale,
                                  const GramCutLayout& layout, std::span<const RankWide> cuts,
-                                 std::span<const GramTerm> a, std::span<const GramTerm> b) {
+                                 std::span<const RankWide> weighted, std::span<const GramTerm> a,
+                                 std::span<const GramTerm> b) {
     RankWide rectangular{}, cut{};
     while (!a.empty() && !b.empty()) {
         work.charge();
@@ -155,8 +158,14 @@ struct GramScale {
             work.charge();
             ++bc;
         }
-        const auto slot = layout.slot(a.front().key.cell);
-        const auto cut_moments = slot >= 0 ? cut_cell(cuts, slot) : std::span<const RankWide>{};
+        const auto cell = a.front().key.cell;
+        const auto slot = layout.slot(cell);
+        const auto cut_moments =
+            slot >= 0 && !cuts.empty() ? cut_cell(cuts, slot) : std::span<const RankWide>{};
+        const auto weighted_moments =
+            weighted.empty()
+                ? std::span<const RankWide>{}
+                : weighted.subspan(layout.index(cell) * thickness_gram_slots, thickness_gram_slots);
         for (const auto& p : a.first(ac))
             for (const auto& q : b.first(bc)) {
                 work.charge();
@@ -166,7 +175,7 @@ struct GramScale {
                     static_cast<std::size_t>(p.key.field) + static_cast<std::size_t>(q.key.field);
                 if (scale.moment[z] == 0)
                     continue;
-                if (cut_moments.empty()) {
+                if (cut_moments.empty() && weighted_moments.empty()) {
                     if (scale.moment[u] == 0 || scale.moment[v] == 0)
                         continue;
                     auto term = product(work, p.weighted, q.weighted);
@@ -174,7 +183,10 @@ struct GramScale {
                     term = product(work, term, scale.moment[v]);
                     rectangular += product(work, term, scale.moment[z]);
                 } else {
-                    const auto& planar = cut_moments[cut_index(u, v)];
+                    const auto& planar =
+                        weighted_moments.empty()
+                            ? cut_moments[cut_index(u, v)]
+                            : weighted_moments[thickness_gram_offset[z / 2] + cut_index(u, v)];
                     if (planar == 0)
                         continue;
                     auto term = product(work, p.weighted, q.weighted);
@@ -240,8 +252,12 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
             math.admit(partition_add(reference_live_rationals, partition_mul(entry_count, 2)));
             const auto profile = flat_profile(math, reference, graph);
             auto work = GramWork{math, limits.maximum_integer_steps};
-            const auto h =
-                math.div(profile.thickness, math.mul(math.constant("2"), basis.length_metres()));
+            // The varying path includes h^(z+1) in the planar moments, so
+            // only the field's factorial remains in the raw column scaling.
+            const auto h = profile.variable_thickness
+                               ? math.constant("1")
+                               : math.div(profile.thickness,
+                                          math.mul(math.constant("2"), basis.length_metres()));
             const auto four_n = index_value(math, 4 * graph.n);
             const auto measure = math.div(math.mul(graph.width, h), math.square(four_n));
             const auto rows = partition_take(rank->rows());
@@ -255,18 +271,31 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
             forecast.add<GramTerm>(nnz);
             forecast.add<std::size_t>(rank_count + 1);
             forecast.add<PgGramEntry>(entry_count);
-            const auto cut_count = partition_mul(profile.cuts.count, cut_slots);
+            const auto cut_count =
+                profile.variable_thickness ? 0 : partition_mul(profile.cuts.count, cut_slots);
+            const auto weighted_count =
+                profile.variable_thickness ? partition_mul(graph.cells.size(), thickness_gram_slots)
+                                           : 0;
+            const auto scratch_count = profile.variable_thickness ? thickness_piece_slots : 0;
             forecast.add<RankWide>(cut_count);
+            forecast.add<RankWide>(weighted_count);
+            forecast.add<RankWide>(scratch_count);
             if (forecast.bytes > plan.remaining_bytes())
                 partition_fail(core::FailureCode::ResourceExceeded);
             auto terms = rank_allocate<GramTerm>(plan, nnz);
             auto offsets = rank_allocate<std::size_t>(plan, rank_count + 1);
             auto output = rank_allocate<PgGramEntry>(plan, entry_count);
             auto moments = rank_allocate<RankWide>(plan, cut_count);
-            const auto cut_denominator = cut_count == 0
-                                             ? RankWide{1}
-                                             : generate_cut_moments(work, reference.partition,
-                                                                    profile.cuts, moments.values());
+            auto weighted = rank_allocate<RankWide>(plan, weighted_count);
+            auto scratch = rank_allocate<RankWide>(plan, scratch_count);
+            auto planar_denominator = RankWide{1};
+            if (profile.variable_thickness)
+                planar_denominator = generate_thickness_moments(
+                    work, reference.partition, profile.cuts, basis.length_metres(), four_n,
+                    weighted.values(), scratch.values());
+            else if (cut_count != 0)
+                planar_denominator =
+                    generate_cut_moments(work, reference.partition, profile.cuts, moments.values());
             auto common = RankWide{1};
             std::size_t at = 0;
             for (std::size_t k = 0; k < rank_count; ++k) {
@@ -292,8 +321,9 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
                     });
                 offsets.values()[k + 1] = at;
             }
-            const auto scale = setup_scale(work, h, measure, common, terms.values(),
-                                           cut_count == 0 ? nullptr : &cut_denominator);
+            const auto scale = setup_scale(
+                work, h, measure, common, terms.values(),
+                (cut_count == 0 && weighted_count == 0) ? nullptr : &planar_denominator);
             const auto column = [&](std::size_t k) {
                 const auto begin = offsets.values()[k];
                 return terms.values().subspan(begin, offsets.values()[k + 1] - begin);
@@ -302,7 +332,7 @@ core::Result<PgFlatGram> PgFlatGram::prepare(PgReferenceBasis&& basis, std::uint
             for (std::size_t j = 0; j < rank_count; ++j)
                 for (std::size_t i = 0; i <= j; ++i) {
                     const auto value = integrate(work, scale, profile.cuts, moments.values(),
-                                                 column(i), column(j));
+                                                 weighted.values(), column(i), column(j));
                     output.values()[entry++] = enclose(work, value, scale.denominator, bits);
                 }
             math.cancel();

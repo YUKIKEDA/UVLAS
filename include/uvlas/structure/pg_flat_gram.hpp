@@ -10,7 +10,7 @@ struct PgFlatGramLimits {
 };
 
 /// Density-one geometric Gram enclosure on the actual domain of a flat chart
-/// with constant height and thickness.
+/// with constant height and certified piecewise-affine thickness.
 /// Preparation consumes the matching physical basis only on success.
 class PgFlatGram {
 public:
