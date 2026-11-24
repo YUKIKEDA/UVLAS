@@ -900,6 +900,27 @@ if(MSVC)
         TIMEOUT "$<IF:$<CONFIG:Debug>,90,60>")
 endif()
 
+uvlas_add_test(coupling.case_motion
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision)
+target_include_directories(uvlas_test_coupling_case_motion PRIVATE
+    "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(coupling.case_motion_time_series
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_time_series_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_motion_time_series PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+
+uvlas_add_test(coupling.case_motion_frame
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_frame_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_motion_frame PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
     SOURCES io/case_schema_test.cpp io/case_schema_intrinsic_test.cpp io/case_schema_cross_test.cpp io/case_schema_fragments_test.cpp io/case_schema_inventory_test.cpp

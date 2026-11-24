@@ -39,7 +39,7 @@ class TraceTest(unittest.TestCase):
         self.assertEqual(trace.ANY.findall("xEIG-01 EIG-01x EIG-001 EIG-01"), ["EIG-01"])
 
     def test_adopted_families_trace_definitions_tags_records_and_reject_unknown(self) -> None:
-        for family in ("UI-D", "UW-D", "BM-D", "CN-D", "SI-D"):
+        for family in ("UI-D", "UW-D", "BM-D", "CN-D", "SI-D", "FD-"):
             with self.subTest(family=family):
                 identifier = f"{family}01"
                 self.write("docs/specs/adopted.md", f"| {identifier} | adopted decision |\n")
