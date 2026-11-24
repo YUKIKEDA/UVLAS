@@ -163,6 +163,7 @@ private:
 /// An owning provenance token for one immutable, reference-qualified topology.
 class PreparedTopologyOwner {
 public:
+    [[nodiscard]] core::Result<bool> is_trailing_point(PointId) const noexcept;
     [[nodiscard]] bool same_owner(const PreparedTopologyOwner& other) const noexcept {
         return topology_ && topology_ == other.topology_;
     }

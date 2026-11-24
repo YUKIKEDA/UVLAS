@@ -451,6 +451,15 @@ GlobalContactState::geometry() const& noexcept {
     return std::cref(*owner);
 }
 
+core::Result<bool> PreparedTopologyOwner::is_trailing_point(PointId canonical) const noexcept {
+    if (!topology_)
+        return std::unexpected(
+            core::Failure{core::FailureCode::InvalidInput, core::Operation::EvaluateAero});
+    const auto ids = topology_->trailing_points.values().first(
+        static_cast<std::size_t>(topology_->trailing_point_size));
+    return std::ranges::binary_search(ids, canonical.value());
+}
+
 core::Result<PreparedTopologyOwner> GlobalContactState::reference_topology() const noexcept {
     const auto state = data_.values();
     if (state.empty() || !state.front().topology)

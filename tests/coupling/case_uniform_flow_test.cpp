@@ -7,6 +7,7 @@
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
 #include "coupling/fixed_bdf2_circulation.hpp"
+#include "coupling/fixed_wake_transport.hpp"
 #include "coupling/pg_aero_attachment.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "io/si_rational_projection.hpp"
@@ -3534,9 +3535,11 @@ TEST_CASE("Known flow drives discrete midpoint loads and their implicit actions"
 }
 
 TEST_CASE("Free wake motion uses all sources at attached and inherited material points",
-          "[AE-07][UW-D01][UW-D02][UW-D04][UW-D07][N4-06][verification][negative]") {
+          "[AE-07][UW-D01][UW-D02][UW-D04][UW-D07][N4-06][J1-D01][FD-07][verification][negative]") {
     auto source_case = gust_case("deg", R"({"kind":"constant","value":[1]})");
-    source_case.field("analysis").field("intervals").elements[0].set("end", parse("2"));
+    const auto schedule = parse(R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
+    source_case.field("analysis").set("intervals", schedule);
+    source_case.field("analysis").field("wake").set("convection", parse(R"({"kind":"free"})"));
     source_case.field("flow").set("uniform", parse(R"({"kind":"constant","value":[0,0,1]})"));
     auto& gust = source_case.field("flow").field("gust");
     gust.set("direction", parse("[0,0,1]"));
@@ -3579,6 +3582,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     input_geometry.edges = edges;
     input_geometry.reference = a::SinglePositions{xyz};
     input_geometry.current = a::SinglePositions{xyz};
+    const Number transport_time{5, 4};
+    input_geometry.exact_time = transport_time.view();
     const a::GlobalLimits cap{std::numeric_limits<std::uint64_t>::max() / 4,
                               numerics::linear::EstimateAdmission{4096}};
     core::ResourcePlan memory{128ULL * 1024 * 1024};
@@ -3738,6 +3743,172 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
                                                     cap_velocity, shared, *local, *kernel,
                                                     no_payload),
            core::FailureCode::ResourceExceeded);
+    const cf::CaseFlowClockLimits transport_clock_limits{limits, 1, 4};
+    const auto wake_si = materialize(source_case, io::SourceId{481});
+    const auto wake_grid = take(
+        cf::prepare_case_reference_clock(wake_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::CaseFlowClockQuery destination{stamp, 0, 2, p::RequestedSide::Automatic};
+    const cf::WakeTransportClock transport_clock{wake_grid, wake_grid, destination};
+    const cf::WakeTransportLimits transport_limits{transport_clock_limits, 1, 10000, 4096,
+                                                   core::Precision::TwoWord};
+    const auto history_contact = [&](const Number& stamp_time, double seconds, double downstream) {
+        auto shape = xyz;
+        shape[12] = downstream;
+        auto history_geometry = input_geometry;
+        history_geometry.current = a::SinglePositions{shape};
+        history_geometry.context.time = seconds;
+        history_geometry.exact_time = stamp_time.view();
+        const auto snapshot = test_geometry::take(a::prepare_owned_geometry(
+            history_geometry, test_geometry::limits(), *geometry_work, memory));
+        return take_global(a::check_global_geometry(topology, snapshot, cap, *global, memory));
+    };
+    const auto previous = history_contact(Number{9, 8}, 1.125, 1.875);
+    const auto older = history_contact(Number{1}, 1., 1.75);
+    const auto release = take_global(topology.release_key(id[2], a::ReleaseEpoch{8}));
+    const std::array material{cf::WakeMaterialPoint{release, id[4], a::FacetId{202}}};
+    const std::array stages{cf::WakeMaterialSnapshot{contact, material},
+                            cf::WakeMaterialSnapshot{previous, material},
+                            cf::WakeMaterialSnapshot{older, material}};
+    const std::array<cf::NonpenetrationVector, 1> dprevious{coordinates(.25, 0, 0)},
+        dolder{coordinates(.375, 0, 0)};
+    const cf::WakeTransportHistoryDirection history_direction{dprevious, dolder};
+    const std::array<cf::NonpenetrationVector, 1> transport_seeds{seeds[1]};
+    const std::array selected{id[4]};
+    const auto run_material = [&](const auto& history) {
+        return cf::evaluate_fixed_free_wake_transport(
+            transport_clock, history, input, flow, selected, &d, history_direction, transport_seeds,
+            transport_limits, cap_velocity, shared, *local, *kernel, memory);
+    };
+    auto reversed_time = stages;
+    const std::array wrong_time{stages[0], stages[2], stages[1]};
+    reject(run_material(wrong_time), core::FailureCode::StaleGeneration);
+    auto wrong_release = material;
+    wrong_release[0].release.epoch = a::ReleaseEpoch{9};
+    reversed_time[2].points = wrong_release;
+    reject(run_material(reversed_time), core::FailureCode::StaleGeneration);
+    auto attached = material;
+    attached[0].point = id[2];
+    const std::array attached_history{cf::WakeMaterialSnapshot{contact, attached}, stages[1],
+                                      stages[2]};
+    reject(run_material(attached_history), core::FailureCode::InvalidInput);
+
+    const auto advected = take(run_material(stages));
+    const auto transported = take(advected.row(0));
+    CHECK(transported.release == release);
+    near(center(transported.residual[0]), 1.);
+    near(center(transported.residual[1]), 0.);
+    near(center(transported.residual[2]), -vz[1]);
+    if (!transported.direction) {
+        FAIL("Expected the free transport direction");
+        return;
+    }
+    const auto& tangent = transported.direction.value();
+    near(center(tangent[0]), -1.125);
+    near(center(tangent[1]), .0625);
+    near(center(tangent[2]), -dvz[1]);
+    const auto& actual_velocity = take(advected.free_velocity()).get();
+    const auto time_dual = take(advected.position_dual(0));
+    WorkEnclosure left, right;
+    left.add(tangent, transport_seeds[0]);
+    right.add(time_dual.stencil[0], dx);
+    right.add(time_dual.stencil[1], dprevious[0]);
+    right.add(time_dual.stencil[2], dolder[0]);
+    for (std::size_t i = 0; i < points.size(); ++i)
+        right.add(take(actual_velocity.point_dual(i)).position, displacements[i]);
+    right.add(take(actual_velocity.strength_dual(0)).value, dhistory[0].strength);
+    right.add(take(actual_velocity.strength_dual(1)).value, bound[0].circulation_direction);
+    const auto field_dual = take(actual_velocity.field_dual());
+    right.add(field_dual.uniform_flow, dambient);
+    right.add(field_dual.flow_time, d.flow_time);
+    right.add(field_dual.core_radius, d.core_radius);
+    near(left.value, .180645889468151347);
+    CHECK(abs(left.value - right.value) <= left.radius + right.radius + rational_word(1e-15));
+
+    auto prescribed_case = source(R"({"kind":"constant","value":[0,0,9]})",
+                                  R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
+    prescribed_case.field("units").set("length", string("m"));
+    prescribed_case.field("units").set("time", string("s"));
+    prescribed_case.field("analysis")
+        .field("wake")
+        .set(
+            "convection",
+            parse(
+                R"({"kind":"prescribed","velocity":{"kind":"polynomial","origin":1,"scale":1,"domain":[1,1.5],"coefficients":[[1,0,0],[2,0,0]]}})"));
+    const auto prescribed_si = materialize(prescribed_case, io::SourceId{483});
+    const auto prescribed_grid = take(cf::prepare_case_reference_clock(
+        prescribed_si, stamp, transport_clock_limits, 1000000, memory));
+    const auto prescribed_source = take(cf::prepare_case_clocked_flows(
+        prescribed_si, stamp, flow_workspace, transport_clock_limits, memory));
+    const Number projection_one{1}, projection_zero{0};
+    const cf::CaseFlowComponentBudget component{projection_one.view(), absolute.view(),
+                                                projection_zero.view()};
+    const std::array budgets{component, component, component};
+    const cf::CaseFlowProjectionRequest projection{
+        core::Precision::TwoWord, budgets, budgets, {4096, budget}};
+    const auto prescribed_node = take(cf::evaluate_case_clocked_flows(
+        prescribed_source, prescribed_source, destination, projection, projection, flow_workspace,
+        transport_clock_limits, memory));
+    const cf::WakeTransportClock prescribed_clock{prescribed_grid, prescribed_grid, destination};
+    reject(cf::evaluate_fixed_free_wake_transport(
+               prescribed_clock, stages, input, flow, selected, &d, history_direction,
+               transport_seeds, transport_limits, cap_velocity, shared, *local, *kernel, memory),
+           core::FailureCode::StaleGeneration);
+    const auto prescribed_ambient =
+        prepare_gust(prescribed_case, io::SourceId{483}, flow_workspace, memory);
+    const cf::DiscreteKnownFlowInput wrong_mode{
+        prescribed_ambient, prescribed_ambient,     flow.time,        flow.projection,
+        flow.flow_limits,   flow.coordinate_limits, flow.coordinates, flow.workspace};
+    reject(cf::evaluate_fixed_free_wake_transport(
+               prescribed_clock, stages, input, wrong_mode, selected, &d, history_direction,
+               transport_seeds, transport_limits, cap_velocity, shared, *local, *kernel, memory),
+           core::FailureCode::Unsupported);
+    auto short_transport = transport_limits;
+    short_transport.maximum_steps = 1;
+    reject(cf::evaluate_fixed_free_wake_transport(
+               transport_clock, stages, input, flow, selected, &d, history_direction,
+               transport_seeds, short_transport, cap_velocity, shared, *local, *kernel, memory),
+           core::FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+    std::stop_source cancellation;
+    REQUIRE(cancellation.request_stop());
+    reject(cf::evaluate_fixed_free_wake_transport(transport_clock, stages, input, flow, selected,
+                                                  &d, history_direction, transport_seeds,
+                                                  transport_limits, cap_velocity, shared, *local,
+                                                  *kernel, memory, cancellation.get_token()),
+           core::FailureCode::Cancelled);
+    const std::array<cf::NonpenetrationVector, 1> dcurrent{dx},
+        prescribed_seeds{coordinates(2, 0, 0)};
+    const cf::PrescribedWakeTransportDirection direction{dcurrent, history_direction,
+                                                         a::SingleWord{.25}};
+    const cf::PrescribedWakeClockSample clock_sample{std::cref(prescribed_node)};
+    reject(cf::evaluate_fixed_prescribed_wake_transport(transport_clock, stages, clock_sample,
+                                                        &direction, prescribed_seeds,
+                                                        transport_limits, memory),
+           core::FailureCode::StaleGeneration);
+    const auto prescribed = take(cf::evaluate_fixed_prescribed_wake_transport(
+        prescribed_clock, stages, clock_sample, &direction, prescribed_seeds, transport_limits,
+        memory));
+    const auto row = take(prescribed.row(0));
+    CHECK(row.release == release);
+    residual_expected(row.residual[0], Rat{-1, 2});
+    residual_expected(row.residual[2], Rat{0});
+    if (!row.prescribed_position || !row.direction || !row.prescribed_position_direction) {
+        FAIL("Expected the prescribed position and both transport directions");
+        return;
+    }
+    residual_expected(row.prescribed_position.value()[0], Rat{49, 24});
+    residual_expected(row.direction.value()[0], Rat{-3, 2});
+    residual_expected(row.prescribed_position_direction.value()[0], Rat{1, 4});
+    const auto prescribed_dual = take(prescribed.position_dual(0));
+    residual_expected(take(prescribed.prescribed_time_dual()), Rat{-4});
+    WorkEnclosure prescribed_lhs, prescribed_rhs;
+    prescribed_lhs.add(row.direction.value(), prescribed_seeds[0]);
+    prescribed_rhs.add(prescribed_dual.stencil[0], dcurrent[0]);
+    prescribed_rhs.add(prescribed_dual.stencil[1], dprevious[0]);
+    prescribed_rhs.add(prescribed_dual.stencil[2], dolder[0]);
+    prescribed_rhs.add(take(prescribed.prescribed_time_dual()), direction.flow_time);
+    CHECK(abs(prescribed_lhs.value - prescribed_rhs.value) <=
+          prescribed_lhs.radius + prescribed_rhs.radius);
 }
 
 TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete nonpenetration",

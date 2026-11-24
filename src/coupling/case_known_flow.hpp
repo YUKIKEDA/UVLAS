@@ -47,6 +47,8 @@ public:
     CaseKnownFlowReady(const CaseKnownFlowReady&) = delete;
     CaseKnownFlowReady& operator=(const CaseKnownFlowReady&) = delete;
     ~CaseKnownFlowReady();
+    /// Source identity for a field prepared from an active, free-convection transient.
+    [[nodiscard]] core::Result<io::SchemaIdentity> free_wake_case_identity() const noexcept;
 
 private:
     friend struct known_flow_detail::Builder;
