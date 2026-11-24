@@ -573,6 +573,53 @@ GlobalContactState::uvlm_load_edge(EdgeId id, std::uint64_t max_steps,
     });
 }
 
+GlobalResult<std::pair<EdgeId, std::uint64_t>>
+GlobalContactState::facet_edge_alias(FacetId target, EdgeId canonical, std::uint64_t max_steps,
+                                     const std::stop_token& stop) const noexcept {
+    return guarded(context_, [&]() -> GlobalResult<std::pair<EdgeId, std::uint64_t>> {
+        const auto geometry_owner = geometry();
+        if (!geometry_owner)
+            return std::unexpected(geometry_owner.error());
+        const auto& source = GlobalEngine::source(geometry_owner->get());
+        const auto& topology = data_.values()[0].topology;
+        if (!source || !topology)
+            reject(core::FailureCode::InvalidInput, target);
+        std::uint64_t used = 0;
+        const auto step = [&] {
+            if (stop.stop_requested())
+                reject(core::FailureCode::Cancelled, target);
+            if (used == max_steps)
+                reject(core::FailureCode::ResourceExceeded, target);
+            ++used;
+        };
+        step();
+        const auto lookup = source->facet_lookup.values();
+        const auto entry = std::lower_bound(lookup.begin(), lookup.end(), target.value(),
+                                            [&](const IdLookup& value, std::uint64_t key) {
+                                                step();
+                                                return value.id < key;
+                                            });
+        if (entry == lookup.end() || entry->id != target.value())
+            reject(core::FailureCode::InvalidInput, target);
+        const auto& facet = source->facets.values()[static_cast<std::size_t>(entry->ordinal)];
+        const auto edges = source->edges.values();
+        std::optional<EdgeId> alias;
+        for (const auto index : facet.edges) {
+            step();
+            const auto raw = static_cast<std::size_t>(index);
+            const auto owner = static_cast<std::size_t>(topology->edges.values()[raw].owner);
+            if (raw != owner && edges[owner].id == canonical.value()) {
+                if (alias)
+                    reject(core::FailureCode::GeometryInvalid, target);
+                alias = EdgeId{edges[raw].id};
+            }
+        }
+        if (!alias)
+            reject(core::FailureCode::GeometryInvalid, target);
+        return std::pair{*alias, used};
+    });
+}
+
 GlobalResult<GlobalWorkPlan> GlobalContactState::work_plan() const noexcept {
     if (!active())
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
