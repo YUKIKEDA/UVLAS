@@ -39,8 +39,8 @@ struct QualifiedExternalSidecarPg {
     bool thickness_compared{};
     std::uint64_t materials_compared{};
     std::uint64_t work{};
-    // Original normal agrees with the PG normal in slot 0 and is reversed in slot 1.
-    std::array<std::optional<NastranPcompGeometryMatch>, 2> laminate{};
+    // One section per distinct PCOMP property and winding, in first face order.
+    core::PlannedBuffer<std::optional<NastranPcompLayerSection>> laminate{};
     std::optional<ExternalPgThicknessReport> thickness_regions{};
 };
 
@@ -63,7 +63,7 @@ struct CertifiedExternalSidecarPgBounds {
 // The Nastran quantity owner must come from the same authenticated deck. Its material
 // table is required for Nastran; Gmsh uses the Case material IDs already bound by the sidecar.
 // This call certifies affine chart correspondence and supported explicit material and
-// uniform-thickness matches, including ordered PCOMP plies. It retains no borrows.
+// regional thickness matches, including ordered PCOMP plies. It retains no borrows.
 [[nodiscard]] core::Result<QualifiedExternalSidecarPg> qualify_external_sidecar_planar_pg(
     const SchemaCase&, const ExternalMeshSidecarBinding&, MeshShellId,
     const structure::PgReferenceGeometry&, const SiUnits&, const NastranLaminateCards*,

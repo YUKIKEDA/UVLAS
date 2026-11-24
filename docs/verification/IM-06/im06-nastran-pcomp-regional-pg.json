@@ -1,0 +1,43 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-pcomp-regional-pg",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "2f498d9698fa31823058402029bd523a650d9d87",
+  "claimed_state": "認証済みの元面が覆う範囲でPCOMPの総厚・層界面・明示材料定数をCase PGと照合する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "regional_assertions": 111,
+    "real_file_assertions": 1117,
+    "omitting_second_property_thickness_failures": 1,
+    "restored_real_file_assertions": 1117
+  },
+  "artifacts": {
+    "CMakeLists.txt": "45f6b0b663ebb2cf6a0d41800739af2517f3ce9b56b959149cdee11abbf207c8",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/nastran-pcomp-regional-pg.md": "8144c6e9993b5e9bdd33f8da9a04708224eaffad112e9a81871dc6de83565f61",
+    "src/coupling/case_external_pg.cpp": "5858290149f7b88316a7f19497c2e25febb2ae8dbcdd6bc65087e4c56ff23969",
+    "src/io/external_mesh_sidecar_pg.cpp": "0d11744a47d16756f254fb3cce4fc043d8667aa9e9225f319c7e49e0fdd5d726",
+    "src/io/external_mesh_sidecar_pg.hpp": "78fe75ba9197bf65749606913630d789b5847da2ae9a1367c6339de3c43d2279",
+    "src/io/external_pg_chart_clip.hpp": "c2f3174f6ea2cda95bf1d3895c940bcc2c53a9d957f73fa58acd51565872107b",
+    "src/io/external_pg_regional_thickness.cpp": "42f4f964554245f273f7b25347cf798ff7f0ae1b23bee12f9ac1deeb255a2d44",
+    "src/io/external_pg_regional_thickness.hpp": "bf789a338d86e5ca6a8a9d79c2d4194ab0dee58a4c1487a042eb759970770c48",
+    "src/io/external_planar_pg.cpp": "85b8ec021962d97604616065cdb68fd2a4ca0b459302927f86fe6cfcb4217c10",
+    "src/io/nastran_laminate_cards.cpp": "b1852d8ec7251025d7dd5a263d3f15a685873243ae5dc803be360e8eb885c7b0",
+    "src/io/nastran_pcomp_physical.cpp": "a767ca9fa1c6f94d4191de70a3ca1b8bb633aeb6946b2e00638b5b59ce55f1f1",
+    "src/io/nastran_pcomp_physical.hpp": "2a6cfb962bd005d55bff967c1009ff8bd78bc807334bf64b4a0757990540f944",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "tests/io/external_pg_regional_thickness_test.cpp": "f79c4d779ee7c1a67a07af3da453044ad168aed8438ec4b846f7f2d3ce90dde9",
+    "tests/io/nastran_laminate_cards_test.cpp": "2238b194dc3165bfdc02a1eb58984a67ad59ea62e528f990ed562e8214a169f2",
+    "tests/io/reference_input_test.cpp": "a8fa58ed3cc4adfbd52d78a0cd53a2bc8dcb397ca151adbd72004cafaeff9b5f"
+  }
+}
