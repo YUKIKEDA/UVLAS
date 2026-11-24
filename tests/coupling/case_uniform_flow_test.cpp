@@ -62,8 +62,9 @@ template <class T>
 T take(core::Result<T> value, const std::source_location at = std::source_location::current()) {
     if (!value) {
         INFO(at.file_name() << ':' << at.line());
-        if (value.error().details.resources) {
-            const auto& usage = *value.error().details.resources;
+        const auto& resources = value.error().details.resources;
+        if (resources) {
+            const auto& usage = *resources;
             INFO("Resource kind " << static_cast<int>(usage.kind) << ", required " << usage.required
                                   << ", observed " << usage.observed);
             FAIL("Unexpected case-flow failure " << static_cast<int>(value.error().code));
@@ -4115,7 +4116,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
            core::FailureCode::StaleGeneration);
     const auto birth = take(first(transport_clock, newest, at_trailing_edge, release.epoch, born));
     const auto birth_row = take(birth.row(0));
-    REQUIRE(birth_row.direction);
+    if (!birth_row.direction)
+        FAIL("The birth row must retain its direction");
     CHECK(birth_row.release == release);
     residual_expected(birth_row.residual[0], Rat{8});
     residual_expected(birth_row.residual[1], Rat{0});
@@ -4126,7 +4128,8 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto trial_row = take(trial_velocity.row(0));
     CHECK(parent_row.owner == release.point);
     near(center(parent_row.velocity[2]), 1.024661130622405660);
-    REQUIRE(parent_row.direction);
+    if (!parent_row.direction)
+        FAIL("The parent row must retain its direction");
     near(center((*parent_row.direction)[2]), -.064175653096249599);
     near(center(birth_row.residual[2]), -1.559233165679606171);
     near(center((*birth_row.direction)[2]), -.000440026076076997);
@@ -4400,10 +4403,13 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     auto evaluated_velocity = cf::evaluate_discrete_free_wake_velocity(
         with_owned_history, flow, historical_probe, nullptr, {}, extended_velocity_limits, shared,
         *local, *kernel, extended_velocity_memory);
-    if (!evaluated_velocity && evaluated_velocity.error().details.resources) {
-        const auto& observed = *evaluated_velocity.error().details.resources;
-        INFO("Resource demand " << observed.required << ", usage " << observed.observed);
-        REQUIRE(evaluated_velocity);
+    if (!evaluated_velocity) {
+        const auto& resources = evaluated_velocity.error().details.resources;
+        if (resources) {
+            const auto& observed = *resources;
+            INFO("Resource demand " << observed.required << ", usage " << observed.observed);
+            REQUIRE(evaluated_velocity);
+        }
     }
     const auto growing_velocity = take(std::move(evaluated_velocity));
     CHECK(take(growing_velocity.row(0)).owner == far_up);
