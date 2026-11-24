@@ -1,0 +1,38 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-material-original-binding-v1",
+  "ids": [
+    "IM-03",
+    "AE-02",
+    "SH-D02",
+    "SH-D05",
+    "SH-D06",
+    "UW-D06",
+    "V-MULTI"
+  ],
+  "package": "IM-03",
+  "source_commit": "360abde0942efdcce2ebcb6eec9309b87df88f7e",
+  "claimed_state": "Derive original local vertices of checked aerodynamic quads from a Case material surface and qualify registered point aliases by equality of exact constrained free shape and prescribed rigid-support generators.",
+  "verification": {
+    "windows": "MSVC 19.51 Release, coupling.case_pg_support_motion and coupling.case_uniform_flow: 2/2. Focused material layout and cross-support tests: 443 assertions, seed 23.",
+    "linux": "GCC 14.2 Release, the same 2/2 targets, 434 material layout and 9 cross-support assertions, seed 23.",
+    "qualification": "Fixed and shared rigid groups match. Separate groups and uncoupled free rows fail, as do repeated/reordered physical face declarations and exhausted exact work."
+  },
+  "sources": {
+    "include/uvlas/structure/pg_sparse_chart.hpp": "1c7c3ed33310c39a6d444670adbd5405bfdc23f413f6037403a56ddfff727e36",
+    "src/aero/global_geometry.cpp": "e6032ae9dacae403d7f9b31687d84a647c7b09b9522198ab660fdbeda7e3abca",
+    "src/aero/global_geometry.hpp": "d62c5ff88304165d639dd83b44d99f7b7cd066f171267a97ca9c611b41e432de",
+    "src/coupling/case_material_alias.cpp": "26afa13e3564c813c7ed932cb499c2fd689cdb65d3760b5a50e40630c410f64d",
+    "src/coupling/case_material_alias.hpp": "cc1fdb30d4603d87af9a802cacc239bda02978a832103695302f97212e97aaf1",
+    "src/coupling/case_material_chart.cpp": "1d434d19b542195cdd7d30ef5563b059b7cae409d9980cfb5af9e60e194881ec",
+    "src/coupling/case_material_chart.hpp": "2a97a3435978ed77327cd2cfbbe90f317be12b0912bf1ed310d3dfd1dceccb14",
+    "src/coupling/case_material_original_layout.cpp": "9c5474dacf624a8e4f644065883fc1d728d1b7f862e07f784fc3e7a25d0ddedd",
+    "src/coupling/case_material_original_layout.hpp": "4895912baf0746dafc464f89c412c61d55f58b4952a3e369144005d3ea6e807a",
+    "src/coupling/case_material_rows.cpp": "400213740a37564b0756f08b57f0a0e51d30144396c745845333280ef92351fc",
+    "src/structure/pg_sparse_chart.cpp": "5d9dfbb578774528b401d746353e585d3ed94ca6041a356a2b38a05709a5604b",
+    "tests/coupling/case_pg_support_motion_test.cpp": "17525d8f615029a620f2c1464f140002309e11688100458fcfc890ec4b00d74b"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-material-original-binding.md": "9d3379e8525087515c4bd19aa55bdea585a586d13e4ce5108cdb4bdbd196012a"
+  }
+}
