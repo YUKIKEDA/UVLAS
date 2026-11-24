@@ -2,7 +2,9 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <memory_resource>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -166,14 +168,17 @@ public:
     auto memory =
         p.value(p.plan.allocate<std::byte>(static_cast<core::Index>(bytes + alignment), operation),
                 Reason::Resource);
-    // The corner values hold references to the stable exact charts. The PMR allocator
-    // has no upstream and only uses the slab already charged to the resource plan.
+    // Store only the reference-bearing views in the charged slab.
+    // Iterator-checking containers may allocate separate bookkeeping.
+    static_assert(std::is_trivially_destructible_v<ExternalPgFace>);
+    static_assert(std::is_trivially_destructible_v<ExternalPgCorner>);
     std::pmr::monotonic_buffer_resource scratch(memory.values().data(), memory.size(),
                                                 std::pmr::null_memory_resource());
-    std::pmr::vector<ExternalPgFace> faces{&scratch};
-    std::pmr::vector<ExternalPgCorner> corners{&scratch};
-    faces.reserve(count);
-    corners.reserve(4U * count);
+    auto* faces = std::pmr::polymorphic_allocator<ExternalPgFace>{&scratch}.allocate(count);
+    auto* corners =
+        std::pmr::polymorphic_allocator<ExternalPgCorner>{&scratch}.allocate(4U * count);
+    std::size_t face_index = 0;
+    std::size_t corner_index = 0;
     auto tags = p.value(p.plan.allocate<std::uint64_t>(static_cast<core::Index>(count), operation),
                         Reason::Resource);
     const auto& payload = bound.sidecar().payload();
@@ -183,15 +188,18 @@ public:
             continue;
         }
         const auto& mapping = chart(payload, face);
-        const auto begin = corners.size();
+        auto* ring = corners + corner_index;
         for (std::size_t i = 0; i < face.count; ++i) {
-            corners.emplace_back(face.nodes[i], mapping.vertices[i]);
+            std::construct_at(ring + i, face.nodes[i], mapping.vertices[i]);
         }
         const auto winding = mapping.orientation == MeshSidecarOrientation::Same
                                  ? ExternalPgWinding::Forward
                                  : ExternalPgWinding::Reversed;
-        tags.values()[faces.size()] = face.element;
-        faces.emplace_back(face.element, winding, std::span{corners}.subspan(begin, face.count));
+        tags.values()[face_index] = face.element;
+        std::construct_at(faces + face_index, face.element, winding,
+                          std::span<const ExternalPgCorner>{ring, face.count});
+        ++face_index;
+        corner_index += face.count;
     }
 
     auto geometry_limits = p.limits.geometry;
@@ -209,14 +217,14 @@ public:
         }
         const auto certified = p.value(std::move(topology), Reason::Selection);
         return p.value(ExternalPlanarPg::prepare(pg, *gmsh, certified,
-                                                 std::get<GmshSidecar>(payload).length, faces,
-                                                 geometry_limits, p.plan, geometry),
+                                                 std::get<GmshSidecar>(payload).length,
+                                                 {faces, count}, geometry_limits, p.plan, geometry),
                        Reason::Selection);
     }
     const auto& nastran = std::get<NastranShellCards>(bound.source());
     return p.value(ExternalPlanarPg::prepare(pg, nastran,
-                                             std::get<NastranSidecar>(payload).units.length, faces,
-                                             geometry_limits, p.plan, geometry),
+                                             std::get<NastranSidecar>(payload).units.length,
+                                             {faces, count}, geometry_limits, p.plan, geometry),
                    Reason::Selection);
 }
 

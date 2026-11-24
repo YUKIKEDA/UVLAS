@@ -1,0 +1,40 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-case-v1",
+  "ids": [
+    "IM-03",
+    "V-AERO",
+    "AE-02",
+    "UW-D03",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "source_commit": "684d294acebff4ef3e913b04d16fc8715dbb3448",
+  "claimed_state": "Two frozen finite-core wing geometries, each with eight original nonpenetration rows and the first bound-circulation direction, checked through the typed flow and discrete production entry points.",
+  "verification": {
+    "fixture": "Independent 75-digit Decimal finite-ring solution; byte-identical regeneration.",
+    "msvc": "Windows 11 x64 MSVC 19.51 Release coupling.case_uniform_flow passed. The focused 251 assertions and output expressions matched the recorded observation after the const-only test edit.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release coupling.case_uniform_flow passed. The focused 251 assertions and two-panel free-wake cost replay (381 assertions) passed.",
+    "mutation": "Set the FW-V01 first attached wake tail circulation to zero. The eight FW-V01 residual rows failed; restoring exact input bytes returned 251 passes.",
+    "static": "Affected clang-format 21.1.2, GCC compile-database clang-tidy for the test TU, Ruff, Japanese prose lint, and recorded byte hashes."
+  },
+  "historical_evidence": {
+    "path": "docs/verification/IM-03/im03-free-wake-cost.json",
+    "tree": "49fd9c0a1d921e172d0222dc4b8831ce2ff1f7c0",
+    "sha256": "19392fc8d9379c78b38c36afd958f1b2d1cccbdf66173a2746f3338c5f7d972e"
+  },
+  "sources": {
+    "tests/CMakeLists.txt": "025ad7cadc02a8411353cd6922ed0d7644364483392e2d7c03c2d021933bfe07",
+    "tests/coupling/case_uniform_flow_test.cpp": "0aec1609f3aa62125a87389091a1c402e424e0328a4c13026707ca1310b139db",
+    "src/coupling/discrete_nonpenetration.cpp": "4fcd401943b560d3c02fe249a322ba43a9dce123f54bf1bc8fa162bf5c22f234",
+    "src/coupling/discrete_nonpenetration.hpp": "e395dd544cc4d374cc8b8cfed15428f7489fa07ec0ee35450a6ad9a22290bb90",
+    "docs/requirements/practical-acceptance-plan.md": "050213606ad95a1cab93ece3a0500f5b7444cafcb24f9b5e064f4f0466890c0f"
+  },
+  "artifacts": {
+    "rd/aero/finite-wing/records/finite-wing-specialization-result.json": "56da441111e16b149f6030916cb3decd3c091ba1744fa9073c22077188dca719",
+    "tests/aero/fixtures/finite-wing-case-v1.json": "0fa3597ffecbddba915652af463b5475a98e32a625d0cba2c3ab5b56093c6e01",
+    "docs/verification/IM-03/finite-wing-case-v1/reference.py": "18d84c7def0ee7a40426a4dcab71e6537b686e9f2addec5c5e972d81a3835950",
+    "docs/verification/IM-03/finite-wing-case-v1/observed.json": "b1df56d83e6da60efbc6fb382efe6255ebceb9674dad7c6c0e424a6896927c10",
+    "docs/verification/IM-03/finite-wing-case-v1/verification.md": "9966a950a574acbffdbc47ea36ff8bf97759fc791a6344807594334934948cde"
+  }
+}

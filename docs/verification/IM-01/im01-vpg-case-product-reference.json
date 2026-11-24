@@ -1,0 +1,42 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-vpg-case-product-reference",
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "ids": [
+    "A5-02",
+    "FD-03",
+    "GEO-01",
+    "SH-D02",
+    "V-PG"
+  ],
+  "source_commit": "3712de83424db8e4964199bcdd1cd4f0228154c5",
+  "runtime_source_commit": "3712de83424db8e4964199bcdd1cd4f0228154c5",
+  "claimed_state": "R4・R5の凍結34 Caseの36 Shellで、型付きCaseとSIから所有PG参照を準備し、格子、層、全厚と領域面積を独立式と照合した。",
+  "sources": {
+    "CMakeLists.txt": "92e0e37d5708e75291eb0e3ec274dfc9654945102bfcc6f1bc358ab90fbf008e",
+    "src/coupling/case_pg_reference.cpp": "8c349c9fd80ca49f9d94fc0928574722ce467ae0357e0102108b119e28060ace",
+    "src/coupling/case_pg_reference.hpp": "9dab198b636d8c4e7c4e187393a40a16c485c5062228551d33ba37eb1dc77383",
+    "tests/CMakeLists.txt": "de58e3a739c9a0b6b7a84d2a9cd5ca25be85455ef7ef024ef2fa9c4d61720bd1",
+    "tests/coupling/case_pg_support_motion_test.cpp": "8a0937f72afe40b32606f634c08d33e757f00ae6e96d74fb168611fbb94ebc42",
+    "tests/structure/pg_reference_geometry_test.cpp": "ab126e961e2b9d29f3304c3782e9b22e5b9b1366bbda4baa9ff92b233e34e943",
+    "tools/qa/vpg_case_reference.py": "29fb7a9908bfd1143bb14ccfed2d21fc9fb6f84acd7b02272caf39842785f322",
+    "tools/qa/vpg_product_reference.py": "81084f51576ba94a5022dde78eefc690027b46dfc6bb5052712f6540b30a9231"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/vpg-case-product-reference.md": "540eca9d7fe21d26298e2800b80df69e96171c1af50fa94c7b485a0ce68e018d"
+  },
+  "checks": {
+    "manifest_sha256": "a3464f54edfc40b1e2752f13bafa648c29a898faef877de7593b67db725e1fb4",
+    "frozen_cases": 34,
+    "prepared_shells": 36,
+    "frozen_case_assertions_each_os": 253,
+    "reference_geometry_cases_each_os": 13,
+    "reference_geometry_assertions_each_os": 111438,
+    "negative_control": "Frame origin x instead of reference length: expected 2 m, observed 3 m.",
+    "configurations": [
+      "Windows MSVC 19.51 Release",
+      "Linux GCC 14.2 Release"
+    ]
+  }
+}

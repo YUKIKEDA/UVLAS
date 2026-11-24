@@ -96,8 +96,20 @@ string(JSON gmsh SET "${gmsh}" reference file path "\"reference.dat\"")
 string(JSON gmsh SET "${gmsh}" reference file sha256 "\"${geometry_digest}\"")
 string(JSON external SET "${coupled}" model geometry 1 "${gmsh}")
 file(WRITE "${case_path}" "${external}")
-check(2 "external reference dependency validation is unsupported at /model/geometry/1/sidecar"
+check(2 "Gmsh sidecar format" "${case_name}")
+file(WRITE "${CASE_DIRECTORY}/sidecar.json" [=[{
+  "schema":"uvlas.gmsh-sidecar/1","geometry":"2","length":"m",
+  "shells":[],"supports":[],"joints":[]
+}]=])
+file(SHA256 "${CASE_DIRECTORY}/sidecar.json" sidecar_digest)
+string(JSON external SET "${external}" model geometry 1 sidecar sha256 "\"${sidecar_digest}\"")
+file(WRITE "${case_path}" "${external}")
+check(2 "external reference dependency validation is unsupported at /model/geometry/1/reference/file"
     "${case_name}")
+string(JSON fit GET "${examples}" fragments "ReferenceGeometry.fit")
+string(JSON fitted SET "${external}" model geometry 1 reference "${fit}")
+file(WRITE "${case_path}" "${fitted}")
+check(0 "" "${case_name}")
 
 string(REPLACE "1 1 2 3" "1 1 2 9" bad_mesh "${mesh}")
 file(WRITE "${CASE_DIRECTORY}/skin.msh" "${bad_mesh}")
@@ -113,6 +125,7 @@ set(deck "BEGIN BULK\nGRID,1,,3.0,4.0,5.0\nENDDATA\n")
 file(CONFIGURE OUTPUT "${deck_path}" CONTENT "${deck}" @ONLY NEWLINE_STYLE LF)
 file(WRITE "${CASE_DIRECTORY}/sidecar.json" "{}")
 file(SHA256 "${deck_path}" deck_digest)
+file(SHA256 "${CASE_DIRECTORY}/sidecar.json" sidecar_digest)
 string(JSON nastran GET "${examples}" fragments "Geometry.nastran")
 string(JSON nastran SET "${nastran}" deck source_id "\"300\"")
 string(JSON nastran SET "${nastran}" deck path "\"skin.bdf\"")
@@ -122,8 +135,16 @@ string(JSON nastran SET "${nastran}" sidecar path "\"sidecar.json\"")
 string(JSON nastran SET "${nastran}" sidecar sha256 "\"${sidecar_digest}\"")
 string(JSON external SET "${coupled}" model geometry 1 "${nastran}")
 file(WRITE "${case_path}" "${external}")
-check(2 "external reference dependency validation is unsupported at /model/geometry/1/sidecar"
-    "${case_name}")
+check(2 "Nastran sidecar format" "${case_name}")
+file(WRITE "${CASE_DIRECTORY}/sidecar.json" [=[{
+  "schema":"uvlas.nastran-sidecar/1","geometry":"2","generator":"MSC Nastran 2022.1",
+  "units":{"length":"m","mass":"kg","time":"s","angle":"deg"},
+  "shells":[],"materials":[],"beams":[],"masses":[],"supports":[],"joints":[]
+}]=])
+file(SHA256 "${CASE_DIRECTORY}/sidecar.json" sidecar_digest)
+string(JSON external SET "${external}" model geometry 1 sidecar sha256 "\"${sidecar_digest}\"")
+file(WRITE "${case_path}" "${external}")
+check(0 "" "${case_name}")
 
 string(REPLACE "ENDDATA" "INCLUDE 'child.bdf'\nENDDATA" include_deck "${deck}")
 file(CONFIGURE OUTPUT "${deck_path}" CONTENT "${include_deck}" @ONLY NEWLINE_STYLE LF)

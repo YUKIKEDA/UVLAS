@@ -934,6 +934,8 @@ uvlas_add_test(coupling.case_uniform_flow
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests" "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_coupling_case_uniform_flow PRIVATE
+    UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json")
 if(MSVC)
     # The full MSVC Debug test including PG material preparation took 79 s locally.
     set_tests_properties(coupling.case_uniform_flow PROPERTIES
@@ -969,6 +971,22 @@ uvlas_add_test(coupling.case_pg_support_motion
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_pg_support_motion PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
+# Run all exact PG preparations in Release. The same executable runs the
+# two-layer Case preparation and its negative checks in every configuration.
+if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(frozen_pg_configs)
+    if(CMAKE_CONFIGURATION_TYPES)
+        set(frozen_pg_configs CONFIGURATIONS Release)
+    endif()
+    add_test(NAME coupling.frozen_case_pg_reference
+        COMMAND "${Python3_EXECUTABLE}" -m tools.qa.vpg_product_reference
+            "$<TARGET_FILE:uvlas_test_coupling_case_pg_support_motion>"
+        ${frozen_pg_configs})
+    set_tests_properties(coupling.frozen_case_pg_reference PROPERTIES
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+        LABELS "integration;verification;V-PG"
+        TIMEOUT 600)
+endif()
 
 uvlas_add_test(coupling.case_motion_frame
     LABELS V-AERO property negative verification

@@ -2,6 +2,8 @@
 #include "external_planar_pg.hpp"
 #include "source_digest.hpp"
 
+#include <catch2/generators/catch_generators.hpp>
+
 #include <algorithm>
 #include <compare>
 #include <stdexcept>
@@ -481,7 +483,7 @@ TEST_CASE("Irrational Nastran shell placement bounds the whole oriented planar P
         "CQUAD4,101,20,10,40,90,95,,500.0\nCQUAD4,102,20,10,95,90,40,,-500.0\n"
         "CQUAD4,103,20,10,95,90,40,,500.0\nCTRIA3,201,20,10,40,90,,500.0\n"
         "CTRIA3,202,20,10,90,95,,500.0\n";
-    const NastranPgBoundLimits limits{{reference_limits(), 2}, 200'000};
+    const ExternalPgBoundLimits limits{{reference_limits(), 2}, 200'000};
     std::optional<ExternalPgDiagnostic> diagnostic;
     const auto measure = [&](const NastranShellCards& deck,
                              std::span<const ExternalPgFace> selection) {
@@ -524,7 +526,7 @@ TEST_CASE("Irrational Nastran shell placement bounds the whole oriented planar P
         CHECK(take(diagnostic).reason == Reason::Coverage);
         CHECK(plan.remaining_bytes() < baseline);
         const auto after_partial = plan.remaining_bytes();
-        const NastranPgBoundLimits no_work{limits.region, 0};
+        const ExternalPgBoundLimits no_work{limits.region, 0};
         const auto exhausted = NastranPlanarPgBounds::prepare(
             target, deck, SiLengthUnit::Millimetre, forward, no_work, plan);
         REQUIRE_FALSE(exhausted);
@@ -587,7 +589,7 @@ TEST_CASE("Nastran face bounds include the interior gap from a curved PG graph",
     const auto deck = cards("CQUAD4,101,20,10,40,90,95\nCQUAD4,102,20,10,95,90,40\n"
                             "CTRIA3,201,20,10,40,90\nCTRIA3,202,20,10,90,95\n",
                             plan);
-    const NastranPgBoundLimits limits{{reference_limits(), 2}, 200'000};
+    const ExternalPgBoundLimits limits{{reference_limits(), 2}, 200'000};
     std::optional<ExternalPgDiagnostic> diagnostic;
     const auto measure = [&](std::span<const ExternalPgFace> selection) {
         return NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Millimetre, selection,
@@ -622,6 +624,222 @@ TEST_CASE("Nastran face bounds include the interior gap from a curved PG graph",
     CHECK(take(diagnostic).element == 102);
 }
 
+[[nodiscard]] PgReferenceGeometry gmsh_bound_target(Fixture& f, core::ResourcePlan& plan,
+                                                    bool curved) {
+    const auto zero = f.r("0");
+    const auto one = f.r("1");
+    if (curved) {
+        const auto tenth = f.r("1", "10");
+        const auto minus_tenth = f.r("-1", "10");
+        const std::array terms{ExactInputTerm{{1, 0}, minus_tenth}, ExactInputTerm{{1, 1}, tenth},
+                               ExactInputTerm{{2, 0}, tenth}};
+        const auto height = take(ExactChartPolynomial::make(terms, algebra(), plan));
+        f.graph = take(PgGraph::prepare({zero, one, zero, height, 1, PgGraphConvention::Version1},
+                                        {algebra(), 64, {}}, plan));
+    }
+    const std::array<ExactRational, 3> origin;
+    std::array<ExactRational, 9> rotation;
+    rotation[0] = f.r("1");
+    rotation[4] = f.r("1");
+    rotation[8] = f.r("1");
+    return flat_target(f, {rotation, origin, one}, plan);
+}
+
+[[nodiscard]] std::string bilinear_mesh(std::string_view last_node, std::string_view elements) {
+    return "$MeshFormat\n4.1 0 8\n$EndMeshFormat\n$Nodes\n1 4 10 95\n2 17 0 4\n"
+           "10\n40\n90\n95\n0 0 0\n1000 0 0\n1000 1000 100\n" +
+           std::string{last_node} + "\n$EndNodes\n$Elements\n" + std::string{elements} +
+           "$EndElements\n";
+}
+
+TEST_CASE("Gmsh quad bounds include curved interior distance and the original bilinear normals",
+          "[IO4-04][SH-D02][N4-02][R-05][integration][negative][verification]") {
+    const bool curved = GENERATE(false, true);
+    INFO("Curved PG: " << curved);
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto a = f.point("0", "0"), b = f.point("1", "0"), c = f.point("1", "1"),
+               d = f.point("0", "1");
+    const std::array ring{ExternalPgCorner{10, a}, ExternalPgCorner{40, b}, ExternalPgCorner{90, c},
+                          ExternalPgCorner{95, d}};
+    const std::array reversed{ring[0], ring[3], ring[2], ring[1]};
+    const std::array charts{ExternalPgFace{701, Winding::Forward, ring}};
+    const std::array reverse_charts{ExternalPgFace{702, Winding::Reversed, reversed}};
+    constexpr std::array<std::uint64_t, 1> selected{701};
+    constexpr std::array<std::uint64_t, 1> selected_reverse{702};
+    const ExternalPgBoundLimits limits{{reference_limits(), 2}, 50'000};
+    const auto text = bilinear_mesh("0 1000 0", "1 2 701 702\n2 17 3 2\n701 10 40 90 95\n"
+                                                "702 10 95 90 40\n");
+    const auto prepared = [&] {
+        const auto target = gmsh_bound_target(f, plan, curved);
+        const auto msh = mesh(text, plan);
+        const auto make_topology = [&](std::span<const std::uint64_t> faces) {
+            return take(GmshSurfaceTopology::prepare(msh, faces, {2, 8, 8, 2, 4096}, plan, {}));
+        };
+        const auto topology = make_topology(selected);
+        const auto topology_reverse = make_topology(selected_reverse);
+        auto bounds = take(GmshPgBounds::prepare(target, msh, topology, SiLengthUnit::Millimetre,
+                                                 charts, limits, plan));
+        const auto inspected = take(bounds.view());
+        CHECK(inspected.patch == take(target.identity()));
+        CHECK(inspected.digest == take(msh.view()).digest);
+        CHECK(inspected.source.source == SourceId{17});
+        CHECK(inspected.directed_work > 0);
+        const auto mirror = take(GmshPgBounds::prepare(
+            target, msh, topology_reverse, SiLengthUnit::Millimetre, reverse_charts, limits, plan));
+        const auto mirror_view = take(mirror.view());
+        const auto& mir = mirror_view.faces.front();
+        CHECK(mir.winding == Winding::Reversed);
+        CHECK(mir.ring()[1].node == 95);
+        CHECK(mir.distance_upper_metres == inspected.faces.front().distance_upper_metres);
+        CHECK(mir.normal_chord_upper == inspected.faces.front().normal_chord_upper);
+
+        const ExternalPgBoundLimits exhausted{limits.region, inspected.directed_work - 1};
+        const auto denied = GmshPgBounds::prepare(target, msh, topology, SiLengthUnit::Millimetre,
+                                                  charts, exhausted, plan);
+        REQUIRE_FALSE(denied);
+        CHECK(denied.error().code == Code::ResourceExceeded);
+        const auto bounded =
+            GmshPgBounds::prepare(target, msh, topology, SiLengthUnit::Millimetre, charts,
+                                  {limits.region, inspected.directed_work}, plan);
+        REQUIRE(bounded);
+        return bounds;
+    }();
+
+    const auto output = take(prepared.view());
+    REQUIRE(output.faces.size() == 1);
+    const auto& row = output.faces.front();
+    CHECK(row.element == 701);
+    CHECK((row.entity == GmshKey{2, 17}));
+    REQUIRE(row.ring().size() == 4);
+    const auto& lifted = row.ring()[2];
+    CHECK(lifted.node == 90);
+    CHECK(lifted.chart.s == f.r("1"));
+    CHECK(lifted.chart.t == f.r("1"));
+    CHECK(lifted.position_metres[2] == f.r("1", "10"));
+    CHECK(std::string_view{text}.substr(lifted.source_bytes[2], 3) == "100");
+    const auto compare = [&](const ExactRational& actual, const ExactRational& bound) {
+        return take(actual.compare(bound, algebra(), plan));
+    };
+    if (curved) {
+        // Actual bilinear source z=st/10. PG z=(st+s^2-s)/10.
+        // All corners agree, but the exact maximum gap at s=1/2 is 1/40 m.
+        CHECK(std::is_gteq(compare(row.distance_upper_metres, f.r("1", "40"))));
+        CHECK(std::is_lt(compare(row.distance_upper_metres, f.r("501", "10000"))));
+        // At (0,0), normals are (0,0,1) and (1,0,10)/sqrt(101).
+        const auto square =
+            take(row.normal_chord_upper.multiply(row.normal_chord_upper, algebra(), plan));
+        const auto gap = take(f.r("2").subtract(square, algebra(), plan));
+        REQUIRE(gap.sign() > 0);
+        const auto check = take(gap.multiply(gap, algebra(), plan));
+        CHECK(std::is_lteq(compare(check, f.r("400", "101"))));
+    } else {
+        // Bilinear z=st/10 versus z=0. The greatest normal chord is at (1,1),
+        // where the source direction is (-1,-1,10)/sqrt(102). Both fixed
+        // diagonal triangles, or the flat first corner, give smaller chords.
+        CHECK(std::is_gteq(compare(row.distance_upper_metres, f.r("1", "10"))));
+        CHECK(std::is_lt(compare(row.distance_upper_metres, f.r("1001", "10000"))));
+        const auto square =
+            take(row.normal_chord_upper.multiply(row.normal_chord_upper, algebra(), plan));
+        const auto gap = take(f.r("2").subtract(square, algebra(), plan));
+        REQUIRE(gap.sign() > 0);
+        const auto check = take(gap.multiply(gap, algebra(), plan));
+        CHECK(std::is_lteq(compare(check, f.r("200", "51"))));
+        CHECK(std::is_lt(compare(row.normal_chord_upper, f.r("143", "1000"))));
+    }
+}
+
+TEST_CASE("Gmsh PG bounds reject orientation reversal and unattested selections",
+          "[IO4-04][SH-D02][R-05][integration][negative][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto target = gmsh_bound_target(f, plan, false);
+    const auto a = f.point("0", "0"), b = f.point("1", "0"), c = f.point("1", "1"),
+               d = f.point("0", "1");
+    const std::array ring{ExternalPgCorner{10, a}, ExternalPgCorner{40, b}, ExternalPgCorner{90, c},
+                          ExternalPgCorner{95, d}};
+    const std::array charts{ExternalPgFace{701, Winding::Forward, ring}};
+    constexpr std::array<std::uint64_t, 1> selected{701};
+    constexpr std::string_view elements = "1 1 701 701\n2 17 3 1\n701 10 40 90 95\n";
+    const auto text = bilinear_mesh("2000 1000 0", elements);
+    const auto folded = mesh(text, plan);
+    const auto regular = mesh(bilinear_mesh("0 1000 0", elements), plan);
+    const auto topology =
+        take(GmshSurfaceTopology::prepare(folded, selected, {1, 4, 4, 1, 4096}, plan, {}));
+    const ExternalPgBoundLimits limits{{reference_limits(), 2}, 50'000};
+    std::optional<ExternalPgDiagnostic> diagnostic;
+    const auto measure = [&](const GmshMesh& source, std::span<const ExternalPgFace> faces) {
+        return GmshPgBounds::prepare(target, source, topology, SiLengthUnit::Millimetre, faces,
+                                     limits, plan, &diagnostic);
+    };
+    const auto stale = measure(regular, charts);
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == Code::StaleGeneration);
+    CHECK(take(diagnostic).reason == Reason::Source);
+
+    const auto swapped = std::array{ring[0], ring[1], ring[3], ring[2]};
+    const std::array wrong{ExternalPgFace{701, Winding::Forward, swapped}};
+    const auto source_order = measure(folded, wrong);
+    REQUIRE_FALSE(source_order);
+    CHECK(source_order.error().code == Code::InvalidInput);
+    CHECK(take(diagnostic).reason == Reason::SourceOrder);
+
+    // The chart is a valid square, but the physical Jacobian's z component
+    // is 1-2v. Its projection reverses within the source ring.
+    const auto bad_geometry = measure(folded, charts);
+    REQUIRE_FALSE(bad_geometry);
+    CHECK(bad_geometry.error().code == Code::GeometryInvalid);
+    const auto reason = take(diagnostic);
+    CHECK(reason.reason == Reason::SourceWinding);
+    CHECK(reason.node == 90);
+    CHECK(reason.byte == text.find("1000 1000 100"));
+    CHECK(take(folded.view()).digest == take(topology.view()).source.digest);
+}
+TEST_CASE("Gmsh source triangles keep their own normals and cover the PG chart",
+          "[IO4-04][SH-D02][R-05][integration][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{budget};
+    const auto target = gmsh_bound_target(f, plan, false);
+    const auto a = f.point("0", "0"), b = f.point("1", "0"), c = f.point("1", "1"),
+               d = f.point("0", "1");
+    const std::array first{ExternalPgCorner{10, a}, ExternalPgCorner{40, b},
+                           ExternalPgCorner{90, c}};
+    const std::array second{first[0], first[2], ExternalPgCorner{95, d}};
+    const std::array charts{ExternalPgFace{801, Winding::Forward, first},
+                            ExternalPgFace{802, Winding::Forward, second}};
+    constexpr std::array<std::uint64_t, 2> selected{801, 802};
+    const auto source = mesh(bilinear_mesh("0 1000 0", "1 2 801 802\n2 17 2 2\n"
+                                                       "801 10 40 90\n802 10 90 95\n"),
+                             plan);
+    const auto topology =
+        take(GmshSurfaceTopology::prepare(source, selected, {2, 6, 4, 1, 4096}, plan, {}));
+    const ExternalPgBoundLimits limits{{reference_limits(), 2}, 50'000};
+    std::optional<ExternalPgDiagnostic> diagnostic;
+    const auto measure = [&](const GmshSurfaceTopology& faces,
+                             std::span<const ExternalPgFace> given) {
+        return GmshPgBounds::prepare(target, source, faces, SiLengthUnit::Millimetre, given, limits,
+                                     plan, &diagnostic);
+    };
+    const auto owned = take(measure(topology, charts));
+    const auto result = take(owned.view());
+    REQUIRE(result.faces.size() == 2);
+    for (const auto& row : result.faces) {
+        REQUIRE(row.ring().size() == 3);
+        // The two original triangles have z=t/10 and z=s/10 respectively.
+        // In either case the maximum distance is .1 m and chord is just below .1.
+        CHECK(
+            std::is_gteq(take(row.distance_upper_metres.compare(f.r("1", "10"), algebra(), plan))));
+        CHECK(std::is_gt(take(row.normal_chord_upper.compare(f.r("99", "1000"), algebra(), plan))));
+        CHECK(std::is_lt(take(row.normal_chord_upper.compare(f.r("1", "10"), algebra(), plan))));
+    }
+    const auto partial = take(GmshSurfaceTopology::prepare(source, std::span{selected}.first(1),
+                                                           {1, 3, 3, 1, 4096}, plan, {}));
+    const auto uncovered = measure(partial, std::span{charts}.first(1));
+    REQUIRE_FALSE(uncovered);
+    CHECK(uncovered.error().code == Code::GeometryInvalid);
+    CHECK(take(diagnostic).reason == Reason::Coverage);
+}
+
 TEST_CASE("Nastran triangle distance bound needs the mixed PG height derivative",
           "[IO4-03][IO4-04][SH-D02][N4-02][integration][verification]") {
     Fixture f;
@@ -649,7 +867,7 @@ TEST_CASE("Nastran triangle distance bound needs the mixed PG height derivative"
     const std::array ring{ExternalPgCorner{10, f.domain[0]}, ExternalPgCorner{40, f.domain[1]},
                           ExternalPgCorner{90, f.domain[2]}};
     const std::array selection{ExternalPgFace{101, Winding::Forward, ring}};
-    const NastranPgBoundLimits limits{{reference_limits(), 1}, 200'000};
+    const ExternalPgBoundLimits limits{{reference_limits(), 1}, 200'000};
     const auto result = take(
         NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Metre, selection, limits, plan));
     const auto faces = take(result.view()).faces;
@@ -761,7 +979,7 @@ TEST_CASE("Nastran bounded placement requires source edge incidence across a PG 
         [](const PgReferenceGeometry& target, const NastranShellCards& deck,
            std::span<const ExternalPgFace> charts, core::ResourcePlan& plan,
            std::optional<ExternalPgDiagnostic>* diagnostic) {
-            const NastranPgBoundLimits limits{{reference_limits(), 4}, 200'000};
+            const ExternalPgBoundLimits limits{{reference_limits(), 4}, 200'000};
             return NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Metre, charts, limits,
                                                   plan, diagnostic);
         },

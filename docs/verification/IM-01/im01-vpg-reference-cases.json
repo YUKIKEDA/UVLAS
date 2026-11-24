@@ -1,0 +1,47 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-vpg-reference-cases",
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "ids": [
+    "A5-02",
+    "GEO-01",
+    "SH-D03",
+    "SH-D05",
+    "V-PG"
+  ],
+  "source_commit": "5a2d60b87d5fd0d09d3bf587a2afc55c24b15556",
+  "runtime_source_commit": "d519a9fdf737f3036c4fb73e6abce5db966421a2",
+  "claimed_state": "R4とR5の凍結形状、全厚支持・接続をCaseとして再生成し、製品のCLIとPythonで受理を確認した。",
+  "sources": {
+    "tools/qa/vpg_case_reference.py": "29fb7a9908bfd1143bb14ccfed2d21fc9fb6f84acd7b02272caf39842785f322",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "rd/structure/main-shell/geometry-compatible/experiments/coefficient_compatible_finite.py": "22d56d7e412ad5a8daed817169c1d21c1f8cc399a208357009590dff438f85bb",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_coefficient_input.py": "68fe1c38ba8380a3bd72c9e12c3cba9bcaafd766cf2e1e4c24f7f652c7693ba2",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_interface.py": "0eb764b84c8ab1e9c215538bbb570d39a8548170a57446c2cae752c81e42f453",
+    "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_quality.py": "2c34de18e55eba8d6aab71bd196ef31999d9d27cade7531ca5a480487c309c4b",
+    "rd/structure/main-shell/paired-geometry/experiments/check_paired_shell_r5_domain_v2.py": "1e926f1d7bd0e0e34b4d8c8a8e52485ed5664f874e8b74eb38afab94c3e75e5a",
+    "rd/structure/main-shell/paired-geometry/experiments/exact_paired_finite.py": "174c35497dece5e18a14826d81710f1e0574e2609c7af48130fdc377ab31a341",
+    "rd/structure/main-shell/paired-geometry/experiments/swept_taper_domain.py": "e29bcfa5e20b638e5ee0e344627fb4b73763358c5b511d5a385832bb0321f2fc",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-coefficient-input-result.json": "46d1111dc403182244d54091d2ef85051533d822468050b6d01e48615af204e8",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-interface-result.json": "3b93269d1a04e83dc992fc589d11fae8e8aa2bec0c78802aa39e5e0b4cdb2bb4",
+    "rd/structure/main-shell/paired-geometry/records/mass-paired-quality-result.json": "f0345e55e920f4bb87d3b9abd4c6e1507b201f8ea4eb929a86417997cc224c9a",
+    "rd/structure/main-shell/paired-geometry/records/paired-reference-r4-audit.json": "2af9e42f35928cb0d213f126fd481d03703ce6995b3c52e75ea1c8045cd9f0c9",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-audit.json": "48e4a9ecbcb3ea0ee6cff0269f71c0567032d9b0ddf6040421aba51f8e222167",
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-domain-v2-result.json": "7552eb6b9cb4f9cebb07b31eeeb61abd3c392620ed9f5e897f1ba5ffe2ce7e43",
+    "rd/structure/main-shell/polynomial-trace/experiments/polynomial_reference_surface.py": "793e5aafa760bcec8deae2b4eca8ac0e13eea36e59530a325a18184b833735fb"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/vpg-case-reference.md": "6b5b719b893f186b32af800d60281be683de055e88a7fc75bef495964822e9c7",
+    "docs/verification/IM-01/pg-local-rank-start-review.md": "52b9832c72ce6a6441335911787a0e59fcddab6a6832c45da74a9f17a31e539c"
+  },
+  "checks": {
+    "case_count": 34,
+    "windows_cli": 34,
+    "windows_python": 34,
+    "linux_cli": 34,
+    "linux_python": 34,
+    "independent_output_rejection_cases": 4,
+    "manifest_sha256": "a3464f54edfc40b1e2752f13bafa648c29a898faef877de7593b67db725e1fb4"
+  }
+}
