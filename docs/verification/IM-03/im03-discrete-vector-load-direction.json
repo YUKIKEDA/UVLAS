@@ -1,0 +1,105 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-vector-load-direction-v1",
+  "ids": [
+    "UW-D01",
+    "UW-D03",
+    "UW-D05",
+    "UW-D06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "4331b612800dfb725dac228db2f7e612681092db",
+  "claimed_state": "Fixed-contact-chart derivative of value loads through the actual shared induction action, explicit Γ and Γdot directions, moving edge midpoints and triangle centroids, nodal distribution, and Euclidean totals and moments.",
+  "verification": {
+    "msvc": "Windows 11 x64 MSVC 19.51 Ninja Multi-Config, Debug and Release 4/4 each.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2 Release, warnings as errors, 4/4.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "aero.global_geometry",
+      "numerics.dense_solve"
+    ],
+    "catch": "Final filter selected 4 cases and 3211 assertions in all 3 configurations. Load fixture selected 1 case and 2273 assertions. Seed 23.",
+    "oracle": "65-digit centered differences using direct regularized line and wake area integrals and explicitly perturbed circulation and circulation-rate words. Tensor GL72/96, steps 1e-15/1e-18. Force direction convergence 4.12e-33 N, moment 8.11e-33 N m. Both trailing-edge signs and both shared-edge ownership forms. Exact triangle low-word and nodal force/moment directional controls.",
+    "mutations": [
+      "Ignore signed attached wake coefficient direction: 8 failing assertions.",
+      "Omit oriented edge-vector direction: 54 failing assertions.",
+      "Omit triangle area direction: 46 failing assertions.",
+      "Omit moving moment arm: 24 failing assertions."
+    ],
+    "mutation_environment": "Isolated GCC 14.2 Release. Each mutation exits Catch2 with code 42.",
+    "static": "clang-format 21.1.2 and Windows and Linux clang-tidy 21.1.1 on affected translation units.",
+    "scope": "Real positive-radius finite loads on the fixed current chart. The caller supplies both Γ and Γdot directions, canonical point directions and affine velocity directions. Nominal rate/velocity inputs have the value route's same-trial binding. Time integrator, history transport, switching contact, structural material mapping and loads transpose are downstream."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/aero/uvlm-induction-adopted-specification.md": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "docs/verification/IM-03/discrete-vector-loads-v1/reference.py": "36e17415fb6f4126f5e759cb7da93c61246d4d0eb15e564f01e57562a1fb27dc",
+    "src/aero/p1_shared_action.cpp": "d8e2e027445a99d5f1a14995fe11c8a945fb235b6a54bfb65288b44ad5f444ac",
+    "src/aero/p1_shared_action.hpp": "69bc79fee2cc5250b2a6df712c73c0a454c6a33469868c9b36f7bd7afee18deb",
+    "src/coupling/discrete_nonpenetration.cpp": "2a203be280f73ffb7a9247a236f90f7f07d8cb0f2d25a148013839f5dc1451fc",
+    "src/coupling/discrete_nonpenetration.hpp": "2b0a2ade402dd13d1d40ed9e10099bd8c74437c9d3b02c91a3eb997335d1f0ae",
+    "tests/coupling/case_uniform_flow_test.cpp": "d21eb96896efdad42b117ab5380b02888ca4705e94f873d8e0a13e4ddcfbcd20"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-vector-load-direction-v1/reference.py": "0473b715c987f35652b953ac9558c91c83ee9273dee5e8267619d4486ea640c1",
+    "docs/verification/IM-03/discrete-vector-load-direction-v1/verification.md": "89ebbd13a3317c9ecbf7335b1519814b375e3b621d854c537b3d7a37802b1d4d"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "sha256": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-vector-loads-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-vector-loads-v1/reference.py",
+      "sha256": "36e17415fb6f4126f5e759cb7da93c61246d4d0eb15e564f01e57562a1fb27dc"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "d8e2e027445a99d5f1a14995fe11c8a945fb235b6a54bfb65288b44ad5f444ac"
+    },
+    {
+      "id": "src/aero/p1_shared_action.hpp",
+      "hint": "src/aero/p1_shared_action.hpp",
+      "sha256": "69bc79fee2cc5250b2a6df712c73c0a454c6a33469868c9b36f7bd7afee18deb"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "2a203be280f73ffb7a9247a236f90f7f07d8cb0f2d25a148013839f5dc1451fc"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "2b0a2ade402dd13d1d40ed9e10099bd8c74437c9d3b02c91a3eb997335d1f0ae"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "d21eb96896efdad42b117ab5380b02888ca4705e94f873d8e0a13e4ddcfbcd20"
+    }
+  ]
+}

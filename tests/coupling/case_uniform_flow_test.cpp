@@ -1459,6 +1459,128 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
         reject(result.edge(result.edge_count()), core::FailureCode::InvalidInput);
         reject(result.point(result.point_count()), core::FailureCode::InvalidInput);
         reject(result.facet(result.facet_count()), core::FailureCode::InvalidInput);
+
+        const auto displacement = [&](std::size_t i) {
+            const auto x = fixture.points[3 * i];
+            const auto y = fixture.points[3 * i + 1];
+            return coordinates(x / 8 + y / 16, -x / 32 + y / 8, x / 16 + y / 32);
+        };
+        const std::array motion{displacement(0), displacement(1), displacement(2),
+                                displacement(3), displacement(4), displacement(5)};
+        const auto velocity_direction = [](const cf::EdgeMidpointVelocity& entry) {
+            return cf::EdgeMidpointVelocity{
+                entry.edge,
+                coordinates(.03125, -.0625, static_cast<double>(entry.edge.value()) / 256)};
+        };
+        const std::array all_midpoint_variations{
+            velocity_direction(midpoint_velocities[0]), velocity_direction(midpoint_velocities[1]),
+            velocity_direction(midpoint_velocities[2]), velocity_direction(midpoint_velocities[3]),
+            velocity_direction(midpoint_velocities[4]), velocity_direction(midpoint_velocities[5]),
+            velocity_direction(midpoint_velocities[6])};
+        const std::array wake_midpoint_variations{
+            all_midpoint_variations[0], all_midpoint_variations[1], all_midpoint_variations[3]};
+        const std::array gamma_directions{
+            cf::BoundLoadDirection{fixture.faces[0].id, a::DoubleWord{.1875, 0x1p-56},
+                                   a::DoubleWord{-.25, 0x1p-58}},
+            cf::BoundLoadDirection{fixture.faces[1].id, a::SingleWord{-.15625},
+                                   a::SingleWord{.0625}}};
+        const cf::DiscreteVectorLoadDirection variation{
+            input.trial_stamp,
+            request.retained_generation,
+            fixture.id,
+            motion,
+            has_wake ? std::span<const cf::EdgeMidpointVelocity>{wake_midpoint_variations}
+                     : std::span<const cf::EdgeMidpointVelocity>{all_midpoint_variations},
+            std::span{gamma_directions}.first(count),
+            coordinates(.125, -.0625, .09375)};
+        auto jvp_flow = flow_at();
+        const auto run_direction = [&](const cf::DiscreteVectorLoadDirection& delta) {
+            return cf::solve_discrete_circulation_load_direction(
+                input, load_input, delta, std::move(jvp_flow), load_limits, request, *geometry_work,
+                shared, *local, *kernel, memory);
+        };
+        if (mode == LoadCase::Wake) {
+            auto invalid = variation;
+            invalid.circulation = core::NumericalGeneration{902};
+            const auto before = memory.allocated_bytes();
+            reject(run_direction(invalid), core::FailureCode::StaleGeneration);
+            CHECK(memory.allocated_bytes() == before);
+            invalid = variation;
+            invalid.displacements = std::span{motion}.first(5);
+            reject(run_direction(invalid), core::FailureCode::InvalidInput);
+            invalid = variation;
+            auto bad_rows = gamma_directions;
+            bad_rows[0].circulation = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+            invalid.bound = std::span{bad_rows}.first(1);
+            reject(run_direction(invalid), core::FailureCode::Nonfinite);
+            invalid = variation;
+            auto wrong_edge_directions = wake_midpoint_variations;
+            std::swap(wrong_edge_directions[0], wrong_edge_directions[1]);
+            invalid.edges = wrong_edge_directions;
+            reject(run_direction(invalid), core::FailureCode::InvalidInput);
+            CHECK(jvp_flow.source().jet.active());
+        }
+        const auto jvp = take(run_direction(variation));
+        CHECK_FALSE(jvp_flow.source().jet.active());
+        CHECK(jvp.loads().primal().flow().source().jet.active());
+        CHECK(jvp.loads().used_steps() <= load_limits.steps);
+        const auto edge_direction = take(jvp.edge(0));
+        const auto facet_direction = take(jvp.facet(0));
+        expected(edge_direction.position, {.03125, .0625, .015625});
+        expected(facet_direction.position, {1. / 12, 7. / 96, 1. / 24});
+        expected(facet_direction.force, {-.0146484375, -.00732421875, -.09765625});
+        const auto exact_direction = Rat{5, 4} * ((-Rat{1, 4} + two_power(-58)) * Rat{1, 2} +
+                                                  (Rat{3, 8} + two_power(-57)) * Rat{1, 8});
+        residual_expected(facet_direction.force[2], exact_direction);
+        if (has_wake) {
+            expected(edge_direction.force,
+                     {-.0313421017332066007, -.000155053438542526309, -.0300854876693103419});
+            expected(take(jvp.edge(1)).force,
+                     {-.0000514174166970542093, .0883611191373407818, .0290019435772196279});
+            expected(take(jvp.edge(2)).force,
+                     {.00010075169669772684, -.176050182858272690, -.0582494842972189574});
+            expected(jvp.total_force_direction(),
+                     {-.0605896424532059286, -.102492554659474434, -.254645528389309665});
+            expected(jvp.total_moment_direction(),
+                     {-.144922614949141765, .0349452424989099995, .0122891137124191336});
+            expected(take(jvp.point(0)).force,
+                     {-.0253863000182544371, -.0929854306484076081, -.109271652649931314});
+        } else {
+            expected(take(jvp.edge(2)).force,
+                     {.237429517694973129, -.0103885011014196999, .0927190867664370914});
+            expected(jvp.total_force_direction(),
+                     {.0584661631586267516, -.0431664920836314646, .0342573010497334486});
+            expected(jvp.total_moment_direction(),
+                     {.0598305790447179028, -.387825417382047371, .0294373849541907755});
+        }
+        std::array<Rat, 3> sum_df{}, sum_dm{};
+        for (std::size_t i = 0; i < jvp.loads().point_count(); ++i) {
+            const auto value = take(jvp.loads().point(i));
+            const auto delta = take(jvp.point(i));
+            CHECK(value.point == delta.point);
+            std::array<Rat, 3> r{}, dx{}, f{}, df{};
+            for (std::size_t axis = 0; axis < r.size(); ++axis) {
+                r[axis] = rational_word(fixture.points[3 * i + axis]) - origin[axis];
+                dx[axis] = sum_words(motion[i][axis]);
+                f[axis] = unpack(value.force[axis]);
+                df[axis] = unpack(delta.force[axis]);
+                sum_df[axis] += df[axis];
+            }
+            for (std::size_t axis = 0; axis < r.size(); ++axis) {
+                const auto j = (axis + 1) % 3;
+                const auto k = (axis + 2) % 3;
+                sum_dm[axis] += dx[j] * f[k] - dx[k] * f[j] + r[j] * df[k] - r[k] * df[j];
+            }
+        }
+        for (std::size_t axis = 0; axis < sum_df.size(); ++axis) {
+            CHECK(abs(sum_df[axis] - unpack(jvp.total_force_direction()[axis])) <=
+                  rational_word(1e-24));
+            CHECK(abs(sum_dm[axis] - unpack(jvp.total_moment_direction()[axis])) <=
+                  rational_word(1e-24));
+        }
+        reject(jvp.edge(result.edge_count()), core::FailureCode::InvalidInput);
+        reject(jvp.point(result.point_count()), core::FailureCode::InvalidInput);
+        reject(jvp.facet(result.facet_count()), core::FailureCode::InvalidInput);
     }
 }
 
