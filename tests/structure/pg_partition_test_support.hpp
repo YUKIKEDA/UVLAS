@@ -37,8 +37,9 @@ T take(core::Result<T> value) {
                                  std::to_string(static_cast<unsigned>(value.error().code)));
     return std::move(*value);
 }
-/// Pass the source by value so a token keeps the requested state on either STL.
-[[nodiscard]] inline std::stop_token requested_stop_token(std::stop_source source = {}) {
+/// Keep a mutable source because MSVC's request_stop() is non-const.
+[[nodiscard]] inline std::stop_token
+requested_stop_token(std::stop_source&& source = std::stop_source{}) {
     REQUIRE(source.request_stop());
     return source.get_token();
 }
