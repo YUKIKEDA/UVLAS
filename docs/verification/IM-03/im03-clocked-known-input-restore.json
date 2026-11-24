@@ -1,0 +1,144 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-clocked-known-input-restore-v1",
+  "ids": [
+    "AE-07",
+    "FD-02",
+    "FD-06",
+    "FD-07",
+    "IO4-06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "80fdcefd1fcd155536fef7dcae0a72c2041e4986",
+  "input_baseline": "52da78aa828abc38893661b884dff5301172ad8f",
+  "standalone_motion_evidence": "f6eeeaf796b1bc02c3ed0a3d354b11bf3edf5e9e",
+  "claimed_state": "One independently requalified typed archive for exact grid, known ambient flow, free or prescribed transport mode, optional prescribed velocity and one selected rigid motion. No J1 file layout or accepted history.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 8/8 each on the merged structural base. Coupling suite 62.62 s in Debug and 5.98 s in Release.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, affected CTest 8/8. Coupling suite 4.59 s.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "coupling.case_motion",
+      "coupling.case_motion_frame",
+      "coupling.case_motion_time_series",
+      "aero.pchip_curve",
+      "io.si_case",
+      "io.si_case_resources",
+      "io.si_interval"
+    ],
+    "catch": "626 assertions for the shared-clock case and 342 for standalone Motion restoration, both under seed 23 in all three configurations.",
+    "oracle": "At 1 s, the independent Hermite jet gives 4/3 and left/right second derivatives 1/3 and 5/3. Ambient polynomial gives 4 with rate 3; prescribed velocity gives 6 with rate 2. Check left/right exact time and step, restart role, matching stored center/radius/exponent for all ambient and prescribed components and motion pose jet.",
+    "negative": "Reject separate same-shape changes to step or restart, ambient coefficients, prescribed transport coefficients and Motion samples. Both free/prescribed mismatch directions fail, and the originally free mode restores without a prescribed input.",
+    "mutation": "In a separate Linux build, comparing the current grid to itself failed 2 diagnostics for step/restart. Comparing ambient and prescribed against themselves failed 2 diagnostics for those series. Each mutation exited 42, and both byte-identical restorations passed all 626 clock assertions.",
+    "static": "Pinned clang-format 21.1.2; Windows and Linux clang-tidy 21.1.1 on clock and regression translation units; trace-check and Japanese prose lint."
+  },
+  "sources": {
+    "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
+    "docs/specs/foundation/checkpoint-manifest-contract.md": "0c14b5624c7f41ee18ad1e408af436e83fa0604f97b24b90f2fdd62fa77f83eb",
+    "docs/specs/foundation/case-schema-fields.md": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119",
+    "src/coupling/case_known_flow.cpp": "700eabb0dbcdea3913541c6ba6e9439b68bdebaa6885c902050099e9f5471254",
+    "src/coupling/case_known_flow.hpp": "5c9b5bfc36afe0a2d2026f1c49b6be4455f3a91cf3f38f6082d7d49f700af0f8",
+    "src/coupling/case_motion.cpp": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058",
+    "src/coupling/case_motion.hpp": "b85214d88aeca06a1f75cbf565f28e465acd37213f7929f395988eaed2dd24d6",
+    "src/coupling/case_motion_frame.cpp": "d45056f342fca0a9f13471e065e73341c5d790737a87c5d619110ebe3369a790",
+    "src/coupling/case_motion_time_series.cpp": "24dd8654e113f2ea7bbceafca81aac0a015ec9c6de335f77fa551b2d3a70b906",
+    "src/coupling/case_uniform_flow.cpp": "9fbb604bd7f757beb937db913590cf0a9591235493cae3e35b62a7c040d8d964",
+    "src/coupling/case_uniform_flow.hpp": "aaa13640c5ee5c5576cd0498efab80bb9825aac37325018f1f577e90ce0305cf",
+    "tests/coupling/case_motion_time_series_test.cpp": "55754ce8e14938d3cd4676979a2ab36d3271af26ec6639c3c0ddf165ff97a92e"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "hint": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "sha256": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8"
+    },
+    {
+      "id": "docs/specs/foundation/checkpoint-manifest-contract.md",
+      "hint": "docs/specs/foundation/checkpoint-manifest-contract.md",
+      "sha256": "0c14b5624c7f41ee18ad1e408af436e83fa0604f97b24b90f2fdd62fa77f83eb"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.cpp",
+      "hint": "src/coupling/case_flow_clock.cpp",
+      "sha256": "78930c092b0b978d97897f428c19d52afdffcbac1277a780b406b78b19d3d3cb"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.hpp",
+      "hint": "src/coupling/case_flow_clock.hpp",
+      "sha256": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13"
+    },
+    {
+      "id": "src/coupling/case_known_flow.cpp",
+      "hint": "src/coupling/case_known_flow.cpp",
+      "sha256": "700eabb0dbcdea3913541c6ba6e9439b68bdebaa6885c902050099e9f5471254"
+    },
+    {
+      "id": "src/coupling/case_known_flow.hpp",
+      "hint": "src/coupling/case_known_flow.hpp",
+      "sha256": "5c9b5bfc36afe0a2d2026f1c49b6be4455f3a91cf3f38f6082d7d49f700af0f8"
+    },
+    {
+      "id": "src/coupling/case_motion.cpp",
+      "hint": "src/coupling/case_motion.cpp",
+      "sha256": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058"
+    },
+    {
+      "id": "src/coupling/case_motion.hpp",
+      "hint": "src/coupling/case_motion.hpp",
+      "sha256": "b85214d88aeca06a1f75cbf565f28e465acd37213f7929f395988eaed2dd24d6"
+    },
+    {
+      "id": "src/coupling/case_motion_frame.cpp",
+      "hint": "src/coupling/case_motion_frame.cpp",
+      "sha256": "d45056f342fca0a9f13471e065e73341c5d790737a87c5d619110ebe3369a790"
+    },
+    {
+      "id": "src/coupling/case_motion_time_series.cpp",
+      "hint": "src/coupling/case_motion_time_series.cpp",
+      "sha256": "24dd8654e113f2ea7bbceafca81aac0a015ec9c6de335f77fa551b2d3a70b906"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.cpp",
+      "hint": "src/coupling/case_uniform_flow.cpp",
+      "sha256": "9fbb604bd7f757beb937db913590cf0a9591235493cae3e35b62a7c040d8d964"
+    },
+    {
+      "id": "src/coupling/case_uniform_flow.hpp",
+      "hint": "src/coupling/case_uniform_flow.hpp",
+      "sha256": "aaa13640c5ee5c5576cd0498efab80bb9825aac37325018f1f577e90ce0305cf"
+    },
+    {
+      "id": "tests/coupling/case_motion_time_series_test.cpp",
+      "hint": "tests/coupling/case_motion_time_series_test.cpp",
+      "sha256": "55754ce8e14938d3cd4676979a2ab36d3271af26ec6639c3c0ddf165ff97a92e"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/clocked-known-input-restore-v1/verification.md": "6c4b77111bffd588ee1dc7f098acb0da37e4dc902ee0f8541635d58b6811b437"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/clocked-known-input-restore-v1/verification.md",
+      "hint": "docs/verification/IM-03/clocked-known-input-restore-v1/verification.md",
+      "sha256": "6c4b77111bffd588ee1dc7f098acb0da37e4dc902ee0f8541635d58b6811b437"
+    }
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "80fdcefd1fcd155536fef7dcae0a72c2041e4986",
+      "sha256": "78930c092b0b978d97897f428c19d52afdffcbac1277a780b406b78b19d3d3cb"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "80fdcefd1fcd155536fef7dcae0a72c2041e4986",
+      "sha256": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13"
+    }
+  }
+}

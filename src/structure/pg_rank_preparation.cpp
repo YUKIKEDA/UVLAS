@@ -513,7 +513,7 @@ PgRankPreparation::translation_axis(PgRankRequiredColumn target) const noexcept 
 std::array<std::array<ExactRational, 3>, 3>
 PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn column,
                                   PgCellIndex cell, const ExactRational& u, const ExactRational& v,
-                                  const ExactRational& axis_scale) const {
+                                  const ExactRational& axis_scale, bool derivatives) const {
     const auto& state = rank_state(state_);
     math.visit(1);
     const auto k = rank_index(column.value, state.info.rank);
@@ -528,6 +528,7 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
     constexpr std::array fields{PgCoefficientField::R, PgCoefficientField::P,
                                 PgCoefficientField::C};
     std::array<std::array<ExactRational, 3>, 3> jet{};
+    const auto orders = std::span{reference_orders}.first(derivatives ? jet.front().size() : 1);
     for (std::size_t field = 0; field < fields.size(); ++field) {
         const auto target = std::tuple{fields[field], cell.first, cell.second};
         const auto first = std::partition_point(indices.begin(), indices.end(),
@@ -538,8 +539,8 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
             math.charge();
             const auto coefficient =
                 rank_exact(state.basis_values.values()[offset], math.leaf_limits, math.plan);
-            for (std::size_t i = 0; i < jet[field].size(); ++i) {
-                const auto order = reference_orders[i];
+            for (std::size_t i = 0; i < orders.size(); ++i) {
+                const auto order = orders[i];
                 if (order.first > row.powers.first || order.second > row.powers.second)
                     continue;
                 auto value =
@@ -548,7 +549,7 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
                 jet[field][i] = math.add(jet[field][i], value);
             }
         }
-        for (std::size_t i = 1; i < jet[field].size(); ++i)
+        for (std::size_t i = 1; i < orders.size(); ++i)
             jet[field][i] = math.mul(jet[field][i], axis_scale);
     }
     return jet;

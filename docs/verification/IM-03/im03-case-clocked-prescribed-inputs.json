@@ -1,0 +1,44 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-clocked-prescribed-inputs",
+  "ids": [
+    "AE-07",
+    "FD-02",
+    "N4-03",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "d8fe0d4ed4fec152a3d8458fae1074a52fd63e59",
+  "claimed_state": "同じ厳密時刻と片側で選択運動、既知流れ、指定後流を評価し、区間内の周期延長イベントを拒否する。",
+  "checks": {
+    "windows": {
+      "compiler": "MSVC 19.51",
+      "configuration": "Release",
+      "ctest_targets_passed": 8
+    },
+    "linux": {
+      "compiler": "GCC 14.2",
+      "configuration": "Release",
+      "ctest_targets_passed": 8
+    },
+    "new_case_assertions_per_platform": 79,
+    "clang_tidy_translation_units": 2,
+    "periodic_floor_mutation_failed_checks": 1
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-clocked-prescribed-inputs.md": "3d78aa53213a6e84e648e2bcfc8397dab1c2f6a31d8c5ee7de0f5687386236e2",
+    "tests/coupling/case_motion_time_series_test.cpp": "24de119e94a0cf546ab541a27848deba460525a45ecd09aff35cb36abee266d4"
+  },
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "d8fe0d4ed4fec152a3d8458fae1074a52fd63e59",
+      "sha256": "59c1bddac8d066b2a42f14ff42e87e9740611964918f8a7960d107e71650c053"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "d8fe0d4ed4fec152a3d8458fae1074a52fd63e59",
+      "sha256": "51ea851ef1eec81c0e87f1506700c1568bb318657ecfe29dba4c70f6b4d8f7c2"
+    }
+  }
+}

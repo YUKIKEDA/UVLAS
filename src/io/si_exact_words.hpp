@@ -21,6 +21,8 @@ public:
 
     [[nodiscard]] SiRationalWordsView view() const& noexcept;
     [[nodiscard]] SiRationalWordsView view() const&& = delete;
+    [[nodiscard]] core::Result<SiRationalWords> clone(core::ResourcePlan&,
+                                                      const std::stop_token&) const noexcept;
 
 private:
     friend core::Result<SiRationalWords> copy_rational_words(const structure::ExactRational&,

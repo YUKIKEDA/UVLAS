@@ -1,0 +1,21 @@
+param([Parameter(Mandatory)] [string]$Build, [Parameter(Mandatory)] [string]$Dependencies)
+
+$ErrorActionPreference = 'Stop'
+$series = 'docs/verification/IM-01/pg-chart-refinement-series'
+$runner = [IO.File]::ReadAllText((Join-Path $pwd "$series/run-series.ps1.txt"))
+$anchor = '$headers = @('
+$offset = $runner.IndexOf($anchor, [StringComparison]::Ordinal)
+if ($offset -lt 0) { throw 'Frozen refinement runner changed' }
+$extend = @'
+$trace = [IO.File]::ReadAllText((Join-Path $pwd "$verification/pg-chart-refinement-series/check-physical-trace.cpp.txt"))
+$declaration = $refined.IndexOf('void verify_refinement(', [StringComparison]::Ordinal)
+$call = '    verify_refinement(candidate, r, c, f, primal.output, dual.output, work);'
+if ($declaration -lt 0 -or -not $refined.Contains($call)) { throw 'Frozen refinement driver changed' }
+$refined = $refined.Insert($declaration, $trace + [Environment]::NewLine)
+$refined = $refined.Replace($call, $call + [Environment]::NewLine + '    check_physical_trace(candidate, c, primal.output.coordinates);')
+'@
+$runner = $runner.Insert($offset, $extend + [Environment]::NewLine)
+$file = Join-Path $pwd ('out/run-r02-physical-trace-' + [Guid]::NewGuid().ToString('N') + '.ps1')
+[IO.File]::WriteAllText($file, $runner)
+& $file -Build $Build -Dependencies $Dependencies
+exit $LASTEXITCODE

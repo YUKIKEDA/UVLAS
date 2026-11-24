@@ -170,6 +170,10 @@ public:
     /// Canonical cross-call identity. A moved-from object cannot supply it.
     [[nodiscard]] core::Result<PgReferenceIdentity> identity() const noexcept;
 
+    /// Borrow the exact physical frame of this valid reference.
+    [[nodiscard]] core::Result<PgReferenceFrame> frame() const& noexcept;
+    [[nodiscard]] core::Result<PgReferenceFrame> frame() const&& = delete;
+
     /// Counts for the preparation which produced this object.
     [[nodiscard]] PgReferenceCallInfo preparation() const noexcept;
 

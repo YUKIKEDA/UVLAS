@@ -1,0 +1,41 @@
+void check_physical_trace(const PgChartCandidate& chart, const R02Buffer& rhs,
+                          const R02Buffer& coordinates) {
+    const auto& original = chart.exact().original();
+    const auto overlaps = original.overlaps();
+    for (const auto& overlap : overlaps) {
+        REQUIRE(q(overlap.active_first) == 0);
+        REQUIRE(q(overlap.active_last) == 1);
+        REQUIRE(q(overlap.left_depth.lower_first) == Q(-1, 2));
+        REQUIRE(q(overlap.left_depth.lower_last) == Q(-1, 2));
+        REQUIRE(q(overlap.left_depth.upper_first) == Q(1, 2));
+        REQUIRE(q(overlap.left_depth.upper_last) == Q(1, 2));
+    }
+    const std::array<Q, 3> depth_bound{Q(1), Q(1, 2), Q(1, 4)};
+    const auto rows = original.original_rows();
+    const auto sources = original.sources();
+    Q maximum_component;
+    for (std::size_t axis = 0; axis < 3; ++axis) {
+        std::vector<Q> trace_bound(overlaps.size());
+        for (std::size_t row = 0; row < rows.size(); ++row) {
+            auto gap = retained(rhs, row, axis);
+            for (const auto& term : take(original.row(static_cast<core::Index>(row))))
+                gap -= q(term.coefficient) *
+                       retained(coordinates, static_cast<std::size_t>(term.column), axis);
+            const auto& metadata = rows[row];
+            const auto& source = sources[static_cast<std::size_t>(metadata.source)];
+            const auto overlap = static_cast<std::size_t>(source.first_overlap +
+                                                          metadata.source_overlap);
+            const auto depth = static_cast<std::size_t>(metadata.field);
+            REQUIRE(overlap < trace_bound.size());
+            REQUIRE(depth < depth_bound.size());
+            // Along-coordinate monomials are bounded by one on the whole trace.
+            trace_bound[overlap] += abs(gap) * depth_bound[depth];
+        }
+        for (const auto& upper : trace_bound)
+            maximum_component = std::max(maximum_component, upper);
+    }
+    const Q position_limit("1/100000000000000");
+    REQUIRE(3 * maximum_component * maximum_component <= position_limit * position_limit);
+    std::cout << ",\"independent_trace_component_bound_metres\":"
+              << maximum_component.convert_to<double>();
+}

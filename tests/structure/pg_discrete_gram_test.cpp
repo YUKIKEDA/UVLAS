@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <string>
 #include <uvlas/structure/pg_discrete_gram.hpp>
+#include <uvlas/structure/pg_full_trace.hpp>
+#include <uvlas/structure/pg_prepared_patch.hpp>
+#include <uvlas/structure/pg_prepared_volume.hpp>
 
 using namespace uvlas;
 using namespace uvlas::structure;
@@ -19,14 +22,20 @@ constexpr auto curved_rule_points_per_volume = static_cast<std::size_t>(curved_r
 constexpr int curved_rule_weight_denominator =
     2 * curved_rule_planar_count * curved_rule_depth_count;
 
-PgReferenceBasis parabolic_basis(Fixture& f, core::Workspace& scratch, core::ResourcePlan& plan) {
+PgReferenceBasis parabolic_basis(Fixture& f, core::Workspace& scratch, core::ResourcePlan& plan,
+                                 bool adjacent = false) {
     const auto zero = f.r("0"), one = f.r("1"), length = f.r("2");
     const auto coefficient = f.r("1", "16");
     const std::array<ExactInputTerm, 1> terms{{{{2, 0}, coefficient}}};
     const auto curve = take(ExactChartPolynomial::make(terms, exact_limits(), f.input_plan));
     f.graph = take(PgGraph::prepare({zero, one, zero, curve, 1, PgGraphConvention::Version1},
                                     {exact_limits(), 64, {}}, f.input_plan));
-    return make_basis(f, length, scratch, plan);
+    std::array<ExactRational, 9> rotation;
+    for (const auto i : {0U, 4U, 8U})
+        rotation[i] = f.r("1");
+    const std::array origin{ExactRational{}, adjacent ? f.r("2") : ExactRational{},
+                            ExactRational{}};
+    return make_basis(f, {rotation, origin, length}, scratch, plan);
 }
 
 struct CurvedRulePoint {
@@ -110,6 +119,290 @@ Q independent_curve_value(const CurvedRulePoint& p, std::span<const Term> terms)
     return value;
 }
 
+const PgIntegrationPartition& trace_partition(const PgPreparedPatch& patch) {
+    const auto* basis = take(patch.conditioning().reference_basis());
+    return take(basis->source()).partition;
+}
+
+std::vector<PgTraceEdgeSpan> curved_edge(const PgPreparedPatch& patch, const ExactRational& fixed_t,
+                                         const ExactRational& zero, const ExactRational& one) {
+    const auto& partition = trace_partition(patch);
+    const auto vertices = take(partition.vertices());
+    const auto edges = take(partition.edges());
+    std::vector<PgTraceEdgeSpan> spans;
+    for (std::size_t i = 0; i < edges.size(); ++i) {
+        const auto& edge = edges[i];
+        const auto& a = vertices[static_cast<std::size_t>(edge.vertices[0])];
+        const auto& b = vertices[static_cast<std::size_t>(edge.vertices[1])];
+        if (!edge.external || q(a.t) != q(fixed_t) || q(b.t) != q(fixed_t))
+            continue;
+        const bool forward = q(a.s) < q(b.s);
+        spans.push_back({static_cast<core::Index>(i),
+                         forward ? a.s : b.s,
+                         forward ? b.s : a.s,
+                         forward ? zero : one,
+                         forward ? one : zero,
+                         {}});
+    }
+    // Sort indices because the borrowed record itself is immutable.
+    std::vector<const PgTraceEdgeSpan*> ordered;
+    ordered.reserve(spans.size());
+    for (const auto& span : spans)
+        ordered.push_back(&span);
+    std::ranges::sort(ordered,
+                      [](const auto* a, const auto* b) { return q(a->first) < q(b->first); });
+    std::vector<PgTraceEdgeSpan> sorted;
+    sorted.reserve(ordered.size());
+    for (const auto* span : ordered)
+        sorted.push_back(*span);
+    return sorted;
+}
+
+Q curved_point_value(Fixture& f, const PgPreparedPatch& patch, const PgTraceEdgeSpan& edge,
+                     const Q& s, const Q& root, std::span<const PgCartesianExactPosition> state,
+                     core::ResourcePlan& plan) {
+    const auto faces = take(trace_partition(patch).lateral_faces());
+    const auto selected = std::ranges::find_if(
+        faces, [&](const auto& face) { return face.edge == edge.edge && face.layer == 1; });
+    REQUIRE(selected != faces.end());
+    const Q fraction = (s - q(edge.first)) / (q(edge.last) - q(edge.first));
+    const bool forward = q(edge.along_first) < q(edge.along_last);
+    const Q along = forward == selected->canonical_direction ? fraction : 1 - fraction;
+    const auto a = rat(f, numerator(along), denominator(along));
+    const auto depth = f.r("1", "2"); // zeta = 1/3, physical z = 1/6.
+    const PgReferencePoint point =
+        PgReferenceLateralPoint{static_cast<core::Index>(selected - faces.begin()), a, depth};
+    const auto value = take(patch.evaluate_reference(std::span{&point, 1}, query_limits(), plan));
+    CHECK(q(value.points.values().front().position_metres[1].rational) == 2);
+    CHECK(q(value.points.values().front().g) == root * root);
+    Q result;
+    for (std::size_t i = 0; i < state.size(); ++i) {
+        const auto& n = value.columns.values()[i].value;
+        result += q(state[i][0]) * (q(n.rational) + root * q(n.radical));
+    }
+    return result;
+}
+
+void check_curved_trace(Fixture& f, const PgPreparedPatch& left, const PgPreparedPatch& right,
+                        const PgReferenceLimits& limits, core::Workspace& workspace,
+                        core::ResourcePlan& plan) {
+    const auto zero = f.r("0"), one = f.r("1");
+    const auto a = curved_edge(left, one, zero, one), b = curved_edge(right, zero, zero, one);
+    REQUIRE(a.size() == 2);
+    REQUIRE(b.size() == 2);
+    const auto trace =
+        take(PgFullTrace::prepare(left, a, right, b, {limits, 100'000}, workspace, plan));
+    const auto info = take(trace.info());
+    REQUIRE(info.overlaps == 2);
+    std::vector<PgCartesianExactPosition> q_left(left.reference_coordinates().size()),
+        q_right(right.reference_coordinates().size());
+    for (std::size_t j = 0; j < q_left.size(); ++j)
+        q_left[j][0] = f.r(std::to_string(static_cast<int>(j % 7) - 3), "17");
+    for (std::size_t j = 0; j < q_right.size(); ++j)
+        q_right[j][0] = f.r(std::to_string(static_cast<int>(j % 5) - 2), "11");
+    const auto residual =
+        take(trace.apply({info.left, info.right, q_left, q_right}, limits, workspace, plan));
+    // f(s)=s²/16. The rational Pythagorean slope makes sqrt(1+(s/8)²) exact.
+    const Q s("1024/4095"), root("4097/4095"), z("1/6");
+    const auto& segment = trace.overlaps().front();
+    const Q local = (s - q(segment.first)) / (q(segment.last) - q(segment.first));
+    const Q normal_x = -s / 8;
+    std::array<Q, 3> field{};
+    for (std::size_t i = 0; i < trace.original_rows().size(); ++i) {
+        const auto& row = trace.original_rows()[i];
+        if (row.overlap == 0)
+            field[static_cast<std::size_t>(row.field)] +=
+                power(local, row.power) * q(residual.values()[i][0]);
+    }
+    const Q restored =
+        field[0] + z * field[1] / (power(normal_x, 3) * power(root, 3)) + z * z * field[2];
+    REQUIRE(field[1] != 0);
+    CHECK(restored == curved_point_value(f, left, a.front(), s, root, q_left, plan) -
+                          curved_point_value(f, right, b.front(), s, root, q_right, plan));
+}
+
+void check_curved_area_projection(Fixture& f, const PgPreparedPatch& patch,
+                                  const PgReferenceLimits& limits, core::ResourcePlan& plan) {
+    const auto& partition = trace_partition(patch);
+    const auto faces = take(partition.horizontal_faces());
+    const auto layers = take(partition.layers());
+    const auto selected = std::ranges::find_if(faces, [&](const auto& face) {
+        const auto& layer = layers[static_cast<std::size_t>(face.layer)];
+        return q(face.side == PgPartitionFaceSide::Lower ? layer.lower : layer.upper) != 0;
+    });
+    REQUIRE(selected != faces.end());
+    const auto& face = *selected;
+    const auto& tri = take(partition.triangles())[static_cast<std::size_t>(face.triangle)];
+    const auto& layer = layers[static_cast<std::size_t>(face.layer)];
+    const auto vertices = take(partition.vertices());
+    Q s;
+    for (const auto index : tri.vertices)
+        s += q(vertices[static_cast<std::size_t>(index)].s) / 3;
+    const Q z = q(face.side == PgPartitionFaceSide::Lower ? layer.lower : layer.upper) / 2;
+    REQUIRE(z != 0);
+    const Q g = 1 + s * s / 64;
+    const I grid = I{1} << 256;
+    const Dec approximate = sqrt(numerator(g).convert_to<Dec>() / denominator(g).convert_to<Dec>());
+    const auto floor_root = floor(approximate * grid.convert_to<Dec>()).convert_to<I>();
+    const Q lower_root = Q{floor_root} / grid, upper_root = Q{floor_root + 1} / grid;
+    REQUIRE(lower_root * lower_root < g);
+    REQUIRE(upper_root * upper_root > g);
+    // For X(s,t,z) = 2(s,t,s²/16) + z n, the tangent lengths on a
+    // fixed-z face are 2 sqrt(g) - z/(8g) and 2, in orthogonal directions.
+    const auto area = [&](const Q& root) -> Q {
+        return q(tri.twice_area) * (4 * root - z / (4 * g));
+    };
+    const auto third = f.r("1", "3");
+    const PgReferencePoint query = PgReferenceHorizontalPoint{
+        static_cast<core::Index>(selected - faces.begin()), third, third};
+    constexpr double tolerance = 0x1p-72;
+    const PgPreparedReferenceProjection projection{
+        core::Precision::TwoWord, tolerance, tolerance, tolerance, tolerance, tolerance};
+    const auto projected =
+        take(patch.project_reference(std::span{&query, 1}, projection, limits, plan));
+    const Q measure = independent_double(projected.high_words()[3]) +
+                      independent_double(projected.low_words()[3]);
+    const Q budget = independent_double(tolerance);
+    CHECK(measure - budget <= area(lower_root));
+    CHECK(measure + budget >= area(upper_root));
+}
+
+void check_fixed_projection(const PgPreparedPatch& patch, std::span<const CurvedRulePoint> rule,
+                            const PgReferenceLimits& limits, core::ResourcePlan& plan) {
+    REQUIRE(rule.size() > 2);
+    const auto source = take(patch.info());
+    for (const auto precision : {core::Precision::Binary64, core::Precision::TwoWord}) {
+        const bool paired = precision == core::Precision::TwoWord;
+        const PgVolumeMassProjection projection{precision, paired ? 0x1p-82 : 0x1p-42,
+                                                paired ? 0x1p-88 : 0x1p-45};
+        core::ResourcePlan none{0};
+        check_failure(
+            PgPreparedVolumeReference::prepare(patch, rule.size(), 1, projection, limits, none),
+            core::FailureCode::InvalidInput);
+        check_failure(PgPreparedVolumeReference::prepare(patch, 1, 2, projection, limits, none),
+                      core::FailureCode::ResourceExceeded);
+        auto projected =
+            take(PgPreparedVolumeReference::prepare(patch, 1, 2, projection, limits, plan));
+        CHECK(projected.source() == source.identity);
+        const auto rank = projected.column_count();
+        REQUIRE(rank == source.basis.rank);
+        const auto retained = projected.words();
+        REQUIRE(retained.high.size() == 2 * (rank + 1));
+        REQUIRE(retained.low.size() == (paired ? retained.high.size() : 0));
+        const auto rational_words = [](double high, double low) -> Q {
+            return independent_double(high) + independent_double(low);
+        };
+        const auto lo = [&](std::span<const double> low, std::size_t i) {
+            return paired ? low[i] : 0.0;
+        };
+        std::vector<Q> exact_shapes(2 * rank);
+        for (std::size_t row = 0; row < projected.points().size(); ++row) {
+            const auto& actual = projected.points()[row];
+            REQUIRE(actual.rule_ordinal == row + 1);
+            CHECK(q(actual.weight) == Q{1} / curved_rule_weight_denominator);
+            const auto& source_point = rule[row + 1];
+            const PgReferencePoint query = PgReferenceVolumePoint{
+                source_point.volume, source_point.u, source_point.v, source_point.depth};
+            const auto exact = take(patch.evaluate_reference(std::span{&query, 1}, limits, plan));
+            const auto& point = exact.points.values().front();
+            CHECK(actual.reference.identity == point.identity);
+            CHECK(actual.reference.partition_record == point.partition_record);
+            CHECK(actual.reference.layer == point.layer);
+            const auto slot0 = row * (rank + 1);
+            const auto& jacobian = std::get<PgReferenceVolumeMeasure>(point.measure).jacobian;
+            const auto exact_j = q(jacobian.rational) + source_point.root * q(jacobian.radical);
+            CHECK(abs(rational_words(retained.high[slot0], lo(retained.low, slot0)) - exact_j) <=
+                  independent_double(projection.maximum_volume_jacobian_error_metres_cubed));
+            for (std::size_t j = 0; j < rank; ++j) {
+                const auto& n = exact.columns.values()[j].value;
+                auto& scalar = exact_shapes[row * rank + j];
+                scalar = q(n.rational) + source_point.root * q(n.radical);
+                const auto i = slot0 + j + 1;
+                CHECK(abs(rational_words(retained.high[i], lo(retained.low, i)) - scalar) <=
+                      independent_double(projection.maximum_shape_error));
+            }
+        }
+        std::vector<double> coords(3 * rank), inputs_low(paired ? coords.size() : 0);
+        for (std::size_t j = 0; j < coords.size(); ++j)
+            coords[j] = static_cast<double>(static_cast<int>(j % 9) - 4) / 16;
+        const std::array<double, 6> lambda_high{0.5, -0.25, 0.75, -0.125, 0.375, -0.5};
+        const std::array<double, 6> lambda_low{0x1p-60, 0, 0, 0, 0, 0};
+        const PgCartesianWords q_words{precision, coords, inputs_low};
+        const PgCartesianWords lambda{precision, lambda_high,
+                                      paired ? std::span<const double>{lambda_low}
+                                             : std::span<const double>{}};
+        auto output = take(PgVolumePositionResult::allocate(static_cast<core::Index>(coords.size()),
+                                                            precision, plan));
+        const auto workspace = take(core::Workspace::create(output.workspace_bytes(), plan));
+        const double bound = paired ? 0x1p-68 : 0x1p-29;
+        const PgVolumePositionLimits application{100'000, bound, {}};
+        const auto map = PgVolumePositionDirection::ToPoints;
+        const auto adjoint = PgVolumePositionDirection::TransposeToColumns;
+        check_failure(apply_pg_prepared_volume_position(projected, {}, map, q_words, application,
+                                                        *workspace, output),
+                      core::FailureCode::StaleGeneration);
+        REQUIRE(apply_pg_prepared_volume_position(projected, source.identity, map, q_words,
+                                                  application, *workspace, output));
+        auto action = output.words();
+        REQUIRE(action.high.size() == lambda_high.size());
+        for (std::size_t row = 0; row < 2; ++row)
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                Q expected;
+                for (std::size_t j = 0; j < rank; ++j)
+                    expected +=
+                        exact_shapes[row * rank + j] * independent_double(coords[3 * j + axis]);
+                const auto i = 3 * row + axis;
+                CHECK(abs(rational_words(action.high[i], lo(action.low, i)) - expected) <=
+                      independent_double(bound));
+            }
+        REQUIRE(apply_pg_prepared_volume_position(projected, source.identity, adjoint, lambda,
+                                                  application, *workspace, output));
+        action = output.words();
+        REQUIRE(action.high.size() == coords.size());
+        for (std::size_t j = 0; j < rank; ++j)
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                Q expected;
+                for (std::size_t row = 0; row < 2; ++row) {
+                    const auto i = 3 * row + axis;
+                    expected += exact_shapes[row * rank + j] *
+                                rational_words(lambda.high[i], lo(lambda.low, i));
+                }
+                const auto i = 3 * j + axis;
+                CHECK(abs(rational_words(action.high[i], lo(action.low, i)) - expected) <=
+                      independent_double(bound));
+            }
+    }
+}
+
+void check_projected_weight_admission(const PgPreparedPatch& patch, const PgReferenceLimits& limits,
+                                      core::ResourcePlan& plan) {
+    const auto source = take(patch.info());
+    REQUIRE(source.basis.rank == 130);
+    constexpr std::uint64_t limb_bits = detail::IntegerBackend::limb_bits;
+    const auto limbs = limits.algebra.maximum_work_bits / limb_bits;
+    const auto integer_payload = 4 * limbs * sizeof(boost::multiprecision::limb_type);
+    // An isolated exact point has 336 work slots, 74 point slots and 8 per basis column.
+    const auto point_rationals = 336 + 74 + 8 * source.basis.rank;
+    const auto point_payload = (2 * point_rationals + 1) * integer_payload;
+    const auto isolated = take(
+        detail::exact_rational_admission(limits.algebra, (limbs - 2) * limb_bits, point_payload));
+
+    const PgVolumeMassProjection projection{core::Precision::Binary64, 0x1p-42, 0x1p-45};
+    auto restricted = limits;
+    auto& budget = std::get<ExactEstimateAdmission>(restricted.algebra.external_memory).bytes;
+    budget = isolated.estimated_external_payload_bytes;
+    REQUIRE(PgPreparedVolumeReference::prepare(patch, 1, 1, projection, restricted, plan));
+    REQUIRE(PgPreparedVolumeReference::prepare(patch, 2, 1, projection, restricted, plan));
+    check_failure(PgPreparedVolumeReference::prepare(patch, 1, 2, projection, restricted, plan),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(take(patch.info()).identity == source.identity);
+
+    budget += 2 * integer_payload;
+    const auto pair =
+        take(PgPreparedVolumeReference::prepare(patch, 1, 2, projection, restricted, plan));
+    CHECK(pair.points().size() == 2);
+}
+
 } // namespace
 
 TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its transform",
@@ -121,6 +414,11 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     const auto columns = static_cast<std::size_t>(take(basis.size()));
     CAPTURE(columns);
     const auto source = take(basis.source());
+    Fixture adjacent;
+    auto adjacent_basis = parabolic_basis(adjacent, scratch, setup, true);
+    const auto* selected_a = take(basis.rank());
+    const auto* selected_b = take(adjacent_basis.rank());
+    CHECK(std::ranges::equal(take(selected_a->selected()), take(selected_b->selected())));
     auto rule = pythagorean_rule(f, source.partition);
     auto raw = basis_terms(*take(basis.rank()), columns, setup);
     auto weight = f.r("1", std::to_string(curved_rule_weight_denominator));
@@ -206,6 +504,10 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     using ReferenceDecimal =
         boost::multiprecision::number<boost::multiprecision::cpp_dec_float<160>>;
     const auto independent_transform = proposal<ReferenceDecimal>(f, centres, columns, 216);
+    // This is the same chart, thickness, local basis and finite rule under
+    // a rigid origin translation, which leaves N and det(J) unchanged.
+    auto adjacent_certificate = take(PgConditioningCertificate::generate_and_certify(
+        std::move(adjacent_basis), enclosure, {512, 216}, {profile, steps, {}}, scratch, plan));
     const auto generate = [&](core::ResourcePlan& budget) {
         return std::move(enclosure_owner)
             .generate_and_certify({512, 216}, {profile, steps, {}}, scratch, budget);
@@ -242,6 +544,39 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     const auto residual = q(take(conditioning.congruence_bound(caps.arithmetic.algebra, plan)));
     CHECK(residual <= Q("1/100000000000000000000"));
     check_generated_required(conditioning, 216, independent_transform, scratch, plan);
+    const auto source_basis = take(take(conditioning.reference_basis())->reference_identity());
+    auto patch =
+        take(PgPreparedPatch::prepare(std::move(certified), caps.arithmetic, scratch, plan));
+    CHECK(take(patch.info()).geometry == source_basis);
+    const auto available_rule = patch.fixed_rule();
+    REQUIRE(available_rule.has_value());
+    const auto owned_rule = available_rule.value_or(std::span<const PgOwnedDiscreteVolumePoint>{});
+    REQUIRE(owned_rule.size() == rule.size());
+    const auto& p = owned_rule.front();
+    const auto& exact = rule.front();
+    const PgReferencePoint query = PgReferenceVolumePoint{p.volume, p.u, p.v, p.depth};
+    const auto evaluated =
+        take(patch.evaluate_reference(std::span{&query, 1}, caps.arithmetic, plan));
+    const auto root = exact.root;
+    const std::array<Q, 3> expected{2 * exact.s - exact.zeta * exact.s / (16 * root), 2 * exact.t,
+                                    exact.s * exact.s / 8 + exact.zeta / (2 * root)};
+    std::array<Q, 3> rebuilt{};
+    Q translated{};
+    for (std::size_t j = 0; j < columns; ++j) {
+        const auto& n = evaluated.columns.values()[j].value;
+        const Q scalar = q(n.rational) + q(n.radical) * root;
+        for (std::size_t d = 0; d < rebuilt.size(); ++d)
+            rebuilt[d] += scalar * q(patch.reference_coordinates()[j][d]);
+        translated += scalar * q(patch.translation()[j]);
+    }
+    CHECK(rebuilt == expected);
+    CHECK(translated == 1);
+    const auto adjacent_patch = take(
+        PgPreparedPatch::prepare(std::move(adjacent_certificate), caps.arithmetic, scratch, plan));
+    check_curved_trace(f, patch, adjacent_patch, caps.arithmetic, scratch, plan);
+    check_fixed_projection(patch, rule, caps.arithmetic, plan);
+    check_projected_weight_admission(patch, caps.arithmetic, plan);
+    check_curved_area_projection(f, patch, caps.arithmetic, plan);
 }
 
 TEST_CASE("PG irrational curved samples enclose signed Gram entries",
@@ -319,15 +654,17 @@ TEST_CASE("PG irrational curved samples enclose signed Gram entries",
     PgDiscreteGramLimits limited{query_limits(), steps};
     limited.arithmetic.algebra.external_memory =
         ExactEstimateAdmission{std::uint64_t{32} * 1024 * 1024};
+    // Preparation transfers the basis only after all admission checks succeed.
+    const auto prepare_gram = [&](const PgDiscreteGramLimits& limits, core::ResourcePlan& memory) {
+        return PgDiscreteGram::prepare(std::move(basis), points, {224, 152}, limits, scratch,
+                                       memory);
+    };
     core::ResourcePlan rejected_plan{profile};
-    check_failure(PgDiscreteGram::prepare(std::move(basis), points, {224, 152}, limited, scratch,
-                                         rejected_plan),
-                  core::FailureCode::ResourceExceeded);
+    check_failure(prepare_gram(limited, rejected_plan), core::FailureCode::ResourceExceeded);
     CHECK(rejected_plan.allocated_bytes() == 0);
     REQUIRE(take(basis.size()) == rank);
 
-    auto gram = take(PgDiscreteGram::prepare(std::move(basis), points, {224, 152},
-                                             {query_limits(), steps}, scratch, plan));
+    auto gram = take(prepare_gram({query_limits(), steps}, plan));
     const auto entries = take(gram.enclosure()).upper_triangle;
     for (std::size_t i = 0; i < checks.size(); ++i) {
         const auto& entry = entries[slot(checks[i].first, checks[i].second)];

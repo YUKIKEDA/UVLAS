@@ -44,8 +44,8 @@ struct PgProjectionComparator {
     }
 };
 
-[[nodiscard]] inline double pg_round_word(const PgProjectionComparator& comparator,
-                                          const ExactRational& a) {
+template <class Comparator>
+[[nodiscard]] double pg_round_word(const Comparator& comparator, const ExactRational& a) {
     const auto sign = comparator.compare(a, {});
     if (sign == 0)
         return 0.0;
@@ -79,18 +79,14 @@ struct PgProjectionComparator {
     return word(relation < 0 || (relation == 0 && lower % 2 == 0) ? lower : upper);
 }
 
-[[nodiscard]] inline PgProjectedWord
-pg_project_scalar(ReferenceArithmetic& math, const PgReferenceScalar& value, const ExactRational& g,
-                  const ExactRational& tolerance, core::Precision representation) {
+template <class Comparator>
+[[nodiscard]] PgProjectedWord pg_project_words(const Comparator& comparator, const ExactRational& a,
+                                               const ExactRational& tolerance,
+                                               core::Precision representation) {
     PgProjectedWord words;
-    if (value.rational.sign() == 0 && value.radical.sign() == 0)
-        return words;
-    const auto radical_sign = value.radical.sign();
-    const auto square =
-        radical_sign == 0 ? ExactRational{} : math.mul(g, math.square(value.radical));
-    const PgProjectionComparator comparator{math, square, radical_sign};
-    words.high = pg_round_word(comparator, value.rational);
-    auto residual = math.sub(value.rational, reference_binary64(math, words.high));
+    auto& math = comparator.math;
+    words.high = pg_round_word(comparator, a);
+    auto residual = math.sub(a, reference_binary64(math, words.high));
     if (representation == core::Precision::TwoWord) {
         words.low = pg_round_word(comparator, residual);
         residual = math.sub(residual, reference_binary64(math, words.low));
@@ -99,6 +95,45 @@ pg_project_scalar(ReferenceArithmetic& math, const PgReferenceScalar& value, con
         comparator.compare(residual, math.neg(tolerance)) < 0)
         partition_fail(core::FailureCode::PrecisionUnresolved);
     return words;
+}
+
+[[nodiscard]] inline PgProjectedWord
+pg_project_scalar(ReferenceArithmetic& math, const PgReferenceScalar& value, const ExactRational& g,
+                  const ExactRational& tolerance, core::Precision representation) {
+    const auto radical_sign = value.radical.sign();
+    if (value.rational.sign() == 0 && radical_sign == 0)
+        return {};
+    const auto square =
+        radical_sign == 0 ? ExactRational{} : math.mul(g, math.square(value.radical));
+    const PgProjectionComparator comparator{math, square, radical_sign};
+    return pg_project_words(comparator, value.rational, tolerance, representation);
+}
+
+/// Compare offset + sqrt(squared_norm) to a rational without rounding the area.
+struct PgPositiveRootComparator {
+    ReferenceArithmetic& math;
+    const PgProjectionComparator& squared;
+    const ExactRational& rational;
+
+    [[nodiscard]] int compare(const ExactRational& offset, const ExactRational& threshold) const {
+        const auto delta = math.sub(threshold, offset);
+        return delta.sign() <= 0 ? 1 : squared.compare(rational, math.square(delta));
+    }
+};
+
+[[nodiscard]] inline PgProjectedWord pg_project_positive_root(ReferenceArithmetic& math,
+                                                              const PgReferenceScalar& square,
+                                                              const ExactRational& g,
+                                                              const ExactRational& tolerance,
+                                                              core::Precision representation) {
+    const auto sign = square.radical.sign();
+    const auto squared_radical =
+        sign == 0 ? ExactRational{} : math.mul(g, math.square(square.radical));
+    const PgProjectionComparator squared{math, squared_radical, sign};
+    if (squared.compare(square.rational, {}) <= 0)
+        partition_fail(core::FailureCode::PrecisionUnresolved);
+    const PgPositiveRootComparator root{math, squared, square.rational};
+    return pg_project_words(root, {}, tolerance, representation);
 }
 
 } // namespace uvlas::structure::detail

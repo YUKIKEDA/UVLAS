@@ -31,13 +31,15 @@
 | TimeSeries<n> pchip | kind:Tag{pchip}, times:List<Q<T>>, values:List<Vec<Number,n>>, outside:Outside | 同じ長さ2以上、時刻厳密増加。AE-07の同じ補間係数をprepareで生成 |
 | Outside reject/hold | kind:Tag{reject,hold} | 明示されたholdは端値保持 |
 | Outside periodic | kind:Tag{periodic}, period:Q<T> | period>0、時刻幅と一致。値/一階微分の周期整合はprepare |
-| Motion | origin:Frame, translation:TimeSeries<3>, rotation_vector:TimeSeries<3>, events:List<Q<T>> | 並進L、回転angle。基準姿勢から同じSO(3)写像で位置/速度/加速度を生成。events厳密増加、空可。Log/区分C2適格性はprepare |
+| Motion | origin:Frame, translation:TimeSeries<3>, rotation_vector:TimeSeries<3>, events:List<Q<T>> | 並進Lと回転angleは基準Frameの局所軸成分。同じSO(3)写像から位置・速度・加速度を生成。events厳密増加、空可。相対Logと区分C2の適格性はprepare |
 | Axis projected | kind:Tag{projected}, direction:ReferenceField<1,3>, angle:ReferenceField<angle,1> | 法線射影と回転はMAT-D05。零/平行/退化をprepareで拒否 |
 | Axis explicit | kind:Tag{explicit}, columns:ReferenceField<1,9> | row-major3×3の行列成分。SO(3)/連続性はprepare |
 
 ReferenceFieldとTimeSeriesはFD-12の限定式variantも持つ。callback、任意コード、名前だけの外部providerを受けない。空力の状態依存荷重は既存couplingが同じmodelから作る。近似多項式を入力する場合は座標・出自・誤差を保持し、必要微分と物理予算をprepareで検査する。
 
 MotionはPCHIPのC1だけを加速度のC2資格へ流用しない。支持運動の各table節点は明示イベントとし、左右の二階微分を同じ補間から生成して各区間で評価する。節点加速度が一意でない場合はsideを要求し、滑らかなC2運動と表示しない。C2を要求する連続区間で左右二階微分が一致しなければprepareで拒否する。gustにはAE-07のC1を要求する。
+
+基準原点と姿勢を $c_0,Q_0$、局所並進と回転ベクトルを $d,\phi$ とすると、世界座標の原点と姿勢は $c=c_0+Q_0d$、$Q=Q_0\exp([\phi]_\times)$ である。PCHIPでは、同じ標本から導いた勾配を区間の三次Hermite係数に使う。[指定剛体運動の開始契約](../aero/prescribed-rigid-motion-start-contract.md)
 
 PGの物理参照は $$ rhat=(x0+width*s+skew*t,t,f(s,t)) $$ 、 $$ X0=o+Lref Q(rhat+Hhat ζ nhat/2) $$ とする。thickness.valuesは物理全厚H、Hhat=H/Lref、ζ∈[−1,1]で実法線厚さ[−H/2,H/2]へ写す。アンカーは採用graph規約s=0であり自由入力ではない。
 

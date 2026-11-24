@@ -117,7 +117,7 @@ target_include_directories(uvlas_test_io_nastran_isotropic_shell_cards PRIVATE "
 uvlas_add_test(io.nastran_laminate_cards
     LABELS unit integration negative verification
     SOURCES io/nastran_laminate_cards_test.cpp
-    LIBS uvlas_io Boost::hash2)
+    LIBS uvlas_io Boost::hash2 nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_io_nastran_laminate_cards PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
 uvlas_add_test(io.nastran_beam_cards
@@ -137,6 +137,12 @@ uvlas_add_test(io.gmsh_surface_topology
     SOURCES io/gmsh_surface_topology_test.cpp
     LIBS uvlas_io Boost::hash2)
 target_include_directories(uvlas_test_io_gmsh_surface_topology PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(io.external_planar_pg
+    LABELS unit integration negative verification
+    SOURCES io/external_planar_pg_test.cpp
+    LIBS uvlas_io Boost::hash2)
+target_include_directories(uvlas_test_io_external_planar_pg PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
 uvlas_add_test(io.gmsh_mesh
     LABELS unit property negative verification
@@ -714,10 +720,17 @@ uvlas_require_audited_dependencies(uvlas_test_structure_pg_rank_preparation_reso
 
 uvlas_add_test(structure.pg_reference_geometry
     LABELS unit property negative verification V-PG
+    TIMEOUT 180
     SOURCES structure/pg_reference_geometry_test.cpp
     LIBS uvlas_structure Boost::multiprecision)
 target_include_directories(uvlas_test_structure_pg_reference_geometry
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_reference_geometry PROPERTIES TIMEOUT 600)
+else()
+    set_tests_properties(structure.pg_reference_geometry PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,360,180>")
+endif()
 
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG
@@ -737,8 +750,52 @@ uvlas_add_test(structure.pg_discrete_gram
 target_include_directories(uvlas_test_structure_pg_discrete_gram
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 if(UVLAS_SANITIZERS AND NOT MSVC)
-    set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 420)
+    # The curved trace and reference cache reuse the expensive certified Gram fixture.
+    set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 540)
 endif()
+
+uvlas_add_test(structure.pg_product_quadrature
+    LABELS property negative verification V-PG
+    TIMEOUT 300
+    SOURCES structure/pg_product_quadrature_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_product_quadrature
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_product_quadrature PROPERTIES TIMEOUT 420)
+endif()
+
+uvlas_add_test(structure.pg_prepared_patch
+    LABELS property negative verification V-PG
+    TIMEOUT 120
+    SOURCES structure/pg_prepared_patch_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_prepared_patch
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
+uvlas_add_test(structure.pg_full_trace
+    LABELS property negative verification V-PG
+    TIMEOUT 240
+    SOURCES structure/pg_full_trace_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_full_trace
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
+uvlas_add_test(structure.pg_chart_candidate
+    LABELS property negative verification V-PG
+    TIMEOUT 180
+    SOURCES structure/pg_chart_candidate_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_chart_candidate
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+
+uvlas_add_test(structure.pg_support_history
+    LABELS property negative verification V-PG
+    TIMEOUT 120
+    SOURCES structure/pg_support_history_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_support_history
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
@@ -876,12 +933,49 @@ uvlas_add_test(coupling.case_uniform_flow
     SOURCES coupling/case_uniform_flow_test.cpp
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
-    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests" "${PROJECT_SOURCE_DIR}/src/structure")
 if(MSVC)
-    # The full MSVC Debug test ran in 42–55 s locally. Allow headroom on loaded hosts.
+    # The full MSVC Debug test including PG material preparation took 79 s locally.
     set_tests_properties(coupling.case_uniform_flow PROPERTIES
-        TIMEOUT "$<IF:$<CONFIG:Debug>,90,60>")
+        TIMEOUT "$<IF:$<CONFIG:Debug>,120,60>")
 endif()
+
+uvlas_add_test(coupling.case_motion
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision)
+target_include_directories(uvlas_test_coupling_case_motion PRIVATE
+    "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(coupling.case_motion_time_series
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_time_series_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_motion_time_series PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+
+uvlas_add_test(coupling.case_structural_pg_support
+    LABELS V-PG property negative verification
+    TIMEOUT 180
+    SOURCES coupling/case_structural_pg_support_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_structural_pg_support PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
+
+uvlas_add_test(coupling.case_pg_support_motion
+    LABELS V-PG V-AERO property negative verification
+    TIMEOUT 180
+    SOURCES coupling/case_pg_support_motion_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_pg_support_motion PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
+
+uvlas_add_test(coupling.case_motion_frame
+    LABELS V-AERO property negative verification
+    SOURCES coupling/case_motion_frame_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_motion_frame PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
 
 uvlas_add_test(io.case_schema
     LABELS unit property negative verification
@@ -899,6 +993,9 @@ if(UVLAS_SANITIZERS AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # Both full schema suites reached the default 60 s on GCC 14 with
     # ASan/UBSan. Give these runners a separate, bounded test time.
     set_tests_properties(io.case_schema io.case_schema_resources PROPERTIES TIMEOUT 300)
+    # Exact coefficient work and the full circulation path are slower under ASan and UBSan.
+    set_tests_properties(structure.pg_conditioning PROPERTIES TIMEOUT 600)
+    set_tests_properties(coupling.case_uniform_flow PROPERTIES TIMEOUT 300)
 endif()
 
 uvlas_add_test(io.reference_root_plan

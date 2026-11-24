@@ -1,0 +1,31 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-curved-pg-bounds",
+  "date": "2026-11-24",
+  "package": "IM-06",
+  "ids": [
+    "IO4-03",
+    "IO4-04",
+    "SH-D02",
+    "R-05"
+  ],
+  "source_commit": "d519a9fdf",
+  "scope": "Whole-face distance and oriented unit normal bounds for the stated retained mapping.",
+  "checks": {
+    "windows_release_ctest": 6,
+    "linux_release_ctest": 6,
+    "exact_max_interior_gap_metres": "1/20000",
+    "tested_faces": 4,
+    "restored_assertions": 26,
+    "mutation_failed": 4,
+    "mutation": "scale the curved interpolation allowance by 1/32"
+  },
+  "sources": {
+    "src/io/external_planar_pg.cpp": "6e10e45ea8207b788d3f1aae63d3a3a5e1786048a13b7d90fe91f3e9a7e07097",
+    "src/io/external_planar_pg.hpp": "8cb24ec791506adbe8b1fc509e3fff0e622598e25aadce39286cffebfa79052a",
+    "tests/io/external_planar_pg_test.cpp": "32fe5587083f9de8c043aae7283298ed64be505394df07f45883ebbb88587903"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-curved-pg-bounds.md": "f6d74dca9caff1fe6652cfcf8efe6782e9281ef3ae6f53f5f55b18c717e37035"
+  }
+}

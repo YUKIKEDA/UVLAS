@@ -66,12 +66,15 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
     src/structure/pg_conditioning.cpp src/structure/pg_flat_gram.cpp
-    src/structure/pg_discrete_gram.cpp
+    src/structure/pg_discrete_gram.cpp src/structure/pg_prepared_patch.cpp
+    src/structure/pg_full_trace.cpp src/structure/pg_global_constraints.cpp
+    src/structure/pg_sparse_chart.cpp src/structure/pg_chart_candidate.cpp
+    src/structure/pg_support_history.cpp src/structure/pg_rigid_support_rows.cpp
     src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_structure PUBLIC uvlas_core PRIVATE Boost::headers Boost::hash2)
+target_link_libraries(uvlas_structure PUBLIC uvlas_core uvlas_numerics PRIVATE Boost::headers Boost::hash2)
 
 if(UVLAS_BUILD_PYTHON)
     if(NOT CMAKE_CROSSCOMPILING)
@@ -116,11 +119,12 @@ target_link_libraries(uvlas_eigen_full_canary PRIVATE uvlas_numerics)
 set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_path.cpp src/io/reference_file_snapshot.cpp src/io/gmsh_mesh.cpp src/io/gmsh_surface_topology.cpp
     src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp src/io/nastran_beam_cards.cpp
-    src/io/nastran_pbeam_cards.cpp
+    src/io/nastran_pbeam_cards.cpp src/io/nastran_position_enclosures.cpp
     src/io/nastran_shell_cards.cpp src/io/nastran_isotropic_shell_cards.cpp
-    src/io/nastran_laminate_cards.cpp
+    src/io/nastran_laminate_cards.cpp src/io/external_mesh_quantity.cpp src/io/external_planar_pg.cpp
     src/io/nastran_support_cards.cpp src/io/nastran_lumped_mass_cards.cpp
-    src/io/nastran_rigid_link_cards.cpp
+    src/io/nastran_lumped_mass_geometry.cpp src/io/nastran_beam_si.cpp
+    src/io/nastran_rigid_link_cards.cpp src/io/nastran_rigid_attachment.cpp
     src/io/case_schema.cpp src/io/case_schema_exact.cpp src/io/case_schema_dictionary.cpp
     src/io/si_case.cpp src/io/si_case_storage.cpp src/io/si_case_catalog.cpp src/io/si_exact.cpp
     src/io/si_exact_center.cpp src/io/si_rational_projection.cpp src/io/si_quantity.cpp src/io/reference_declarations.cpp
@@ -145,7 +149,14 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
+                         src/coupling/pg_aero_attachment.cpp
+    src/coupling/fixed_bdf2_circulation.cpp
+    src/coupling/fixed_wake_transport.cpp
     src/coupling/case_known_flow.cpp
+    src/coupling/case_aero_attachment.cpp
+    src/coupling/case_motion.cpp src/coupling/case_pg_support_motion.cpp
+    src/coupling/case_motion_frame.cpp
+    src/coupling/case_motion_time_series.cpp
     src/coupling/case_uniform_flow.cpp
     src/coupling/case_uniform_flow_projection.cpp src/coupling/discrete_nonpenetration.cpp)
 uvlas_configure_target(uvlas_coupling)
@@ -211,11 +222,17 @@ if(BUILD_TESTING)
         target_link_libraries(uvlas_core_audit PRIVATE psapi)
     endif()
     add_dependencies(uvlas_core_audit uvlas_git_revision)
+    add_library(uvlas_numerics_audit STATIC ${UVLAS_NUMERICS_SOURCES})
+    uvlas_configure_target(uvlas_numerics_audit)
+    uvlas_enable_allocation_audit(uvlas_numerics_audit)
+    target_include_directories(uvlas_numerics_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
+    uvlas_require_audited_dependencies(uvlas_numerics_audit)
     add_library(uvlas_structure_audit STATIC ${UVLAS_STRUCTURE_SOURCES})
     uvlas_configure_target(uvlas_structure_audit)
     uvlas_enable_allocation_audit(uvlas_structure_audit)
     target_include_directories(uvlas_structure_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(uvlas_structure_audit PUBLIC uvlas_core_audit PRIVATE Boost::headers Boost::hash2)
+    target_link_libraries(uvlas_structure_audit PUBLIC uvlas_core_audit uvlas_numerics_audit PRIVATE Boost::headers Boost::hash2)
     uvlas_require_audited_dependencies(uvlas_structure_audit)
     uvlas_require_audited_dependencies(uvlas_core_audit)
     add_library(uvlas_io_audit STATIC ${UVLAS_IO_SOURCES})
@@ -224,12 +241,6 @@ if(BUILD_TESTING)
     target_include_directories(uvlas_io_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
     target_link_libraries(uvlas_io_audit PUBLIC uvlas_core_audit uvlas_structure_audit PRIVATE nlohmann_json::nlohmann_json Boost::headers Boost::hash2)
     uvlas_require_audited_dependencies(uvlas_io_audit)
-    add_library(uvlas_numerics_audit STATIC ${UVLAS_NUMERICS_SOURCES})
-    uvlas_configure_target(uvlas_numerics_audit)
-    uvlas_enable_allocation_audit(uvlas_numerics_audit)
-    target_include_directories(uvlas_numerics_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
-    uvlas_require_audited_dependencies(uvlas_numerics_audit)
     add_library(uvlas_aero_audit STATIC ${UVLAS_AERO_SOURCES})
     uvlas_configure_target(uvlas_aero_audit)
     uvlas_enable_allocation_audit(uvlas_aero_audit)

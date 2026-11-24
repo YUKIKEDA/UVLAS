@@ -41,6 +41,9 @@ public:
                                                                core::ResourcePlan&) const noexcept;
 
     [[nodiscard]] core::Result<std::uint64_t> size() const noexcept;
+    [[nodiscard]] core::Result<PgReferenceIdentity> reference_identity() const noexcept;
+    [[nodiscard]] core::Result<PgReferenceFrame> frame() const& noexcept;
+    [[nodiscard]] core::Result<PgReferenceFrame> frame() const&& = delete;
     /// Borrow source maps and selected order for subsequent basis transforms.
     [[nodiscard]] core::Result<const PgRankPreparation*> rank() const& noexcept;
     [[nodiscard]] core::Result<const PgRankPreparation*> rank() const&& = delete;
@@ -56,7 +59,7 @@ private:
                                                      const PgReferencePoint&) const;
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
     numerator_jet(detail::ReferenceArithmetic&, PgRankBasisColumn,
-                  const detail::BasisReferencePoint&) const;
+                  const detail::BasisReferencePoint&, bool derivatives = true) const;
     [[nodiscard]] detail::BasisReferenceSample
     sample(detail::ReferenceArithmetic&, const detail::BasisReferencePoint&,
            const std::array<std::array<ExactRational, 3>, 3>&) const;

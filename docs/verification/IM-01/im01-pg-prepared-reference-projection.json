@@ -1,0 +1,46 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-prepared-reference-projection",
+  "ids": [
+    "SH-D02",
+    "SH-D03",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "d76bd831f87a31380a454a8172d3b9a9437464df",
+  "claimed_state": "準備済みパッチに位置・形状・勾配・正の測度の成分別の射影を接続し、Binary64とTwoWordを両OSで照合した。",
+  "checks": {
+    "integrated_product_commit": "ce96248d5b4f37b681f53ba22fb6a473526cab0d",
+    "targets_per_release_platform": 13,
+    "final_targeted_tests_per_platform": 2,
+    "rounding_case_assertions_per_platform": 27,
+    "windows": {
+      "compiler": "MSVC 19.51.36260",
+      "configuration": "Release"
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release"
+    },
+    "flat_binary64_absolute": "2^-32",
+    "flat_twoword_absolute": "2^-72",
+    "curved_area_absolute_m2": "2^-72",
+    "independent_sqrt_grid_bits": 256
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-prepared-patch-contract.md": "4f2b996e071f21b127c3f1ea77f0a95a81c954b27e71f0de3610c91b2b2cfd0f",
+    "docs/verification/IM-01/pg-prepared-reference-projection.md": "0dac6e3e10dec2296e6bdccc3b8b51d0825e1bca6997b4258dcc8a28893714be",
+    "include/uvlas/structure/pg_prepared_patch.hpp": "8eca864cb84461727ed5074991a8a09ed57eba22e8d1d92b04810407645c7585",
+    "src/structure/pg_reference_projection.hpp": "eacf129a8874d98e451e57ad2a550b186c633aee2bc02782eecbd2500f8af398",
+    "src/structure/pg_volume_mass_reference.cpp": "e2d52906b0ad43faeaefd95eacbee362ffd5a770764a676cd44440d37f4d3473",
+    "tests/structure/pg_conditioning_test.cpp": "33a5463796d6eac95c111e24001ae99a9f135e00dac5ba8654e668bfe793f823",
+    "tests/structure/pg_discrete_gram_test.cpp": "c4279b288ab385bba496191eb2d0b2b0ee4fe975a896069e5b51ff2a52a48c2b",
+    "tests/structure/pg_prepared_patch_test.cpp": "c95a0acb65f7dd748d6f501888c4066fe5a1bc07e2cd5965fe2dcdc03f87ac39",
+    "tests/structure/pg_full_trace_test.cpp": "d1609fe6dff3ad546f9f7bca56213e747b3662122b55623c910feef183abcee8"
+  }
+}

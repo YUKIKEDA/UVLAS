@@ -60,7 +60,8 @@ struct PgConditionedReferenceBatch {
 
 namespace detail {
 struct PgConditioningState;
-}
+class ReferenceHash;
+} // namespace detail
 
 /// Certifies the complete discrete congruence against the caller's independently
 /// qualified Gram enclosure. The caller supplies the enclosure for this actual basis.
@@ -120,6 +121,11 @@ public:
                          core::ResourcePlan&) const noexcept;
 
 private:
+    friend class PgPreparedPatch;
+    [[nodiscard]] core::PlannedBuffer<ExactRational>
+    materialize_required(detail::ReferenceArithmetic&, PgRankRequiredColumn) const;
+    void append_basis_identity(detail::ReferenceArithmetic&, detail::ReferenceHash&) const;
+
     [[nodiscard]] static core::Result<PgConditioningCertificate>
     certify_impl(PgReferenceBasis&&, PgDiscreteGramEnclosure,
                  std::variant<PgConditioningCandidate, PgConditioningGeneration>,

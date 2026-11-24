@@ -1,7 +1,7 @@
 #pragma once
 
 #include "aero/p1_shared_action.hpp"
-#include "case_uniform_flow_projection.hpp"
+#include "case_known_flow.hpp"
 
 #include <uvlas/numerics/linear_solve.hpp>
 
@@ -11,12 +11,29 @@ struct Interval;
 
 namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
+using ExplicitCollocationTangents = std::array<NonpenetrationVector, 2>;
+
+/// Retained current coordinates of an oriented facet. The tangents are the
+/// exact differences 1-0 and 2-0, evaluated without intermediate projection.
+struct RoundedFacetTangents {
+    std::array<NonpenetrationVector, 3> points;
+};
 
 /// Explicit discrete collocation in the current geometry. The tangents orient its
 /// normal and the velocity is in m/s. No physical PG mapping is inferred.
 struct DiscreteCollocation {
     DiscreteCollocation(aero::detail::FacetId source, const aero::detail::ResolvedQuery& point,
-                        const std::array<NonpenetrationVector, 2>& frame,
+                        const ExplicitCollocationTangents& frame,
+                        const NonpenetrationVector& motion, const aero::detail::ScalarWords& gamma,
+                        const aero::detail::ScalarWords& direction) noexcept
+        : facet(source),
+          query(point),
+          tangents(frame),
+          velocity(motion),
+          circulation(gamma),
+          circulation_direction(direction) {}
+    DiscreteCollocation(const RoundedFacetTangents& frame, aero::detail::FacetId source,
+                        const aero::detail::ResolvedQuery& point,
                         const NonpenetrationVector& motion, const aero::detail::ScalarWords& gamma,
                         const aero::detail::ScalarWords& direction) noexcept
         : facet(source),
@@ -27,7 +44,7 @@ struct DiscreteCollocation {
           circulation_direction(direction) {}
     aero::detail::FacetId facet; ///< Either child of the bound physical quadrilateral.
     const aero::detail::ResolvedQuery& query;
-    std::array<NonpenetrationVector, 2> tangents;
+    std::variant<ExplicitCollocationTangents, RoundedFacetTangents> tangents;
     NonpenetrationVector velocity;
     aero::detail::ScalarWords circulation;
     aero::detail::ScalarWords circulation_direction;
@@ -97,10 +114,11 @@ struct DiscreteNonpenetrationLimits {
 };
 
 struct DiscreteNonpenetrationRow {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure residual;           ///< m/s, including the original affine terms.
     aero::detail::ScaledEnclosure circulation_action; ///< A_eff δΓ in m/s.
-    bool includes_wake_quadrature; ///< The finite wake formula carries the existing P1 diagnostic.
+    bool
+        includes_wake_quadrature{}; ///< The finite wake formula carries the existing P1 diagnostic.
 };
 struct NonpenetrationStorage;
 struct NonpenetrationBuilder;
@@ -174,9 +192,9 @@ struct DiscreteCirculationRequest {
 };
 
 struct CirculationResidualRow {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure original_residual; ///< m/s from the native finite expression.
-    bool includes_wake_quadrature;
+    bool includes_wake_quadrature{};
 };
 
 /// Own both the LU-qualified retained words and the independent native residual
@@ -197,6 +215,10 @@ public:
         return flow_;
     }
     [[nodiscard]] const ProjectedCaseUniformFlow& flow() const&& = delete;
+    [[nodiscard]] const aero::detail::PreparedTopologyOwner& source() const& noexcept {
+        return source_;
+    }
+    [[nodiscard]] const aero::detail::PreparedTopologyOwner& source() const&& = delete;
     [[nodiscard]] std::uint64_t used_steps() const noexcept {
         return steps_;
     }
@@ -206,12 +228,14 @@ private:
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
                         std::optional<aero::detail::P1ActionValue>,
-                        core::PlannedBuffer<aero::detail::p1::Interval>, std::uint64_t) noexcept;
+                        core::PlannedBuffer<aero::detail::p1::Interval>,
+                        aero::detail::PreparedTopologyOwner, std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
     std::optional<aero::detail::P1ActionValue> geometry_owner_;
     core::PlannedBuffer<aero::detail::p1::Interval> influence_;
+    aero::detail::PreparedTopologyOwner source_;
     std::uint64_t steps_;
 };
 
@@ -308,7 +332,7 @@ struct DiscreteCirculationDirection {
 };
 
 struct CirculationForcingRow {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure residual_direction; ///< Fixed-circulation δR, in m/s.
 };
 
@@ -447,6 +471,8 @@ struct BoundCirculationRate {
     aero::detail::ScalarWords rate; ///< Externally supplied Γdot, m²/s², for this discrete face.
 };
 
+class FixedBdf2Circulation;
+
 struct DiscreteVectorLoadInput {
     DiscreteVectorLoadInput(aero::detail::P1ActionStamp trial,
                             core::NumericalGeneration circulation_generation,
@@ -466,6 +492,7 @@ struct DiscreteVectorLoadInput {
     std::span<const BoundCirculationRate> rates; ///< Ascending physical bound face IDs.
     aero::detail::ScalarWords density;           ///< kg/m³, finite and strictly positive.
     NonpenetrationVector moment_origin;          ///< Reference point in the geometry's SI frame.
+    const FixedBdf2Circulation* fixed_bdf2 = nullptr; ///< Alternative to independent rates.
 };
 
 struct DiscreteCirculatoryLoad {
@@ -486,6 +513,18 @@ struct DiscreteNoncirculatoryLoad {
 struct DiscreteNodalLoad {
     aero::detail::PointId point;
     DiscreteLoadVector force;
+};
+
+struct RetainedBdf2Rate {
+    aero::detail::PhysicalFaceId face{0};
+    aero::detail::ScaledEnclosure rate; ///< Same D_h Gamma used in the load, m²/s².
+};
+
+/// Exact adopted trial identity retained with assembled nodal forces.
+struct DiscreteLoadSource {
+    aero::detail::GeometryContext context;
+    std::array<std::byte, 32> geometry;
+    aero::detail::P1ActionStamp stamp;
 };
 
 /// Own one certified circulation and its vector loads, in SI units.
@@ -520,6 +559,13 @@ public:
     [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t bdf2_rate_count() const noexcept {
+        return bdf2_rates_.size();
+    }
+    [[nodiscard]] core::Result<RetainedBdf2Rate> bdf2_rate(std::size_t) const noexcept;
+    [[nodiscard]] DiscreteLoadSource source() const noexcept {
+        return source_;
+    }
     [[nodiscard]] std::uint64_t used_steps() const noexcept {
         return steps_;
     }
@@ -531,12 +577,16 @@ private:
                              core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>>,
                              core::PlannedBuffer<std::optional<DiscreteNodalLoad>>,
                              const DiscreteLoadVector& force, const DiscreteLoadVector& moment,
-                             const DiscreteLoadVector& origin, std::uint64_t) noexcept;
+                             const DiscreteLoadVector& origin,
+                             core::PlannedBuffer<std::optional<RetainedBdf2Rate>>,
+                             DiscreteLoadSource, std::uint64_t) noexcept;
     DiscreteCirculation primal_;
     core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges_;
     core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets_;
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points_;
     DiscreteLoadVector force_, moment_, origin_;
+    core::PlannedBuffer<std::optional<RetainedBdf2Rate>> bdf2_rates_;
+    DiscreteLoadSource source_;
     std::uint64_t steps_;
 };
 
@@ -782,12 +832,13 @@ private:
     const std::stop_token& = {}) noexcept;
 
 struct LoadCirculationRateCovector {
-    aero::detail::PhysicalFaceId face;
+    aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure rate; ///< Dual to the independent Γdot, s²/m².
 };
 
 /// Fixed-chart transpose of the solved load outputs. Point and flow duals
-/// include the response of the retained circulation. Γdot remains independent.
+/// include the response of retained circulation. With fixed BDF2 they include
+/// the current-rate chain while the older solves and step size stay fixed.
 class DiscreteCirculationImplicitLoadVjp {
 public:
     DiscreteCirculationImplicitLoadVjp(DiscreteCirculationImplicitLoadVjp&&) noexcept = default;
@@ -845,5 +896,230 @@ solve_discrete_circulation_implicit_load_pullback(
     const DiscreteCirculationRequest& transpose, aero::detail::GeometryWorkspace&,
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
+struct DiscreteKnownFlowInput {
+    const CaseKnownFlowReady& source;
+    const CaseKnownFlowReady& current;
+    CaseUniformFlowQuery time;
+    CaseKnownFlowProjection projection;
+    CaseKnownFlowLimits flow_limits; ///< Provider caps per collocation.
+    aero::detail::GeometryLimits coordinate_limits;
+    aero::detail::GeometryWorkspace& coordinates;
+    aero::detail::UniformFlowWorkspace& workspace;
+};
+
+struct KnownCirculationTangent {
+    const DiscreteCirculationDirection& state;
+    aero::detail::ScalarWords flow_time; ///< Variation of ambient time only, in seconds.
+    const DiscreteCirculationRequest& request;
+};
+
+struct KnownCirculationAdjoint {
+    std::span<const CirculationLinearRhs> seed;
+    const DiscreteCirculationRequest& request;
+};
+
+using KnownCirculationDerivative =
+    std::variant<std::monostate, KnownCirculationTangent, KnownCirculationAdjoint>;
+struct KnownCirculationRun;
+
+/// Real discrete solve with the known flow sampled once at each qualified collocation.
+/// Holds the native original residual, input jets, and the selected fixed-chart derivative.
+class DiscreteKnownCirculation {
+public:
+    DiscreteKnownCirculation(DiscreteKnownCirculation&&) noexcept;
+    DiscreteKnownCirculation& operator=(DiscreteKnownCirculation&&) noexcept;
+    ~DiscreteKnownCirculation();
+    DiscreteKnownCirculation(const DiscreteKnownCirculation&) = delete;
+    DiscreteKnownCirculation& operator=(const DiscreteKnownCirculation&) = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const numerics::linear::Solution<double>>>
+    solution() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const numerics::linear::Solution<double>>>
+    solution() const&& = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
+    linearization() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
+    linearization() const&& = delete;
+    [[nodiscard]] core::Result<CirculationResidualRow> row(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    flow(std::size_t) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    flow(std::size_t) const&& = delete;
+    [[nodiscard]] core::Result<CirculationForcingRow> forcing(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationPointCovector> point(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationCollocationCovector>
+    collocation(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationVectorCovector> uniform_component_dual() const noexcept;
+    /// Covector to a common ambient time shift, in inverse seconds.
+    [[nodiscard]] core::Result<aero::detail::ScaledEnclosure> flow_time_dual() const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    explicit DiscreteKnownCirculation(core::PlannedBuffer<KnownCirculationRun>&&) noexcept;
+    core::PlannedBuffer<KnownCirculationRun> data_;
+};
+
+/// Requires at least one bound row. Geometry, attached-wake chart, core radius and wake history
+/// remain those of this trial.
+/// The time direction differentiates only the analytic known-flow input at its requested side.
+[[nodiscard]] core::Result<DiscreteKnownCirculation> solve_discrete_known_circulation(
+    const DiscreteNonpenetrationInput&, const DiscreteKnownFlowInput&,
+    const KnownCirculationDerivative&, const DiscreteNonpenetrationLimits&,
+    const DiscreteCirculationRequest&, aero::detail::SharedP1Workspace&,
+    aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}) noexcept;
+
+struct KnownLoadTangent {
+    const DiscreteImplicitVectorLoadDirection& state;
+    aero::detail::ScalarWords flow_time; ///< Ambient-time direction only, in seconds.
+    const DiscreteCirculationRequest& request;
+};
+struct KnownLoadAdjoint {
+    const DiscreteVectorLoadWeights& weights;
+    const DiscreteCirculationRequest& request;
+};
+using KnownLoadDerivative = std::variant<std::monostate, KnownLoadTangent, KnownLoadAdjoint>;
+
+struct KnownLoadRun;
+
+/// Own the solved circulation, the flow at all used midpoints, and the matching loads.
+class DiscreteKnownLoads {
+public:
+    DiscreteKnownLoads(DiscreteKnownLoads&&) noexcept;
+    DiscreteKnownLoads& operator=(DiscreteKnownLoads&&) noexcept;
+    DiscreteKnownLoads(const DiscreteKnownLoads&) = delete;
+    DiscreteKnownLoads& operator=(const DiscreteKnownLoads&) = delete;
+    ~DiscreteKnownLoads();
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteKnownCirculation>>
+    circulation() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteKnownCirculation>>
+    circulation() const&& = delete;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    midpoint_flow(std::size_t) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    midpoint_flow(std::size_t) const&& = delete;
+    [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> total_force() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> total_moment() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> moment_origin() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadSampleDirection>
+    edge_direction(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadSampleDirection>
+    facet_direction(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteNodalLoad> point_direction(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> force_direction() const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> moment_direction() const noexcept;
+    [[nodiscard]] core::Result<CirculationPointCovector> point_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<LoadEdgeVelocityCovector>
+    midpoint_velocity_dual(std::size_t) const noexcept;
+    /// Dual to independent Γdot. The solved Γ response is included in the other covectors.
+    [[nodiscard]] core::Result<LoadCirculationRateCovector>
+    circulation_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<CirculationCollocationCovector>
+    collocation_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<DiscreteLoadVector> uniform_component_dual() const noexcept;
+    [[nodiscard]] core::Result<aero::detail::ScaledEnclosure> flow_time_dual() const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    explicit DiscreteKnownLoads(core::PlannedBuffer<KnownLoadRun>&&) noexcept;
+    core::PlannedBuffer<KnownLoadRun> data_;
+};
+
+/// One nominal circulation solve, then fixed-chart loads and the selected implicit action.
+/// Circulation rate and midpoint wing velocity remain explicit independent inputs.
+[[nodiscard]] core::Result<DiscreteKnownLoads>
+solve_discrete_known_loads(const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
+                           const DiscreteKnownFlowInput&, const KnownLoadDerivative&,
+                           const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest&,
+                           aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+                           aero::detail::P1Workspace&, core::ResourcePlan&,
+                           const std::stop_token& = {}) noexcept;
+
+struct DiscreteFreeWakeDirection {
+    std::span<const aero::detail::PointId> points; ///< Ascending canonical point IDs.
+    std::span<const NonpenetrationVector> displacements;
+    std::span<const FrozenWakeTrace> history; ///< Old trace directions in source ID order.
+    NonpenetrationVector uniform_flow;
+    aero::detail::ScalarWords flow_time; ///< Only the input field's time coordinate.
+    aero::detail::ScalarWords core_radius;
+};
+
+struct DiscreteFreeWakeLimits {
+    DiscreteNonpenetrationLimits action;
+    std::uint64_t max_particles{};
+};
+
+struct FreeWakeVelocitySource {
+    aero::detail::GeometryContext geometry;
+    aero::detail::P1ActionStamp stamp;
+    core::AcceptedStateId parent{0};
+};
+
+struct FreeWakeVelocityRow {
+    aero::detail::PointId particle{0};
+    aero::detail::PointId owner{0};
+    DiscreteLoadVector velocity;
+    std::optional<DiscreteLoadVector> direction;
+    bool includes_wake_quadrature{};
+};
+
+struct FreeWakeStrengthCovector {
+    aero::detail::P1StrengthId id; ///< Bound circulation or independent old wake trace.
+    aero::detail::ScaledEnclosure value;
+};
+struct FreeWakeFieldCovector {
+    DiscreteLoadVector uniform_flow;
+    aero::detail::ScaledEnclosure flow_time, core_radius;
+};
+struct DiscreteFreeWakeRun;
+
+class DiscreteFreeWakeVelocity {
+public:
+    DiscreteFreeWakeVelocity(DiscreteFreeWakeVelocity&&) noexcept;
+    DiscreteFreeWakeVelocity& operator=(DiscreteFreeWakeVelocity&&) noexcept;
+    DiscreteFreeWakeVelocity(const DiscreteFreeWakeVelocity&) = delete;
+    DiscreteFreeWakeVelocity& operator=(const DiscreteFreeWakeVelocity&) = delete;
+    ~DiscreteFreeWakeVelocity();
+    [[nodiscard]] std::size_t size() const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept;
+    [[nodiscard]] core::Result<FreeWakeVelocitySource> source() const noexcept;
+    [[nodiscard]] core::Result<FreeWakeVelocityRow> row(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    ambient(std::size_t) const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
+    ambient(std::size_t) const&& = delete;
+    [[nodiscard]] std::size_t point_count() const noexcept;
+    [[nodiscard]] std::size_t strength_count() const noexcept;
+    [[nodiscard]] core::Result<CirculationPointCovector> point_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<FreeWakeStrengthCovector> strength_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<FreeWakeFieldCovector> field_dual() const noexcept;
+
+private:
+    friend struct NonpenetrationBuilder;
+    explicit DiscreteFreeWakeVelocity(core::PlannedBuffer<DiscreteFreeWakeRun>&&) noexcept;
+    core::PlannedBuffer<DiscreteFreeWakeRun> data_;
+};
+
+/// Compose the velocity pullback directly into a signed residual.
+enum class FreeWakeSeedSign : std::uint8_t { Positive, Negative };
+
+/// Use a fixed contact-qualified source state and its positive common SI radius.
+/// Each selected particle belongs to a retained wake face. The listed IDs can be
+/// explicit aliases of wake points, with one evaluation per canonical owner.
+/// The circulation words (and directions, when requested) are the supplied
+/// bound rows. The attached trace follows T; history entries remain independent.
+/// Seeds are empty for no adjoint, otherwise one real velocity seed per particle.
+/// No material identity is released or advanced here.
+[[nodiscard]] core::Result<DiscreteFreeWakeVelocity> evaluate_discrete_free_wake_velocity(
+    const DiscreteNonpenetrationInput&, const DiscreteKnownFlowInput&,
+    std::span<const aero::detail::PointId> particles, const DiscreteFreeWakeDirection*,
+    std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits&,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {},
+    FreeWakeSeedSign = FreeWakeSeedSign::Positive) noexcept;
 
 } // namespace uvlas::coupling::detail

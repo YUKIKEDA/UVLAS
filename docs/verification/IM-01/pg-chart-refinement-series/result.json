@@ -1,0 +1,201 @@
+{
+  "source_commit": "94fde16a2d49872bf8065d31791d4c843c085df3",
+  "compiler": "MSVC 19.51.36260 Release",
+  "logical_cpu": 2,
+  "case_assertions": [
+    8874,
+    11768,
+    15971
+  ],
+  "candidate_coefficient_absolute_error": 9.313225746154785e-10,
+  "candidate_original_absolute_error": 1e-05,
+  "refined_original_absolute_error": 1e-16,
+  "work_absolute_error": 1e-06,
+  "maximum_corrections": 3,
+  "maximum_owned_payload_bytes": 51539607552,
+  "cases": [
+    {
+      "patches": 2,
+      "connections": 1,
+      "rank": 107,
+      "project_and_factor": {
+        "nanoseconds": 1263266800,
+        "charged_bytes": 73584967,
+        "resident_bytes": 549179392,
+        "lifetime_peak_resident_bytes": 937013248
+      },
+      "lift": {
+        "nanoseconds": 51190000,
+        "charged_bytes": 39882,
+        "resident_bytes": 549281792,
+        "lifetime_peak_resident_bytes": 937013248
+      },
+      "transpose": {
+        "nanoseconds": 58842100,
+        "charged_bytes": 410874,
+        "resident_bytes": 549564416,
+        "lifetime_peak_resident_bytes": 937013248
+      },
+      "lift_failure": 11,
+      "lift_operation": 0,
+      "transpose_failure": 11,
+      "transpose_operation": 0,
+      "refine_lift": {
+        "nanoseconds": 892240200,
+        "charged_bytes": 22454182,
+        "resident_bytes": 549568512,
+        "lifetime_peak_resident_bytes": 937013248
+      },
+      "refine_transpose": {
+        "nanoseconds": 510407300,
+        "charged_bytes": 23915628,
+        "resident_bytes": 549568512,
+        "lifetime_peak_resident_bytes": 937013248
+      },
+      "refined_work": {
+        "nanoseconds": 310000,
+        "charged_bytes": 0,
+        "resident_bytes": 549572608,
+        "lifetime_peak_resident_bytes": 937013248
+      },
+      "lift_work": {
+        "corrections": 2,
+        "scalar_operations": 512200,
+        "partition_visits": 106230
+      },
+      "transpose_work": {
+        "corrections": 1,
+        "scalar_operations": 633034,
+        "partition_visits": 43494
+      },
+      "residual_upper": 2.0838401689886385e-17,
+      "balance_upper": 5.553580473294097e-20,
+      "work_upper": 4.547141253097251e-17,
+      "independent_original_defect": 2.0838401689886382e-17,
+      "independent_force_balance": 5.553580473294097e-20,
+      "independent_work_defect": 4.547141253097251e-17
+    },
+    {
+      "patches": 3,
+      "connections": 2,
+      "rank": 144,
+      "project_and_factor": {
+        "nanoseconds": 1014662900,
+        "charged_bytes": 101734984,
+        "resident_bytes": 684675072,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "lift": {
+        "nanoseconds": 50886800,
+        "charged_bytes": 53328,
+        "resident_bytes": 684781568,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "transpose": {
+        "nanoseconds": 70334100,
+        "charged_bytes": 545744,
+        "resident_bytes": 685027328,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "lift_failure": 11,
+      "lift_operation": 0,
+      "transpose_failure": 11,
+      "transpose_operation": 0,
+      "refine_lift": {
+        "nanoseconds": 565515800,
+        "charged_bytes": 31532864,
+        "resident_bytes": 685031424,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "refine_transpose": {
+        "nanoseconds": 400469000,
+        "charged_bytes": 32768592,
+        "resident_bytes": 685035520,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "refined_work": {
+        "nanoseconds": 391300,
+        "charged_bytes": 0,
+        "resident_bytes": 685039616,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "lift_work": {
+        "corrections": 2,
+        "scalar_operations": 713511,
+        "partition_visits": 153849
+      },
+      "transpose_work": {
+        "corrections": 1,
+        "scalar_operations": 857174,
+        "partition_visits": 65202
+      },
+      "residual_upper": 2.0838401689886385e-17,
+      "balance_upper": 1.524853614194144e-18,
+      "work_upper": 1.55956108251305e-12,
+      "independent_original_defect": 2.0838401689886382e-17,
+      "independent_force_balance": 1.524853614194144e-18,
+      "independent_work_defect": 1.55956108251305e-12
+    },
+    {
+      "patches": 4,
+      "connections": 4,
+      "rank": 248,
+      "project_and_factor": {
+        "nanoseconds": 1901707900,
+        "charged_bytes": 222219280,
+        "resident_bytes": 822427648,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "lift": {
+        "nanoseconds": 94465700,
+        "charged_bytes": 81648,
+        "resident_bytes": 822534144,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "transpose": {
+        "nanoseconds": 94822100,
+        "charged_bytes": 701488,
+        "resident_bytes": 823140352,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "lift_failure": 11,
+      "lift_operation": 0,
+      "transpose_failure": 11,
+      "transpose_operation": 0,
+      "refine_lift": {
+        "nanoseconds": 901565500,
+        "charged_bytes": 61821960,
+        "resident_bytes": 823156736,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "refine_transpose": {
+        "nanoseconds": 652342300,
+        "charged_bytes": 48709480,
+        "resident_bytes": 823226368,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "refined_work": {
+        "nanoseconds": 497800,
+        "charged_bytes": 0,
+        "resident_bytes": 823230464,
+        "lifetime_peak_resident_bytes": 936996864
+      },
+      "lift_work": {
+        "corrections": 2,
+        "scalar_operations": 1354543,
+        "partition_visits": 329451
+      },
+      "transpose_work": {
+        "corrections": 1,
+        "scalar_operations": 1195138,
+        "partition_visits": 140718
+      },
+      "residual_upper": 6.368117922485877e-18,
+      "balance_upper": 9.467731949157115e-20,
+      "work_upper": 1.930574194879953e-12,
+      "independent_original_defect": 6.368117922485876e-18,
+      "independent_force_balance": 9.467731949157115e-20,
+      "independent_work_defect": 1.930574194879953e-12
+    }
+  ]
+}

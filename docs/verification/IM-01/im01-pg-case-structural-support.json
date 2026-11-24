@@ -1,0 +1,86 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-case-structural-support",
+  "package": "IM-01",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-04"
+  ],
+  "date": "2026-11-24",
+  "source_commit": "16abcf4678773da8d46417a08976cbc50139f859",
+  "claimed_state": "ケースの構造支持宣言を同じ共通時計と元の固定PGチャートに結び、実位置・速度・加速度の元行残差と仕事を検証した。",
+  "checks": {
+    "ctest": [
+      "coupling.case_structural_pg_support",
+      "coupling.case_pg_support_motion"
+    ],
+    "assertions_per_configuration": [
+      3149,
+      6365
+    ],
+    "elapsed_seconds": {
+      "msvc_release": [
+        1.29,
+        0.66
+      ],
+      "msvc_debug": [
+        8.09,
+        3.24
+      ],
+      "gcc14_asan_ubsan": [
+        17.65,
+        7.09
+      ]
+    },
+    "mutation": {
+      "base_commit": "51792e6335107d0e224af26a7ee018fe751cb549",
+      "change": "ignore the result of validating the original rows against the declared whole edge",
+      "mutated_source_sha256": "fbf8c4e78230fca4fc0698c60e25a5ccbf47ed49615dfc6881f50268da68095f",
+      "failure_assertion_index": 4
+    },
+    "clang_tidy_translation_units": 3
+  },
+  "sources": {
+    "src/coupling/case_flow_clock.hpp": "587675b2dd2e4b937b0b1629b3f8a98239a10ff80fb4820e063555a8d6500cf6",
+    "src/coupling/case_flow_clock.cpp": "d7a6007e4d50bcbf11462ad40a5893e388faa9eaf884591568d4a00a23cb46c5",
+    "src/coupling/case_motion.cpp": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "tests/coupling/case_pg_support_motion_test.cpp": "58c2bd65d83cb20ecea8befc095a765722ece7c7dfbd79ac0c53cc3257ef5eb8",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-case-structural-support.md": "351a7019d504a70d5ee1c5468f4fe7d7a9791d47257fa21388ad562949bda761"
+  },
+  "sources_at_tested_commit": {
+    "tests/CMakeLists.txt": {
+      "commit": "16abcf4678773da8d46417a08976cbc50139f859",
+      "sha256": "af5bbdc18e1e48d159fc3fc6b7442aa088815cb59c08a2df8540bba981745b7d"
+    },
+    "src/structure/pg_chart_candidate.cpp": {
+      "commit": "16abcf4678773da8d46417a08976cbc50139f859",
+      "sha256": "89eb181dcd9f849d836b61797ff259aa2106ea778dd7837e60279501d9a721fa"
+    },
+    "src/coupling/case_pg_support_motion.cpp": {
+      "commit": "16abcf4678773da8d46417a08976cbc50139f859",
+      "sha256": "dd406916527b0b0d0057dda7cb9d895f0be623f424080b55754164a6a1e6ff37"
+    },
+    "src/coupling/case_pg_support_motion.hpp": {
+      "commit": "16abcf4678773da8d46417a08976cbc50139f859",
+      "sha256": "c6b919f7a62c540e451a89f7fbdd2800c67db79217bf8dc0d4902d900dcc317a"
+    },
+    "src/structure/pg_rigid_support_rows.cpp": {
+      "commit": "16abcf4678773da8d46417a08976cbc50139f859",
+      "sha256": "07ca7ce9da3734343b30dfde7b553474664996598f81d321d044454602d1a645"
+    },
+    "tests/coupling/case_structural_pg_support_test.cpp": {
+      "commit": "16abcf4678773da8d46417a08976cbc50139f859",
+      "sha256": "8f4023ae020b44696c43a7113fae92505c69474d79ce8ef1fdce8acb2043a28d"
+    },
+    "docs/specs/structure/pg-case-structural-support-contract.md": {
+      "commit": "16abcf4678773da8d46417a08976cbc50139f859",
+      "sha256": "6177fccb7d2f66cb69b3fcca6f0860552edfe9b67a10b03292e04608a91aad49"
+    }
+  }
+}

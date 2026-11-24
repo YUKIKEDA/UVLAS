@@ -1,0 +1,622 @@
+#include "coupling/case_pg_support_motion.hpp"
+#include "io/case_schema_test_adapter.hpp"
+#include "numerics/sparse_test_support.hpp"
+#include "structure/pg_conditioning_test_support.hpp"
+
+#include <algorithm>
+#include <string>
+#include <uvlas/structure/pg_flat_gram.hpp>
+#include <uvlas/structure/pg_full_trace.hpp>
+#include <uvlas/structure/pg_global_constraints.hpp>
+#include <uvlas/structure/pg_sparse_chart.hpp>
+
+namespace {
+using namespace uvlas;
+using namespace uvlas::structure;
+using namespace partition_test;
+using namespace pg_conditioning_test;
+
+PgPreparedPatch patch(Fixture& f, const PgReferenceFrame& frame, core::Workspace& ws,
+                      core::ResourcePlan& plan) {
+    const auto limits = query_limits();
+    auto basis = make_basis(f, frame, ws, plan);
+    auto gram = take(PgFlatGram::prepare(std::move(basis), 256, {limits, steps}, ws, plan));
+    auto accepted =
+        take(std::move(gram).generate_and_certify({320, 246}, {profile, steps, {}}, ws, plan));
+    return take(PgPreparedPatch::prepare(std::move(accepted), limits, ws, plan));
+}
+
+const PgIntegrationPartition& partition(const PgPreparedPatch& patch) {
+    return take(take(patch.conditioning().reference_basis())->source()).partition;
+}
+
+struct EdgeRange {
+    core::Index edge{};
+    ExactRational first, last;
+    bool increasing = true;
+};
+
+std::vector<EdgeRange> vertical_edges(Fixture& fixture, const PgPreparedPatch& patch, const Q& s,
+                                      const Q& scale) {
+    const auto& part = partition(patch);
+    const auto vertices = take(part.vertices());
+    const auto edges = take(part.edges());
+    std::vector<EdgeRange> result;
+    for (std::size_t i = 0; i < edges.size(); ++i) {
+        const auto& edge = edges[i];
+        if (!edge.external)
+            continue;
+        const auto& a = vertices[static_cast<std::size_t>(edge.vertices[0])];
+        const auto& b = vertices[static_cast<std::size_t>(edge.vertices[1])];
+        if (q(a.s) != s || q(b.s) != s)
+            continue;
+        const Q x = q(a.t) * scale, y = q(b.t) * scale;
+        const auto lo = std::min(x, y), hi = std::max(x, y);
+        result.push_back({static_cast<core::Index>(i), rat(fixture, numerator(lo), denominator(lo)),
+                          rat(fixture, numerator(hi), denominator(hi)), x < y});
+    }
+    std::ranges::sort(result, [](const auto& a, const auto& b) { return q(a.first) < q(b.first); });
+    return result;
+}
+
+std::vector<PgTraceEdgeSpan> edge_spans(std::span<const EdgeRange> ranges,
+                                        const ExactRational& zero, const ExactRational& one,
+                                        std::optional<core::Index> layer = {}) {
+    std::vector<PgTraceEdgeSpan> result;
+    result.reserve(ranges.size());
+    for (const auto& edge : ranges)
+        result.push_back({edge.edge, edge.first, edge.last, edge.increasing ? zero : one,
+                          edge.increasing ? one : zero, layer});
+    return result;
+}
+
+} // namespace
+
+namespace {
+using namespace uvlas;
+namespace c = coupling::detail;
+namespace p = aero::detail::pchip;
+namespace a = uvlas::test::schema_adapter;
+using enum p::JetOrder;
+using enum p::RequestedSide;
+
+constexpr std::uint64_t case_budget = std::uint64_t{1} << 48U;
+constexpr p::PchipInputStamp stamp{p::PchipIssuerId{71}, p::PchipInputGeneration{8}};
+
+structure::ExactLimits motion_exact_limits() noexcept {
+    return {100000,
+            100000,
+            100000,
+            64,
+            64,
+            100000,
+            200000,
+            structure::ExactEstimateAdmission{case_budget},
+            structure::ExactTimingMode::Disabled};
+}
+
+const c::CaseMotionTimeLimits motion_limits{
+    motion_exact_limits(),
+    {{128, 100000, case_budget, 10000}, numerics::linear::EstimateAdmission{case_budget}},
+    100,
+    1000};
+
+io::SiCase checked_case(const a::JsonToken& input) {
+    core::ResourcePlan plan{case_budget};
+    const auto wire = input.wire();
+    const io::InputLimits syntax{
+        1000000, 256,     100000,  100000,
+        1000000, 1000000, 1000000, {io::ParserAllocationMode::EstimateAdmission, case_budget}};
+    std::optional<io::InputDiagnostic> parsing;
+    const auto doc =
+        take(io::read_input_document(std::as_bytes(std::span{wire.data(), wire.size()}),
+                                     io::SourceId{19}, syntax, plan, parsing));
+    std::array<std::uint64_t, static_cast<std::size_t>(io::SchemaQuota::Count)> schema_caps{};
+    schema_caps.fill(case_budget);
+    io::SchemaDiagnostic schema_diagnostic;
+    auto checked =
+        io::validate_case_schema(doc, io::SchemaLimits{schema_caps}, plan, &schema_diagnostic);
+    if (!checked) {
+        const auto diagnostic = schema_diagnostic.detail();
+        FAIL("Motion schema fixture "
+             << static_cast<unsigned>(checked.error().code) << " "
+             << (diagnostic ? static_cast<unsigned>(diagnostic->reason) : 999U) << " "
+             << schema_diagnostic.path().value_or("") << " "
+             << (diagnostic ? diagnostic->expected_field_name().value_or("") : ""));
+    }
+    std::array<std::uint64_t, static_cast<std::size_t>(io::SiQuota::Count)> si_caps{};
+    si_caps.fill(case_budget);
+    const io::SiLimits bounds{si_caps, motion_exact_limits()};
+    const auto catalog = take(io::make_si_catalog(*checked, bounds, plan, nullptr));
+    std::vector<io::SiRequirementRow> requirements;
+    for (std::uint64_t i = 0; i < take(catalog.size()); ++i) {
+        const auto entry = take(catalog.entry(i));
+        requirements.push_back({entry.key,
+                                {io::SiDecimalInput{"1"}, entry.recipe.dimensions},
+                                io::SiDecimalInput{"1e-25"},
+                                io::SiDecimalInput{"1e-25"}});
+    }
+    const auto request = take(io::make_si_request(catalog, requirements, bounds, plan, nullptr));
+    return take(io::convert_case_to_si(*checked, catalog, request, bounds, plan, nullptr));
+}
+
+} // namespace
+
+TEST_CASE("The structural reference clock checks a shell-only periodic load",
+          "[BC-01][SH-D05][N4-04][verification][negative]") {
+    auto input = a::root("structural_static");
+    input.set("initial",
+              a::parse(R"({"kind":"equilibrium","branch":"1","perturbation":{"kind":"none"}})"));
+    auto& analysis = input.field("analysis");
+    analysis.set("kind", a::string("transient"));
+    analysis.erase("speed");
+    analysis.set("intervals",
+                 a::parse(R"([{"start":-3.5,"end":-2.5,"step":1,"restart":"initial"}])"));
+    input.field("numerics").field("scales").elements.push_back(a::scale("structural_velocity"));
+    auto load = a::fragment("Load.pressure");
+    load.set(
+        "multiplier",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,4],"values":[[0],[1],[0]],"outside":{"kind":"periodic","period":4}})"));
+    input.field("model").field("shells").elements.front().field("loads").elements.push_back(
+        std::move(load));
+
+    const c::CaseUniformFlowLimits uniform{motion_exact_limits(), motion_limits.curve, 100};
+    const c::CaseFlowClockLimits limits{uniform, 2, 2};
+    const auto prepare = [&](const a::JsonToken& source) {
+        const auto si = checked_case(source);
+        core::ResourcePlan memory{profile};
+        return c::prepare_case_reference_clock(si, stamp, limits, case_budget, memory);
+    };
+    const auto crossed = prepare(input);
+    REQUIRE_FALSE(crossed);
+    CHECK(crossed.error().code == core::FailureCode::InvalidInput);
+    analysis.set(
+        "intervals",
+        a::parse(
+            R"([{"start":-3.5,"end":-3,"step":0.5,"restart":"initial"},{"start":-3,"end":-2.5,"step":0.5,"restart":"event"}])"));
+    REQUIRE(prepare(input));
+}
+
+TEST_CASE("Actual structural Support declarations use the case clock without aerodynamic inputs",
+          "[SH-D05][SH-D06][N4-04][verification][negative]") {
+    auto input = a::root("structural_static");
+    input.field("units").set("angle", a::string("deg"));
+    input.set("initial",
+              a::parse(R"({"kind":"equilibrium","branch":"1","perturbation":{"kind":"none"}})"));
+    auto& analysis = input.field("analysis");
+    analysis.set("kind", a::string("transient"));
+    analysis.erase("speed");
+    analysis.set("physics", a::string("structural"));
+    analysis.set(
+        "intervals",
+        a::parse(
+            R"([{"start":0,"end":1,"step":1,"restart":"initial"},{"start":1,"end":2,"step":1,"restart":"event"}])"));
+    analysis.set("wake", a::parse(R"({"kind":"none"})"));
+    analysis.set("loads", a::array());
+    input.set("flow", a::parse(R"({"kind":"none"})"));
+    auto& model = input.field("model");
+    model.set("aero_surfaces", a::array());
+    model.field("geometry").elements[0].field("frame").set("origin", a::parse("[2,-1,0]"));
+    auto& scales = input.field("numerics").field("scales");
+    scales.elements.push_back(a::scale("structural_velocity"));
+    auto declaration = a::fragment("Support.trace_constraint");
+    declaration.set("id", a::string("17"));
+    auto& motion = declaration.field("motion");
+    motion.set("origin", a::parse(R"({"origin":[1,2,3],"rotation":[[0,-1,0],[1,0,0],[0,0,1]]})"));
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[1,0,0],[3,0,0]],"outside":{"kind":"reject"}})"));
+    motion.set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"pchip","times":[0,2],"values":[[0,0,0],[0,0,180]],"outside":{"kind":"reject"}})"));
+    motion.set("events", a::parse("[0,1,2]"));
+    auto duplicate = declaration;
+    duplicate.set("id", a::string("71"));
+    model.set("supports", a::array());
+    model.field("supports").elements.push_back(std::move(duplicate));
+    model.field("supports").elements.push_back(std::move(declaration));
+
+    core::ResourcePlan memory{profile};
+    p::CurveWorkspace motion_workspace;
+    const c::CaseUniformFlowLimits uniform{motion_exact_limits(), motion_limits.curve, 100};
+    const c::CaseClockedPrescribedLimits clocks{
+        {{uniform, 8, 8}, {uniform, 2048, 50'000}},
+        {{motion_exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+         motion_limits,
+         2048,
+         50'000},
+        case_budget};
+    Fixture f;
+    const std::array boundary{f.point("0", "0"), f.point("0", "1")};
+    f.names.push_back({"leading", boundary});
+    f.layers.clear();
+    f.layers.push_back({core::LayerId{1}, f.zeta[0], f.zeta[2]});
+    const auto zero = f.r("0"), one = f.r("1");
+    std::array<ExactRational, 9> rotation;
+    for (const auto i : {0U, 4U, 8U})
+        rotation[i] = f.r("1");
+    const std::array<ExactRational, 3> origin{f.r("2"), f.r("-1"), f.r("0")};
+    core::Workspace ws{core::PlannedBuffer<std::byte>{}};
+    const auto patch_ready = patch(f, {rotation, origin, one}, ws, memory);
+    const auto ranges = vertical_edges(f, patch_ready, Q{0}, Q{1});
+    const auto spans = edge_spans(ranges, zero, one);
+    auto arithmetic = query_limits();
+    arithmetic.maximum_scalar_operations = 300'000'000;
+    arithmetic.maximum_partition_visits = 100'000'000;
+    const PgTraceLimits trace_limits{arithmetic, 30000};
+    const auto trace = take(PgFullTrace::prepare_support(
+        patch_ready, spans, take(patch_ready.info()).identity, patch_ready.reference_coordinates(),
+        trace_limits, ws, memory));
+    const auto clipped = take(PgFullTrace::prepare_support(
+        patch_ready, std::span{spans}.first(1), take(patch_ready.info()).identity,
+        patch_ready.reference_coordinates(), trace_limits, ws, memory));
+    const auto middle = f.r("1", "2");
+    auto shorter = spans;
+    shorter.clear();
+    for (std::size_t i = 0; i < spans.size(); ++i) {
+        const auto& span = spans[i];
+        shorter.push_back({span.edge, span.first, span.last, span.along_first,
+                           i == 0 ? middle : span.along_last, span.layer});
+    }
+    const auto shortened = take(PgFullTrace::prepare_support(
+        patch_ready, shorter, take(patch_ready.info()).identity,
+        patch_ready.reference_coordinates(), trace_limits, ws, memory));
+    constexpr PgConstraintId support_id{71}, duplicate_id{17};
+    const std::array patches{PgConstraintPatchBinding{numerics::PatchId{1}, patch_ready}};
+    auto exact = arithmetic;
+    exact.algebra.maximum_value_bits = 65536;
+    exact.algebra.maximum_work_bits = 262144;
+    const auto make_chart = [&](const PgFullTrace& second) {
+        const std::array sources{PgConstraintTraceBinding{support_id, trace, 0, {}},
+                                 PgConstraintTraceBinding{duplicate_id, second, 0, {}}};
+        auto result = take(PgGlobalConstraints::prepare(
+            patches, sources, {arithmetic, 1, 2, 4096, 30000}, ws, memory));
+        return take(
+            PgSparseChart::prepare(std::move(result), {exact, 140, 140, 12000}, ws, memory));
+    };
+    auto chart = make_chart(trace);
+    const auto id = take(chart.identity());
+    const auto count = chart.original().original_rows().size();
+    const c::CasePgSupportLimits evaluation{clocks, 2048, 2'000'000, count};
+    const c::CaseStructuralSupportLimits caps{
+        evaluation, {exact, exact, count}, trace_limits, 2, 100'000};
+    constexpr std::array first{support_id, duplicate_id}, reverse{duplicate_id, support_id};
+    const auto ready = [&](const a::JsonToken& json, PgSparseChart& source,
+                           std::span<const PgConstraintId> ids,
+                           const c::CaseStructuralSupportLimits& request_limits) {
+        const auto typed = checked_case(json);
+        return c::prepare_case_structural_pg_support(typed, std::move(source), patches, ids, stamp,
+                                                     ws, motion_workspace, request_limits, memory);
+    };
+    auto other = input;
+    auto& other_supports = other.field("model").field("supports").elements;
+    other_supports[0].field("motion").set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"pchip","times":[0,2],"values":[[0,0,0],[0,0,178]],"outside":{"kind":"reject"}})"));
+    check_failure(ready(other, chart, first, caps), core::FailureCode::ResourceExceeded);
+    auto group_caps = caps;
+    group_caps.maximum_motion_groups = 2;
+    check_failure(ready(other, chart, first, group_caps), core::FailureCode::InvalidInput);
+    CHECK(take(chart.identity()) == id);
+    auto wrong_region = input;
+    wrong_region.field("model")
+        .field("supports")
+        .elements[0]
+        .field("region")
+        .set("boundary", a::parse("1"));
+    check_failure(ready(wrong_region, chart, first, caps), core::FailureCode::StaleGeneration);
+    auto partial_chart = make_chart(clipped);
+    check_failure(ready(input, partial_chart, first, caps), core::FailureCode::StaleGeneration);
+    auto shortened_chart = make_chart(shortened);
+    check_failure(ready(input, shortened_chart, first, caps), core::FailureCode::StaleGeneration);
+    check_failure(ready(input, chart, std::array{support_id}, caps),
+                  core::FailureCode::Unsupported);
+    const auto prepared = take(ready(input, chart, first, caps));
+    REQUIRE(prepared.support().group_count() == 1);
+    auto duplicate_chart = make_chart(trace);
+    const auto current = take(ready(input, duplicate_chart, reverse, caps));
+
+    const std::array<std::uint32_t, 1> word{1};
+    const std::array<std::uint32_t, 2> denom{0, 1U << 12U};
+    const p::RationalView unit{1, word, word}, null{0, {}, word};
+    const c::CaseFlowComponentBudget tolerance{unit, {1, word, denom}, null};
+    std::array<c::CaseFlowComponentBudget, 36> pose{};
+    std::array<c::CaseFlowComponentBudget, 9> row_budgets{};
+    pose.fill(tolerance);
+    row_budgets.fill(tolerance);
+    const c::CasePgSupportProjection projection{core::Precision::TwoWord, pose, row_budgets,
+                                                row_budgets};
+    const auto query = [&](c::CaseFlowClockQuery node) {
+        return c::evaluate_case_structural_pg_support(prepared, current, node, Second, projection,
+                                                      motion_workspace, evaluation, memory);
+    };
+    const auto left = take(query({stamp, 0, 1, Left}));
+    const auto right = take(query({stamp, 1, 0, Right}));
+    REQUIRE(left.motion_count() == 1);
+    CHECK(q(left.node().seconds) == 1);
+    CHECK(q(right.node().seconds) == 1);
+    CHECK(right.chart() == id);
+    REQUIRE(left.rows() == count);
+    REQUIRE(right.rows() == count);
+    bool unequal_accelerations = false;
+    const auto centre = [](const io::SiEnclosure& x) -> Dec {
+        const auto& w = std::get<io::ScaledTwoWord>(x);
+        return ldexp(Dec(w.high) + Dec(w.low), static_cast<int>(w.exponent2));
+    };
+    for (std::size_t i = 0; i < count * 3; ++i) {
+        CHECK(centre(left.original_rhs()[i]) == centre(right.original_rhs()[i]));
+        CHECK(centre(left.original_rhs()[i + 3 * count]) ==
+              centre(right.original_rhs()[i + 3 * count]));
+        unequal_accelerations =
+            unequal_accelerations || centre(left.original_rhs()[i + 6 * count]) !=
+                                         centre(right.original_rhs()[i + 6 * count]);
+    }
+    CHECK(unequal_accelerations);
+    auto numerical_chart = make_chart(trace);
+    const auto rank = static_cast<core::Index>(numerical_chart.pivots().size());
+    sparse_test::Fixture forward_scale{rank}, transpose_scale{rank};
+    auto backward = sparse_test::context();
+    backward.unknown_layout = core::ScopeId{501};
+    backward.residual_layout = core::ScopeId{502};
+    const auto forward = forward_scale.scales(), transpose = transpose_scale.scales(backward);
+    const auto solver = sparse_test::limits(rank, 3);
+    auto candidate = take(PgChartCandidate::prepare(std::move(numerical_chart), forward, transpose,
+                                                    {arithmetic, 0x1p-30, solver}, memory));
+    namespace lin = numerics::linear;
+    const auto request = [&](const lin::Scales& scale) {
+        return PgChartCandidateSolve{scale,
+                                     forward_scale.precision(),
+                                     sparse_test::accuracy(),
+                                     solver,
+                                     core::RhsGeneration{91},
+                                     core::NumericalGeneration{92},
+                                     core::NumericalGeneration{93},
+                                     1e-5,
+                                     2'000'000,
+                                     {}};
+    };
+    const auto from_real = [&](std::size_t rows, std::span<const double> data) {
+        const auto n = static_cast<core::Index>(rows);
+        auto dense = take(
+            numerics::DenseReal::copy({n, 3, n}, data, memory, core::Operation::EvaluateStructure));
+        return take(numerics::PrecisionBuffer<double>::binary64(std::move(dense),
+                                                                core::NumericalGeneration{78}));
+    };
+    const auto exact_dec = [](const ExactRational& value) -> Dec {
+        const auto x = q(value);
+        return Dec(numerator(x).convert_to<std::string>()) /
+               Dec(denominator(x).convert_to<std::string>());
+    };
+    const auto r_columns = candidate.exact().free_columns();
+    const auto q_columns = patch_ready.reference_coordinates();
+    const auto b_columns = patch_ready.translation();
+    const Dec omega = acos(Dec(-1)) / 2;
+    using Triple = std::array<Dec, 3>;
+    std::vector<std::array<Triple, 3>> full(q_columns.size());
+    for (std::size_t j = 0; j < full.size(); ++j) {
+        const auto b = exact_dec(b_columns[j]);
+        const Dec x = exact_dec(q_columns[j][0]) - b;
+        const Dec y = exact_dec(q_columns[j][1]) - 2 * b;
+        full[j][0] = {b - y, 3 * b + x, exact_dec(q_columns[j][2])};
+        full[j][1] = {-omega * x, (Dec(4) / 3) * b - omega * y, Dec{0}};
+        full[j][2] = {omega * omega * y, (Dec(5) / 3) * b - omega * omega * x, Dec{0}};
+    }
+    std::vector<double> force(3 * full.size());
+    force[static_cast<std::size_t>(candidate.exact().pivots().front().dependent_column)] = 1;
+    const auto forcing = from_real(full.size(), force);
+    const auto reaction = take(candidate.transpose({id, forcing}, request(transpose), ws, memory));
+    std::vector<PgCartesianExactPosition> exact_force(full.size());
+    const auto selected_force =
+        static_cast<std::size_t>(candidate.exact().pivots().front().dependent_column);
+    exact_force[selected_force][0] = f.r("1");
+    const auto exact_dual =
+        take(prepared.support().chart().transpose({id, exact_force}, exact, ws, memory));
+
+    for (std::size_t d = 0; d < 3; ++d) {
+        const auto rhs = take(c::retain_case_structural_pg_rhs(
+            right, static_cast<p::JetOrder>(d), core::NumericalGeneration{109}, 100'000, memory));
+        CHECK(rhs.centre().precision() == core::Precision::TwoWord);
+        std::vector<double> weights(3 * r_columns.size());
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            for (std::size_t j = 0; j < r_columns.size(); ++j)
+                weights[axis * r_columns.size() + j] =
+                    full[static_cast<std::size_t>(r_columns[j])][d][axis].convert_to<double>();
+        const auto r = from_real(r_columns.size(), weights);
+        std::vector<PgCartesianExactPosition> exact_independent(r_columns.size());
+        for (std::size_t j = 0; j < r_columns.size(); ++j)
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                exact_independent[j][axis] = take(ExactRational::from_binary64(
+                    weights[axis * r_columns.size() + j], exact.algebra, memory));
+        const auto compatible = take(
+            c::lift_case_structural_pg_support_exact(prepared, right, static_cast<p::JetOrder>(d),
+                                                     exact_independent, caps.exact, ws, memory));
+        const auto& raw = prepared.support().chart().original();
+        const auto recomputed =
+            take(raw.apply({raw.layout(), compatible.coordinates.values()}, exact, ws, memory));
+        CHECK(std::ranges::equal(recomputed.values(), compatible.original_rhs.values()));
+        CHECK(exact_dec(compatible.maximum_rhs_error) <= Dec("1e-10"));
+        Q exact_balance = 0;
+        for (std::size_t j = 0; j < full.size(); ++j)
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                CHECK(abs(exact_dec(compatible.coordinates.values()[j][axis]) - full[j][d][axis]) <=
+                      Dec("1e-6"));
+                exact_balance +=
+                    q(compatible.coordinates.values()[j][axis]) * q(exact_force[j][axis]);
+            }
+        for (std::size_t j = 0; j < exact_independent.size(); ++j)
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                exact_balance -= q(exact_independent[j][axis]) *
+                                 q(exact_dual.independent_force.values()[j][axis]);
+        for (std::size_t i = 0; i < count; ++i)
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                exact_balance -= q(compatible.original_rhs.values()[i][axis]) *
+                                 q(exact_dual.original_multipliers.values()[i][axis]);
+        CHECK(exact_balance == 0);
+        const auto primal = request(forward);
+        const auto result =
+            take(c::lift_case_structural_pg_support(candidate, {id, r}, rhs, primal, ws, memory));
+        REQUIRE(result.original_residual_upper <= primal.maximum_absolute_original_defect);
+        const auto retained_coordinate = [&](std::size_t i) {
+            const auto& values = result.coordinates.storage();
+            if (const auto* binary = std::get_if<numerics::Binary64<double>>(&values))
+                return Dec(binary->values.values()[i]);
+            const auto& two = std::get<numerics::TwoWord<double>>(values);
+            return Dec(two.hi.values()[i]) + Dec(two.lo.values()[i]);
+        };
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            for (std::size_t j = 0; j < full.size(); ++j)
+                CHECK(abs(retained_coordinate(axis * full.size() + j) - full[j][d][axis]) <=
+                      Dec("1e-6"));
+        const auto defect = take(c::work_case_structural_pg_support(
+            candidate, {id, forcing}, {id, r}, rhs, result, reaction, 1e-6, 2'000'000));
+        CHECK(defect <= 1e-6);
+    }
+    // Two separately prescribed rigid fields can share one chart if their zero-extended
+    // generators pass separately. Here the supports act on physically separate plates.
+    auto grouped_input = other;
+    auto& grouped_model = grouped_input.field("model");
+    auto second_geometry = grouped_model.field("geometry").elements.front();
+    second_geometry.set("id", a::string("2"));
+    second_geometry.field("frame").set("origin", a::parse("[5,-1,0]"));
+    grouped_model.field("geometry").elements.push_back(std::move(second_geometry));
+    auto second_shell = grouped_model.field("shells").elements.front();
+    second_shell.set("id", a::string("2"));
+    second_shell.set("geometry", a::string("2"));
+    second_shell.field("layers").elements.front().set("id", a::string("2"));
+    grouped_model.field("shells").elements.push_back(std::move(second_shell));
+    auto& separate_support = grouped_model.field("supports").elements.front();
+    auto& region = separate_support.field("region");
+    region.field("target").set("id", a::string("2"));
+    region.set("geometry", a::string("2"));
+    auto& separate_motion = separate_support.field("motion");
+    separate_motion.set("origin",
+                        a::parse(R"({"origin":[3,1,-2],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
+    separate_motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[2,0,0],[4,0,0]],"outside":{"kind":"reject"}})"));
+    separate_motion.set("rotation_vector", a::parse(R"({"kind":"constant","value":[0,0,0]})"));
+
+    const std::array second_origin{f.r("5"), f.r("-1"), f.r("0")};
+    Fixture second_fixture;
+    second_fixture.names.push_back({"leading", boundary});
+    second_fixture.layers.clear();
+    second_fixture.layers.push_back(
+        {core::LayerId{2}, second_fixture.zeta[0], second_fixture.zeta[2]});
+    const auto second_patch = patch(second_fixture, {rotation, second_origin, one}, ws, memory);
+    const auto second_ranges = vertical_edges(second_fixture, second_patch, Q{0}, Q{1});
+    const auto second_spans = edge_spans(second_ranges, zero, one);
+    const auto second_trace = take(PgFullTrace::prepare_support(
+        second_patch, second_spans, take(second_patch.info()).identity,
+        second_patch.reference_coordinates(), trace_limits, ws, memory));
+    const std::array two_patches{patches.front(),
+                                 PgConstraintPatchBinding{numerics::PatchId{2}, second_patch}};
+    const std::array two_traces{PgConstraintTraceBinding{support_id, second_trace, 1, {}},
+                                PgConstraintTraceBinding{duplicate_id, trace, 0, {}}};
+    const auto make_grouped = [&] {
+        auto original = take(PgGlobalConstraints::prepare(
+            two_patches, two_traces, {arithmetic, 2, 2, 4096, 30000}, ws, memory));
+        return take(
+            PgSparseChart::prepare(std::move(original), {exact, 280, 280, 24000}, ws, memory));
+    };
+    auto first_grouped = make_grouped();
+    auto second_grouped = make_grouped();
+    const auto grouped_identity = take(first_grouped.identity());
+    const auto group_case = checked_case(grouped_input);
+    const auto grouped = take(c::prepare_case_structural_pg_support(
+        group_case, std::move(first_grouped), two_patches, first, stamp, ws, motion_workspace,
+        group_caps, memory));
+    const auto current_case = checked_case(grouped_input);
+    const auto grouped_current = take(c::prepare_case_structural_pg_support(
+        current_case, std::move(second_grouped), two_patches, reverse, stamp, ws, motion_workspace,
+        group_caps, memory));
+    REQUIRE(grouped.support().group_count() == 2);
+    auto changed = grouped_input;
+    changed.field("model")
+        .field("supports")
+        .elements.front()
+        .field("motion")
+        .set(
+            "translation",
+            a::parse(
+                R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[3,0,0],[6,0,0]],"outside":{"kind":"reject"}})"));
+    auto changed_chart = make_grouped();
+    const auto changed_case = checked_case(changed);
+    const auto changed_current = take(c::prepare_case_structural_pg_support(
+        changed_case, std::move(changed_chart), two_patches, first, stamp, ws, motion_workspace,
+        group_caps, memory));
+    check_failure(c::evaluate_case_structural_pg_support(grouped, changed_current,
+                                                         {stamp, 1, 0, Right}, Second, projection,
+                                                         motion_workspace, evaluation, memory),
+                  core::FailureCode::StaleGeneration);
+
+    const auto grouped_sample = take(c::evaluate_case_structural_pg_support(
+        grouped, grouped_current, {stamp, 1, 0, Right}, Second, projection, motion_workspace,
+        evaluation, memory));
+    REQUIRE(grouped_sample.motion_count() == 2);
+    CHECK(q(grouped_sample.node().seconds) == 1);
+    check_failure(grouped_sample.motion(2), core::FailureCode::InvalidInput);
+    const auto& raw_grouped = grouped.support().chart().original();
+    const auto& group_chart = grouped.support().chart();
+    const auto second_positions = second_patch.reference_coordinates();
+    const auto second_translations = second_patch.translation();
+    const auto layout = raw_grouped.layout();
+    REQUIRE(layout.size() == 2);
+    REQUIRE(layout[0].id == numerics::PatchId{1});
+    REQUIRE(layout[1].id == numerics::PatchId{2});
+    std::vector<PgCartesianExactPosition> group_free(group_chart.free_columns().size());
+    std::vector<PgCartesianExactPosition> group_force(
+        static_cast<std::size_t>(take(raw_grouped.info()).columns));
+    for (const auto& item : layout)
+        group_force[static_cast<std::size_t>(item.first)][0] = f.r("1");
+    const auto group_dual =
+        take(group_chart.transpose({grouped_identity, group_force}, exact, ws, memory));
+    for (std::size_t d = 0; d < 3; ++d) {
+        const auto part = static_cast<p::JetOrder>(d);
+        const auto recovered = take(c::lift_case_structural_pg_support_exact(
+            grouped, grouped_sample, part, group_free, group_caps.exact, ws, memory));
+        const auto applied = take(raw_grouped.apply(
+            {raw_grouped.layout(), recovered.coordinates.values()}, exact, ws, memory));
+        CHECK(std::ranges::equal(applied.values(), recovered.original_rhs.values()));
+        Q work_gap = 0;
+        for (std::size_t col = 0; col < group_force.size(); ++col)
+            work_gap += q(recovered.coordinates.values()[col][0]) * q(group_force[col][0]);
+        for (const auto& source : raw_grouped.sources()) {
+            const bool separate = source.id == support_id;
+            const auto& patch_layout = layout[separate ? 1U : 0U];
+            for (core::Index offset = 0; offset < source.rows; ++offset) {
+                const auto row = source.first_row + offset;
+                const auto actual = static_cast<std::size_t>(row);
+                CHECK(grouped_sample.row_groups()[actual] == (separate ? 1U : 0U));
+                Triple expected{};
+                for (const auto& term : take(raw_grouped.row(row))) {
+                    const auto local = static_cast<std::size_t>(term.column - patch_layout.first);
+                    const auto coefficient = exact_dec(term.coefficient);
+                    for (std::size_t axis = 0; axis < 3; ++axis) {
+                        Dec value;
+                        if (!separate) {
+                            value = full[local][d][axis];
+                        } else if (d == 0) {
+                            value = exact_dec(second_positions[local][axis]);
+                        }
+                        if (separate && axis == 0 && d <= 1)
+                            value += 2 * exact_dec(second_translations[local]);
+                        expected[axis] += coefficient * value;
+                    }
+                }
+                for (std::size_t axis = 0; axis < 3; ++axis) {
+                    const auto& rhs_value = recovered.original_rhs.values()[actual][axis];
+                    CHECK(abs(exact_dec(rhs_value) - expected[axis]) <=
+                          exact_dec(recovered.maximum_rhs_error) + Dec("1e-85"));
+                    work_gap -=
+                        q(rhs_value) * q(group_dual.original_multipliers.values()[actual][axis]);
+                }
+            }
+        }
+        CHECK(work_gap == 0);
+    }
+}

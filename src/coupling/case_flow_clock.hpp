@@ -1,5 +1,6 @@
 #pragma once
 
+#include "case_aero_attachment.hpp"
 #include "case_known_flow.hpp"
 #include "io/si_exact_words.hpp"
 
@@ -37,6 +38,25 @@ struct Grid {
     [[nodiscard]] core::Result<std::uint64_t> interval_steps(std::uint64_t) const noexcept;
 };
 } // namespace case_clock_detail
+
+struct CaseReferenceClockSample {
+    structure::ExactRational seconds;
+    CaseFlowClockQuery address;
+    CaseClockRestart restart;
+};
+
+/// Prepare the case grid and validate declared motion/load events without selecting a flow.
+[[nodiscard]] core::Result<case_clock_detail::Grid>
+prepare_case_reference_clock(const io::SiCase&, aero::detail::pchip::PchipInputStamp,
+                             const CaseFlowClockLimits&, std::uint64_t maximum_event_work,
+                             core::ResourcePlan&, const std::stop_token& = {},
+                             core::FailureDetails = {}) noexcept;
+
+[[nodiscard]] core::Result<CaseReferenceClockSample>
+evaluate_case_reference_clock(const case_clock_detail::Grid&,
+                              const case_clock_detail::Grid& current, CaseFlowClockQuery,
+                              const CaseFlowClockLimits&, core::ResourcePlan&,
+                              const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
 class CaseClockedFlows {
 public:
@@ -219,5 +239,106 @@ prepare_case_clocked_known_flows(const io::SiCase&, aero::detail::pchip::PchipIn
     const CaseKnownFlowProjection& ambient, const CaseFlowProjectionRequest& wake,
     aero::detail::UniformFlowWorkspace&, const CaseClockedKnownFlowLimits&, core::ResourcePlan&,
     const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+struct CaseClockedPrescribedLimits {
+    CaseClockedKnownFlowLimits flow;
+    CaseMotionLimits motion;
+    /// Preparation cap shared by event visits and the periodic arithmetic forecast.
+    std::uint64_t maximum_event_work{};
+};
+
+class CaseClockedPrescribedInputs {
+public:
+    CaseClockedPrescribedInputs(CaseClockedPrescribedInputs&&) noexcept = default;
+    CaseClockedPrescribedInputs& operator=(CaseClockedPrescribedInputs&&) noexcept = default;
+    CaseClockedPrescribedInputs(const CaseClockedPrescribedInputs&) = delete;
+    CaseClockedPrescribedInputs& operator=(const CaseClockedPrescribedInputs&) = delete;
+
+private:
+    friend struct case_clock_detail::Builder;
+    CaseClockedPrescribedInputs(case_clock_detail::Grid&& grid, CaseKnownFlowReady&& ambient,
+                                std::optional<CasePrescribedWakeReady>&& prescribed,
+                                PrescribedAeroAttachment&& attachment) noexcept
+        : grid_(std::move(grid)),
+          ambient_(std::move(ambient)),
+          prescribed_(std::move(prescribed)),
+          attachment_(std::move(attachment)) {}
+
+    case_clock_detail::Grid grid_;
+    CaseKnownFlowReady ambient_;
+    std::optional<CasePrescribedWakeReady> prescribed_;
+    PrescribedAeroAttachment attachment_;
+};
+
+/// Owned input record for one clock and selected prescribed motion. An absent
+/// prescribed-transport record represents the already qualified free mode.
+class CaseClockedPrescribedSnapshot {
+public:
+    CaseClockedPrescribedSnapshot(CaseClockedPrescribedSnapshot&&) noexcept = default;
+    CaseClockedPrescribedSnapshot& operator=(CaseClockedPrescribedSnapshot&&) noexcept = default;
+    CaseClockedPrescribedSnapshot(const CaseClockedPrescribedSnapshot&) = delete;
+    CaseClockedPrescribedSnapshot& operator=(const CaseClockedPrescribedSnapshot&) = delete;
+
+private:
+    friend struct case_clock_detail::Builder;
+    CaseClockedPrescribedSnapshot(case_clock_detail::Grid&& clock, CaseKnownFlowSnapshot&& known,
+                                  std::optional<CasePrescribedWakeSnapshot>&& prescribed,
+                                  CaseMotionSnapshot&& motion) noexcept
+        : grid_(std::move(clock)),
+          ambient_(std::move(known)),
+          prescribed_(std::move(prescribed)),
+          motion_(std::move(motion)) {}
+
+    case_clock_detail::Grid grid_;
+    CaseKnownFlowSnapshot ambient_;
+    std::optional<CasePrescribedWakeSnapshot> prescribed_;
+    CaseMotionSnapshot motion_;
+};
+
+struct CaseClockedPrescribedSample {
+    io::SchemaIdentity source;
+    CaseFlowClockQuery address;
+    CaseClockRestart restart;
+    io::detail::SiRationalWords step;
+    CaseKnownFlowJet ambient;
+    std::optional<ProjectedCasePrescribedWake> prescribed;
+    CaseMotionEvaluation motion;
+};
+
+[[nodiscard]] core::Result<CaseClockedPrescribedInputs> prepare_case_clocked_prescribed_inputs(
+    const io::SiCase&, const io::schema::AeroAttachmentPrescribed&,
+    aero::detail::pchip::PchipInputStamp, aero::detail::UniformFlowWorkspace&,
+    aero::detail::pchip::CurveWorkspace&, const CaseClockedPrescribedLimits&, core::ResourcePlan&,
+    const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+/// Save input content, independently of any current clock node or accepted history.
+[[nodiscard]] core::Result<CaseClockedPrescribedSnapshot> snapshot_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedInputs&, aero::detail::UniformFlowWorkspace&,
+    aero::detail::pchip::CurveWorkspace&, const CaseClockedPrescribedLimits&, core::ResourcePlan&,
+    const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
+/// Requalify the owned clock and all input roles before returning a new prepared owner.
+[[nodiscard]] core::Result<CaseClockedPrescribedInputs> restore_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedSnapshot&, const CaseClockedPrescribedInputs& current,
+    aero::detail::UniformFlowWorkspace&, aero::detail::pchip::CurveWorkspace&,
+    const CaseClockedPrescribedLimits&, core::ResourcePlan&, const std::stop_token& = {},
+    core::FailureDetails = {}) noexcept;
+
+[[nodiscard]] core::Result<CaseClockedPrescribedSample> evaluate_case_clocked_prescribed_inputs(
+    const CaseClockedPrescribedInputs&, const CaseClockedPrescribedInputs& current,
+    CaseFlowClockQuery, const std::array<aero::detail::pchip::RationalView, 3>& position,
+    const CaseKnownFlowProjection&, const std::optional<CaseFlowProjectionRequest>& wake,
+    aero::detail::pchip::JetOrder motion_order, const CaseMotionProjection&,
+    aero::detail::UniformFlowWorkspace&, aero::detail::pchip::CurveWorkspace&,
+    const CaseClockedPrescribedLimits&, core::ResourcePlan&, const std::stop_token& = {},
+    core::FailureDetails = {}) noexcept;
+
+/// Bind an actual attachment trial to the exact time and side of a checked clock node.
+[[nodiscard]] core::Result<PrescribedAeroTrial> evaluate_case_clocked_prescribed_attachment(
+    const CaseClockedPrescribedInputs&, const CaseClockedPrescribedInputs& current,
+    CaseFlowClockQuery, const PrescribedAeroReference&, const PrescribedAeroProjection&,
+    aero::detail::pchip::CurveWorkspace&, aero::detail::GeometryWorkspace&,
+    aero::detail::GlobalWorkspace&, const CaseFlowClockLimits&, const PrescribedAeroLimits&,
+    core::ResourcePlan&, const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
 } // namespace uvlas::coupling::detail

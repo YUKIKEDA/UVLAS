@@ -1,0 +1,82 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-sparse-chart",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-03",
+    "N4-04",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "source_commit": "4f6ae08694e8f7c4367c841596b9698d1d09ee7a",
+  "claimed_state": "実PGの全厚トレース・固定支持から元の大域疎拘束を保ち、固定支持優先の厳密線形チャート、前進と転置を検証した。",
+  "environment": {
+    "windows_compiler": "MSVC 19.51.36260",
+    "linux_compiler": "GCC 14.2.0",
+    "linux_sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "ctest": "structure.pg_full_trace",
+    "test_cases_per_configuration": 2,
+    "assertions_per_configuration": 33627,
+    "seconds": {
+      "msvc_release": 11.65,
+      "msvc_debug": 63.3,
+      "gcc14_asan_ubsan": 118.89
+    },
+    "global_independent_gate": {
+      "source_commit": "ef632860d562d41aaad498f90641c82db2b08daa",
+      "assertions": 30625,
+      "gcc14_sanitizer_seconds": 75.7,
+      "rejected_mutation": {
+        "change": "omit original local scale when scattering normalized coefficients",
+        "mutated_source_sha256": "f25f88cc905e1c154d2e07b8885beae83a976ffe6ae0925a3232da8200ab8f5d",
+        "strict_assertions_before_failure": 55
+      }
+    },
+    "rejected_priority_mutation": {
+      "source_commit": "2b9548bea9770c735b6d294336915cd5d2987886",
+      "change": "ignore support kind and examine rows using physical ID alone",
+      "mutated_source_sha256": "56e8f26d52c7462feacf99e439a18583dd05a9d8eee1fe3afa5da7425383f1e1",
+      "strict_assertions_before_failure": 29588
+    },
+    "chart_example": {
+      "source_commit": "2b9548bea9770c735b6d294336915cd5d2987886",
+      "physical_patches": 3,
+      "rank": 95,
+      "original_nonzeros": 8213,
+      "actual_l": 151,
+      "actual_u": 3963,
+      "pivot_capacity": 300,
+      "work_row_capacity": 327,
+      "factor_term_capacity": 30000,
+      "preparation_charged_bytes": 7254936,
+      "preparation_elapsed_nanoseconds": 416920500
+    }
+  },
+  "sources": {
+    "docs/specs/foundation/numerical-foundation-adoption-specification.md": "0853ea74b082002f49ce887129dcd4d0e6c234c08f1acdebe599d3b44dddfc33",
+    "docs/specs/structure/connection-adopted-specification.md": "dbe318730a5024f9095e10f4ad1bbe5c70d2033f4e8ae812edb466a5ef5f7056",
+    "rd/structure/main-shell/paired-geometry/paired-reference-local-global-contract.md": "6ef49ef388c89d8712249a8249075f09a6fa01372460956374178972dccfd189",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-sparse-chart.md": "c53db656016dafad6062a0de812d0f6a34279b41b4b1e0efdc1f3c25b105b9da",
+    "docs/specs/structure/pg-global-constraints-contract.md": "727ef7e2c9eb6f710ce2a879e74c0884ce360f09ae04cb9e24649ceab56ef277",
+    "docs/specs/structure/pg-sparse-chart-contract.md": "56c978310c42685104dfed9c6c12691b085028b235a2bdcec7058cf026ff2c35",
+    "include/uvlas/structure/pg_global_constraints.hpp": "97ca21409aac4ad098c872a4eb36ab4aa7797a72416b9bcf489a9161e1ee552e",
+    "src/structure/pg_global_constraints.cpp": "f9f519952872f59d2d1a57d03fa8c65057baf8649b1b27f64814b66e0cab921c",
+    "include/uvlas/structure/pg_sparse_chart.hpp": "3b84772247707611b84e7e8697bc6da9cf8b4e956c02cfcb0a141aeb7ca34a34",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "tests/structure/pg_full_trace_test.cpp": "bb476fe44f80d33b10201d98ada318fc517a591783077cfb385d978a3c23f600"
+  }
+}

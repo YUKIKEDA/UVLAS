@@ -1,0 +1,47 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-physical-qualification",
+  "package": "IM-01",
+  "date": "2026-11-24",
+  "ids": [
+    "GEO-01",
+    "SH-D02",
+    "SH-D05",
+    "SH-D06",
+    "SH-D07",
+    "V-PG"
+  ],
+  "source_commit": "9d405c2cb3bb576261a7dac5679254da83d8eca2",
+  "claimed_state": "R4の参照位置とJacobian、R5の体積・独立外力仕事、実接続のKKTとR-02の全厚位置差を検証。",
+  "checks": {
+    "r4_geometry_configurations": 28,
+    "r5_geometry_configurations": 4,
+    "r5_assertions": 1440,
+    "r5_lateral_orientation_mutation_failed_assertions": 16,
+    "r5_work_relative_limit": 1e-09,
+    "r02_trace_maximum_enclosure_metres": 1.153e-16,
+    "r02_primal_and_dual_series_assertions": [
+      66097,
+      93801,
+      190800
+    ],
+    "windows_release_integrated_ctest": 8,
+    "linux_release_integrated_ctest": 7,
+    "linux_release_post_ci_fix_ctest": 2
+  },
+  "sources": {
+    "tests/structure/pg_reference_geometry_test.cpp": "282a8a06e1f6955d3036cedf7029938c3418907316307318997ca58a0fcd1a23",
+    "tests/structure/pg_full_trace_test.cpp": "d2c0ad1038803844da1b7f3b31fcc4f1e9fa3ff0adf4d2712f4944394c7c4e2b",
+    "tests/structure/pg_chart_candidate_test.cpp": "6e28e4f754b3170b5dc16ac693daed1803c9020e676f1e181e8cb50dc24981dd",
+    "tests/coupling/case_structural_pg_support_test.cpp": "e24f730ec0b8b5b4722e46a34c53463854443b93359dad2e520382427a26eae9",
+    "src/structure/pg_chart_candidate.cpp": "4ccf978e1ebaf836d516a93c258ba7fcafa5d79632b6490824882f482c1f08e1",
+    "src/structure/pg_reference_geometry.cpp": "0e2887e722f0fbd8542a39b6c5000c1a44987a05fd0c6fddff2e879c0d543521",
+    "docs/verification/IM-01/pg-chart-refinement-series/check-physical-trace.cpp.txt": "ac5a1e56c905423a7a327c7e86999a23b84646ef602c1160813466f42753cc89",
+    "docs/verification/IM-01/pg-chart-refinement-series/run-physical-trace.ps1.txt": "c1cf59f4f40551ecc9d3910abf0422c21fd2002240929ab6ba20f47c915d3f4d"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-r4-reference-geometries.md": "b0ca055a9bebc2d8bf9be3e05ae59e5b6fcdb4d2a695a5cfc469e670e9328f8f",
+    "docs/verification/IM-01/pg-r5-swept-taper-reference.md": "476208009b827b8d657aa52fef685a85c0303cb4208dfce15e1bc8b696e958d9",
+    "docs/verification/IM-01/pg-chart-refinement-series/physical-trace-verification.md": "9e93008b9c6132556c4de96bb6912fda5bd10ca502e425853bccfad29dd4c5b1"
+  }
+}

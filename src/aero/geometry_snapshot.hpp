@@ -260,6 +260,7 @@ public:
     [[nodiscard]] AeroResult<std::optional<pchip::RationalView>> exact_time() const&& = delete;
     [[nodiscard]] AeroResult<GeometryCounts> counts() const noexcept;
     [[nodiscard]] AeroResult<std::uint64_t> payload_bytes() const noexcept;
+    [[nodiscard]] AeroResult<std::uint64_t> used_preparation_steps() const noexcept;
     [[nodiscard]] AeroResult<PointId> owner(PointId point) const noexcept;
     [[nodiscard]] AeroResult<std::array<ScalarWords, 3>> point_words(PointId,
                                                                      Configuration) const noexcept;
@@ -299,6 +300,9 @@ public:
     [[nodiscard]] bool active() const noexcept;
     [[nodiscard]] AeroResult<QueryRequest> definition() const noexcept;
     [[nodiscard]] AeroResult<CanonicalSupport> support() const noexcept;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return active() ? steps_ : 0;
+    }
     [[nodiscard]] GeometryContext context() const noexcept {
         return context_;
     }
@@ -308,10 +312,11 @@ private:
     friend class GeometryEngine;
     friend class SharedP1Engine;
     ResolvedQuery(std::shared_ptr<const GeometryData>, core::PlannedBuffer<QueryStorage>,
-                  GeometryContext) noexcept;
+                  GeometryContext, std::uint64_t steps) noexcept;
     std::shared_ptr<const GeometryData> geometry_;
     core::PlannedBuffer<QueryStorage> query_;
     GeometryContext context_;
+    std::uint64_t steps_;
 };
 /// The underlying predicate lease protects both predicate and interpolation scratch.
 class GeometryWorkspace {

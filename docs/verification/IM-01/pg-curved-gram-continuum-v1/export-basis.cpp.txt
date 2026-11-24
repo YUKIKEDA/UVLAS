@@ -1,0 +1,124 @@
+#include "pg_conditioning_test_support.hpp"
+
+#include <iostream>
+
+#ifdef UVLAS_PG_TEST_FINITE_RULE
+#include "rule-values.hpp"
+
+#include <uvlas/structure/pg_discrete_gram.hpp>
+#endif
+
+using namespace uvlas;
+using namespace uvlas::structure;
+using namespace pg_conditioning_test;
+
+#ifdef UVLAS_PG_TEST_FINITE_RULE
+template <std::size_t N>
+auto exact_nodes(Fixture& input, const std::array<std::array<std::string_view, 2>, N>& seed) {
+    std::array<std::array<ExactRational, 2>, N> values;
+    for (std::size_t i = 0; i < N; ++i)
+        values[i] = {input.r(seed[i][0], rule_denominator), input.r(seed[i][1], rule_denominator)};
+    return values;
+}
+
+template <std::size_t N>
+auto line_rule(const std::array<std::array<ExactRational, 2>, N>& values) {
+    std::vector<PgLineQuadratureNode> line;
+    line.reserve(N);
+    for (const auto& value : values)
+        line.push_back({value[0], value[1]});
+    return line;
+}
+
+void export_finite_rule(Fixture& input, PgReferenceBasis&& basis, core::Workspace& scratch,
+                        core::ResourcePlan& memory, const core::Index rank) {
+    const auto plane = exact_nodes(input, g17);
+    const auto depth = exact_nodes(input, g3);
+    const auto plane_rule = line_rule(plane);
+    const auto depth_rule = line_rule(depth);
+    auto limits = query_limits();
+    limits.maximum_scalar_operations = 50'000'000'000;
+    limits.maximum_partition_visits = 20'000'000'000;
+    limits.algebra.external_memory = ExactEstimateAdmission{profile};
+    std::cout << "begin product rule" << std::endl;
+    auto gram =
+        take(PgDiscreteGram::prepare_product(std::move(basis), {plane_rule, plane_rule, depth_rule},
+                                             {352, 272}, {limits, steps}, scratch, memory));
+    std::cout << "points=" << gram.info().points << " integer_steps=" << gram.info().integer_steps
+              << " planned_bytes=" << profile - memory.remaining_bytes() << std::endl;
+    REQUIRE(gram.info().points == 34'680);
+    const auto enclosure = take(gram.enclosure());
+    for (const auto& element : enclosure.upper_triangle)
+        std::cout << "gram," << q(element.lower) << ',' << q(element.upper) << '\n';
+    std::cout << "begin finite transform qualification" << std::endl;
+    const auto admitted = take(
+        std::move(gram).generate_and_certify({512, 216}, {profile, steps, {}}, scratch, memory));
+    std::cout << "congruence,"
+              << q(take(admitted.conditioning().congruence_bound(exact_limits(), memory))) << '\n';
+    for (core::Index j = 0; j < rank; ++j)
+        for (core::Index i = 0; i <= j; ++i)
+            std::cout << "transform," << i << ',' << j << ','
+                      << q(take(admitted.conditioning().transform_coefficient(
+                             {i}, {j}, exact_limits(), memory)))
+                      << '\n';
+}
+#endif
+
+TEST_CASE("Export the cut parabola basis for a continuum Gram oracle") {
+    Fixture input;
+    input.domain.clear();
+    input.thickness.clear();
+    input.heights.clear();
+    const auto add = [&](std::string_view s, std::string_view tn, std::string_view td,
+                         std::string_view hn, std::string_view hd) {
+        input.domain.push_back({input.r(s), input.r(tn, td)});
+        input.thickness.push_back({input.r(s), input.r(tn, td)});
+        input.heights.push_back(input.r(hn, hd));
+    };
+    add("0", "0", "1", "1", "1");
+    add("1", "1", "4", "3", "2");
+    add("1", "7", "8", "3", "2");
+    add("0", "1", "1", "1", "1");
+    const auto zero = input.r("0"), one = input.r("1"), length = input.r("2");
+    const auto quadratic = input.r("1", "16");
+    const std::array<ExactInputTerm, 1> terms{{{{2, 0}, quadratic}}};
+    const auto curve = take(ExactChartPolynomial::make(terms, exact_limits(), input.input_plan));
+    input.graph = take(PgGraph::prepare({zero, one, zero, curve, 1, PgGraphConvention::Version1},
+                                        {exact_limits(), 64, {}}, input.input_plan));
+    core::ResourcePlan memory{profile};
+    core::Workspace scratch{core::PlannedBuffer<std::byte>{}};
+    auto basis = make_basis(input, length, scratch, memory);
+    const auto& partition = take(basis.source()).partition;
+    const auto volumes = take(partition.volumes());
+    const auto triangles = take(partition.triangles());
+    const auto vertices = take(partition.vertices());
+    const auto layers = take(partition.layers());
+    const auto pieces = take(partition.pieces());
+    for (std::size_t volume_index = 0; volume_index < volumes.size(); ++volume_index) {
+        const auto& volume = volumes[volume_index];
+        const auto& triangle = triangles[static_cast<std::size_t>(volume.triangle)];
+        const auto cell = pieces[static_cast<std::size_t>(triangle.piece)].cell;
+        const auto& layer = layers[static_cast<std::size_t>(volume.layer)];
+        std::cout << "volume," << volume_index << ',' << cell.first << ',' << cell.second;
+        for (const auto vertex : triangle.vertices) {
+            const auto& point = vertices[static_cast<std::size_t>(vertex)];
+            std::cout << ',' << q(point.s) << ',' << q(point.t);
+        }
+        std::cout << ',' << q(layer.lower) << ',' << q(layer.upper) << '\n';
+    }
+    const auto rank = take(basis.size());
+    const auto raw = basis_terms(*take(basis.rank()), static_cast<std::size_t>(rank), memory);
+    std::cout << "column,cell_s,cell_t,field,power_s,power_t,coefficient\n";
+    for (std::size_t column = 0; column < raw.size(); ++column) {
+        for (const auto& term : raw[column]) {
+            const auto& row = term.row;
+            std::cout << column << ',' << row.cell.first << ',' << row.cell.second << ','
+                      << static_cast<unsigned>(row.field) << ',' << row.powers.first << ','
+                      << row.powers.second << ',' << term.value << '\n';
+        }
+    }
+    REQUIRE(rank == 130);
+#ifdef UVLAS_PG_TEST_FINITE_RULE
+    export_finite_rule(input, std::move(basis), scratch, memory, rank);
+#endif
+}

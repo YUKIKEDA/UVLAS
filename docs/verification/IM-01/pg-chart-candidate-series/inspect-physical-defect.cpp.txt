@@ -1,0 +1,108 @@
+    if (q && dual) {
+        const auto native = [](const Buffer& buffer, std::size_t i, std::size_t axis) {
+            const auto offset = axis * static_cast<std::size_t>(buffer.shape().leading_dimension) + i;
+            if (const auto* single = std::get_if<numerics::Binary64<double>>(&buffer.storage()))
+                return independent_double(single->values.values()[offset]);
+            const auto& pair = std::get<numerics::TwoWord<double>>(buffer.storage());
+            return Q(independent_double(pair.hi.values()[offset]) +
+                     independent_double(pair.lo.values()[offset]));
+        };
+        const auto q_native = [&] {
+            std::vector<std::array<Q, 3>> result(cols);
+            for (std::size_t col = 0; col < cols; ++col)
+                for (std::size_t axis = 0; axis < 3; ++axis)
+                    result[col][axis] = native(q->coordinates, col, axis);
+            return result;
+        }();
+        std::vector<std::array<Q, 3>> balance(cols);
+        for (std::size_t col = 0; col < cols; ++col)
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                balance[col][axis] = native(f, col, axis);
+        const auto& csr = candidate->exact().original();
+        constexpr unsigned degree = 30;
+        using Polynomial = std::array<Q, degree + 1>;
+        using Trace = std::array<std::array<Polynomial, 3>, 3>; // axis, depth power, along power
+        std::vector<Trace> traces(csr.overlaps().size());
+        Q residual{};
+        for (std::size_t row = 0; row < rows; ++row) {
+            std::array<Q, 3> defect{}, lambda{};
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                lambda[axis] = native(dual->original_multipliers, row, axis);
+            for (const auto& term : take(candidate->exact().original().row(
+                     static_cast<core::Index>(row)))) {
+                const auto col = static_cast<std::size_t>(term.column);
+                const auto& weight = pg_conditioning_test::q(term.coefficient);
+                for (std::size_t axis = 0; axis < 3; ++axis) {
+                    defect[axis] += weight * q_native[col][axis];
+                    balance[col][axis] -= weight * lambda[axis];
+                }
+            }
+            const auto& original_row = csr.original_rows()[row];
+            const auto& original_source = csr.sources()[static_cast<std::size_t>(original_row.source)];
+            const auto overlap = static_cast<std::size_t>(original_source.first_overlap +
+                                                          original_row.source_overlap);
+            const auto depth_power = static_cast<std::size_t>(original_row.field);
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                traces[overlap][axis][depth_power][original_row.power] = defect[axis];
+            for (const auto& x : defect)
+                residual = std::max(residual, Q(abs(x)));
+        }
+        const auto free_columns = candidate->exact().free_columns();
+        for (std::size_t k = 0; k < free_columns.size(); ++k)
+            for (std::size_t axis = 0; axis < 3; ++axis)
+                balance[static_cast<std::size_t>(free_columns[k])][axis] -=
+                    native(dual->independent_force, k, axis);
+        const auto choose = [](unsigned n, unsigned k) {
+            unsigned long long product = 1;
+            for (unsigned i = 1; i <= k; ++i)
+                product = product * (n - i + 1) / i;
+            return product;
+        };
+        const auto evaluate = [](const Polynomial& p, const Q& x) {
+            Q value;
+            for (auto it = p.rbegin(); it != p.rend(); ++it)
+                value = value * x + *it;
+            return value;
+        };
+        Q field_lower{}, field_upper{};
+        for (std::size_t region = 0; region < traces.size(); ++region) {
+            const auto& domain = csr.overlaps()[region];
+            const auto& z = domain.left_depth;
+            REQUIRE(pg_conditioning_test::q(domain.active_first) == 0);
+            REQUIRE(pg_conditioning_test::q(domain.active_last) == 1);
+            REQUIRE(pg_conditioning_test::q(z.lower_first) == Q(-1, 2));
+            REQUIRE(pg_conditioning_test::q(z.upper_first) == Q(1, 2));
+            REQUIRE(pg_conditioning_test::q(z.lower_last) == Q(-1, 2));
+            REQUIRE(pg_conditioning_test::q(z.upper_last) == Q(1, 2));
+            for (const auto& axis : traces[region]) {
+                for (unsigned p = 0; p <= degree; ++p) {
+                    std::array<Q, 3> bernstein{};
+                    for (unsigned k = 0; k <= p; ++k)
+                        for (std::size_t depth = 0; depth < bernstein.size(); ++depth)
+                            bernstein[depth] += axis[depth][k] * Q(choose(p, k), choose(degree, k));
+                    const Q r = bernstein[0], p_half = bernstein[1] / 2, c_quarter = bernstein[2] / 4;
+                    for (const Q& control : std::array<Q, 3>{
+                             r - p_half + c_quarter, r - c_quarter, r + p_half + c_quarter})
+                        field_upper = std::max(field_upper, Q(abs(control)));
+                }
+                for (int i = 0; i <= 8; ++i) {
+                    const Q x(i, 8);
+                    const auto r = evaluate(axis[0], x), p = evaluate(axis[1], x),
+                               c_field = evaluate(axis[2], x);
+                    for (int k = -2; k <= 2; ++k) {
+                        const Q z_sample(k, 4);
+                        field_lower = std::max(field_lower,
+                                               Q(abs(r + z_sample * p + z_sample*z_sample*c_field)));
+                    }
+                }
+            }
+        }
+        REQUIRE(field_lower <= field_upper);
+        std::cout << ",\"physical_component_lower\":" << field_lower.convert_to<double>()
+                  << ",\"physical_component_upper\":" << field_upper.convert_to<double>();
+        Q force_balance{};
+        for (const auto& xyz : balance)
+            for (const auto& x : xyz)
+                force_balance = std::max(force_balance, Q(abs(x)));
+        std::cout << ",\"exact_original_lift\":" << residual.convert_to<double>()
+                  << ",\"exact_original_dual\":" << force_balance.convert_to<double>();

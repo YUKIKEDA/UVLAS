@@ -47,6 +47,163 @@ TEST_CASE("Sparse product solves KKT with original constraints and support react
     CHECK(values(result)[0] == values(repeated)[0]);
 }
 
+TEST_CASE("Sparse transpose reuses the original asymmetric factor and binds its physical layout",
+          "[N4-03][N4-04][N4-05][N4-06]") {
+    Fixture forward{4}, transpose{4};
+    const std::array<Triplet, 6> entries{
+        {{0, 2, 2}, {1, 0, 3}, {1, 3, 4}, {2, 1, 5}, {2, 3, 6}, {3, 0, 7}}};
+    auto matrix = forward.matrix(4, entries);
+    const SparseOperator original{matrix, context()};
+    auto dual_context = context();
+    dual_context.unknown_layout = core::ScopeId{71};
+    dual_context.residual_layout = core::ScopeId{72};
+    transpose.unknown[0] = 8;
+    transpose.residual[3] = 16;
+    transpose.unknown_units[0][0] = -1;
+    transpose.residual_units[3][2] = 2;
+    auto unrelated = dual_context;
+    unrelated.trial = core::TrialId{99};
+    core::ResourcePlan no_prepare{0};
+    const auto stale_prepare =
+        SparsePrepared::prepare(original, forward.scales(), transpose.scales(unrelated),
+                                SparseMethod::GeneralLu, limits(), no_prepare);
+    REQUIRE_FALSE(stale_prepare);
+    CHECK(stale_prepare.error().code == core::FailureCode::StaleGeneration);
+    CHECK(no_prepare.allocated_bytes() == 0);
+    auto prepared =
+        take(SparsePrepared::prepare(original, forward.scales(), transpose.scales(dual_context),
+                                     SparseMethod::GeneralLu, limits(), forward.plan));
+
+    const std::array forward_values{8.0, 18.0, 13.0, 14.0};
+    auto fb = forward.rhs(4, 1, forward_values);
+    const Rhs<double> f_rhs{fb, context(), core::RhsGeneration{41}};
+    const auto f = take(solve_linear(original, f_rhs, forward.scales(), forward.precision(),
+                                     accuracy(), limits(), prepared, forward.plan));
+    const std::array forward_expected{2.0, -1.0, 4.0, 3.0};
+    for (std::size_t i = 0; i < forward_expected.size(); ++i) {
+        CHECK(std::abs(values(f)[i] - forward_expected[i]) <= 1e-13);
+    }
+
+    // These two columns are A^T times the separately specified exact solutions.
+    const std::array data{-34.0, 15.0, 2.0, 10.0, 68.0, -30.0, -4.0, -20.0};
+    const std::array expected{1.0, -2.0, 3.0, -4.0, -2.0, 4.0, -6.0, 8.0};
+    auto b = transpose.rhs(4, 2, data);
+    const Rhs<double> rhs{b, dual_context, core::RhsGeneration{42}};
+    const auto precision = transpose.precision();
+    const auto solve = [&](const SparseOperator& op, const Rhs<double>& right, const Scales& scale,
+                           SparsePrepared& reusable, core::ResourcePlan& plan) {
+        return solve_transposed_linear(op, right, scale, precision, accuracy(Norm::L2), limits(),
+                                       reusable, plan);
+    };
+    auto result =
+        take(solve(original, rhs, transpose.scales(dual_context), prepared, transpose.plan));
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        CHECK(std::abs(values(result)[i] - expected[i]) <= 1e-13);
+    }
+    double force_work = 0, displacement_work = 0;
+    for (std::size_t i = 0; i < forward_values.size(); ++i) {
+        force_work += forward_values[i] * values(result)[i];
+        displacement_work += values(f)[i] * data[i];
+    }
+    CHECK(std::abs(force_work + 45) <= 1e-12);
+    CHECK(std::abs(displacement_work + 45) <= 1e-12);
+    CHECK(result.certificate().orientation() == LinearSystemOrientation::Transpose);
+    CHECK(f.certificate().orientation() == LinearSystemOrientation::Original);
+    CHECK(result.certificate().context() == dual_context);
+    CHECK(result.certificate().unknown_units()[0][0] == -1);
+    CHECK(result.certificate().residual_units()[3][2] == 2);
+    CHECK(result.certificate().unknown_scales()[0] == 8);
+    CHECK(result.certificate().residual_scales()[3] == 16);
+    CHECK(result.certificate().rhs_generation() == core::RhsGeneration{42});
+
+    core::ResourcePlan no_result{0};
+    const auto fails = [](const auto& candidate, core::FailureCode expected_code) {
+        REQUIRE_FALSE(candidate);
+        CHECK(candidate.error().code == expected_code);
+    };
+    fails(solve(original, rhs, transpose.scales(dual_context), prepared, no_result),
+          core::FailureCode::ResourceExceeded);
+    transpose.residual[3] = 32;
+    fails(solve(original, rhs, transpose.scales(dual_context), prepared, no_result),
+          core::FailureCode::StaleGeneration);
+    CHECK(result.certificate().residual_scales()[3] == 16);
+    transpose.residual[3] = 16;
+    const Rhs<double> wrong_rhs{b, context(), core::RhsGeneration{42}};
+    fails(solve(original, wrong_rhs, transpose.scales(dual_context), prepared, no_result),
+          core::FailureCode::StaleGeneration);
+    auto different_entries = entries;
+    different_entries[2].value = 8;
+    auto other = forward.matrix(4, different_entries);
+    fails(solve(SparseOperator{other, context()}, rhs, transpose.scales(dual_context), prepared,
+                no_result),
+          core::FailureCode::StaleGeneration);
+    auto only_forward = take(SparsePrepared::prepare(
+        original, forward.scales(), SparseMethod::GeneralLu, limits(), forward.plan));
+    fails(solve(original, rhs, transpose.scales(dual_context), only_forward, no_result),
+          core::FailureCode::Unsupported);
+    CHECK(no_result.allocated_bytes() == 0);
+    auto repeated =
+        take(solve(original, rhs, transpose.scales(dual_context), prepared, transpose.plan));
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        CHECK(std::bit_cast<std::uint64_t>(values(result)[i]) ==
+              std::bit_cast<std::uint64_t>(values(repeated)[i]));
+    }
+}
+
+TEST_CASE("Sparse transpose certifies both RHS words and rejects an inaccurate projection",
+          "[N4-04][N4-06]") {
+    Fixture f{2};
+    const std::array<Triplet, 3> entries{{{0, 0, 3}, {0, 1, 2}, {1, 1, 1}}};
+    auto matrix = f.matrix(2, entries);
+    const SparseOperator original{matrix, context()};
+    auto prepared = take(SparsePrepared::prepare(original, f.scales(), f.scales(),
+                                                 SparseMethod::GeneralLu, limits(), f.plan));
+    const auto low = 0x1p-60;
+    const std::array high_words{3.0, 0.0};
+    const std::array low_words{3 * low, 0.0};
+    auto high_rhs = take(DenseReal::copy({2, 1, 2}, high_words, f.plan, operation));
+    auto low_rhs = take(DenseReal::copy({2, 1, 2}, low_words, f.plan, operation));
+    auto b = take(PrecisionBuffer<double>::two_word(std::move(high_rhs), std::move(low_rhs),
+                                                    core::NumericalGeneration{40}));
+    const Rhs<double> rhs{b, context(), core::RhsGeneration{41}};
+    auto tight = accuracy();
+    tight.absolute_tolerance = 1e-25;
+    tight.componentwise_backward_tolerance = 1e-25;
+    auto keep = f.precision();
+    const auto retained = take(solve_transposed_linear(original, rhs, f.scales(), keep, tight,
+                                                       limits(), prepared, f.plan));
+    const auto* pair = std::get_if<TwoWord<double>>(&retained.values().storage());
+    REQUIRE(pair != nullptr);
+    CHECK(pair->hi.values()[0] == 1);
+    CHECK(pair->hi.values()[1] == -2);
+    CHECK(pair->lo.values()[0] == low);
+    CHECK(pair->lo.values()[1] == -2 * low);
+    keep.returned =
+        Binary64Projection{core::NumericalGeneration{100}, core::NumericalGeneration{101}};
+    const auto projection =
+        solve_transposed_linear(original, rhs, f.scales(), keep, tight, limits(), prepared, f.plan);
+    REQUIRE_FALSE(projection);
+    CHECK(projection.error().code == core::FailureCode::PrecisionUnresolved);
+    CHECK(pair->lo.values()[1] == -2 * low);
+
+    // A^T x=[1,0] has x=[1/3,-2/3]. The first factor result cannot meet the
+    // requested accuracy using binary64, so this traverses transpose refinement.
+    const std::array one_column{1.0, 0.0};
+    auto binary = f.rhs(2, 1, one_column);
+    const Rhs<double> binary_rhs{binary, context(), core::RhsGeneration{42}};
+    const auto refined = take(solve_transposed_linear(
+        original, binary_rhs, f.scales(), f.precision(), tight, limits(), prepared, f.plan));
+    CHECK(refined.certificate().refinements() > 0);
+    CHECK(refined.certificate().retention_path() == RetentionPath::PromotedTwoWord);
+    const auto* refined_pair = std::get_if<TwoWord<double>>(&refined.values().storage());
+    REQUIRE(refined_pair != nullptr);
+    using Big = boost::multiprecision::number<boost::multiprecision::cpp_bin_float<200>>;
+    const Big x0 = Big{refined_pair->hi.values()[0]} + Big{refined_pair->lo.values()[0]};
+    const Big x1 = Big{refined_pair->hi.values()[1]} + Big{refined_pair->lo.values()[1]};
+    CHECK(abs(1 - 3 * x0) <= Big{"1e-25"});
+    CHECK(abs(2 * x0 + x1) <= Big{"1e-25"});
+}
+
 TEST_CASE("Sparse SPD product verifies the original matrix before LLT", "[N4-05]") {
     Fixture fixture{3};
     const std::array<Triplet, 7> entries{
@@ -56,16 +213,21 @@ TEST_CASE("Sparse SPD product verifies the original matrix before LLT", "[N4-05]
     auto diagnostic = take(inspect_sparse_spd(original, limits(), fixture.plan));
     CHECK(diagnostic.status() == SparseSpdStatus::PositiveDefinite);
     CHECK(diagnostic.witness() == nullptr);
-    auto prepared = take(SparsePrepared::prepare(
-        original, fixture.scales(), SparseMethod::PositiveDefiniteLlt, limits(), fixture.plan));
+    auto prepared =
+        take(SparsePrepared::prepare(original, fixture.scales(), fixture.scales(),
+                                     SparseMethod::PositiveDefiniteLlt, limits(), fixture.plan));
     const std::array data{-24.0, -18.0, 207.0};
     auto b = fixture.rhs(3, 1, data);
     const Rhs<double> rhs{b, context(), core::RhsGeneration{41}};
     auto result = take(solve_linear(original, rhs, fixture.scales(), fixture.precision(),
                                     accuracy(Norm::L2), limits(), prepared, fixture.plan));
+    const auto transposed =
+        take(solve_transposed_linear(original, rhs, fixture.scales(), fixture.precision(),
+                                     accuracy(Norm::L2), limits(), prepared, fixture.plan));
     const std::array expected{1.0, -2.0, 3.0};
     for (std::size_t i = 0; i < 3; ++i) {
         CHECK(std::abs(values(result)[i] - expected[i]) <= 1e-12);
+        CHECK(std::abs(values(transposed)[i] - expected[i]) <= 1e-12);
     }
 }
 

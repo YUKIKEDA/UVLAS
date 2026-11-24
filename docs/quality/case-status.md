@@ -8,7 +8,7 @@
 
 | ケース | 対象 | 状態 | 根拠の記録 |
 |---|---|---|---|
-| V-PG | 主シェル：曲面、厚さ、歪み、支持、独立荷重 | Specified | なし |
+| V-PG | 主シェル：曲面、厚さ、歪み、支持、独立荷重 | SourceAvailable | R4・R5の原ソースと保存データを照合した。R5の全4配置では、製品の幾何から独立荷重の仕事まで照合した。 [検証記録](../verification/IM-01/pg-r5-swept-taper-reference.md) |
 | V-MAT | 材料、積層、初期ひずみ、層別回復 | Specified | なし |
 | V-BEAM | 梁、偏心質量と慣性 | Specified | なし |
 | V-JOINT | 接続、支持、全厚さトレース、反力 | Specified | なし |

@@ -142,6 +142,54 @@ void validate_rule(ReferenceArithmetic& math, std::span<const PgDiscreteVolumePo
         partition_fail(core::FailureCode::InvalidInput);
 }
 
+[[nodiscard]] std::uint64_t product_count(PgVolumeProductRule input, std::size_t volumes) {
+    if (volumes == 0 || input.radial.empty() || input.transverse.empty() || input.depth.empty())
+        partition_fail(core::FailureCode::InvalidInput);
+    return partition_mul(partition_mul(volumes, input.radial.size()),
+                         partition_mul(input.transverse.size(), input.depth.size()));
+}
+
+void validate_factor(ReferenceArithmetic& math, std::span<const PgLineQuadratureNode> nodes,
+                     const ExactRational& one, bool triangle_jacobian) {
+    ExactRational mass, first_moment;
+    const ExactRational* previous = nullptr;
+    for (const auto& node : nodes) {
+        math.visit(1);
+        if (node.coordinate.sign() <= 0 || math.compare(node.coordinate, one) >= 0 ||
+            node.weight.sign() <= 0 ||
+            (previous != nullptr && math.compare(*previous, node.coordinate) >= 0))
+            partition_fail(core::FailureCode::InvalidInput);
+        previous = &node.coordinate;
+        mass = math.add(mass, node.weight);
+        if (triangle_jacobian)
+            first_moment = math.add(first_moment, math.mul(node.coordinate, node.weight));
+    }
+    if (mass != one || (triangle_jacobian && math.add(first_moment, first_moment) != one))
+        partition_fail(core::FailureCode::InvalidInput);
+}
+
+void fill_product(ReferenceArithmetic& math, PgVolumeProductRule input, core::Index volumes,
+                  std::span<PgOwnedDiscreteVolumePoint> output) {
+    const auto one = math.constant("1");
+    std::size_t index = 0;
+    for (core::Index volume = 0; volume < volumes; ++volume) {
+        for (const auto& radial : input.radial) {
+            const auto side = math.sub(one, radial.coordinate);
+            const auto mapped_weight = math.mul(radial.weight, side);
+            for (const auto& transverse : input.transverse) {
+                const auto v = math.mul(side, transverse.coordinate);
+                const auto surface_weight = math.mul(mapped_weight, transverse.weight);
+                for (const auto& depth : input.depth) {
+                    math.visit(1);
+                    output[index++] = {volume, math.copy(radial.coordinate), math.copy(v),
+                                       math.copy(depth.coordinate),
+                                       math.mul(surface_weight, depth.weight)};
+                }
+            }
+        }
+    }
+}
+
 void accumulate_sample(IntegerWork& work, std::span<Interval> entries,
                        std::span<const Interval> values, const Interval& weight) {
     for (std::size_t j = 0; j < values.size(); ++j)
@@ -183,6 +231,21 @@ core::Result<PgDiscreteGram>
 PgDiscreteGram::prepare(PgReferenceBasis&& basis, std::span<const PgDiscreteVolumePoint> points,
                         PgDiscreteGramGrid grid, const PgDiscreteGramLimits& limits,
                         core::Workspace& workspace, core::ResourcePlan& plan) noexcept {
+    return prepare_rule(std::move(basis), points, grid, limits, workspace, plan);
+}
+
+core::Result<PgDiscreteGram>
+PgDiscreteGram::prepare_product(PgReferenceBasis&& basis, PgVolumeProductRule product,
+                                PgDiscreteGramGrid grid, const PgDiscreteGramLimits& limits,
+                                core::Workspace& workspace, core::ResourcePlan& plan) noexcept {
+    return prepare_rule(std::move(basis), product, grid, limits, workspace, plan);
+}
+
+core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& basis, RuleInput input,
+                                                          PgDiscreteGramGrid grid,
+                                                          const PgDiscreteGramLimits& limits,
+                                                          core::Workspace& workspace,
+                                                          core::ResourcePlan& plan) noexcept {
     return partition_entry([&]() -> core::Result<PgDiscreteGram> {
         try {
             auto math = ReferenceArithmetic{limits.arithmetic, plan};
@@ -195,29 +258,45 @@ PgDiscreteGram::prepare(PgReferenceBasis&& basis, std::span<const PgDiscreteVolu
             const auto rank = partition_take(basis.size());
             if (rank == 0 || rank > rank_max_columns)
                 partition_fail(core::FailureCode::InvalidInput);
-            const auto point_count = partition_index(points.size());
             const auto source = partition_take(basis.source());
             const auto volumes = partition_take(source.partition.volumes());
-            validate_rule(math, points, volumes.size());
+            const auto* points = std::get_if<std::span<const PgDiscreteVolumePoint>>(&input);
+            const auto size =
+                points != nullptr
+                    ? points->size()
+                    : product_count(std::get<PgVolumeProductRule>(input), volumes.size());
+            const auto point_count = partition_index(size);
+            if (points != nullptr)
+                validate_rule(math, *points, volumes.size());
             const auto entries = packed(0, static_cast<std::size_t>(rank));
             const auto storage =
                 partition_add(partition_mul(entries, sizeof(Interval) + sizeof(PgGramEntry)),
                               partition_mul(rank, sizeof(Interval)));
-            const auto rule_bytes =
-                partition_mul(points.size(), sizeof(PgOwnedDiscreteVolumePoint));
+            const auto rule_bytes = partition_mul(size, sizeof(PgOwnedDiscreteVolumePoint));
             if (partition_add(storage, rule_bytes) > plan.remaining_bytes())
                 partition_fail(core::FailureCode::ResourceExceeded);
             // The exact rule and both endpoints of every result entry can coexist.
             const auto held_rationals =
-                partition_add(partition_mul(4, points.size()), partition_mul(2, entries));
+                partition_add(partition_mul(4, size), partition_mul(2, entries));
             math.admit(partition_add(basis_live_rationals + 16, held_rationals));
+            if (const auto* product = std::get_if<PgVolumeProductRule>(&input)) {
+                const auto one = math.constant("1");
+                validate_factor(math, product->radial, one, true);
+                validate_factor(math, product->transverse, one, false);
+                validate_factor(math, product->depth, one, false);
+            }
             auto rule = partition_take(
                 plan.allocate<PgOwnedDiscreteVolumePoint>(point_count, partition_operation));
-            for (std::size_t i = 0; i < points.size(); ++i) {
-                math.visit(1);
-                const auto& p = points[i];
-                rule.values()[i] = {p.point.volume, math.copy(p.point.u), math.copy(p.point.v),
-                                    math.copy(p.point.depth), math.copy(p.weight)};
+            if (points != nullptr) {
+                for (std::size_t i = 0; i < points->size(); ++i) {
+                    math.visit(1);
+                    const auto& p = (*points)[i];
+                    rule.values()[i] = {p.point.volume, math.copy(p.point.u), math.copy(p.point.v),
+                                        math.copy(p.point.depth), math.copy(p.weight)};
+                }
+            } else {
+                fill_product(math, std::get<PgVolumeProductRule>(input),
+                             partition_index(volumes.size()), rule.values());
             }
             auto samples =
                 partition_take(plan.allocate<Interval>(partition_index(rank), partition_operation));
@@ -251,7 +330,8 @@ PgDiscreteGram::prepare(PgReferenceBasis&& basis, std::span<const PgDiscreteVolu
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);
-                    const auto jet = basis.numerator_jet(math, {partition_index(i)}, located);
+                    const auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
+                                                         /*derivatives=*/false);
                     auto a = math.add(jet[0][0], math.mul(half_z_squared, jet[2][0]));
                     auto b = math.mul(director_radical, jet[1][0]);
                     values[i] = radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
@@ -275,7 +355,7 @@ PgDiscreteGram::prepare(PgReferenceBasis&& basis, std::span<const PgDiscreteVolu
                                   std::move(result),
                                   grid.output_fractional_bits,
                                   std::move(rule),
-                                  {math.info(), work.steps, points.size()}};
+                                  {math.info(), work.steps, static_cast<std::size_t>(point_count)}};
         } catch (const std::overflow_error&) {
             partition_fail(core::FailureCode::ResourceExceeded);
         }

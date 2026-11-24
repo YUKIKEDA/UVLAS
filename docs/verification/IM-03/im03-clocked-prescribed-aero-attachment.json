@@ -1,0 +1,155 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-clocked-prescribed-aero-attachment-v1",
+  "ids": [
+    "AE-07",
+    "IO4-01",
+    "UW-D06",
+    "UW-D07",
+    "N4-06",
+    "FD-02",
+    "FD-06",
+    "FD-07"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "57a0d8d8107491eebf0438c5e238bfa4907bc83e",
+  "parents": {
+    "clock_and_attachment": "4fc0478243b283761cccc5e2d23add831b621eff",
+    "standalone_attachment_evidence": "3b90967a2b0a4a91df175109b6973544d890e4cd",
+    "sidecar_base": "d6e397767b9c5c38d240256d601f64988d8bff74"
+  },
+  "claimed_state": "One typed prescribed attachment enters exact case-clock evaluation at the Left node of the initial interval, preserving the material geometry and velocities in Binary64 and TwoWord for nonlinear nonpenetration. Related known inputs keep their event side.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 8/8 per configuration. Coupling suite 48.57 s in Debug and 6.20 s in Release.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, warnings as errors, affected CTest 8/8. Coupling suite 4.45 s.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "coupling.case_motion",
+      "coupling.case_motion_frame",
+      "coupling.case_motion_time_series",
+      "aero.geometry_snapshot",
+      "aero.global_geometry",
+      "aero.p1_shared_action",
+      "numerics.dense_solve"
+    ],
+    "catch": "244 assertions within the two attachment and circulation cases per configuration; 79 assertions for the clocked prescribed-input case run separately in MSVC Release. Seed 23.",
+    "negative": "Reject the Right side of the terminal node, disagreeing exact time with same binary64, changed live motion, unrelated moving point and alias offered as a canonical ID.",
+    "oracle": "Independent sin(60 degrees), cos(60 degrees), angular speed and the normal residual -5*pi/3; one explicit tangent equivalence and nonzero directional/transpose identity. The existing shared clock checks the two faces of a PCHIP event and the two known field samples.",
+    "mutation": "Substitute Automatic for the qualified Left side in the isolated Linux build. The same case failed both Binary64 and TwoWord side assertions, exit 42. After exact byte restoration and rebuild all 72 attachment assertions passed.",
+    "static": "Pinned clang-format 21.1.2, both Windows and Linux clang-tidy 21.1.1 including the clock translation unit, trace-check and Japanese prose lint."
+  },
+  "sources": {
+    "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
+    "docs/specs/foundation/case-schema-fields.md": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119",
+    "src/aero/geometry_snapshot.cpp": "19d6c4415259161af6f2769965fbad58a2cdaa2db24ba3660ff623818d67db38",
+    "src/aero/query_coordinates_private.hpp": "61ef3abbdd1ec4cc9a739ecbcb990d60a9bcb8db24bf57813775936fcd328350",
+    "src/coupling/case_aero_attachment.cpp": "1e6f5c8668a233e969a1801876e90906d0736da6fc39ba3b7f76b75d87b42609",
+    "src/coupling/case_aero_attachment.hpp": "212e1e992a90eea8d834263173e1e717e0ef8cd8bc2af747795260d56a793958",
+    "src/coupling/case_dyadic_words_private.hpp": "240c4462266a0b168f6d078b23ccdf5e64e793c8c1a3ef21f3f991bae2bf9f38",
+    "src/coupling/case_motion.cpp": "b225c57423602d869150ac5f7a550e3221c98d79c7cccadec7148079a1f96100",
+    "src/coupling/case_motion.hpp": "9474737af3afdfda29b7ab4a120e74225bb76b1c6c16c56c778109563e1cd953",
+    "src/coupling/discrete_nonpenetration.cpp": "f73f3d90789e3fc06fd3f66124452ec9b051f8e847e00411164d7d68d4d68f62",
+    "src/coupling/discrete_nonpenetration.hpp": "8966c45ba40df5eed3211c173023c6ef2fce89f0623b9b731a77f48725551cb4",
+    "tests/coupling/case_motion_time_series_test.cpp": "cc04edddfa3d52774f43e23093ca7b4c6ed8345c7ae03544ee4e71cba75480e9",
+    "tests/coupling/case_uniform_flow_test.cpp": "aa27ae6d01a5ea9276fcbcf058fe6cd3385cc33e84257fa03aa4b8134c491b1c"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "hint": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "sha256": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119"
+    },
+    {
+      "id": "src/aero/geometry_snapshot.cpp",
+      "hint": "src/aero/geometry_snapshot.cpp",
+      "sha256": "19d6c4415259161af6f2769965fbad58a2cdaa2db24ba3660ff623818d67db38"
+    },
+    {
+      "id": "src/aero/query_coordinates_private.hpp",
+      "hint": "src/aero/query_coordinates_private.hpp",
+      "sha256": "61ef3abbdd1ec4cc9a739ecbcb990d60a9bcb8db24bf57813775936fcd328350"
+    },
+    {
+      "id": "src/coupling/case_aero_attachment.cpp",
+      "hint": "src/coupling/case_aero_attachment.cpp",
+      "sha256": "1e6f5c8668a233e969a1801876e90906d0736da6fc39ba3b7f76b75d87b42609"
+    },
+    {
+      "id": "src/coupling/case_aero_attachment.hpp",
+      "hint": "src/coupling/case_aero_attachment.hpp",
+      "sha256": "212e1e992a90eea8d834263173e1e717e0ef8cd8bc2af747795260d56a793958"
+    },
+    {
+      "id": "src/coupling/case_dyadic_words_private.hpp",
+      "hint": "src/coupling/case_dyadic_words_private.hpp",
+      "sha256": "240c4462266a0b168f6d078b23ccdf5e64e793c8c1a3ef21f3f991bae2bf9f38"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.cpp",
+      "hint": "src/coupling/case_flow_clock.cpp",
+      "sha256": "82284ac9614ceeda37c42b86bbf47af3fae7a40c9e7549711b403e643ea4b3aa"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.hpp",
+      "hint": "src/coupling/case_flow_clock.hpp",
+      "sha256": "a5d3cbd4ceb3b1c833624a2d7d93e4b837e78068a99705d8df4553d35a48cca0"
+    },
+    {
+      "id": "src/coupling/case_motion.cpp",
+      "hint": "src/coupling/case_motion.cpp",
+      "sha256": "b225c57423602d869150ac5f7a550e3221c98d79c7cccadec7148079a1f96100"
+    },
+    {
+      "id": "src/coupling/case_motion.hpp",
+      "hint": "src/coupling/case_motion.hpp",
+      "sha256": "9474737af3afdfda29b7ab4a120e74225bb76b1c6c16c56c778109563e1cd953"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "f73f3d90789e3fc06fd3f66124452ec9b051f8e847e00411164d7d68d4d68f62"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "8966c45ba40df5eed3211c173023c6ef2fce89f0623b9b731a77f48725551cb4"
+    },
+    {
+      "id": "tests/coupling/case_motion_time_series_test.cpp",
+      "hint": "tests/coupling/case_motion_time_series_test.cpp",
+      "sha256": "cc04edddfa3d52774f43e23093ca7b4c6ed8345c7ae03544ee4e71cba75480e9"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "aa27ae6d01a5ea9276fcbcf058fe6cd3385cc33e84257fa03aa4b8134c491b1c"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/clocked-prescribed-aero-attachment-v1/verification.md": "943d72660701ba855a3388f416cefa9c697054eddb56f407115309e4da8aa0a1"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/clocked-prescribed-aero-attachment-v1/verification.md",
+      "hint": "docs/verification/IM-03/clocked-prescribed-aero-attachment-v1/verification.md",
+      "sha256": "943d72660701ba855a3388f416cefa9c697054eddb56f407115309e4da8aa0a1"
+    }
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "57a0d8d8107491eebf0438c5e238bfa4907bc83e",
+      "sha256": "82284ac9614ceeda37c42b86bbf47af3fae7a40c9e7549711b403e643ea4b3aa"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "57a0d8d8107491eebf0438c5e238bfa4907bc83e",
+      "sha256": "a5d3cbd4ceb3b1c833624a2d7d93e4b837e78068a99705d8df4553d35a48cca0"
+    }
+  }
+}

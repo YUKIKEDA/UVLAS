@@ -3,6 +3,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
+#include <complex>
+#include <map>
 #include <optional>
 #include <span>
 #include <string>
@@ -216,7 +219,379 @@ struct IndependentRadical {
     return product;
 }
 
+struct R5Integrals {
+    double volume{};
+    double load_work{};
+    double weak_work{};
+    std::array<double, 3> load_resultant{};
+};
+
+R5Integrals r5_quadrature(Fixture& fixture, const PgReferenceGeometry& geometry,
+                          const PgIntegrationPartition& partition, core::ResourcePlan& plan) {
+    constexpr std::array<std::array<std::string_view, 2>, 5> plane{{
+        {"0.0469100770306680", "0.1184634425280945"},
+        {"0.2307653449471585", "0.2393143352496832"},
+        {"0.5000000000000000", "0.2844444444444444"},
+        {"0.7692346550528415", "0.2393143352496832"},
+        {"0.9530899229693320", "0.1184634425280945"},
+    }};
+    const auto exact_decimal = [&](std::string_view value) {
+        return take(R::from_decimal(value, partition_test::exact_limits(), fixture.input_plan));
+    };
+    const std::array depth{exact_decimal("0.1127016653792583"), exact_decimal("0.5"),
+                           exact_decimal("0.8872983346207417")};
+    constexpr std::array depth_weight{5.0 / 18, 4.0 / 9, 5.0 / 18};
+    const auto evaluate = [&](const PgReferenceScalar& value, double sqrt_g) {
+        return rational(value.rational).convert_to<double>() +
+               rational(value.radical).convert_to<double>() * sqrt_g;
+    };
+    // Frozen R5 continuum load: u_x = a X_x^2, b = -div(sigma), t = sigma n.
+    constexpr double amplitude = 0.01;
+    constexpr double lame = 0.3 / (1.3 * 0.4);
+    constexpr double uniaxial = lame + 2.0 / 2.6;
+    constexpr double body_x = -2 * amplitude * uniaxial;
+    R5Integrals result;
+    const auto add_surface = [&](const PgReferenceValue& value, const PgReferenceAreaMeasure& area,
+                                 double weight) {
+        const auto sqrt_g = std::sqrt(rational(value.g).convert_to<double>());
+        const auto x = evaluate(value.position_metres[0], sqrt_g);
+        const auto strain = 2 * amplitude * x;
+        for (std::size_t axis = 0; axis < result.load_resultant.size(); ++axis) {
+            const auto stress = strain * (axis == 0 ? uniaxial : lame);
+            const auto force = weight * stress * evaluate(area.outward[axis], sqrt_g);
+            result.load_resultant[axis] += force;
+            if (axis == 0)
+                result.load_work += force * amplitude * x * x;
+        }
+    };
+    const auto volume_count = take(partition.volumes()).size();
+    const auto horizontal_count = take(partition.horizontal_faces()).size();
+    const auto lateral_count = take(partition.lateral_faces()).size();
+    for (const auto& radial : plane) {
+        const auto u = exact_decimal(radial[0]);
+        const auto radial_weight = rational(exact_decimal(radial[1])).convert_to<double>();
+        for (const auto& transverse : plane) {
+            const auto v =
+                fraction(fixture, (1 - rational(u)) * rational(exact_decimal(transverse[0])));
+            const double weight = radial_weight * Q(1 - rational(u)).convert_to<double>() *
+                                  rational(exact_decimal(transverse[1])).convert_to<double>();
+            for (std::size_t i = 0; i < volume_count; ++i) {
+                for (std::size_t k = 0; k < depth.size(); ++k) {
+                    const auto sample = take(geometry.evaluate(
+                        PgReferenceVolumePoint{static_cast<core::Index>(i), u, v, depth[k]},
+                        std::nullopt, reference_limits(), plan));
+                    const auto& jacobian =
+                        std::get<PgReferenceVolumeMeasure>(sample.measure).jacobian;
+                    const auto sqrt_g = std::sqrt(rational(sample.g).convert_to<double>());
+                    const auto volume = weight * depth_weight[k] * evaluate(jacobian, sqrt_g);
+                    const auto x = evaluate(sample.position_metres[0], sqrt_g);
+                    const auto strain = 2 * amplitude * x;
+                    result.volume += volume;
+                    result.load_resultant[0] += volume * body_x;
+                    result.load_work += volume * body_x * amplitude * x * x;
+                    result.weak_work += volume * strain * uniaxial * strain;
+                }
+            }
+            for (std::size_t i = 0; i < horizontal_count; ++i) {
+                const auto sample = take(
+                    geometry.evaluate(PgReferenceHorizontalPoint{static_cast<core::Index>(i), u, v},
+                                      std::nullopt, reference_limits(), plan));
+                add_surface(sample, std::get<PgReferenceHorizontalMeasure>(sample.measure).area,
+                            weight);
+            }
+        }
+        for (std::size_t i = 0; i < lateral_count; ++i) {
+            for (std::size_t k = 0; k < depth.size(); ++k) {
+                const auto sample = take(geometry.evaluate(
+                    PgReferenceLateralPoint{static_cast<core::Index>(i), u, depth[k]}, std::nullopt,
+                    reference_limits(), plan));
+                add_surface(sample, std::get<PgReferenceLateralMeasure>(sample.measure).area,
+                            radial_weight * depth_weight[k]);
+            }
+        }
+    }
+    return result;
+}
+
 } // namespace
+
+TEST_CASE("PG reproduces the independent reference geometry across all frozen R4 inputs",
+          "[GEO-01][SH-D02][SH-D07][V-PG][verification]") {
+    struct Input {
+        std::string_view name;
+        core::Index coarse;
+        bool tapered;
+        std::string_view skew;
+        std::array<std::string_view, 11> coefficients;
+    };
+    constexpr std::array<std::array<unsigned, 2>, 11> exponents{{
+        {2, 0},
+        {0, 2},
+        {1, 1},
+        {3, 0},
+        {0, 3},
+        {2, 2},
+        {4, 0},
+        {0, 4},
+        {3, 1},
+        {1, 3},
+        {2, 1},
+    }};
+    // Source: check_mass_paired_quality.py jobs and check_mass_paired_coefficient_input.py
+    // COEFFICIENTS. The physical (x,y) polynomial precedes the exact chart substitution.
+    constexpr std::array inputs{
+        Input{"cylinder", 2, false, "0", {"1/5"}},
+        Input{"ellipse", 2, false, "0", {"1/5", "1/10"}},
+        Input{"twist", 2, false, "0", {"1/5", "0", "7/100"}},
+        Input{"saddle", 2, true, "0", {"1/5", "-1/10", "7/100"}},
+        Input{"mixed quartic", 1, true, "0", {"1/5", "1/10", "7/100", "1/30", "-1/50", "1/40"}},
+        Input{"skew mixed quartic",
+              1,
+              true,
+              "1/5",
+              {"1/5", "1/10", "7/100", "1/30", "-1/50", "1/40"}},
+        Input{"explicit coefficients",
+              1,
+              true,
+              "0",
+              {"1/5", "1/10", "7/100", "1/30", "-1/50", "1/40", "7/1000", "-1/100", "3/250",
+               "-1/125", "9/1000"}},
+    };
+    using Complex = std::complex<double>;
+    for (const auto& input : inputs) {
+        const Q skew(input.skew);
+        std::array<double, exponents.size()> physical_coefficients{};
+        std::map<std::pair<unsigned, unsigned>, Q> chart_coefficients;
+        for (std::size_t k = 0; k < exponents.size(); ++k) {
+            if (input.coefficients[k].empty())
+                continue;
+            const Q coefficient(input.coefficients[k]);
+            physical_coefficients[k] = coefficient.convert_to<double>();
+            const auto [px, py] = exponents[k];
+            Q skew_power(1);
+            unsigned binomial = 1;
+            for (unsigned j = 0; j <= px; ++j) {
+                chart_coefficients[{px - j, py + j}] += coefficient * binomial * skew_power;
+                skew_power *= skew;
+                if (j < px)
+                    binomial = binomial * (px - j) / (j + 1);
+            }
+        }
+        for (const auto resolution : {input.coarse, 2 * input.coarse}) {
+            for (const auto thickness : {"1/100", "1/10000"}) {
+                CAPTURE(input.name, resolution, thickness);
+                const Q base(thickness);
+                Fixture fixture;
+                std::vector<R> values;
+                values.reserve(chart_coefficients.size());
+                std::vector<ExactInputTerm> terms;
+                terms.reserve(chart_coefficients.size());
+                for (const auto& [power, coefficient] : chart_coefficients) {
+                    if (coefficient != 0)
+                        terms.push_back({{power.first, power.second},
+                                         values.emplace_back(fraction(fixture, coefficient))});
+                }
+                const auto unit = fixture.r("1");
+                set_graph(fixture, resolution, unit, fraction(fixture, skew), terms);
+                for (std::size_t i = 0; i < fixture.heights.size(); ++i) {
+                    const auto& vertex = fixture.thickness[i];
+                    const Q factor = input.tapered
+                                         ? Q(1 + rational(vertex.s) / 10 + rational(vertex.t) / 20)
+                                         : Q(1);
+                    fixture.heights[i] = fraction(fixture, base * factor);
+                }
+                std::array<R, 9> rotation;
+                for (const auto k : {0U, 4U, 8U})
+                    rotation[k] = fixture.r("1");
+                const std::array<R, 3> origin;
+                core::ResourcePlan plan{cap};
+                auto sources = prepare_inputs(fixture, plan);
+                const auto geometry = take(
+                    prepare_candidate(sources, {rotation, origin, unit}, reference_limits(), plan));
+                const auto& partition = take(geometry.source()).partition;
+                const auto vertices = take(partition.vertices());
+                const auto triangles = take(partition.triangles());
+                const auto volumes = take(partition.volumes());
+                REQUIRE_FALSE(volumes.empty());
+                const auto u = fixture.r("1", "3"), v = fixture.r("1", "5"),
+                           d = fixture.r("2", "3");
+                const auto continuum = [&](std::array<Complex, 3> q) {
+                    const auto s = q[0], t = q[1], zeta = q[2];
+                    const auto x = s + skew.convert_to<double>() * t, y = t;
+                    Complex h{}, hx{}, hy{};
+                    for (std::size_t k = 0; k < exponents.size(); ++k) {
+                        const auto [px, py] = exponents[k];
+                        const auto c = physical_coefficients[k];
+                        const auto mx = std::pow(x, static_cast<int>(px));
+                        const auto my = std::pow(y, static_cast<int>(py));
+                        h += c * mx * my;
+                        if (px != 0)
+                            hx += c * px * std::pow(x, static_cast<int>(px - 1)) * my;
+                        if (py != 0)
+                            hy += c * py * mx * std::pow(y, static_cast<int>(py - 1));
+                    }
+                    const auto factor = input.tapered ? 1.0 + s / 10.0 + t / 20.0 : Complex{1.0};
+                    const auto offset = zeta * base.convert_to<double>() * factor /
+                                        (2.0 * std::sqrt(1.0 + hx * hx + hy * hy));
+                    return std::array{x - offset * hx, y - offset * hy, h + offset};
+                };
+                for (const auto i : {std::size_t{0}, volumes.size() - 1}) {
+                    const auto& volume = volumes[i];
+                    const auto& tri = triangles[static_cast<std::size_t>(volume.triangle)];
+                    const auto& a = vertices[static_cast<std::size_t>(tri.vertices[0])];
+                    const auto& b = vertices[static_cast<std::size_t>(tri.vertices[1])];
+                    const auto& c = vertices[static_cast<std::size_t>(tri.vertices[2])];
+                    const auto chart = [&](auto field) {
+                        return Q((7 * rational(a.*field) + 5 * rational(b.*field) +
+                                  3 * rational(c.*field)) /
+                                 15)
+                            .convert_to<double>();
+                    };
+                    const auto& frozen_layer =
+                        fixture.layers[static_cast<std::size_t>(volume.layer)];
+                    const auto zeta =
+                        Q((rational(frozen_layer.lower) + 2 * rational(frozen_layer.upper)) / 3)
+                            .convert_to<double>();
+                    const std::array<Complex, 3> point{chart(&PgPartitionPoint::s),
+                                                       chart(&PgPartitionPoint::t), zeta};
+                    const auto reference = continuum(point);
+                    const auto actual = take(geometry.evaluate(
+                        PgReferenceVolumePoint{static_cast<core::Index>(i), u, v, d}, std::nullopt,
+                        reference_limits(), plan));
+                    const auto sqrt_g = std::sqrt(rational(actual.g).convert_to<double>());
+                    const auto physical = [&](const PgReferenceScalar& value) {
+                        return rational(value.rational).convert_to<double>() +
+                               rational(value.radical).convert_to<double>() * sqrt_g;
+                    };
+                    for (std::size_t k = 0; k < reference.size(); ++k)
+                        CHECK(std::abs(physical(actual.position_metres[k]) - reference[k].real()) <
+                              2e-14);
+                    constexpr double step = 1e-20;
+                    for (std::size_t axis = 0; axis < point.size(); ++axis) {
+                        auto shifted = point;
+                        shifted[axis] += Complex{0, step};
+                        const auto derivative = continuum(shifted);
+                        for (std::size_t k = 0; k < derivative.size(); ++k) {
+                            const auto expected = derivative[k].imag() / step;
+                            CHECK(std::abs(physical(actual.jacobian_columns_metres[axis][k]) -
+                                           expected) < 2e-14);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
+          "[GEO-01][SH-D02][SH-D07][V-PG][verification]") {
+    for (const core::Index resolution : {1, 2}) {
+        for (const auto denominator : {"100", "10000"}) {
+            CAPTURE(resolution, denominator);
+            Fixture fixture;
+            // R5, polynomial_reference_surface.coefficients((.4,.2,0.,.1,-.06,.025)).
+            const auto s2 = fixture.r("1", "5"), t2 = fixture.r("1", "10");
+            const auto s3 = fixture.r("1", "30"), t3 = fixture.r("-1", "50");
+            const auto mixed = fixture.r("1", "40");
+            const std::array<ExactInputTerm, 5> height_terms{
+                {{{2, 0}, s2}, {{0, 2}, t2}, {{3, 0}, s3}, {{0, 3}, t3}, {{2, 2}, mixed}}};
+            const auto zero = fixture.r("0"), one = fixture.r("1");
+            set_graph(fixture, resolution, one, zero, height_terms);
+            fixture.domain.clear();
+            fixture.domain.push_back(fixture.point("0", "0"));
+            fixture.domain.push_back({fixture.r("1"), fixture.r("3", "10")});
+            fixture.domain.push_back({fixture.r("1"), fixture.r("9", "10")});
+            fixture.domain.push_back(fixture.point("0", "1"));
+            const Q base_thickness{std::string("1/") + denominator};
+            for (std::size_t i = 0; i < fixture.thickness.size(); ++i) {
+                const auto& vertex = fixture.thickness[i];
+                const Q thickness =
+                    base_thickness * (1 + rational(vertex.s) / 10 + rational(vertex.t) / 20);
+                fixture.heights[i] = fraction(fixture, thickness);
+            }
+            fixture.layers.clear();
+            fixture.layers.push_back(
+                {core::LayerId{11}, fixture.zeta.front(), fixture.zeta.back()});
+
+            std::array<R, 9> rotation;
+            for (const auto diagonal : {0U, 4U, 8U})
+                rotation[diagonal] = fixture.r("1");
+            const std::array<R, 3> origin;
+            core::ResourcePlan plan{cap};
+            auto inputs = prepare_inputs(fixture, plan);
+            const auto geometry =
+                take(prepare_candidate(inputs, {rotation, origin, one}, reference_limits(), plan));
+            const auto& partition = take(geometry.source()).partition;
+            const auto vertices = take(partition.vertices());
+            const auto triangles = take(partition.triangles());
+            const auto volumes = take(partition.volumes());
+            REQUIRE(volumes.size() == triangles.size());
+            const auto third = fixture.r("1", "3"), depth = fixture.r("3", "4");
+            Q area{}, first_s{}, first_t{};
+            for (std::size_t v = 0; v < volumes.size(); ++v) {
+                const auto& triangle = triangles[static_cast<std::size_t>(volumes[v].triangle)];
+                Q s{}, t{};
+                for (const auto vertex : triangle.vertices) {
+                    const auto& point = vertices[static_cast<std::size_t>(vertex)];
+                    s += rational(point.s) / 3;
+                    t += rational(point.t) / 3;
+                }
+                const Q triangle_area = rational(triangle.twice_area) / 2;
+                area += triangle_area;
+                first_s += triangle_area * s;
+                first_t += triangle_area * t;
+
+                const Q hs = 2 * s / 5 + s * s / 10 + s * t * t / 20;
+                const Q ht = t / 5 - 3 * t * t / 50 + s * s * t / 20;
+                const Q hss = Q("2/5") + s / 5 + t * t / 20;
+                const Q htt = Q("1/5") - 3 * t / 25 + s * s / 20;
+                const Q hst = s * t / 10;
+                const Q g = 1 + hs * hs + ht * ht;
+                const Q h = base_thickness * (1 + s / 10 + t / 20);
+                const Q z = h / 4;
+                const Q gaussian_numerator = hss * htt - hst * hst;
+                const Q mean_numerator =
+                    (1 + hs * hs) * htt - 2 * hs * ht * hst + (1 + ht * ht) * hss;
+                // det[dX/ds,dX/dt,dX/dz] from the two shape-operator invariants.
+                const Q determinant_rational = -z * mean_numerator / g;
+                const Q determinant_radical = 1 + z * z * gaussian_numerator / (g * g);
+                const auto sample = take(geometry.evaluate(
+                    PgReferenceVolumePoint{static_cast<core::Index>(v), third, third, depth},
+                    std::nullopt, reference_limits(), plan));
+                CHECK(rational(sample.s) == s);
+                CHECK(rational(sample.t) == t);
+                CHECK(rational(sample.g) == g);
+                CHECK(rational(sample.full_thickness_metres) == h);
+                CHECK(rational(sample.position_metres[0].rational) == s);
+                CHECK(rational(sample.position_metres[0].radical) == -z * hs / g);
+                CHECK(rational(sample.position_metres[1].radical) == -z * ht / g);
+                CHECK(rational(sample.position_metres[2].radical) == z / g);
+                const auto& measure = std::get<PgReferenceVolumeMeasure>(sample.measure).jacobian;
+                // The unit depth spans all thickness and the triangle map has area factor 2A.
+                CHECK(rational(measure.rational) == determinant_rational * h * 2 * triangle_area);
+                CHECK(rational(measure.radical) == determinant_radical * h * 2 * triangle_area);
+            }
+            CHECK(area == Q("4/5"));
+            CHECK(first_s == Q("11/30"));
+            CHECK(first_t == Q("131/300"));
+            // Independently integrated over chart strips and exact depth moments.
+            constexpr double full_volume = 0.008930137852542443516987;
+            constexpr double thin_volume = 0.000089301323707466072234;
+            const bool full = base_thickness == Q("1/100");
+            const auto expected_volume = full ? full_volume : thin_volume;
+            // R5 v2, records[].loads.exact_external_work, at this n and thickness.
+            constexpr std::array work_n1{1.4885875544444301e-6, 1.4885750872609408e-8};
+            constexpr std::array work_n2{1.4885875544444367e-6, 1.4885750872613537e-8};
+            const auto expected_work = (resolution == 1 ? work_n1 : work_n2)[full ? 0 : 1];
+            const auto integrated = r5_quadrature(fixture, geometry, partition, plan);
+            CHECK(std::abs(integrated.volume - expected_volume) <= 1e-12 * expected_volume);
+            CHECK(std::abs(integrated.load_work - expected_work) <= 1e-9 * expected_work);
+            CHECK(std::abs(integrated.weak_work - expected_work) <= 1e-9 * expected_work);
+            for (const auto component : integrated.load_resultant)
+                CHECK(std::abs(component) <= 1e-10 * expected_volume);
+        }
+    }
+}
 
 TEST_CASE("PG physical map and fourth-order jet match an independent quartic reference",
           "[SH-D01][SH-D02][SH-D07][N4-06][V-PG][verification]") {

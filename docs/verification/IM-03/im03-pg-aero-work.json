@@ -1,0 +1,130 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-pg-aero-work-v1",
+  "ids": [
+    "AE-02",
+    "UW-D01",
+    "UW-D06",
+    "SH-D02",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "e11c0cc1d7dc50430af13d287f20107b8d38cbd3",
+  "input_baseline": "5cdd35e8",
+  "claimed_state": "Structural-following fixed material points feed the existing discrete circulation and load route. Recognize the same prepared PG basis, the owned geometry and the assembled force trial on the return path. Available for one explicit typed prepared patch, including surface and interior material sides.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 4/4 each. Frame and motion time-series regression passed 2/2 additionally in Release.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, affected CTest 4/4.",
+    "ctest": [
+      "aero.global_geometry",
+      "coupling.case_uniform_flow",
+      "structure.pg_prepared_patch",
+      "structure.pg_full_trace"
+    ],
+    "catch": "2492 assertions on the end-to-end fixture with seed 23 in each configuration.",
+    "oracle": "For a flat 2 m thick reference with an independent constant-curvature deformation, at s=3/4 the upper surface has z=41/32, Vz=9/16 and normal slope -3/4. An explicit interior chart zeta=(s-3/4)/4 predicts z=9/32 and slopes (1,0,1) and (0,1,0) at the collocation. Compare the actual native nonpenetration to (127/12500-9/16)/sqrt(2), with ambient converted independently from 2 ft/min. The exact planar control predicts 127/12500-9/16.",
+    "negative": "Reject changed patch, changed geometry generation, swapped reference vertex material points, zero work, and reuse of actual load results from a different trial stamp or same-stamp changed geometry. Keep the registered vertex alias on its canonical point and each load on one vertex.",
+    "static": "Windows and Linux clang-tidy 21.1.1 on five product/test translation units, pinned clang-format 21.1.2, trace-check, recorded SHA256 and Japanese prose lint.",
+    "mutation": "Omitting the zeta Jacobian column in an isolated GCC build caused both the curved interior slope assertion and the original residual assertion to fail (Catch2 exit 42). Byte-identical restoration passed all 2492 assertions."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/structure/pg-reference-geometry-contract.md": "2cf03ea466b44914018ff6f391cb49c85ef46fde29f393e3ff72ec37b7550439",
+    "docs/specs/structure/pg-volume-position-contract.md": "dfe235ba43570c8189e44c9012b1a127a359e30ee4689d162d8ae5a554b5feb9",
+    "include/uvlas/structure/pg_prepared_patch.hpp": "80115bffb1bb73584f589c2fb1f0546b335b1d45138693a85d7fcbd9a0ca3de7",
+    "include/uvlas/structure/pg_volume_position.hpp": "74479647117d21b4f7cf46fbb35dd1e50baf44267f4b2e3e8ac0d207d13963d2",
+    "include/uvlas/structure/pg_material_tangents.hpp": "60d811a3e4374278fe34022fd0afe278651a166fd61e64eb9e295ad496dc3572",
+    "src/structure/pg_volume_mass_reference.cpp": "062a405de0e8db9cbcd15550a3c9c5bb594c79c400e56e8efb7490b731ed11f5",
+    "src/structure/pg_volume_position.cpp": "c82a582c0326aa01c944f9bc3f5c1fb6a6c8db0d75b13653f2c23d1774c13689",
+    "src/coupling/discrete_nonpenetration.cpp": "f909d006a5b640b6ab0b3bc353ba65aa85d5d3aea4d7cdfd33250cbb7ad8591b",
+    "src/coupling/discrete_nonpenetration.hpp": "be9893643a0e5f118f686de08876bb2c826d005aed045a7b5f575d9d3babb55f",
+    "src/coupling/pg_aero_attachment.cpp": "a1effe93bf9b4502f94285118e19f881ac16d25ca41699eb7e577a82113338ca",
+    "src/coupling/pg_aero_attachment.hpp": "eb1e2a00e2b266bd05bfa5aeec20f6a83567c88e71cf0ea1ea27dad4d5197f94",
+    "tests/coupling/case_uniform_flow_test.cpp": "17f36ef71de716c71665493ed3edd64bef30e9facfa17f32ab95882292809aa3"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/structure/pg-reference-geometry-contract.md",
+      "hint": "docs/specs/structure/pg-reference-geometry-contract.md",
+      "sha256": "2cf03ea466b44914018ff6f391cb49c85ef46fde29f393e3ff72ec37b7550439"
+    },
+    {
+      "id": "docs/specs/structure/pg-volume-position-contract.md",
+      "hint": "docs/specs/structure/pg-volume-position-contract.md",
+      "sha256": "dfe235ba43570c8189e44c9012b1a127a359e30ee4689d162d8ae5a554b5feb9"
+    },
+    {
+      "id": "include/uvlas/structure/pg_prepared_patch.hpp",
+      "hint": "include/uvlas/structure/pg_prepared_patch.hpp",
+      "sha256": "80115bffb1bb73584f589c2fb1f0546b335b1d45138693a85d7fcbd9a0ca3de7"
+    },
+    {
+      "id": "include/uvlas/structure/pg_volume_position.hpp",
+      "hint": "include/uvlas/structure/pg_volume_position.hpp",
+      "sha256": "74479647117d21b4f7cf46fbb35dd1e50baf44267f4b2e3e8ac0d207d13963d2"
+    },
+    {
+      "id": "include/uvlas/structure/pg_material_tangents.hpp",
+      "hint": "include/uvlas/structure/pg_material_tangents.hpp",
+      "sha256": "60d811a3e4374278fe34022fd0afe278651a166fd61e64eb9e295ad496dc3572"
+    },
+    {
+      "id": "src/structure/pg_volume_mass_reference.cpp",
+      "hint": "src/structure/pg_volume_mass_reference.cpp",
+      "sha256": "062a405de0e8db9cbcd15550a3c9c5bb594c79c400e56e8efb7490b731ed11f5"
+    },
+    {
+      "id": "src/structure/pg_volume_position.cpp",
+      "hint": "src/structure/pg_volume_position.cpp",
+      "sha256": "c82a582c0326aa01c944f9bc3f5c1fb6a6c8db0d75b13653f2c23d1774c13689"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "f909d006a5b640b6ab0b3bc353ba65aa85d5d3aea4d7cdfd33250cbb7ad8591b"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "be9893643a0e5f118f686de08876bb2c826d005aed045a7b5f575d9d3babb55f"
+    },
+    {
+      "id": "src/coupling/pg_aero_attachment.cpp",
+      "hint": "src/coupling/pg_aero_attachment.cpp",
+      "sha256": "a1effe93bf9b4502f94285118e19f881ac16d25ca41699eb7e577a82113338ca"
+    },
+    {
+      "id": "src/coupling/pg_aero_attachment.hpp",
+      "hint": "src/coupling/pg_aero_attachment.hpp",
+      "sha256": "eb1e2a00e2b266bd05bfa5aeec20f6a83567c88e71cf0ea1ea27dad4d5197f94"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "17f36ef71de716c71665493ed3edd64bef30e9facfa17f32ab95882292809aa3"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/pg-aero-work-v1/verification.md": "2727c878a14a782b9571bac601f05f94ba69786128072e63e2c3856f2895cacc"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/pg-aero-work-v1/verification.md",
+      "hint": "docs/verification/IM-03/pg-aero-work-v1/verification.md",
+      "sha256": "2727c878a14a782b9571bac601f05f94ba69786128072e63e2c3856f2895cacc"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-fixed-wake-transport-v1",
+  "ids": [
+    "AE-07",
+    "UW-D01",
+    "UW-D02",
+    "UW-D04",
+    "UW-D07",
+    "J1-D01",
+    "FD-07",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "cf6437db427f38e96bd0080871bce2622ce0252a",
+  "input_baseline": "d6751d51",
+  "claimed_state": "Fixed-step old-particle position residual on three exact clock nodes and contact-qualified material rows. Includes the actual free-velocity action and its residual derivatives, plus prescribed endpoint velocity, position candidate, and residual derivatives. The material history correspondence comes from caller-supplied snapshots.",
+  "verification": {
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.global_geometry",
+      "aero.p1_shared_action",
+      "coupling.case_motion_time_series"
+    ],
+    "catch": "Free wake motion uses all sources at attached and inherited material points, seed 23; 518 assertions.",
+    "oracle": "Fraction evaluation of same-interval BDF2 over exact eighth-second steps; 75-decimal inherited independent GL88 induction/JVP at the second receiver; analytic polynomial prescribed velocity with independent candidate, direction, and transpose work.",
+    "negative": "Swapped times, stale release epoch, use of attached trailing-edge point, wrong original Case, prescribed mode supplied to a free evaluator, resource ceiling, and stop request.",
+    "msvc_release": "Windows x64 MSVC 19.51 Release, four affected CTests passed.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, build with warnings as errors; four affected CTests passed.",
+    "mutation": "In the separate Linux build, supplying the positive velocity seed instead of the negative seed failed the physical transpose pairing (1 of 518 assertions, exit 42). Restoring byte-identical product source and rebuilding passed all 518 assertions.",
+    "stack": "The existing load transpose's zero-RHS-budget rejection nested two fixed-width rounding scratch blocks. Reusing its caller's block removed the duplicate while preserving the unchanged projection checks and a 1 MiB MSVC test stack.",
+    "static": "Pinned clang-format 21.1.2, clang-tidy 21.1.1 on affected units in both environments, reference regeneration, Ruff and Japanese prose lint, trace-check, and source/artifact hash comparison.",
+    "msvc_debug": "Windows x64 MSVC 19.51 Debug, four affected CTests passed. coupling.case_uniform_flow completed in 65.53 s (120 s limit), and the focused case passed 518 assertions with seed 23.",
+    "review_base": "e518c6c4e496998510ad177bf7d629e56ecda20b",
+    "review_case": "With h=1/8 s, positions (2, 15/8, 13/8) and directions (1/8, 1/4, 1/2) give distinct exact BDF2 (1/2,-1/2) and backward Euler (1,-1) time derivatives. Both production transport paths use rational comparisons of residuals, JVPs and three stencil covectors.",
+    "review_msvc_release": "Windows x64 MSVC 19.51 Release; 548 focused assertions passed with seed 23.",
+    "review_backward_euler_mutation": "Only transport_rate was replaced with (current-previous)/h. The focused MSVC Release run rejected 7 of 548 assertions, exit 42. The byte-identical restored product source rebuilt and passed all 548 assertions."
+  },
+  "sources": {
+    "src/aero/global_geometry.cpp": "a9abfc3492a8f638150fcfcea76ed65ceceae632d9a401c2324280d9d70bbfa0",
+    "src/aero/global_geometry.hpp": "d7a5801391c8ed1fff94f26b0c67309c70c8388474a6f7288fc2fd2033170ea4",
+    "src/coupling/case_known_flow.cpp": "8e5c5262c0d093c08446ebb21a998ad5057522f6316a11bd8672bff6b29532c6",
+    "src/coupling/case_known_flow.hpp": "d00b12babb2cf46ad6f81f67b104fad9c1177a6e3129688be0fb19d2e0263007",
+    "src/coupling/discrete_nonpenetration.cpp": "c0db62f34585d1d30a64cfb768c0611ee150b17f105a1016cbb20b4ed7f775a1",
+    "src/coupling/discrete_nonpenetration.hpp": "7f9d05ba8561cc52ff1f4e101acb0aac6f651138e60553e7d976175a468beffb",
+    "src/coupling/fixed_wake_transport.cpp": "b65b21923b5f3d5979be1fb6f8e27b147b27d050ada1bf20b67bfaaef681d423",
+    "src/coupling/fixed_wake_transport.hpp": "ed13c49754374977a11b2b20557c0b2692e951401a2432588fe5c56e05c10941",
+    "tests/coupling/case_uniform_flow_test.cpp": "1d524252ac7537f8691d78a221f89083caeffbecc933b7a88ab2f349f2b95068",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/coupled/coupled-adopted-specification.md": "e58792bfc857af73166ea596724a66a7dcd08f43ba083b642f538dfecf56dc3d",
+    "src/coupling/case_flow_clock.cpp": "d7a6007e4d50bcbf11462ad40a5893e388faa9eaf884591568d4a00a23cb46c5",
+    "src/coupling/case_flow_clock.hpp": "587675b2dd2e4b937b0b1629b3f8a98239a10ff80fb4820e063555a8d6500cf6",
+    "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py": "24f80eb3a7fa8ff4c7b92062f4582a8d56deed2aaed562d77a076aa61b576dc2",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+  },
+  "source_records": [
+    {
+      "id": "src/aero/global_geometry.cpp",
+      "hint": "src/aero/global_geometry.cpp",
+      "sha256": "a9abfc3492a8f638150fcfcea76ed65ceceae632d9a401c2324280d9d70bbfa0"
+    },
+    {
+      "id": "src/aero/global_geometry.hpp",
+      "hint": "src/aero/global_geometry.hpp",
+      "sha256": "d7a5801391c8ed1fff94f26b0c67309c70c8388474a6f7288fc2fd2033170ea4"
+    },
+    {
+      "id": "src/coupling/case_known_flow.cpp",
+      "hint": "src/coupling/case_known_flow.cpp",
+      "sha256": "8e5c5262c0d093c08446ebb21a998ad5057522f6316a11bd8672bff6b29532c6"
+    },
+    {
+      "id": "src/coupling/case_known_flow.hpp",
+      "hint": "src/coupling/case_known_flow.hpp",
+      "sha256": "d00b12babb2cf46ad6f81f67b104fad9c1177a6e3129688be0fb19d2e0263007"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "c0db62f34585d1d30a64cfb768c0611ee150b17f105a1016cbb20b4ed7f775a1"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "7f9d05ba8561cc52ff1f4e101acb0aac6f651138e60553e7d976175a468beffb"
+    },
+    {
+      "id": "src/coupling/fixed_wake_transport.cpp",
+      "hint": "src/coupling/fixed_wake_transport.cpp",
+      "sha256": "b65b21923b5f3d5979be1fb6f8e27b147b27d050ada1bf20b67bfaaef681d423"
+    },
+    {
+      "id": "src/coupling/fixed_wake_transport.hpp",
+      "hint": "src/coupling/fixed_wake_transport.hpp",
+      "sha256": "ed13c49754374977a11b2b20557c0b2692e951401a2432588fe5c56e05c10941"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "1d524252ac7537f8691d78a221f89083caeffbecc933b7a88ab2f349f2b95068"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/coupled/coupled-adopted-specification.md",
+      "hint": "docs/specs/coupled/coupled-adopted-specification.md",
+      "sha256": "e58792bfc857af73166ea596724a66a7dcd08f43ba083b642f538dfecf56dc3d"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.cpp",
+      "hint": "src/coupling/case_flow_clock.cpp",
+      "sha256": "d7a6007e4d50bcbf11462ad40a5893e388faa9eaf884591568d4a00a23cb46c5"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.hpp",
+      "hint": "src/coupling/case_flow_clock.hpp",
+      "sha256": "587675b2dd2e4b937b0b1629b3f8a98239a10ff80fb4820e063555a8d6500cf6"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py",
+      "sha256": "24f80eb3a7fa8ff4c7b92062f4582a8d56deed2aaed562d77a076aa61b576dc2"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/fixed-wake-transport-v1/reference.py": "f432e7e31e8b8e5a6ddc9ddc43adfa93b5479bee7479e550fa7043642e6943c0",
+    "docs/verification/IM-03/fixed-wake-transport-v1/reference.json": "b916faca3b9dc1079079be80fc6e5369615b61aea339cfb507916e93ef424a06",
+    "docs/verification/IM-03/fixed-wake-transport-v1/verification.md": "cc907322c011afb4dea54a070771fb4a2b8fd09b87cdb3fac5cacd3c4842d745"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/fixed-wake-transport-v1/reference.py",
+      "hint": "docs/verification/IM-03/fixed-wake-transport-v1/reference.py",
+      "sha256": "f432e7e31e8b8e5a6ddc9ddc43adfa93b5479bee7479e550fa7043642e6943c0"
+    },
+    {
+      "id": "docs/verification/IM-03/fixed-wake-transport-v1/reference.json",
+      "hint": "docs/verification/IM-03/fixed-wake-transport-v1/reference.json",
+      "sha256": "b916faca3b9dc1079079be80fc6e5369615b61aea339cfb507916e93ef424a06"
+    },
+    {
+      "id": "docs/verification/IM-03/fixed-wake-transport-v1/verification.md",
+      "hint": "docs/verification/IM-03/fixed-wake-transport-v1/verification.md",
+      "sha256": "cc907322c011afb4dea54a070771fb4a2b8fd09b87cdb3fac5cacd3c4842d745"
+    }
+  ],
+  "initial_verified_source_commit": "9e9033b54b5d46ea93aa55fdf35df00e9766a2dc"
+}

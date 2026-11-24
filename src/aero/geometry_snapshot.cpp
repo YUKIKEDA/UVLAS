@@ -1,6 +1,7 @@
 #include "exact_triangle_private.hpp"
 #include "geometry_snapshot_storage.hpp"
 #include "local_geometry_input_private.hpp"
+#include "query_coordinates_private.hpp"
 
 #include <boost/hash2/sha2.hpp>
 
@@ -367,6 +368,10 @@ public:
                                                     GeometryWorkspace&, core::ResourcePlan&,
                                                     std::stop_token) noexcept;
 
+    static AeroResult<ExactQueryCoordinates> coordinates(const OwnedGeometry&, const ResolvedQuery&,
+                                                         const GeometryLimits&, GeometryWorkspace&,
+                                                         std::stop_token, Configuration) noexcept;
+
 private:
     static AeroResult<void> copy(const GeometryInput&, GeometryData&, Run&);
     static AeroResult<void> lookups(GeometryData&, Run&);
@@ -380,7 +385,9 @@ private:
     static AeroResult<void> load_point(const GeometryData&, core::Index, Configuration,
                                        std::array<ExactInteger, 3>&, QueryArithmeticScratch&, Run&);
     static AeroResult<void> query_position(const GeometryData&, const QueryStorage&, ExactPoints&,
-                                           QueryArithmeticScratch&, Run&);
+                                           QueryArithmeticScratch&, Run&,
+                                           ExactQueryCoordinates* = nullptr,
+                                           Configuration = Configuration::Current);
     static void hash(GeometryData&);
 };
 
@@ -535,6 +542,7 @@ AeroResult<OwnedGeometry> GeometryEngine::prepare(const GeometryInput& input,
                 return std::unexpected(hashed.error());
         }
         hash(*data);
+        data->preparation_steps = run.steps;
         return OwnedGeometry{std::move(data), context};
     });
 }
@@ -983,6 +991,11 @@ AeroResult<std::uint64_t> OwnedGeometry::payload_bytes() const noexcept {
         return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
     return data_->payload;
 }
+AeroResult<std::uint64_t> OwnedGeometry::used_preparation_steps() const noexcept {
+    if (!data_)
+        return std::unexpected(rejected(core::FailureCode::InvalidInput, context_));
+    return data_->preparation_steps;
+}
 AeroResult<PointId> OwnedGeometry::owner(PointId id) const noexcept {
     if (!data_)
         return std::unexpected(rejected(core::FailureCode::InvalidInput, context_, id));
@@ -1244,13 +1257,15 @@ GeometryEngine::resolve(const OwnedGeometry& geometry, const QueryRequest& reque
             return std::unexpected(
                 OwnedGeometryFailure{complete(storage.error(), context), request.id, context});
         storage->values()[0] = query;
-        return ResolvedQuery{geometry.data_, std::move(*storage), context};
+        return ResolvedQuery{geometry.data_, std::move(*storage), context, run.steps};
     });
 }
 
 AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const QueryStorage& query,
                                                 ExactPoints& points,
-                                                QueryArithmeticScratch& scratch, Run& run) {
+                                                QueryArithmeticScratch& scratch, Run& run,
+                                                ExactQueryCoordinates* result,
+                                                Configuration configuration) {
     if (const auto* single = std::get_if<FreeSingleStorage>(&query.definition)) {
         for (std::size_t axis = 0; axis < 3; ++axis) {
             if (auto r = run.step(QueryId{query.id}); !r)
@@ -1274,7 +1289,13 @@ AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const 
         if (!index)
             return std::unexpected(
                 rejected(core::FailureCode::InvalidInput, run.context, QueryId{query.id}));
-        return load_point(data, *index, Configuration::Current, points[3], scratch, run);
+        if (result != nullptr) {
+            result->point_count = 1;
+            const auto owner = data.points.values()[static_cast<std::size_t>(*index)].owner;
+            result->point_ids[0] = data.points.values()[static_cast<std::size_t>(owner)].id;
+            result->weights[0] = ExactInteger{1} << 1074;
+        }
+        return load_point(data, *index, configuration, points[3], scratch, run);
     }
     std::array<core::Index, 3> vertices{};
     std::size_t count = 0;
@@ -1305,6 +1326,16 @@ AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const 
     } else
         return std::unexpected(
             rejected(core::FailureCode::InvalidInput, run.context, QueryId{query.id}));
+    if (result != nullptr) {
+        result->point_count = count;
+        for (std::size_t i = 0; i < count; ++i) {
+            if (auto charged = run.step(QueryId{query.id}); !charged)
+                return charged;
+            const auto owner = data.points.values()[static_cast<std::size_t>(vertices[i])].owner;
+            result->point_ids[i] = data.points.values()[static_cast<std::size_t>(owner)].id;
+            result->weights[i] = scratch.weights[i];
+        }
+    }
     for (std::size_t axis = 0; axis < 3; ++axis) {
         scratch.sum = 0;
         for (std::size_t i = 0; i < count; ++i) {
@@ -1312,8 +1343,8 @@ AeroResult<void> GeometryEngine::query_position(const GeometryData& data, const 
                 return r;
             // Decode at delta, multiply complete exact word sums, then add at
             // delta^2. No rounded derived point or independent third weight exists.
-            scalar_into(position(data, vertices[i], Configuration::Current, axis), 0,
-                        scratch.coordinate, scratch.word);
+            scalar_into(position(data, vertices[i], configuration, axis), 0, scratch.coordinate,
+                        scratch.word);
             scratch.product = scratch.weights[i] * scratch.coordinate;
             scratch.sum += scratch.product;
         }
@@ -1438,6 +1469,60 @@ classify_resolved_query(const OwnedGeometry& geometry, const ResolvedQuery& quer
                                     std::move(stop));
 }
 
+AeroResult<ExactQueryCoordinates>
+GeometryEngine::coordinates(const OwnedGeometry& geometry, const ResolvedQuery& query,
+                            const GeometryLimits& limits, GeometryWorkspace& workspace,
+                            std::stop_token stop, Configuration configuration) noexcept {
+    const auto context = geometry.context_;
+    return guarded(context, [&]() -> AeroResult<ExactQueryCoordinates> {
+        if (configuration != Configuration::Reference && configuration != Configuration::Current)
+            return std::unexpected(rejected(core::FailureCode::InvalidInput, context));
+        if (!geometry.data_ || !query.active())
+            return std::unexpected(rejected(core::FailureCode::InvalidInput, context));
+        const auto& data = *geometry.data_;
+        const auto& q = query.query_.values().front();
+        if (data.identity != query.geometry_->identity || !same_context(context, query.context_))
+            return std::unexpected(
+                rejected(core::FailureCode::StaleGeneration, context, QueryId{q.id}));
+        Run run{limits, context, stop};
+        if (auto admitted = run.admission(); !admitted)
+            return std::unexpected(admitted.error());
+        const auto& n = data.counts;
+        if (!fits(n.points, limits.counts.points) || !fits(n.edges, limits.counts.edges) ||
+            !fits(n.faces, limits.counts.faces) || !fits(n.bands, limits.counts.bands) ||
+            !fits(n.triangles, limits.counts.triangles) || !fits(n.quads, limits.counts.quads))
+            return std::unexpected(
+                rejected(core::FailureCode::ResourceExceeded, context, QueryId{q.id}));
+        auto lease = workspace.acquire(context.diagnostics);
+        if (!lease)
+            return std::unexpected(
+                OwnedGeometryFailure{complete(lease.error(), context), QueryId{q.id}, context});
+        auto slots =
+            ExactPredicateAccess::coordinates(*workspace.predicate_, *lease, context.diagnostics);
+        if (!slots)
+            return std::unexpected(
+                OwnedGeometryFailure{complete(slots.error(), context), QueryId{q.id}, context});
+        ExactQueryCoordinates coordinates{};
+        if (auto loaded = query_position(data, q, slots->get(), workspace.arithmetic_.values()[0],
+                                         run, &coordinates, configuration);
+            !loaded)
+            return std::unexpected(loaded.error());
+        if (auto published = run.step(QueryId{q.id}); !published)
+            return std::unexpected(published.error());
+        coordinates.numerator = slots->get()[3];
+        coordinates.used_steps = run.steps;
+        return coordinates;
+    });
+}
+
+AeroResult<ExactQueryCoordinates>
+exact_query_coordinates(const OwnedGeometry& geometry, const ResolvedQuery& query,
+                        const GeometryLimits& limits, GeometryWorkspace& workspace,
+                        std::stop_token stop, Configuration configuration) noexcept {
+    return GeometryEngine::coordinates(geometry, query, limits, workspace, std::move(stop),
+                                       configuration);
+}
+
 GeometryWorkspace::GeometryWorkspace(Key, std::unique_ptr<PredicateWorkspace> predicate,
                                      core::PlannedBuffer<QueryArithmeticScratch> scratch) noexcept
     : predicate_(std::move(predicate)), arithmetic_(std::move(scratch)) {}
@@ -1464,9 +1549,9 @@ std::uint64_t GeometryWorkspace::payload_bytes() noexcept {
     return PredicateWorkspace::payload_bytes() + sizeof(QueryArithmeticScratch);
 }
 ResolvedQuery::ResolvedQuery(std::shared_ptr<const GeometryData> data,
-                             core::PlannedBuffer<QueryStorage> query,
-                             GeometryContext stamp) noexcept
-    : geometry_(std::move(data)), query_(std::move(query)), context_(stamp) {}
+                             core::PlannedBuffer<QueryStorage> query, GeometryContext stamp,
+                             std::uint64_t steps) noexcept
+    : geometry_(std::move(data)), query_(std::move(query)), context_(stamp), steps_(steps) {}
 ResolvedQuery::ResolvedQuery(ResolvedQuery&&) noexcept = default;
 ResolvedQuery& ResolvedQuery::operator=(ResolvedQuery&&) noexcept = default;
 ResolvedQuery::~ResolvedQuery() = default;

@@ -382,9 +382,9 @@ BasisReferencePoint PgReferenceBasis::locate(ReferenceArithmetic& m,
 
 std::array<std::array<ExactRational, 3>, 3>
 PgReferenceBasis::numerator_jet(ReferenceArithmetic& m, PgRankBasisColumn column,
-                                const BasisReferencePoint& point) const {
-    return rank_.basis_cell_jet(m, column, point.reference.cell, point.u, point.v,
-                                point.axis_scale);
+                                const BasisReferencePoint& point, bool derivatives) const {
+    return rank_.basis_cell_jet(m, column, point.reference.cell, point.u, point.v, point.axis_scale,
+                                derivatives);
 }
 
 BasisReferenceSample
@@ -421,6 +421,20 @@ PgReferenceBasis::evaluate(const PgReferencePoint& query, PgRankBasisColumn colu
         const auto numerators = numerator_jet(m, column, point);
         return assemble(m, std::move(point), column, numerators);
     });
+}
+
+core::Result<PgReferenceFrame> PgReferenceGeometry::frame() const& noexcept {
+    if (const auto present = identity(); !present)
+        return std::unexpected(present.error());
+    return PgReferenceFrame{rotation_, origin_, length_};
+}
+
+core::Result<PgReferenceIdentity> PgReferenceBasis::reference_identity() const noexcept {
+    return geometry_.identity();
+}
+
+core::Result<PgReferenceFrame> PgReferenceBasis::frame() const& noexcept {
+    return geometry_.frame();
 }
 
 core::Result<std::uint64_t> PgReferenceBasis::size() const noexcept {

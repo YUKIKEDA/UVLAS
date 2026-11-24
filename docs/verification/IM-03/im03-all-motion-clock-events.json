@@ -1,0 +1,101 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-all-motion-clock-events-v1",
+  "ids": [
+    "AE-07",
+    "FD-02",
+    "FD-06",
+    "FD-07",
+    "IO4-06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "a75bcdd43fedb3f5b30e68c58e10abb969305dc8",
+  "input_baseline": "a953de3fac167d334cc74821302d7a69c9d8e3cb",
+  "claimed_state": "The composed input clock qualifies exact event boundaries of every declared motion consumer and time-varying load while preserving typed restart identity.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 8/8 each.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, affected CTest 8/8.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "coupling.case_motion",
+      "coupling.case_motion_frame",
+      "coupling.case_motion_time_series",
+      "aero.pchip_curve",
+      "io.si_case",
+      "io.si_case_resources",
+      "io.si_interval"
+    ],
+    "catch": "Under seed 23, 1102 assertions in the three focused cases per configuration, including 134 assertions for declared events and consumer knots.",
+    "negative": "Individually reject a missed periodic seam for a second aero attachment, a point support, a trace support, an elastic support reference and gravity. Reject restart against the same grid with changed unselected trace support data.",
+    "oracle": "Independent period-three knot arithmetic predicts a seam at -3 s, and exact absolute event -13/4 s remains unshifted. Both arrival Left and departure Right qualify at both boundaries. The absolute event 5/4 s does not repeat at -7/4 s.",
+    "mutation": "In two isolated Linux variants, scanning only the first aero attachment or skipping the elastic reference caused the matching negative control to fail (Catch2 exit 42). A byte-identical restoration passed all 134 new assertions after each mutation.",
+    "static": "Pinned clang-format 21.1.2 and clang-tidy 21.1.1 on touched translation units, trace-check, evidence SHA256 verification and Japanese prose lint."
+  },
+  "sources": {
+    "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
+    "docs/specs/foundation/case-schema-fields.md": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119",
+    "include/uvlas/io/case_schema_records.hpp": "737bad957979af654395ed92bc2cdd1f4e6e45f9d8ce3708b8519f54ec5348d8",
+    "src/io/case_schema_exact.cpp": "8b18eefd6c7869a12480784bdf315711d190c398a2ed8d26b3b336b0968d6f78",
+    "tests/coupling/case_motion_time_series_test.cpp": "85609fe1a52f10a766c93d8bcc50768a74669ca83be28c1ea3b76b4db91baac0"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "hint": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "sha256": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119"
+    },
+    {
+      "id": "include/uvlas/io/case_schema_records.hpp",
+      "hint": "include/uvlas/io/case_schema_records.hpp",
+      "sha256": "737bad957979af654395ed92bc2cdd1f4e6e45f9d8ce3708b8519f54ec5348d8"
+    },
+    {
+      "id": "src/io/case_schema_exact.cpp",
+      "hint": "src/io/case_schema_exact.cpp",
+      "sha256": "8b18eefd6c7869a12480784bdf315711d190c398a2ed8d26b3b336b0968d6f78"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.cpp",
+      "hint": "src/coupling/case_flow_clock.cpp",
+      "sha256": "b3e7d9f2c26e33a997ca7132f9f6d1cd0dff80f82e052c2043b00ffe827eaaaf"
+    },
+    {
+      "id": "src/coupling/case_flow_clock.hpp",
+      "hint": "src/coupling/case_flow_clock.hpp",
+      "sha256": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13"
+    },
+    {
+      "id": "tests/coupling/case_motion_time_series_test.cpp",
+      "hint": "tests/coupling/case_motion_time_series_test.cpp",
+      "sha256": "85609fe1a52f10a766c93d8bcc50768a74669ca83be28c1ea3b76b4db91baac0"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/all-motion-clock-events-v1/verification.md": "9d27bfc9e1e0c0092789f20e839957b08f28fd0d40beb23c230e9af617e9e597"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/all-motion-clock-events-v1/verification.md",
+      "hint": "docs/verification/IM-03/all-motion-clock-events-v1/verification.md",
+      "sha256": "9d27bfc9e1e0c0092789f20e839957b08f28fd0d40beb23c230e9af617e9e597"
+    }
+  ],
+  "sources_at_tested_commit": {
+    "src/coupling/case_flow_clock.cpp": {
+      "commit": "a75bcdd43fedb3f5b30e68c58e10abb969305dc8",
+      "sha256": "b3e7d9f2c26e33a997ca7132f9f6d1cd0dff80f82e052c2043b00ffe827eaaaf"
+    },
+    "src/coupling/case_flow_clock.hpp": {
+      "commit": "a75bcdd43fedb3f5b30e68c58e10abb969305dc8",
+      "sha256": "072631376e7bf574131e5b42d06b4dd7a24b5961f1489760ca483cddf52fcc13"
+    }
+  }
+}

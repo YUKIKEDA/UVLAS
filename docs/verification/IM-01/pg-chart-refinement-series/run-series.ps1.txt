@@ -1,0 +1,65 @@
+param([Parameter(Mandatory)] [string]$Build, [Parameter(Mandatory)] [string]$Dependencies)
+
+$ErrorActionPreference = 'Stop'
+$out = 'out/pg-chart-refinement-series-' + [Guid]::NewGuid().ToString('N')
+New-Item -ItemType Directory $out | Out-Null
+Write-Output ("R02_OUTPUT=$out")
+$verification = 'docs/verification/IM-01'
+$source = "$out/series.cpp"
+$base = [IO.File]::ReadAllText((Join-Path $pwd "$verification/pg-sparse-chart-series/run-series.cpp.txt"))
+$unrefined = [IO.File]::ReadAllText((Join-Path $pwd "$verification/pg-chart-candidate-series/measure-candidate.cpp.txt"))
+$refined = [IO.File]::ReadAllText((Join-Path $pwd "$verification/pg-chart-refinement-series/measure-refinement.cpp.txt"))
+$headers = @(
+    '#include "pg_conditioning_test_support.hpp"',
+    '#include "numerics/sparse_test_support.hpp"',
+    '#include <bit>',
+    '#include <iomanip>',
+    '#include <uvlas/structure/pg_chart_candidate.hpp>'
+)
+$base = $base.Replace($headers[0], ($headers -join [Environment]::NewLine))
+$insert = $base.IndexOf('void run(std::size_t patch_count,')
+$begin = $base.IndexOf('        measure_reuse(', $insert)
+$end = $base.IndexOf('        return;', $begin)
+if ($insert -lt 0 -or $begin -lt 0 -or $end -le $begin) { throw 'Frozen driver shape changed' }
+$call = '        measure_candidate(patch_count, contact_count, std::move(chart), original_info, limits.arithmetic, workspace, plan);'
+$base = $base.Remove($begin, $end - $begin).Insert($begin, $call + [Environment]::NewLine)
+$base = $base.Replace('        const auto chart = take(prepare(original));','        auto chart = take(prepare(original));')
+$anchor = '    if (q && dual) {'
+$check = @'
+    REQUIRE_FALSE(q);
+    REQUIRE_FALSE(dual);
+    REQUIRE(q.error().code == core::FailureCode::PrecisionUnresolved);
+    REQUIRE(dual.error().code == core::FailureCode::PrecisionUnresolved);
+    measure_refinement(*candidate, identity, limits, request(direct), request(reverse),
+                       r, c, f, workspace, plan);
+'@
+$point = $unrefined.IndexOf($anchor)
+$closing = $unrefined.LastIndexOf('    std::cout << "}\n";')
+if ($point -lt 0 -or $closing -le $point) { throw 'Frozen candidate recorder shape changed' }
+$unrefined = $unrefined.Remove($point, $closing - $point).Insert($point, $check + [Environment]::NewLine)
+$unrefined = $unrefined.Replace('R02-CANDIDATE', 'R02-REFINEMENT').Replace('    write_phase("project_and_factor", projected);', '    std::cout << std::setprecision(17);' + [Environment]::NewLine + '    write_phase("project_and_factor", projected);')
+$base = $base.Insert($insert,$refined + [Environment]::NewLine + $unrefined + [Environment]::NewLine)
+$base = $base.Replace('void measure_reuse(', '[[maybe_unused]] void measure_reuse(')
+[IO.File]::WriteAllText((Join-Path $pwd $source),$base,[Text.UTF8Encoding]::new($false))
+pwsh tools/dev/msvc.ps1 cl /nologo /std:c++23preview /utf-8 /EHsc /TP /O2 /MD /W4 /WX /fp:strict /DNDEBUG /DNOMINMAX /DUVLAS_R02_MEASURE_REUSE /Iinclude /Isrc/structure /Itests /Itests/structure "/external:I$Dependencies/include" /external:W0 "/Fo$out/series.obj" $source "/Fe$out/series.exe" /link /STACK:67108864 "$Build/Release/uvlas_structure.lib" "$Build/Release/uvlas_numerics.lib" "$Build/Release/uvlas_core.lib" "$Dependencies/lib/manual-link/Catch2Main.lib" "$Dependencies/lib/Catch2.lib" psapi.lib /SUBSYSTEM:CONSOLE
+if ($LASTEXITCODE) { exit $LASTEXITCODE }
+$env:PATH = "$Dependencies/bin;$env:PATH"
+$runner = [System.Diagnostics.Process]::GetCurrentProcess()
+$prior = $runner.ProcessorAffinity
+try {
+    $runner.ProcessorAffinity = [IntPtr]4
+    $cases = @('R02 two patches','R02 three patches','R02 four patch loop')
+    for ($i = 0; $i -lt $cases.Count; $i++) {
+        & "$out/series.exe" $cases[$i] --colour-mode none 2>&1 | Tee-Object "$out/case-$($i + 2).log"
+        if ($LASTEXITCODE) { exit $LASTEXITCODE }
+        $result = Get-Content "$out/case-$($i + 2).log" |
+            Where-Object { $_.StartsWith('R02-REFINEMENT ') }
+        if (@($result).Count -ne 1) { throw 'Expected one complete refinement result' }
+        $record = $result.Substring('R02-REFINEMENT '.Length) | ConvertFrom-Json
+        if ($record.patches -ne ($i + 2) -or $null -eq $record.independent_work_defect) {
+            throw 'Missing independent checks for the selected patch count'
+        }
+    }
+} finally {
+    $runner.ProcessorAffinity = $prior
+}

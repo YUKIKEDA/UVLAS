@@ -658,20 +658,6 @@ void check_reference_points(Fixture& f, const PgConditioningCertificate& certifi
     check_reference_batch(certificate, terms, transform, partition, queries);
 }
 
-Q independent_double(double value) {
-    const auto bits = std::bit_cast<std::uint64_t>(value);
-    const auto biased = static_cast<unsigned>((bits >> 52U) & 0x7ffU);
-    REQUIRE(biased != 0x7ffU);
-    const auto fraction = bits & 0x000fffffffffffffULL;
-    const auto significand = biased == 0 ? fraction : fraction | (1ULL << 52U);
-    const auto exponent = biased == 0 ? -1074 : static_cast<int>(biased) - 1075;
-    I n{significand};
-    if ((bits >> 63U) != 0)
-        n = -n;
-    const auto shift = static_cast<unsigned>(std::abs(exponent));
-    return exponent >= 0 ? Q{n * (I{1} << shift)} : Q{n} / (I{1} << shift);
-}
-
 template <class Reference, class Apply>
 void check_position_action(const Reference& reference, std::span<const Q> exact_shapes,
                            const Apply& apply, std::size_t rows_per_point = 1) {
@@ -713,6 +699,7 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
         take(core::Workspace::create(output.workspace_bytes() - 1, plan))};
     auto& workspace = *workspaces[0];
     CHECK(output.words().high.empty());
+    CHECK(output.used_steps() == 0);
 
     const auto exact_word = [](PgCartesianWords words, std::size_t k) -> Q {
         auto value = independent_double(words.high[k]);
@@ -755,10 +742,14 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
         return retained;
     };
     const auto positions = evaluate(forward, q_input, fwd_caps);
-    const auto repeated = compare_run(forward, q_input, fwd_caps);
+    auto wide = fwd_caps;
+    ++wide.maximum_steps;
+    const auto repeated = compare_run(forward, q_input, wide);
+    CHECK(output.used_steps() == forward_steps);
     for (std::size_t i = 0; i < positions.size(); ++i)
         CHECK(exact_word(repeated, i) == positions[i]);
     const auto forces = evaluate(transpose, f_input, trans_caps);
+    CHECK(output.used_steps() == transpose_steps);
 
     Q forward_work{}, transpose_work{}, input_norm{};
     for (std::size_t i = 0; i < positions.size(); ++i) {
@@ -779,6 +770,7 @@ void check_position_action(const Reference& reference, std::span<const Q> exact_
                               core::Workspace& scratch, core::FailureCode failure) {
         check_failure(apply(reference, transpose, input, bounds, scratch, output), failure);
         REQUIRE(output.words().high.size() == forces.size());
+        CHECK(output.used_steps() == transpose_steps);
         for (std::size_t i = 0; i < forces.size(); ++i)
             CHECK(exact_word(output.words(), i) == forces[i]);
     };
@@ -1505,6 +1497,27 @@ TEST_CASE("PG projection rounds the actual exact radical and enforces the reques
     check_failure(round(overflow_tie, one, 0x1p970, binary),
                   core::FailureCode::PrecisionUnresolved);
     CHECK(take(round(below_tie, one, 0x1p970, binary)).high == std::numeric_limits<double>::max());
+
+    const auto area = [&](const I& top, const I& bottom, double budget) {
+        const auto squared = PgReferenceScalar{rat(f, top * top, bottom * bottom), {}};
+        return detail::partition_entry([&]() -> core::Result<detail::PgProjectedWord> {
+            const auto tolerance = detail::reference_binary64(math, budget);
+            return detail::pg_project_positive_root(math, squared, one, tolerance, two_word);
+        });
+    };
+    const I binary_midpoint = I{1} << 53U;
+    const auto lower_even = take(area(binary_midpoint + 1, binary_midpoint, 0));
+    CHECK(lower_even.high == 0x1p0);
+    CHECK(lower_even.low == 0x1p-53);
+    const auto upper_even = take(area(binary_midpoint + 3, binary_midpoint, 0));
+    CHECK(upper_even.high == 0x1.0000000000002p0);
+    CHECK(upper_even.low == -0x1p-53);
+    const I low_denominator = I{1} << 107U;
+    const I low_midpoint = low_denominator + binary_midpoint + 1;
+    const auto low_even = take(area(low_midpoint, low_denominator, 0x1p-107));
+    CHECK(low_even.high == 0x1p0);
+    CHECK(low_even.low == 0x1p-54);
+    check_failure(area(low_midpoint, low_denominator, 0), core::FailureCode::PrecisionUnresolved);
 }
 
 TEST_CASE("PG dyadic dot preserves cancellation and subnormal rounding",

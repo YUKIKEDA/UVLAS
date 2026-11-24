@@ -3,12 +3,11 @@
 #include "aero/certified_trigonometry_private.hpp"
 #include "aero/local_geometry_bounds_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
+#include "case_component_precision_private.hpp"
 #include "case_flow_series_private.hpp"
 #include "io/si_exact_words.hpp"
 
 #include <algorithm>
-#include <bit>
-#include <ranges>
 
 namespace uvlas::coupling::detail {
 namespace a = aero::detail;
@@ -70,43 +69,8 @@ Number own(p::RationalView value, core::ResourcePlan& memory, m::Work& work,
     return {std::move(words), value.numerator.size(), value.sign};
 }
 
-std::uint64_t bits(std::span<const std::uint32_t> limbs) {
-    if (limbs.empty())
-        return 0;
-    if (limbs.size() > 1024)
-        reject(ResourceExceeded);
-    if (limbs.back() == 0)
-        reject(InvalidInput);
-    return 32U * (limbs.size() - 1U) + static_cast<std::uint64_t>(std::bit_width(limbs.back()));
-}
-
-void validate_words(p::RationalView value, std::uint64_t input_bits) {
-    if (value.sign < -1 || value.sign > 1 || value.denominator.empty() ||
-        value.numerator.empty() != (value.sign == 0) ||
-        (value.sign == 0 && (value.denominator.size() != 1 || value.denominator.front() != 1)))
-        reject(InvalidInput);
-    if (bits(value.numerator) > input_bits || bits(value.denominator) > input_bits)
-        reject(ResourceExceeded);
-}
-
-m::Interval rational(p::RationalView value, std::uint64_t input_bits, m::Work& work) {
-    work.step();
-    validate_words(value, input_bits);
-    const auto assemble = [&](std::span<const std::uint32_t> limbs) {
-        a::ExactInteger result = 0;
-        for (const auto limb : limbs | std::views::reverse) {
-            work.step();
-            result <<= 32U;
-            result += limb;
-        }
-        return result;
-    };
-    if (value.sign == 0)
-        return m::integer(0);
-    const auto n = assemble(value.numerator);
-    return m::divide(m::exact(value.sign < 0 ? -n : n, 0), m::exact(assemble(value.denominator), 0),
-                     work);
-}
+using case_components::rational;
+using case_components::validate_words;
 
 constexpr std::size_t direction_at = 0, wave_at = 3, origin_at = 6, omega_at = 9, phase_at = 10,
                       time_origin_at = 11;
@@ -261,29 +225,7 @@ std::optional<Gust> prepare_gust(const io::SiCase& source, const CaseKnownFlowLi
     return result;
 }
 
-io::SiEnclosure project(const m::Interval& value, const CaseFlowComponentBudget& budget,
-                        core::Precision representation, std::uint64_t input_bits,
-                        a::LocalRootScratch& scratch, m::Work& work) {
-    const auto scale = rational(budget.scale, input_bits, work);
-    const auto absolute = rational(budget.absolute, input_bits, work);
-    const auto relative = rational(budget.relative, input_bits, work);
-    if (m::compare(scale.lower, {}) <= 0 || m::compare(absolute.lower, {}) < 0 ||
-        m::compare(relative.lower, {}) < 0)
-        reject(InvalidInput);
-    const auto tolerance = m::add(m::multiply(scale, absolute, work),
-                                  m::multiply(relative, m::absolute(value), work), work);
-    work.step();
-    const auto result = a::enclose_p1_value(value, representation, scratch);
-    const auto error = m::scale(a::decode_p1_word(result.radius()), result.exponent());
-    if (m::compare(error.upper, tolerance.lower) > 0)
-        reject(PrecisionUnresolved);
-    const auto center = result.center();
-    if (const auto* single = std::get_if<a::SingleWord>(&center))
-        return io::ScaledBinary64{single->value, result.radius(), result.exponent()};
-    if (const auto* two = std::get_if<a::DoubleWord>(&center))
-        return io::ScaledTwoWord{two->high, two->low, result.radius(), result.exponent()};
-    reject(PrecisionUnsupported);
-}
+using case_components::project;
 
 void add_gust(const PhysicalGust& gust, m::PhaseUnits units,
               const a::ExactUniformFlowJet& amplitude, const CaseKnownFlowQuery& query,
@@ -319,6 +261,7 @@ struct Prepared {
     std::optional<CaseUniformFlowReady> ambient, amplitude;
     std::optional<Gust> gust;
     std::optional<PhysicalGust> physical;
+    std::optional<io::SchemaIdentity> free_wake_case;
 };
 
 struct Saved {
@@ -338,14 +281,14 @@ struct Builder {
         return records.front();
     }
 
-    static CaseKnownFlowReady publish(CaseUniformFlowReady ambient,
-                                      std::optional<CaseUniformFlowReady> amplitude,
-                                      std::optional<Gust> gust, std::uint64_t input_bits,
-                                      core::ResourcePlan& memory, m::Work& work) {
+    static CaseKnownFlowReady
+    publish(CaseUniformFlowReady ambient, std::optional<CaseUniformFlowReady> amplitude,
+            std::optional<Gust> gust, std::optional<io::SchemaIdentity> free_wake_case,
+            std::uint64_t input_bits, core::ResourcePlan& memory, m::Work& work) {
         auto physical = qualify(gust, input_bits, work);
         auto record = take(memory.allocate<Prepared>(1, prepare));
         record.values().front() = {std::move(ambient), std::move(amplitude), std::move(gust),
-                                   std::move(physical)};
+                                   std::move(physical), free_wake_case};
         work.step();
         return CaseKnownFlowReady{std::move(record)};
     }
@@ -362,8 +305,19 @@ struct Builder {
             source, stamp, window, workspace, limits.time_curves, memory, stop, details));
         if (series.amplitude.has_value() != gust.has_value())
             reject(InvalidInput);
+        const auto& schema = take(source.source_case()).get();
+        const auto root = take(schema.root());
+        const auto analysis = root.analysis.record();
+        std::optional<io::SchemaIdentity> free_wake_case;
+        if (const auto* transient = std::get_if<s::AnalysisTransient>(&analysis)) {
+            const auto wake = transient->wake.record();
+            if (const auto* active = std::get_if<s::WakeActive>(&wake);
+                active != nullptr &&
+                std::holds_alternative<s::ConvectionFree>(active->convection.record()))
+                free_wake_case = take(schema.identity());
+        }
         return publish(std::move(series.ambient), std::move(series.amplitude), std::move(gust),
-                       limits.maximum_input_bits, memory, work);
+                       free_wake_case, limits.maximum_input_bits, memory, work);
     }
 
     static CaseKnownFlowJet run(const CaseKnownFlowReady& requested, const CaseKnownFlowReady& host,
@@ -479,7 +433,7 @@ struct Builder {
         }
         auto gust = clone(field.gust, limits.maximum_input_bits, memory, work);
         return publish(std::move(ambient), std::move(amplitude), std::move(gust),
-                       limits.maximum_input_bits, memory, work);
+                       current.free_wake_case, limits.maximum_input_bits, memory, work);
     }
 };
 } // namespace known_flow_detail
@@ -490,6 +444,15 @@ CaseKnownFlowReady::CaseKnownFlowReady(
 CaseKnownFlowReady::CaseKnownFlowReady(CaseKnownFlowReady&&) noexcept = default;
 CaseKnownFlowReady& CaseKnownFlowReady::operator=(CaseKnownFlowReady&&) noexcept = default;
 CaseKnownFlowReady::~CaseKnownFlowReady() = default;
+
+core::Result<io::SchemaIdentity> CaseKnownFlowReady::free_wake_case_identity() const noexcept {
+    const auto records = data_.values();
+    if (records.empty())
+        return std::unexpected(core::Failure{InvalidInput, evaluate});
+    if (const auto& identity = records.front().free_wake_case)
+        return *identity;
+    return std::unexpected(core::Failure{Unsupported, evaluate});
+}
 
 CaseKnownFlowSnapshot::CaseKnownFlowSnapshot(
     core::PlannedBuffer<known_flow_detail::Saved>&& data) noexcept

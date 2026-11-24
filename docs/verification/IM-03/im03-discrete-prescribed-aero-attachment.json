@@ -1,0 +1,121 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-prescribed-aero-attachment-v1",
+  "ids": [
+    "AE-07",
+    "IO4-01",
+    "UW-D06",
+    "UW-D07",
+    "N4-06",
+    "FD-02"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "8dabff4e5d9403d8d4c91ef7f866656165609f39",
+  "claimed_state": "Typed prescribed attachment produces a contact-qualified rounded geometry snapshot and fixed material collocations with the same exact-time rigid pose's position and velocity; Binary64 and TwoWord checked.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 7/7 per configuration. Coupling suite 49.61 s in Debug (90 s limit) and 5.94 s in Release.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, warnings as errors, affected CTest 7/7. Coupling suite 5.16 s.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "coupling.case_motion",
+      "coupling.case_motion_frame",
+      "coupling.case_motion_time_series",
+      "aero.geometry_snapshot",
+      "aero.global_geometry",
+      "aero.p1_shared_action"
+    ],
+    "catch": "Two focused cases, 239 assertions per configuration, seed 23. The new prescribed attachment case has 67 assertions.",
+    "oracle": "Direct sin(60 degrees), cos(60 degrees), rigid angular velocity and normal projection give the independent position, velocity and -5*pi/3 normal residual. Equivalent exact-vertex and explicit-tangent paths match value, a nonzero tangent solve, and the transpose pairing.",
+    "negative": "Rejected a different exact time with identical display double, mismatched known-flow side, altered live motion at the same stamp, alias given as a canonical point, and an unrelated moving point. Zero work cap performs no allocation.",
+    "mutation": "A separate Linux tree used previous current coordinates in place of reference coordinates. The independent point position moved 4 m, yielding 1 failed assertion and exit 42. Restoring identical bytes passed 67 assertions.",
+    "static": "Pinned clang-format 21.1.2 and Windows and Linux clang-tidy 21.1.1 on the modified motion/attachment/discrete nonpenetration and regression units."
+  },
+  "sources": {
+    "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
+    "docs/specs/foundation/case-schema-fields.md": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119",
+    "src/aero/geometry_snapshot.cpp": "19d6c4415259161af6f2769965fbad58a2cdaa2db24ba3660ff623818d67db38",
+    "src/aero/query_coordinates_private.hpp": "61ef3abbdd1ec4cc9a739ecbcb990d60a9bcb8db24bf57813775936fcd328350",
+    "src/coupling/case_aero_attachment.cpp": "1e6f5c8668a233e969a1801876e90906d0736da6fc39ba3b7f76b75d87b42609",
+    "src/coupling/case_aero_attachment.hpp": "43c480c1def5ace68429981afbd90ec4442e6ee5a98d183e6f30cd6dd39039d2",
+    "src/coupling/case_dyadic_words_private.hpp": "240c4462266a0b168f6d078b23ccdf5e64e793c8c1a3ef21f3f991bae2bf9f38",
+    "src/coupling/case_motion.cpp": "b225c57423602d869150ac5f7a550e3221c98d79c7cccadec7148079a1f96100",
+    "src/coupling/case_motion.hpp": "9474737af3afdfda29b7ab4a120e74225bb76b1c6c16c56c778109563e1cd953",
+    "src/coupling/discrete_nonpenetration.cpp": "f73f3d90789e3fc06fd3f66124452ec9b051f8e847e00411164d7d68d4d68f62",
+    "src/coupling/discrete_nonpenetration.hpp": "8966c45ba40df5eed3211c173023c6ef2fce89f0623b9b731a77f48725551cb4",
+    "tests/coupling/case_uniform_flow_test.cpp": "b13f69e30baaa478ceab15b8171ec26b762bf484e15c1cb6de9ba01099916509"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "hint": "docs/specs/aero/prescribed-rigid-motion-start-contract.md",
+      "sha256": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8"
+    },
+    {
+      "id": "docs/specs/foundation/case-schema-fields.md",
+      "hint": "docs/specs/foundation/case-schema-fields.md",
+      "sha256": "3bd298cb23d73e6d05f77b8c78741fd43a42371ad849e554f210ee73f90fe119"
+    },
+    {
+      "id": "src/aero/geometry_snapshot.cpp",
+      "hint": "src/aero/geometry_snapshot.cpp",
+      "sha256": "19d6c4415259161af6f2769965fbad58a2cdaa2db24ba3660ff623818d67db38"
+    },
+    {
+      "id": "src/aero/query_coordinates_private.hpp",
+      "hint": "src/aero/query_coordinates_private.hpp",
+      "sha256": "61ef3abbdd1ec4cc9a739ecbcb990d60a9bcb8db24bf57813775936fcd328350"
+    },
+    {
+      "id": "src/coupling/case_aero_attachment.cpp",
+      "hint": "src/coupling/case_aero_attachment.cpp",
+      "sha256": "1e6f5c8668a233e969a1801876e90906d0736da6fc39ba3b7f76b75d87b42609"
+    },
+    {
+      "id": "src/coupling/case_aero_attachment.hpp",
+      "hint": "src/coupling/case_aero_attachment.hpp",
+      "sha256": "43c480c1def5ace68429981afbd90ec4442e6ee5a98d183e6f30cd6dd39039d2"
+    },
+    {
+      "id": "src/coupling/case_dyadic_words_private.hpp",
+      "hint": "src/coupling/case_dyadic_words_private.hpp",
+      "sha256": "240c4462266a0b168f6d078b23ccdf5e64e793c8c1a3ef21f3f991bae2bf9f38"
+    },
+    {
+      "id": "src/coupling/case_motion.cpp",
+      "hint": "src/coupling/case_motion.cpp",
+      "sha256": "b225c57423602d869150ac5f7a550e3221c98d79c7cccadec7148079a1f96100"
+    },
+    {
+      "id": "src/coupling/case_motion.hpp",
+      "hint": "src/coupling/case_motion.hpp",
+      "sha256": "9474737af3afdfda29b7ab4a120e74225bb76b1c6c16c56c778109563e1cd953"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "f73f3d90789e3fc06fd3f66124452ec9b051f8e847e00411164d7d68d4d68f62"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "8966c45ba40df5eed3211c173023c6ef2fce89f0623b9b731a77f48725551cb4"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "b13f69e30baaa478ceab15b8171ec26b762bf484e15c1cb6de9ba01099916509"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/discrete-prescribed-aero-attachment-v1/verification.md": "c142b3717c76b87cc38d53be8280f83892ba2c2b1d94752efff752136b619d15"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/discrete-prescribed-aero-attachment-v1/verification.md",
+      "hint": "docs/verification/IM-03/discrete-prescribed-aero-attachment-v1/verification.md",
+      "sha256": "c142b3717c76b87cc38d53be8280f83892ba2c2b1d94752efff752136b619d15"
+    }
+  ]
+}
