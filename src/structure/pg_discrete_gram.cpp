@@ -306,10 +306,12 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             using Numerators = std::array<ExactRational, 3>;
             core::PlannedBuffer<Numerators> cached;
             std::size_t depth_group = 1;
+            bool use_monomial_powers = false;
             if (product != nullptr && product->depth.size() > 1) {
                 auto cache_arithmetic = ReferenceArithmetic{limits.arithmetic, plan};
+                const auto cache_rationals = partition_add(live_rationals, partition_mul(rank, 3));
                 try {
-                    cache_arithmetic.admit(partition_add(live_rationals, partition_mul(rank, 3)));
+                    cache_arithmetic.admit(cache_rationals);
                     cached = partition_take(
                         plan.allocate<Numerators>(partition_index(rank), partition_operation));
                     math.leaf_limits = cache_arithmetic.leaf_limits;
@@ -317,6 +319,18 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 } catch (const PartitionAbort& unavailable) {
                     if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
                         throw;
+                }
+                if (depth_group > 1) {
+                    cache_arithmetic.leaf_limits = limits.arithmetic.algebra;
+                    try {
+                        cache_arithmetic.admit(partition_add(
+                            cache_rationals, PgRankMonomialPowers::retained_rationals));
+                        math.leaf_limits = cache_arithmetic.leaf_limits;
+                        use_monomial_powers = true;
+                    } catch (const PartitionAbort& unavailable) {
+                        if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
+                            throw;
+                    }
                 }
             }
             std::size_t depth_slot = 0;
@@ -348,12 +362,17 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                     auto b = math.mul(director_radical, terms[1]);
                     return radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
                 };
+                std::optional<PgRankMonomialPowers> monomials;
+                if (depth_slot == 0 && use_monomial_powers &&
+                    PgRankMonomialPowers::fits(located.u, located.v, math.leaf_limits))
+                    monomials.emplace(located.u, located.v);
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);
                     const auto numerator_values = [&]() -> Numerators {
                         auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
-                                                       /*derivatives=*/false);
+                                                       /*derivatives=*/false,
+                                                       monomials ? &*monomials : nullptr);
                         return {std::move(jet[0][0]), std::move(jet[1][0]), std::move(jet[2][0])};
                     };
                     if (cached.size() == 0) {

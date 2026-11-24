@@ -33,6 +33,30 @@ constexpr std::uint32_t rank_key_count = rank_field_slots.back() * rank_max_cell
 constexpr std::uint32_t rank_trace_count = rank_trace_slots.back() * 8;
 constexpr std::uint32_t rank_missing = UINT32_MAX;
 
+/// Lazy powers shared by all value-only columns at one chart point.
+class PgRankMonomialPowers {
+    static constexpr std::size_t degree = *std::ranges::max_element(rank_degree);
+
+public:
+    static constexpr std::uint64_t retained_rationals = 2 * (degree - 1);
+
+    PgRankMonomialPowers(const ExactRational& u, const ExactRational& v) noexcept : u_(u), v_(v) {}
+
+    [[nodiscard]] static bool fits(const ExactRational&, const ExactRational&, const ExactLimits&);
+    [[nodiscard]] ExactRational term(ReferenceArithmetic&, const ExactRational&, ExactPowers);
+
+private:
+    struct Axis {
+        const ExactRational& coordinate;
+        std::array<ExactRational, degree - 1> values{};
+        std::size_t last_power = 1;
+
+        [[nodiscard]] const ExactRational& power(ReferenceArithmetic&, std::size_t);
+    };
+
+    Axis u_, v_;
+};
+
 template <class I>
 struct RankFraction {
     I numerator{};
