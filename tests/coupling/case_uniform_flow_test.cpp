@@ -4291,7 +4291,10 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
                                              next_epoch, extended_limits, memory));
     REQUIRE(extended.size() == 4);
     const auto inherited = take(extended.row(0));
-    REQUIRE(inherited.parent);
+    if (!inherited.parent) {
+        FAIL("A retained row must keep its parent material point");
+        return;
+    }
     CHECK(inherited.parent->point == id[4]);
     CHECK(inherited.current.point == far_up);
     CHECK_FALSE(take(extended.row(1)).parent);
@@ -4392,8 +4395,10 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const auto step = take(cf::evaluate_free_wake_trial(
         wake_si, transport_clock, parent_trial, current_trial, {&preceding, {}}, next_epoch,
         trial_seeds, trial_limits, shared, *local, *kernel, trial_memory));
-    REQUIRE(step.trapezoid);
-    REQUIRE(step.bdf2);
+    if (!step.trapezoid || !step.bdf2) {
+        FAIL("An interior trial must include both the released and retained rows");
+        return;
+    }
     REQUIRE(step.trapezoid->size() == 2);
     REQUIRE(step.bdf2->size() == 2);
     CHECK(step.strength.history_material()[0].epoch == next_epoch);
@@ -4627,7 +4632,10 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     CHECK(take(shifted.retired(0)).release == release);
     CHECK(take(shifted.retired(1)).release == second_release);
     const auto retained = take(shifted.row(0));
-    REQUIRE(retained.parent);
+    if (!retained.parent) {
+        FAIL("A retained window row must keep its parent material point");
+        return;
+    }
     CHECK(retained.parent->release.epoch == next_epoch);
     CHECK(retained.parent->point == id[4]);
     CHECK(retained.current.point == far_up);
