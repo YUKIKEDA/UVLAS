@@ -50,7 +50,7 @@ enum class NastranSupportFailure : std::uint8_t {
 };
 
 struct NastranSupportDiagnostic {
-    NastranSupportFailure reason;
+    NastranSupportFailure reason = NastranSupportFailure::Input;
     NastranBulkPosition position;
 };
 

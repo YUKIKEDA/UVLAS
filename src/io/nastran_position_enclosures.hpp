@@ -135,7 +135,7 @@ public:
     [[nodiscard]] std::uint64_t work() const noexcept;
 
 private:
-    NastranSpcDirections(NastranSpcDirectionOrigin, std::uint8_t,
+    NastranSpcDirections(const NastranSpcDirectionOrigin&, std::uint8_t,
                          std::array<NastranComponentAxis, 3>&&, std::uint64_t) noexcept;
     std::optional<NastranSpcDirectionOrigin> origin_;
     std::uint8_t components_;

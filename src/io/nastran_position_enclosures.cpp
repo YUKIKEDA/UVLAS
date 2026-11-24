@@ -407,11 +407,11 @@ NastranPositionEnclosures::prepare(const NastranShellCards& input, SiLengthUnit 
     return prepare_view(source ? &source->input : nullptr, length, grids, limits, plan, diagnostic);
 }
 
-NastranSpcDirections::NastranSpcDirections(NastranSpcDirectionOrigin origin,
+NastranSpcDirections::NastranSpcDirections(const NastranSpcDirectionOrigin& origin,
                                            std::uint8_t components,
                                            std::array<NastranComponentAxis, 3>&& axes,
                                            std::uint64_t work) noexcept
-    : origin_(std::move(origin)), components_(components), axes_(std::move(axes)), work_(work) {}
+    : origin_(origin), components_(components), axes_(std::move(axes)), work_(work) {}
 
 NastranSpcDirections::NastranSpcDirections(NastranSpcDirections&& other) noexcept
     : origin_(std::exchange(other.origin_, std::nullopt)),

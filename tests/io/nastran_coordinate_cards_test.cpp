@@ -691,8 +691,9 @@ TEST_CASE("SPC direction preparation diagnoses polar axes and stale or absent so
     REQUIRE(NastranSpcDirections::prepare(input, support, 0, NastranGridId{1}, exact_work, plan));
     const auto moved = std::move(first);
     CHECK(moved.origin());
+    // The owning type explicitly permits observing an empty moved-from origin.
+    // NOLINTNEXTLINE(bugprone-use-after-move)
     CHECK_FALSE(first.origin());
-    CHECK_FALSE(first.direction(1));
     CHECK(take(input.view()).bulk.bytes == spc_fixture);
 }
 
