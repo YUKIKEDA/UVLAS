@@ -1,0 +1,105 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-fixed-bdf2-loads-v1",
+  "ids": [
+    "AE-02",
+    "UW-D06",
+    "J1-D01",
+    "FD-07",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "f9f0f3662dc913f4cb6e0e15aa3e68ffa5e11009",
+  "input_baseline": "7a2de0ba658b507659070eb080f4e1e9249de961",
+  "claimed_state": "Same-interval fixed-step circulation rates from qualified numerical history and the current native circulation, with value and frozen-history forward/transpose actions on the active trial's loads. The physical accepted-history role belongs to IM-04.",
+  "verification": {
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, scoped CTest 4/4 each. The earlier Debug stack-overflow in the existing load case is resolved by moving BDF2-only wide temporaries into helpers; focused old and new cases passed 5603 assertions together.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, scoped CTest 4/4.",
+    "ctest": [
+      "aero.global_geometry",
+      "aero.p1_shared_action",
+      "coupling.case_uniform_flow",
+      "coupling.case_motion_time_series"
+    ],
+    "catch": "85 focused assertions in each configuration with seed 23.",
+    "oracle": "Use three genuine numerical solves at exact 0, 1/10 and 1/5 s with different normal velocities. An independent rational oracle on all retained circulation words gives D_h Gamma=(3G2-4G1+G0)*5. Check the retained rate and two triangle z-forces of area times density. Frozen-history current derivative is 15 dG2. Compare forward total-force work and the transposed physical collocation-velocity contribution.",
+    "negative": "Reject reorder or skipped nodes, swapped circulation solves, independently prepared topology despite same reference arrays, and another complete case clock of changed duration with the same source ID and generation. Earlier exact result remains owning when preparation fails.",
+    "static": "Windows and Linux clang-tidy 21.1.1 on four affected translation units, pinned clang-format 21.1.2, trace-check, SHA256 verification and Japanese prose lint."
+  },
+  "sources": {
+    "docs/specs/coupled/coupled-adopted-specification.md": "e58792bfc857af73166ea596724a66a7dcd08f43ba083b642f538dfecf56dc3d",
+    "docs/specs/coupled/j1-initialization-output-derivative-addendum.md": "6b2159b633a0412b5221546b075eb9938718c69d306a63602b638ce73c16f05f",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "src/aero/global_geometry.cpp": "06e1329fbca7e5db54a14adfb915a1542ab284205c9b21093f85d14437df0051",
+    "src/aero/global_geometry.hpp": "20f5e5fdd59aab0e73a521108293c8f45d89e6b7795a91acd99e49d3186621ef",
+    "src/coupling/fixed_bdf2_circulation.cpp": "3fcbff7c1e123e90f92aaad8a894a71a5e87b7461dcd9e3a63161c862be837f5",
+    "src/coupling/fixed_bdf2_circulation.hpp": "8f63ed6376c6cbf95371db71a51aa032ddcf6ded408340486a30cc39a326e64c",
+    "src/coupling/discrete_nonpenetration.cpp": "507ce3b99332a9b1893e55e334658c53f0f85d8afb78c6d3ac1c108648f5971d",
+    "src/coupling/discrete_nonpenetration.hpp": "039dc24356004af55e4997bf85c36f244aaf73c361064d6ff78904674b3d18eb",
+    "tests/coupling/case_uniform_flow_test.cpp": "eeda37be9bdc3e0854c1db355a59e9d17b252cd677119864f799a37f1f1f44ef"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/coupled/coupled-adopted-specification.md",
+      "hint": "docs/specs/coupled/coupled-adopted-specification.md",
+      "sha256": "e58792bfc857af73166ea596724a66a7dcd08f43ba083b642f538dfecf56dc3d"
+    },
+    {
+      "id": "docs/specs/coupled/j1-initialization-output-derivative-addendum.md",
+      "hint": "docs/specs/coupled/j1-initialization-output-derivative-addendum.md",
+      "sha256": "6b2159b633a0412b5221546b075eb9938718c69d306a63602b638ce73c16f05f"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "src/aero/global_geometry.cpp",
+      "hint": "src/aero/global_geometry.cpp",
+      "sha256": "06e1329fbca7e5db54a14adfb915a1542ab284205c9b21093f85d14437df0051"
+    },
+    {
+      "id": "src/aero/global_geometry.hpp",
+      "hint": "src/aero/global_geometry.hpp",
+      "sha256": "20f5e5fdd59aab0e73a521108293c8f45d89e6b7795a91acd99e49d3186621ef"
+    },
+    {
+      "id": "src/coupling/fixed_bdf2_circulation.cpp",
+      "hint": "src/coupling/fixed_bdf2_circulation.cpp",
+      "sha256": "3fcbff7c1e123e90f92aaad8a894a71a5e87b7461dcd9e3a63161c862be837f5"
+    },
+    {
+      "id": "src/coupling/fixed_bdf2_circulation.hpp",
+      "hint": "src/coupling/fixed_bdf2_circulation.hpp",
+      "sha256": "8f63ed6376c6cbf95371db71a51aa032ddcf6ded408340486a30cc39a326e64c"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "507ce3b99332a9b1893e55e334658c53f0f85d8afb78c6d3ac1c108648f5971d"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "039dc24356004af55e4997bf85c36f244aaf73c361064d6ff78904674b3d18eb"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "eeda37be9bdc3e0854c1db355a59e9d17b252cd677119864f799a37f1f1f44ef"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/fixed-bdf2-loads-v1/verification.md": "c2039bfa4555e042737b2b93bc8776ac569037e67adf64b0379b7206d832edfd"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/fixed-bdf2-loads-v1/verification.md",
+      "hint": "docs/verification/IM-03/fixed-bdf2-loads-v1/verification.md",
+      "sha256": "c2039bfa4555e042737b2b93bc8776ac569037e67adf64b0379b7206d832edfd"
+    }
+  ]
+}
