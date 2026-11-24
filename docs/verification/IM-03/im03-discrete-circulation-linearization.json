@@ -1,0 +1,96 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-circulation-linearization-v1",
+  "ids": [
+    "UW-D01",
+    "UW-D03",
+    "UW-D06",
+    "N4-05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "8dafe13aa84573b6e6ac9731e18d2039177062d3",
+  "claimed_state": "Fixed real discrete circulation tangent and transpose solves sharing the primal's owned unprojected A_eff enclosures, with native original-residual qualification.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51, Ninja Multi-Config. Both Debug and Release passed the four selected tests on predecessor ca0334468ec852a5ae4e3a093c73ba50737c894e. Coupling rerun passed both on this source after the layout fix.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2.0 Release, warnings as errors. 4/4 on this source.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "aero.global_geometry",
+      "numerics.dense_solve"
+    ],
+    "catch": "Each of the three final configurations passed the discrete nonpenetration and circulation filter (293 assertions in 3 cases, seed 23).",
+    "oracle": "60-digit determinant comparisons for a nonsymmetric 2-by-2 bound panel matrix and scalar derivative for both orientations of an attached wake; direct regularized line integrals and GL96 wake surface integrals.",
+    "mutations": [
+      "Isolated GCC 14.2 Release without coefficient transposition: two independent transpose values and the duality check failed, Catch2 exit 42.",
+      "Isolated GCC 14.2 Release replacing the checked native residual by zero: the strict original-residual negative control failed, Catch2 exit 42."
+    ],
+    "static": "clang-format 21.1.2 and both OS clang-tidy 21.1.1 for the affected translation units.",
+    "scope": "Fixed real dense finite-discrete A_eff. The tangent consumes a supplied residual direction, and the transpose uses a dimensionless scalar dual pairing. PG material coordinates, geometry/time derivatives, wake evolution and physical wake quadrature qualification are outside the measured case."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/foundation/dense-solve-contract.md": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911",
+    "docs/specs/foundation/linear-solve-qualification-contract.md": "90eee9ef0ab5d4ae0656119aaf2b7b00f69069bba5b98b15fad43f26ac91955c",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "docs/verification/IM-03/discrete-circulation-v1/reference.py": "a9f6901ea2d35ff6847f650ab847514b7df0c33a4f85e77f0af2c2a7bffa2dae",
+    "src/coupling/discrete_nonpenetration.cpp": "0f7109a73818460dd3d6bd3d95b00283852820e3b051c5010df3e794759f2e48",
+    "src/coupling/discrete_nonpenetration.hpp": "5743d77c3a2e7adfb8dc7e11178988ea35ec61ee56642a2c4b656fbf5027b237",
+    "tests/coupling/case_uniform_flow_test.cpp": "41b12745e6118dc80624c85127dfbbf0a026426671b96de9986a5a818196fc18"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-circulation-linearization-v1/reference.py": "d8c6bac80e85bce6cb842f300eba671457fda908e3a4330c723e30fbf4f83a8c",
+    "docs/verification/IM-03/discrete-circulation-linearization-v1/verification.md": "fae4ce9f961ebd0cf7809013f27b50cb255be93711df0999b7722b0a6a93462c"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/foundation/dense-solve-contract.md",
+      "hint": "docs/specs/foundation/dense-solve-contract.md",
+      "sha256": "5820019888a47b49e1b8ee79723afb21e30093d1041eac066c1a155f29592911"
+    },
+    {
+      "id": "docs/specs/foundation/linear-solve-qualification-contract.md",
+      "hint": "docs/specs/foundation/linear-solve-qualification-contract.md",
+      "sha256": "90eee9ef0ab5d4ae0656119aaf2b7b00f69069bba5b98b15fad43f26ac91955c"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-circulation-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-circulation-v1/reference.py",
+      "sha256": "a9f6901ea2d35ff6847f650ab847514b7df0c33a4f85e77f0af2c2a7bffa2dae"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "0f7109a73818460dd3d6bd3d95b00283852820e3b051c5010df3e794759f2e48"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "5743d77c3a2e7adfb8dc7e11178988ea35ec61ee56642a2c4b656fbf5027b237"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "41b12745e6118dc80624c85127dfbbf0a026426671b96de9986a5a818196fc18"
+    }
+  ]
+}
