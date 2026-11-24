@@ -1,8 +1,11 @@
 #include "../structure/pg_partition_test_support.hpp"
 #include "coupling/case_external_pg.hpp"
+#include "coupling/case_nastran_static_point_support.hpp"
 #include "reference_file_test_fixture.hpp"
 #include "reference_resolution.hpp"
 #include "source_digest.hpp"
+
+#include <catch2/generators/catch_generators.hpp>
 
 #include <source_location>
 
@@ -87,11 +90,9 @@ nlohmann::json native_sidecar(bool gmsh, bool bad, std::string_view geometry) {
     return result;
 }
 
-void add_external(fixture::JsonToken& model, const files::Tree& tree, bool gmsh, bool bad,
-                  unsigned id, unsigned first_source) {
+void write_external(fixture::JsonToken& model, const files::Tree& tree, bool gmsh, unsigned id,
+                    unsigned first_source, std::string_view native, std::string_view sidecar) {
     const auto geometry = std::to_string(id);
-    const auto native = gmsh ? std::string{mesh} : deck(bad);
-    const auto sidecar = native_sidecar(gmsh, bad, geometry).dump();
     const auto native_file = geometry + (gmsh ? ".msh" : ".bdf");
     const auto sidecar_file = geometry + ".json";
     auto external = fixture::fragment(gmsh ? "Geometry.gmsh" : "Geometry.nastran");
@@ -108,6 +109,51 @@ void add_external(fixture::JsonToken& model, const files::Tree& tree, bool gmsh,
     files::write_file(tree.root / native_file, native);
     files::write_file(tree.root / sidecar_file, sidecar);
     model.field("geometry").elements.push_back(std::move(external));
+}
+
+void add_external(fixture::JsonToken& model, const files::Tree& tree, bool gmsh, bool bad,
+                  unsigned id, unsigned first_source) {
+    write_external(model, tree, gmsh, id, first_source, gmsh ? std::string{mesh} : deck(bad),
+                   native_sidecar(gmsh, bad, std::to_string(id)).dump());
+}
+
+const rd::MeshSidecarBindingLimits binding_limits{
+    {files::limits().document,
+     {256, 256, 256, 8, 8, 4096, 8192, ExactEstimateAdmission{fixture::budget},
+      ExactTimingMode::Disabled},
+     32,
+     8,
+     32'000},
+    {4096, 16, 16, 64, 16, 16, 32'000},
+    {4096, 80, 32, 32, 256, 32'000},
+    {32, 32, 8, 32'000},
+    {32, 32, 32'000},
+    {32, 32, 32'000},
+    8,
+    32'000};
+
+rd::ReferencedCase read_graph(const files::Tree& tree, const fixture::JsonToken& config,
+                              core::ResourcePlan& plan) {
+    files::write_file(tree.root / "case.json", config.wire());
+    rd::ReferenceInputDiagnostic input_problem;
+    const auto input = rd::ReferenceInput::from_file(tree.root, "case.json", io::SourceId{12},
+                                                     files::manifest_limits, files::limits(), plan,
+                                                     {}, &input_problem);
+    CAPTURE(input_problem.stage, input_problem.schema.path());
+    REQUIRE(input);
+    auto declarations = files::prepare(*input);
+    rd::LeafReferenceDiagnostic reference_problem;
+    auto result = rd::resolve_leaf_references(
+        *input, std::move(declarations),
+        {{{4096, 4097, 2, 4096}, 64, 256}, 8, 32'768, 32'776, 16, 32'768, 64}, {8, 8, 1, 512, 512},
+        {binding_limits.gmsh, binding_limits.nastran, binding_limits.sidecar}, plan, {}, nullptr,
+        &reference_problem);
+    CAPTURE(reference_problem.reason, reference_problem.pointer());
+    if (const auto& sidecar_problem = reference_problem.sidecar) {
+        INFO(static_cast<unsigned>(sidecar_problem->reason));
+        REQUIRE(result);
+    }
+    return fixture::take(std::move(result));
 }
 
 io::SiCase convert(const io::SchemaCase& schema, const ExactLimits& exact,
@@ -304,46 +350,14 @@ TEST_CASE("One planar Case has the same measured Shell through Nastran and Gmsh"
     pg.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
     auto& layer = model.field("shells").elements.front().field("layers").elements.front();
     layer.field("axis").field("direction").set("value", fixture::json("[0,1,0]"));
-    const rd::MeshSidecarBindingLimits binding{
-        {files::limits().document,
-         {256, 256, 256, 8, 8, 4096, 8192, ExactEstimateAdmission{fixture::budget},
-          ExactTimingMode::Disabled},
-         32,
-         8,
-         32'000},
-        {4096, 16, 16, 64, 16, 16, 32'000},
-        {4096, 80, 32, 32, 256, 32'000},
-        {32, 32, 8, 32'000},
-        {32, 32, 32'000},
-        {32, 32, 32'000},
-        8,
-        32'000};
+    const auto& binding = binding_limits;
     const auto graph = [&] {
         const files::Tree tree;
         add_external(model, tree, true, false, 2, 1);
         add_external(model, tree, false, false, 3, 3);
         add_external(model, tree, true, true, 4, 5);
         add_external(model, tree, false, true, 5, 7);
-        files::write_file(tree.root / "case.json", config.wire());
-        rd::ReferenceInputDiagnostic input_problem;
-        const auto input = rd::ReferenceInput::from_file(tree.root, "case.json", io::SourceId{12},
-                                                         files::manifest_limits, files::limits(),
-                                                         plan, {}, &input_problem);
-        CAPTURE(input_problem.stage, input_problem.schema.path());
-        REQUIRE(input);
-        auto declarations = files::prepare(*input);
-        rd::LeafReferenceDiagnostic reference_problem;
-        auto result = rd::resolve_leaf_references(
-            *input, std::move(declarations),
-            {{{4096, 4097, 2, 4096}, 64, 256}, 8, 32'768, 32'776, 16, 32'768, 64},
-            {8, 8, 1, 512, 512}, {binding.gmsh, binding.nastran, binding.sidecar}, plan, {},
-            nullptr, &reference_problem);
-        CAPTURE(reference_problem.reason, reference_problem.pointer());
-        if (const auto& sidecar_problem = reference_problem.sidecar) {
-            INFO(static_cast<unsigned>(sidecar_problem->reason));
-            REQUIRE(result);
-        }
-        return fixture::take(std::move(result));
+        return read_graph(tree, config, plan);
     }();
     const auto schema = fixture::checked(config);
     const auto parent = fixture::take(schema.identity());
@@ -480,4 +494,157 @@ TEST_CASE("One planar Case has the same measured Shell through Nastran and Gmsh"
     const auto n_again = fixture::take(prepare_nastran(nastran, native, &nastran_diag));
     CHECK(fixture::take(fixture::take(g_again.at(0)).get().reference().identity()) == identity);
     CHECK(fixture::take(fixture::take(n_again.at(0)).get().reference().identity()) == identity);
+}
+
+TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
+          "[FD-03][IO4-03][R-05][integration][verification][negative]") {
+    using Code = core::FailureCode;
+    using Reason = coupling::CaseNastranPointSupportFailure;
+    enum class Trial { Match, DifferentComponents, PrescribedMotion, DifferentPoint, Offset };
+    const auto trial = GENERATE(Trial::Match, Trial::DifferentComponents, Trial::PrescribedMotion,
+                                Trial::DifferentPoint, Trial::Offset);
+    CAPTURE(static_cast<unsigned>(trial));
+    core::ResourcePlan plan{fixture::budget};
+    auto config = fixture::root("coupled_transient");
+    auto& model = config.field("model");
+    auto& pg = model.field("geometry").elements.front();
+    pg.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    if (trial == Trial::Offset)
+        pg.field("frame").set("origin", fixture::json("[0,0,0.125]"));
+    auto support = fixture::fragment("Support.constraint");
+    support.set("components",
+                fixture::json(trial == Trial::DifferentComponents ? "[0,2]" : "[1,2]"));
+    if (trial == Trial::DifferentPoint)
+        support.field("target").set("coordinates", fixture::json("[0.5,0,0]"));
+    auto& supports = model.field("supports").elements;
+    supports.clear();
+    supports.push_back(std::move(support));
+    std::string native{R"BDF(GRID,10,,0.0,0.0,0.0,12
+GRID,20,,1.0,0.0,0.0
+GRID,40,,1.0,1.0,0.0
+GRID,99,,0.0,1.0,0.0
+CORD2R,12,,0.0,0.0,0.0,0.0,0.0,1.0
+,0.0,1.0,0.0
+CQUAD4,701,90,10,20,40,99,0.0)BDF"};
+    if (trial == Trial::Offset)
+        native += ",0.125";
+    native += "\nMAT1,6,1.0,,0.0,1.0\nPSHELL,90,6,0.25\nSPC1,31,1,10\nSPC,31,10,3,";
+    native += trial == Trial::PrescribedMotion ? "0.001" : "-0.0";
+    native += "\nSPC1,61,2,10\nSPCADD,61,31\n";
+    auto mapping = native_sidecar(false, false, "2");
+    mapping["supports"].push_back(
+        {{"set", "61"}, {"grid", "10"}, {"components", {1, 3}}, {"support", "1"}});
+    const auto graph = [&] {
+        const files::Tree tree;
+        write_external(model, tree, false, 2, 1, native, mapping.dump());
+        return read_graph(tree, config, plan);
+    }();
+    const auto schema = fixture::checked(config);
+    const auto parent = fixture::take(schema.identity());
+    const auto bound = fixture::take(rd::bind_external_mesh_sidecar(
+        schema, graph, rd::MeshGeometryId{2}, binding_limits, plan, {}));
+    const auto cards = quantities(graph, parent, io::SourceId{1}, binding_limits, plan);
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const auto si = convert(schema, arithmetic.algebra, plan);
+    const coupling::CasePgReferenceLimits preparation{
+        {arithmetic.algebra, 4, {}},
+        {arithmetic.algebra, 2000, 20'000'000, 100'000, {}},
+        partition_test::limits(),
+        arithmetic,
+        100'000,
+        {}};
+    const rd::ExternalSidecarPgLimits qualification{
+        {arithmetic, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    coupling::CaseNastranPgSetDiagnostic geometry_failure;
+    auto prepared =
+        coupling::CaseNastranPlanarPgSet::prepare(si, bound, cards, preparation, qualification,
+                                                  {1, 1, 1}, workspace, plan, &geometry_failure);
+    CAPTURE(geometry_failure.member.planar.geometry, geometry_failure.member.material_axes);
+    REQUIRE(prepared);
+    const auto& shell = fixture::take(prepared->at(0)).get();
+    const auto patch = fixture::take(shell.reference().identity());
+    std::optional<coupling::CaseNastranPointSupportDiagnostic> diagnostic;
+    const auto certify = [&](const coupling::CaseNastranPointSupportLimits& limits) {
+        return coupling::certify_case_nastran_static_point_support(
+            si, bound, *prepared, rd::NastranSupportSetId{61}, rd::NastranGridId{10}, limits, plan,
+            &diagnostic);
+    };
+    if (trial != Trial::Match) {
+        const auto rejected = certify({arithmetic, 2});
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == Code::InvalidInput);
+        REQUIRE(diagnostic);
+        CHECK(diagnostic->set == rd::NastranSupportSetId{61});
+        CHECK(diagnostic->grid == rd::NastranGridId{10});
+        REQUIRE(diagnostic->field);
+        if (trial == Trial::DifferentComponents) {
+            CHECK(diagnostic->reason == Reason::Components);
+            CHECK(diagnostic->field->byte == native.find(",1,10") + 1);
+            REQUIRE(diagnostic->cd_field);
+            CHECK(diagnostic->cd_field->byte == native.find(",12") + 1);
+        } else if (trial == Trial::PrescribedMotion) {
+            CHECK(diagnostic->reason == Reason::Motion);
+            CHECK(diagnostic->field->byte == native.find("0.001"));
+        } else {
+            CHECK(diagnostic->reason == Reason::Position);
+            CHECK(diagnostic->field->byte == native.find("10"));
+            if (trial == Trial::Offset)
+                CHECK(diagnostic->offset_byte == native.find("0.125"));
+        }
+        CHECK(fixture::take(shell.reference().identity()) == patch);
+        return;
+    }
+    auto cancelled_limits = arithmetic;
+    // MSVC implements request_stop() as a non-const member.
+    // NOLINTNEXTLINE(misc-const-correctness)
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    cancelled_limits.cancellation = stop.get_token();
+    const auto cancelled = certify({cancelled_limits, 2});
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == Code::Cancelled);
+
+    config.field("model")
+        .field("supports")
+        .elements.front()
+        .set("components", fixture::json("[0,2]"));
+    const auto other_schema = fixture::checked(config);
+    const auto other_si = convert(other_schema, arithmetic.algebra, plan);
+    const auto stale = coupling::certify_case_nastran_static_point_support(
+        other_si, bound, *prepared, rd::NastranSupportSetId{61}, rd::NastranGridId{10},
+        {arithmetic, 2}, plan, &diagnostic);
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == Code::StaleGeneration);
+    REQUIRE(diagnostic);
+    CHECK(diagnostic->reason == Reason::Binding);
+
+    const auto limited = certify({arithmetic, 1});
+    REQUIRE_FALSE(limited);
+    CHECK(limited.error().code == Code::ResourceExceeded);
+    CHECK(fixture::take(shell.reference().identity()) == patch);
+    const auto result = certify({arithmetic, 2});
+    REQUIRE(result);
+    CHECK_FALSE(diagnostic);
+    CHECK(result->patch == patch);
+    CHECK(result->deck.location.source == io::SourceId{1});
+    CHECK(result->deck.digest == rd::source_digest(files::bytes_of(native)));
+    CHECK(result->sidecar_digest == bound.sidecar().digest());
+    CHECK(result->mapping.support == rd::MeshSupportId{1});
+    CHECK(result->mapping.component_bits == 5U); // Native x,z.
+    CHECK(result->world_components == 6U);       // World y,z from the declared CORD2R.
+    CHECK(result->element == 701);
+    CHECK(result->cd == rd::NastranCoordinateId{12});
+    CHECK(result->grid_field.byte == native.find("10"));
+    const auto terms = result->terms.values();
+    REQUIRE(terms.size() == 2);
+    CHECK(terms[0].source_set == rd::NastranSupportSetId{31});
+    CHECK(terms[1].source_set == rd::NastranSupportSetId{31});
+    CHECK(terms[0].local_components == 1U);
+    CHECK(terms[1].local_components == 4U);
+    CHECK(terms[0].card.byte == native.find("SPC1,31"));
+    CHECK(terms[1].card.byte == native.find("SPC,31"));
+    CHECK_FALSE(terms[0].motion);
+    REQUIRE(terms[1].motion);
+    CHECK(terms[1].motion->byte == native.find("-0.0"));
 }
