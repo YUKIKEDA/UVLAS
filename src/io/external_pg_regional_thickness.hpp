@@ -96,4 +96,11 @@ struct ExternalPgThicknessReport {
     std::span<const ExternalPgThicknessClaim>, const ExternalPgThicknessLimits&,
     core::ResourcePlan&, std::optional<ExternalPgThicknessDiagnostic>* = nullptr) noexcept;
 
+// The bounded Gmsh map certifies the same chart coverage. The thickness
+// comparison on that chart remains exact and does not spend the geometry budget.
+[[nodiscard]] core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
+    const GmshPgBounds&, const structure::PgReferenceGeometry&,
+    std::span<const ExternalPgThicknessClaim>, const ExternalPgThicknessLimits&,
+    core::ResourcePlan&, std::optional<ExternalPgThicknessDiagnostic>* = nullptr) noexcept;
+
 } // namespace uvlas::io::detail

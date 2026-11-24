@@ -83,17 +83,95 @@ core::Result<CaseExternalPg<CaseNastranPgMatch>> prepare_case_nastran_planar_pg(
     return CaseExternalPgFactory::with_material_axes(std::move(*planar), std::move(*axes));
 }
 
-core::Result<std::reference_wrapper<const CaseNastranPlanarPgSet::Shell>>
-CaseNastranPlanarPgSet::at(core::Index index) const& noexcept {
-    if (index < 0 || std::cmp_greater_equal(index, shells_.size())) {
+namespace {
+
+template <class Shell>
+core::Result<std::reference_wrapper<const Shell>>
+shell_at(const core::PlannedBuffer<std::optional<Shell>>& shells, core::Index index) noexcept {
+    if (index < 0 || std::cmp_greater_equal(index, shells.size())) {
         return std::unexpected(
             core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
     }
-    if (const auto& member = shells_.values()[static_cast<std::size_t>(index)]) {
+    if (const auto& member = shells.values()[static_cast<std::size_t>(index)]) {
         return std::cref(*member);
     }
     return std::unexpected(
         core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
+}
+
+struct SelectedShells {
+    core::PlannedBuffer<std::size_t> ordinals;
+    std::size_t count{};
+};
+
+template <class Diagnostic>
+core::Result<SelectedShells> select_shells(std::span<const imported::BoundExternalFace> faces,
+                                           std::uint64_t maximum_shells, std::uint64_t maximum_work,
+                                           const std::stop_token& stop, core::ResourcePlan& plan,
+                                           Diagnostic* diagnostic) noexcept {
+    using Code = core::FailureCode;
+    constexpr auto operation = core::Operation::PrepareModel;
+    if (faces.empty()) {
+        return std::unexpected(core::Failure{Code::InvalidInput, operation});
+    }
+    const auto capacity = std::min<std::uint64_t>(faces.size(), maximum_shells);
+    if (!std::in_range<core::Index>(capacity)) {
+        return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
+    }
+    auto selections = plan.allocate<std::size_t>(static_cast<core::Index>(capacity), operation);
+    if (!selections) {
+        return std::unexpected(selections.error());
+    }
+
+    std::size_t count = 0;
+    auto work = maximum_work;
+    for (std::size_t i = 0; i < faces.size(); ++i) {
+        if (stop.stop_requested()) {
+            return std::unexpected(core::Failure{Code::Cancelled, operation});
+        }
+        if (work == 0) {
+            return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
+        }
+        --work;
+        const auto& face = faces[i];
+        bool selected = false;
+        for (const auto previous : selections->values().first(count)) {
+            if (stop.stop_requested()) {
+                return std::unexpected(core::Failure{Code::Cancelled, operation});
+            }
+            if (work == 0) {
+                return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
+            }
+            --work;
+            if (faces[previous].shell == face.shell) {
+                selected = true;
+                break;
+            }
+        }
+        if (!selected) {
+            if (count == selections->size()) {
+                if (diagnostic) {
+                    diagnostic->shell = face.shell;
+                    diagnostic->first_declaration = face.sidecar_node;
+                }
+                return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
+            }
+            selections->values()[count++] = i;
+        }
+    }
+    return SelectedShells{std::move(*selections), count};
+}
+
+} // namespace
+
+core::Result<std::reference_wrapper<const CaseNastranPlanarPgSet::Shell>>
+CaseNastranPlanarPgSet::at(core::Index index) const& noexcept {
+    return shell_at(shells_, index);
+}
+
+core::Result<std::reference_wrapper<const CaseGmshPgSet::Shell>>
+CaseGmshPgSet::at(core::Index index) const& noexcept {
+    return shell_at(shells_, index);
 }
 
 core::Result<CaseNastranPlanarPgSet> CaseNastranPlanarPgSet::prepare(
@@ -138,61 +216,19 @@ core::Result<CaseNastranPlanarPgSet> CaseNastranPlanarPgSet::prepare(
     }
 
     const auto faces = bound.faces();
-    if (faces.empty()) {
-        return std::unexpected(core::Failure{Code::InvalidInput, operation});
-    }
-    const auto capacity = std::min<std::uint64_t>(faces.size(), limits.maximum_shells);
-    if (!std::in_range<core::Index>(capacity)) {
-        return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
-    }
-    auto selections = plan.allocate<std::size_t>(static_cast<core::Index>(capacity), operation);
+    const auto selections = select_shells(faces, limits.maximum_shells,
+                                          limits.maximum_selection_work, stop, plan, diagnostic);
     if (!selections) {
         return std::unexpected(selections.error());
     }
-
-    std::size_t count = 0;
-    auto work = limits.maximum_selection_work;
-    for (std::size_t i = 0; i < faces.size(); ++i) {
-        if (stop.stop_requested()) {
-            return std::unexpected(core::Failure{Code::Cancelled, operation});
-        }
-        if (work == 0) {
-            return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
-        }
-        --work;
-        const auto& face = faces[i];
-        bool selected = false;
-        for (const auto previous : selections->values().first(count)) {
-            if (stop.stop_requested()) {
-                return std::unexpected(core::Failure{Code::Cancelled, operation});
-            }
-            if (work == 0) {
-                return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
-            }
-            --work;
-            if (faces[previous].shell == face.shell) {
-                selected = true;
-                break;
-            }
-        }
-        if (!selected) {
-            if (count == selections->size()) {
-                if (diagnostic) {
-                    diagnostic->shell = face.shell;
-                    diagnostic->first_declaration = face.sidecar_node;
-                }
-                return std::unexpected(core::Failure{Code::ResourceExceeded, operation});
-            }
-            selections->values()[count++] = i;
-        }
-    }
+    const auto count = selections->count;
     auto result = plan.allocate<std::optional<Shell>>(static_cast<core::Index>(count), operation);
     if (!result) {
         return std::unexpected(result.error());
     }
 
     for (std::size_t i = 0; i < count; ++i) {
-        const auto& face = faces[selections->values()[i]];
+        const auto& face = faces[selections->ordinals.values()[i]];
         auto member = prepare_case_nastran_planar_pg(
             si, bound, face.shell, quantities, reference_limits, external_limits,
             limits.maximum_axis_matches_per_shell, workspace, plan,
@@ -210,6 +246,81 @@ core::Result<CaseNastranPlanarPgSet> CaseNastranPlanarPgSet::prepare(
         return std::unexpected(core::Failure{Code::Cancelled, operation});
     }
     return CaseNastranPlanarPgSet{std::move(*result)};
+}
+
+core::Result<CaseGmshPgSet>
+CaseGmshPgSet::prepare(const io::SiCase& si, const imported::ExternalMeshSidecarBinding& bound,
+                       const CasePgReferenceLimits& reference_limits,
+                       const imported::ExternalSidecarPgLimits& external_limits,
+                       const CaseGmshPgSetLimits& limits, core::Workspace& workspace,
+                       core::ResourcePlan& plan, CaseGmshPgSetDiagnostic* diagnostic) noexcept {
+    using Code = core::FailureCode;
+    constexpr auto operation = core::Operation::PrepareModel;
+    if (diagnostic) {
+        *diagnostic = {};
+    }
+    const auto& stop = reference_limits.cancellation;
+    if (stop.stop_requested()) {
+        return std::unexpected(core::Failure{Code::Cancelled, operation});
+    }
+    if (!std::holds_alternative<imported::GmshMesh>(bound.source())) {
+        return std::unexpected(core::Failure{Code::Unsupported, operation});
+    }
+    const auto schema = si.source_case();
+    if (!schema) {
+        return std::unexpected(schema.error());
+    }
+    const auto identity = schema->get().identity();
+    if (!identity) {
+        return std::unexpected(identity.error());
+    }
+    const auto parent = bound.sidecar().source().parent;
+    if (identity->source != parent.source ||
+        identity->contract_revision != parent.contract_revision ||
+        identity->representation_revision != parent.representation_revision) {
+        return std::unexpected(core::Failure{Code::StaleGeneration, operation});
+    }
+
+    const auto faces = bound.faces();
+    const auto selections = select_shells(faces, limits.maximum_shells,
+                                          limits.maximum_selection_work, stop, plan, diagnostic);
+    if (!selections) {
+        return std::unexpected(selections.error());
+    }
+    auto result =
+        plan.allocate<std::optional<Shell>>(static_cast<core::Index>(selections->count), operation);
+    if (!result) {
+        return std::unexpected(result.error());
+    }
+    for (std::size_t i = 0; i < selections->count; ++i) {
+        const auto& face = faces[selections->ordinals.values()[i]];
+        auto reference =
+            prepare_case_pg_reference(si, face.shell.value(), reference_limits, workspace, plan);
+        if (!reference) {
+            if (diagnostic) {
+                diagnostic->shell = face.shell;
+                diagnostic->first_declaration = face.sidecar_node;
+            }
+            return std::unexpected(reference.error());
+        }
+        auto match =
+            imported::prepare_gmsh_sidecar_pg(si, bound, face.shell, *reference, external_limits,
+                                              limits.maximum_directed_work_per_shell, plan, stop,
+                                              diagnostic ? &diagnostic->member : nullptr);
+        if (!match) {
+            if (diagnostic) {
+                diagnostic->shell = face.shell;
+                diagnostic->first_declaration = face.sidecar_node;
+            }
+            return std::unexpected(match.error());
+        }
+        result->values()[i].emplace(
+            CaseExternalPgFactory::make(std::move(*reference), std::move(*match)));
+    }
+    if (stop.stop_requested()) {
+        return std::unexpected(core::Failure{Code::Cancelled, operation});
+    }
+    return CaseGmshPgSet{std::move(*result)};
 }
 
 core::Result<CaseExternalPg<imported::CertifiedExternalSidecarPgBounds>>
