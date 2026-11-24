@@ -551,8 +551,8 @@ TEST_CASE("CONM2 identifies the field that blocks typed mass preparation", "[IO4
 
 TEST_CASE("RBE2 separates the ordered GRID list from thermal terms", "[IO4-03][verification]") {
     const auto source = std::string{"RBE2,101,17,136,22,8,6.5-6,-273.15\n"} +
-                        fixed("RBE2", {"102", "8", "45", "41", "17", "22"}, 8) +
-                        fixed("RBE2", {"103", "17", "6", "22", "8", "41", "5", "6"}, 8, "+R1") +
+                        fixed("RBE2", {"102", "17", "45", "41", "8", "22"}, 8) +
+                        fixed("RBE2", {"103", "17", "2", "22", "8", "41", "5", "6"}, 8, "+R1") +
                         fixed("+R1", {"0.0", "15.0"}, 8) + std::string{grids} + "GRID,5\nGRID,6\n";
     core::ResourcePlan shell_plan{memory}, plan{memory};
     const auto parent =
@@ -580,10 +580,12 @@ TEST_CASE("RBE2 separates the ordered GRID list from thermal terms", "[IO4-03][v
     CHECK(shell.input.bulk.text(alpha.field) == "6.5-6");
     CHECK(view.links[1].first_dependent == 2);
     CHECK(view.links[1].dependent_count == 3);
+    CHECK(view.links[1].independent.id == NastranGridId{17});
     CHECK_FALSE(view.links[1].alpha);
     CHECK_FALSE(view.links[1].reference_temperature);
     CHECK(view.links[2].first_dependent == 5);
     CHECK(view.links[2].dependent_count == 5);
+    CHECK(view.links[2].dependent_components == 0b000010);
     CHECK(view.dependents[8].id == NastranGridId{5});
     CHECK(view.dependents[9].id == NastranGridId{6});
     const auto fixed_tref = take(view.links[2].reference_temperature);
