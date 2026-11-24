@@ -505,10 +505,11 @@ cf::CaseKnownFlowReady prepare_gust(const JsonToken& input, io::SourceId id,
 cf::CaseKnownFlowProjection gust_projection(core::Precision precision, const Number& absolute) {
     const static Number unit{1}, zero{0};
     const cf::CaseFlowComponentBudget per_component{unit.view(), absolute.view(), zero.view()};
-    std::array<cf::CaseFlowComponentBudget, 3> vector{per_component, per_component, per_component};
-    std::array<cf::CaseFlowComponentBudget, 9> matrix{per_component, per_component, per_component,
-                                                      per_component, per_component, per_component,
-                                                      per_component, per_component, per_component};
+    const std::array<cf::CaseFlowComponentBudget, 3> vector{per_component, per_component,
+                                                            per_component};
+    const std::array<cf::CaseFlowComponentBudget, 9> matrix{
+        per_component, per_component, per_component, per_component, per_component,
+        per_component, per_component, per_component, per_component};
     return {precision, vector, vector, matrix};
 }
 

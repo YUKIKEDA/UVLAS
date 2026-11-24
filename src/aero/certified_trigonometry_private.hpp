@@ -52,7 +52,7 @@ inline SinCos sine_cosine(const Interval& phase, PhaseUnits units, const Interva
                              : subtract(phase, multiply(selected, half_pi, work), work);
     if (compare(absolute(reduced).upper, integer(1).upper) > 0)
         throw ArithmeticFailure{core::FailureCode::PrecisionUnresolved};
-    const auto values = small_sin_cos(reduced, work);
+    auto values = small_sin_cos(reduced, work);
     const Integer index = (quadrant % 4 + 4) % 4;
     switch (index.convert_to<unsigned>()) {
     case 0:
