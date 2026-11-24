@@ -589,6 +589,15 @@ ExactRational PgRankMonomialPowers::term(ReferenceArithmetic& math,
     const auto b = static_cast<std::size_t>(exponents.second);
     if (a == 0)
         return b == 0 ? math.copy(coefficient) : math.mul(coefficient, v_.power(math, b));
+    if (b != 0 && reuse_mixed_) {
+        // Positive mixed powers occupy consecutive diagonals of the degree bound.
+        const auto order = a + b;
+        auto& mixed = mixed_[(order - 2) * (order - 1) / 2 + a - 1];
+        if (const auto& ready = mixed)
+            return math.mul(coefficient, *ready);
+        const auto& stored = mixed.emplace(math.mul(u_.power(math, a), v_.power(math, b)));
+        return math.mul(coefficient, stored);
+    }
     auto value = math.mul(coefficient, u_.power(math, a));
     if (b != 0)
         value = math.mul(value, v_.power(math, b));
