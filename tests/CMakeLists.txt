@@ -934,6 +934,8 @@ uvlas_add_test(coupling.case_uniform_flow
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests" "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_coupling_case_uniform_flow PRIVATE
+    UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json")
 if(MSVC)
     # The full MSVC Debug test including PG material preparation took 79 s locally.
     set_tests_properties(coupling.case_uniform_flow PROPERTIES

@@ -1,0 +1,1356 @@
+{
+  "id": "finite-wing-case-v1",
+  "source": "rd/aero/finite-wing/records/finite-wing-specialization-result.json",
+  "source_sha256": "56da441111e16b149f6030916cb3decd3c091ba1744fa9073c22077188dca719",
+  "chord_panels": 2,
+  "span_panels": 4,
+  "wake_length_m": 32,
+  "core_radius_m": 0.001,
+  "angle_degrees": 1,
+  "cases": [
+    {
+      "dihedral_degrees": 0,
+      "case_geometry": [
+        {
+          "kind": "surface_graph",
+          "id": "1",
+          "frame": {
+            "origin": [
+              0,
+              -4,
+              0
+            ],
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          "reference_length": 4,
+          "x0": {
+            "numerator": "140041507641941955891704543889",
+            "denominator": "200000000000000000000000000000"
+          },
+          "width": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "skew": {
+            "numerator": "-140041507641941955891704543889",
+            "denominator": "200000000000000000000000000000"
+          },
+          "degree": [
+            0,
+            0
+          ],
+          "coefficients": [],
+          "domain": [
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "20"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "8"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ]
+          ],
+          "boundaries": [
+            {
+              "name": "leading",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "trailing",
+              "vertices": [
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-start",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-end",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            }
+          ],
+          "continuity": []
+        },
+        {
+          "kind": "surface_graph",
+          "id": "2",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          "reference_length": 4,
+          "x0": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "width": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "skew": {
+            "numerator": "140041507641941955891704543889",
+            "denominator": "200000000000000000000000000000"
+          },
+          "degree": [
+            0,
+            0
+          ],
+          "coefficients": [],
+          "domain": [
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "8"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "20"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ]
+          ],
+          "boundaries": [
+            {
+              "name": "leading",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "trailing",
+              "vertices": [
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-start",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-end",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            }
+          ],
+          "continuity": []
+        }
+      ],
+      "case_surfaces": [
+        {
+          "id": "1",
+          "geometry": "1",
+          "attachment": {
+            "kind": "fixed_reference"
+          },
+          "chord": [
+            0,
+            0.5,
+            1
+          ],
+          "span": [
+            0,
+            0.5,
+            1
+          ],
+          "leading": 0,
+          "trailing": 1,
+          "orientation": "positive",
+          "sharing": [
+            {
+              "other": "2",
+              "own_boundary": 3,
+              "other_boundary": 2,
+              "orientation": "same"
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "geometry": "2",
+          "attachment": {
+            "kind": "fixed_reference"
+          },
+          "chord": [
+            0,
+            0.5,
+            1
+          ],
+          "span": [
+            0,
+            0.5,
+            1
+          ],
+          "leading": 0,
+          "trailing": 1,
+          "orientation": "positive",
+          "sharing": [
+            {
+              "other": "1",
+              "own_boundary": 2,
+              "other_boundary": 3,
+              "orientation": "same"
+            }
+          ]
+        }
+      ],
+      "flow_m_s": [
+        19.996953903127825,
+        0.0,
+        0.34904812874567026
+      ],
+      "vertices_m": [
+        [
+          2.875830152838839,
+          -4.0,
+          0.0
+        ],
+        [
+          1.5316650764194195,
+          -2.0,
+          0.0
+        ],
+        [
+          0.1875,
+          0.0,
+          0.0
+        ],
+        [
+          1.5316650764194195,
+          2.0,
+          0.0
+        ],
+        [
+          2.875830152838839,
+          4.0,
+          0.0
+        ],
+        [
+          3.1758301528388393,
+          -4.0,
+          0.0
+        ],
+        [
+          2.0566650764194194,
+          -2.0,
+          0.0
+        ],
+        [
+          0.9375,
+          0.0,
+          0.0
+        ],
+        [
+          2.0566650764194194,
+          2.0,
+          0.0
+        ],
+        [
+          3.1758301528388393,
+          4.0,
+          0.0
+        ],
+        [
+          3.400830152838839,
+          -4.0,
+          0.0
+        ],
+        [
+          2.4504150764194197,
+          -2.0,
+          0.0
+        ],
+        [
+          1.5,
+          0.0,
+          0.0
+        ],
+        [
+          2.4504150764194197,
+          2.0,
+          0.0
+        ],
+        [
+          3.400830152838839,
+          4.0,
+          0.0
+        ],
+        [
+          35.400830152838836,
+          -4.0,
+          0.0
+        ],
+        [
+          34.45041507641942,
+          -2.0,
+          0.0
+        ],
+        [
+          33.5,
+          0.0,
+          0.0
+        ],
+        [
+          34.45041507641942,
+          2.0,
+          0.0
+        ],
+        [
+          35.400830152838836,
+          4.0,
+          0.0
+        ]
+      ],
+      "collocations_m": [
+        [
+          2.4099976146291295,
+          -3.0,
+          0.0
+        ],
+        [
+          1.1783325382097098,
+          -1.0,
+          0.0
+        ],
+        [
+          1.1783325382097098,
+          1.0,
+          0.0
+        ],
+        [
+          2.4099976146291295,
+          3.0,
+          0.0
+        ],
+        [
+          2.822497614629129,
+          -3.0,
+          0.0
+        ],
+        [
+          1.8158325382097098,
+          -1.0,
+          0.0
+        ],
+        [
+          1.8158325382097098,
+          1.0,
+          0.0
+        ],
+        [
+          2.822497614629129,
+          3.0,
+          0.0
+        ]
+      ],
+      "tangents_y": [
+        [
+          -1.3441650764194195,
+          2.0,
+          0.0
+        ],
+        [
+          -1.3441650764194195,
+          2.0,
+          0.0
+        ],
+        [
+          1.3441650764194195,
+          2.0,
+          0.0
+        ],
+        [
+          1.3441650764194195,
+          2.0,
+          0.0
+        ],
+        [
+          -1.1191650764194196,
+          2.0,
+          0.0
+        ],
+        [
+          -1.1191650764194196,
+          2.0,
+          0.0
+        ],
+        [
+          1.1191650764194196,
+          2.0,
+          0.0
+        ],
+        [
+          1.1191650764194196,
+          2.0,
+          0.0
+        ]
+      ],
+      "circulation_m2_s": [
+        0.5251534652674352,
+        0.6994418089666807,
+        0.6994418089666807,
+        0.5251534652674352,
+        0.7052762142909859,
+        0.9431426898856987,
+        0.9431426898856987,
+        0.7052762142909859
+      ],
+      "first_bound_column": [
+        -1.834290238905429,
+        0.010280453642084237,
+        0.0011147981416544973,
+        0.00033364820130118143,
+        0.5563619738916111,
+        0.01557035569471588,
+        0.0012186705819386176,
+        0.00032847836579236075
+      ]
+    },
+    {
+      "dihedral_degrees": 5,
+      "case_geometry": [
+        {
+          "kind": "surface_graph",
+          "id": "1",
+          "frame": {
+            "origin": [
+              0,
+              -4,
+              0
+            ],
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          "reference_length": 4,
+          "x0": {
+            "numerator": "140041507641941955891704543889",
+            "denominator": "200000000000000000000000000000"
+          },
+          "width": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "skew": {
+            "numerator": "-140041507641941955891704543889",
+            "denominator": "200000000000000000000000000000"
+          },
+          "degree": [
+            0,
+            1
+          ],
+          "coefficients": [
+            {
+              "powers": [
+                0,
+                0
+              ],
+              "coefficient": {
+                "numerator": "17497732705184801044403733887",
+                "denominator": "200000000000000000000000000000"
+              }
+            },
+            {
+              "powers": [
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "-17497732705184801044403733887",
+                "denominator": "200000000000000000000000000000"
+              }
+            }
+          ],
+          "domain": [
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "20"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "8"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ]
+          ],
+          "boundaries": [
+            {
+              "name": "leading",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "trailing",
+              "vertices": [
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-start",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-end",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            }
+          ],
+          "continuity": []
+        },
+        {
+          "kind": "surface_graph",
+          "id": "2",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              [
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                1,
+                0
+              ],
+              [
+                0,
+                0,
+                1
+              ]
+            ]
+          },
+          "reference_length": 4,
+          "x0": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "width": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "skew": {
+            "numerator": "140041507641941955891704543889",
+            "denominator": "200000000000000000000000000000"
+          },
+          "degree": [
+            0,
+            1
+          ],
+          "coefficients": [
+            {
+              "powers": [
+                0,
+                1
+              ],
+              "coefficient": {
+                "numerator": "17497732705184801044403733887",
+                "denominator": "200000000000000000000000000000"
+              }
+            }
+          ],
+          "domain": [
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "8"
+              },
+              {
+                "numerator": "0",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "3",
+                "denominator": "20"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ],
+            [
+              {
+                "numerator": "0",
+                "denominator": "1"
+              },
+              {
+                "numerator": "1",
+                "denominator": "1"
+              }
+            ]
+          ],
+          "boundaries": [
+            {
+              "name": "leading",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "trailing",
+              "vertices": [
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-start",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "8"
+                  },
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            },
+            {
+              "name": "span-end",
+              "vertices": [
+                [
+                  {
+                    "numerator": "0",
+                    "denominator": "1"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ],
+                [
+                  {
+                    "numerator": "3",
+                    "denominator": "20"
+                  },
+                  {
+                    "numerator": "1",
+                    "denominator": "1"
+                  }
+                ]
+              ]
+            }
+          ],
+          "continuity": []
+        }
+      ],
+      "case_surfaces": [
+        {
+          "id": "1",
+          "geometry": "1",
+          "attachment": {
+            "kind": "fixed_reference"
+          },
+          "chord": [
+            0,
+            0.5,
+            1
+          ],
+          "span": [
+            0,
+            0.5,
+            1
+          ],
+          "leading": 0,
+          "trailing": 1,
+          "orientation": "positive",
+          "sharing": [
+            {
+              "other": "2",
+              "own_boundary": 3,
+              "other_boundary": 2,
+              "orientation": "same"
+            }
+          ]
+        },
+        {
+          "id": "2",
+          "geometry": "2",
+          "attachment": {
+            "kind": "fixed_reference"
+          },
+          "chord": [
+            0,
+            0.5,
+            1
+          ],
+          "span": [
+            0,
+            0.5,
+            1
+          ],
+          "leading": 0,
+          "trailing": 1,
+          "orientation": "positive",
+          "sharing": [
+            {
+              "other": "1",
+              "own_boundary": 2,
+              "other_boundary": 3,
+              "orientation": "same"
+            }
+          ]
+        }
+      ],
+      "flow_m_s": [
+        19.996953903127825,
+        0.0,
+        0.34904812874567026
+      ],
+      "vertices_m": [
+        [
+          2.875830152838839,
+          -4.0,
+          0.34995465410369603
+        ],
+        [
+          1.5316650764194195,
+          -2.0,
+          0.17497732705184801
+        ],
+        [
+          0.1875,
+          0.0,
+          0.0
+        ],
+        [
+          1.5316650764194195,
+          2.0,
+          0.17497732705184801
+        ],
+        [
+          2.875830152838839,
+          4.0,
+          0.34995465410369603
+        ],
+        [
+          3.1758301528388393,
+          -4.0,
+          0.34995465410369603
+        ],
+        [
+          2.0566650764194194,
+          -2.0,
+          0.17497732705184801
+        ],
+        [
+          0.9375,
+          0.0,
+          0.0
+        ],
+        [
+          2.0566650764194194,
+          2.0,
+          0.17497732705184801
+        ],
+        [
+          3.1758301528388393,
+          4.0,
+          0.34995465410369603
+        ],
+        [
+          3.400830152838839,
+          -4.0,
+          0.34995465410369603
+        ],
+        [
+          2.4504150764194197,
+          -2.0,
+          0.17497732705184801
+        ],
+        [
+          1.5,
+          0.0,
+          0.0
+        ],
+        [
+          2.4504150764194197,
+          2.0,
+          0.17497732705184801
+        ],
+        [
+          3.400830152838839,
+          4.0,
+          0.34995465410369603
+        ],
+        [
+          35.400830152838836,
+          -4.0,
+          0.34995465410369603
+        ],
+        [
+          34.45041507641942,
+          -2.0,
+          0.17497732705184801
+        ],
+        [
+          33.5,
+          0.0,
+          0.0
+        ],
+        [
+          34.45041507641942,
+          2.0,
+          0.17497732705184801
+        ],
+        [
+          35.400830152838836,
+          4.0,
+          0.34995465410369603
+        ]
+      ],
+      "collocations_m": [
+        [
+          2.4099976146291295,
+          -3.0,
+          0.26246599057777203
+        ],
+        [
+          1.1783325382097098,
+          -1.0,
+          0.08748866352592401
+        ],
+        [
+          1.1783325382097098,
+          1.0,
+          0.08748866352592401
+        ],
+        [
+          2.4099976146291295,
+          3.0,
+          0.26246599057777203
+        ],
+        [
+          2.822497614629129,
+          -3.0,
+          0.26246599057777203
+        ],
+        [
+          1.8158325382097098,
+          -1.0,
+          0.08748866352592401
+        ],
+        [
+          1.8158325382097098,
+          1.0,
+          0.08748866352592401
+        ],
+        [
+          2.822497614629129,
+          3.0,
+          0.26246599057777203
+        ]
+      ],
+      "tangents_y": [
+        [
+          -1.3441650764194195,
+          2.0,
+          -0.17497732705184801
+        ],
+        [
+          -1.3441650764194195,
+          2.0,
+          -0.17497732705184801
+        ],
+        [
+          1.3441650764194195,
+          2.0,
+          0.17497732705184801
+        ],
+        [
+          1.3441650764194195,
+          2.0,
+          0.17497732705184801
+        ],
+        [
+          -1.1191650764194196,
+          2.0,
+          -0.17497732705184801
+        ],
+        [
+          -1.1191650764194196,
+          2.0,
+          -0.17497732705184801
+        ],
+        [
+          1.1191650764194196,
+          2.0,
+          0.17497732705184801
+        ],
+        [
+          1.1191650764194196,
+          2.0,
+          0.17497732705184801
+        ]
+      ],
+      "circulation_m2_s": [
+        0.5238866784480252,
+        0.6982588310275711,
+        0.6982588310275711,
+        0.5238866784480252,
+        0.7035513640594228,
+        0.9415495240866039,
+        0.9415495240866039,
+        0.7035513640594228
+      ],
+      "first_bound_column": [
+        -1.832296617660115,
+        0.010233200262261854,
+        0.0011186159006439087,
+        0.00033729239440435016,
+        0.5560071193315557,
+        0.015458950005886528,
+        0.0012238712347307,
+        0.0003319937774809558
+      ]
+    }
+  ]
+}

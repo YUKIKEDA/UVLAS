@@ -1,0 +1,4 @@
+wake_panels,contact_ns,case_and_workspaces_ns,contact_planned_bytes,all_preparation_planned_bytes,contact_resident_bytes,preparation_resident_bytes,process_peak_bytes
+2,3229800,24471400,672131,4008650,7688192,12656640,12656640
+4,5578800,22493800,680053,4016572,7692288,12677120,12677120
+8,10733400,21143800,695705,4032224,7716864,12705792,12705792
