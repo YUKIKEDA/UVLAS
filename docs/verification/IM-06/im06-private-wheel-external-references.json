@@ -1,0 +1,132 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-private-wheel-external-references",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "IO4-07",
+    "R-06",
+    "V-USE"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "3a140d7bfbffef797a3fb7b29187dc458e50f53a",
+  "claimed_state": "移設したCLIとPythonが同一Caseの実BDF・実MSH・対応表を照合し、破損と復元を両OSで検証した。",
+  "external_references": {
+    "case_sha256": "741e954d7cdbf8882f9f8876efbeed287e304403d284de5a0e3e2bbef90c298b",
+    "sources": {
+      "wing.msh": "9543d355442833d70f8a49fd512a114dfa1d279b1f70e0923c74ff30a165a037",
+      "gmsh.json": "c0c7ba785b4a304f7f2d2c2c34b37ea97d6985c19e820eac00108a654a18c02e",
+      "wing.bdf": "a02d07c9e93ce20900ae3bfe42475348f4d7eea178e9e1ea69017a2ea50c9ffa",
+      "nastran.json": "97056a41d580a5e44465c322234a8d024730476c8e772671d84c5b86f83eb2d9"
+    },
+    "accepted": {
+      "cli": 0,
+      "python_file": true,
+      "python_dict": true
+    },
+    "changed_deck": "validate: reference SHA-256 mismatch at /model/geometry/2/deck",
+    "different_gmsh_sidecar_geometry": "validate: Gmsh sidecar format at /model/geometry/1/sidecar",
+    "restored_cli": 0
+  },
+  "python_invalid_input_cases_per_platform": 2,
+  "python_ownership_tests_per_platform": 10,
+  "executed_probe_sha256": "5d67e45179c14477a787770235bf8f6626fc4bc9f9ad31ca5181dabe08cc0aa8",
+  "lf_reproduction_probe_sha256": "616634fe12e64a4b7d667e2c118beb5ff9fb9da844af8f6f63e087eebe6086ef",
+  "results": {
+    "windows": {
+      "build_info": {
+        "commit": "3a140d7bfbffef797a3fb7b29187dc458e50f53a",
+        "compiler": "MSVC 19.51.36260.0",
+        "configuration": "Release",
+        "dependencies": {
+          "boost": "1.92.0",
+          "eigen": "5.0.1",
+          "nlohmann_json": "3.12.0",
+          "spectra": "1.2.0"
+        },
+        "dependency_repairs": {
+          "nlohmann_json_sax_allocation": 1
+        },
+        "floating_point": "/fp:strict",
+        "instruction_set": "sse2",
+        "platform": "Windows AMD64",
+        "platform_key": "windows-x64-msvc19.51-sse2",
+        "schema": "uvlas.build-info/1",
+        "uncommitted_changes": false,
+        "version": "0.1.0-dev"
+      },
+      "manifest_sha256": "1f8aaf07b0b324ececb647d51dbad39a7571d83994113848b0372b849346c36d",
+      "artifact_hashes": {
+        "cli": "c4f8a811131ba3ab031b58bd0bb511c6a2bd50a9b80d3aea7ca35fef0b8f79d7",
+        "extension": "8957630550fe8d466dfed5da67968583ef08c9a19b9f47580896959b926861d9"
+      },
+      "python": "3.12.8 (main, Dec 19 2024, 14:41:01) [MSC v.1942 64 bit (AMD64)]",
+      "numpy": "2.3.5",
+      "wheel_name": "uvlas_private_rehearsal-0.1.0.dev0+g3a140d7bfbff-cp312-cp312-win_amd64.whl",
+      "wheel_sha256": "7f4537268907feb56335132189fe0a35c375f4613c863714ffabcdd3ef7a93dc",
+      "numpy_wheel_sha256": "86945f2ee6d10cdfd67bcb4069c1662dd711f7e2a4343db5cecec06b87cf31aa",
+      "provider_hashes": {
+        "python312.dll": "fbddf09b578bc1489827bcc19f591e2cd6be687f3db26b60e4dfca15f331800b",
+        "msvcp140.dll": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca",
+        "vcruntime140.dll": "bb2281b178b5c47fc98e4cf4293e59a07684e6c6d929d1c2f0acdcb245211417",
+        "vcruntime140_1.dll": "c2fa6e9ad1b41bd3f7621ba7cb6cddfc10903b73a33c36d7b13afcf3ff99dbf8",
+        "ucrtbase.dll": "dedb7611e1abc1ff3852dcac3d4c93a048d729e25b061973b9969f22698f14ca"
+      },
+      "pip_check": "No broken requirements found.",
+      "ordinary_manifest_remove": "after_owner_release",
+      "raw_result_sha256": "3e2221e5eea297aa9763bfb75a693f21a468e3448e46650825b1c6dd95e1bd07"
+    },
+    "linux": {
+      "build_info": {
+        "commit": "3a140d7bfbffef797a3fb7b29187dc458e50f53a",
+        "compiler": "GNU 14.2.0",
+        "configuration": "Release",
+        "dependencies": {
+          "boost": "1.92.0",
+          "eigen": "5.0.1",
+          "nlohmann_json": "3.12.0",
+          "spectra": "1.2.0"
+        },
+        "dependency_repairs": {
+          "nlohmann_json_sax_allocation": 1
+        },
+        "floating_point": "-ffp-contract=off -fno-fast-math",
+        "instruction_set": "sse2",
+        "platform": "Linux x86_64",
+        "platform_key": "linux-x64-gnu14.2-sse2",
+        "schema": "uvlas.build-info/1",
+        "uncommitted_changes": false,
+        "version": "0.1.0-dev"
+      },
+      "manifest_sha256": "0b59e0d5863391804bdee3abb5104f4e170b1c2d3a4f1f3122bb046ca17205ba",
+      "artifact_hashes": {
+        "cli": "31790b9949b5135a18579e1cff602e00c65f1e8a10d90cc08cafb334b3fe6268",
+        "extension": "be08f7239ed663cb3ca67f915250d600afb895698078d271f734bb07193a3e34"
+      },
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "numpy": "2.3.5",
+      "wheel_name": "uvlas_private_rehearsal-0.1.0.dev0+g3a140d7bfbff-cp312-cp312-linux_x86_64.whl",
+      "wheel_sha256": "b0a352b49d6c61e02d5fb895ae65903517fe5127bc13bb07e47feadb843cd5f3",
+      "numpy_wheel_sha256": "0d8163f43acde9a73c2a33605353a4f1bc4798745a8b1d73183b28e5b435ae28",
+      "provider_hashes": {
+        "libstdc++.so.6.0.33": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11",
+        "libgcc_s.so.1": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb",
+        "libc.so.6": "755a371e86cc9f564ab54f66140747700fb0a103f698f659f2060f707897e09a",
+        "libm.so.6": "5dcc4d25466e29ca390ed6fabb371c69b65dff6fa4e91c34561057a020d6994a",
+        "ld-linux-x86-64.so.2": "5fc0940888e9d2e1a00e66d6b1a559c36364ee867683652e1074fa576952cc3f"
+      },
+      "pip_check": "No broken requirements found.",
+      "ordinary_manifest_remove": "while_owned",
+      "raw_result_sha256": "8ae94997febe973c2fb2827848c053ce6f3693fae9e0bba8409e4b56573639dd"
+    }
+  },
+  "artifacts": {
+    "docs/verification/IM-06/private-wheel-rehearsal-probe.py": "d325c658331608fe2a9cfe073c0fcb02eb3e3c98889f87b28573fa693baf7bbe",
+    "docs/verification/IM-06/private-wheel-external-references-probe.patch": "f1246e8bedfd756dae0dd743b6aed614f2453b075225f9d239862785c377d9cd",
+    "docs/verification/IM-06/private-wheel-external-references.md": "d0fb293d80b0d0be4016f5715ac5646afdef9404bb024ad33a6945f6b369e012",
+    "docs/specs/foundation/case-schema-examples.json": "c957d97d4cf5eb2b919edd26cae004c85566f23b2d59dba306e3c01302e7dbfe",
+    "tests/python/test_ownership.py": "8ab9bcc9fd9903f101c33b273102ee6241d04162d57afed79963728abf1ee703"
+  }
+}
