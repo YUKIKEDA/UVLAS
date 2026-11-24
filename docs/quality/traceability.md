@@ -101,8 +101,8 @@
 | FD-10 | [case-schema-fields.md:228](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-11 | [case-schema-fields.md:316](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-12 | [case-schema-fields.md:330](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 181 | 47 | 0 |
-| IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 12 | 0 |
+| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 181 | 48 | 0 |
+| IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 13 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 68 | 15 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 23 | 7 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 17 | 7 | 0 |
@@ -144,11 +144,11 @@
 | QA-02 | [quality-plan.md:23](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-03 | [quality-plan.md:31](../quality/quality-plan.md) | 0 | 0 | 0 |
 | QA-04 | [quality-plan.md:39](../quality/quality-plan.md) | 0 | 0 | 0 |
-| QA-05 | [quality-plan.md:51](../quality/quality-plan.md) | 0 | 6 | 0 |
-| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 5 | 10 | 0 |
+| QA-05 | [quality-plan.md:51](../quality/quality-plan.md) | 0 | 7 | 0 |
+| QA-06 | [quality-plan.md:65](../quality/quality-plan.md) | 5 | 11 | 0 |
 | QA-07 | [quality-plan.md:71](../quality/quality-plan.md) | 0 | 0 | 1 |
 | QA-08 | [quality-plan.md:82](../quality/quality-plan.md) | 0 | 0 | 0 |
-| QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 6 | 0 |
+| QA-09 | [quality-plan.md:88](../quality/quality-plan.md) | 0 | 7 | 0 |
 | QA-10 | [quality-plan.md:100](../quality/quality-plan.md) | 0 | 0 | 0 |
 | SH-D01 | [main-shell-adopted-specification.md:11](../specs/structure/main-shell-adopted-specification.md) | 7 | 2 | 0 |
 | SH-D02 | [main-shell-adopted-specification.md:12](../specs/structure/main-shell-adopted-specification.md) | 21 | 12 | 0 |
@@ -246,5 +246,5 @@
 | R-03 | [implementation-start-review.md:71](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | R-04 | [implementation-start-review.md:72](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | R-05 | [implementation-start-review.md:73](../plans/implementation-start-review.md) | 3 | 0 | 0 |
-| R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 6 | 0 |
+| R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 7 | 0 |
 | R-07 | [implementation-start-review.md:75](../plans/implementation-start-review.md) | 0 | 0 | 0 |
