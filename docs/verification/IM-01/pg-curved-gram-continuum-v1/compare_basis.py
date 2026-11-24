@@ -3,7 +3,8 @@
 import argparse
 from collections import defaultdict
 from collections.abc import Sequence
-from decimal import Decimal as D, localcontext
+from decimal import Decimal as D
+from decimal import localcontext
 from fractions import Fraction as F
 from pathlib import Path
 
@@ -57,15 +58,11 @@ def read_basis(path: Path):
 
 
 def field_pairs(columns, cell):
-    rows = [
-        (i, [(field, a, b, decimal(coefficient)) for field, a, b, coefficient in parts[cell]])
-        for i, parts in enumerate(columns)
-        if cell in parts
-    ]
+    rows = [(i, parts[cell]) for i, parts in enumerate(columns) if cell in parts]
     pairs, keys = {}, set()
     for row, (i, left) in enumerate(rows):
         for j, right in rows[row:]:
-            combined = defaultdict(D)
+            combined = defaultdict(F)
             for field_i, a_i, b_i, value_i in left:
                 for field_j, a_j, b_j, value_j in right:
                     field = FIELD_PAIRS[field_i][field_j]
@@ -78,7 +75,7 @@ def field_pairs(columns, cell):
 
 def continuous_moments(cell, keys):
     return {
-        (field, a, b): decimal(analytic(*cell, a, b, *FIELD_FACTORS[field])[0])
+        (field, a, b): decimal(analytic(cell, (a, b), *FIELD_FACTORS[field])[0])
         for field, a, b in keys
     }
 
@@ -134,7 +131,9 @@ def matrix(cell_terms, triangles, order: int | None = None) -> Matrix:
         else:
             moments = sampled_moments(cell, triangles[cell], keys, order)
         for (i, j), terms in pairs.items():
-            result[i][j] += sum(coefficient * moments[key] for key, coefficient in terms.items())
+            result[i][j] += sum(
+                decimal(coefficient) * moments[key] for key, coefficient in terms.items()
+            )
     for j in range(RANK):
         for i in range(j):
             result[j][i] = result[i][j]

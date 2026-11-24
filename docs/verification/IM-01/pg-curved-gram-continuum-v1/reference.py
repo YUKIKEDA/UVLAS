@@ -1,7 +1,8 @@
 """Continuum moments for the cut parabola in the product-volume regression."""
 
 from collections.abc import Sequence
-from decimal import Decimal as D, localcontext
+from decimal import Decimal as D
+from decimal import localcontext
 from fractions import Fraction as F
 from functools import cache
 from math import cos, pi
@@ -62,7 +63,8 @@ def strip_integral(t_cell: int, t_power: int) -> list[F]:
 def integrate_polynomial(polynomial: Sequence[F], lower: F, upper: F, shift: int) -> F:
     return sum(
         (
-            value * (upper ** (degree + shift + 1) - lower ** (degree + shift + 1))
+            value
+            * (upper ** (degree + shift + 1) - lower ** (degree + shift + 1))
             / (degree + shift + 1)
             for degree, value in enumerate(polynomial)
         ),
@@ -71,8 +73,10 @@ def integrate_polynomial(polynomial: Sequence[F], lower: F, upper: F, shift: int
 
 
 def analytic(
-    s_cell: int, t_cell: int, s_power: int, t_power: int, depth_power: int, exponent: F, scale: F
+    cell: tuple[int, int], powers: tuple[int, int], depth_power: int, exponent: F, scale: F
 ) -> tuple[F, F]:
+    s_cell, t_cell = cell
+    s_power, t_power = powers
     strip = strip_integral(t_cell, t_power)
     s_monomial = polynomial_power((F(-(2 * s_cell + 1)), F(4)), s_power)
     depth = [
@@ -97,9 +101,10 @@ def unit_gauss(order: int) -> tuple[tuple[D, D], ...]:
     def evaluate(z: D) -> tuple[D, D]:
         previous, current = D(1), z
         for degree in range(2, order + 1):
-            previous, current = current, (
-                (2 * degree - 1) * z * current - (degree - 1) * previous
-            ) / degree
+            previous, current = (
+                current,
+                ((2 * degree - 1) * z * current - (degree - 1) * previous) / degree,
+            )
         derivative = order * (z * current - previous) / (z * z - 1)
         return current, derivative
 
@@ -126,21 +131,24 @@ def decimal_power(value: D, exponent: int) -> D:
 
 
 def sweep(
-    s_cell: int, t_cell: int, s_power: int, t_power: int, depth_power: int, exponent: F, scale: F
+    cell: tuple[int, int], powers: tuple[int, int], depth_power: int, exponent: F, scale: F
 ) -> D:
     """Cross-check the series by integrating the analytic vertical sections."""
+    s_cell, t_cell = cell
+    s_power, t_power = powers
     total = D(0)
     for node, weight in unit_gauss(48):
         s = (D(s_cell) + node) / 2
         lower, upper = chart_strip(s, t_cell)
         t_offset = 2 * t_cell + 1
         t_exponent = t_power + 1
-        strip = ((4 * upper - t_offset)**t_exponent -
-                 (4 * lower - t_offset)**t_exponent) / (4 * t_exponent)
+        strip = ((4 * upper - t_offset) ** t_exponent - (4 * lower - t_offset) ** t_exponent) / (
+            4 * t_exponent
+        )
         g = 1 + s * s / 64
         root = g.sqrt()
         metric = root if exponent == F(1, 2) else 1 / (root * g * g)
-        depth = (D(1) / 4 + s / 8)**(depth_power + 1)
+        depth = (D(1) / 4 + s / 8) ** (depth_power + 1)
         s_monomial = decimal_power(4 * s - (2 * s_cell + 1), s_power)
         total += weight * strip * s_monomial * metric * depth * decimal(scale) / (depth_power + 1)
     return total
@@ -197,10 +205,12 @@ def compare(powers: Sequence[tuple[int, int]], orders: Sequence[int]) -> None:
         for s_cell in range(2):
             for t_cell in range(2):
                 for i, j in powers:
-                    exact, tail = analytic(s_cell, t_cell, i, j, depth_power, exponent, scale)
-                    cross_check = sweep(s_cell, t_cell, i, j, depth_power, exponent, scale)
+                    exact, tail = analytic((s_cell, t_cell), (i, j), depth_power, exponent, scale)
+                    cross_check = sweep((s_cell, t_cell), (i, j), depth_power, exponent, scale)
                     largest_tail = max(largest_tail, decimal(tail))
-                    largest_sweep_error = max(largest_sweep_error, abs(cross_check - decimal(exact)))
+                    largest_sweep_error = max(
+                        largest_sweep_error, abs(cross_check - decimal(exact))
+                    )
                     reference[(s_cell, t_cell, field, i, j)] = exact, tail
     if largest_tail >= D("1e-50") or largest_sweep_error >= D("1e-40"):
         raise ValueError("Independent continuum reference exceeded its precision budget")

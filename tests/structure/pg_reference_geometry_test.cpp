@@ -218,6 +218,101 @@ struct IndependentRadical {
 
 } // namespace
 
+TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
+          "[GEO-01][SH-D02][SH-D07][verification]") {
+    for (const core::Index resolution : {1, 2}) {
+        for (const auto denominator : {"100", "10000"}) {
+            CAPTURE(resolution, denominator);
+            Fixture fixture;
+            // R5, polynomial_reference_surface.coefficients((.4,.2,0.,.1,-.06,.025)).
+            const auto s2 = fixture.r("1", "5"), t2 = fixture.r("1", "10");
+            const auto s3 = fixture.r("1", "30"), t3 = fixture.r("-1", "50");
+            const auto mixed = fixture.r("1", "40");
+            const std::array<ExactInputTerm, 5> height_terms{
+                {{{2, 0}, s2}, {{0, 2}, t2}, {{3, 0}, s3}, {{0, 3}, t3}, {{2, 2}, mixed}}};
+            const auto zero = fixture.r("0"), one = fixture.r("1");
+            set_graph(fixture, resolution, one, zero, height_terms);
+            fixture.domain.clear();
+            fixture.domain.push_back(fixture.point("0", "0"));
+            fixture.domain.push_back({fixture.r("1"), fixture.r("3", "10")});
+            fixture.domain.push_back({fixture.r("1"), fixture.r("9", "10")});
+            fixture.domain.push_back(fixture.point("0", "1"));
+            const Q base_thickness{std::string("1/") + denominator};
+            for (std::size_t i = 0; i < fixture.thickness.size(); ++i) {
+                const auto& vertex = fixture.thickness[i];
+                const Q thickness =
+                    base_thickness * (1 + rational(vertex.s) / 10 + rational(vertex.t) / 20);
+                fixture.heights[i] = fraction(fixture, thickness);
+            }
+            fixture.layers.clear();
+            fixture.layers.push_back(
+                {core::LayerId{11}, fixture.zeta.front(), fixture.zeta.back()});
+
+            std::array<R, 9> rotation;
+            for (const auto diagonal : {0U, 4U, 8U})
+                rotation[diagonal] = fixture.r("1");
+            const std::array<R, 3> origin;
+            core::ResourcePlan plan{cap};
+            auto inputs = prepare_inputs(fixture, plan);
+            const auto geometry =
+                take(prepare_candidate(inputs, {rotation, origin, one}, reference_limits(), plan));
+            const auto& partition = take(geometry.source()).partition;
+            const auto vertices = take(partition.vertices());
+            const auto triangles = take(partition.triangles());
+            const auto volumes = take(partition.volumes());
+            REQUIRE(volumes.size() == triangles.size());
+            const auto third = fixture.r("1", "3"), depth = fixture.r("3", "4");
+            Q area{}, first_s{}, first_t{};
+            for (std::size_t v = 0; v < volumes.size(); ++v) {
+                const auto& triangle = triangles[static_cast<std::size_t>(volumes[v].triangle)];
+                Q s{}, t{};
+                for (const auto vertex : triangle.vertices) {
+                    const auto& point = vertices[static_cast<std::size_t>(vertex)];
+                    s += rational(point.s) / 3;
+                    t += rational(point.t) / 3;
+                }
+                const Q triangle_area = rational(triangle.twice_area) / 2;
+                area += triangle_area;
+                first_s += triangle_area * s;
+                first_t += triangle_area * t;
+
+                const Q hs = 2 * s / 5 + s * s / 10 + s * t * t / 20;
+                const Q ht = t / 5 - 3 * t * t / 50 + s * s * t / 20;
+                const Q hss = Q("2/5") + s / 5 + t * t / 20;
+                const Q htt = Q("1/5") - 3 * t / 25 + s * s / 20;
+                const Q hst = s * t / 10;
+                const Q g = 1 + hs * hs + ht * ht;
+                const Q h = base_thickness * (1 + s / 10 + t / 20);
+                const Q z = h / 4;
+                const Q gaussian_numerator = hss * htt - hst * hst;
+                const Q mean_numerator =
+                    (1 + hs * hs) * htt - 2 * hs * ht * hst + (1 + ht * ht) * hss;
+                // det[dX/ds,dX/dt,dX/dz] from the two shape-operator invariants.
+                const Q determinant_rational = -z * mean_numerator / g;
+                const Q determinant_radical = 1 + z * z * gaussian_numerator / (g * g);
+                const auto sample = take(geometry.evaluate(
+                    PgReferenceVolumePoint{static_cast<core::Index>(v), third, third, depth},
+                    std::nullopt, reference_limits(), plan));
+                CHECK(rational(sample.s) == s);
+                CHECK(rational(sample.t) == t);
+                CHECK(rational(sample.g) == g);
+                CHECK(rational(sample.full_thickness_metres) == h);
+                CHECK(rational(sample.position_metres[0].rational) == s);
+                CHECK(rational(sample.position_metres[0].radical) == -z * hs / g);
+                CHECK(rational(sample.position_metres[1].radical) == -z * ht / g);
+                CHECK(rational(sample.position_metres[2].radical) == z / g);
+                const auto& measure = std::get<PgReferenceVolumeMeasure>(sample.measure).jacobian;
+                // The unit depth spans all thickness and the triangle map has area factor 2A.
+                CHECK(rational(measure.rational) == determinant_rational * h * 2 * triangle_area);
+                CHECK(rational(measure.radical) == determinant_radical * h * 2 * triangle_area);
+            }
+            CHECK(area == Q("4/5"));
+            CHECK(first_s == Q("11/30"));
+            CHECK(first_t == Q("131/300"));
+        }
+    }
+}
+
 TEST_CASE("PG physical map and fourth-order jet match an independent quartic reference",
           "[SH-D01][SH-D02][SH-D07][N4-06][V-PG][verification]") {
     Fixture f;
