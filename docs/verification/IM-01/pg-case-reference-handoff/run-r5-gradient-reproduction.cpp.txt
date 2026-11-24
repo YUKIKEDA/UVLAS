@@ -1,0 +1,61 @@
+#include "run-r5-handoff.cpp.txt"
+
+TEST_CASE("R5 rounded gradient reproduction at the two retained witness points",
+          "[.r5-gradient-reproduction]") {
+    std::ifstream stream("r5-taper-00/case.json", std::ios::binary);
+    REQUIRE(stream);
+    const std::string wire{std::istreambuf_iterator<char>{stream},
+                           std::istreambuf_iterator<char>{}};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    const auto chart = prepare_r5(wire, 1, workspace, plan);
+    const auto shell = take(chart.shell_reference(numerics::PatchId{1}, 1));
+    const auto rule = shell.fixed_rule();
+    REQUIRE(rule.size() == 282);
+    const auto q0 = shell.patch().reference_coordinates();
+    const auto translation = shell.patch().translation();
+    const auto limits = chart_limits(2).chart.arithmetic;
+    for (std::size_t ordinal = 280; ordinal < rule.size(); ++ordinal) {
+        const auto& r = rule[ordinal];
+        const PgReferencePoint query = PgReferenceVolumePoint{r.volume, r.u, r.v, r.depth};
+        const auto exact =
+            take(shell.patch().evaluate_reference(std::span{&query, 1}, limits, plan));
+        REQUIRE(exact.column_count == q0.size());
+        REQUIRE(exact.column_count == translation.size());
+        const Decimal root = sqrt(decimal(exact.points.values().front().g));
+        std::array<Q, 3> dc{};
+        std::array<std::array<Q, 3>, 3> dX{};
+        Decimal max_entry_error = 0, max_entry = 0;
+        std::size_t worst = 0;
+        for (std::size_t col = 0; col < exact.column_count; ++col) {
+            const auto& gradient = exact.columns.values()[col].physical_gradient_per_metre;
+            for (std::size_t d = 0; d < gradient.size(); ++d) {
+                const Decimal val = evaluate(gradient[d], root);
+                const double hi = val.convert_to<double>();
+                const double lo = (val - decimal(Q{hi})).convert_to<double>();
+                const Q projected = Q{hi} + Q{lo};
+                const Decimal error = abs(val - decimal(projected));
+                if (error > max_entry_error) {
+                    max_entry_error = error;
+                    worst = 3 * col + d;
+                    max_entry = val;
+                }
+                dc[d] += projected * q(translation[col]);
+                for (std::size_t a = 0; a < dX.size(); ++a)
+                    dX[a][d] += projected * q(q0[col][a]);
+            }
+        }
+        Decimal error_constant = 0, error_x = 0;
+        for (std::size_t d = 0; d < dc.size(); ++d) {
+            error_constant = (std::max)(error_constant, Decimal(abs(decimal(dc[d]))));
+            for (std::size_t a = 0; a < dX.size(); ++a) {
+                const Q diff = dX[a][d] - (a == d ? 1 : 0);
+                error_x = (std::max)(error_x, Decimal(abs(decimal(diff))));
+            }
+        }
+        std::clog << "R5_GRADIENT_REPRODUCTION," << ordinal << ',' << worst << ',' << max_entry
+                  << ',' << max_entry_error << ',' << error_constant << ',' << error_x << '\n'
+                  << std::flush;
+        CHECK(max_entry_error > Decimal(projection_error));
+    }
+}
