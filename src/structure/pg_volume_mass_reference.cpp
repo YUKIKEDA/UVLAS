@@ -316,19 +316,23 @@ project_reference_row(ReferenceArithmetic& math, const PgConditionedReferenceBat
 PgProjectedReferenceBatch::PgProjectedReferenceBatch(
     PgPreparedPatchIdentity source, std::size_t columns, PgPreparedReferenceProjection projection,
     PgReferenceCallInfo call_info, core::PlannedBuffer<PgProjectedReferencePoint> points,
-    core::PlannedBuffer<double> high, core::PlannedBuffer<double> low) noexcept
+    core::PlannedBuffer<double> high, core::PlannedBuffer<double> low,
+    std::optional<std::size_t> first_rule_ordinal) noexcept
     : source_(source),
       columns_(columns),
       projection_(projection),
       call_info_(call_info),
       points_(std::move(points)),
       high_(std::move(high)),
-      low_(std::move(low)) {}
+      low_(std::move(low)),
+      first_rule_ordinal_(first_rule_ordinal) {}
 
 template <class Query>
-core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_points(
-    std::span<const Query> queries, const PgPreparedReferenceProjection& projection,
-    const PgReferenceLimits& limits, core::ResourcePlan& plan) const noexcept {
+core::Result<PgProjectedReferenceBatch>
+PgPreparedPatch::project_points(std::span<const Query> queries,
+                                const PgPreparedReferenceProjection& projection,
+                                const PgReferenceLimits& limits, core::ResourcePlan& plan,
+                                std::optional<std::size_t> first_rule_ordinal) const noexcept {
     return partition_entry([&]() -> core::Result<PgProjectedReferenceBatch> {
         auto math = ReferenceArithmetic{limits, plan};
         math.cancel();
@@ -352,7 +356,8 @@ core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_points(
                                          math.info(),
                                          std::move(rows.points),
                                          std::move(rows.high),
-                                         std::move(rows.low)};
+                                         std::move(rows.low),
+                                         first_rule_ordinal};
     });
 }
 
@@ -360,6 +365,21 @@ core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_reference(
     std::span<const PgReferencePoint> queries, const PgPreparedReferenceProjection& projection,
     const PgReferenceLimits& limits, core::ResourcePlan& plan) const noexcept {
     return project_points(queries, projection, limits, plan);
+}
+
+core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_fixed_reference(
+    std::size_t first, std::size_t count, const PgPreparedReferenceProjection& projection,
+    const PgReferenceLimits& limits, core::ResourcePlan& plan) const noexcept {
+    return partition_entry([&]() -> core::Result<PgProjectedReferenceBatch> {
+        if (limits.cancellation.stop_requested())
+            partition_fail(core::FailureCode::Cancelled);
+        const auto rule = fixed_rule();
+        if (!rule)
+            partition_fail(core::FailureCode::Unsupported);
+        if (count == 0 || first > rule->size() || count > rule->size() - first)
+            partition_fail(core::FailureCode::InvalidInput);
+        return project_points(rule->subspan(first, count), projection, limits, plan, first);
+    });
 }
 
 core::Result<PgProjectedReferenceBatch>

@@ -57,6 +57,10 @@ public:
     [[nodiscard]] std::size_t column_count() const noexcept {
         return columns_;
     }
+    /// Present only for a contiguous projection of the same owner's retained rule.
+    [[nodiscard]] std::optional<std::size_t> first_rule_ordinal() const noexcept {
+        return first_rule_ordinal_;
+    }
     [[nodiscard]] PgPreparedReferenceProjection projection() const noexcept {
         return projection_;
     }
@@ -82,7 +86,8 @@ private:
     friend class PgPreparedPatch;
     PgProjectedReferenceBatch(PgPreparedPatchIdentity, std::size_t, PgPreparedReferenceProjection,
                               PgReferenceCallInfo, core::PlannedBuffer<PgProjectedReferencePoint>,
-                              core::PlannedBuffer<double>, core::PlannedBuffer<double>) noexcept;
+                              core::PlannedBuffer<double>, core::PlannedBuffer<double>,
+                              std::optional<std::size_t>) noexcept;
 
     PgPreparedPatchIdentity source_;
     std::size_t columns_;
@@ -90,6 +95,7 @@ private:
     PgReferenceCallInfo call_info_;
     core::PlannedBuffer<PgProjectedReferencePoint> points_;
     core::PlannedBuffer<double> high_, low_;
+    std::optional<std::size_t> first_rule_ordinal_;
 };
 
 /// Use the N entries of a prepared point batch, in the patch's Cartesian column order.
@@ -150,6 +156,12 @@ public:
     project_reference(std::span<const PgReferencePoint>, const PgPreparedReferenceProjection&,
                       const PgReferenceLimits&, core::ResourcePlan&) const noexcept;
 
+    /// Project N/G/X0 and measure at the retained finite points in ordinal order.
+    [[nodiscard]] core::Result<PgProjectedReferenceBatch>
+    project_fixed_reference(std::size_t first, std::size_t count,
+                            const PgPreparedReferenceProjection&, const PgReferenceLimits&,
+                            core::ResourcePlan&) const noexcept;
+
     /// Project material-side queries without introducing a volume point.
     [[nodiscard]] core::Result<PgProjectedReferenceBatch>
     project_boundary_reference(std::span<const PgBoundaryPositionPoint>,
@@ -160,7 +172,8 @@ private:
     template <class Query>
     [[nodiscard]] core::Result<PgProjectedReferenceBatch>
     project_points(std::span<const Query>, const PgPreparedReferenceProjection&,
-                   const PgReferenceLimits&, core::ResourcePlan&) const noexcept;
+                   const PgReferenceLimits&, core::ResourcePlan&,
+                   std::optional<std::size_t> first_rule_ordinal = {}) const noexcept;
 
     struct Coordinates;
     using Conditioning = std::variant<PgConditioningCertificate, PgFixedDiscreteGramCertificate>;
