@@ -373,7 +373,10 @@ void expect_material_map_rejection(const JsonToken& value, std::string_view path
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == core::FailureCode::InvalidInput);
     const auto detail = diagnostic.detail();
-    REQUIRE(detail);
+    if (!detail) {
+        FAIL("Material map failure must own its diagnostic");
+        return;
+    }
     CHECK(detail->reason == reason);
     CHECK(diagnostic.path() == path);
 }
@@ -391,7 +394,10 @@ TEST_CASE("Structural attachment stores exact material map fields and preserves 
     const auto* structural = std::get_if<io::schema::AeroAttachmentStructural>(&attachment);
     REQUIRE(structural != nullptr);
     const auto map = structural->material_map;
-    REQUIRE(map);
+    if (!map) {
+        FAIL("Prepared typed surface must retain its material map");
+        return;
+    }
     const auto pieces = map->record().pieces;
     REQUIRE(pieces.size() == 2);
     const auto first = pieces.at(0);
