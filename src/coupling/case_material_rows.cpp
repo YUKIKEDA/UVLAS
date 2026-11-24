@@ -1,6 +1,7 @@
 #include "case_material_rows.hpp"
 
 #include "aero/local_geometry_bounds_private.hpp"
+#include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
 

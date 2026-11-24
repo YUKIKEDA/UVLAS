@@ -128,7 +128,7 @@ struct Domain {
     std::span<const structure::PgPartitionSource> edges;
     std::span<const Point> points;
 
-    bool strictly_contains(pg::ReferenceArithmetic& m, const R& s, const R& t) const {
+    bool contains(pg::ReferenceArithmetic& m, const R& s, const R& t, bool allow_boundary) const {
         bool inside = false;
         for (const auto& edge : edges) {
             m.visit(1);
@@ -138,7 +138,7 @@ struct Domain {
             const auto& b = points[static_cast<std::size_t>(edge.endpoints[1])];
             const int orient = orientation(m, a, b, s, t).sign();
             if (orient == 0 && between(m, s, a.s, b.s) && between(m, t, a.t, b.t))
-                return false;
+                return allow_boundary;
             const bool below_a = m.compare(a.t, t) <= 0;
             const bool below_b = m.compare(b.t, t) <= 0;
             if (below_a != below_b && (orient > 0) == below_a)
@@ -233,7 +233,7 @@ bool certify_box(pg::ReferenceArithmetic& m, const Domain& domain, const Piece& 
     const auto det = value(m, piece.determinant, xi, eta).sign();
     if (orientation_sign == 0)
         orientation_sign = det;
-    if (det == 0 || orientation_sign != det || !domain.strictly_contains(m, s, t))
+    if (det == 0 || orientation_sign != det || !domain.contains(m, s, t, false))
         partition_fail(FailureCode::GeometryInvalid);
 
     bool shape_known = true;
@@ -266,9 +266,13 @@ bool certify_box(pg::ReferenceArithmetic& m, const Domain& domain, const Piece& 
                 if (m.compare(z, endpoint) != 0)
                     partition_fail(FailureCode::GeometryInvalid);
     }
-    return domain.boundary_avoided(m, coefficients<coordinate_degree>(m, piece.material[0], bx, by),
-                                   coefficients<coordinate_degree>(m, piece.material[1], bx, by)) &&
-           shape_known;
+    const auto bounded_s = coefficients<coordinate_degree>(m, piece.material[0], bx, by);
+    const auto bounded_t = coefficients<coordinate_degree>(m, piece.material[1], bx, by);
+    for (const auto i : {std::size_t{0}, coordinate_degree})
+        for (const auto j : {std::size_t{0}, coordinate_degree})
+            if (!domain.contains(m, bounded_s[i][j], bounded_t[i][j], true))
+                partition_fail(FailureCode::GeometryInvalid);
+    return domain.boundary_avoided(m, bounded_s, bounded_t) && shape_known;
 }
 
 struct PendingBox {

@@ -2247,6 +2247,8 @@ struct NonpenetrationBuilder {
             [&](a::PhysicalFaceId face, a::FacetId facet, std::uint8_t corner, a::PointId vertex,
                 std::optional<a::EdgeId> edge, const DiscreteLoadVector& contribution) {
                 work.step();
+                if (original_count >= original_loads.size())
+                    reject(core::FailureCode::ResourceExceeded);
                 original_loads.values()[original_count++].emplace(DiscreteOriginalLoadContribution{
                     face, facet, corner, require(geometry.owner(vertex)), edge, contribution});
             };

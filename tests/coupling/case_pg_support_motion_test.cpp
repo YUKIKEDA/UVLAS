@@ -1,4 +1,5 @@
 #include "aero/local_geometry_bounds_private.hpp"
+#include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
 #include "coupling/case_material_chart.hpp"
 #include "coupling/case_material_reference.hpp"
@@ -387,6 +388,15 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
             .field("pieces")
             .elements.at(0)
             .set("side", a::string("upper"));
+        wrong(core::FailureCode::GeometryInvalid);
+    }
+    SECTION("An outside corner proves that the full panel does not fit the support domain") {
+        for (auto& row : attachment.field("material_map").field("pieces").elements) {
+            auto& width = row.field("terms").elements.at(1).field("coefficient").elements.at(0);
+            width.set("numerator", a::string("7"));
+            width.set("denominator", a::string("8"));
+        }
+        // The centre is inside the PG square, while xi=1 maps to s=9/8.
         wrong(core::FailureCode::GeometryInvalid);
     }
     SECTION("A hidden zero Jacobian invalidates the entire panel") {
