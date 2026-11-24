@@ -1,0 +1,109 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-free-wake-velocity-v1",
+  "ids": [
+    "AE-07",
+    "UW-D01",
+    "UW-D02",
+    "UW-D04",
+    "UW-D07",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "2da9afa7050ec5d9595c640c2d23c9c1c2996da6",
+  "claimed_state": "Instantaneous material particle velocity, fixed-contact direction and transpose for bound, attached and old wake induction plus exact spatial and temporal known flow. Covers the explicitly supplied discrete state.",
+  "verification": {
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.global_geometry",
+      "aero.local_geometry_packet",
+      "aero.p1_shared_action",
+      "numerics.dense_solve"
+    ],
+    "catch": "Free wake motion uses all sources at attached and inherited material points, 229 assertions per configuration, seed 23.",
+    "oracle": "75-decimal direct straight-segment and regularized sheet integrals, analytic ambient phase terms and independent canonical TE point-geometry pullback. Max orders 64 to 88 step difference 1.7359990738638e-24; TE orders 72 to 96 difference below 1e-20.",
+    "negative": "Duplicate canonical owner, independent coincident point, and particle/steps/payload caps are refused. Particle cap refusal leaves allocation counter unchanged.",
+    "msvc": "Windows x64 MSVC 19.51 Debug and Release, affected CTest 5/5 per configuration. Coupling suite 44.77 s in Debug (90 s limit) and 5.76 s in Release.",
+    "gcc": "Ubuntu Noble x64 GCC 14.2 Release, warnings as errors, affected CTest 5/5. Coupling suite 4.66 s.",
+    "mutation": "Setting the old wake coefficient to zero in a separate Linux tree caused 7 assertion failures, exit 42. The byte-identical restored product source passed all 229 assertions after a rebuild.",
+    "static": "Pinned clang-format 21.1.2, Windows and Linux clang-tidy 21.1.1 on both touched translation units, independent reference reproduction and trace-check.",
+    "integration": "After merging specified rigid motion, same eight affected CTests passed under Windows x64 MSVC 19.51 Debug and Release and Ubuntu Noble x64 GCC 14.2 Release. This adds coupling.case_motion, coupling.case_motion_time_series and coupling.case_motion_frame to the standalone selection. Free-wake product and regression bytes were identical throughout."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "src/aero/query_coordinates_private.hpp": "2d618cfdc773347554a68bd4b6e9a26a86f901391456f62e00f43aac3896fa83",
+    "src/coupling/case_component_precision_private.hpp": "8a7417d5f0d239b5784eda938e9da6ab3bec3e6a3bcd4c2159123012fb2e1b16",
+    "src/coupling/case_known_flow.cpp": "700eabb0dbcdea3913541c6ba6e9439b68bdebaa6885c902050099e9f5471254",
+    "src/coupling/discrete_nonpenetration.cpp": "db121ba67b92cb596d7b287a3e22ff7055b3d6d825f440abe852229c8d6869fb",
+    "src/coupling/discrete_nonpenetration.hpp": "2a6507b2fbdd999274723089dfd6b7553f91213814ac61ddf103681e04139bf5",
+    "tests/coupling/case_uniform_flow_test.cpp": "27258488c8fde612b6971fe9bef0a9f272d7bee88e9100c1f914563bdc0beb08"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "src/aero/query_coordinates_private.hpp",
+      "hint": "src/aero/query_coordinates_private.hpp",
+      "sha256": "2d618cfdc773347554a68bd4b6e9a26a86f901391456f62e00f43aac3896fa83"
+    },
+    {
+      "id": "src/coupling/case_component_precision_private.hpp",
+      "hint": "src/coupling/case_component_precision_private.hpp",
+      "sha256": "8a7417d5f0d239b5784eda938e9da6ab3bec3e6a3bcd4c2159123012fb2e1b16"
+    },
+    {
+      "id": "src/coupling/case_known_flow.cpp",
+      "hint": "src/coupling/case_known_flow.cpp",
+      "sha256": "700eabb0dbcdea3913541c6ba6e9439b68bdebaa6885c902050099e9f5471254"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "db121ba67b92cb596d7b287a3e22ff7055b3d6d825f440abe852229c8d6869fb"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "2a6507b2fbdd999274723089dfd6b7553f91213814ac61ddf103681e04139bf5"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "27258488c8fde612b6971fe9bef0a9f272d7bee88e9100c1f914563bdc0beb08"
+    }
+  ],
+  "artifacts": {
+    "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py": "24f80eb3a7fa8ff4c7b92062f4582a8d56deed2aaed562d77a076aa61b576dc2",
+    "docs/verification/IM-03/discrete-free-wake-velocity-v1/verification.md": "b6ee17ac11aa1d25e69743478aaef0cbc3232f3b068b9ebf1cfaa65b82295ed8"
+  },
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-free-wake-velocity-v1/reference.py",
+      "sha256": "24f80eb3a7fa8ff4c7b92062f4582a8d56deed2aaed562d77a076aa61b576dc2"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-free-wake-velocity-v1/verification.md",
+      "hint": "docs/verification/IM-03/discrete-free-wake-velocity-v1/verification.md",
+      "sha256": "b6ee17ac11aa1d25e69743478aaef0cbc3232f3b068b9ebf1cfaa65b82295ed8"
+    }
+  ],
+  "standalone_source_commit": "cacebfe3e831486a0feba25b10827ff9a7fad7d7"
+}
