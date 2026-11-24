@@ -1,0 +1,37 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-discrete-gram-external-admission",
+  "ids": [
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "9a6b0c750c01320187b2a37f6e9eb6e09a81ee07",
+  "claimed_state": "曲面の離散Gramは、求積点と上三角の全端点が同時に保持する厳密有理数を外部領域の見積りに含める。",
+  "environment": {
+    "os": "Windows 11 x64",
+    "compiler": "MSVC 19.51.36260",
+    "configuration": "Release"
+  },
+  "checks": {
+    "columns": 130,
+    "volume_points": 16,
+    "result_endpoints": 17030,
+    "restricted_external_bytes": 33554432,
+    "restricted_failure": "ResourceExceeded",
+    "allocated_bytes_on_rejection": 0,
+    "basis_reused_after_rejection": true,
+    "conditioning_seconds": 20.62,
+    "discrete_gram_seconds": 28.75
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-discrete-gram-contract.md": "189b6e40c4ce326337d0cc2c52f0da0ae42f858e3d7dd4770f91a9d93f4fd029",
+    "src/structure/pg_discrete_gram.cpp": "6039ae9692d0d00e3169a3bc1d9c8494d785c84a596f6a80101d7d5a49e8915b",
+    "tests/structure/pg_discrete_gram_test.cpp": "aa026d447cf890da24526765c3067908fce6d60af76ed7e9b0c4f064a762154c",
+    "docs/verification/IM-01/im01-pg-discrete-gram.json": "b50ccc9063312ed46760153fb86e2139e20f56b7f19e45ec9c4fa91613ae41b7"
+  }
+}
