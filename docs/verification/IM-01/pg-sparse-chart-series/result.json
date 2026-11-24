@@ -1,0 +1,842 @@
+{
+  "source_commit": "df173fe0a8c7b50ee1b20a7cb9594f606928948d",
+  "environment": {
+    "os": "Windows 11 26H2 (10.0.26300.9974)",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "physical_cores": 10,
+    "logical_cpus": 16,
+    "assigned_logical_cpu": 2,
+    "installed_ram_bytes": 51343966208,
+    "compiler": "MSVC 19.51.36260 x64",
+    "boost": "1.92.0",
+    "catch2": "3.16.1",
+    "build": "CMake/Ninja Multi-Config Release",
+    "flags": "/O2 /fp:strict /DNDEBUG"
+  },
+  "limits": {
+    "process_logical_cpu": 2,
+    "planned_bytes": 51539607552,
+    "factor_terms": 65000,
+    "pivots": 512,
+    "work_row_terms": 768,
+    "algebra_maximum_value_bits": 65536,
+    "algebra_maximum_work_bits": 262144,
+    "scalar_operations": 300000000,
+    "partition_visits": 100000000
+  },
+  "driver": {
+    "preparation_only_commit": "2b4f1d629d1d7de5bef5530bf1f6d098da550540",
+    "preparation_only_sha256": "76e2699838b39af8ee45017e96e97befab1a5db13a38ec8f350eb5aa895855f5",
+    "reuse_compile_define": "UVLAS_R02_MEASURE_REUSE"
+  },
+  "reuse_runs": [
+    {
+      "assertions": 30,
+      "catch_seed": 1508005372,
+      "patches": 2,
+      "connections": 1,
+      "rank": 107,
+      "nonzeros": 9099,
+      "lower_terms": 706,
+      "upper_terms": 5449,
+      "resident_before_reuse": 548519936,
+      "chart_live_rationals": 68073,
+      "chart_estimated_external_bytes": 17846730776,
+      "lift_live_rationals": 1576,
+      "lift_estimated_external_bytes": 414941208,
+      "transpose_live_rationals": 3118,
+      "transpose_estimated_external_bytes": 819167256,
+      "lift_temporary_triples": 107,
+      "transpose_temporary_triples": 333,
+      "lift_retained_triples": 333,
+      "transpose_retained_triples": 514,
+      "chart": {
+        "nanoseconds": 826503200,
+        "charged_bytes": 16045104,
+        "resident_bytes": 548356096,
+        "lifetime_peak_resident_bytes": 936898560
+      },
+      "lift": {
+        "nanoseconds": 3985643400,
+        "charged_bytes": 5491584,
+        "resident_bytes": 550100992,
+        "lifetime_peak_resident_bytes": 936898560
+      },
+      "transpose": {
+        "nanoseconds": 4136478300,
+        "charged_bytes": 2575400,
+        "resident_bytes": 554385408,
+        "lifetime_peak_resident_bytes": 936898560
+      }
+    },
+    {
+      "assertions": 38,
+      "catch_seed": 2906399167,
+      "patches": 3,
+      "connections": 2,
+      "rank": 144,
+      "nonzeros": 13088,
+      "lower_terms": 2636,
+      "upper_terms": 10661,
+      "resident_before_reuse": 683560960,
+      "chart_live_rationals": 69002,
+      "chart_estimated_external_bytes": 18090262552,
+      "lift_live_rationals": 2014,
+      "lift_estimated_external_bytes": 529760280,
+      "transpose_live_rationals": 4060,
+      "transpose_estimated_external_bytes": 1066106904,
+      "lift_temporary_triples": 144,
+      "transpose_temporary_triples": 442,
+      "lift_retained_triples": 442,
+      "transpose_retained_triples": 682,
+      "chart": {
+        "nanoseconds": 21598492500,
+        "charged_bytes": 43876104,
+        "resident_bytes": 683556864,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "lift": {
+        "nanoseconds": 13131122800,
+        "charged_bytes": 8917872,
+        "resident_bytes": 684191744,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "transpose": {
+        "nanoseconds": 13608667500,
+        "charged_bytes": 5385888,
+        "resident_bytes": 689860608,
+        "lifetime_peak_resident_bytes": 936873984
+      }
+    },
+    {
+      "assertions": 56,
+      "catch_seed": 2779824515,
+      "patches": 4,
+      "connections": 4,
+      "rank": 248,
+      "nonzeros": 28116,
+      "lower_terms": 4330,
+      "upper_terms": 19173,
+      "resident_before_reuse": 819113984,
+      "chart_live_rationals": 70059,
+      "chart_estimated_external_bytes": 18367348760,
+      "lift_live_rationals": 2653,
+      "lift_estimated_external_bytes": 697270296,
+      "transpose_live_rationals": 5578,
+      "transpose_estimated_external_bytes": 1464041496,
+      "lift_temporary_triples": 248,
+      "transpose_temporary_triples": 551,
+      "lift_retained_triples": 551,
+      "transpose_retained_triples": 975,
+      "chart": {
+        "nanoseconds": 28992490100,
+        "charged_bytes": 72322328,
+        "resident_bytes": 819101696,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "lift": {
+        "nanoseconds": 39652195600,
+        "charged_bytes": 17635368,
+        "resident_bytes": 821227520,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "transpose": {
+        "nanoseconds": 37137953200,
+        "charged_bytes": 9379088,
+        "resident_bytes": 831754240,
+        "lifetime_peak_resident_bytes": 936873984
+      }
+    }
+  ],
+  "raw_runs": [
+    {
+      "round": 1,
+      "assertions": 28,
+      "catch_seed": 3850254335,
+      "patches": 2,
+      "connections": 1,
+      "cycle": false,
+      "nonconforming_contacts": 1,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ]
+      ],
+      "rows": 288,
+      "columns": 333,
+      "nonzeros": 9099,
+      "rank": 107,
+      "lower_terms": 706,
+      "upper_terms": 5449,
+      "pivot_capacity": 288,
+      "work_row_capacity": 333,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 972308700,
+      "exact_factor_capacity_accepted": 6155,
+      "one_less_factor_capacity_rejected": 6154,
+      "one_less_charged_bytes": 11051904,
+      "initial_resident_bytes": 6262784,
+      "geometry": {
+        "nanoseconds": 1669448400,
+        "charged_bytes": 1160769768,
+        "resident_bytes": 526397440,
+        "lifetime_peak_resident_bytes": 936841216
+      },
+      "traces": {
+        "nanoseconds": 174790900,
+        "charged_bytes": 24311920,
+        "resident_bytes": 537518080,
+        "lifetime_peak_resident_bytes": 936841216
+      },
+      "aggregate": {
+        "nanoseconds": 9230300,
+        "charged_bytes": 1424584,
+        "resident_bytes": 540012544,
+        "lifetime_peak_resident_bytes": 936841216
+      },
+      "chart": {
+        "nanoseconds": 972381900,
+        "charged_bytes": 16045104,
+        "resident_bytes": 548274176,
+        "lifetime_peak_resident_bytes": 936841216
+      }
+    },
+    {
+      "round": 1,
+      "assertions": 36,
+      "catch_seed": 4144002711,
+      "patches": 3,
+      "connections": 2,
+      "cycle": false,
+      "nonconforming_contacts": 1,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "rows": 384,
+      "columns": 442,
+      "nonzeros": 13088,
+      "rank": 144,
+      "lower_terms": 2636,
+      "upper_terms": 10661,
+      "pivot_capacity": 384,
+      "work_row_capacity": 442,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 21993951000,
+      "exact_factor_capacity_accepted": 13297,
+      "one_less_factor_capacity_rejected": 13296,
+      "one_less_charged_bytes": 39395272,
+      "initial_resident_bytes": 6258688,
+      "geometry": {
+        "nanoseconds": 2218671400,
+        "charged_bytes": 1403958944,
+        "resident_bytes": 635568128,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "traces": {
+        "nanoseconds": 194494500,
+        "charged_bytes": 33696472,
+        "resident_bytes": 651198464,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "aggregate": {
+        "nanoseconds": 13076500,
+        "charged_bytes": 2037256,
+        "resident_bytes": 654553088,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "chart": {
+        "nanoseconds": 21994040900,
+        "charged_bytes": 43876104,
+        "resident_bytes": 683356160,
+        "lifetime_peak_resident_bytes": 936873984
+      }
+    },
+    {
+      "round": 1,
+      "assertions": 54,
+      "catch_seed": 3659183943,
+      "patches": 4,
+      "connections": 4,
+      "cycle": true,
+      "nonconforming_contacts": 2,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ],
+        [
+          2,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          2
+        ],
+        [
+          4,
+          2,
+          4
+        ]
+      ],
+      "rows": 672,
+      "columns": 551,
+      "nonzeros": 28116,
+      "rank": 248,
+      "lower_terms": 4330,
+      "upper_terms": 19173,
+      "pivot_capacity": 512,
+      "work_row_capacity": 551,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 26327551200,
+      "exact_factor_capacity_accepted": 23503,
+      "one_less_factor_capacity_rejected": 23502,
+      "one_less_charged_bytes": 68801368,
+      "initial_resident_bytes": 6254592,
+      "geometry": {
+        "nanoseconds": 2134788200,
+        "charged_bytes": 1647148952,
+        "resident_bytes": 745005056,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "traces": {
+        "nanoseconds": 421465400,
+        "charged_bytes": 69094968,
+        "resident_bytes": 774422528,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "aggregate": {
+        "nanoseconds": 28025500,
+        "charged_bytes": 4315912,
+        "resident_bytes": 782364672,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "chart": {
+        "nanoseconds": 26327610400,
+        "charged_bytes": 72322328,
+        "resident_bytes": 818913280,
+        "lifetime_peak_resident_bytes": 936873984
+      }
+    },
+    {
+      "round": 2,
+      "assertions": 28,
+      "catch_seed": 1924009377,
+      "patches": 2,
+      "connections": 1,
+      "cycle": false,
+      "nonconforming_contacts": 1,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ]
+      ],
+      "rows": 288,
+      "columns": 333,
+      "nonzeros": 9099,
+      "rank": 107,
+      "lower_terms": 706,
+      "upper_terms": 5449,
+      "pivot_capacity": 288,
+      "work_row_capacity": 333,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 895288600,
+      "exact_factor_capacity_accepted": 6155,
+      "one_less_factor_capacity_rejected": 6154,
+      "one_less_charged_bytes": 11051904,
+      "initial_resident_bytes": 6254592,
+      "geometry": {
+        "nanoseconds": 1924384300,
+        "charged_bytes": 1160769768,
+        "resident_bytes": 526794752,
+        "lifetime_peak_resident_bytes": 936845312
+      },
+      "traces": {
+        "nanoseconds": 170085200,
+        "charged_bytes": 24311920,
+        "resident_bytes": 537522176,
+        "lifetime_peak_resident_bytes": 936845312
+      },
+      "aggregate": {
+        "nanoseconds": 9675200,
+        "charged_bytes": 1424584,
+        "resident_bytes": 539885568,
+        "lifetime_peak_resident_bytes": 936845312
+      },
+      "chart": {
+        "nanoseconds": 895351000,
+        "charged_bytes": 16045104,
+        "resident_bytes": 548265984,
+        "lifetime_peak_resident_bytes": 936845312
+      }
+    },
+    {
+      "round": 2,
+      "assertions": 36,
+      "catch_seed": 3311617577,
+      "patches": 3,
+      "connections": 2,
+      "cycle": false,
+      "nonconforming_contacts": 1,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "rows": 384,
+      "columns": 442,
+      "nonzeros": 13088,
+      "rank": 144,
+      "lower_terms": 2636,
+      "upper_terms": 10661,
+      "pivot_capacity": 384,
+      "work_row_capacity": 442,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 22225564700,
+      "exact_factor_capacity_accepted": 13297,
+      "one_less_factor_capacity_rejected": 13296,
+      "one_less_charged_bytes": 39395272,
+      "initial_resident_bytes": 6258688,
+      "geometry": {
+        "nanoseconds": 2101241400,
+        "charged_bytes": 1403958944,
+        "resident_bytes": 635564032,
+        "lifetime_peak_resident_bytes": 936841216
+      },
+      "traces": {
+        "nanoseconds": 217765300,
+        "charged_bytes": 33696472,
+        "resident_bytes": 651177984,
+        "lifetime_peak_resident_bytes": 936841216
+      },
+      "aggregate": {
+        "nanoseconds": 12583000,
+        "charged_bytes": 2037256,
+        "resident_bytes": 654675968,
+        "lifetime_peak_resident_bytes": 936841216
+      },
+      "chart": {
+        "nanoseconds": 22225650800,
+        "charged_bytes": 43876104,
+        "resident_bytes": 683294720,
+        "lifetime_peak_resident_bytes": 936841216
+      }
+    },
+    {
+      "round": 2,
+      "assertions": 54,
+      "catch_seed": 121808271,
+      "patches": 4,
+      "connections": 4,
+      "cycle": true,
+      "nonconforming_contacts": 2,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ],
+        [
+          2,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          2
+        ],
+        [
+          4,
+          2,
+          4
+        ]
+      ],
+      "rows": 672,
+      "columns": 551,
+      "nonzeros": 28116,
+      "rank": 248,
+      "lower_terms": 4330,
+      "upper_terms": 19173,
+      "pivot_capacity": 512,
+      "work_row_capacity": 551,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 27503338800,
+      "exact_factor_capacity_accepted": 23503,
+      "one_less_factor_capacity_rejected": 23502,
+      "one_less_charged_bytes": 68801368,
+      "initial_resident_bytes": 6262784,
+      "geometry": {
+        "nanoseconds": 2321100700,
+        "charged_bytes": 1647148952,
+        "resident_bytes": 745480192,
+        "lifetime_peak_resident_bytes": 936861696
+      },
+      "traces": {
+        "nanoseconds": 518977000,
+        "charged_bytes": 69094968,
+        "resident_bytes": 774385664,
+        "lifetime_peak_resident_bytes": 936861696
+      },
+      "aggregate": {
+        "nanoseconds": 29460300,
+        "charged_bytes": 4315912,
+        "resident_bytes": 782340096,
+        "lifetime_peak_resident_bytes": 936861696
+      },
+      "chart": {
+        "nanoseconds": 27503417300,
+        "charged_bytes": 72322328,
+        "resident_bytes": 819204096,
+        "lifetime_peak_resident_bytes": 936861696
+      }
+    },
+    {
+      "round": 3,
+      "assertions": 28,
+      "catch_seed": 1697432006,
+      "patches": 2,
+      "connections": 1,
+      "cycle": false,
+      "nonconforming_contacts": 1,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ]
+      ],
+      "rows": 288,
+      "columns": 333,
+      "nonzeros": 9099,
+      "rank": 107,
+      "lower_terms": 706,
+      "upper_terms": 5449,
+      "pivot_capacity": 288,
+      "work_row_capacity": 333,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 828591000,
+      "exact_factor_capacity_accepted": 6155,
+      "one_less_factor_capacity_rejected": 6154,
+      "one_less_charged_bytes": 11051904,
+      "initial_resident_bytes": 6254592,
+      "geometry": {
+        "nanoseconds": 1767873900,
+        "charged_bytes": 1160769768,
+        "resident_bytes": 526376960,
+        "lifetime_peak_resident_bytes": 936820736
+      },
+      "traces": {
+        "nanoseconds": 148306000,
+        "charged_bytes": 24311920,
+        "resident_bytes": 537497600,
+        "lifetime_peak_resident_bytes": 936820736
+      },
+      "aggregate": {
+        "nanoseconds": 9270300,
+        "charged_bytes": 1424584,
+        "resident_bytes": 539992064,
+        "lifetime_peak_resident_bytes": 936820736
+      },
+      "chart": {
+        "nanoseconds": 828649900,
+        "charged_bytes": 16045104,
+        "resident_bytes": 548253696,
+        "lifetime_peak_resident_bytes": 936820736
+      }
+    },
+    {
+      "round": 3,
+      "assertions": 36,
+      "catch_seed": 1766212741,
+      "patches": 3,
+      "connections": 2,
+      "cycle": false,
+      "nonconforming_contacts": 1,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ],
+        [
+          2,
+          2,
+          2
+        ]
+      ],
+      "rows": 384,
+      "columns": 442,
+      "nonzeros": 13088,
+      "rank": 144,
+      "lower_terms": 2636,
+      "upper_terms": 10661,
+      "pivot_capacity": 384,
+      "work_row_capacity": 442,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 21947058100,
+      "exact_factor_capacity_accepted": 13297,
+      "one_less_factor_capacity_rejected": 13296,
+      "one_less_charged_bytes": 39395272,
+      "initial_resident_bytes": 6254592,
+      "geometry": {
+        "nanoseconds": 2177666400,
+        "charged_bytes": 1403958944,
+        "resident_bytes": 635564032,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "traces": {
+        "nanoseconds": 204007500,
+        "charged_bytes": 33696472,
+        "resident_bytes": 651214848,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "aggregate": {
+        "nanoseconds": 13056800,
+        "charged_bytes": 2037256,
+        "resident_bytes": 654716928,
+        "lifetime_peak_resident_bytes": 936873984
+      },
+      "chart": {
+        "nanoseconds": 21947146800,
+        "charged_bytes": 43876104,
+        "resident_bytes": 683171840,
+        "lifetime_peak_resident_bytes": 936873984
+      }
+    },
+    {
+      "round": 3,
+      "assertions": 54,
+      "catch_seed": 735763662,
+      "patches": 4,
+      "connections": 4,
+      "cycle": true,
+      "nonconforming_contacts": 2,
+      "edge_counts": [
+        [
+          2,
+          4,
+          4
+        ],
+        [
+          2,
+          2,
+          2
+        ],
+        [
+          2,
+          2,
+          2
+        ],
+        [
+          4,
+          2,
+          4
+        ]
+      ],
+      "rows": 672,
+      "columns": 551,
+      "nonzeros": 28116,
+      "rank": 248,
+      "lower_terms": 4330,
+      "upper_terms": 19173,
+      "pivot_capacity": 512,
+      "work_row_capacity": 551,
+      "factor_term_capacity": 65000,
+      "internal_chart_nanoseconds": 26937896500,
+      "exact_factor_capacity_accepted": 23503,
+      "one_less_factor_capacity_rejected": 23502,
+      "one_less_charged_bytes": 68801368,
+      "initial_resident_bytes": 6258688,
+      "geometry": {
+        "nanoseconds": 2284489700,
+        "charged_bytes": 1647148952,
+        "resident_bytes": 744738816,
+        "lifetime_peak_resident_bytes": 936845312
+      },
+      "traces": {
+        "nanoseconds": 451878700,
+        "charged_bytes": 69094968,
+        "resident_bytes": 774316032,
+        "lifetime_peak_resident_bytes": 936845312
+      },
+      "aggregate": {
+        "nanoseconds": 27779300,
+        "charged_bytes": 4315912,
+        "resident_bytes": 782258176,
+        "lifetime_peak_resident_bytes": 936845312
+      },
+      "chart": {
+        "nanoseconds": 26937958700,
+        "charged_bytes": 72322328,
+        "resident_bytes": 819089408,
+        "lifetime_peak_resident_bytes": 936845312
+      }
+    }
+  ],
+  "reductions": {
+    "2": {
+      "rows": 288,
+      "columns": 333,
+      "nonzeros": 9099,
+      "rank": 107,
+      "lower_terms": 706,
+      "upper_terms": 5449,
+      "pivot_capacity": 288,
+      "work_row_capacity": 333,
+      "factor_term_capacity": 65000,
+      "exact_factor_capacity_accepted": 6155,
+      "one_less_factor_capacity_rejected": 6154,
+      "geometry": {
+        "nanoseconds_min": 1669448400,
+        "nanoseconds_median": 1767873900,
+        "nanoseconds_max": 1924384300,
+        "charged_bytes": 1160769768,
+        "resident_bytes_max": 526794752,
+        "lifetime_peak_resident_bytes_max": 936845312
+      },
+      "traces": {
+        "nanoseconds_min": 148306000,
+        "nanoseconds_median": 170085200,
+        "nanoseconds_max": 174790900,
+        "charged_bytes": 24311920,
+        "resident_bytes_max": 537522176,
+        "lifetime_peak_resident_bytes_max": 936845312
+      },
+      "aggregate": {
+        "nanoseconds_min": 9230300,
+        "nanoseconds_median": 9270300,
+        "nanoseconds_max": 9675200,
+        "charged_bytes": 1424584,
+        "resident_bytes_max": 540012544,
+        "lifetime_peak_resident_bytes_max": 936845312
+      },
+      "chart": {
+        "nanoseconds_min": 828649900,
+        "nanoseconds_median": 895351000,
+        "nanoseconds_max": 972381900,
+        "charged_bytes": 16045104,
+        "resident_bytes_max": 548274176,
+        "lifetime_peak_resident_bytes_max": 936845312
+      },
+      "nonconforming_contacts": 1,
+      "one_less_charged_bytes": 11051904
+    },
+    "3": {
+      "rows": 384,
+      "columns": 442,
+      "nonzeros": 13088,
+      "rank": 144,
+      "lower_terms": 2636,
+      "upper_terms": 10661,
+      "pivot_capacity": 384,
+      "work_row_capacity": 442,
+      "factor_term_capacity": 65000,
+      "exact_factor_capacity_accepted": 13297,
+      "one_less_factor_capacity_rejected": 13296,
+      "geometry": {
+        "nanoseconds_min": 2101241400,
+        "nanoseconds_median": 2177666400,
+        "nanoseconds_max": 2218671400,
+        "charged_bytes": 1403958944,
+        "resident_bytes_max": 635568128,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "traces": {
+        "nanoseconds_min": 194494500,
+        "nanoseconds_median": 204007500,
+        "nanoseconds_max": 217765300,
+        "charged_bytes": 33696472,
+        "resident_bytes_max": 651214848,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "aggregate": {
+        "nanoseconds_min": 12583000,
+        "nanoseconds_median": 13056800,
+        "nanoseconds_max": 13076500,
+        "charged_bytes": 2037256,
+        "resident_bytes_max": 654716928,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "chart": {
+        "nanoseconds_min": 21947146800,
+        "nanoseconds_median": 21994040900,
+        "nanoseconds_max": 22225650800,
+        "charged_bytes": 43876104,
+        "resident_bytes_max": 683356160,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "nonconforming_contacts": 1,
+      "one_less_charged_bytes": 39395272
+    },
+    "4": {
+      "rows": 672,
+      "columns": 551,
+      "nonzeros": 28116,
+      "rank": 248,
+      "lower_terms": 4330,
+      "upper_terms": 19173,
+      "pivot_capacity": 512,
+      "work_row_capacity": 551,
+      "factor_term_capacity": 65000,
+      "exact_factor_capacity_accepted": 23503,
+      "one_less_factor_capacity_rejected": 23502,
+      "geometry": {
+        "nanoseconds_min": 2134788200,
+        "nanoseconds_median": 2284489700,
+        "nanoseconds_max": 2321100700,
+        "charged_bytes": 1647148952,
+        "resident_bytes_max": 745480192,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "traces": {
+        "nanoseconds_min": 421465400,
+        "nanoseconds_median": 451878700,
+        "nanoseconds_max": 518977000,
+        "charged_bytes": 69094968,
+        "resident_bytes_max": 774422528,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "aggregate": {
+        "nanoseconds_min": 27779300,
+        "nanoseconds_median": 28025500,
+        "nanoseconds_max": 29460300,
+        "charged_bytes": 4315912,
+        "resident_bytes_max": 782364672,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "chart": {
+        "nanoseconds_min": 26327610400,
+        "nanoseconds_median": 26937958700,
+        "nanoseconds_max": 27503417300,
+        "charged_bytes": 72322328,
+        "resident_bytes_max": 819204096,
+        "lifetime_peak_resident_bytes_max": 936873984
+      },
+      "nonconforming_contacts": 2,
+      "one_less_charged_bytes": 68801368
+    }
+  }
+}

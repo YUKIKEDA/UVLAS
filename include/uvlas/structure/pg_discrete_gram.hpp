@@ -1,6 +1,7 @@
 #pragma once
 
 #include <uvlas/structure/pg_conditioning.hpp>
+#include <variant>
 
 namespace uvlas::structure {
 
@@ -9,6 +10,17 @@ namespace uvlas::structure {
 struct PgDiscreteVolumePoint {
     PgReferenceVolumePoint point;
     const ExactRational& weight;
+};
+
+/// One positive node of a normalized unit-interval rule.
+struct PgLineQuadratureNode {
+    const ExactRational& coordinate;
+    const ExactRational& weight;
+};
+
+/// Tensor factors on [0,1]. The triangle map is (u,(1-u)*v).
+struct PgVolumeProductRule {
+    std::span<const PgLineQuadratureNode> radial, transverse, depth;
 };
 
 /// Exact immutable snapshot supporting the finite-rule qualification.
@@ -74,6 +86,13 @@ public:
     prepare(PgReferenceBasis&&, std::span<const PgDiscreteVolumePoint>, PgDiscreteGramGrid,
             const PgDiscreteGramLimits&, core::Workspace&, core::ResourcePlan&) noexcept;
 
+    /// Map positive interior tensor nodes into every owned volume in partition order.
+    /// The factors each sum to one, with radial first moment one half.
+    /// The resulting certificate applies to the mapped finite rule.
+    [[nodiscard]] static core::Result<PgDiscreteGram>
+    prepare_product(PgReferenceBasis&&, PgVolumeProductRule, PgDiscreteGramGrid,
+                    const PgDiscreteGramLimits&, core::Workspace&, core::ResourcePlan&) noexcept;
+
     [[nodiscard]] core::Result<PgDiscreteGramEnclosure> enclosure() const& noexcept;
     [[nodiscard]] core::Result<PgDiscreteGramEnclosure> enclosure() const&& = delete;
     [[nodiscard]] std::span<const PgOwnedDiscreteVolumePoint> rule() const& noexcept {
@@ -91,6 +110,11 @@ public:
                          core::ResourcePlan&) && noexcept;
 
 private:
+    using RuleInput = std::variant<std::span<const PgDiscreteVolumePoint>, PgVolumeProductRule>;
+    [[nodiscard]] static core::Result<PgDiscreteGram>
+    prepare_rule(PgReferenceBasis&&, RuleInput, PgDiscreteGramGrid, const PgDiscreteGramLimits&,
+                 core::Workspace&, core::ResourcePlan&) noexcept;
+
     PgDiscreteGram(PgReferenceBasis&&, core::PlannedBuffer<PgGramEntry>, std::uint32_t,
                    core::PlannedBuffer<PgOwnedDiscreteVolumePoint>, PgDiscreteGramInfo) noexcept;
 

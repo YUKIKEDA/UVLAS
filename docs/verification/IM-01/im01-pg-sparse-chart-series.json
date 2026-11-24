@@ -1,0 +1,47 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-sparse-chart-series",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-03",
+    "N4-04",
+    "N4-08"
+  ],
+  "package": "IM-01",
+  "source_commit": "df173fe0a8c7b50ee1b20a7cb9594f606928948d",
+  "date": "2026-11-24",
+  "claimed_state": "非整合接続と閉路を含む実PGの限定系列で、固定疎因子の準備時間、保持項、容量等号と1項不足、同じ因子の位置復元と転置を計測した。",
+  "environment": {
+    "os": "Windows 11 26H2 (10.0.26300.9974)",
+    "cpu": "13th Gen Intel(R) Core(TM) i5-13400F",
+    "physical_cores": 10,
+    "logical_cpus": 16,
+    "assigned_logical_cpu": 2,
+    "installed_ram_bytes": 51343966208,
+    "compiler": "MSVC 19.51.36260 x64",
+    "boost": "1.92.0",
+    "catch2": "3.16.1",
+    "build": "CMake/Ninja Multi-Config Release",
+    "flags": "/O2 /fp:strict /DNDEBUG"
+  },
+  "preparation_runs_per_case": 3,
+  "reuse_runs_per_case": 1,
+  "performance_acceptance": "not_evaluated",
+  "sources": {
+    "include/uvlas/structure/pg_sparse_chart.hpp": "3b84772247707611b84e7e8697bc6da9cf8b4e956c02cfcb0a141aeb7ca34a34",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "src/structure/pg_global_constraints.cpp": "f9f519952872f59d2d1a57d03fa8c65057baf8649b1b27f64814b66e0cab921c",
+    "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
+    "src/structure/exact_polynomial.cpp": "bcb9bc521ddbef820b94286065ae5807fe55c51439984ca281c471c159706017",
+    "tests/structure/pg_conditioning_test_support.hpp": "6518becda7ae6db712a005924de2f88cc02f5ee95c5742ae63e36bf7e88737d4",
+    "tests/structure/pg_partition_test_support.hpp": "33246f600d8b6d95492b35b9cf3b4ee2431296cc2aa73c03e3c538f84e2ba79b",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-sparse-chart-series.md": "ccb7a7083ed292dd2cb508afbef33fa3a2a0e9f591b26d555b73655896dea277",
+    "docs/verification/IM-01/pg-sparse-chart-series/result.json": "9a14db55a4e5e4ed0d18956a227a7c9cdf3649fa505d373755b72def03082968",
+    "docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt": "78ef8a8e65259b473d0201efe94b7b22fa3d0c2b953a033434310aea34f3f384"
+  }
+}
