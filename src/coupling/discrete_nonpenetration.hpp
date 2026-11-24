@@ -5,10 +5,6 @@
 
 #include <uvlas/numerics/linear_solve.hpp>
 
-namespace uvlas::aero::detail::p1 {
-struct Interval;
-}
-
 namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
 using ExplicitCollocationTangents = std::array<NonpenetrationVector, 2>;
@@ -197,6 +193,8 @@ struct CirculationResidualRow {
     bool includes_wake_quadrature{};
 };
 
+struct NativeCirculationRows;
+
 /// Own both the LU-qualified retained words and the independent native residual
 /// check. No physical mapping or continuous wake-integral accuracy is inferred.
 class DiscreteCirculation {
@@ -228,13 +226,13 @@ private:
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
                         std::optional<aero::detail::P1ActionValue>,
-                        core::PlannedBuffer<aero::detail::p1::Interval>,
+                        core::PlannedBuffer<NativeCirculationRows>,
                         aero::detail::PreparedTopologyOwner, std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
     std::optional<aero::detail::P1ActionValue> geometry_owner_;
-    core::PlannedBuffer<aero::detail::p1::Interval> influence_;
+    core::PlannedBuffer<NativeCirculationRows> operator_rows_;
     aero::detail::PreparedTopologyOwner source_;
     std::uint64_t steps_;
 };
@@ -243,7 +241,7 @@ private:
 /// solution and its dense native coefficients are only the witness's comparison data.
 struct CirculationRowReplay {
     std::size_t rows, coefficients;
-    std::uint64_t replay_row_bytes, retained_dense_bytes, allocated_bytes, used_steps;
+    std::uint64_t replay_row_bytes, reference_dense_bytes, allocated_bytes, used_steps;
 };
 
 [[nodiscard]] core::Result<CirculationRowReplay> verify_discrete_circulation_row_replay(
@@ -315,6 +313,7 @@ private:
 /// transpose has distinct matrix and scale generations and its own dual layout IDs.
 /// Reusing the primal scale generation requires its certified scale values and units.
 /// rhs_absolute uses the RHS's units and matrix_absolute uses 1/m in both senses.
+/// max_steps covers native row preparation, projection, solve and original residual.
 [[nodiscard]] core::Result<DiscreteCirculationLinearization>
 solve_discrete_circulation_linearization(const DiscreteCirculation&, CirculationSense,
                                          std::span<const CirculationLinearRhs>,

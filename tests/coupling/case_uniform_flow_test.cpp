@@ -1884,7 +1884,8 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         reject(solved.row(1), core::FailureCode::InvalidInput);
         const std::array tangent_rhs{cf::CirculationLinearRhs{row.face, a::SingleWord{.125}}};
         const auto tangent = take(cf::solve_discrete_circulation_linearization(
-            solved, cf::CirculationSense::Tangent, tangent_rhs, request, 100000, memory));
+            solved, cf::CirculationSense::Tangent, tangent_rhs, request, solve_limits.steps,
+            memory));
         const Rat expected_tangent{Big{"167540106538491744036640792288003354"},
                                    Big{"1000000000000000000000000000000000000"}};
         CHECK(abs(solution_word(tangent.solution(), 0) - expected_tangent) <= rational_word(1e-15));
@@ -3081,13 +3082,14 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     };
     const auto first = collocate(a::QueryId{1}, {.75, .5, 0.});
     const auto second = collocate(a::QueryId{2}, {.625, 2.375, 0.});
-    const auto rows = [&](const a::ResolvedQuery& second_query) {
+    const auto rows = [&](const a::ResolvedQuery& first_query,
+                          const a::ResolvedQuery& second_query) {
         const std::array frame{coordinates(1, 0, 0), coordinates(0, 1, 0)};
         // The input may arrive in a different order than the qualified physical face order.
         return std::array{
             cf::DiscreteCollocation{a::FacetId{202}, second_query, frame, coordinates(0, 0, .75),
                                     a::SingleWord{9}, a::SingleWord{0}},
-            cf::DiscreteCollocation{a::FacetId{200}, first, frame, coordinates(0, 0, .5),
+            cf::DiscreteCollocation{a::FacetId{200}, first_query, frame, coordinates(0, 0, .5),
                                     a::SingleWord{7}, a::SingleWord{0}}};
     };
     a::SharedP1Workspace shared;
@@ -3110,8 +3112,16 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
                             circulation_context(geometry.context())};
     const auto request = circulation_request(scales, 2, ls::Norm::L2);
     const auto solve = [&](const a::ResolvedQuery& query) {
-        const auto collocations = rows(query);
-        const cf::DiscreteNonpenetrationInput input{contact,
+        const auto qualified = take_global(contact.retain_checked(memory));
+        const auto fresh_query = [&](const a::ResolvedQuery& original) {
+            return test_geometry::take(a::resolve_query(
+                geometry, test_geometry::take(original.definition()), geometry.context(),
+                test_geometry::limits(), *geometry_work, memory));
+        };
+        const auto owned_first = fresh_query(first);
+        const auto owned_second = fresh_query(query);
+        const auto collocations = rows(owned_first, owned_second);
+        const cf::DiscreteNonpenetrationInput input{qualified,
                                                     collocations,
                                                     {},
                                                     {core::AcceptedStateId{2}, {}},
@@ -3135,7 +3145,7 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
         residual_small(original.original_residual, rational_word(1e-13) * residual_scales[i]);
     }
 
-    constexpr std::uint64_t linearization_steps = 100000;
+    const auto linearization_steps = solve_limits.steps;
     std::array forcing{
         cf::CirculationLinearRhs{fixture.faces[0].id, a::DoubleWord{-.125, 0x1p-57}},
         cf::CirculationLinearRhs{fixture.faces[1].id, a::DoubleWord{.1875, -0x1p-58}}};
@@ -3244,6 +3254,11 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
                solved, tangent_sense, forcing, tangent_request, linearization_steps, no_space),
            core::FailureCode::ResourceExceeded);
 
+    // There are no live input row/query objects from solve() here. The old
+    // algebra-only cap does not admit exact row replay from the owned input.
+    reject(cf::solve_discrete_circulation_linearization(solved, tangent_sense, forcing,
+                                                        tangent_request, 100000, memory),
+           core::FailureCode::ResourceExceeded);
     const auto tangent = take(linearize(tangent_sense, forcing, tangent_request));
     const auto transpose = take(linearize(transpose_sense, seed, transpose_request));
     CHECK(tangent.sense() == tangent_sense);
@@ -3294,7 +3309,7 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     }
 
     // A uniform-velocity direction is shared across these two nonsymmetric rows.
-    const auto two_collocations = rows(second);
+    const auto two_collocations = rows(first, second);
     const cf::DiscreteNonpenetrationInput pullback_input{
         contact, two_collocations,           {}, {core::AcceptedStateId{2}, {}}, {7, 11},
         stamp,   p::RequestedSide::Automatic};

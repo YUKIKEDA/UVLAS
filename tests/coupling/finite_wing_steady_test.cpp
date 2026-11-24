@@ -1376,11 +1376,11 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             CHECK(evidence.rows == count);
             CHECK(evidence.coefficients == count * count);
             CHECK(evidence.replay_row_bytes > 0);
-            CHECK(evidence.retained_dense_bytes == evidence.replay_row_bytes * count);
+            CHECK(evidence.reference_dense_bytes == evidence.replay_row_bytes * count);
             CHECK(evidence.allocated_bytes == replay_memory.allocated_bytes() - contact_bytes);
             CHECK(evidence.used_steps > 0);
             std::cout << "Native coefficient replay, row bytes=" << evidence.replay_row_bytes
-                      << ", dense bytes=" << evidence.retained_dense_bytes
+                      << ", dense bytes=" << evidence.reference_dense_bytes
                       << ", cumulative replay payload bytes=" << evidence.allocated_bytes
                       << ", used steps=" << evidence.used_steps << '\n';
 
