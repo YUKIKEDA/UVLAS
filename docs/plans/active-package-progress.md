@@ -64,12 +64,12 @@
 | 励振と既知入力 | 実装中 | 型付きSIケースから突風なしの一様流を準備し、定数・多項式・PCHIPの値と時間微分を評価する。指定した成分別の誤差予算でBinary64／TwoWordに投影した値を認定できる。参照snapshot、他の励振、J1への接続が残る |
 | parametric入力とprepare | 残 | 型付きcaseを共通のRawModelへ渡す。物理準備には対応するIM-01／02／03の成果が必要 |
 | Nastran | 残 | schema・SI・snapshotを入力に、採用カード、座標系、sidecarを解析する |
-| Gmsh | 一部実装 | 検査済みのスナップショットからMSH 4.1 ASCIIを読み、疎な節点タグ、所属、物理名、向きと元の座標字句を保持する。sidecarの型と物理モデルへの対応が残る。 [入力契約](../specs/foundation/gmsh-mesh-input-contract.md) |
+| Gmsh | 一部実装 | 検査済みのスナップショットからMSH 4.1 ASCIIを読み、疎な節点タグ、所属、物理名、向きと元の座標字句を保持する。CLIは同じバイト列からメッシュ本体に子参照がないことを確かめる。sidecarの型と物理モデルへの対応が残る。 [入力契約](../specs/foundation/gmsh-mesh-input-contract.md) |
 | 共通参照への変換 | 残 | 外部面を共通の曲面・厚さ・接続へ変換し、質量・仕事などの誤差を評価する。対応するIM-01／02の成果が必要 |
 | 結果と診断 | 実装中 | 状態と来歴のJSON、確定観測のCSV、適格な可視化標本のVTU・PVDを内部で生成できる。VTU・PVDは層界面の両側と再始動区間を保つ。型検査・SI変換済みケースから、元入力、保持値、誤差半径、現時点で解決した既定値を出力し、その指紋を来歴に結び付けられる。物理回復から可視化標本を作り、物理準備で確定する設定とともに実行結果の保存へつなぐ工程が残る。 [解決済みケース](../verification/IM-06/resolved-case-document.md)・[観測CSV](../verification/IM-06/observation-csv.md)・[VTU・PVD](../verification/IM-06/visualization-series.md) |
 | checkpoint容器 | 完了 | 型付きチャンクと指紋からマニフェストを作り、既存番号を保持したまま確定する。中断した保存を除外し、型、長さ、SHA-256、指紋が一致する最新番号を復元する。 [マニフェストと確定ディレクトリの検証](../verification/IM-06/checkpoint-manifest.md) |
 | 実状態とresume | 残 | 全BDF2ステンシル、受理済みの微分・荷重・後流履歴、探索状態などを保存する。IM-04／05の実状態を使い、同版・同環境での再開結果のビット一致と非互換の拒否を確認する |
-| CLI | 実装中 | `validate` で外部ファイル不要のケースの全スキーマと参照を検査できる。外部ファイルはマニフェスト直下の取得と照合を行う。形式別の子依存の検査、prepare／run／resume／inspect、実行終了時の状態記録が残る。 [開発用CLI](../build.md#開発用cliの終了規約)・[検証](../verification/IM-06/im06-cli-case-validation.json) |
+| CLI | 実装中 | `validate` は全スキーマと参照を検査する。外部ファイルはマニフェスト直下の取得と SHA-256 の照合を行い、MSH 4.1 ASCII は節とタグも検査する。未対応の宣言は位置を診断する。形式別の子依存の検査、prepare／run／resume／inspect、実行終了時の状態記録が残る。 [開発用CLI](../build.md#開発用cliの終了規約)・[検証](../verification/IM-06/im06-cli-case-validation.json) |
 | Python | 残 | 同じC++処理にPythonの辞書・ファイル・実行・再開と所有権を接続する |
 | ランタイムと新規環境 | 基盤あり | CLIとbindingの基盤は [IM-00](im00-package-acceptance.md) にある。実際に配布するCLI／wheelの依存・ABIと、開発環境に依存しない導入・実行を確認する |
 | 終了審査 | 残 | V-USE・V-STATEで3入力経路とCLI／Pythonの物理結果、両OSの導入・中断・再開を照合する |

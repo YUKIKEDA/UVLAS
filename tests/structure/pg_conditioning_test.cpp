@@ -1,10 +1,15 @@
 #include "exact_polynomial_detail.hpp"
 #include "pg_partition_test_support.hpp"
 #include "pg_rank_storage.hpp"
+#include "pg_reference_projection.hpp"
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
+#include <bit>
+#include <cmath>
+#include <limits>
 #include <uvlas/structure/pg_flat_gram.hpp>
+#include <uvlas/structure/pg_volume_mass_reference.hpp>
 
 namespace {
 using namespace uvlas;
@@ -556,6 +561,145 @@ void check_reference_points(Fixture& f, const PgConditioningCertificate& certifi
     check_reference_batch(certificate, terms, transform, partition, queries);
 }
 
+Q independent_double(double value) {
+    const auto bits = std::bit_cast<std::uint64_t>(value);
+    const auto biased = static_cast<unsigned>((bits >> 52U) & 0x7ffU);
+    REQUIRE(biased != 0x7ffU);
+    const auto fraction = bits & 0x000fffffffffffffULL;
+    const auto significand = biased == 0 ? fraction : fraction | (1ULL << 52U);
+    const auto exponent = biased == 0 ? -1074 : static_cast<int>(biased) - 1075;
+    I n{significand};
+    if ((bits >> 63U) != 0)
+        n = -n;
+    const auto shift = static_cast<unsigned>(std::abs(exponent));
+    return exponent >= 0 ? Q{n * (I{1} << shift)} : Q{n} / (I{1} << shift);
+}
+
+void check_volume_mass_projection(Fixture& f, PgConditioningCertificate& certificate,
+                                  const std::vector<std::vector<Term>>& terms,
+                                  std::span<const ExactRational> transform,
+                                  PgVolumeMassProjection projection, bool negative_controls) {
+    const auto* basis = take(certificate.reference_basis());
+    const auto& partition = take(basis->source()).partition;
+    const auto volumes = take(partition.volumes());
+    const auto vertices = take(partition.vertices());
+    const auto pieces = take(partition.pieces());
+    const auto triangles = take(partition.triangles());
+    const auto layers = take(partition.layers());
+    const auto first = volumes.front();
+    const auto same_triangle = std::ranges::find_if(volumes, [&](const auto& x) {
+        return x.triangle == first.triangle && x.layer != first.layer;
+    });
+    REQUIRE(same_triangle != volumes.end());
+    const auto second_index = static_cast<core::Index>(same_triangle - volumes.begin());
+    const auto& triangle = triangles[static_cast<std::size_t>(first.triangle)];
+    const auto cell = pieces[static_cast<std::size_t>(triangle.piece)].cell;
+    const auto third = f.r("1", "3");
+    const std::array queries{PgReferenceVolumePoint{second_index, third, third, third},
+                             PgReferenceVolumePoint{0, third, third, third}};
+    const auto request_limits = query_limits();
+    const auto prepare = [&](const PgVolumeMassProjection& policy, const PgReferenceLimits& caps,
+                             core::ResourcePlan& plan,
+                             std::span<const PgReferenceVolumePoint> points) {
+        return PgVolumeMassReference::prepare(std::move(certificate), points, policy, caps, plan);
+    };
+    if (negative_controls) {
+        core::ResourcePlan none{0};
+        auto invalid = projection;
+        invalid.representation = static_cast<core::Precision>(255);
+        check_failure(prepare(invalid, request_limits, none, queries),
+                      core::FailureCode::PrecisionUnsupported);
+        invalid = projection;
+        invalid.maximum_shape_error = -0x1p-1074;
+        check_failure(prepare(invalid, request_limits, none, queries),
+                      core::FailureCode::InvalidInput);
+        invalid.maximum_shape_error = std::numeric_limits<double>::infinity();
+        check_failure(prepare(invalid, request_limits, none, queries),
+                      core::FailureCode::Nonfinite);
+        auto stopped = request_limits;
+        stopped.cancellation = requested_stop_token();
+        check_failure(prepare(projection, stopped, none, queries), core::FailureCode::Cancelled);
+        check_failure(prepare(projection, request_limits, none, queries),
+                      core::FailureCode::ResourceExceeded);
+        CHECK(none.allocated_bytes() == 0);
+        auto zero_work = request_limits;
+        zero_work.maximum_partition_visits = 0;
+        core::ResourcePlan work_reject{profile};
+        check_failure(prepare(projection, zero_work, work_reject, queries),
+                      core::FailureCode::ResourceExceeded);
+        CHECK(work_reject.allocated_bytes() == 0);
+        auto strict = projection;
+        strict.maximum_volume_jacobian_error_metres_cubed = 0;
+        core::ResourcePlan reject{profile};
+        check_failure(prepare(strict, request_limits, reject, queries),
+                      core::FailureCode::PrecisionUnresolved);
+        const std::array invalid_query{queries.front(),
+                                       PgReferenceVolumePoint{-1, third, third, third}};
+        check_failure(prepare(projection, request_limits, reject, invalid_query),
+                      core::FailureCode::InvalidInput);
+        REQUIRE(certificate.info());
+    }
+    // Calculate all oracle coordinates before the certificate owner is transferred.
+    Q s{}, t{};
+    for (const auto vertex : triangle.vertices) {
+        const auto& value = vertices[static_cast<std::size_t>(vertex)];
+        s += q(value.s) / 3;
+        t += q(value.t) / 3;
+    }
+    const std::array selected_layers{static_cast<std::size_t>(same_triangle->layer),
+                                     static_cast<std::size_t>(first.layer)};
+    const Q chart_area = q(triangle.twice_area);
+    std::array<Q, 2> expected_jacobian, expected_zeta;
+    std::array<core::LayerId, 2> expected_layer_id{core::LayerId{0}, core::LayerId{0}};
+    for (std::size_t row = 0; row < queries.size(); ++row) {
+        const auto& layer = layers[selected_layers[row]];
+        const Q thickness = q(layer.upper) - q(layer.lower);
+        expected_jacobian[row] = chart_area * thickness;
+        expected_zeta[row] = q(layer.lower) + thickness / 3;
+        expected_layer_id[row] = layer.id;
+    }
+    const auto result = [&] {
+        core::ResourcePlan evaluation{profile};
+        auto retained = take(prepare(projection, request_limits, evaluation, queries));
+        CHECK(retained.call_info().allocated_owned_payload_bytes == evaluation.allocated_bytes());
+        return retained;
+    }();
+    CHECK_FALSE(certificate.info());
+    CHECK(take(result.conditioning().info()).rank == terms.size());
+    REQUIRE(result.column_count() == terms.size());
+    REQUIRE(result.points().size() == queries.size());
+    CHECK(result.projection().representation == projection.representation);
+    const auto words = result.words();
+    const bool two_word = projection.representation == core::Precision::TwoWord;
+    const auto stride = terms.size() + 1;
+    REQUIRE(words.high.size() == queries.size() * stride);
+    REQUIRE(words.low.size() == (two_word ? words.high.size() : 0));
+    const auto stored = [&](std::size_t i) -> Q {
+        const auto high = independent_double(words.high[i]);
+        return two_word ? high + independent_double(words.low[i]) : high;
+    };
+    const auto budget_n = independent_double(projection.maximum_shape_error);
+    const auto budget_j = independent_double(projection.maximum_volume_jacobian_error_metres_cubed);
+    for (std::size_t row = 0; row < queries.size(); ++row) {
+        const auto& point = result.points()[row];
+        CHECK(point.cell == cell);
+        CHECK(point.partition_record == queries[row].volume);
+        CHECK(point.layer == expected_layer_id[row]);
+        CHECK(point.identity == result.points().front().identity);
+        CHECK(abs(stored(row * stride) - expected_jacobian[row]) <= budget_j);
+        for (std::size_t column = 0; column < terms.size(); ++column) {
+            CAPTURE(row, column);
+            const auto expected =
+                conditioned_jet(terms, transform, column, cell, s, t, expected_zeta[row])[0];
+            CHECK(abs(stored(row * stride + column + 1) - expected) <= budget_n);
+        }
+    }
+    if (two_word) {
+        CHECK(std::ranges::any_of(words.low, [](double low) { return low != 0; }));
+        CHECK(abs(independent_double(words.high.front()) - expected_jacobian.front()) > budget_j);
+    }
+}
+
 } // namespace
 
 TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory fields",
@@ -612,7 +756,7 @@ TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory
     check_failure(certify_owned(supplied, refused), core::FailureCode::ResourceExceeded);
     REQUIRE(supplied.enclosure());
     const auto prior = plan.allocated_bytes();
-    const auto certificate = take(certify_owned(supplied, plan));
+    auto certificate = take(certify_owned(supplied, plan));
     const auto info = take(certificate.info());
     CHECK(info.rank == count);
     CHECK(info.payload_bytes == plan.allocated_bytes() - prior);
@@ -643,6 +787,12 @@ TEST_CASE("PG full flat Gram certifies the transform and preserves all mandatory
             CHECK(reconstructed == original_required[t * count + i]);
         }
     }
+    check_volume_mass_projection(f, certificate, terms, transform,
+                                 {core::Precision::TwoWord, 0x1p-90, 0x1p-100}, true);
+    auto second = flat_basis(ws, plan);
+    auto binary = take(verify(second, enclosure, transform, {profile, steps, {}}, ws, plan));
+    check_volume_mass_projection(f, binary, terms, transform,
+                                 {core::Precision::Binary64, 0x1p-43, 0x1p-53}, false);
 }
 
 TEST_CASE("PG conditioning rejects row-sum excess and honors exact work and byte limits",
@@ -829,4 +979,57 @@ TEST_CASE("PG LCM meters both limbs of its division before the final product",
     const auto [short_division, division_used] = attempt(gcd_steps + division_steps - 1);
     check_failure(short_division, core::FailureCode::ResourceExceeded);
     CHECK(division_used == gcd_steps);
+}
+
+TEST_CASE("PG projection rounds the actual exact radical and enforces the requested error",
+          "[SH-D03][N4-02][N4-06][N4-08][negative][verification]") {
+    Fixture f;
+    core::ResourcePlan plan{profile};
+    const auto limits = query_limits();
+    auto math = detail::ReferenceArithmetic{limits, plan};
+    const auto round = [&](const PgReferenceScalar& value, const ExactRational& g, double budget,
+                           core::Precision precision) {
+        return detail::partition_entry([&]() -> core::Result<detail::PgProjectedWord> {
+            const auto tolerance = detail::reference_binary64(math, budget);
+            return detail::pg_project_scalar(math, value, g, tolerance, precision);
+        });
+    };
+    const auto one = f.r("1"), two = f.r("2"), four = f.r("4");
+    const auto radical = PgReferenceScalar{{}, f.r("1")};
+    const auto binary = core::Precision::Binary64;
+    const auto two_word = core::Precision::TwoWord;
+    const auto root = take(round(radical, two, 0x1p-104, two_word));
+    // Independently rounded from a 140 decimal digit evaluation of sqrt(2).
+    CHECK(root.high == 0x1.6a09e667f3bcdp+0);
+    CHECK(root.low == -0x1.bdd3413b26456p-54);
+    check_failure(round(radical, two, 0x1p-104, binary), core::FailureCode::PrecisionUnresolved);
+    const auto zero = take(round({f.r("-2"), f.r("1")}, four, 0, two_word));
+    CHECK(zero.high == 0);
+    CHECK(zero.low == 0);
+
+    const auto tie = PgReferenceScalar{f.r("9007199254740993", "9007199254740992"), {}};
+    const auto at_bound = take(round(tie, one, 0x1p-53, binary));
+    CHECK(at_bound.high == 1);
+    check_failure(round(tie, one, std::nextafter(0x1p-53, 0.0), binary),
+                  core::FailureCode::PrecisionUnresolved);
+    const auto kept = take(round(tie, one, 0, two_word));
+    CHECK(kept.high == 1);
+    CHECK(kept.low == 0x1p-53);
+    const auto negative_tie = PgReferenceScalar{f.r("-9007199254740995", "9007199254740992"), {}};
+    CHECK(take(round(negative_tie, one, 0x1p-53, binary)).high == -0x1.0000000000002p+0);
+
+    const I half_denominator = I{1} << 1075U;
+    const auto neg_half = PgReferenceScalar{rat(f, I{-1}, half_denominator), {}};
+    const auto odd_half = PgReferenceScalar{rat(f, I{3}, half_denominator), {}};
+    CHECK(std::bit_cast<std::uint64_t>(take(round(neg_half, one, 0x1p-1074, binary)).high) ==
+          0x8000000000000000ULL);
+    CHECK(std::bit_cast<std::uint64_t>(take(round(odd_half, one, 0x1p-1074, binary)).high) == 2);
+    check_failure(round(neg_half, one, 0, two_word), core::FailureCode::PrecisionUnresolved);
+
+    const I overflow = (I{1} << 1024U) - (I{1} << 970U);
+    const auto overflow_tie = PgReferenceScalar{rat(f, overflow, I{1}), {}};
+    const auto below_tie = PgReferenceScalar{rat(f, overflow - 1, I{1}), {}};
+    check_failure(round(overflow_tie, one, 0x1p970, binary),
+                  core::FailureCode::PrecisionUnresolved);
+    CHECK(take(round(below_tie, one, 0x1p970, binary)).high == std::numeric_limits<double>::max());
 }

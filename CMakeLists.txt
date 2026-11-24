@@ -65,7 +65,8 @@ target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spec
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
-    src/structure/pg_conditioning.cpp src/structure/pg_flat_gram.cpp)
+    src/structure/pg_conditioning.cpp src/structure/pg_flat_gram.cpp
+    src/structure/pg_volume_mass_reference.cpp)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -119,7 +120,7 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/reference_root_plan.cpp src/io/reference_dependency_walk.cpp src/io/checkpoint_chunk.cpp
     src/io/checkpoint_manifest.cpp src/io/observation_csv.cpp)
 add_library(uvlas_io STATIC ${UVLAS_IO_SOURCES}
-    src/io/reference_input.cpp src/io/reference_root_snapshot.cpp)
+    src/io/reference_input.cpp src/io/reference_root_snapshot.cpp src/io/reference_resolution.cpp)
 target_sources(uvlas_io PRIVATE src/io/result_documents.cpp src/io/resolved_case_document.cpp)
 target_sources(uvlas_io PRIVATE src/io/visualization_series.cpp)
 uvlas_configure_target(uvlas_io)

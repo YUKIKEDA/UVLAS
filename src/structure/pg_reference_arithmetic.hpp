@@ -50,11 +50,11 @@ struct ReferenceArithmetic {
         if (limits.cancellation.stop_requested())
             partition_fail(core::FailureCode::Cancelled);
     }
-    void charge() {
+    void charge(std::uint64_t count = 1) {
         cancel();
-        if (scalar_operations == limits.maximum_scalar_operations)
+        if (count > limits.maximum_scalar_operations - scalar_operations)
             partition_fail(core::FailureCode::ResourceExceeded);
-        ++scalar_operations;
+        scalar_operations += count;
     }
     void admit(std::uint64_t live_rationals = reference_live_rationals) {
         cancel();

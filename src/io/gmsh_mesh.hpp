@@ -17,6 +17,43 @@ struct GmshLimits {
     std::uint64_t work;
 };
 
+// Proof issued after parsing every byte under the adopted dependency-free MSH role.
+// Other root roles, including the separate Gmsh sidecar, have their own contracts.
+class GmshMeshLeaf {
+public:
+    [[nodiscard]] RootSnapshotLocation location() const noexcept {
+        return location_;
+    }
+    [[nodiscard]] SourceDigest digest() const noexcept {
+        return digest_;
+    }
+    [[nodiscard]] std::uint64_t byte_count() const noexcept {
+        return byte_count_;
+    }
+    [[nodiscard]] std::uint64_t work() const noexcept {
+        return work_;
+    }
+
+private:
+    friend core::Result<GmshMeshLeaf> prove_gmsh_mesh_leaf(const AcquiredRootSnapshot&, GmshLimits,
+                                                           core::ResourcePlan&,
+                                                           const std::stop_token&,
+                                                           std::size_t*) noexcept;
+    GmshMeshLeaf(RootSnapshotLocation location, SourceDigest digest, std::uint64_t byte_count,
+                 std::uint64_t work) noexcept
+        : location_(location), digest_(digest), byte_count_(byte_count), work_(work) {}
+    RootSnapshotLocation location_;
+    SourceDigest digest_;
+    std::uint64_t byte_count_;
+    std::uint64_t work_;
+};
+
+// Uses the original immutable snapshot in both parser passes. The temporary mesh records
+// are charged on plan and released before return. Unknown sections never prove a leaf.
+[[nodiscard]] core::Result<GmshMeshLeaf>
+prove_gmsh_mesh_leaf(const AcquiredRootSnapshot&, GmshLimits, core::ResourcePlan&,
+                     const std::stop_token&, std::size_t* failure_offset = nullptr) noexcept;
+
 struct GmshKey {
     std::uint8_t dimension = 0;
     std::int32_t tag = 0;
