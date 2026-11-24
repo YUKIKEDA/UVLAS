@@ -34,7 +34,7 @@ struct GramTerm {
 struct FlatProfile {
     const ExactRational& thickness;
     GramCutLayout cuts;
-    bool variable_thickness;
+    bool variable_thickness = false;
 };
 
 [[nodiscard]] FlatProfile flat_profile(ReferenceArithmetic& math, const PgReferenceSource& source,
