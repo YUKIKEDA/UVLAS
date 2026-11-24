@@ -151,7 +151,7 @@ struct NastranPgFaceBound {
     [[nodiscard]] std::span<const NastranPgBoundCorner> ring() const&& = delete;
 };
 
-struct NastranPgBoundLimits {
+struct ExternalPgBoundLimits {
     ExternalPgLimits region;
     std::uint64_t maximum_directed_work = 0;
 };
@@ -176,7 +176,7 @@ public:
 
     [[nodiscard]] static core::Result<NastranPlanarPgBounds>
     prepare(const structure::PgReferenceGeometry&, const NastranShellCards&, SiLengthUnit,
-            std::span<const ExternalPgFace>, const NastranPgBoundLimits&, core::ResourcePlan&,
+            std::span<const ExternalPgFace>, const ExternalPgBoundLimits&, core::ResourcePlan&,
             std::optional<ExternalPgDiagnostic>* = nullptr) noexcept;
 
     [[nodiscard]] std::optional<NastranPlanarPgBoundView> view() const& noexcept;
@@ -191,6 +191,66 @@ private:
     SiLengthUnit units_;
     structure::PgReferenceIdentity patch_;
     core::PlannedBuffer<NastranPgFaceBound> faces_;
+    structure::PgReferenceCallInfo chart_work_;
+    std::uint64_t directed_work_;
+};
+
+struct GmshPgBoundCorner {
+    std::uint64_t node{};
+    structure::PgPartitionPoint chart;
+    std::array<std::uint64_t, 3> source_bytes{};
+    std::array<structure::ExactRational, 3> position_metres;
+};
+
+struct GmshPgFaceBound {
+    std::uint64_t element{};
+    GmshKey entity;
+    ExternalPgWinding winding = ExternalPgWinding::Forward;
+    std::uint8_t count{};
+    std::array<GmshPgBoundCorner, 4> corners;
+    structure::ExactRational distance_upper_metres;
+    structure::ExactRational normal_chord_upper;
+
+    [[nodiscard]] std::span<const GmshPgBoundCorner> ring() const& noexcept {
+        return std::span{corners}.first(count);
+    }
+    [[nodiscard]] std::span<const GmshPgBoundCorner> ring() const&& = delete;
+};
+
+struct GmshPgBoundView {
+    RootSnapshotLocation source;
+    SourceDigest digest;
+    SiLengthUnit units;
+    structure::PgReferenceIdentity patch;
+    std::span<const GmshPgFaceBound> faces;
+    structure::PgReferenceCallInfo chart_work;
+    std::uint64_t directed_work;
+};
+
+// Bounds distance in metres and oriented unit-normal chord on the complete
+// original triangle or bilinear quad with the declared PG chart interpolation.
+class GmshPgBounds {
+public:
+    GmshPgBounds(GmshPgBounds&&) noexcept = default;
+    GmshPgBounds& operator=(GmshPgBounds&&) = delete;
+
+    [[nodiscard]] static core::Result<GmshPgBounds>
+    prepare(const structure::PgReferenceGeometry&, const GmshMesh&, const GmshSurfaceTopology&,
+            SiLengthUnit, std::span<const ExternalPgFace>, const ExternalPgBoundLimits&,
+            core::ResourcePlan&, std::optional<ExternalPgDiagnostic>* = nullptr) noexcept;
+
+    [[nodiscard]] std::optional<GmshPgBoundView> view() const& noexcept;
+    [[nodiscard]] std::optional<GmshPgBoundView> view() const&& = delete;
+
+private:
+    GmshPgBounds(RootSnapshotLocation, SourceDigest, SiLengthUnit, structure::PgReferenceIdentity,
+                 core::PlannedBuffer<GmshPgFaceBound>&&, structure::PgReferenceCallInfo,
+                 std::uint64_t) noexcept;
+    RootSnapshotLocation source_;
+    SourceDigest digest_;
+    SiLengthUnit units_;
+    structure::PgReferenceIdentity patch_;
+    core::PlannedBuffer<GmshPgFaceBound> faces_;
     structure::PgReferenceCallInfo chart_work_;
     std::uint64_t directed_work_;
 };
