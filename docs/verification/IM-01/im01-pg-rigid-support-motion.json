@@ -1,0 +1,49 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-rigid-support-motion",
+  "package": "IM-01",
+  "ids": [
+    "SH-D05",
+    "SH-D06",
+    "N4-04",
+    "AE-07"
+  ],
+  "date": "2026-11-24",
+  "source_commit": "9f880a3d0665a70eaf32efef99774d6e8957a171",
+  "clock_base_commit": "5cdd35e813c41aca6a715cfcc3f70b3b60f094b4",
+  "claimed_state": "共通時計の剛体ジェットから全厚PG支持の全元行を評価し、全時間適合、左右加速度と元行の反力仕事を検証した。",
+  "checks": {
+    "ctest": "coupling.case_pg_support_motion",
+    "assertions_per_configuration": 6365,
+    "elapsed_seconds": {
+      "msvc_release": 0.71,
+      "msvc_debug": 3.64,
+      "gcc14_asan_ubsan": 7.85
+    },
+    "mutation_base_commit": "19cf63f8f0c311c14b2e2ef5c2b8e1d3a400285b",
+    "mutation": {
+      "change": "omit subtraction of reference origin jet when constructing columns",
+      "mutated_source_sha256": "c96c92b72660f409681884a2b1b5de70ffb035fea7f7a7c60588e65df135cc25",
+      "failure_assertion_index": 20
+    }
+  },
+  "sources": {
+    "docs/specs/structure/pg-global-constraints-contract.md": "727ef7e2c9eb6f710ce2a879e74c0884ce360f09ae04cb9e24649ceab56ef277",
+    "docs/specs/aero/prescribed-rigid-motion-start-contract.md": "e31821bd5ad246a2a99b2edd494b0bd0e17a26fe386fec7a793e8614c7702fb8",
+    "src/coupling/case_motion.cpp": "99588fff4f72d1d0608b8faca31e75be0ec45403fac0781ee0daf59528974058",
+    "src/coupling/case_motion_frame.hpp": "dcce545146e4400c4d91b4b405e78964369b8c2244328308dccf8b6a07147f82",
+    "src/coupling/case_flow_clock.cpp": "b3e7d9f2c26e33a997ca7132f9f6d1cd0dff80f82e052c2043b00ffe827eaaaf",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-rigid-support-motion.md": "276fddd00d2273f27b397b64dd25012f0cf53a132b386ed1bd97c490b27feb5c",
+    "docs/specs/structure/pg-rigid-support-motion-contract.md": "96ed24bdfbc8d7b06f86b245e281391c9a40fcc5662506424310e378584f1520",
+    "include/uvlas/structure/pg_rigid_support_rows.hpp": "6eebf596150452a1c373b217963d86099e6faacd5b34afaa059ac4ea4788a964",
+    "src/structure/pg_rigid_support_rows.cpp": "07ca7ce9da3734343b30dfde7b553474664996598f81d321d044454602d1a645",
+    "src/coupling/case_pg_support_motion.hpp": "7745809d230dee2d6d5265e57da5cad3a79fcf3cda630a476fa0c79ebab89ff4",
+    "src/coupling/case_pg_support_motion.cpp": "9531a15472e76c12e9aee8184ace3bd21bfe79fa6cecaf5ed829b49cc7891291",
+    "tests/coupling/case_pg_support_motion_test.cpp": "58c2bd65d83cb20ecea8befc095a765722ece7c7dfbd79ac0c53cc3257ef5eb8"
+  }
+}
