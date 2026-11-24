@@ -142,25 +142,43 @@ struct BoundRoot {
         return failure(core::FailureCode::InvalidInput);
     }
 
-#if defined(_WIN32) || defined(__linux__)
     const auto& declared = occurrence->original;
-    const RootSnapshotLocation location{bound.parent, declared.source_id, declared.role,
-                                        declared.declaration_node};
-    const auto pointer = declared.declaration_pointer;
+    return acquire_reference_snapshot(
+        bound.origin, source->path,
+        {bound.parent, declared.source_id, declared.role, declared.declaration_node},
+        declared.declared_digest, declared.declaration_pointer, earlier_sources, limits, plan, stop,
+        diagnostic);
+}
+
+} // namespace
+
+core::Result<AcquiredRootSnapshot> acquire_reference_snapshot(
+    const ReferenceInputView& origin, const NormalizedReferencePath& path,
+    RootSnapshotLocation location, const SourceDigest& digest, std::string_view pointer,
+    std::span<const ReferenceFileId> earlier_sources, RootSnapshotLimits limits,
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    RootSnapshotDiagnostic* diagnostic) noexcept {
+    if (cancelled(stop, diagnostic)) {
+        return failure(core::FailureCode::Cancelled);
+    }
+    if (origin.root == nullptr) {
+        mark(diagnostic, RootSnapshotFailure::InvalidSelection);
+        return failure(core::FailureCode::InvalidInput);
+    }
+#if defined(_WIN32) || defined(__linux__)
     const auto reject = [&](core::Failure error, RootSnapshotFailure reason) {
         return describe_failure(error, reason, location, pointer, limits.diagnostic_bytes, plan,
                                 stop, diagnostic);
     };
     const auto acquire = [&]() -> core::Result<ReferenceFileSnapshot> {
-        auto reader = bound.origin.root->open_file(source->path, plan, stop,
-                                                   diagnostic ? &diagnostic->open : nullptr);
+        auto reader =
+            origin.root->open_file(path, plan, stop, diagnostic ? &diagnostic->open : nullptr);
         if (!reader) {
             return reject(reader.error(), RootSnapshotFailure::Open);
         }
         auto snapshot = read_reference_file(
-            *reader, declared.declared_digest, limits.file, plan, stop,
-            diagnostic ? &diagnostic->read : nullptr,
-            {bound.origin.manifest_identity, earlier_sources, limits.maximum_identity_comparisons});
+            *reader, digest, limits.file, plan, stop, diagnostic ? &diagnostic->read : nullptr,
+            {origin.manifest_identity, earlier_sources, limits.maximum_identity_comparisons});
         if (!snapshot) {
             return reject(snapshot.error(), RootSnapshotFailure::Read);
         }
@@ -170,7 +188,6 @@ struct BoundRoot {
     if (!file) {
         return std::unexpected(file.error());
     }
-
     auto owned_pointer = copy_pointer(pointer, plan);
     if (cancelled(stop, diagnostic)) {
         return failure(core::FailureCode::Cancelled);
@@ -180,6 +197,10 @@ struct BoundRoot {
     }
     return AcquiredRootSnapshot{location, std::move(*file), std::move(*owned_pointer)};
 #else
+    static_cast<void>(path);
+    static_cast<void>(location);
+    static_cast<void>(digest);
+    static_cast<void>(pointer);
     static_cast<void>(earlier_sources);
     static_cast<void>(limits);
     static_cast<void>(plan);
@@ -187,8 +208,6 @@ struct BoundRoot {
     return failure(core::FailureCode::Unsupported);
 #endif
 }
-
-} // namespace
 
 core::Result<AcquiredRootSnapshot>
 acquire_root_snapshot(const ReferenceInput& input, const PreparedRootReferences& prepared,
@@ -270,11 +289,29 @@ AcquiredRootReferences::find(const SchemaIdentity& parent, SourceId source, Refe
     return failure(Code::InvalidInput);
 }
 
+RootSnapshotLimits RootInventoryLimits::next_file() const noexcept {
+    return {{std::min(per_source.file.maximum_file_bytes, total_payload_bytes),
+             std::min(per_source.file.maximum_read_bytes, total_read_bytes),
+             std::min(per_source.file.maximum_read_calls, total_read_calls),
+             std::min(per_source.file.maximum_hash_bytes, total_hash_bytes)},
+            std::min(per_source.maximum_identity_comparisons, total_identity_comparisons),
+            per_source.diagnostic_bytes};
+}
+
+void RootInventoryLimits::charge(const ReferenceFileView& file,
+                                 std::uint64_t identity_checks) noexcept {
+    const auto bytes = file.file_info.byte_count;
+    total_payload_bytes -= bytes;
+    total_read_bytes -= bytes + 1;
+    total_read_calls -= file.read_calls;
+    total_hash_bytes -= bytes;
+    total_identity_comparisons -= identity_checks;
+}
+
 core::Result<AcquiredRootReferences>
 acquire_root_references(const ReferenceInput& input, PreparedRootReferences&& prepared,
                         RootInventoryLimits limits, core::ResourcePlan& plan,
-                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic,
-                        RootSnapshotInspector* inspector) noexcept {
+                        const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic) noexcept {
     using Code = core::FailureCode;
     if (diagnostic) {
         diagnostic->reset();
@@ -314,36 +351,17 @@ acquire_root_references(const ReferenceInput& input, PreparedRootReferences&& pr
         if (cancelled(stop, diagnostic)) {
             return failure(Code::Cancelled);
         }
-        const auto& per_file = limits.per_source.file;
-        const RootSnapshotLimits admitted{
-            {std::min(per_file.maximum_file_bytes, limits.total_payload_bytes),
-             std::min(per_file.maximum_read_bytes, limits.total_read_bytes),
-             std::min(per_file.maximum_read_calls, limits.total_read_calls),
-             std::min(per_file.maximum_hash_bytes, limits.total_hash_bytes)},
-            std::min(limits.per_source.maximum_identity_comparisons,
-                     limits.total_identity_comparisons),
-            limits.per_source.diagnostic_bytes};
         auto acquired = acquire_bound_root_snapshot(*bound, prepared, static_cast<core::Index>(i),
-                                                    previous->values().first(i), admitted, plan,
-                                                    stop, diagnostic);
+                                                    previous->values().first(i), limits.next_file(),
+                                                    plan, stop, diagnostic);
         if (!acquired) {
             return std::unexpected(acquired.error());
-        }
-        if (inspector) {
-            if (const auto inspected = inspector->inspect(*acquired); !inspected) {
-                return std::unexpected(inspected.error());
-            }
         }
         const auto file = acquired->file.view();
         if (!file) {
             return failure(Code::InvalidInput);
         }
-        const auto bytes = file->file_info.byte_count;
-        limits.total_payload_bytes -= bytes;
-        limits.total_read_bytes -= bytes + 1;
-        limits.total_read_calls -= file->read_calls;
-        limits.total_hash_bytes -= bytes;
-        limits.total_identity_comparisons -= i + manifest_checks;
+        limits.charge(*file, i + manifest_checks);
         previous->values()[i] = file->file_info.identity;
         files->values()[i].emplace(std::move(*acquired));
     }
