@@ -1,0 +1,134 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-discrete-vector-load-implicit-pullback-v1",
+  "ids": [
+    "UW-D01",
+    "UW-D03",
+    "UW-D05",
+    "UW-D06",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-24",
+  "source_commit": "c4d401f64735d6649fd034b06e9956ce7e74aa56",
+  "claimed_state": "Fixed-contact real load pullback through one retained primal circulation and its original-residual-qualified discrete transpose, with independent supplied circulation rate.",
+  "verification": {
+    "msvc": "Windows 11 x64, MSVC 19.51 Debug and Release. Selected CTest 3/3 in each configuration.",
+    "gcc": "Ubuntu Noble chroot, GCC 14.2 Release, warnings as errors. Selected CTest 3/3.",
+    "ctest": [
+      "coupling.case_uniform_flow",
+      "aero.p1_shared_action",
+      "numerics.dense_solve"
+    ],
+    "catch": "Discrete circulation loads keep midpoint and triangle force and moment; 1 case, 5274 assertions, Release on both platforms, seed 23.",
+    "oracle": "65-digit Decimal direct line and wake-area integrals, then re-solve both perturbed primal circulations. Work -0.0552599357049885265356 for the single bound and attached wake and -0.0753320247028545422098 for adjacent aliased bounds. GL72/96 and central steps 1e-15/1e-18 differ by 8.24e-34 and 1.01e-32 respectively.",
+    "negative": "Early matrix, scale, layout, RHS and retained-generation collisions and cancellation. Late strict RHS projection and original-residual failures protect the flow and earlier results and allow a successful retry.",
+    "mutation": "Isolated GCC 14.2 Release copy drops the implicit contribution to the uniform-flow covector. Both forward and independent checks in both configurations detect it, four failures, Catch2 exit 42.",
+    "static": "clang-format 21.1.2, clang-tidy 21.1.1 on implementation and regression TUs in the MSVC and GCC compile databases."
+  },
+  "sources": {
+    "docs/specs/aero/uvlm-integrated-specification.md": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b",
+    "docs/specs/aero/uvlm-wake-adopted-specification.md": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca",
+    "docs/specs/aero/uvlm-induction-adopted-specification.md": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc",
+    "docs/verification/IM-03/p1-shared-action-v1/reference.py": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f",
+    "docs/verification/IM-03/discrete-vector-loads-v1/reference.py": "36e17415fb6f4126f5e759cb7da93c61246d4d0eb15e564f01e57562a1fb27dc",
+    "docs/verification/IM-03/discrete-vector-load-direction-v1/reference.py": "0473b715c987f35652b953ac9558c91c83ee9273dee5e8267619d4486ea640c1",
+    "docs/verification/IM-03/discrete-vector-load-pullback-v1/reference.py": "8c9ac9ae91292446bf3e5780b45ce8616ecdcb7d707c355a6af6a953aa47c97b",
+    "src/aero/global_geometry.cpp": "768ec3ba187b7c808368224faee924d4b1b28fdbf36340a625dc1447a563ed7b",
+    "src/aero/local_geometry_packet.cpp": "27cdf4e3b00a1cbce3326c027cbd9ca8ee4755c5fe2900ac6b8ee43ab85ea658",
+    "src/aero/p1_shared_action.cpp": "5cf28b046de437cb847c5fa3a92ed8e3896754075bc915282e7983251a8ac455",
+    "src/numerics/dense_solve.cpp": "d142365030155192b5579783931b25b3d26a37152a9ad1f6cc1b5dc247c7d7b3",
+    "src/coupling/discrete_nonpenetration.cpp": "dabf1b5316a2f5ca9ed2860bcd9bd16d1de3b267666ecf7acb98e35d799cbea7",
+    "src/coupling/discrete_nonpenetration.hpp": "611c92d67bd2595ae5230b4cddaa9ece306abb9a25077ab5707a525bb34800fa",
+    "tests/coupling/case_uniform_flow_test.cpp": "e7026bdb8eecb2a4e4b02b52a94a0cf461cacd269679111eff0eb42f45030946"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/discrete-vector-load-implicit-pullback-v1/reference.py": "07fa951733564547c34597ed229eeb3a5c9bdbe12903a332423fc38ae101ead1",
+    "docs/verification/IM-03/discrete-vector-load-implicit-pullback-v1/verification.md": "6a44f64032e9637ceb112395c7ade8ab3ddd489d2ef2ef3b85850ecc72466c61"
+  },
+  "source_records": [
+    {
+      "id": "docs/specs/aero/uvlm-integrated-specification.md",
+      "hint": "docs/specs/aero/uvlm-integrated-specification.md",
+      "sha256": "f3b038be7e706a0e94fd93776a9129651726bd44deb26dc8e27f19bfd0f4d66b"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-wake-adopted-specification.md",
+      "sha256": "073ca933cfea839498234c11f13fb7ae838d79ea81633ee9677edaaaf552b5ca"
+    },
+    {
+      "id": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "hint": "docs/specs/aero/uvlm-induction-adopted-specification.md",
+      "sha256": "f2804bcd6adbcb8082f8c09e3d170400fc0947d8efe2e99f1acb67504173becc"
+    },
+    {
+      "id": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "hint": "docs/verification/IM-03/p1-shared-action-v1/reference.py",
+      "sha256": "d4f16851808a8d7c17e1b985a0a8b766280e430824a3eda29b52bc62a3c7bc3f"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-vector-loads-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-vector-loads-v1/reference.py",
+      "sha256": "36e17415fb6f4126f5e759cb7da93c61246d4d0eb15e564f01e57562a1fb27dc"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-vector-load-direction-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-vector-load-direction-v1/reference.py",
+      "sha256": "0473b715c987f35652b953ac9558c91c83ee9273dee5e8267619d4486ea640c1"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-vector-load-pullback-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-vector-load-pullback-v1/reference.py",
+      "sha256": "8c9ac9ae91292446bf3e5780b45ce8616ecdcb7d707c355a6af6a953aa47c97b"
+    },
+    {
+      "id": "src/aero/global_geometry.cpp",
+      "hint": "src/aero/global_geometry.cpp",
+      "sha256": "768ec3ba187b7c808368224faee924d4b1b28fdbf36340a625dc1447a563ed7b"
+    },
+    {
+      "id": "src/aero/local_geometry_packet.cpp",
+      "hint": "src/aero/local_geometry_packet.cpp",
+      "sha256": "27cdf4e3b00a1cbce3326c027cbd9ca8ee4755c5fe2900ac6b8ee43ab85ea658"
+    },
+    {
+      "id": "src/aero/p1_shared_action.cpp",
+      "hint": "src/aero/p1_shared_action.cpp",
+      "sha256": "5cf28b046de437cb847c5fa3a92ed8e3896754075bc915282e7983251a8ac455"
+    },
+    {
+      "id": "src/numerics/dense_solve.cpp",
+      "hint": "src/numerics/dense_solve.cpp",
+      "sha256": "d142365030155192b5579783931b25b3d26a37152a9ad1f6cc1b5dc247c7d7b3"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.cpp",
+      "hint": "src/coupling/discrete_nonpenetration.cpp",
+      "sha256": "dabf1b5316a2f5ca9ed2860bcd9bd16d1de3b267666ecf7acb98e35d799cbea7"
+    },
+    {
+      "id": "src/coupling/discrete_nonpenetration.hpp",
+      "hint": "src/coupling/discrete_nonpenetration.hpp",
+      "sha256": "611c92d67bd2595ae5230b4cddaa9ece306abb9a25077ab5707a525bb34800fa"
+    },
+    {
+      "id": "tests/coupling/case_uniform_flow_test.cpp",
+      "hint": "tests/coupling/case_uniform_flow_test.cpp",
+      "sha256": "e7026bdb8eecb2a4e4b02b52a94a0cf461cacd269679111eff0eb42f45030946"
+    }
+  ],
+  "artifact_records": [
+    {
+      "id": "docs/verification/IM-03/discrete-vector-load-implicit-pullback-v1/reference.py",
+      "hint": "docs/verification/IM-03/discrete-vector-load-implicit-pullback-v1/reference.py",
+      "sha256": "07fa951733564547c34597ed229eeb3a5c9bdbe12903a332423fc38ae101ead1"
+    },
+    {
+      "id": "docs/verification/IM-03/discrete-vector-load-implicit-pullback-v1/verification.md",
+      "hint": "docs/verification/IM-03/discrete-vector-load-implicit-pullback-v1/verification.md",
+      "sha256": "6a44f64032e9637ceb112395c7ade8ab3ddd489d2ef2ef3b85850ecc72466c61"
+    }
+  ]
+}

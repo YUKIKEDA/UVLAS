@@ -1,0 +1,51 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-isotropic-shell-cards",
+  "ids": [
+    "IO4-01",
+    "IO4-03",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "5af1a07894206950150255d9b8dcad60512d227e",
+  "scope": "MSC Nastran 2022.1 exact MAT1 fields plus PSHELL material roles and dimensional source values; deferred three-dimensional equivalence",
+  "verification": {
+    "ctest_regex": "^io\\.nastran_(isotropic_shell_cards|shell_cards|coordinate_cards|bulk|number_fields)$",
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Debug",
+      "ctest_targets": 5,
+      "material_card_cases": 5,
+      "material_card_assertions": 295
+    },
+    "linux": {
+      "platform": "Ubuntu 24.04.5 LTS (isolated WSL chroot)",
+      "compiler": "GCC 14.2.0",
+      "configuration": "Debug ASan+UBSan",
+      "ctest_targets": 5,
+      "material_card_cases": 5,
+      "material_card_assertions": 295,
+      "clang_tidy": "21.1.1 PASS on parser normal/audit and test"
+    }
+  },
+  "reference": {
+    "title": "MSC Nastran 2022.1 Quick Reference Guide",
+    "printed_pages": "2169-2172, 2185, 2901-2905",
+    "pdf_sha256": "c0675eed07f664ee985bc0cb3f1e1c00cc138b3a9a0ec1bf538ef345a172fcef"
+  },
+  "tested_target_registration": {
+    "commit": "5af1a07894206950150255d9b8dcad60512d227e",
+    "CMakeLists.txt": "c1d7bf55e37ffc097865859b3ae79a3587c921c39acf9021f13107ccbe65f687",
+    "tests/CMakeLists.txt": "e64f3c2774381e13b0f1d4711783c59a245d0c16d9e5f430daeecdf372d083bc"
+  },
+  "sources": {
+    "src/io/nastran_isotropic_shell_cards.cpp": "b08e7be8c7237e71d60685a050bb16040fc5d0a9bf9c5cdd12a718ddff49bf0b",
+    "src/io/nastran_isotropic_shell_cards.hpp": "8e38a2c41f72567c7401385be0c5e2b88e23e8515956bb5b71a1ca1a4e36581c",
+    "tests/io/nastran_isotropic_shell_cards_test.cpp": "df2f8f1b93ea51c524d6eb413614b4d59fa86ac9d90bae436e0d0e5e7b277399"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-isotropic-shell-cards.md": "c2b07d183e2041ded06e58b676a697def1b7052b6cfdfeb99ec8f59b756bbf01"
+  }
+}

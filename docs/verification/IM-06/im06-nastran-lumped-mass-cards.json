@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-lumped-mass-cards",
+  "ids": [
+    "IO4-03"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "0cc321ecc383eacce6d210567a875b83c802381a",
+  "scope": "Capture CONM2 mass, offsets and centre coordinates, and source inertia products from a checked deck",
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260.0",
+      "configuration": "Release",
+      "ctest_targets": 1
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "configuration": "Release",
+      "ctest_targets": 1,
+      "clang_tidy": "21.1.1 PASS on the parser and integration test"
+    },
+    "mutation": "Reading I21 from the I31 slot caused the independent field checks to fail."
+  },
+  "tested_target_registration": {
+    "commit": "0cc321ecc383eacce6d210567a875b83c802381a",
+    "CMakeLists.txt": "dcbfc8a2c32036593001ed3371941e1fa3cccd2ba2748df6fcfec93e0eccae44",
+    "tests/CMakeLists.txt": "ff75c5fd42eb153d21554fad2be81ff3f9d98f8e7e8f79a45ba9012f4d915650"
+  },
+  "sources": {
+    "src/io/nastran_lumped_mass_cards.cpp": "d36335121aa8c4202342c5c086fef44d8c635d4688da88927878f13db73e9d2f",
+    "src/io/nastran_lumped_mass_cards.hpp": "fb8a83803f391ee2b3d58bd2f7dcf3a78fd9f91f7de8bf5f54872acbca39513c",
+    "tests/io/nastran_shell_cards_test.cpp": "b1636e6aab860601124d190dc228afb5505788dc39567c1119871d239f2df4e9"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/nastran-lumped-mass-cards.md": "68a2d64db5cceec9562fa3846275cc17565147e6f55a4abb75bd9f820f4a0ddd"
+  }
+}

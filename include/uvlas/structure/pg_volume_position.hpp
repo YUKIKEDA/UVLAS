@@ -7,7 +7,7 @@ namespace uvlas::structure {
 /// Select the fixed Cartesian position map or its work-conjugate transpose.
 enum class PgVolumePositionDirection : std::uint8_t { ToPoints, TransposeToColumns };
 
-/// Three Cartesian components per basis column or volume point, contiguous in
+/// Three Cartesian components per basis column or evaluation row, contiguous in
 /// x,y,z order. Representation identifies whether the low span is required.
 struct PgCartesianWords {
     core::Precision representation;
@@ -20,6 +20,9 @@ struct PgVolumePositionLimits {
     double maximum_absolute_error;
     std::stop_token cancellation;
 };
+
+class PgBoundaryPositionReference;
+class PgBoundaryTangentReference;
 
 /// Reusable owned destination. Its prior words remain valid after any failed
 /// action. Stage writes in a separate exclusive Workspace before publishing.
@@ -48,6 +51,28 @@ private:
                                                        const PgVolumePositionLimits&,
                                                        core::Workspace&,
                                                        PgVolumePositionResult&) noexcept;
+    friend core::Result<void>
+    apply_pg_boundary_position(const PgBoundaryPositionReference&, PgVolumePositionDirection,
+                               PgCartesianWords, const PgVolumePositionLimits&, core::Workspace&,
+                               PgVolumePositionResult&) noexcept;
+
+    friend core::Result<void>
+    apply_pg_boundary_tangents(const PgBoundaryTangentReference&, PgVolumePositionDirection,
+                               PgCartesianWords, const PgVolumePositionLimits&, core::Workspace&,
+                               PgVolumePositionResult&) noexcept;
+
+    struct MatrixView {
+        const PgConditioningCertificate* certificate;
+        std::size_t rank, rows;
+        std::span<const double> high, low;
+        std::size_t prefix;
+        double maximum_coefficient_error;
+    };
+
+    [[nodiscard]] core::Result<void> apply(const MatrixView&, PgVolumePositionDirection,
+                                           PgCartesianWords, const PgVolumePositionLimits&,
+                                           core::Workspace&) noexcept;
+
     PgVolumePositionResult(core::Precision, core::Index, core::PlannedBuffer<double>,
                            core::PlannedBuffer<double>) noexcept;
 

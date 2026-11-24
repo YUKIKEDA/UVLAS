@@ -1,0 +1,82 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-boundary-tangents",
+  "ids": [
+    "SH-D02",
+    "SH-D05",
+    "N4-02",
+    "N4-03",
+    "N4-06",
+    "N4-08",
+    "N4-09"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "1abf11d61bf92cd5c14d55e7596f22ed6cefbe47",
+  "claimed_state": "層の上下面と外周側面について認定基底の2方向の微分を保持し、固定接線写像と転置を両形式で評価した。2層平板で基底微分、両作用、仕事の差を独立照合した。",
+  "environment": {
+    "windows": {
+      "os": "Windows 11 x64",
+      "compiler": "MSVC 19.51.36260",
+      "configurations": [
+        "Debug",
+        "Release"
+      ]
+    },
+    "linux": {
+      "os": "Ubuntu 24.04 x64",
+      "compiler": "GCC 14.2.0",
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1"
+    },
+    "boost": "1.92.0",
+    "clang_tidy": "21.1.1"
+  },
+  "checks": {
+    "points": 4,
+    "directions_per_point": 2,
+    "conditioned_columns": 109,
+    "independent_derivative_coefficients": 1744,
+    "independent_cartesian_components": 702,
+    "audited_success_calls": 9,
+    "audited_precision_rejections": 2,
+    "cpp_allocation_attempts": 0,
+    "windows_debug_ctest_passed": 1,
+    "windows_release_ctest_passed": 1,
+    "linux_sanitizer_test_cases": 13,
+    "linux_sanitizer_assertions": 193162,
+    "linux_sanitizer_direct_timeout_seconds": 240,
+    "clang_tidy_translation_units": 3,
+    "rejected_mutation": {
+      "change": "use the stored edge order without the counterclockwise direction flag",
+      "failed_assertions": 679
+    }
+  },
+  "sources": {
+    "docs/specs/structure/main-shell-adopted-specification.md": "6b672a00dec5447fb30ca43d759676794ed6268afe575069aaf4a27c08ad6580",
+    "docs/specs/structure/pg-reference-geometry-contract.md": "2cf03ea466b44914018ff6f391cb49c85ef46fde29f393e3ff72ec37b7550439",
+    "docs/specs/structure/pg-boundary-position-contract.md": "17d79cd7f4bf1367fd32aff14391eb4efcb17e54ecb72ab935133447b0f28b6f",
+    "include/uvlas/structure/pg_boundary_position.hpp": "d1b3b1aec137d337621d5855f781dee057d7f21e901c9c5e889460b42d88b7f1",
+    "src/structure/pg_reference_domain.hpp": "73b04ad4e1536ce010aab0969f6ae2ba56b63d0424e600c85ad6c94869be9836",
+    "src/structure/pg_reference_arithmetic.hpp": "3cc4a012f9f52524e5b431ca6cd48a94f50bc786933b16891835289ad217b412",
+    "src/structure/pg_reference_projection.hpp": "25fd5056d7536fac52ab1f4cff4a3c288ffb1ccc4966c067e2216bba33a88a80",
+    "src/structure/pg_volume_position_arithmetic.hpp": "b430b347ef64d35719d55883b932743413f4a670d980b450124cd8df9955d7c0",
+    "tests/support/allocation_audit.cpp": "8c0d3c579969b02fe9d34518eb658d491d9e721f2061bc46bf2149ef64dcaacc",
+    "tests/support/allocation_audit.hpp": "43dbcee0598effdd3765a4d20c3bd2f844dddcb08d3b7d259989d09c276b0ba8",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/specs/structure/pg-boundary-tangents-contract.md": "ef87587cff7adc6293694822981341bd58099cf182d2822cad035f866802669e",
+    "docs/verification/IM-01/pg-boundary-tangents.md": "5890fee539fc01033a7f958aca4616feb7a7797144782438c681ef1e6ac7226b",
+    "include/uvlas/structure/pg_boundary_tangents.hpp": "fe75d09bec5c537b559dfb93b5bf7ae9b6699b4c679330fdfb320dc7fee3c2a0",
+    "include/uvlas/structure/pg_volume_position.hpp": "88403fd32326cf24e17c7376e16021559691382388da17b11114f4a0e21b7000",
+    "src/structure/pg_volume_mass_reference.cpp": "d17b3be95198874e8057305dda4412584347ca85d0c0ad368617f005df4558b9",
+    "src/structure/pg_volume_position.cpp": "093e90aa8d63e01e57908a0897b2dd1a1b242d57e63139f999c0621ca35cc3bd",
+    "tests/structure/pg_conditioning_test.cpp": "03f63c5865f970d80ff511fae3b5d769456db23dcba4b8095ca34b43fed70de0"
+  }
+}

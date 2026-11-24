@@ -790,13 +790,16 @@ struct WorkEnclosure {
     Rat value{};
     Rat radius{};
 
+    void add(const a::ScaledEnclosure& dual, const a::ScalarWords& direction) {
+        const auto scale = two_power(dual.exponent());
+        const auto displacement = sum_words(direction);
+        value += sum_words(dual.center()) * scale * displacement;
+        radius += rational_word(dual.radius()) * scale * abs(displacement);
+    }
+
     void add(const cf::CirculationVectorCovector& dual, const cf::NonpenetrationVector& direction) {
-        for (std::size_t axis = 0; axis < dual.size(); ++axis) {
-            const auto scale = two_power(dual[axis].exponent());
-            const auto displacement = sum_words(direction[axis]);
-            value += sum_words(dual[axis].center()) * scale * displacement;
-            radius += rational_word(dual[axis].radius()) * scale * abs(displacement);
-        }
+        for (std::size_t axis = 0; axis < dual.size(); ++axis)
+            add(dual[axis], direction[axis]);
     }
 };
 
@@ -1581,6 +1584,325 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
         reject(jvp.edge(result.edge_count()), core::FailureCode::InvalidInput);
         reject(jvp.point(result.point_count()), core::FailureCode::InvalidInput);
         reject(jvp.facet(result.facet_count()), core::FailureCode::InvalidInput);
+
+        const auto zeros = coordinates(0, 0, 0);
+        const cf::DiscreteLoadSampleWeights no_weight{zeros, zeros};
+        const std::array edge_weights{cf::DiscreteLoadSampleWeights{coordinates(.125, .0625, -.125),
+                                                                    coordinates(.25, -.125, .5)},
+                                      no_weight,
+                                      no_weight,
+                                      no_weight,
+                                      no_weight,
+                                      no_weight,
+                                      no_weight};
+        const std::array facet_weights{
+            cf::DiscreteLoadSampleWeights{coordinates(-.25, .125, .0625),
+                                          coordinates(.0625, .25, -.125)},
+            no_weight, no_weight, no_weight};
+        const std::array node_weights{
+            coordinates(-.375, .125, .25), zeros, zeros, zeros, zeros, zeros};
+        const cf::NonpenetrationVector total_weight{a::SingleWord{.125}, a::SingleWord{-.25},
+                                                    a::DoubleWord{.375, 0x1p-57}};
+        const cf::DiscreteVectorLoadWeights weights{
+            input.trial_stamp,
+            request.retained_generation,
+            std::span{edge_weights}.first(result.edge_count()),
+            std::span{facet_weights}.first(result.facet_count()),
+            std::span{node_weights}.first(result.point_count()),
+            total_weight,
+            coordinates(-.125, .25, .0625)};
+        auto vjp_flow = flow_at();
+        const auto run_pullback = [&](const cf::DiscreteVectorLoadWeights& dual) {
+            return cf::solve_discrete_circulation_load_pullback(
+                input, load_input, dual, std::move(vjp_flow), load_limits, request, *geometry_work,
+                shared, *local, *kernel, memory);
+        };
+        if (mode == LoadCase::Wake) {
+            auto invalid = weights;
+            invalid.circulation = core::NumericalGeneration{903};
+            const auto before = memory.allocated_bytes();
+            reject(run_pullback(invalid), core::FailureCode::StaleGeneration);
+            CHECK(memory.allocated_bytes() == before);
+            invalid = weights;
+            invalid.facets = {};
+            reject(run_pullback(invalid), core::FailureCode::InvalidInput);
+            invalid = weights;
+            invalid.points = std::span{node_weights}.first(3);
+            reject(run_pullback(invalid), core::FailureCode::InvalidInput);
+            invalid = weights;
+            invalid.moment[0] = a::SingleWord{std::numeric_limits<double>::quiet_NaN()};
+            reject(run_pullback(invalid), core::FailureCode::Nonfinite);
+            CHECK(vjp_flow.source().jet.active());
+        }
+        const auto vjp = take(run_pullback(weights));
+        CHECK_FALSE(vjp_flow.source().jet.active());
+        CHECK(vjp.loads().primal().flow().source().jet.active());
+        CHECK(vjp.loads().used_steps() <= load_limits.steps);
+        const auto load_work = [&](const cf::DiscreteCirculationLoadJvp& direction) {
+            WorkEnclosure work;
+            work.add(direction.total_force_direction(), weights.force);
+            work.add(direction.total_moment_direction(), weights.moment);
+            for (std::size_t i = 0; i < weights.edges.size(); ++i) {
+                const auto delta = take(direction.edge(i));
+                work.add(delta.position, weights.edges[i].position);
+                work.add(delta.force, weights.edges[i].force);
+            }
+            for (std::size_t i = 0; i < weights.facets.size(); ++i) {
+                const auto delta = take(direction.facet(i));
+                work.add(delta.position, weights.facets[i].position);
+                work.add(delta.force, weights.facets[i].force);
+            }
+            for (std::size_t i = 0; i < weights.points.size(); ++i)
+                work.add(take(direction.point(i)).force, weights.points[i]);
+            return work;
+        };
+        const auto forward = load_work(jvp);
+
+        WorkEnclosure reverse;
+        reverse.add(vjp.uniform_flow(), variation.uniform_flow);
+        REQUIRE(vjp.point_count() == variation.points.size());
+        for (std::size_t i = 0; i < vjp.point_count(); ++i) {
+            const auto dual = take(vjp.point(i));
+            CHECK(dual.point == variation.points[i]);
+            reverse.add(dual.position, variation.displacements[i]);
+        }
+        for (std::size_t i = 0; i < variation.edges.size(); ++i) {
+            const auto dual = take(vjp.midpoint_velocity(i));
+            CHECK(dual.edge == variation.edges[i].edge);
+            reverse.add(dual.velocity, variation.edges[i].velocity);
+        }
+        for (std::size_t i = 0; i < variation.bound.size(); ++i) {
+            const auto dual = take(vjp.bound(i));
+            CHECK(dual.face == variation.bound[i].face);
+            reverse.add(dual.circulation, variation.bound[i].circulation);
+            reverse.add(dual.circulation_rate, variation.bound[i].circulation_rate);
+        }
+        CHECK(abs(forward.value - reverse.value) <= forward.radius + reverse.radius);
+        CHECK(forward.radius < rational_word(1e-24));
+        CHECK(reverse.radius < rational_word(1e-24));
+        const auto independent =
+            rational_word(has_wake ? -.0958978088767875470302 : -.120307262620136262701);
+        CHECK(abs(reverse.value - independent) <= reverse.radius + rational_word(1e-16));
+        reject(vjp.point(vjp.point_count()), core::FailureCode::InvalidInput);
+        reject(vjp.midpoint_velocity(weights.edges.size()), core::FailureCode::InvalidInput);
+        reject(vjp.bound(count), core::FailureCode::InvalidInput);
+
+        if (mode != LoadCase::Wake && mode != LoadCase::AliasedShared)
+            continue;
+        const std::array<ls::UnitDimensions, 2> dual_speed{
+            {{-1, 0, 1, 0, 0, 0, 0}, {-1, 0, 1, 0, 0, 0, 0}}};
+        const std::array<ls::UnitDimensions, 2> dual_gamma{
+            {{-2, 0, 1, 0, 0, 0, 0}, {-2, 0, 1, 0, 0, 0}}};
+        auto dual_context = model.context;
+        dual_context.cache.matrix = core::NumericalGeneration{1000};
+        dual_context.cache.scales = core::ScaleGeneration{1001};
+        dual_context.unknown_layout = core::ScopeId{1002};
+        dual_context.residual_layout = core::ScopeId{1003};
+        const ls::Scales dual_model{model.residual, model.unknown,
+                                    std::span{dual_speed}.first(count),
+                                    std::span{dual_gamma}.first(count), dual_context};
+        auto transpose_request =
+            circulation_request(dual_model, static_cast<core::Index>(count), ls::Norm::Infinity);
+        transpose_request.rhs_generation = core::RhsGeneration{1004};
+        transpose_request.retained_generation = core::NumericalGeneration{1005};
+        auto implicit_flow = flow_at();
+        const auto run_implicit = [&](const cf::DiscreteCirculationRequest& transpose,
+                                      const std::stop_token& stop = {}) {
+            return cf::solve_discrete_circulation_implicit_load_pullback(
+                input, load_input, weights, std::move(implicit_flow), load_limits, request,
+                transpose, *geometry_work, shared, *local, *kernel, memory, stop);
+        };
+        if (has_wake) {
+            const auto before = memory.allocated_bytes();
+            auto stale = transpose_request;
+            stale.scales.context.cache.matrix = model.context.cache.matrix;
+            reject(run_implicit(stale), core::FailureCode::StaleGeneration);
+            stale = transpose_request;
+            stale.scales.context.cache.scales = model.context.cache.scales;
+            reject(run_implicit(stale), core::FailureCode::StaleGeneration);
+            stale = transpose_request;
+            stale.scales.context.unknown_layout = model.context.residual_layout;
+            reject(run_implicit(stale), core::FailureCode::StaleGeneration);
+            stale = transpose_request;
+            stale.rhs_generation = request.rhs_generation;
+            reject(run_implicit(stale), core::FailureCode::StaleGeneration);
+            stale = transpose_request;
+            stale.retained_generation = request.retained_generation;
+            reject(run_implicit(stale), core::FailureCode::StaleGeneration);
+            // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+            std::stop_source cancel;
+            REQUIRE(cancel.request_stop());
+            reject(run_implicit(transpose_request, cancel.get_token()),
+                   core::FailureCode::Cancelled);
+            CHECK(memory.allocated_bytes() == before);
+            const auto original_gamma = solution_word(result.primal().solution(), 0);
+            auto tight = transpose_request;
+            tight.rhs_absolute = 0;
+            reject(run_implicit(tight), core::FailureCode::PrecisionUnresolved);
+            tight = transpose_request;
+            tight.original_absolute = 0;
+            reject(run_implicit(tight), core::FailureCode::LinearUnconverged);
+            CHECK(memory.allocated_bytes() >
+                  before); // The plan counts successful allocations cumulatively.
+            CHECK(solution_word(result.primal().solution(), 0) == original_gamma);
+            CHECK(contact.active());
+            CHECK(implicit_flow.source().jet.active());
+        }
+        const auto combined = take(run_implicit(transpose_request));
+        CHECK_FALSE(implicit_flow.source().jet.active());
+        CHECK(combined.loads().primal().flow().source().jet.active());
+        CHECK(combined.loads().used_steps() <= load_limits.steps);
+        CHECK(combined.transpose().sense() == cf::CirculationSense::Transpose);
+        const auto& certificate = combined.transpose().solution().certificate();
+        CHECK(certificate.context() == dual_context);
+        CHECK(certificate.rhs_generation() == transpose_request.rhs_generation);
+        CHECK(combined.transpose().solution().values().generation() ==
+              transpose_request.retained_generation);
+
+        const std::array collocation_directions{
+            cf::CirculationCollocationDirection{
+                fixture.faces[0].id,
+                coordinates(.03125, -.046875, .0234375),
+                {coordinates(.03125, .0625, .125), coordinates(-.09375, .015625, -.0625)},
+                coordinates(.0625, -.03125, .125)},
+            cf::CirculationCollocationDirection{
+                fixture.faces[1].id,
+                coordinates(-.046875, .0625, -.0390625),
+                {coordinates(-.0625, .03125, -.125), coordinates(.125, -.03125, .0625)},
+                coordinates(-.03125, .0625, -.09375)}};
+        const cf::DiscreteCirculationDirection circulation_direction{
+            variation.points, variation.displacements,
+            std::span{collocation_directions}.first(count), variation.uniform_flow};
+        auto tangent_request = request;
+        tangent_request.rhs_generation = core::RhsGeneration{1100};
+        tangent_request.retained_generation = core::NumericalGeneration{1101};
+        const std::array rate_directions{
+            cf::BoundCirculationRate{gamma_directions[0].face,
+                                     gamma_directions[0].circulation_rate},
+            cf::BoundCirculationRate{gamma_directions[1].face,
+                                     gamma_directions[1].circulation_rate}};
+        const cf::DiscreteImplicitVectorLoadDirection implicit_variation{
+            variation.stamp, variation.circulation, circulation_direction, variation.edges,
+            std::span{rate_directions}.first(count)};
+        auto tangent_flow = flow_at();
+        const auto run_tangent = [&](const cf::DiscreteCirculationRequest& settings,
+                                     const cf::DiscreteImplicitVectorLoadDirection& direction,
+                                     const std::stop_token& stop = {}) {
+            return cf::solve_discrete_circulation_implicit_load_direction(
+                input, load_input, direction, std::move(tangent_flow), load_limits, request,
+                settings, *geometry_work, shared, *local, *kernel, memory, stop);
+        };
+        if (has_wake) {
+            const auto before = memory.allocated_bytes();
+            auto stale = tangent_request;
+            stale.rhs_generation = request.rhs_generation;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            stale = tangent_request;
+            stale.retained_generation = request.retained_generation;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            stale = tangent_request;
+            stale.scales.context.cache.matrix = transpose_request.scales.context.cache.matrix;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            auto missing = implicit_variation;
+            missing.rates = {};
+            reject(run_tangent(tangent_request, missing), core::FailureCode::InvalidInput);
+            // NOLINTNEXTLINE(misc-const-correctness) MSVC 14.51 request_stop is non-const.
+            std::stop_source cancel;
+            REQUIRE(cancel.request_stop());
+            reject(run_tangent(tangent_request, implicit_variation, cancel.get_token()),
+                   core::FailureCode::Cancelled);
+            CHECK(memory.allocated_bytes() == before);
+
+            const std::array bad_scale{2.};
+            stale = tangent_request;
+            stale.scales.unknown = bad_scale;
+            reject(run_tangent(stale, implicit_variation), core::FailureCode::StaleGeneration);
+            auto strict = tangent_request;
+            strict.rhs_absolute = 0;
+            reject(run_tangent(strict, implicit_variation), core::FailureCode::PrecisionUnresolved);
+            strict = tangent_request;
+            strict.original_absolute = 0;
+            reject(run_tangent(strict, implicit_variation), core::FailureCode::LinearUnconverged);
+            CHECK(tangent_flow.source().jet.active());
+            CHECK(result.primal().flow().source().jet.active());
+        }
+        const auto tangent = take(run_tangent(tangent_request, implicit_variation));
+        CHECK_FALSE(tangent_flow.source().jet.active());
+        CHECK(tangent.direction().loads().primal().flow().source().jet.active());
+        CHECK(tangent.direction().loads().used_steps() <= load_limits.steps);
+        CHECK(tangent.tangent().sense() == cf::CirculationSense::Tangent);
+        CHECK(tangent.tangent().solution().certificate().context() == model.context);
+        CHECK(tangent.tangent().solution().certificate().rhs_generation() ==
+              tangent_request.rhs_generation);
+        CHECK(tangent.tangent().solution().values().generation() ==
+              tangent_request.retained_generation);
+        const auto implicit_forward = load_work(tangent.direction());
+        if (has_wake) {
+            const auto& storage = tangent.tangent().solution().values().storage();
+            const auto* words = std::get_if<numerics::TwoWord<double>>(&storage);
+            if (words == nullptr)
+                FAIL("Expected a retained two-word tangent");
+            CHECK(words->lo.values()[0] != 0.);
+            auto exact_directions = gamma_directions;
+            exact_directions[0].circulation =
+                a::DoubleWord{words->hi.values()[0], words->lo.values()[0]};
+            auto explicit_variation = variation;
+            explicit_variation.bound = std::span{exact_directions}.first(count);
+            auto explicit_flow = flow_at();
+            const auto explicit_path = take(cf::solve_discrete_circulation_load_direction(
+                input, load_input, explicit_variation, std::move(explicit_flow), load_limits,
+                request, *geometry_work, shared, *local, *kernel, memory));
+            const auto explicit_work = load_work(explicit_path);
+            CHECK(abs(explicit_work.value - implicit_forward.value) <=
+                  explicit_work.radius + implicit_forward.radius);
+            CHECK(implicit_forward.radius < rational_word(1e-24));
+        }
+        WorkEnclosure implicit_reverse;
+        implicit_reverse.add(combined.uniform_flow(), variation.uniform_flow);
+        REQUIRE(combined.point_count() == variation.points.size());
+        for (std::size_t i = 0; i < combined.point_count(); ++i) {
+            const auto dual = take(combined.point(i));
+            CHECK(dual.point == variation.points[i]);
+            implicit_reverse.add(dual.position, variation.displacements[i]);
+        }
+        for (std::size_t i = 0; i < variation.edges.size(); ++i) {
+            const auto dual = take(combined.midpoint_velocity(i));
+            CHECK(dual.edge == variation.edges[i].edge);
+            implicit_reverse.add(dual.velocity, variation.edges[i].velocity);
+        }
+        for (std::size_t i = 0; i < count; ++i) {
+            const auto tangent_row = take(tangent.tangent().row(i));
+            CHECK(tangent_row.face == variation.bound[i].face);
+            residual_expected(tangent_row.original_residual, Rat{0}, rational_word(5e-15));
+            const auto check = take(combined.transpose().row(i));
+            CHECK(check.face == variation.bound[i].face);
+            residual_expected(check.original_residual, Rat{0}, rational_word(5e-15));
+            const auto rate = take(combined.circulation_rate(i));
+            CHECK(rate.face == variation.bound[i].face);
+            implicit_reverse.add(rate.rate, variation.bound[i].circulation_rate);
+            const auto dual = take(combined.collocation(i));
+            const auto& delta = collocation_directions[i];
+            CHECK(dual.face == delta.face);
+            if (!dual.free_query || !delta.free_query)
+                FAIL("Free collocation coordinates must have covectors");
+            implicit_reverse.add(*dual.free_query, *delta.free_query);
+            implicit_reverse.add(dual.tangents[0], delta.tangents[0]);
+            implicit_reverse.add(dual.tangents[1], delta.tangents[1]);
+            implicit_reverse.add(dual.velocity, delta.velocity);
+        }
+        const auto work_difference = abs(implicit_forward.value - implicit_reverse.value);
+        CHECK(work_difference <=
+              implicit_forward.radius + implicit_reverse.radius + rational_word(5e-15));
+        CHECK(implicit_reverse.radius < rational_word(1e-24));
+        const auto independently_solved =
+            rational_word(has_wake ? -.0552599357049885265356 : -.0753320247028545422098);
+        CHECK(abs(implicit_forward.value - independently_solved) <=
+              implicit_forward.radius + rational_word(5e-15));
+        CHECK(abs(implicit_reverse.value - independently_solved) <=
+              implicit_reverse.radius + rational_word(5e-15));
+        CHECK(abs(implicit_reverse.value - reverse.value) > rational_word(1e-4));
+        reject(combined.collocation(count), core::FailureCode::InvalidInput);
+        reject(combined.circulation_rate(count), core::FailureCode::InvalidInput);
     }
 }
 

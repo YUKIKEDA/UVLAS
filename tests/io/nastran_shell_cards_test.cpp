@@ -1,4 +1,7 @@
+#include "nastran_lumped_mass_cards.hpp"
+#include "nastran_rigid_link_cards.hpp"
 #include "nastran_shell_cards.hpp"
+#include "nastran_support_cards.hpp"
 #include "source_digest.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -306,6 +309,360 @@ TEST_CASE("Nastran shell identities, work and memory obey the supplied plan",
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == ResourceExceeded);
     CHECK(short_work.remaining_bytes() < memory);
+}
+
+TEST_CASE("Nastran structural supports preserve prescribed motion, THRU and set membership",
+          "[IO4-03][verification]") {
+    const auto source = std::string{grids} + "SPC,10,17,135,-2.5D+1,8,46,\n"
+                                             "SPC1,30,26,7,THRU,24\n"
+                                             "SPC1,30,126,41,22\n"
+                                             "SPC1,100,1,17\nSPCADD,100,30,10\n";
+    const auto parent = coordinates(source);
+    const auto parent_view = take(parent.view());
+    core::ResourcePlan plan{memory};
+    auto resolved = take(NastranSupportCards::prepare(parent, {6, 2, 10000}, plan, {}));
+    const auto initial = take(resolved.view());
+    CHECK(initial.source.digest == parent_view.bulk.digest);
+    CHECK(initial.source.location.source == parent_view.bulk.location.source);
+    REQUIRE(initial.terms.size() == 6);
+    REQUIRE(initial.union_members.size() == 2);
+    CHECK(initial.terms[0].set == NastranSupportSetId{10});
+    CHECK(initial.terms[0].components == 0b010101);
+    const auto& point = std::get<NastranSupportPoint>(initial.terms[0].target);
+    CHECK(point.grid == NastranGridId{17});
+    CHECK(parent_view.grids[point.grid_ordinal].id == point.grid);
+    const auto prescribed = take(initial.terms[0].prescribed_motion);
+    CHECK(prescribed.decimal() == "-2.5e+1");
+    CHECK(parent_view.bulk.text(take(initial.terms[0].motion_field)) == "-2.5D+1");
+    CHECK(initial.terms[1].components == 0b101000);
+    CHECK_FALSE(initial.terms[1].prescribed_motion);
+    CHECK(parent_view.bulk.text(take(initial.terms[1].motion_field)).empty());
+    const auto& range = std::get<NastranSupportRange>(initial.terms[2].target);
+    CHECK(range.first == NastranGridId{7});
+    CHECK(range.last == NastranGridId{24});
+    CHECK(parent_view.bulk.text(range.thru_field) == "THRU");
+    CHECK(std::get<NastranSupportPoint>(initial.terms[3].target).grid == NastranGridId{41});
+    CHECK(std::get<NastranSupportPoint>(initial.terms[4].target).grid == NastranGridId{22});
+    CHECK(initial.terms[5].set == NastranSupportSetId{100});
+    CHECK(initial.union_members[0].combination == NastranSupportSetId{100});
+    CHECK(initial.union_members[0].member == NastranSupportSetId{30});
+    CHECK(initial.union_members[1].member == NastranSupportSetId{10});
+    CHECK(take(parent.view()).bulk.bytes == source);
+
+    const auto moved = std::move(resolved);
+    // NOLINTNEXTLINE(bugprone-use-after-move): moving invalidates the old support view.
+    CHECK_FALSE(resolved.view());
+    CHECK(take(moved.view()).terms.size() == 6);
+
+    core::ResourcePlan exact{plan.allocated_bytes()};
+    CHECK(NastranSupportCards::prepare(parent, {6, 2, initial.work}, exact, {}));
+    core::ResourcePlan constrained{plan.allocated_bytes() - 1};
+    const auto short_memory =
+        NastranSupportCards::prepare(parent, {6, 2, initial.work}, constrained, {});
+    REQUIRE_FALSE(short_memory);
+    CHECK(short_memory.error().code == ResourceExceeded);
+    core::ResourcePlan enough{memory};
+    const auto short_work =
+        NastranSupportCards::prepare(parent, {6, 2, initial.work - 1}, enough, {});
+    REQUIRE_FALSE(short_work);
+    CHECK(short_work.error().code == ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC request_stop is non-const.
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    core::ResourcePlan no_memory{0};
+    const auto cancelled =
+        NastranSupportCards::prepare(parent, {6, 2, initial.work}, no_memory, stop.get_token());
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == Cancelled);
+    CHECK(no_memory.allocated_bytes() == 0);
+    CHECK(take(parent.view()).bulk.bytes == source);
+}
+
+TEST_CASE("Nastran structural supports diagnose invalid references before returning a set",
+          "[IO4-03][negative]") {
+    using SupportIssue = NastranSupportFailure;
+    std::string_view input;
+    SupportIssue reason{};
+    std::size_t expected_line = 5;
+    std::optional<std::size_t> expected_column;
+    SECTION("unknown explicit point") {
+        input = "SPC1,10,2,12";
+        reason = SupportIssue::UnknownGrid;
+    }
+    SECTION("repeated component digit") {
+        input = "SPC,10,17,122,0.0";
+        reason = SupportIssue::InvalidField;
+    }
+    SECTION("invalid range direction") {
+        input = "SPC1,10,123,24,THRU,7";
+        reason = SupportIssue::InvalidField;
+    }
+    SECTION("invalid prescribed real") {
+        input = "SPC,10,17,1,TRU";
+        reason = SupportIssue::InvalidField;
+    }
+    SECTION("small-width free integer fields have at most eight characters") {
+        input = "SPC1,123456789,1,17";
+        reason = SupportIssue::InvalidField;
+        expected_column = 6;
+    }
+    SECTION("unsupported nesting") {
+        input = "SPCADD,30,20\nSPCADD,20,10\nSPC1,10,2,17";
+        reason = SupportIssue::NestedCombination;
+    }
+    SECTION("unresolved union member") {
+        input = "SPCADD,30,10";
+        reason = SupportIssue::UnknownSet;
+    }
+    SECTION("duplicate union member") {
+        input = "SPCADD,30,10,10\nSPC1,10,2,17";
+        reason = SupportIssue::DuplicateMember;
+        expected_column = 14;
+    }
+    SECTION("duplicate set combination") {
+        input = "SPCADD,30,20\nSPCADD,30,10\nSPC1,10,2,17\nSPC1,20,2,8";
+        reason = SupportIssue::DuplicateCombination;
+        expected_line = 6;
+    }
+    const auto source = std::string{grids} + std::string{input};
+    const auto parent = coordinates(source);
+    core::ResourcePlan plan{memory};
+    std::optional<NastranSupportDiagnostic> diagnostic;
+    const auto result = NastranSupportCards::prepare(parent, {8, 8, 10000}, plan, {}, &diagnostic);
+    REQUIRE_FALSE(result);
+    const auto recorded = take(diagnostic);
+    CHECK(recorded.reason == reason);
+    CHECK(recorded.position.line == expected_line);
+    if (expected_column)
+        CHECK(recorded.position.column == *expected_column);
+    CHECK(take(parent.view()).bulk.bytes == source);
+}
+
+TEST_CASE("CONM2 retains local offsets, basic centres and named inertia products",
+          "[IO4-03][verification]") {
+    const auto source =
+        "CONM2*,101,17,9,12.5\n*,1.25D+1,-2.0,3.0\n" +
+        fixed("CONM2", {"102", "41", "-1", "2.75", "4.0", "-5.0", "6.0"}, 8, "+M2") +
+        fixed("+M2", {"11.0", "-21.0", "22.0", "31.0", "-32.0", "33.0"}, 8) +
+        "CONM2,103,8,,0.5\nCORD2C,9,0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0\n" + std::string{grids};
+    core::ResourcePlan shell_plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    const auto shell = take(parent.view());
+    core::ResourcePlan plan{memory};
+    auto parsed = take(NastranLumpedMassCards::prepare(parent, {3, 10000}, plan, {}));
+    const auto held = take(parsed.view());
+    CHECK(held.source.digest == shell.input.bulk.digest);
+    CHECK(held.source.location.source == shell.input.bulk.location.source);
+    REQUIRE(held.masses.size() == 3);
+    const auto& framed = held.masses[0];
+    CHECK(framed.id == NastranElementId{101});
+    CHECK(framed.grid == NastranGridId{17});
+    CHECK(shell.input.grids[framed.grid_ordinal].id == framed.grid);
+    const auto& local = std::get<NastranFramedMassOffset>(framed.frame);
+    CHECK(local.frame == NastranCoordinateId{9});
+    CHECK(shell.input.coordinates[local.frame_ordinal].kind == NastranCoordinateKind::Cylindrical);
+    const auto x = take(framed.position[0].supplied);
+    CHECK(x.decimal() == "1.25e+1");
+    CHECK_FALSE(framed.inertia.i11.supplied);
+    CHECK_FALSE(framed.inertia.i11.field);
+    const auto& absolute = held.masses[1];
+    CHECK(std::holds_alternative<NastranBasicMassCentre>(absolute.frame));
+    CHECK(shell.input.bulk.text(take(absolute.frame_field)) == "-1");
+    const auto supplied_mass = take(absolute.mass.supplied);
+    CHECK(supplied_mass.decimal() == "2.75");
+    const auto& i = absolute.inertia;
+    const std::array inertia{&i.i11, &i.i21, &i.i22, &i.i31, &i.i32, &i.i33};
+    const std::array<std::string_view, 6> expected{"11.0", "-21.0", "22.0",
+                                                   "31.0", "-32.0", "33.0"};
+    for (std::size_t n = 0; n < inertia.size(); ++n) {
+        const auto value = take(inertia[n]->supplied);
+        const auto field = take(inertia[n]->field);
+        CHECK(value.decimal() == expected[n]);
+        CHECK(field.position == NastranBulkPosition{source.find(expected[n]), 4, 9 + 8 * n});
+    }
+    const auto& basic = held.masses[2];
+    CHECK(std::holds_alternative<NastranBasicMassOffset>(basic.frame));
+    CHECK(shell.input.bulk.text(take(basic.frame_field)).empty());
+    CHECK_FALSE(basic.position[0].supplied);
+
+    const auto moved = std::move(parsed);
+    // NOLINTNEXTLINE(bugprone-use-after-move): moving invalidates the old mass view.
+    CHECK_FALSE(parsed.view());
+    CHECK(take(moved.view()).masses.size() == 3);
+    core::ResourcePlan exact{plan.allocated_bytes()};
+    CHECK(NastranLumpedMassCards::prepare(parent, {3, held.work}, exact, {}));
+    core::ResourcePlan short_memory{plan.allocated_bytes() - 1};
+    const auto memory_limited =
+        NastranLumpedMassCards::prepare(parent, {3, held.work}, short_memory, {});
+    REQUIRE_FALSE(memory_limited);
+    CHECK(memory_limited.error().code == ResourceExceeded);
+    const auto work_limited = NastranLumpedMassCards::prepare(parent, {3, held.work - 1}, plan, {});
+    REQUIRE_FALSE(work_limited);
+    CHECK(work_limited.error().code == ResourceExceeded);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
+}
+
+TEST_CASE("CONM2 identifies the field that blocks typed mass preparation", "[IO4-03][negative]") {
+    using MassIssue = NastranLumpedMassFailure;
+    std::string_view line;
+    MassIssue expected{};
+    SECTION("unknown GRID") {
+        line = "CONM2,1,99,0,1.0";
+        expected = MassIssue::UnknownGrid;
+    }
+    SECTION("missing mass") {
+        line = "CONM2,1,17,0,";
+        expected = MassIssue::MissingField;
+    }
+    SECTION("unknown coordinate") {
+        line = "CONM2,1,17,99,1.0";
+        expected = MassIssue::UnknownFrame;
+    }
+    SECTION("invalid negative coordinate") {
+        line = "CONM2,1,17,-2,1.0";
+        expected = MassIssue::InvalidField;
+    }
+    SECTION("an integer spelling is not a mass value") {
+        line = "CONM2,1,17,0,10";
+        expected = MassIssue::InvalidField;
+    }
+    SECTION("a word in the reserved first row") {
+        line = "CONM2,1,17,0,1.0,,,,3.0";
+        expected = MassIssue::ExtraField;
+    }
+    SECTION("a word beyond the last inertia slot") {
+        line = "CONM2,1,17,0,1.0,,,,,1.0,,2.0,,,3.0,4.0";
+        expected = MassIssue::ExtraField;
+    }
+    const auto source = std::string{grids} + std::string{line};
+    core::ResourcePlan shell_plan{memory}, mass_plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    std::optional<NastranLumpedMassDiagnostic> diagnostic;
+    const auto result =
+        NastranLumpedMassCards::prepare(parent, {3, 10000}, mass_plan, {}, &diagnostic);
+    REQUIRE_FALSE(result);
+    const auto found = take(diagnostic);
+    CHECK(found.reason == expected);
+    CHECK(found.position.line == 5);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
+}
+
+TEST_CASE("RBE2 separates the ordered GRID list from thermal terms", "[IO4-03][verification]") {
+    const auto source = std::string{"RBE2,101,17,136,22,8,6.5-6,-273.15\n"} +
+                        fixed("RBE2", {"102", "17", "45", "41", "8", "22"}, 8) +
+                        fixed("RBE2", {"103", "17", "2", "22", "8", "41", "5", "6"}, 8, "+R1") +
+                        fixed("+R1", {"0.0", "15.0"}, 8) + std::string{grids} + "GRID,5\nGRID,6\n";
+    core::ResourcePlan shell_plan{memory}, plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    const auto shell = take(parent.view());
+    auto prepared = take(NastranRigidLinkCards::prepare(parent, {3, 10, 10000}, plan, {}));
+    const auto view = take(prepared.view());
+    CHECK(view.source.digest == shell.input.bulk.digest);
+    CHECK(view.source.location.source == shell.input.bulk.location.source);
+    REQUIRE(view.links.size() == 3);
+    REQUIRE(view.dependents.size() == 10);
+    const auto& first = view.links[0];
+    CHECK(first.id == NastranElementId{101});
+    CHECK(first.dependent_components == 0b100101);
+    CHECK(first.independent.id == NastranGridId{17});
+    CHECK(shell.input.grids[first.independent.ordinal].id == first.independent.id);
+    CHECK(first.first_dependent == 0);
+    CHECK(first.dependent_count == 2);
+    CHECK(view.dependents[0].id == NastranGridId{22});
+    CHECK(view.dependents[1].id == NastranGridId{8});
+    const auto alpha = take(first.alpha);
+    const auto tref = take(first.reference_temperature);
+    CHECK(alpha.value.decimal() == "6.5e-6");
+    CHECK(tref.value.decimal() == "-273.15");
+    CHECK(shell.input.bulk.text(alpha.field) == "6.5-6");
+    CHECK(view.links[1].first_dependent == 2);
+    CHECK(view.links[1].dependent_count == 3);
+    CHECK(view.links[1].independent.id == NastranGridId{17});
+    CHECK_FALSE(view.links[1].alpha);
+    CHECK_FALSE(view.links[1].reference_temperature);
+    CHECK(view.links[2].first_dependent == 5);
+    CHECK(view.links[2].dependent_count == 5);
+    CHECK(view.links[2].dependent_components == 0b000010);
+    CHECK(view.dependents[8].id == NastranGridId{5});
+    CHECK(view.dependents[9].id == NastranGridId{6});
+    const auto fixed_tref = take(view.links[2].reference_temperature);
+    CHECK(fixed_tref.field.position == NastranBulkPosition{source.find("15.0"), 4, 17});
+    CHECK(fixed_tref.value.decimal() == "15.0");
+    for (const auto& point : view.dependents)
+        CHECK(shell.input.grids[point.ordinal].id == point.id);
+
+    const auto moved = std::move(prepared);
+    // NOLINTNEXTLINE(bugprone-use-after-move): moving invalidates the old rigid-link view.
+    CHECK_FALSE(prepared.view());
+    CHECK(take(moved.view()).links.size() == 3);
+    core::ResourcePlan exact{plan.allocated_bytes()};
+    CHECK(NastranRigidLinkCards::prepare(parent, {3, 10, view.work}, exact, {}));
+    core::ResourcePlan short_memory{plan.allocated_bytes() - 1};
+    const auto constrained =
+        NastranRigidLinkCards::prepare(parent, {3, 10, view.work}, short_memory, {});
+    REQUIRE_FALSE(constrained);
+    CHECK(constrained.error().code == ResourceExceeded);
+    const auto short_members = NastranRigidLinkCards::prepare(parent, {3, 9, view.work}, plan, {});
+    REQUIRE_FALSE(short_members);
+    CHECK(short_members.error().code == ResourceExceeded);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
+}
+
+TEST_CASE("RBE2 rejects ambiguous thermal fields and inconsistent GRID references",
+          "[IO4-03][negative]") {
+    using RigidIssue = NastranRigidLinkFailure;
+    std::string_view line;
+    RigidIssue expected{};
+    auto code = InvalidInput;
+    SECTION("unknown independent GRID") {
+        line = "RBE2,11,99,1,22";
+        expected = RigidIssue::UnknownGrid;
+    }
+    SECTION("unknown dependent GRID") {
+        line = "RBE2,11,17,1,99";
+        expected = RigidIssue::UnknownGrid;
+    }
+    SECTION("independent GRID reused as a dependent") {
+        line = "RBE2,11,17,1,17";
+        expected = RigidIssue::RepeatedGrid;
+    }
+    SECTION("dependent GRID repeated") {
+        line = "RBE2,11,17,1,22,8,22";
+        expected = RigidIssue::RepeatedGrid;
+    }
+    SECTION("component repeated") {
+        line = "RBE2,11,17,66,22";
+        expected = RigidIssue::InvalidField;
+    }
+    SECTION("no dependent GRID") {
+        line = "RBE2,11,17,1,0.0";
+        expected = RigidIssue::MissingField;
+    }
+    SECTION("temperature without a spelled ALPHA") {
+        line = "RBE2,11,17,1,22,,15.0";
+        expected = RigidIssue::UnsupportedThermalForm;
+        code = Unsupported;
+    }
+    SECTION("more than two thermal fields") {
+        line = "RBE2,11,17,1,22,0.0,1.0,2.0";
+        expected = RigidIssue::ExtraField;
+    }
+    const auto source = std::string{grids} + std::string{line};
+    core::ResourcePlan shell_plan{memory}, plan{memory};
+    const auto parent =
+        take(NastranShellCards::prepare(coordinates(source), shell_limits, shell_plan, {}));
+    std::optional<NastranRigidLinkDiagnostic> diagnostic;
+    const auto result =
+        NastranRigidLinkCards::prepare(parent, {3, 10, 10000}, plan, {}, &diagnostic);
+    REQUIRE_FALSE(result);
+    CHECK(result.error().code == code);
+    const auto failure = take(diagnostic);
+    CHECK(failure.reason == expected);
+    CHECK(failure.position.line == 5);
+    CHECK(take(parent.view()).input.bulk.bytes == source);
 }
 
 } // namespace
