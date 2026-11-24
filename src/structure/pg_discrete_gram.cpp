@@ -9,7 +9,7 @@ using namespace detail;
 
 struct IntegerWork {
     ReferenceArithmetic& math;
-    std::uint64_t limit;
+    std::uint64_t limit = 0;
     std::uint64_t steps = 0;
 
     void charge(std::uint64_t count = 1) {

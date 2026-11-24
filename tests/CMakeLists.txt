@@ -729,6 +729,17 @@ target_include_directories(uvlas_test_structure_pg_conditioning
 uvlas_enable_allocation_audit(uvlas_test_structure_pg_conditioning)
 uvlas_require_audited_dependencies(uvlas_test_structure_pg_conditioning)
 
+uvlas_add_test(structure.pg_discrete_gram
+    LABELS property negative verification V-PG
+    TIMEOUT 300
+    SOURCES structure/pg_discrete_gram_test.cpp
+    LIBS uvlas_structure Boost::headers)
+target_include_directories(uvlas_test_structure_pg_discrete_gram
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+if(UVLAS_SANITIZERS AND NOT MSVC)
+    set_tests_properties(structure.pg_discrete_gram PROPERTIES TIMEOUT 420)
+endif()
+
 uvlas_add_test(aero.p1_induction
     LABELS unit property negative verification V-AERO
     SOURCES aero/p1_induction_test.cpp aero/p1_area_reference_test.cpp
