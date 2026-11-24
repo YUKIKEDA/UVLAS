@@ -167,6 +167,7 @@ def graph(parameters: list[Fraction], chart: tuple[Fraction, Fraction, Fraction]
 
 def make_case(
     template: bytes,
+    *,
     n: int,
     h: Fraction,
     variable: bool,
@@ -216,9 +217,23 @@ def interface_case(
     half = Fraction(1, 2)
     left_chart = (Fraction(0), half, Fraction(0))
     right_chart = (half, half, Fraction(0))
-    case = make_case(template, left_n, h, False, left_chart, graph(parameters, left_chart), SQUARE)
+    case = make_case(
+        template,
+        n=left_n,
+        h=h,
+        variable=False,
+        chart=left_chart,
+        coefficients=graph(parameters, left_chart),
+        domain=SQUARE,
+    )
     right_case = make_case(
-        template, right_n, h, False, right_chart, graph(parameters, right_chart), SQUARE
+        template,
+        n=right_n,
+        h=h,
+        variable=False,
+        chart=right_chart,
+        coefficients=graph(parameters, right_chart),
+        domain=SQUARE,
     )
     model = mapping(case["model"])
     right_model = mapping(right_case["model"])
@@ -354,7 +369,17 @@ def bundle() -> dict[Path, bytes]:
             coefficients = explicit_coefficients if path == EXPLICIT else graph(parameters, chart)
             domain = TAPER if path == CUT else SQUARE
             target = Path(f"{family}-{index:02d}") / "case.json"
-            data = to_json(make_case(template, n_value, h, variable, chart, coefficients, domain))
+            data = to_json(
+                make_case(
+                    template,
+                    n=n_value,
+                    h=h,
+                    variable=variable,
+                    chart=chart,
+                    coefficients=coefficients,
+                    domain=domain,
+                )
+            )
             files[target] = data
             entries.append(
                 {
