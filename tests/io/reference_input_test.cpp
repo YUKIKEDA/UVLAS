@@ -1961,9 +1961,12 @@ $EndElements
             if (distance_short || normal_short) {
                 REQUIRE_FALSE(prepared);
                 CHECK(prepared.error().code == core::FailureCode::PrecisionUnresolved);
-                REQUIRE(failure.binding);
-                CHECK(failure.binding->reason == rd::MeshSidecarFailure::Chart);
-                CHECK(failure.binding->element.has_value());
+                if (const auto& detail = failure.binding) {
+                    CHECK(detail->reason == rd::MeshSidecarFailure::Chart);
+                    CHECK(detail->element.has_value());
+                } else {
+                    FAIL("Missing conversion budget diagnostic");
+                }
                 return;
             }
             REQUIRE(prepared);
