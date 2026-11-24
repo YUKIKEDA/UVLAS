@@ -1,6 +1,8 @@
+#include "coupling/case_motion.hpp"
 #include "coupling/case_motion_time_series.hpp"
 #include "io/case_schema_test_adapter.hpp"
 
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
@@ -282,4 +284,122 @@ TEST_CASE("Typed Motion retains Hold and periodic knot accelerations in SI time"
     exact(repeated_left.rotation_coefficient(0, Second), 2);
     exact(repeated_right.rotation_coefficient(0, Second), 2, 1, -1);
     exact(repeated_right.translation(0, Second), 0);
+}
+
+TEST_CASE("Prepared Motion projects a rotated Frame and PCHIP side accelerations together",
+          "[AE-07][IO4-01][N4-03][N4-06][verification][negative]") {
+    auto input = a::root("aerodynamic_prescribed_transient");
+    input.field("units").set("time", a::string("s"));
+    input.field("units").set("length", a::string("m"));
+    input.field("units").set("angle", a::string("deg"));
+    input.field("analysis")
+        .set(
+            "intervals",
+            a::parse(
+                R"([{"start":0,"end":1,"step":1,"restart":"initial"},{"start":1,"end":2,"step":1,"restart":"event"}])"));
+    auto& motion = motion_json(input);
+    motion.set("origin", a::parse(R"({"origin":[3,4,5],"rotation":[[1,0,0],[0,0,-1],[0,1,0]]})"));
+    motion.set(
+        "translation",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[0,1,0],[0,3,0]],"outside":{"kind":"reject"}})"));
+    motion.set(
+        "rotation_vector",
+        a::parse(
+            R"({"kind":"pchip","times":[0,1,2],"values":[[0,0,0],[0,0,90],[0,0,270]],"outside":{"kind":"reject"}})"));
+    motion.set("events", a::parse("[0,1,2]"));
+
+    core::ResourcePlan plan{budget};
+    p::CurveWorkspace workspace;
+    const auto begin = exact_time("0", plan);
+    const auto end = exact_time("2", plan);
+    const auto at = exact_time("1", plan);
+    const c::CaseMotionLimits motion_limits{
+        {exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+        limits,
+        2048,
+        50'000};
+    const auto prepare = [&](const a::JsonToken& json) {
+        const auto si = checked_case(json);
+        return take(c::prepare_case_motion(si, motion_field(si), {begin, end}, stamp, workspace,
+                                           motion_limits, plan));
+    };
+    const auto ready = prepare(input);
+    const auto current = prepare(input);
+    REQUIRE(ready.events().size() == 3);
+    const std::array<std::uint32_t, 1> one{1};
+    const std::array<std::uint32_t, 3> denominator{0, 0, 1U << 17U};
+    const p::RationalView unit{1, one, one}, absolute{1, one, denominator}, zero{0, {}, one};
+    std::array<c::CaseFlowComponentBudget, 36> budgets{};
+    budgets.fill({unit, absolute, zero});
+    const std::array<std::uint32_t, 1> three{3}, four{4}, five{5};
+    const p::RationalView x0{1, three, one}, y0{1, four, one}, z0{1, five, one};
+    const auto point_budgets = std::span<const c::CaseFlowComponentBudget>{budgets}.first(9);
+    const std::array points{c::CaseMotionReferencePoint{{x0, y0, z0}, point_budgets},
+                            c::CaseMotionReferencePoint{{y0, y0, z0}, point_budgets}};
+    const c::CaseMotionProjection projection{core::Precision::TwoWord, budgets, points};
+    const auto evaluate = [&](p::RequestedSide side) {
+        return c::evaluate_case_motion(ready, current, {stamp, at, Second, side}, projection,
+                                       workspace, motion_limits, plan);
+    };
+    rejected(evaluate(Automatic), core::FailureCode::InvalidInput);
+    const auto left = take(evaluate(Left));
+    const auto right = take(evaluate(Right));
+
+    using Dec = boost::multiprecision::cpp_dec_float_100;
+    // Independent decimal enclosure of pi, with an error far smaller than the
+    // requested projection. The Hermite accelerations below come from the
+    // slopes 1/2, 4/3 and 5/2 of the respective unscaled translation ordinates.
+    const Dec pi{"3.141592653589793238462643383279502884197169399375105820974944592307816406"};
+    const auto expect = [&](core::Result<io::SiEnclosure> supplied, const Dec& oracle) {
+        const auto enclosure = take(std::move(supplied));
+        const auto* words = std::get_if<io::ScaledTwoWord>(&enclosure);
+        REQUIRE(words != nullptr);
+        const auto exp = static_cast<int>(words->exponent2);
+        const Dec center = ldexp(Dec{words->high} + Dec{words->low}, exp);
+        const Dec radius = ldexp(Dec{words->radius}, exp);
+        CHECK(abs(center - oracle) <= radius + Dec{"1e-65"});
+        CHECK(radius <= ldexp(Dec{1}, -81));
+    };
+    for (const auto* evaluated : {&left, &right}) {
+        CHECK(evaluated->point_count() == 2);
+        expect(evaluated->centre(0, Value), 3);
+        expect(evaluated->centre(1, Value), 4);
+        expect(evaluated->centre(2, Value), 6);
+        expect(evaluated->centre(2, First), Dec{4} / 3);
+        expect(evaluated->rotation(0, 0, Value), 0);
+        expect(evaluated->rotation(1, 0, Value), 0);
+        expect(evaluated->rotation(2, 0, Value), 1);
+        expect(evaluated->rotation(0, 0, First), -2 * pi / 3);
+        expect(evaluated->rotation(2, 0, Second), -4 * pi * pi / 9);
+        expect(evaluated->point(0, 2, Value), 6);
+        expect(evaluated->point(1, 0, Value), 3);
+        expect(evaluated->point(1, 1, Value), 4);
+        expect(evaluated->point(1, 2, Value), 7);
+        expect(evaluated->point(1, 0, First), -2 * pi / 3);
+        expect(evaluated->point(1, 2, First), Dec{4} / 3);
+        CHECK_FALSE(evaluated->point(2, 0, Value));
+    }
+    expect(left.centre(2, Second), Dec{1} / 3);
+    expect(right.centre(2, Second), Dec{5} / 3);
+    expect(left.rotation(0, 0, Second), -pi / 6);
+    expect(right.rotation(0, 0, Second), -5 * pi / 6);
+    expect(left.point(1, 2, Second), Dec{1} / 3 - 4 * pi * pi / 9);
+    expect(right.point(1, 2, Second), Dec{5} / 3 - 4 * pi * pi / 9);
+    CHECK(take(left.time()).get().requested_side() == Left);
+    CHECK(take(right.time()).get().requested_side() == Right);
+    CHECK(left.interval_work() != 0);
+
+    auto changed = input;
+    motion_json(changed).field("origin").set("origin", a::parse("[3,4,6]"));
+    const auto other = prepare(changed);
+    rejected(c::evaluate_case_motion(ready, other, {stamp, at, Second, Left}, projection, workspace,
+                                     motion_limits, plan),
+             core::FailureCode::StaleGeneration);
+    auto strict = budgets;
+    strict[12 + 3].absolute = zero;
+    rejected(c::evaluate_case_motion(ready, current, {stamp, at, Second, Left},
+                                     {core::Precision::TwoWord, strict}, workspace, motion_limits,
+                                     plan),
+             core::FailureCode::PrecisionUnresolved);
 }

@@ -191,4 +191,24 @@ inline RigidJet compose_local(const Vector& centre, const Matrix& frame, const V
     return result;
 }
 
+/// Map a fixed reference point, expressed in the original world frame.
+inline VectorJet map_reference_point(const Vector& reference, const Vector& centre,
+                                     const Matrix& frame, const RigidJet& rigid, m::Work& work) {
+    using namespace rotation_detail;
+    Vector difference{};
+    for (std::size_t axis = 0; axis < 3; ++axis)
+        difference[axis] = m::subtract(reference[axis], centre[axis], work);
+    Vector local{};
+    for (std::size_t axis = 0; axis < 3; ++axis)
+        for (std::size_t world = 0; world < 3; ++world)
+            local[axis] = m::add(
+                local[axis], m::multiply(frame[3 * world + axis], difference[world], work), work);
+    auto result = rigid.centre;
+    for (std::size_t row = 0; row < 3; ++row)
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            result[row] =
+                add(result[row], scale(rigid.rotation[3 * row + axis], local[axis], work), work);
+    return result;
+}
+
 } // namespace uvlas::coupling::detail::motion

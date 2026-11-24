@@ -20,11 +20,18 @@ struct CaseMotionLimits {
     std::uint64_t maximum_interval_work;
 };
 
+struct CaseMotionReferencePoint {
+    std::array<aero::detail::pchip::RationalView, 3> world_metres;
+    /// Three world components per requested derivative order.
+    std::span<const CaseFlowComponentBudget> components;
+};
+
 struct CaseMotionProjection {
     core::Precision representation;
     /// Per derivative order: three world centre components, then nine row-major
     /// rotation components. Each scale uses its component's native units.
     std::span<const CaseFlowComponentBudget> components;
+    std::span<const CaseMotionReferencePoint> reference_points{};
 };
 
 class CaseMotionReady {
@@ -58,6 +65,9 @@ public:
     centre(std::size_t axis, aero::detail::pchip::JetOrder) const noexcept;
     [[nodiscard]] core::Result<io::SiEnclosure>
     rotation(std::size_t row, std::size_t column, aero::detail::pchip::JetOrder) const noexcept;
+    [[nodiscard]] std::size_t point_count() const noexcept;
+    [[nodiscard]] core::Result<io::SiEnclosure> point(std::size_t point, std::size_t axis,
+                                                      aero::detail::pchip::JetOrder) const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const CaseMotionTimeJet>>
     time() const& noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const CaseMotionTimeJet>>
@@ -68,10 +78,12 @@ private:
     friend struct case_motion_detail::Builder;
     static constexpr std::size_t components_per_order = 12;
     using Values = std::array<io::SiEnclosure, 3 * components_per_order>;
-    CaseMotionEvaluation(CaseMotionTimeJet, Values, std::size_t orders, std::uint64_t) noexcept;
+    CaseMotionEvaluation(CaseMotionTimeJet, Values, core::PlannedBuffer<io::SiEnclosure>,
+                         std::size_t orders, std::uint64_t) noexcept;
 
     CaseMotionTimeJet time_;
     Values values_;
+    core::PlannedBuffer<io::SiEnclosure> points_;
     std::size_t orders_;
     std::uint64_t interval_work_;
 };

@@ -2,6 +2,7 @@
 
 #include "case_component_precision_private.hpp"
 
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -78,6 +79,16 @@ struct Builder {
             (request.representation != core::Precision::Binary64 &&
              request.representation != core::Precision::TwoWord))
             case_components::reject(PrecisionUnsupported);
+        const auto point_stride = orders * axes;
+        constexpr auto max_index =
+            static_cast<std::size_t>(std::numeric_limits<core::Index>::max());
+        if (request.reference_points.size() > max_index / point_stride)
+            case_components::reject(ResourceExceeded);
+        for (const auto& point : request.reference_points) {
+            work.step();
+            if (point.components.size() != point_stride)
+                case_components::reject(InvalidInput);
+        }
         take(prepared.frame_.match(current.frame_, stop, details));
         const auto frame = take(prepared.frame_.view());
         auto curves = take(evaluate_case_motion_time_series(prepared.curves_, current.curves_,
@@ -117,8 +128,30 @@ struct Builder {
             for (const auto& component : rigid.rotation)
                 put(component);
         }
+        const auto point_words =
+            static_cast<core::Index>(request.reference_points.size() * point_stride);
+        auto points = take(memory.allocate<io::SiEnclosure>(point_words, evaluation));
+        auto output = points.values();
+        for (const auto& point : request.reference_points) {
+            motion::Vector reference{};
+            for (std::size_t axis = 0; axis < axes; ++axis)
+                reference[axis] = case_components::rational(
+                    point.world_metres[axis], limits.maximum_interval_input_bits, work);
+            const auto mapped =
+                motion::map_reference_point(reference, frame.origin, frame.rotation, rigid, work);
+            std::size_t index = 0;
+            for (std::size_t order = 0; order < orders; ++order)
+                for (const auto& component : mapped) {
+                    output[index] = case_components::project(
+                        component.*jet_components[order], point.components[index],
+                        request.representation, limits.maximum_interval_input_bits, scratch, work);
+                    ++index;
+                }
+            output = output.subspan(point_stride);
+        }
         work.step();
-        return CaseMotionEvaluation{std::move(curves), std::move(values), orders, work.used};
+        return CaseMotionEvaluation{std::move(curves), std::move(values), std::move(points), orders,
+                                    work.used};
     }
 };
 } // namespace case_motion_detail
@@ -132,17 +165,24 @@ std::span<const p::RationalView> CaseMotionReady::events() const& noexcept {
 }
 
 CaseMotionEvaluation::CaseMotionEvaluation(CaseMotionTimeJet time, Values values,
+                                           core::PlannedBuffer<io::SiEnclosure> points,
                                            std::size_t orders, std::uint64_t work) noexcept
-    : time_(std::move(time)), values_(std::move(values)), orders_(orders), interval_work_(work) {}
+    : time_(std::move(time)),
+      values_(std::move(values)),
+      points_(std::move(points)),
+      orders_(orders),
+      interval_work_(work) {}
 
 CaseMotionEvaluation::CaseMotionEvaluation(CaseMotionEvaluation&& source) noexcept
     : CaseMotionEvaluation(std::move(source.time_), std::move(source.values_),
-                           std::exchange(source.orders_, 0), source.interval_work_) {}
+                           std::move(source.points_), std::exchange(source.orders_, 0),
+                           source.interval_work_) {}
 
 CaseMotionEvaluation& CaseMotionEvaluation::operator=(CaseMotionEvaluation&& source) noexcept {
     if (this != &source) {
         time_ = std::move(source.time_);
         values_ = std::move(source.values_);
+        points_ = std::move(source.points_);
         orders_ = std::exchange(source.orders_, 0);
         interval_work_ = source.interval_work_;
     }
@@ -170,6 +210,18 @@ CaseMotionEvaluation::time() const& noexcept {
     if (orders_ == 0)
         return std::unexpected(core::Failure{InvalidInput, evaluation});
     return std::cref(time_);
+}
+
+std::size_t CaseMotionEvaluation::point_count() const noexcept {
+    return orders_ == 0 ? 0 : static_cast<std::size_t>(points_.size()) / (axes * orders_);
+}
+
+core::Result<io::SiEnclosure> CaseMotionEvaluation::point(std::size_t point, std::size_t axis,
+                                                          p::JetOrder order) const noexcept {
+    const auto index = static_cast<std::size_t>(order);
+    if (point >= point_count() || axis >= axes || index >= orders_)
+        return std::unexpected(core::Failure{InvalidInput, evaluation});
+    return points_.values()[(point * orders_ + index) * axes + axis];
 }
 
 std::uint64_t CaseMotionEvaluation::interval_work() const noexcept {
