@@ -98,6 +98,80 @@ core::Result<DependencyWalk> DependencyWalk::create(DependencyWalkLimits limits,
         cells};
 }
 
+core::Result<void> DependencyWalk::charge(std::uint64_t amount) noexcept {
+    if (!limits_ || amount > limits_->work - work_) {
+        return fail(Code::ResourceExceeded);
+    }
+    work_ += amount;
+    return {};
+}
+
+core::Result<void> DependencyWalk::grow_sources(std::uint64_t admitted, core::ResourcePlan& plan,
+                                                const std::stop_token& stop) noexcept {
+    if (stop.stop_requested()) {
+        return fail(Code::Cancelled);
+    }
+    if (!limits_ || admitted < positions_.size()) {
+        return fail(Code::InvalidInput);
+    }
+    if (admitted == positions_.size()) {
+        return {};
+    }
+    const auto frames = std::min(limits_->depth, admitted);
+    constexpr auto max_index = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
+    if (frames > max_index / 4 || admitted > max_index / 4 - frames) {
+        return fail(Code::ResourceExceeded);
+    }
+    const auto changes_frames = frames != frames_.size();
+    const auto copied = positions_.size() + finished_ + (changes_frames ? 2 * active_ : 0);
+    const auto initialized = 2 * (admitted + (changes_frames ? frames : 0));
+    const auto work = initialized + copied;
+    const auto bytes = core::checked_byte_count(static_cast<core::Index>(initialized),
+                                                sizeof(core::Index), operation);
+    if (!bytes) {
+        return std::unexpected(bytes.error());
+    }
+    if (work > limits_->work - work_ || *bytes > plan.remaining_bytes()) {
+        return fail(Code::ResourceExceeded);
+    }
+    const auto grow = [&](const auto& from, std::uint64_t size,
+                          std::size_t amount) -> core::Result<core::PlannedBuffer<core::Index>> {
+        auto target = plan.allocate<core::Index>(static_cast<core::Index>(size), operation);
+        if (stop.stop_requested()) {
+            return fail(Code::Cancelled);
+        }
+        if (target) {
+            std::ranges::copy(from.values().first(amount), target->values().begin());
+        }
+        return target;
+    };
+    auto positions = grow(positions_, admitted, positions_.size());
+    if (!positions) {
+        return std::unexpected(positions.error());
+    }
+    auto order = grow(order_, admitted, finished_);
+    if (!order) {
+        return std::unexpected(order.error());
+    }
+    if (changes_frames) {
+        auto stack = grow(frames_, frames, active_);
+        if (!stack) {
+            return std::unexpected(stack.error());
+        }
+        auto heights = grow(heights_, frames, active_);
+        if (!heights) {
+            return std::unexpected(heights.error());
+        }
+        frames_ = std::move(*stack);
+        heights_ = std::move(*heights);
+    }
+    positions_ = std::move(*positions);
+    order_ = std::move(*order);
+    limits_->sources = admitted;
+    work_ += work;
+    return {};
+}
+
 core::Result<DependencyStep> DependencyWalk::enter(const DependencyEdge& edge,
                                                    core::ResourcePlan& plan,
                                                    const std::stop_token& stop,

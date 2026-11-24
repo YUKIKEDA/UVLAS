@@ -142,25 +142,43 @@ struct BoundRoot {
         return failure(core::FailureCode::InvalidInput);
     }
 
-#if defined(_WIN32) || defined(__linux__)
     const auto& declared = occurrence->original;
-    const RootSnapshotLocation location{bound.parent, declared.source_id, declared.role,
-                                        declared.declaration_node};
-    const auto pointer = declared.declaration_pointer;
+    return acquire_reference_snapshot(
+        bound.origin, source->path,
+        {bound.parent, declared.source_id, declared.role, declared.declaration_node},
+        declared.declared_digest, declared.declaration_pointer, earlier_sources, limits, plan, stop,
+        diagnostic);
+}
+
+} // namespace
+
+core::Result<AcquiredRootSnapshot> acquire_reference_snapshot(
+    const ReferenceInputView& origin, const NormalizedReferencePath& path,
+    RootSnapshotLocation location, const SourceDigest& digest, std::string_view pointer,
+    std::span<const ReferenceFileId> earlier_sources, RootSnapshotLimits limits,
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    RootSnapshotDiagnostic* diagnostic) noexcept {
+    if (cancelled(stop, diagnostic)) {
+        return failure(core::FailureCode::Cancelled);
+    }
+    if (origin.root == nullptr) {
+        mark(diagnostic, RootSnapshotFailure::InvalidSelection);
+        return failure(core::FailureCode::InvalidInput);
+    }
+#if defined(_WIN32) || defined(__linux__)
     const auto reject = [&](core::Failure error, RootSnapshotFailure reason) {
         return describe_failure(error, reason, location, pointer, limits.diagnostic_bytes, plan,
                                 stop, diagnostic);
     };
     const auto acquire = [&]() -> core::Result<ReferenceFileSnapshot> {
-        auto reader = bound.origin.root->open_file(source->path, plan, stop,
-                                                   diagnostic ? &diagnostic->open : nullptr);
+        auto reader =
+            origin.root->open_file(path, plan, stop, diagnostic ? &diagnostic->open : nullptr);
         if (!reader) {
             return reject(reader.error(), RootSnapshotFailure::Open);
         }
         auto snapshot = read_reference_file(
-            *reader, declared.declared_digest, limits.file, plan, stop,
-            diagnostic ? &diagnostic->read : nullptr,
-            {bound.origin.manifest_identity, earlier_sources, limits.maximum_identity_comparisons});
+            *reader, digest, limits.file, plan, stop, diagnostic ? &diagnostic->read : nullptr,
+            {origin.manifest_identity, earlier_sources, limits.maximum_identity_comparisons});
         if (!snapshot) {
             return reject(snapshot.error(), RootSnapshotFailure::Read);
         }
@@ -170,7 +188,6 @@ struct BoundRoot {
     if (!file) {
         return std::unexpected(file.error());
     }
-
     auto owned_pointer = copy_pointer(pointer, plan);
     if (cancelled(stop, diagnostic)) {
         return failure(core::FailureCode::Cancelled);
@@ -180,6 +197,10 @@ struct BoundRoot {
     }
     return AcquiredRootSnapshot{location, std::move(*file), std::move(*owned_pointer)};
 #else
+    static_cast<void>(path);
+    static_cast<void>(location);
+    static_cast<void>(digest);
+    static_cast<void>(pointer);
     static_cast<void>(earlier_sources);
     static_cast<void>(limits);
     static_cast<void>(plan);
@@ -187,8 +208,6 @@ struct BoundRoot {
     return failure(core::FailureCode::Unsupported);
 #endif
 }
-
-} // namespace
 
 core::Result<AcquiredRootSnapshot>
 acquire_root_snapshot(const ReferenceInput& input, const PreparedRootReferences& prepared,

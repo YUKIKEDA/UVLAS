@@ -938,10 +938,10 @@ TEST_CASE("Only format-proven root leaves enter a closed reference graph",
         CHECK(no_storage.allocated_bytes() == 0);
         return closed;
     }();
-    CHECK(fixture::take(empty.roots().identity()).source.source == source);
-    CHECK(fixture::take(empty.roots().report()).declarations == 0);
+    CHECK(fixture::take(empty.identity()).source.source == source);
+    CHECK(fixture::take(empty.dependency_count(std::nullopt)) == 0);
     CHECK(empty.dependency_first().empty());
-    CHECK_FALSE(empty.roots().snapshot(0));
+    CHECK_FALSE(empty.snapshot(0));
 
     const Tree tree;
     const auto wire = write_root_inventory(tree.root);
@@ -1097,4 +1097,222 @@ TEST_CASE("Root walk applies preflight, snapshot, and edge failures in order",
     CHECK_FALSE(diagnostic.reason);
     CHECK_FALSE(diagnostic.walk.reason);
     CHECK(diagnostic.pointer().empty());
+}
+
+namespace {
+
+// The topology is the independent IO4-01 design case: manifest → A,C, A → B,C,
+// C → B. Existing fixture roles provide the manifest roots, including a repeated edge.
+// This extractor supplies typed declarations and asserts the exact authenticated payload
+// it receives. It specifies no product format.
+class DesignDependencies final : public rd::ReferenceDependencyExtractor {
+public:
+    explicit DesignDependencies(core::ResourcePlan& plan) noexcept : plan_(plan) {}
+
+    core::Result<rd::ExtractedReferenceDependencies>
+    extract(const rd::AcquiredRootSnapshot& snapshot) noexcept override {
+        const auto file = snapshot.file.view();
+        if (!file || visits == order.size()) {
+            return std::unexpected(
+                core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
+        }
+        const auto id = snapshot.location.source.value();
+        order[visits++] = id;
+        const auto row = id == 300 ? 2 : id == 302 ? 1 : 0;
+        auto entries =
+            plan_.allocate<rd::ChildReferenceDeclaration>(row, core::Operation::PrepareModel);
+        if (!entries) {
+            return std::unexpected(entries.error());
+        }
+        const rd::ChildReferenceDeclaration b{
+            io::SourceId{901}, rd::ReferenceRole::ReferenceGeometry, abc_digest, 0, child_path,
+            child_path};
+        if (id == 300) {
+            sees_exact_bytes = std::ranges::equal(file->bytes, bytes_of(inventory_mesh));
+            entries->values()[0] = b;
+            entries->values()[1] = {io::SourceId{302}, rd::ReferenceRole::ReferenceGeometry,
+                                    abc_digest,        1,
+                                    "geometry.json",   "geometry.json"};
+        } else if (id == 302) {
+            entries->values()[0] = b;
+            if (cycle) {
+                entries->values()[0] = {io::SourceId{300},
+                                        rd::ReferenceRole::GmshMesh,
+                                        digest_literal(inventory_mesh_hash),
+                                        2,
+                                        "skin.msh",
+                                        "skin.msh"};
+            }
+        }
+        return rd::ExtractedReferenceDependencies{std::move(*entries), {}};
+    }
+
+    std::array<std::uint64_t, 9> order{};
+    std::size_t visits{};
+    std::string_view child_path{"child/./side"};
+    bool cycle{};
+    bool sees_exact_bytes{};
+
+private:
+    core::ResourcePlan& plan_;
+};
+
+rd::ReferenceGraphLimits design_limits() {
+    auto inventory = memory_inventory_bounds;
+    inventory.maximum_sources += 1;
+    inventory.total_payload_bytes += 3;
+    inventory.total_hash_bytes += 3;
+    inventory.total_read_bytes += 4;
+    inventory.total_read_calls += 2;
+    inventory.total_identity_comparisons += 8;
+    return {inventory, {9, 12, 3, 4096, 256}, 512, {64, 64, 4}};
+}
+
+} // namespace
+
+TEST_CASE("An authenticated dependency graph owns sources, provenance and adjacency after cleanup",
+          "[IO4-01][N4-02][integration][verification]") {
+    const auto graph = [] {
+        const Tree tree;
+        const auto wire = write_root_inventory(tree.root);
+        REQUIRE(fs::create_directory(tree.root / "child"));
+        write_file(tree.root / "child" / "side", "abc");
+        const auto input = from_memory(tree.root, wire);
+        auto prepared = prepare(input);
+        core::ResourcePlan plan{fixture::budget};
+        DesignDependencies extractor{plan};
+        auto result = rd::resolve_reference_graph(input, std::move(prepared), design_limits(),
+                                                  extractor, plan, {}, nullptr, nullptr);
+        CHECK(extractor.sees_exact_bytes);
+        CHECK(extractor.visits == 9);
+        CHECK(extractor.order ==
+              std::array<std::uint64_t, 9>{300, 901, 302, 301, 200, 201, 700, 900, 800});
+        return fixture::take(std::move(result));
+    }();
+
+    constexpr std::array<core::Index, 9> expected_order{8, 2, 0, 1, 3, 4, 5, 6, 7};
+    CHECK(std::ranges::equal(graph.dependency_first(), expected_order));
+    CHECK(fixture::take(graph.dependency_count(std::nullopt)) == 9);
+    CHECK(fixture::take(graph.dependency_count(0)) == 2);
+    CHECK(fixture::take(graph.dependency_count(2)) == 1);
+    CHECK(fixture::take(graph.dependency_count(8)) == 0);
+    CHECK_FALSE(graph.dependency(8, 0));
+    CHECK_FALSE(graph.dependency(-1, 0));
+    CHECK_FALSE(graph.snapshot(9));
+    CHECK(fixture::take(graph.dependency(std::nullopt, 7)).topology.dependency == 6);
+    CHECK(fixture::take(graph.dependency(std::nullopt, 8)).topology.dependency == 7);
+    const auto manifest_edge = fixture::take(graph.dependency({}, 0));
+    CHECK(manifest_edge.declaration_pointer == "/model/geometry/0/mesh");
+    CHECK(manifest_edge.topology.declaring_source == source);
+    CHECK(manifest_edge.original_path == "skin.msh");
+    const auto from_a = fixture::take(graph.dependency(0, 0));
+    const auto from_c = fixture::take(graph.dependency(2, 0));
+    CHECK(from_a.topology.dependency == 8);
+    CHECK(from_a.topology.consumer == 0);
+    CHECK(from_a.topology.declaring_source == io::SourceId{300});
+    CHECK(from_a.topology.declaration_node == 0);
+    CHECK(from_a.original_path == "child/./side");
+    CHECK(from_a.declaration_pointer.empty());
+    CHECK(from_c.topology.dependency == 8);
+    CHECK(from_c.topology.declaring_source == io::SourceId{302});
+    CHECK(fixture::take(graph.dependency(0, 1)).topology.dependency == 2);
+
+    const auto parent = fixture::take(graph.identity());
+    const auto child = fixture::take(
+        graph.find(parent, io::SourceId{901}, rd::ReferenceRole::ReferenceGeometry, {}));
+    if (const auto child_file = child.get().file.view()) {
+        CHECK(std::ranges::equal(child_file->bytes, bytes_of("abc")));
+        CHECK(child_file->digest == abc_digest);
+    } else {
+        FAIL("Missing child payload");
+    }
+    CHECK(fixture::take(graph.normalized_path(8)) == "child/side");
+    CHECK(fixture::take(graph.normalized_path(2)) == "geometry.json");
+    CHECK_FALSE(graph.find(parent, io::SourceId{901}, rd::ReferenceRole::GmshSidecar, {}));
+    auto stale = parent;
+    ++stale.representation_revision;
+    check_acquisition_failure(
+        graph.find(stale, io::SourceId{901}, rd::ReferenceRole::ReferenceGeometry, {}),
+        core::FailureCode::StaleGeneration);
+}
+
+TEST_CASE("Reference DFS rejects the first child failure and publishes no partial owner",
+          "[IO4-01][N4-02][integration][verification][negative]") {
+    using Code = core::FailureCode;
+    const Tree tree;
+    const auto wire = write_root_inventory(tree.root);
+    REQUIRE(fs::create_directory(tree.root / "child"));
+    const auto child = tree.root / "child" / "side";
+    // Without DFS the missing later manifest file would hide the child failure.
+    REQUIRE(fs::remove(tree.root / "sidecar.json"));
+    write_file(child, "abd");
+    const auto input = from_memory(tree.root, wire);
+    auto prepared = prepare(input);
+    rd::RootSnapshotDiagnostic acquisition;
+    rd::LeafReferenceDiagnostic diagnostic;
+    core::ResourcePlan plan{fixture::budget};
+    DesignDependencies extractor{plan};
+    const auto run = [&](rd::ReferenceGraphLimits caps) {
+        extractor.visits = 0;
+        return rd::resolve_reference_graph(input, std::move(prepared), caps, extractor, plan, {},
+                                           &acquisition, &diagnostic);
+    };
+
+    check_acquisition_failure(run(design_limits()), Code::InvalidInput);
+    check_read_reason(acquisition, rd::ReferenceFileFailure::DigestMismatch);
+    CHECK(diagnostic.declaring_source == io::SourceId{300});
+    if (const auto location = acquisition.location) {
+        CHECK(location->source == io::SourceId{901});
+        CHECK(location->declaration_node == 0);
+    } else {
+        FAIL("Missing first child location");
+    }
+    CHECK(extractor.visits == 1);
+    CHECK(fixture::take(prepared.report()).unique_sources == 8);
+
+    REQUIRE(fs::remove(child));
+    fs::create_hard_link(tree.root / "skin.msh", child);
+    check_acquisition_failure(run(design_limits()), Code::InvalidInput);
+    check_read_reason(acquisition, rd::ReferenceFileFailure::DuplicateFile);
+    CHECK(extractor.visits == 1);
+    REQUIRE(fs::remove(child));
+    write_file(child, "abc");
+
+    auto too_few_sources = design_limits();
+    too_few_sources.inventory.maximum_sources = 8;
+    check_acquisition_failure(run(too_few_sources), Code::ResourceExceeded);
+    CHECK(diagnostic.reason == rd::LeafReferenceFailure::Graph);
+    CHECK_FALSE(acquisition.reason);
+    CHECK(extractor.visits == 1);
+
+    auto shallow = design_limits();
+    shallow.walk.depth = 1;
+    check_acquisition_failure(run(shallow), Code::ResourceExceeded);
+    CHECK(diagnostic.walk.reason == rd::DependencyWalkFailure::DepthLimit);
+    CHECK(extractor.visits == 1);
+
+    extractor.child_path = "../outside";
+    check_acquisition_failure(run(design_limits()), Code::InvalidInput);
+    if (const auto path = diagnostic.path) {
+        CHECK(path->reason == rd::ReferencePathReason::EscapeRoot);
+    } else {
+        FAIL("Missing child path reason");
+    }
+    CHECK(diagnostic.declaring_source == io::SourceId{300});
+    CHECK_FALSE(acquisition.reason);
+    extractor.child_path = "child/./side";
+    extractor.cycle = true;
+    const auto cyclic = run(design_limits());
+    check_acquisition_failure(cyclic, Code::InvalidInput);
+    CHECK(diagnostic.walk.reason == rd::DependencyWalkFailure::Cycle);
+    constexpr std::array<core::Index, 3> cycle{0, 2, 0};
+    CHECK(std::ranges::equal(diagnostic.walk.cycle.values(), cycle));
+    CHECK(diagnostic.declaring_source == io::SourceId{302});
+    if (const auto position = diagnostic.location) {
+        CHECK(position->declaration_node == 2);
+    } else {
+        FAIL("Missing child cycle position");
+    }
+    CHECK_FALSE(acquisition.reason);
+    CHECK(fixture::take(prepared.report()).unique_sources == 8);
 }

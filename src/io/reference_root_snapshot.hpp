@@ -63,6 +63,15 @@ acquire_root_snapshot(const ReferenceInput& input, const PreparedRootReferences&
                       RootSnapshotLimits limits, core::ResourcePlan& plan,
                       const std::stop_token& stop, RootSnapshotDiagnostic* diagnostic) noexcept;
 
+// Reads an already admitted declaration rooted at the checked origin. The pointer is empty
+// for non-JSON declarations. Earlier IDs are the successfully acquired sources in DFS order.
+[[nodiscard]] core::Result<AcquiredRootSnapshot> acquire_reference_snapshot(
+    const ReferenceInputView& origin, const NormalizedReferencePath& path,
+    RootSnapshotLocation location, const SourceDigest& digest, std::string_view pointer,
+    std::span<const ReferenceFileId> earlier_sources, RootSnapshotLimits limits,
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    RootSnapshotDiagnostic* diagnostic) noexcept;
+
 struct RootInventoryLimits {
     RootSnapshotLimits per_source;
     std::uint64_t maximum_sources;

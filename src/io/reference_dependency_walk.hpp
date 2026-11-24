@@ -60,6 +60,9 @@ public:
     [[nodiscard]] core::Result<void> finish(core::Index source,
                                             const std::stop_token& stop) noexcept;
 
+    [[nodiscard]] core::Result<void> grow_sources(std::uint64_t admitted, core::ResourcePlan& plan,
+                                                  const std::stop_token& stop) noexcept;
+    [[nodiscard]] core::Result<void> charge(std::uint64_t amount) noexcept;
     [[nodiscard]] std::optional<DependencyWalkView> view() const& noexcept;
     [[nodiscard]] std::optional<DependencyWalkView> view() const&& = delete;
 
