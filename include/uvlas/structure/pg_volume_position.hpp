@@ -23,6 +23,7 @@ struct PgVolumePositionLimits {
 
 class PgBoundaryPositionReference;
 class PgBoundaryTangentReference;
+class PgMaterialTangentReference;
 class PgPreparedVolumeReference;
 struct PgPreparedPatchIdentity;
 class PgProjectedReferenceBatch;
@@ -75,6 +76,12 @@ private:
                                          PgVolumePositionDirection, PgCartesianWords,
                                          const PgVolumePositionLimits&, core::Workspace&,
                                          PgVolumePositionResult&) noexcept;
+
+    friend core::Result<void>
+    apply_pg_material_tangents(const PgMaterialTangentReference&, PgPreparedPatchIdentity,
+                               PgVolumePositionDirection, PgCartesianWords,
+                               const PgVolumePositionLimits&, core::Workspace&,
+                               PgVolumePositionResult&) noexcept;
 
     struct MatrixView {
         const PgConditioningCertificate* certificate;

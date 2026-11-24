@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <uvlas/structure/pg_boundary_tangents.hpp>
-#include <uvlas/structure/pg_prepared_patch.hpp>
+#include <uvlas/structure/pg_material_tangents.hpp>
 
 namespace uvlas::coupling::detail {
 
@@ -12,8 +12,8 @@ namespace uvlas::coupling::detail {
 /// the actual PG coordinates. A source expression, when supplied, must agree
 /// with the same PG position on the contact-qualified finite facet.
 struct PgAeroCollocation {
-    aero::detail::FacetId facet;
-    aero::detail::QueryId query;
+    aero::detail::FacetId facet{0};
+    aero::detail::QueryId query{0};
     std::optional<aero::detail::SourceFacePoint> incidence;
     bool reverse_orientation = false;
 };
@@ -33,6 +33,16 @@ public:
             const structure::PgPreparedReferenceProjection&, double maximum_tangent_error,
             const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
 
+    /// The role order is the same. Material points may be within a layer.
+    /// Directions apply only to collocations and are exact in (s,t,zeta).
+    [[nodiscard]] static core::Result<PgAeroMap>
+    prepare_material(const structure::PgPreparedPatch&, std::span<const aero::detail::PointId>,
+                     std::span<const PgAeroCollocation>,
+                     std::span<const structure::PgReferencePoint>,
+                     std::span<const structure::PgMaterialDirections>,
+                     const structure::PgPreparedReferenceProjection&, double maximum_tangent_error,
+                     const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
     [[nodiscard]] structure::PgPreparedPatchIdentity source() const noexcept;
 
 private:
@@ -40,6 +50,11 @@ private:
     friend struct PgAeroTrialData;
     struct Data;
     explicit PgAeroMap(std::shared_ptr<const Data>) noexcept;
+    template <class Position, class Tangents>
+    [[nodiscard]] static core::Result<PgAeroMap>
+    prepare_impl(std::span<const aero::detail::PointId>, std::span<const PgAeroCollocation>,
+                 std::size_t material_count, const structure::PgReferenceLimits&,
+                 core::ResourcePlan&, const Position&, const Tangents&) noexcept;
     std::shared_ptr<const Data> data_;
 };
 
@@ -55,9 +70,9 @@ struct PgAeroLimits {
     structure::PgVolumePositionLimits position, velocity, tangents;
     aero::detail::GeometryLimits geometry;
     aero::detail::GlobalLimits contact;
-    std::uint64_t maximum_steps;
-    double maximum_midpoint_velocity_error;
-    double maximum_reference_geometry_error; ///< Euclidean displacement, in metres.
+    std::uint64_t maximum_steps{};
+    double maximum_midpoint_velocity_error{};
+    double maximum_reference_geometry_error{}; ///< Euclidean displacement, in metres.
 };
 
 struct PgAeroChart {

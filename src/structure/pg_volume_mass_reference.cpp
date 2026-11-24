@@ -2,6 +2,7 @@
 #include "pg_reference_projection.hpp"
 
 #include <uvlas/structure/pg_boundary_tangents.hpp>
+#include <uvlas/structure/pg_material_tangents.hpp>
 #include <uvlas/structure/pg_prepared_volume.hpp>
 
 namespace uvlas::structure {
@@ -70,7 +71,7 @@ void project_shapes(ReferenceArithmetic& math, const PgConditionedReferenceBatch
     return PgReferenceVolumePoint{query.volume, query.u, query.v, query.depth};
 }
 
-[[nodiscard]] const PgReferencePoint& reference_query(const PgReferencePoint& query) {
+[[nodiscard]] PgReferencePoint reference_query(const PgReferencePoint& query) {
     return query;
 }
 
@@ -127,7 +128,7 @@ project_rows(ReferenceArithmetic& math, const PgConditioningCertificate& conditi
             partition_take(conditioning.evaluate_reference(std::span{&query, 1}, remaining, plan));
         math.charge(exact.call_info.scalar_operations);
         math.visit(exact.call_info.partition_visits);
-        points.values()[p] = fill_row(exact, high_row.first(width),
+        points.values()[p] = fill_row(p, exact, high_row.first(width),
                                       two_word ? low_row.first(width) : std::span<double>{});
         high_row = high_row.subspan(width);
         if (two_word)
@@ -214,6 +215,51 @@ void project_tangents(ReferenceArithmetic& math, const PgConditionedReferenceBat
         }
 }
 
+[[nodiscard]] PgProjectedReferencePoint record(const PgReferenceValue& point) {
+    auto domain = PgProjectedReferenceDomain::Volume;
+    if (!std::holds_alternative<PgReferenceVolumeMeasure>(point.measure))
+        switch (boundary_side(point)) {
+        case PgBoundaryPositionSide::Lower:
+            domain = PgProjectedReferenceDomain::Lower;
+            break;
+        case PgBoundaryPositionSide::Upper:
+            domain = PgProjectedReferenceDomain::Upper;
+            break;
+        case PgBoundaryPositionSide::Lateral:
+            domain = PgProjectedReferenceDomain::Lateral;
+            break;
+        }
+    return {point.cell, point.partition_record, point.layer, domain};
+}
+
+void project_material_tangents(ReferenceArithmetic& math, const PgConditionedReferenceBatch& batch,
+                               const PgMaterialDirections& motion,
+                               const PgMaterialTangentProjection& request, std::span<double> high,
+                               std::span<double> low) {
+    const auto& point = batch.points.values().front();
+    ReferenceRadicals field{math, point.g};
+    const auto tolerance = reference_binary64(math, request.maximum_derivative_error);
+    std::size_t slot = 0;
+    for (const auto& change : motion) {
+        PgReferenceVector world_direction;
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            for (std::size_t chart = 0; chart < 3; ++chart)
+                world_direction[axis] = field.add(
+                    world_direction[axis],
+                    field.scale(point.jacobian_columns_metres[chart][axis], change[chart]));
+        for (const auto& column : batch.columns.values()) {
+            math.visit(1);
+            const auto d = field.dot(column.physical_gradient_per_metre, world_direction);
+            const auto words =
+                pg_project_scalar(math, d, point.g, tolerance, request.representation);
+            high[slot] = words.high;
+            if (!low.empty())
+                low[slot] = words.low;
+            ++slot;
+        }
+    }
+}
+
 [[nodiscard]] PgProjectedReferencePoint
 project_reference_row(ReferenceArithmetic& math, const PgConditionedReferenceBatch& batch,
                       const PgPreparedReferenceProjection& request, std::span<double> high,
@@ -296,7 +342,7 @@ core::Result<PgProjectedReferenceBatch> PgPreparedPatch::project_points(
             validate_tolerance(tolerance);
         auto rows = project_rows<PgProjectedReferencePoint>(
             math, conditioning(), source.basis.rank, queries, two_word, 4, 4,
-            [&](const PgConditionedReferenceBatch& batch, std::span<double> high,
+            [&](std::size_t, const PgConditionedReferenceBatch& batch, std::span<double> high,
                 std::span<double> low) {
                 return project_reference_row(math, batch, projection, high, low);
             });
@@ -352,7 +398,7 @@ PgVolumeMassReference::prepare(PgConditioningCertificate&& conditioning,
         validate_tolerance(request.maximum_volume_jacobian_error_metres_cubed);
         auto result = project_rows<PgVolumeMassPoint>(
             math, conditioning, accepted.rank, queries, two_word, 1, 1,
-            [&](const PgConditionedReferenceBatch& point, std::span<double> high,
+            [&](std::size_t, const PgConditionedReferenceBatch& point, std::span<double> high,
                 std::span<double> low) {
                 project_mass_point(math, point, request, high, low);
                 project_shapes(math, point, request.maximum_shape_error, request.representation,
@@ -395,7 +441,7 @@ core::Result<PgBoundaryPositionReference> PgBoundaryPositionReference::prepare(
         validate_tolerance(request.maximum_shape_error);
         auto result = project_rows<PgBoundaryPositionRecord>(
             math, conditioning, accepted.rank, queries, two_word, 0, 1,
-            [&](const PgConditionedReferenceBatch& point, std::span<double> high,
+            [&](std::size_t, const PgConditionedReferenceBatch& point, std::span<double> high,
                 std::span<double> low) {
                 project_shapes(math, point, request.maximum_shape_error, request.representation,
                                high, low);
@@ -454,7 +500,7 @@ core::Result<PgBoundaryTangentReference> PgBoundaryTangentReference::prepare(
         const auto& partition = partition_take(basis->source()).partition;
         auto result = project_rows<PgBoundaryPositionRecord>(
             math, conditioning, accepted.rank, queries, two_word, 0, 2,
-            [&](const PgConditionedReferenceBatch& batch, std::span<double> high,
+            [&](std::size_t, const PgConditionedReferenceBatch& batch, std::span<double> high,
                 std::span<double> low) {
                 const auto record = boundary_record(batch.points.values().front());
                 project_tangents(math, batch, partition, record.side, request, high, low);
@@ -466,6 +512,66 @@ core::Result<PgBoundaryTangentReference> PgBoundaryTangentReference::prepare(
                                           std::move(result.points),
                                           std::move(result.high),
                                           std::move(result.low)};
+    });
+}
+
+PgMaterialTangentReference::PgMaterialTangentReference(
+    PgPreparedPatchIdentity source, std::size_t columns, PgMaterialTangentProjection projection,
+    PgReferenceCallInfo call_info, core::PlannedBuffer<PgProjectedReferencePoint> points,
+    core::PlannedBuffer<double> high, core::PlannedBuffer<double> low) noexcept
+    : source_(source),
+      column_count_(columns),
+      projection_(projection),
+      call_info_(call_info),
+      points_(std::move(points)),
+      high_(std::move(high)),
+      low_(std::move(low)) {}
+
+PgMaterialTangentReference::PgMaterialTangentReference(PgMaterialTangentReference&& other) noexcept
+    : PgMaterialTangentReference(other.source_, std::exchange(other.column_count_, 0),
+                                 other.projection_, other.call_info_, std::move(other.points_),
+                                 std::move(other.high_), std::move(other.low_)) {}
+
+PgMaterialTangentReference&
+PgMaterialTangentReference::operator=(PgMaterialTangentReference&& other) noexcept {
+    if (this != &other) {
+        source_ = other.source_;
+        column_count_ = std::exchange(other.column_count_, 0);
+        projection_ = other.projection_;
+        call_info_ = other.call_info_;
+        points_ = std::move(other.points_);
+        high_ = std::move(other.high_);
+        low_ = std::move(other.low_);
+    }
+    return *this;
+}
+
+core::Result<PgMaterialTangentReference> PgMaterialTangentReference::prepare(
+    const PgPreparedPatch& patch, std::span<const PgReferencePoint> points,
+    std::span<const PgMaterialDirections> directions, const PgMaterialTangentProjection& projection,
+    const PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgMaterialTangentReference> {
+        auto math = ReferenceArithmetic{limits, plan};
+        math.cancel();
+        if (points.size() != directions.size())
+            partition_fail(core::FailureCode::InvalidInput);
+        const auto source = partition_take(patch.info());
+        const auto paired = two_word_projection(projection.representation);
+        validate_tolerance(projection.maximum_derivative_error);
+        auto rows = project_rows<PgProjectedReferencePoint>(
+            math, patch.conditioning(), source.basis.rank, points, paired, 0, 2,
+            [&](std::size_t i, const PgConditionedReferenceBatch& batch, std::span<double> high,
+                std::span<double> low) {
+                project_material_tangents(math, batch, directions[i], projection, high, low);
+                return record(batch.points.values().front());
+            });
+        return PgMaterialTangentReference{source.identity,
+                                          static_cast<std::size_t>(source.basis.rank),
+                                          projection,
+                                          math.info(),
+                                          std::move(rows.points),
+                                          std::move(rows.high),
+                                          std::move(rows.low)};
     });
 }
 
@@ -502,7 +608,7 @@ PgPreparedVolumeReference::prepare(const PgPreparedPatch& patch, std::size_t fir
         auto ordinal = first;
         auto result = project_rows<PgPreparedVolumeSample>(
             math, patch.conditioning(), source.basis.rank, queries, paired, 1, 1,
-            [&](const PgConditionedReferenceBatch& exact, std::span<double> high,
+            [&](std::size_t, const PgConditionedReferenceBatch& exact, std::span<double> high,
                 std::span<double> low) {
                 project_mass_point(math, exact, projection, high, low);
                 project_shapes(math, exact, projection.maximum_shape_error,

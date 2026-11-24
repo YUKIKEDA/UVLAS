@@ -146,7 +146,7 @@ struct PgAeroMap::Data {
         bool reverse_orientation = false;
     };
     s::PgProjectedReferenceBatch position;
-    s::PgBoundaryTangentReference tangents;
+    std::variant<s::PgBoundaryTangentReference, s::PgMaterialTangentReference> tangents;
     core::PlannedBuffer<std::optional<a::PointId>> vertices;
     core::PlannedBuffer<Row> rows;
 };
@@ -157,20 +157,18 @@ s::PgPreparedPatchIdentity PgAeroMap::source() const noexcept {
     return data_ == nullptr ? s::PgPreparedPatchIdentity{} : data_->position.source();
 }
 
-core::Result<PgAeroMap> PgAeroMap::prepare(const s::PgPreparedPatch& patch,
-                                           std::span<const a::PointId> vertices,
-                                           std::span<const PgAeroCollocation> rows,
-                                           std::span<const s::PgBoundaryPositionPoint> material,
-                                           const s::PgPreparedReferenceProjection& projection,
-                                           double tangent_error, const s::PgReferenceLimits& limits,
-                                           core::ResourcePlan& plan) noexcept {
+template <class Position, class Tangents>
+core::Result<PgAeroMap> PgAeroMap::prepare_impl(
+    std::span<const a::PointId> vertices, std::span<const PgAeroCollocation> rows,
+    std::size_t material_count, const s::PgReferenceLimits& limits, core::ResourcePlan& plan,
+    const Position& prepare_position, const Tangents& prepare_tangents) noexcept {
     return guarded([&] {
         if (limits.cancellation.stop_requested())
             reject(Cancelled);
-        if (vertices.empty() || rows.empty() || vertices.size() > material.size() ||
-            rows.size() != material.size() - vertices.size())
+        if (vertices.empty() || rows.empty() || vertices.size() > material_count ||
+            rows.size() != material_count - vertices.size())
             reject(InvalidInput);
-        if (material.size() > limits.maximum_partition_visits)
+        if (material_count > limits.maximum_partition_visits)
             reject(ResourceExceeded);
         auto ids = allocate<std::optional<a::PointId>>(plan, vertices.size());
         auto rules = allocate<Data::Row>(plan, rows.size());
@@ -190,16 +188,50 @@ core::Result<PgAeroMap> PgAeroMap::prepare(const s::PgPreparedPatch& patch,
             rules.values()[i] = {row.facet, row.query, row.incidence, row.reverse_orientation};
         }
         auto budget = limits;
-        budget.maximum_partition_visits -= material.size();
-        auto position = take(patch.project_boundary_reference(material, projection, budget, plan));
+        budget.maximum_partition_visits -= material_count;
+        auto position = take(prepare_position(budget));
         budget.maximum_partition_visits -= position.call_info().partition_visits;
         budget.maximum_scalar_operations -= position.call_info().scalar_operations;
-        auto tangents = take(s::PgBoundaryTangentReference::prepare(
-            patch.conditioning(), material.subspan(vertices.size()),
-            {projection.representation, tangent_error}, budget, plan));
+        auto tangents = take(prepare_tangents(budget));
         return PgAeroMap{std::make_shared<const Data>(
             Data{std::move(position), std::move(tangents), std::move(ids), std::move(rules)})};
     });
+}
+core::Result<PgAeroMap> PgAeroMap::prepare(const s::PgPreparedPatch& patch,
+                                           std::span<const a::PointId> vertices,
+                                           std::span<const PgAeroCollocation> rows,
+                                           std::span<const s::PgBoundaryPositionPoint> material,
+                                           const s::PgPreparedReferenceProjection& projection,
+                                           double tangent_error, const s::PgReferenceLimits& limits,
+                                           core::ResourcePlan& plan) noexcept {
+    return prepare_impl(
+        vertices, rows, material.size(), limits, plan,
+        [&](const s::PgReferenceLimits& budget) {
+            return patch.project_boundary_reference(material, projection, budget, plan);
+        },
+        [&](const s::PgReferenceLimits& budget) {
+            return s::PgBoundaryTangentReference::prepare(
+                patch.conditioning(), material.subspan(vertices.size()),
+                {projection.representation, tangent_error}, budget, plan);
+        });
+}
+
+core::Result<PgAeroMap> PgAeroMap::prepare_material(
+    const s::PgPreparedPatch& patch, std::span<const a::PointId> vertices,
+    std::span<const PgAeroCollocation> rows, std::span<const s::PgReferencePoint> material,
+    std::span<const s::PgMaterialDirections> directions,
+    const s::PgPreparedReferenceProjection& projection, double tangent_error,
+    const s::PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
+    return prepare_impl(
+        vertices, rows, material.size(), limits, plan,
+        [&](const s::PgReferenceLimits& budget) {
+            return patch.project_reference(material, projection, budget, plan);
+        },
+        [&](const s::PgReferenceLimits& budget) {
+            return s::PgMaterialTangentReference::prepare(
+                patch, material.subspan(vertices.size()), directions,
+                {projection.representation, tangent_error}, budget, plan);
+        });
 }
 
 struct PgAeroTrialRow {
@@ -226,9 +258,10 @@ PgAeroTrial::~PgAeroTrial() = default;
 
 core::Result<std::reference_wrapper<const a::GlobalContactState>>
 PgAeroTrial::contact() const& noexcept {
-    if (data_.size() != 0)
-        if (const auto& contact = data_.values().front().contact)
-            return std::cref(*contact);
+    const auto trials = data_.values();
+    if (!trials.empty())
+        if (const auto& candidate = trials.front().contact)
+            return std::cref(*candidate);
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
 std::size_t PgAeroTrial::collocation_count() const noexcept {
@@ -389,9 +422,19 @@ struct PgAeroBuilder {
             reject(Cancelled);
         auto tangent_limits = limits.tangents;
         tangent_limits.cancellation = stop;
-        take(s::apply_pg_boundary_tangents(map.data_->tangents,
-                                           s::PgVolumePositionDirection::ToPoints, state.position,
-                                           tangent_limits, scratch, tangents));
+        std::visit(
+            [&](const auto& map_tangents) {
+                constexpr auto direction = s::PgVolumePositionDirection::ToPoints;
+                using Owner = std::decay_t<decltype(map_tangents)>;
+                if constexpr (std::is_same_v<Owner, s::PgBoundaryTangentReference>)
+                    take(s::apply_pg_boundary_tangents(map_tangents, direction, state.position,
+                                                       tangent_limits, scratch, tangents));
+                else
+                    take(s::apply_pg_material_tangents(map_tangents, state.patch, direction,
+                                                       state.position, tangent_limits, scratch,
+                                                       tangents));
+            },
+            map.data_->tangents);
 
         const auto& base = take(chart.topology.geometry()).get();
         const auto word_count = static_cast<std::size_t>(components(original.points.size()));
@@ -474,8 +517,8 @@ struct PgAeroBuilder {
             allocate<std::optional<EdgeMidpointVelocity>>(memory, chart.load_edges.size());
         const auto resolve = [&](a::QueryId id, a::QueryDefinition definition) {
             account(work, limits.geometry.max_steps);
-            return take(a::resolve_query(geometry, {id, std::move(definition)}, state.context,
-                                         limits.geometry, coordinates, memory, stop));
+            return take(a::resolve_query(geometry, {id, definition}, state.context, limits.geometry,
+                                         coordinates, memory, stop));
         };
         const auto exact_position = [&](const a::ResolvedQuery& query) {
             auto budget = limits.geometry;

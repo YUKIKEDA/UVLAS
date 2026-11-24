@@ -4255,4 +4255,75 @@ TEST_CASE("PG structural attachment retains a curved material point and transfer
     CHECK(abs(fluid.value) > rational_word(.001));
     CHECK(abs(structural.value - fluid.value) <=
           structural.radius + fluid.radius + rational_word(1e-20));
+
+    // The composed material chart crosses the host's reference midsurface at
+    // the collocation. Its zeta derivative adds 1/4 to the surface slope.
+    const auto volumes = take(partition.volumes());
+    const auto inner = [&](const auto& location,
+                           const st::ExactRational& depth) -> st::PgReferencePoint {
+        const auto& selected = faces[static_cast<std::size_t>(std::get<0>(location))];
+        const auto volume = std::ranges::find_if(volumes, [&](const auto& v) {
+            return v.triangle == selected.triangle && v.layer == selected.layer;
+        });
+        REQUIRE(volume != volumes.end());
+        return st::PgReferenceVolumePoint{static_cast<core::Index>(volume - volumes.begin()),
+                                          std::get<1>(location), std::get<2>(location), depth};
+    };
+    const auto near_depth = f.r("7", "64"), far_depth = f.r("19", "64"),
+               control_depth = f.r("1", "4");
+    const std::array interior_points{inner(first, near_depth), inner(second, near_depth),
+                                     inner(third, far_depth), inner(fourth, far_depth),
+                                     inner(control, control_depth)};
+    st::PgMaterialDirections directions{};
+    directions[0][0] = f.r("1");
+    directions[0][2] = f.r("1", "4");
+    directions[1][1] = f.r("1");
+    const auto material_map = take(cf::PgAeroMap::prepare_material(
+        patch, reference.points.first(4), roles, interior_points, std::span{&directions, 1},
+        projection, 1e-24, pg_limits, memory));
+    constexpr double near_z = -3. / 16.;
+    constexpr double far_z = 1. / 16.;
+    const std::array<double, 15> mid_grid{0,     0, near_z, 0,     1, near_z, 1,    1,
+                                          far_z, 1, 0,      far_z, 1, 1,      far_z};
+    auto material_geometry = reference;
+    material_geometry.reference = a::DoublePositions{mid_grid, low};
+    material_geometry.current = material_geometry.reference;
+    const auto mid_base = test_geometry::take(a::prepare_owned_geometry(
+        material_geometry, test_geometry::limits(), *geometry_work, memory));
+    const auto mid_topology = take_global(
+        a::build_global_topology(mid_base, topology_input, global_limits, *global, memory));
+    const cf::PgAeroChart mid_chart{mid_topology, material_geometry, edges};
+    const auto mid_trial =
+        take(cf::evaluate_pg_aero_trial(material_map, state, mid_chart, kinematic_limits, scratch,
+                                        *geometry_work, *global, memory));
+    const std::array mid_rows{take(mid_trial.collocation(0))};
+    const auto& mid_contact = take(mid_trial.contact()).get();
+    const auto& mid_geometry = take_global(mid_contact.geometry()).get();
+    const auto mid_query = test_geometry::take(a::exact_query_coordinates(
+        mid_geometry, mid_rows[0].query, test_geometry::limits(), *geometry_work));
+    const Rat z{mid_query.numerator[2].convert_to<Big>()};
+    CHECK(abs(z * two_power(-static_cast<int>(a::ExactQueryCoordinates::denominator_shift)) -
+              Rat{9, 32}) < rational_word(1e-21));
+    CHECK(abs(sum_words(mid_rows[0].velocity[2]) - Rat{9, 16}) < rational_word(1e-21));
+    const auto& mid_frame = std::get<cf::ExplicitCollocationTangents>(mid_rows[0].tangents);
+    CHECK(abs(sum_words(mid_frame[0][0]) - 1) < rational_word(1e-20));
+    CHECK(abs(sum_words(mid_frame[0][2]) - 1) < rational_word(1e-20));
+    CHECK(abs(sum_words(mid_frame[1][1]) - 1) < rational_word(1e-20));
+    CHECK(abs(sum_words(mid_frame[1][2])) < rational_word(1e-20));
+
+    const cf::DiscreteNonpenetrationInput mid_input{mid_contact,
+                                                    mid_rows,
+                                                    {},
+                                                    {core::AcceptedStateId{2}, {}},
+                                                    state.stamp,
+                                                    stamp,
+                                                    p::RequestedSide::Automatic};
+    auto mid_flow =
+        take(cf::project_case_uniform_flow(evaluate(provider, provider, flow_workspace, time),
+                                           {format, budgets, budgets, {4096, budget}}));
+    const auto residual = take(cf::evaluate_discrete_nonpenetration(
+        mid_input, std::move(mid_flow), load_limits, shared, *local, *kernel, memory));
+    REQUIRE(residual.size() == 1);
+    residual_expected(take(residual.row(0)).residual, rational_word(23. / (16. * std::sqrt(2.))),
+                      rational_word(1e-15));
 }
