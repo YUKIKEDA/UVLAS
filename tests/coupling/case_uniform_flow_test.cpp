@@ -920,6 +920,101 @@ TEST_CASE("Typed SI prescribed wake owns its velocity independently of ambient f
     }
 }
 
+TEST_CASE("The exact transient stage evaluates known flow and prescribed wake together",
+          "[AE-07][UW-D02][IO4-01][N4-03][N4-06][verification][negative]") {
+    auto input = gust_case(
+        "deg",
+        R"({"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[2],[3]]})");
+    input.field("analysis")
+        .set(
+            "intervals",
+            parse(
+                R"([{"start":0,"end":0.5,"step":0.25,"restart":"initial"},{"start":0.5,"end":1,"step":0.5,"restart":"event"}])"));
+    input.field("flow").set("events", parse("[0.5]"));
+    input.field("flow").field("gust").set("phase", parse("90"));
+    input.field("analysis")
+        .field("wake")
+        .set(
+            "convection",
+            parse(
+                R"({"kind":"prescribed","velocity":{"kind":"polynomial","origin":0,"scale":1,"domain":[0,1],"coefficients":[[4,1,0],[2,0,0]]}})"));
+    a::UniformFlowWorkspace work;
+    const cf::CaseClockedKnownFlowLimits clock_limits{{limits, 2, 4}, gust_limits};
+    const auto make = [&](const JsonToken& fixture, io::SourceId id) {
+        const auto si = materialize(fixture, id);
+        core::ResourcePlan memory{budget};
+        return take(cf::prepare_case_clocked_known_flows(si, stamp, work, clock_limits, memory));
+    };
+    const auto field = make(input, io::SourceId{420});
+    const auto current = make(input, io::SourceId{421});
+    CHECK(field.interval_count() == 2);
+    CHECK(take(field.interval_steps(0)) == 2);
+    CHECK(take(field.interval_steps(1)) == 1);
+
+    const Number one{1}, zero{0}, tolerance{1, 1000000000}, middle_x{3, 4};
+    const cf::CaseFlowComponentBudget allowed{one.view(), tolerance.view(), zero.view()};
+    const std::array components{allowed, allowed, allowed};
+    const cf::CaseFlowProjectionRequest wake{
+        core::Precision::TwoWord, components, components, {4096, budget}};
+    const auto ambient = gust_projection(core::Precision::TwoWord, tolerance);
+    const auto run = [&](const cf::CaseClockedKnownFlows& host, cf::CaseFlowClockQuery address,
+                         const Number& x) {
+        core::ResourcePlan memory{budget};
+        const std::array position{x.view(), zero.view(), zero.view()};
+        return cf::evaluate_case_clocked_known_flows(field, host, address, position, ambient, wake,
+                                                     work, clock_limits, memory);
+    };
+    const auto check = [&](const cf::CaseClockedKnownFlowSample& sample, const Number& time,
+                           const Number& step, const Number& x, p::RequestedSide side,
+                           const Rat& expected_u, const Rat& expected_wake) {
+        exact(take(sample.time()), time);
+        exact(take(sample.ambient().time()), time);
+        exact(take(sample.prescribed().jet().time()), time);
+        exact(take(sample.step_seconds()), step);
+        exact(take(sample.ambient().position(0)), x);
+        CHECK(sample.source().source.source == io::SourceId{420});
+        CHECK(sample.address().side == side);
+        CHECK(sample.ambient().requested_side() == side);
+        CHECK(sample.prescribed().requested_side() == side);
+        const Rat radius = two_power(-98);
+        within(take(sample.ambient().velocity(1)), expected_u, radius);
+        within(take(sample.ambient().time_partial(1)), Rat{9} / 5, radius);
+        within(take(sample.ambient().spatial_partial(1, 0)), Rat{0}, Rat{0});
+        within(take(sample.prescribed().velocity(0)), expected_wake, Rat{0});
+        within(take(sample.prescribed().time_partial(0)), Rat{2}, Rat{0});
+    };
+    using enum p::RequestedSide;
+    // The spatial and temporal phase corrections are -22.5 and +22.5 degrees.
+    const auto middle = take(run(current, {stamp, 0, 1, Automatic}, middle_x));
+    check(middle, Number{1, 4}, Number{1, 4}, middle_x, Automatic, Rat{73} / 20, Rat{9} / 2);
+    const auto left = take(run(current, {stamp, 0, 2, Left}, one));
+    check(left, Number{1, 2}, Number{1, 4}, one, Left, Rat{41} / 10, Rat{5});
+    const auto right = take(run(current, {stamp, 1, 0, Right}, one));
+    check(right, Number{1, 2}, Number{1, 2}, one, Right, Rat{41} / 10, Rat{5});
+    CHECK(left.restart() == cf::CaseClockRestart::ItemInitial);
+    CHECK(right.restart() == cf::CaseClockRestart::ItemEvent);
+
+    reject(run(current, {stamp, 1, 0, Left}, one), core::FailureCode::InvalidInput);
+    auto changed_grid = input;
+    changed_grid.field("analysis").field("intervals").elements[1].set("step", parse("0.25"));
+    const auto other_grid = make(changed_grid, io::SourceId{422});
+    reject(run(other_grid, {stamp, 0, 1, Automatic}, middle_x), core::FailureCode::StaleGeneration);
+    auto changed_gust = input;
+    changed_gust.field("flow").field("gust").set("phase", parse("90.000000000000000001"));
+    const auto other_gust = make(changed_gust, io::SourceId{423});
+    reject(run(other_gust, {stamp, 0, 1, Automatic}, middle_x), core::FailureCode::StaleGeneration);
+    auto changed_wake = input;
+    changed_wake.field("analysis")
+        .field("wake")
+        .field("convection")
+        .field("velocity")
+        .field("coefficients")
+        .elements[1]
+        .elements[0] = parse("3");
+    const auto other_wake = make(changed_wake, io::SourceId{424});
+    reject(run(other_wake, {stamp, 0, 1, Automatic}, middle_x), core::FailureCode::StaleGeneration);
+}
+
 TEST_CASE("A typed transient clock binds both flow fields to one exact stage",
           "[AE-07][UW-D02][IO4-01][N4-03][N4-06][verification][negative]") {
     a::UniformFlowWorkspace work;
