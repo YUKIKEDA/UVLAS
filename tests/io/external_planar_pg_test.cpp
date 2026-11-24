@@ -867,7 +867,7 @@ TEST_CASE("Nastran triangle distance bound needs the mixed PG height derivative"
     const std::array ring{ExternalPgCorner{10, f.domain[0]}, ExternalPgCorner{40, f.domain[1]},
                           ExternalPgCorner{90, f.domain[2]}};
     const std::array selection{ExternalPgFace{101, Winding::Forward, ring}};
-    const NastranPgBoundLimits limits{{reference_limits(), 1}, 200'000};
+    const ExternalPgBoundLimits limits{{reference_limits(), 1}, 200'000};
     const auto result = take(
         NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Metre, selection, limits, plan));
     const auto faces = take(result.view()).faces;
@@ -979,7 +979,7 @@ TEST_CASE("Nastran bounded placement requires source edge incidence across a PG 
         [](const PgReferenceGeometry& target, const NastranShellCards& deck,
            std::span<const ExternalPgFace> charts, core::ResourcePlan& plan,
            std::optional<ExternalPgDiagnostic>* diagnostic) {
-            const NastranPgBoundLimits limits{{reference_limits(), 4}, 200'000};
+            const ExternalPgBoundLimits limits{{reference_limits(), 4}, 200'000};
             return NastranPlanarPgBounds::prepare(target, deck, SiLengthUnit::Metre, charts, limits,
                                                   plan, diagnostic);
         },
