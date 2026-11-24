@@ -124,6 +124,13 @@ TEST_CASE("Nastran lexer retains formats, spelling and source positions in one s
     CHECK(result.text(large_fields[1]).empty());
     CHECK(result.text(large_fields[2]) == "1234567890.12D-2");
     CHECK(result.text(large_fields[3]) == "-1.25+3");
+    CHECK(take(result.integer(large_fields[0])) == 12345678901);
+    const auto explicit_exponent = take(result.real(large_fields[2]));
+    const auto implicit_exponent = take(result.real(large_fields[3]));
+    CHECK(explicit_exponent.decimal() == "1234567890.12e-2");
+    CHECK(implicit_exponent.decimal() == "-1.25e+3");
+    CHECK_FALSE(result.real(large_fields[0]));
+    CHECK_FALSE(result.integer(large_fields[2]));
     CHECK(large_fields[2].position == NastranBulkPosition{text.find("1234567890.12D-2"), 4, 41});
     CHECK(large_fields[4].position == NastranBulkPosition{text.find("*L7") + 8, 7, 9});
     CHECK(result.text(large_fields[6]) == "136");
@@ -155,6 +162,8 @@ TEST_CASE("Nastran lexer retains formats, spelling and source positions in one s
     CHECK(result.text(free_fields[11]).empty());
     CHECK(free_fields[11].position == NastranBulkPosition{text.find(",,+11") + 1, 11, 5});
     CHECK(result.text(free_fields[12]) == "+11");
+    CHECK(take(result.integer(free_fields[12])) == 11);
+    CHECK_FALSE(result.integer(free_fields[11]));
 }
 
 TEST_CASE("The checked lexical limits count padding and preserve the snapshot on failure",

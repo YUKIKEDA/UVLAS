@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nastran_number_fields.hpp"
 #include "reference_root_snapshot.hpp"
 
 namespace uvlas::io::detail {
@@ -59,6 +60,14 @@ struct NastranBulkView {
     std::uint64_t work;
 
     [[nodiscard]] std::string_view text(NastranBulkLexeme) const noexcept;
+    // The card dictionary selects the field's type. The spelling and source position
+    // remain available independently of conversion.
+    [[nodiscard]] core::Result<std::int64_t> integer(NastranBulkLexeme field) const noexcept {
+        return read_nastran_integer_field(text(field));
+    }
+    [[nodiscard]] core::Result<NastranRealField> real(NastranBulkLexeme field) const noexcept {
+        return read_nastran_real_field(text(field));
+    }
     [[nodiscard]] std::span<const NastranBulkLexeme>
     data_fields(const NastranBulkCard&) const noexcept;
 };
