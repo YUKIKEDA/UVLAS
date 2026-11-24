@@ -7,6 +7,7 @@
 
 #include <span>
 #include <uvlas/core/resource_plan.hpp>
+#include <uvlas/numerics/linear_solve.hpp>
 
 namespace uvlas::numerics::linear::detail {
 using SparseLuFactor =
@@ -38,9 +39,8 @@ extract_sparse_llt(const SparseLltFactor& factor, core::ResourcePlan& plan) noex
 // work[row_old_to_factor[i]]=b[i]; x[i]=work[column_old_to_factor[i]].
 // All logical spans are packed column-major and mutually non-overlapping.
 // Overlap returns InvalidInput before updates; no scratch/output allocation occurs.
-[[nodiscard]] core::Result<void> solve_sparse_triangular(const SparseTriangularFactors& factors,
-                                                         std::span<const double> rhs,
-                                                         core::Index columns,
-                                                         std::span<double> work,
-                                                         std::span<double> output) noexcept;
+[[nodiscard]] core::Result<void> solve_sparse_triangular(
+    const SparseTriangularFactors& factors, std::span<const double> rhs, core::Index columns,
+    std::span<double> work, std::span<double> output,
+    LinearSystemOrientation orientation = LinearSystemOrientation::Original) noexcept;
 } // namespace uvlas::numerics::linear::detail

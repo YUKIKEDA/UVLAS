@@ -124,6 +124,12 @@ public:
     [[nodiscard]] static core::Result<SparsePrepared> prepare(const SparseOperator&, const Scales&,
                                                               SparseMethod, const Limits&,
                                                               core::ResourcePlan&) noexcept;
+    /// Prepare both directions from one factorization. Transpose scales and layout are
+    /// explicitly provided by the caller and snapshotted with the same cache, trial and time.
+    [[nodiscard]] static core::Result<SparsePrepared>
+    prepare(const SparseOperator&, const Scales& forward_scales, const Scales& transpose_scales,
+            SparseMethod, const Limits&, core::ResourcePlan&) noexcept;
+
     /// Transfer prepared ownership; the source becomes inactive.
     SparsePrepared(SparsePrepared&&) noexcept;
     /// Replace ownership, invalidating internal source borrows.
@@ -149,6 +155,17 @@ private:
     friend core::Result<Solution<double>>
     solve_linear(const SparseOperator&, const Rhs<double>&, const Scales&, const Precision<double>&,
                  const Accuracy&, const Limits&, SparsePrepared&, core::ResourcePlan&) noexcept;
+    friend core::Result<Solution<double>>
+    solve_transposed_linear(const SparseOperator&, const Rhs<double>&, const Scales&,
+                            const Precision<double>&, const Accuracy&, const Limits&,
+                            SparsePrepared&, core::ResourcePlan&) noexcept;
+    [[nodiscard]] static core::Result<SparsePrepared> prepare_impl(const SparseOperator&,
+                                                                   const Scales&, const Scales*,
+                                                                   SparseMethod, const Limits&,
+                                                                   core::ResourcePlan&) noexcept;
+    [[nodiscard]] core::Result<Solution<double>>
+    solve(const SparseOperator&, const Rhs<double>&, const Scales&, const Precision<double>&,
+          const Accuracy&, const Limits&, LinearSystemOrientation, core::ResourcePlan&) noexcept;
     SparsePrepared(std::unique_ptr<detail::SparsePreparedData>, Context, SparseMethod) noexcept;
     std::unique_ptr<detail::SparsePreparedData> data_;
     Context context_;
@@ -165,5 +182,15 @@ private:
                                                           const Accuracy&, const Limits&,
                                                           SparsePrepared&,
                                                           core::ResourcePlan& result_plan) noexcept;
+
+/** Solve A^T x=b using the same factors and prepared scratch as solve_linear.
+ * The original input is A in its original layout. The RHS and scales must match
+ * the explicitly prepared transpose layout, scales and units. Qualification
+ * uses the original transpose action, including refinement and explicit projection.
+ */
+[[nodiscard]] core::Result<Solution<double>>
+solve_transposed_linear(const SparseOperator&, const Rhs<double>&, const Scales&,
+                        const Precision<double>&, const Accuracy&, const Limits&, SparsePrepared&,
+                        core::ResourcePlan& result_plan) noexcept;
 
 } // namespace uvlas::numerics::linear
