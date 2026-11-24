@@ -31,6 +31,11 @@ public:
                                                                   core::Workspace&,
                                                                   core::ResourcePlan&) && noexcept;
 
+    /// Generate and certify using the enclosure and reference owned together.
+    [[nodiscard]] core::Result<PgConditioningCertificate>
+    generate_and_certify(PgConditioningGeneration, const PgConditioningLimits&, core::Workspace&,
+                         core::ResourcePlan&) && noexcept;
+
 private:
     PgFlatGram(PgReferenceBasis&&, core::PlannedBuffer<PgGramEntry>, std::uint32_t) noexcept;
     PgReferenceBasis basis_;
