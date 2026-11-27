@@ -29,4 +29,31 @@ GCC 14.2.0 Releaseでは、単一面を含む試験が14010アサーション、
 
 同じ環境で二度生成したfixtureのSHA-256は `1eb0480838d5d6e01b16f7ed6fbba91647f21baf1599d20762705f51565d5876` で一致した。
 
-正式格子は[凍結入力と参照値](reference.py)を使う後続の照合に含まれる。高周波のM256/N192では、全49,152未知数の実数基底行列だけで18 GiBを要する。凍結参照で採用した反射対称性を使う圧縮と、展開後の元残差・荷重の照合が残る。
+## 反射する水平翼の縮約と正式格子の試験
+
+高周波のM256/N192では、全49,152未知数の実数基底行列だけで18 GiBを要する。
+水平翼では、$y=0$ について反射する面の組を指定すると、対称な上下動・ピッチの循環を24,576未知数で解く。
+面IDの全組、D2の向きを反転した面と固定後流の四隅、照会位置、法線の向き、法線速度、成分尺度と単位を照合する。
+移流速度の $y$ 成分が零で、同じコア、後流年齢、周波数を全行に使い、後流は反射する後縁所有面に付着する。
+このとき、各代表行から見た面の組の二列の包絡を足し、後流の補正列にも同じ操作を適用する。
+縮約した行列で二語解を求め、元の面ID順に展開する。
+元残差には両側の照会位置で計算した閉輪郭作用と、それぞれの位置で計算した後流補正を使う。
+荷重も展開した全翼の二語解から求める。
+
+水平小格子では、全系と縮約系のそれぞれについて、独立参照の循環、元残差と荷重を照合する。
+反射する相手の入替えと、片側だけの法線速度の変更を拒否する。
+後流補正は、全系では1作業域、縮約系では2作業域を使って照合する。
+
+GCC 14.2.0 Releaseで `coupling.case_uniform_flow` と `coupling.finite_wing_drag_refinement.fw_v01.m2n4` が通った（14.46秒、5.26秒）。正式格子のCTest 3件は登録とビルドを確認した。全行残差と12観測の実測は未実施。
+
+正式試験は[凍結入力と参照値](reference.py)から生成したファイルを読む。
+M128/N192の2周波数とM256/N192の高周波について、上下動とピッチを別々に求解する。
+元残差の全行の複素包絡で相対L2上限 $10^{-11}$、鉛直力とピッチングモーメントの計12観測で参照不確かさ $0.25\%$ 未満と、製品結果との差を含む合計 $1\%$ 未満を検査する。
+参照値をJSONの二進値に読む丸めも観測の比較に含める。
+
+```text
+uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt python -B -X utf8 docs/verification/IM-03/finite-wing-unsteady-v1/reference.py --output out/finite-wing-harmonic-formal.json
+cmake -S . -B <build> -DUVLAS_FORMAL_HARMONIC_FIXTURE=<absolute-path-to-input>
+cmake --build <build> --target uvlas_test_coupling_finite_wing_drag_refinement_fw_v01_m2n4
+ctest --test-dir <build> --output-on-failure -R '^coupling[.]finite_wing_harmonic[.]k(005|020|080)$'
+```

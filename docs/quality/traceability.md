@@ -205,7 +205,7 @@
 | A5-07 | [practical-acceptance-plan.md:111](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | P-CURVED-BOX | [practical-acceptance-plan.md:65](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | PERF-FL-01 | [case-status.md:29](../quality/case-status.md) | 0 | 0 | 0 |
-| V-AERO | [practical-acceptance-plan.md:36](../requirements/practical-acceptance-plan.md) | 13 | 10 | 0 |
+| V-AERO | [practical-acceptance-plan.md:36](../requirements/practical-acceptance-plan.md) | 16 | 10 | 0 |
 | V-BEAM | [practical-acceptance-plan.md:32](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-J1 | [practical-acceptance-plan.md:38](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-JOINT | [practical-acceptance-plan.md:33](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |

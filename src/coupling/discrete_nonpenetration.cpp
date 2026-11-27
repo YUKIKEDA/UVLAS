@@ -1710,11 +1710,10 @@ struct NonpenetrationBuilder {
                 limits.induction.kernel.external_memory};
     }
 
-    static DiscreteHarmonicWakeUpdate harmonic_wake(const DiscreteNonpenetrationInput& input,
-                                                    const StraightWakeHarmonicInput& phase,
-                                                    const DiscreteNonpenetrationLimits& limits,
-                                                    const Assembly& assembly,
-                                                    core::ResourcePlan& memory, p::Work& work) {
+    static DiscreteHarmonicWakeUpdate
+    harmonic_wake(const DiscreteNonpenetrationInput& input, const StraightWakeHarmonicInput& phase,
+                  const DiscreteNonpenetrationLimits& limits, const Assembly& assembly,
+                  core::ResourcePlan& memory, p::Work& work, std::size_t requested_workers = 1) {
         if (input.wake.empty() ||
             !std::holds_alternative<SteadyWakeClosure>(input.wake.front().trailing))
             reject(core::FailureCode::InvalidInput);
@@ -1791,49 +1790,67 @@ struct NonpenetrationBuilder {
             allocate<a::StraightWakeColumnUpdate>(memory, multiply_budget(count, bands.size()));
         const auto core = contour_bounds(import(require(geometry.core_radius()), work));
         const auto speed = contour_bounds(velocity);
-        auto contact =
-            require(a::GlobalWorkspace::create(memory, limits.induction.kernel.external_memory));
-        auto coordinates = require(a::GeometryWorkspace::create(memory));
-        auto index = require(a::ContourContactIndex::prepare(
-            input.contact, contour_limits(limits, work), *contact, memory, stop));
-        account(work, index.preparation_steps());
-        for (std::size_t i = 0; i < count; ++i) {
-            const auto& row = assembly.bound.values()[i];
-            rows.values()[i].face = row.panel.face;
-            const auto& supplied = input.collocations[row.caller];
-            account(work, require(index.qualify(supplied.query, {}, limits.induction.geometry,
-                                                contour_limits(limits, work), *coordinates,
-                                                *contact, stop))
-                              .steps);
-            const auto normal = contour_bounds(qualify_normal(geometry, row.panel, supplied, work));
-            auto query_limits = limits.induction.geometry;
-            query_limits.max_steps = std::min(query_limits.max_steps, remaining(work));
-            const auto query = require(a::exact_query_coordinates(
-                geometry, supplied.query, query_limits, *coordinates, stop));
-            account(work, query.used_steps);
-            a::ContourVector location{};
-            for (std::size_t j = 0; j < location.size(); ++j)
-                location[j] = contour_bounds(
-                    p::exact(query.numerator[j],
-                             -static_cast<int>(a::ExactQueryCoordinates::denominator_shift)));
-            for (std::size_t b = 0; b < bands.size(); ++b) {
-                const auto& band = bands.values()[b];
-                const auto samples = quadrature.samples.values();
-                account(work, samples.size());
-                auto coefficient = require(a::project_straight_wake_column_update(
-                    geometry.context(), band.first, band.second, speed, core, location, normal,
-                    samples, samples.size(), stop));
-                // The native kernel has the negative orientation of the
-                // explicitly directed wake contour. Apply that sign together
-                // with the physical trailing-edge transfer to bound Gamma.
-                if (band.sign > 0) {
-                    coefficient.real = {-coefficient.real.upper, -coefficient.real.lower};
-                    coefficient.imaginary = {-coefficient.imaginary.upper,
-                                             -coefficient.imaginary.lower};
-                }
-                coefficients.values()[b * count + i] = coefficient;
-            }
+        struct Workspace {
+            std::unique_ptr<a::GlobalWorkspace> contact;
+            std::unique_ptr<a::GeometryWorkspace> coordinates;
+        };
+        const auto workers = std::min(requested_workers, count);
+        std::array<Workspace, max_contour_workers> workspaces;
+        for (auto& workspace : std::span{workspaces}.first(workers)) {
+            workspace.contact = require(
+                a::GlobalWorkspace::create(memory, limits.induction.kernel.external_memory));
+            workspace.coordinates = require(a::GeometryWorkspace::create(memory));
         }
+        if (workers == 0)
+            reject(core::FailureCode::InvalidInput);
+        auto index =
+            require(a::ContourContactIndex::prepare(input.contact, contour_limits(limits, work),
+                                                    *workspaces.front().contact, memory, stop));
+        account(work, index.preparation_steps());
+        contour_ranges(
+            count, workers, work,
+            [&](std::size_t worker, std::size_t first, std::size_t last, p::Work& local) {
+                const auto& workspace = workspaces[worker];
+                for (std::size_t i = first; i < last; ++i) {
+                    const auto& row = assembly.bound.values()[i];
+                    rows.values()[i].face = row.panel.face;
+                    const auto& supplied = input.collocations[row.caller];
+                    account(local,
+                            require(index.qualify(supplied.query, {}, limits.induction.geometry,
+                                                  contour_limits(limits, local),
+                                                  *workspace.coordinates, *workspace.contact, stop))
+                                .steps);
+                    const auto normal =
+                        contour_bounds(qualify_normal(geometry, row.panel, supplied, local));
+                    auto query_limits = limits.induction.geometry;
+                    query_limits.max_steps = std::min(query_limits.max_steps, remaining(local));
+                    const auto query = require(a::exact_query_coordinates(
+                        geometry, supplied.query, query_limits, *workspace.coordinates, stop));
+                    account(local, query.used_steps);
+                    a::ContourVector location{};
+                    for (std::size_t j = 0; j < location.size(); ++j)
+                        location[j] = contour_bounds(p::exact(
+                            query.numerator[j],
+                            -static_cast<int>(a::ExactQueryCoordinates::denominator_shift)));
+                    for (std::size_t b = 0; b < bands.size(); ++b) {
+                        const auto& band = bands.values()[b];
+                        const auto samples = quadrature.samples.values();
+                        account(local, samples.size());
+                        auto coefficient = require(a::project_straight_wake_column_update(
+                            geometry.context(), band.first, band.second, speed, core, location,
+                            normal, samples, samples.size(), stop));
+                        // The native kernel has the negative orientation of the
+                        // explicitly directed wake contour. Apply that sign together
+                        // with the physical trailing-edge transfer to bound Gamma.
+                        if (band.sign > 0) {
+                            coefficient.real = {-coefficient.real.upper, -coefficient.real.lower};
+                            coefficient.imaginary = {-coefficient.imaginary.upper,
+                                                     -coefficient.imaginary.lower};
+                        }
+                        coefficients.values()[b * count + i] = coefficient;
+                    }
+                }
+            });
         work.step();
         return {geometry.context(), std::move(rows), std::move(columns), std::move(coefficients),
                 work.used};
@@ -1979,6 +1996,118 @@ struct NonpenetrationBuilder {
                 enclose_vector(totals[1].moment, representation, rounding, work)};
     }
 
+    struct ReflectionLayout {
+        struct Pair {
+            std::size_t first{}, second{};
+        };
+        core::PlannedBuffer<Pair> rows;
+        core::PlannedBuffer<std::size_t> reduced;
+    };
+
+    static ReflectionLayout qualify_reflection(
+        const DiscreteNonpenetrationInput& input, const StraightWakeHarmonicInput& phase,
+        std::span<const HarmonicCirculationRhs> rhs, const DiscreteCirculationRequest& request,
+        const DiscreteNonpenetrationLimits& limits, std::span<const PanelRow> bound,
+        const a::OwnedGeometry& geometry, core::ResourcePlan& memory, p::Work& work) {
+        using Code = core::FailureCode;
+        const auto pairs = phase.reflection_pairs;
+        if (bound.size() % 2 != 0 || pairs.size() != bound.size() / 2 ||
+            !input.history.columns.empty())
+            reject(Code::InvalidInput);
+        const auto exactly_equal = [](const p::Interval& x, const p::Interval& y) {
+            return p::compare(x.lower, y.upper) == 0 && p::compare(x.upper, y.lower) == 0;
+        };
+        if (!exactly_equal(import(phase.convection_velocity[1], work), {}))
+            reject(Code::InvalidInput);
+        const auto reflected = [&](Vector x) {
+            x[1] = p::negate(x[1], work);
+            return x;
+        };
+        const auto require_equal = [&](const Vector& x, const Vector& y) {
+            if (!std::ranges::equal(x, y, exactly_equal))
+                reject(Code::InvalidInput);
+        };
+        const auto point = [&](a::PointId id) {
+            return import(require(geometry.point_words(id, a::Configuration::Current)), work);
+        };
+        const auto match_panel = [&](const a::UvlmQuad& x, const a::UvlmQuad& y) {
+            // Reverse the winding while preserving the upstream and downstream
+            // D2 edges. Wake attachment and phase use those same oriented edges.
+            constexpr std::array<std::size_t, 4> across{1, 0, 3, 2};
+            for (std::size_t k = 0; k < across.size(); ++k)
+                require_equal(reflected(point(x.corners[k])), point(y.corners[across[k]]));
+        };
+        const auto ordinal = [&](a::PhysicalFaceId face) {
+            const auto& row =
+                find(bound, face, [](const PanelRow& item) { return item.panel.face; }, work);
+            return static_cast<std::size_t>(&row - bound.data());
+        };
+        auto reduced = allocate<std::size_t>(memory, bound.size());
+        std::ranges::fill(reduced.values(), bound.size());
+        auto rows = allocate<ReflectionLayout::Pair>(memory, pairs.size());
+        auto coordinates = require(a::GeometryWorkspace::create(memory));
+        const auto query = [&](const DiscreteCollocation& row) {
+            auto caps = limits.induction.geometry;
+            caps.max_steps = std::min(caps.max_steps, remaining(work));
+            const auto value = require(
+                a::exact_query_coordinates(geometry, row.query, caps, *coordinates, work.stop));
+            account(work, value.used_steps);
+            return value.numerator;
+        };
+        const auto raw_normal = [&](const DiscreteCollocation& row) {
+            const auto [tx, ty] = import_collocation_tangents(row, work);
+            return cross(tx, ty, work);
+        };
+        for (std::size_t i = 0; i < pairs.size(); ++i) {
+            const auto x = ordinal(pairs[i][0]), y = ordinal(pairs[i][1]);
+            if (x == y || reduced.values()[x] != bound.size() ||
+                reduced.values()[y] != bound.size())
+                reject(Code::InvalidInput);
+            rows.values()[i] = {x, y};
+            reduced.values()[x] = i;
+            reduced.values()[y] = i;
+            if (!exactly_equal(import(rhs[x].real, work), import(rhs[y].real, work)) ||
+                !exactly_equal(import(rhs[x].imaginary, work), import(rhs[y].imaginary, work)) ||
+                request.scales.unknown[x] != request.scales.unknown[y] ||
+                request.scales.residual[x] != request.scales.residual[y] ||
+                request.scales.unknown_units[x] != request.scales.unknown_units[y] ||
+                request.scales.residual_units[x] != request.scales.residual_units[y])
+                reject(Code::InvalidInput);
+            match_panel(bound[x].panel, bound[y].panel);
+            const auto& left = input.collocations[bound[x].caller];
+            const auto& right = input.collocations[bound[y].caller];
+            const auto qx = query(left), qy = query(right);
+            if (qx[0] != qy[0] || qx[1] != -qy[1] || qx[2] != qy[2])
+                reject(Code::InvalidInput);
+            const auto nx = reflected(raw_normal(left)), ny = raw_normal(right);
+            require_equal(cross(nx, ny, work), {});
+            require_positive(dot(nx, ny, work));
+        }
+        auto wakes = allocate<std::optional<a::UvlmQuad>>(memory, bound.size());
+        for (const auto& wake : input.wake) {
+            const auto panel =
+                require(input.contact.uvlm_quad(wake.facet, remaining(work), work.stop));
+            account(work, panel.used_steps);
+            if (!panel.attachment || !std::holds_alternative<AttachedWakeFront>(wake.leading) ||
+                !std::holds_alternative<SteadyWakeClosure>(wake.trailing))
+                reject(Code::InvalidInput);
+            auto& slot = wakes.values()[ordinal(panel.attachment->bound_face)];
+            if (slot)
+                reject(Code::InvalidInput);
+            slot = panel;
+        }
+        for (const auto& paired : rows.values()) {
+            work.step();
+            const auto& x = wakes.values()[paired.first];
+            const auto& y = wakes.values()[paired.second];
+            if (x.has_value() != y.has_value())
+                reject(Code::InvalidInput);
+            if (x)
+                match_panel(*x, *y);
+        }
+        return {std::move(rows), std::move(reduced)};
+    }
+
     static DiscreteHarmonicCirculation
     solve_harmonic(const DiscreteNonpenetrationInput& input, const StraightWakeHarmonicInput& phase,
                    std::span<const HarmonicCirculationRhs> velocities,
@@ -2007,9 +2136,46 @@ struct NonpenetrationBuilder {
             if (velocities[i].face != bound[i].panel.face)
                 reject(Code::InvalidInput);
         }
-        const auto update = harmonic_wake(input, phase, limits, assembly, memory, work);
+        std::optional<ReflectionLayout> reflection;
+        if (!phase.reflection_pairs.empty())
+            reflection.emplace(qualify_reflection(input, phase, velocities, request, limits, bound,
+                                                  geometry, memory, work));
+        const auto solve_order = reflection ? reflection->rows.size() : order;
+        const auto representative = [&](std::size_t i) {
+            return reflection ? reflection->rows.values()[i].first : i;
+        };
+        const auto update =
+            harmonic_wake(input, phase, limits, assembly, memory, work, request.contour_workers);
         const auto rank = update.columns.size();
-        const auto n = static_cast<core::Index>(order), k = static_cast<core::Index>(rank);
+        auto selected = allocate<std::size_t>(memory, rank);
+        for (std::size_t column = 0; column < rank; ++column) {
+            const auto& row = find(
+                bound, update.columns.values()[column].bound_face,
+                [](const PanelRow& item) { return item.panel.face; }, work);
+            selected.values()[column] = static_cast<std::size_t>(&row - bound.data());
+        }
+        struct WakePair {
+            std::optional<std::size_t> first, second;
+        };
+        auto wake_pairs = allocate<WakePair>(memory, reflection ? solve_order : 0);
+        auto solve_rank = rank;
+        if (reflection) {
+            solve_rank = 0;
+            for (std::size_t column = 0; column < rank; ++column) {
+                work.step();
+                const auto source = selected.values()[column];
+                const auto reduced = reflection->reduced.values()[source];
+                auto& pair = wake_pairs.values()[reduced];
+                auto& side = source == representative(reduced) ? pair.first : pair.second;
+                if (side)
+                    reject(Code::InvalidInput);
+                side = column;
+                if (source == representative(reduced))
+                    ++solve_rank;
+            }
+        }
+        const auto n = static_cast<core::Index>(solve_order);
+        const auto k = static_cast<core::Index>(solve_rank);
         // The dense matrix factories check addressed products and allocation limits.
         auto base =
             require(numerics::DenseReal::zeroed({n, n, n}, memory, core::Operation::SolveLinear));
@@ -2019,20 +2185,36 @@ struct NonpenetrationBuilder {
             numerics::DenseComplex::zeroed({n, k, n}, memory, core::Operation::SolveLinear));
         auto rhs = require(
             numerics::DenseComplex::zeroed({n, 1, n}, memory, core::Operation::SolveLinear));
-        auto selected = allocate<std::size_t>(memory, rank);
-        for (std::size_t column = 0; column < rank; ++column) {
-            const auto& row = find(
-                bound, update.columns.values()[column].bound_face,
-                [](const PanelRow& item) { return item.panel.face; }, work);
-            selected.values()[column] = static_cast<std::size_t>(&row - bound.data());
-            right.values()[column * order + selected.values()[column]] = {1., 0.};
-            for (std::size_t i = 0; i < order; ++i) {
+        const auto write_column = [&](std::size_t column, std::size_t source, std::size_t first,
+                                      std::optional<std::size_t> second) {
+            right.values()[column * solve_order + source] = {1., 0.};
+            for (std::size_t i = 0; i < solve_order; ++i) {
                 work.step();
-                const auto& value = update.coefficients.values()[column * order + i];
-                left.values()[column * order + i] = {
+                const auto native_row = representative(i);
+                auto value = update.coefficients.values()[first * order + native_row];
+                if (second) {
+                    const auto& paired = update.coefficients.values()[*second * order + native_row];
+                    value.real = add_contour(value.real, paired.real);
+                    value.imaginary = add_contour(value.imaginary, paired.imaginary);
+                }
+                left.values()[column * solve_order + i] = {
                     project_contour(value.real, request.matrix_absolute),
                     project_contour(value.imaginary, request.matrix_absolute)};
             }
+        };
+        if (reflection) {
+            std::size_t column = 0;
+            for (std::size_t row = 0; row < solve_order; ++row) {
+                work.step();
+                const auto& pair = wake_pairs.values()[row];
+                if (pair.first.has_value() != pair.second.has_value())
+                    reject(Code::InvalidInput);
+                if (pair.first)
+                    write_column(column++, row, *pair.first, pair.second);
+            }
+        } else {
+            for (std::size_t column = 0; column < rank; ++column)
+                write_column(column, selected.values()[column], column, std::nullopt);
         }
         auto operator_rows = retain_operator(input, assembly, limits, memory, work);
         auto& owner = operator_rows.values().front();
@@ -2060,37 +2242,78 @@ struct NonpenetrationBuilder {
                     auto& value = original_rhs.values()[row];
                     value = {import(velocities[row].real, local),
                              import(velocities[row].imaginary, local)};
-                    rhs.values()[row] = {
+                    const auto reduced = reflection ? reflection->reduced.values()[row] : row;
+                    if (row != representative(reduced))
+                        continue;
+                    rhs.values()[reduced] = {
                         project_binary64(value[0], request.rhs_absolute, rounding, local),
                         project_binary64(value[1], request.rhs_absolute, rounding, local)};
                     project_contour_row(contour, *sessions[worker], supplied.query, normal, owner,
                                         scratch, coefficients, limits, local);
-                    for (std::size_t column = 0; column < order; ++column) {
+                    for (std::size_t column = 0; column < solve_order; ++column) {
                         local.step();
-                        base.values()[column * order + row] =
-                            project_contour(coefficients[column], request.matrix_absolute);
+                        auto coefficient = coefficients[representative(column)];
+                        if (reflection)
+                            coefficient =
+                                add_contour(coefficient,
+                                            coefficients[reflection->rows.values()[column].second]);
+                        base.values()[column * solve_order + reduced] =
+                            project_contour(coefficient, request.matrix_absolute);
                     }
                 }
             });
-        const auto& context = request.scales.context;
+        auto scales = request.scales;
+        auto unknown = allocate<double>(memory, reflection ? solve_order : 0);
+        auto residual_scale = allocate<double>(memory, unknown.size());
+        auto unknown_units = allocate<linear::UnitDimensions>(memory, unknown.size());
+        auto residual_units = allocate<linear::UnitDimensions>(memory, unknown.size());
+        if (reflection) {
+            for (std::size_t i = 0; i < solve_order; ++i) {
+                work.step();
+                const auto row = representative(i);
+                unknown.values()[i] = scales.unknown[row];
+                residual_scale.values()[i] = scales.residual[row];
+                unknown_units.values()[i] = scales.unknown_units[row];
+                residual_units.values()[i] = scales.residual_units[row];
+            }
+            scales = {unknown.values(), residual_scale.values(), unknown_units.values(),
+                      residual_units.values(), scales.context};
+        }
+        const auto& context = scales.context;
         const linear::ColumnUpdatedOperator op{base, left, right, context};
         const auto rhs_buffer = require(numerics::PrecisionBuffer<Complex>::binary64(
             std::move(rhs), core::NumericalGeneration{request.rhs_generation.value()}));
-        auto factor = require(
-            linear::UpdatedPrepared::prepare(op, request.scales, request.solver_limits, memory));
+        auto factor =
+            require(linear::UpdatedPrepared::prepare(op, scales, request.solver_limits, memory));
         work.step();
         const NoDenseConsumerChecks<Complex> no_checks;
         const linear::Precision<Complex> precision{
             linear::RetainedPrecision{request.retained_generation}, {}, no_checks};
         auto solved = require(linear::solve_linear(
-            op, linear::Rhs<Complex>{rhs_buffer, context, request.rhs_generation}, request.scales,
+            op, linear::Rhs<Complex>{rhs_buffer, context, request.rhs_generation}, scales,
             precision, request.algebraic, request.solver_limits, factor, memory));
         const auto* words = std::get_if<numerics::TwoWord<Complex>>(&solved.values().storage());
         if (words == nullptr)
             reject(Code::PrecisionUnsupported);
+        std::optional<numerics::PrecisionBuffer<Complex>> expanded;
+        if (reflection) {
+            const auto full = static_cast<core::Index>(order);
+            auto hi = require(numerics::DenseComplex::zeroed({full, 1, full}, memory, evaluate));
+            auto lo = require(numerics::DenseComplex::zeroed({full, 1, full}, memory, evaluate));
+            for (std::size_t i = 0; i < order; ++i) {
+                work.step();
+                const auto reduced = reflection->reduced.values()[i];
+                hi.values()[i] = words->hi.values()[reduced];
+                lo.values()[i] = words->lo.values()[reduced];
+            }
+            expanded.emplace(require(numerics::PrecisionBuffer<Complex>::two_word(
+                std::move(hi), std::move(lo), request.retained_generation)));
+        }
+        const auto& physical =
+            expanded ? std::get<numerics::TwoWord<Complex>>(expanded->storage()) : *words;
         auto amplitudes = allocate<Pair>(memory, order);
         for (std::size_t i = 0; i < order; ++i) {
-            const auto hi = words->hi.values()[i], lo = words->lo.values()[i];
+            const auto hi = physical.hi.values()[i], lo = physical.lo.values()[i];
             amplitudes.values()[i] = {import(a::DoubleWord{hi.real(), lo.real()}, work),
                                       import(a::DoubleWord{hi.imag(), lo.imag()}, work)};
         }
@@ -2166,8 +2389,8 @@ struct NonpenetrationBuilder {
             totals.emplace(harmonic_loads(input, geometry, bound, amplitudes.values(), phase,
                                           *loads, limits.induction_accuracy.representation, memory,
                                           work));
-        return {geometry.context(), std::move(solved), std::move(residual), std::move(totals),
-                work.used};
+        return {geometry.context(), std::move(solved), std::move(residual),
+                std::move(totals),  work.used,         std::move(expanded)};
     }
 
     static PrimalCirculationData solve_contour(const DiscreteNonpenetrationInput& input,

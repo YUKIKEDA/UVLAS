@@ -112,11 +112,16 @@ struct DiscreteNonpenetrationLimits {
     std::uint64_t steps;
 };
 
+/// Pairs cover every bound row exactly once. Each pair uses the same circulation
+/// and is validated against the retained geometry and forcing at y=0.
+using HarmonicReflectionPair = std::array<aero::detail::PhysicalFaceId, 2>;
+
 struct StraightWakeHarmonicInput {
     NonpenetrationVector convection_velocity;
     std::span<const double> age_panel_starts_seconds;
     double angular_frequency;
     std::uint64_t maximum_samples;
+    std::span<const HarmonicReflectionPair> reflection_pairs{};
 };
 
 struct HarmonicWakeColumn {
@@ -257,6 +262,15 @@ struct DiscreteHarmonicCirculation {
     core::PlannedBuffer<std::optional<HarmonicCirculationResidual>> residual;
     std::optional<HarmonicLoadTotals> loads;
     std::uint64_t used_steps;
+    /// Full-order words after reflection expansion; the algebraic certificate
+    /// above describes the condensed system when this buffer is present.
+    std::optional<numerics::PrecisionBuffer<std::complex<double>>> expanded;
+
+    [[nodiscard]] const numerics::PrecisionBuffer<std::complex<double>>&
+    physical_values() const& noexcept {
+        return expanded ? *expanded : solution.values();
+    }
+    const numerics::PrecisionBuffer<std::complex<double>>& physical_values() const&& = delete;
 };
 
 /// Solve the finite straight-wake system A0 + W(omega) E^T with a real A0
