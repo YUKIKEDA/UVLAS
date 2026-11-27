@@ -642,6 +642,18 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
         const p::P1ActionSource source{prepared.contact, query, {3, 5}};
         const auto forecast = test_geometry::take(
             p::forecast_bound_wake_induction(source, bound_wake, ids, limits()));
+        auto tight = limits();
+        const auto kernel_steps = p::P1Workspace::maximum_steps();
+        REQUIRE(kernel_steps > 0);
+        REQUIRE(kernel_steps < tight.kernel.max_steps);
+        tight.kernel.max_steps = kernel_steps;
+        tight.steps = forecast.reserved_steps;
+        const auto at_limit =
+            test_geometry::take(p::forecast_bound_wake_induction(source, bound_wake, ids, tight));
+        CHECK(at_limit.reserved_steps == forecast.reserved_steps);
+        --tight.kernel.max_steps;
+        rejected(p::forecast_bound_wake_induction(source, bound_wake, ids, tight),
+                 core::FailureCode::ResourceExceeded);
         core::ResourcePlan memory{forecast.payload_bytes};
         const auto mixed = test_geometry::take(prepare_mixed(source, bound_wake, ids, memory));
         const auto report = test_geometry::take(mixed.report());
