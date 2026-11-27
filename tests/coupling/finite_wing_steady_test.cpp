@@ -1,4 +1,5 @@
 #include "aero/geometry_snapshot_fixture.hpp"
+#include "aero/p1_shared_action.hpp"
 #include "coupling/case_reference_graph.hpp"
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
@@ -1193,12 +1194,72 @@ struct WingCondition {
     }
 }
 #ifdef UVLAS_FINITE_WING_REFINEMENT_FIXTURE
+#ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
+void verify_formal_wing_forecast(const CaseLattice& grid, const FiniteWingMesh& mesh,
+                                 const a::OwnedGeometry& geometry,
+                                 const a::GlobalContactState& contact,
+                                 const a::GeometryLimits& geometry_caps, std::size_t span,
+                                 a::GeometryWorkspace& workspace, core::ResourcePlan& memory) {
+    const auto count = grid.collocation.size();
+    std::vector<a::P1FaceStrengths> maps;
+    std::vector<a::P1StrengthId> ids;
+    maps.reserve(mesh.faces.size());
+    ids.reserve(mesh.faces.size() + span);
+    for (std::size_t i = 0; i < count; ++i) {
+        const auto face = mesh.faces[i].id;
+        maps.emplace_back(face, a::P0BoundColumn{});
+        ids.push_back(a::P1StrengthId::bound(face));
+    }
+    for (std::size_t i = 0; i < span; ++i) {
+        const auto panel = take_global(contact.uvlm_quad(mesh.quads[count + i].facets[0], 1000000));
+        REQUIRE(panel.attachment);
+        const auto leading = panel.attachment->coefficient == -1
+                                 ? a::P1StrengthId{10000 + i}
+                                 : a::P1StrengthId::bound(panel.attachment->bound_face);
+        const auto trailing = a::P1StrengthId{5000 + i};
+        maps.emplace_back(panel.face, std::array{leading, trailing});
+        ids.push_back(trailing);
+        if (!leading.bound_face())
+            ids.push_back(leading);
+    }
+    std::ranges::sort(ids);
+    REQUIRE(maps.size() == (128 + 1) * 192);
+    constexpr std::uint64_t query_cap = UINT64_C(150000000000);
+    const a::P1AssemblyLimits admission{
+        geometry_caps, {ls::EstimateAdmission{8 * 1024 * 1024}, UINT64_C(1000000000)}, query_cap};
+    std::cout << "Formal geometry: points=" << mesh.ids.size() << " facets=" << 2 * maps.size()
+              << " preparation_bytes=" << memory.allocated_bytes()
+              << " kernel_step_cap=" << a::P1Workspace::maximum_steps() << '\n';
+    for (const auto row : {std::size_t{0}, count / 2, count - 1}) {
+        CAPTURE(row);
+        const auto query = test_geometry::take(a::resolve_query(
+            geometry, {a::QueryId{row + 1}, a::FreePoint{a::FreeSingle{grid.collocation[row]}}},
+            geometry.context(), geometry_caps, workspace, memory));
+        const a::P1ActionSource source{contact, query, {7, 11}};
+        const auto forecast = test_geometry::take(
+            a::forecast_bound_wake_serial_induction(source, maps, ids, admission));
+        REQUIRE(forecast.reusable);
+        CHECK(forecast.ordinary.reserved_steps <= query_cap);
+        std::cout << "Formal forecast: row=" << row
+                  << " preflight=" << forecast.ordinary.preflight_steps
+                  << " reserved=" << forecast.ordinary.reserved_steps
+                  << " first_bytes=" << forecast.initial_payload_bytes
+                  << " repeated_bytes=" << forecast.repeated_payload_bytes
+                  << " metadata_bytes=" << forecast.ordinary.estimated_metadata_bytes << '\n';
+    }
+}
+#endif
+
 void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                       const nlohmann::json& oracle, double length, double radius) {
     const auto m = oracle.at("chord_panels").get<core::Index>();
     const auto n = oracle.at("span_panels").get<core::Index>();
     CAPTURE(m, n);
+#ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
+    REQUIRE((m == 128 && n == 192));
+#else
     REQUIRE(((m == 2 && n == 4) || (m == 4 && n == 8) || (m == 4 && n == 12)));
+#endif
     const auto nx = static_cast<std::size_t>(m);
     const auto ny = static_cast<std::size_t>(n);
     const auto order = m * n;
@@ -1210,7 +1271,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
         surface.set("span", parse(oracle.at("half_span_fractions").dump()));
     }
     const auto si = materialize(recipe, io::SourceId{534});
-    core::ResourcePlan memory{UINT64_C(2000000000)};
+    core::ResourcePlan memory{m == 128 ? UINT64_C(24) * (UINT64_C(1) << 30) : UINT64_C(2000000000)};
     const auto grid = lattice(si, length, memory, m, n / 2);
     for (std::size_t i = 0; i < grid.vertices.size(); ++i) {
         const auto expected = oracle.at("vertices_m").at(i).get<Point>();
@@ -1257,6 +1318,14 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
     const auto contact =
         take_global(a::check_global_geometry(topology, geometry, contact_caps, *global, memory));
     REQUIRE(topology.trailing_edges().size() == ny);
+
+#ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
+    if (m == 128) {
+        verify_formal_wing_forecast(grid, mesh, geometry, contact, geometry_caps, ny,
+                                    *geometry_work, memory);
+        return;
+    }
+#endif
 
     const cf::DiscreteNonpenetrationLimits caps{
         {core::Precision::TwoWord, 1e-12},
@@ -1450,10 +1519,8 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
               far_coefficient);
 }
 #endif
-} // namespace
 
-TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
-          "[V-AERO][AE-02][UW-D03][UW-D05][N4-06][verification]") {
+void verify_selected_wing() {
     std::ifstream source{UVLAS_FINITE_WING_CASE_FIXTURE};
     std::ifstream observations{UVLAS_FINITE_WING_STEADY_FIXTURE};
     REQUIRE(source);
@@ -1505,6 +1572,9 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
         const auto polars = nlohmann::json::parse(polar_file);
         const auto reference = nlohmann::json::parse(reference_file);
         REQUIRE(reference.at("id") == "finite-wing-drag-refinement-v1");
+#ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
+        REQUIRE(reference.at("scope") == "geometry_only");
+#endif
         REQUIRE(reference.at("closure_m") == 1024.);
         REQUIRE(reference.at("core_m") == 1.114285714285714e-5);
         const auto& polar = polars.at("cases").at(wing_index);
@@ -1543,3 +1613,16 @@ TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
         }
     }
 }
+} // namespace
+
+#ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
+TEST_CASE("A formal finite-wing grid qualifies geometry and single-query forecasts",
+          "[V-AERO][AE-02][UW-D03][UW-D05][N4-06][verification]") {
+    verify_selected_wing();
+}
+#else
+TEST_CASE("A frozen finite wing reproduces its complete steady polar and loads",
+          "[V-AERO][AE-02][UW-D03][UW-D05][N4-06][verification]") {
+    verify_selected_wing();
+}
+#endif
