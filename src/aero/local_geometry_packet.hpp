@@ -136,6 +136,9 @@ private:
     std::unique_ptr<GeometryWorkspace> geometry_;
     core::PlannedBuffer<LocalRootScratch> scratch_;
 };
+/// A local packet ceiling within the caller's budget, including midpoint alias lookup.
+[[nodiscard]] std::uint64_t local_packet_step_ceiling(std::uint64_t facets,
+                                                      const GeometryLimits&) noexcept;
 /// Independent immutable local result; it never confers global geometry qualification.
 class LocalGeometryPacket {
 public:

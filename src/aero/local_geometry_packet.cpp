@@ -6,6 +6,7 @@
 #include "shared_p1_reuse_private.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <limits>
 #include <new>
@@ -17,6 +18,7 @@ static_assert(std::is_nothrow_copy_constructible_v<LocalQualification>);
 static_assert(std::is_trivially_copyable_v<QueryRequest>);
 namespace {
 constexpr auto operation = core::Operation::EvaluateAero;
+constexpr std::uint64_t enclosure_steps = 12 * (257 + 2);
 OwnedGeometryFailure packet_failure(core::Failure failure, const GeometryContext& context,
                                     std::optional<GeometryProblem> problem = {}) noexcept {
     auto& d = failure.details;
@@ -208,7 +210,7 @@ public:
         try {
             if (stop.stop_requested())
                 return std::unexpected(packet_failure(core::FailureCode::Cancelled, context));
-            if (alias_steps > limits.max_steps || limits.max_steps - alias_steps < 3108)
+            if (alias_steps > limits.max_steps || limits.max_steps - alias_steps < enclosure_steps)
                 return std::unexpected(
                     packet_failure(core::FailureCode::ResourceExceeded, context));
             if (const auto error = accuracy.validation_error())
@@ -268,7 +270,7 @@ public:
             if (stop.stop_requested())
                 return std::unexpected(packet_failure(core::FailureCode::Cancelled, context));
             if (input->preparation_steps > local_limits.max_steps ||
-                local_limits.max_steps - input->preparation_steps < 3108)
+                local_limits.max_steps - input->preparation_steps < enclosure_steps)
                 return std::unexpected(
                     packet_failure(core::FailureCode::ResourceExceeded, context));
             const auto& facet =
@@ -413,6 +415,19 @@ LocalPacketWorkspace::LocalPacketWorkspace(Key, std::unique_ptr<GeometryWorkspac
                                            core::PlannedBuffer<LocalRootScratch> scratch) noexcept
     : geometry_(std::move(geometry)), scratch_(std::move(scratch)) {}
 LocalPacketWorkspace::~LocalPacketWorkspace() = default;
+std::uint64_t local_packet_step_ceiling(std::uint64_t facets,
+                                        const GeometryLimits& limits) noexcept {
+    // Three source vertices plus a material query with up to three vertices.
+    constexpr std::uint64_t decode_steps = 3 * (3 + 3);
+    // Initial classification, projection, six distance candidates, optional
+    // face, seven minimum comparisons and the far-boundary comparison.
+    constexpr std::uint64_t predicate_steps = 2 + 6 + 1 + 7 + 1;
+    // Check the alias call and its search, then examine all three facet edges.
+    const auto alias_steps = 2 + static_cast<std::uint64_t>(std::bit_width(facets)) + 3;
+    const auto total = enclosure_steps + decode_steps +
+                       std::min(limits.predicate.max_steps, predicate_steps) + alias_steps;
+    return std::min(total, limits.max_steps);
+}
 core::Result<std::unique_ptr<LocalPacketWorkspace>>
 LocalPacketWorkspace::create(core::ResourcePlan& plan, core::FailureDetails details) noexcept {
     auto geometry = GeometryWorkspace::create(plan, details);

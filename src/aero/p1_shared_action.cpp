@@ -618,9 +618,9 @@ class SharedP1Engine {
         // Reserve the ceiling the local evaluator actually enforces.
         const auto kernel_steps = n == 0 ? 0 : P1Workspace::maximum_steps();
         (void)checked_limit(kernel_steps, limits.kernel.max_steps);
+        const auto packet_steps = local_packet_step_ceiling(n, limits.geometry);
         result.reserved_steps =
-            sum(result.preflight_steps,
-                sum(metadata, product(n, sum(limits.geometry.max_steps, kernel_steps))));
+            sum(result.preflight_steps, sum(metadata, product(n, sum(packet_steps, kernel_steps))));
         (void)checked_limit(result.reserved_steps, limits.steps);
         return result;
     }
@@ -958,6 +958,8 @@ public:
             }
             map_facets(data, geometry, faces, strengths, point_columns.values(),
                        occurrences.values(), work);
+            auto packet_limits = limits.geometry;
+            packet_limits.max_steps = local_packet_step_ceiling(facet_count, packet_limits);
             for (std::size_t i = 0; i < facet_count; ++i) {
                 auto& facet = data.facets.values()[i];
                 const auto prepare_packet =
@@ -979,9 +981,9 @@ public:
                 auto packet = needed(
                     has_alias ? prepare_aliased_midpoint_packet(
                                     source.contact, source.query, id, facet.bound, local_accuracy,
-                                    limits.geometry, local, memory, stop, storage_slot)
+                                    packet_limits, local, memory, stop, storage_slot)
                               : prepare_packet(*verified.geometry, source.query, id, local_accuracy,
-                                               limits.geometry, local, memory, stop, storage_slot));
+                                               packet_limits, local, memory, stop, storage_slot));
                 const auto steps = needed(packet.steps());
                 const bool far = !facet.bound && needed(packet.far()) == FarRelation::Far;
                 packets[i].emplace(std::move(packet));
