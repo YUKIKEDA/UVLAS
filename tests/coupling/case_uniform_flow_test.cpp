@@ -1879,12 +1879,12 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
             CHECK(update.columns.values().front().bound_face == fixture.faces[0].id);
             CHECK(update.rows.values().front().face == fixture.faces[0].id);
             const auto& coefficient = update.coefficients.values().front();
-            // Independent planar strip integrals and Gauss16 on [0,1/8] and
-            // [1/8,1/3]. The physical closure is 1 m at 3 m/s.
-            CHECK(coefficient.real.lower <= .02372355017383860083);
-            CHECK(coefficient.real.upper >= .02372355017383860083);
-            CHECK(coefficient.imaginary.lower <= .07640431828473117643);
-            CHECK(coefficient.imaginary.upper >= .07640431828473117643);
+            // Independent oriented contour derivatives and Gauss16 on [0,1/8]
+            // and [1/8,1/3]. The physical closure is 1 m at 3 m/s.
+            CHECK(coefficient.real.lower <= -.02372355017383860083);
+            CHECK(coefficient.real.upper >= -.02372355017383860083);
+            CHECK(coefficient.imaginary.lower <= -.07640431828473117643);
+            CHECK(coefficient.imaginary.upper >= -.07640431828473117643);
             CHECK(coefficient.real.upper - coefficient.real.lower < 1e-12);
             CHECK(coefficient.imaginary.upper - coefficient.imaginary.lower < 1e-12);
             auto skewed = phase;
@@ -1912,7 +1912,9 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                    core::FailureCode::PrecisionUnresolved);
             const auto compare_harmonic = [&](const cf::StraightWakeHarmonicInput& wake_phase,
                                               std::complex<double> expected) {
-                const auto response = take(solve_harmonic(wake_phase, harmonic_request));
+                const cf::HarmonicLoadInput loads{a::SingleWord{1.25}, coordinates(.375, 0, 0)};
+                const auto response = take(cf::solve_discrete_harmonic_loads(
+                    view, wake_phase, forcing, loads, harmonic_limits, harmonic_request, memory));
                 CHECK(response.geometry == geometry.context());
                 CHECK(response.used_steps <= harmonic_limits.steps);
                 REQUIRE(response.residual.size() == 1);
@@ -1924,12 +1926,37 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
                 const auto& gamma = std::get<numerics::TwoWord<std::complex<double>>>(
                     response.solution.values().storage());
                 CHECK(std::abs(gamma.hi.values()[0] + gamma.lo.values()[0] - expected) < 1e-12);
+                REQUIRE(response.loads);
+                constexpr double density = 1.25;
+                // The front edge is x=0. The two unit-normal facets have area
+                // one in total and their area-weighted centroid is (1/2,1/2,0).
+                const std::complex<double> rate{0., wake_phase.angular_frequency};
+                const auto force = density * (3. + rate) * expected;
+                const auto pitch = density * (1.125 - .125 * rate) * expected;
+                const auto& observed = *response.loads;
+                const auto margin = rational_word(1e-12);
+                residual_expected(observed.force_real[2], rational_word(force.real()), margin);
+                residual_expected(observed.force_imaginary[2], rational_word(force.imag()), margin);
+                residual_expected(observed.moment_real[1], rational_word(pitch.real()), margin);
+                residual_expected(observed.moment_imaginary[1], rational_word(pitch.imag()),
+                                  margin);
+                residual_expected(observed.moment_real[0], rational_word(.5 * force.real()),
+                                  margin);
+                residual_expected(observed.moment_imaginary[0], rational_word(.5 * force.imag()),
+                                  margin);
+                for (std::size_t axis = 0; axis < 2; ++axis) {
+                    residual_small(observed.force_real[axis], margin);
+                    residual_small(observed.force_imaginary[axis], margin);
+                }
+                residual_small(observed.moment_real[2], margin);
+                residual_small(observed.moment_imaginary[2], margin);
             };
             // Independent segment antiderivatives on the clockwise [0,2] x [0,1]
             // contour, evaluated at (3/4,1/2,0) with core radius 1/8.
             constexpr double steady_coefficient = -.6839370505734605;
             constexpr std::complex<double> normal_speed{.25, -.125};
-            const std::complex<double> finite_update{.02372355017383860083, .07640431828473117643};
+            const std::complex<double> finite_update{-.02372355017383860083,
+                                                     -.07640431828473117643};
             compare_harmonic(phase, normal_speed / (steady_coefficient + finite_update));
             auto zero_phase = phase;
             zero_phase.angular_frequency = 0.;

@@ -1545,6 +1545,125 @@ void check_formal_product(const cf::DiscreteCirculationLoads& loads, const CaseL
 }
 #endif
 
+void verify_harmonic_grid(const CaseLattice& grid, const FiniteWingMesh& mesh,
+                          a::GeometryInput geometry_input, const a::GeometryLimits& geometry_caps,
+                          const a::GlobalLimits& contact_caps,
+                          cf::DiscreteNonpenetrationLimits action_limits,
+                          cf::DiscreteCirculationRequest request) {
+    std::ifstream fixture(UVLAS_HARMONIC_M2N4_FIXTURE);
+    REQUIRE(fixture);
+    const auto reference = nlohmann::json::parse(fixture);
+    REQUIRE(reference.at("schema") == "finite-wing-harmonic-m2n4/1");
+    REQUIRE(reference.at("cases").size() == 6);
+    const auto wake_length = reference.at("wake_length_m").get<double>();
+    auto high = mesh.xyz;
+    std::vector<double> low(high.size());
+    constexpr std::size_t count = 8;
+    constexpr std::size_t span = 4;
+    constexpr std::size_t width = span + 1;
+    REQUIRE(grid.vertices.size() == 4 * width);
+    for (std::size_t i = 0; i < width; ++i) {
+        const auto x = high[3 * (2 * width + i)];
+        const auto tail = 3 * (3 * width + i);
+        REQUIRE(std::abs(x) < wake_length);
+        // FastTwoSum with the wake length as the larger operand. All four
+        // bands recover the same exact translation from the retained words.
+        high[tail] = wake_length + x;
+        low[tail] = x - (high[tail] - wake_length);
+        CHECK(rational_word(high[tail]) + rational_word(low[tail]) - rational_word(x) ==
+              rational_word(wake_length));
+    }
+    const a::DoublePositions positions{high, low};
+    geometry_input.reference = positions;
+    geometry_input.current = positions;
+    geometry_input.core_radius = a::SingleWord{reference.at("core_m").get<double>()};
+    core::ResourcePlan plan{UINT64_C(2000000000)};
+    auto workspace = test_geometry::workspace(plan);
+    const auto geometry = test_geometry::take(
+        a::prepare_owned_geometry(geometry_input, geometry_caps, *workspace, plan));
+    auto global = take(a::GlobalWorkspace::create(plan, contact_caps.metadata));
+    const auto topology = take_global(a::build_global_topology(
+        geometry, {mesh.roles, mesh.owners, mesh.trailing}, contact_caps, *global, plan));
+    const auto contact =
+        take_global(a::check_global_geometry(topology, geometry, contact_caps, *global, plan));
+    std::vector<a::ResolvedQuery> queries;
+    queries.reserve(count);
+    std::vector<cf::DiscreteCollocation> rows;
+    rows.reserve(count);
+    for (std::size_t i = 0; i < count; ++i) {
+        queries.push_back(test_geometry::take(a::resolve_query(
+            geometry, {a::QueryId{i + 1}, a::FreePoint{a::FreeSingle{grid.collocation[i]}}},
+            geometry.context(), geometry_caps, *workspace, plan)));
+        rows.emplace_back(mesh.quads[i].facets[0], queries.back(), grid.tangents[i], xyz({}),
+                          a::SingleWord{0}, a::SingleWord{0});
+    }
+    std::vector<cf::DiscreteWakePanel> wake;
+    for (std::size_t i = 0; i < span; ++i)
+        wake.emplace_back(mesh.quads[count + i].facets[0], cf::AttachedWakeFront{},
+                          cf::SteadyWakeClosure{});
+    constexpr a::P1ActionStamp trial{815, 6};
+    const cf::DiscreteNonpenetrationInput input{contact,
+                                                rows,
+                                                wake,
+                                                {core::AcceptedStateId{2}, {}},
+                                                trial,
+                                                stamp,
+                                                p::RequestedSide::Automatic};
+    request.scales.context = context(geometry.context());
+    request.certified_closed_contour = true;
+    request.solver_limits.maximum_update_rank = span;
+    request.matrix_absolute = 1e-10;
+    request.algebraic.norm = ls::Norm::L2;
+    action_limits.action_steps = action_limits.induction.steps;
+    const cf::HarmonicLoadInput loading{a::SingleWord{reference.at("density_kg_m3").get<double>()},
+                                        xyz({.375, 0., 0.})};
+    const auto speed = reference.at("inflow_m_s").get<double>();
+    for (const auto& sample : reference.at("cases")) {
+        const auto motion = sample.at("motion").get<std::string>();
+        CAPTURE(sample.at("k").get<double>(), motion);
+        REQUIRE((motion == "heave" || motion == "pitch"));
+        const bool heave = motion == "heave";
+        const auto starts = sample.at("panel_starts").get<std::vector<double>>();
+        const auto omega = sample.at("omega").get<double>();
+        const cf::StraightWakeHarmonicInput phase{xyz({speed, 0., 0.}), starts, omega,
+                                                  16 * starts.size()};
+        std::vector<cf::HarmonicCirculationRhs> forcing;
+        forcing.reserve(count);
+        double rhs_square = 0.;
+        for (std::size_t i = 0; i < count; ++i) {
+            const auto rhs = sample.at("rhs").at(i).get<std::array<double, 2>>();
+            // The horizontal wing's normal component is one. The pivot is
+            // the same x=3/8 m used for the output moment.
+            const double real = heave ? 0. : -speed;
+            const double imag = heave ? omega : -omega * (grid.collocation[i][0] - .375);
+            CHECK(std::hypot(real - rhs[0], imag - rhs[1]) <= 1e-13 * std::hypot(rhs[0], rhs[1]));
+            forcing.push_back({mesh.faces[i].id, a::SingleWord{real}, a::SingleWord{imag}});
+            rhs_square += real * real + imag * imag;
+        }
+        request.original_absolute = .99 * std::sqrt(rhs_square) * 1e-11 / 20.;
+        const auto result = take(cf::solve_discrete_harmonic_loads(input, phase, forcing, loading,
+                                                                   action_limits, request, plan));
+        REQUIRE(result.loads);
+        const auto& solution =
+            std::get<numerics::TwoWord<std::complex<double>>>(result.solution.values().storage());
+        for (std::size_t i = 0; i < count; ++i) {
+            const auto expected = sample.at("gamma").at(i).get<std::array<double, 2>>();
+            const std::complex<double> gamma{expected[0], expected[1]};
+            CHECK(std::abs(solution.hi.values()[i] + solution.lo.values()[i] - gamma) <=
+                  1e-9 * std::abs(gamma));
+        }
+        const auto check = [&](std::size_t output, const a::ScaledEnclosure& real,
+                               const a::ScaledEnclosure& imag) {
+            const auto expected = sample.at("loads").at(output).get<std::array<double, 2>>();
+            const auto tolerance = rational_word(5e-10 * std::hypot(expected[0], expected[1]));
+            check_within(unpack(real), rational_word(expected[0]), tolerance);
+            check_within(unpack(imag), rational_word(expected[1]), tolerance);
+        };
+        check(0, result.loads->force_real[2], result.loads->force_imaginary[2]);
+        check(1, result.loads->moment_real[1], result.loads->moment_imaginary[1]);
+    }
+}
+
 void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                       const nlohmann::json& oracle, double length, double radius) {
     const auto m = oracle.at("chord_panels").get<core::Index>();
@@ -1692,6 +1811,9 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
         1e-11,
         0.};
     constexpr a::P1ActionStamp trial{815, 6};
+    if (count == 8 && wing.at("dihedral_degrees").get<int>() == 0)
+        verify_harmonic_grid(grid, mesh, input_geometry, geometry_caps, contact_caps, caps,
+                             request);
     const cf::DiscreteVectorLoadInput write_loads{
         trial, request.retained_generation, midpoint,
         rates, a::SingleWord{1.2},          xyz({.375, 0., 0.})};

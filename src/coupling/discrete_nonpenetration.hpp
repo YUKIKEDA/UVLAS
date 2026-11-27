@@ -239,10 +239,23 @@ struct HarmonicCirculationResidual {
     aero::detail::ScaledEnclosure imaginary;
 };
 
+using DiscreteLoadVector = std::array<aero::detail::ScaledEnclosure, 3>;
+
+struct HarmonicLoadInput {
+    aero::detail::ScalarWords density;
+    NonpenetrationVector moment_origin;
+};
+
+struct HarmonicLoadTotals {
+    DiscreteLoadVector force_real, force_imaginary;
+    DiscreteLoadVector moment_real, moment_imaginary;
+};
+
 struct DiscreteHarmonicCirculation {
     aero::detail::GeometryContext geometry;
     numerics::linear::Solution<std::complex<double>> solution;
     core::PlannedBuffer<std::optional<HarmonicCirculationResidual>> residual;
+    std::optional<HarmonicLoadTotals> loads;
     std::uint64_t used_steps;
 };
 
@@ -254,6 +267,16 @@ struct DiscreteHarmonicCirculation {
     const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
     std::span<const HarmonicCirculationRhs>, const DiscreteNonpenetrationLimits&,
     const DiscreteCirculationRequest&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
+/// Evaluate the linear harmonic loads from the same certified circulation.
+/// The convection velocity supplies the steady ambient edge velocity. Rates
+/// are i*omega*Gamma, with moment arm measured from the supplied origin.
+[[nodiscard]] core::Result<DiscreteHarmonicCirculation>
+solve_discrete_harmonic_loads(const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+                              std::span<const HarmonicCirculationRhs>, const HarmonicLoadInput&,
+                              const DiscreteNonpenetrationLimits&,
+                              const DiscreteCirculationRequest&, core::ResourcePlan&,
+                              const std::stop_token& = {}) noexcept;
 
 struct CirculationResidualRow {
     aero::detail::PhysicalFaceId face{0};
@@ -532,8 +555,6 @@ private:
     const DiscreteCirculationRequest& primal, const DiscreteCirculationRequest& transpose,
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
-
-using DiscreteLoadVector = std::array<aero::detail::ScaledEnclosure, 3>;
 
 struct EdgeMidpointVelocity {
     EdgeMidpointVelocity(aero::detail::EdgeId id, const NonpenetrationVector& v) noexcept

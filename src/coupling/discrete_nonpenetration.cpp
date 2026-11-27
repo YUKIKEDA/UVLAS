@@ -720,6 +720,8 @@ void accumulate_vector(Vector& destination, const Vector& source, p::Work& work)
         destination[axis] = p::add(destination[axis], source[axis], work);
 }
 
+using HarmonicPair = std::array<p::Interval, 2>;
+
 struct LoadTotals {
     Vector force{}, moment{};
     void add(const Vector& position, const Vector& value, const Vector& origin, p::Work& work) {
@@ -1821,7 +1823,10 @@ struct NonpenetrationBuilder {
                 auto coefficient = require(a::project_straight_wake_column_update(
                     geometry.context(), band.first, band.second, speed, core, location, normal,
                     samples, samples.size(), stop));
-                if (band.sign < 0) {
+                // The native kernel has the negative orientation of the
+                // explicitly directed wake contour. Apply that sign together
+                // with the physical trailing-edge transfer to bound Gamma.
+                if (band.sign > 0) {
                     coefficient.real = {-coefficient.real.upper, -coefficient.real.lower};
                     coefficient.imaginary = {-coefficient.imaginary.upper,
                                              -coefficient.imaginary.lower};
@@ -1904,15 +1909,85 @@ struct NonpenetrationBuilder {
         return *owner.contour;
     }
 
+    static HarmonicLoadTotals
+    harmonic_loads(const DiscreteNonpenetrationInput& input, const a::OwnedGeometry& geometry,
+                   std::span<const PanelRow> bound, std::span<const HarmonicPair> amplitudes,
+                   const StraightWakeHarmonicInput& phase, const HarmonicLoadInput& loads,
+                   core::Precision representation, core::ResourcePlan& memory, p::Work& work) {
+        const auto density = import(loads.density, work);
+        if (p::compare(density.lower, {}) <= 0)
+            reject(core::FailureCode::InvalidInput);
+        const auto origin = import(loads.moment_origin, work);
+        const auto flow = import(phase.convection_velocity, work);
+        const auto half = p::divide(p::integer(1), p::integer(2), work);
+        const auto third = p::divide(p::integer(1), p::integer(3), work);
+        const auto rate = p::multiply(density, checked_word(phase.angular_frequency), work);
+        std::array<LoadTotals, 2> totals{};
+        auto occurrences = allocate<LoadEdgeOccurrence>(memory, multiply_budget(6, bound.size()));
+        prepare_load_edges(bound, geometry, input.contact, occurrences.values(), {}, work);
+        sort_load_edges(occurrences.values(), work);
+        for (std::size_t i = 0; i < occurrences.size();) {
+            const auto& edge = occurrences.values()[i];
+            HarmonicPair strength{};
+            bool exterior = false;
+            while (i < occurrences.size() && occurrences.values()[i].edge == edge.edge) {
+                const auto [panel, orientation] = take_edge_panel(occurrences.values(), i, work);
+                if (orientation == 0)
+                    continue;
+                exterior = true;
+                for (std::size_t part = 0; part < strength.size(); ++part) {
+                    const auto& gamma = amplitudes[panel][part];
+                    strength[part] = orientation == 1 ? p::add(strength[part], gamma, work)
+                                                      : p::subtract(strength[part], gamma, work);
+                }
+            }
+            if (!exterior || edge.trailing)
+                continue;
+            const auto first = point_position(geometry, edge.endpoints[0], work);
+            const auto second = point_position(geometry, edge.endpoints[1], work);
+            const auto midpoint = scale_vector(add_vectors(first, second, work), half, work);
+            const auto direction = cross(flow, difference(second, first, work), work);
+            for (std::size_t part = 0; part < strength.size(); ++part) {
+                const auto force =
+                    scale_vector(direction, p::multiply(density, strength[part], work), work);
+                totals[part].add(midpoint, force, origin, work);
+            }
+        }
+        for (std::size_t panel = 0; panel < bound.size(); ++panel) {
+            const auto& gamma = amplitudes[panel];
+            const HarmonicPair area_factors{
+                p::multiply(half, p::negate(p::multiply(rate, gamma[1], work), work), work),
+                p::multiply(half, p::multiply(rate, gamma[0], work), work)};
+            for (const auto facet : bound[panel].panel.facets) {
+                const auto ids = require(geometry.facet_points(facet));
+                const auto x = point_position(geometry, ids[0], work);
+                const auto y = point_position(geometry, ids[1], work);
+                const auto z = point_position(geometry, ids[2], work);
+                const auto doubled_area =
+                    cross(difference(y, x, work), difference(z, x, work), work);
+                const auto center =
+                    scale_vector(add_vectors(add_vectors(x, y, work), z, work), third, work);
+                for (std::size_t part = 0; part < area_factors.size(); ++part)
+                    totals[part].add(center, scale_vector(doubled_area, area_factors[part], work),
+                                     origin, work);
+            }
+        }
+        a::LocalRootScratch rounding;
+        return {enclose_vector(totals[0].force, representation, rounding, work),
+                enclose_vector(totals[1].force, representation, rounding, work),
+                enclose_vector(totals[0].moment, representation, rounding, work),
+                enclose_vector(totals[1].moment, representation, rounding, work)};
+    }
+
     static DiscreteHarmonicCirculation
     solve_harmonic(const DiscreteNonpenetrationInput& input, const StraightWakeHarmonicInput& phase,
                    std::span<const HarmonicCirculationRhs> velocities,
                    const DiscreteNonpenetrationLimits& limits,
                    const DiscreteCirculationRequest& request, core::ResourcePlan& memory,
-                   const std::stop_token& stop) {
+                   const std::stop_token& stop, const HarmonicLoadInput* loads = nullptr) {
         using Complex = std::complex<double>;
         using Code = core::FailureCode;
-        using Pair = std::array<p::Interval, 2>;
+        using Pair = HarmonicPair;
         p::Work work{0, limits.steps, stop};
         work.step();
         const auto& geometry = require(input.contact.geometry()).get();
@@ -2086,7 +2161,13 @@ struct NonpenetrationBuilder {
         }
         check.finish();
         work.step();
-        return {geometry.context(), std::move(solved), std::move(residual), work.used};
+        std::optional<HarmonicLoadTotals> totals;
+        if (loads != nullptr)
+            totals.emplace(harmonic_loads(input, geometry, bound, amplitudes.values(), phase,
+                                          *loads, limits.induction_accuracy.representation, memory,
+                                          work));
+        return {geometry.context(), std::move(solved), std::move(residual), std::move(totals),
+                work.used};
     }
 
     static PrimalCirculationData solve_contour(const DiscreteNonpenetrationInput& input,
@@ -2836,16 +2917,20 @@ struct NonpenetrationBuilder {
         return {panel, orientation};
     }
 
-    static void reduce_load_edges(std::span<LoadEdgeOccurrence> occurrences,
-                                  std::span<const EdgeMidpointVelocity> velocities,
-                                  std::span<LoadEdge> edges,
-                                  const linear::Solution<double>& solution, p::Work& work,
-                                  LoadDirections* direction) {
+    static void sort_load_edges(std::span<LoadEdgeOccurrence> occurrences, p::Work& work) {
         std::ranges::sort(
             occurrences, [&](const LoadEdgeOccurrence& left, const LoadEdgeOccurrence& right) {
                 work.step();
                 return std::pair{left.edge, left.panel} < std::pair{right.edge, right.panel};
             });
+    }
+
+    static void reduce_load_edges(std::span<LoadEdgeOccurrence> occurrences,
+                                  std::span<const EdgeMidpointVelocity> velocities,
+                                  std::span<LoadEdge> edges,
+                                  const linear::Solution<double>& solution, p::Work& work,
+                                  LoadDirections* direction) {
+        sort_load_edges(occurrences, work);
         std::size_t emitted = 0;
         for (std::size_t i = 0; i < occurrences.size();) {
             work.step();
@@ -2881,11 +2966,11 @@ struct NonpenetrationBuilder {
             reject(core::FailureCode::InvalidInput);
     }
 
-    static std::span<NodalLoad> prepare_load_topology(std::span<const PanelRow> bound,
-                                                      const a::OwnedGeometry& geometry,
-                                                      const a::GlobalContactState& contact,
-                                                      std::span<LoadEdgeOccurrence> occurrences,
-                                                      std::span<NodalLoad> nodes, p::Work& work) {
+    static void prepare_load_edges(std::span<const PanelRow> bound,
+                                   const a::OwnedGeometry& geometry,
+                                   const a::GlobalContactState& contact,
+                                   std::span<LoadEdgeOccurrence> occurrences,
+                                   std::span<NodalLoad> nodes, p::Work& work) {
         std::size_t k = 0;
         for (std::size_t panel = 0; panel < bound.size(); ++panel)
             for (std::size_t child = 0; child < bound[panel].panel.facets.size(); ++child) {
@@ -2905,10 +2990,19 @@ struct NonpenetrationBuilder {
                                       edge.trailing,
                                       static_cast<std::uint8_t>(child),
                                       static_cast<std::uint8_t>(side)};
-                    nodes[k].point = points[side].value();
+                    if (!nodes.empty())
+                        nodes[k].point = points[side].value();
                     ++k;
                 }
             }
+    }
+
+    static std::span<NodalLoad> prepare_load_topology(std::span<const PanelRow> bound,
+                                                      const a::OwnedGeometry& geometry,
+                                                      const a::GlobalContactState& contact,
+                                                      std::span<LoadEdgeOccurrence> occurrences,
+                                                      std::span<NodalLoad> nodes, p::Work& work) {
+        prepare_load_edges(bound, geometry, contact, occurrences, nodes, work);
         std::ranges::sort(nodes, [&](const NodalLoad& left, const NodalLoad& right) {
             work.step();
             return left.point < right.point;
@@ -4353,6 +4447,25 @@ core::Result<DiscreteHarmonicCirculation> solve_discrete_harmonic_circulation(
     try {
         return NonpenetrationBuilder::solve_harmonic(input, phase, velocities, limits, request,
                                                      memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+core::Result<DiscreteHarmonicCirculation> solve_discrete_harmonic_loads(
+    const DiscreteNonpenetrationInput& input, const StraightWakeHarmonicInput& phase,
+    std::span<const HarmonicCirculationRhs> velocities, const HarmonicLoadInput& loads,
+    const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
+    core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_harmonic(input, phase, velocities, limits, request,
+                                                     memory, stop, &loads);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {
