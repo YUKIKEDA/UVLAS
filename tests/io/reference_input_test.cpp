@@ -10,6 +10,7 @@
 #include "reference_resolution.hpp"
 #include "reference_root_snapshot.hpp"
 #include "source_digest.hpp"
+#include "structure/pg_reference_arithmetic.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -1515,6 +1516,10 @@ $EndElements
     bool thermal_link = false;
     enum class ParticleCase : std::uint8_t { Matching, Decimal, Mass, Point, Lever };
     auto particle_case = ParticleCase::Matching;
+    enum class RigidMassCase : std::uint8_t { None, Matching, Absolute, Frame, Centre, Inertia };
+    auto rigid_mass = RigidMassCase::None;
+    bool mass_set = false;
+    bool duplicate_mass_target = false;
     bool case_millimetres = false;
     bool wrong_thickness_units = false;
     SECTION("Gmsh group expands and preserves the original rings") {
@@ -1769,6 +1774,58 @@ $EndElements
         native_cards = true;
         particle_case = ParticleCase::Lever;
     }
+    SECTION("An eccentric CONM2 has the same centroidal inertia in a rotated Case frame") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Matching;
+    }
+    SECTION("An absolute CONM2 centre can include an exact nonbinary GRID position") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Absolute;
+    }
+    SECTION("A rigid Case frame must originate at the authenticated GRID") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Frame;
+    }
+    SECTION("An offset with the wrong sign changes the rigid centre") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Centre;
+    }
+    SECTION("A changed product of inertia fails the rigid Case comparison") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Inertia;
+    }
+    SECTION("Mixed Case mass evidence preserves sidecar order") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Matching;
+        mass_set = true;
+    }
+    SECTION("A late rigid mismatch prevents publication of the mixed mass set") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Centre;
+        mass_set = true;
+    }
+    SECTION("Two distinct CONM2 cards cannot certify the same Case mass") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Matching;
+        mass_set = true;
+        duplicate_mass_target = true;
+    }
     SECTION("The late native RBE2 error keeps its source field and Case declaration") {
         shell_set = true;
         physical = true;
@@ -1919,6 +1976,9 @@ $EndElements
         sidecar["masses"] = empty;
         if (native_cards) {
             sidecar["beams"].push_back({{"element", "905"}, {"beam", "1"}});
+            if (mass_set)
+                sidecar["masses"].push_back(
+                    {{"element", "908"}, {"mass", duplicate_mass_target ? "1" : "20"}});
             sidecar["masses"].push_back({{"element", "906"}, {"mass", "1"}});
             sidecar["joints"].push_back({{"element", "907"}, {"joint", "1"}});
         }
@@ -1987,11 +2047,18 @@ $EndElements
     }
     if (native_cards) {
         source_text += "CBEAM,905,95,10,20,99\nPBEAM,95,6,2.0,3.0,4.0,,5.0\n";
-        source_text += particle_case == ParticleCase::Lever ? "CONM2,906,10,0,2.0,0.125\n"
-                                                            : "CONM2,906,10,0,2.0\n";
+        if (rigid_mass == RigidMassCase::Absolute)
+            source_text += "CONM2,906,10,-1,2.0,-0.25,0.125,0.475,\n,4.0,.25,3.0,.75,-.5,5.0\n";
+        else if (rigid_mass != RigidMassCase::None)
+            source_text += "CONM2,906,10,0,2.0,-0.25,0.125,0.375,\n,4.0,.25,3.0,.75,-.5,5.0\n";
+        else
+            source_text += particle_case == ParticleCase::Lever ? "CONM2,906,10,0,2.0,0.125\n"
+                                                                : "CONM2,906,10,0,2.0\n";
         source_text += thermal_link ? "RBE2,907,10,123,20,0.001,293.15\n" : "RBE2,907,10,123,20\n";
+        if (mass_set)
+            source_text += "CONM2,908,20,0,3.0\n";
     }
-    if (particle_case == ParticleCase::Decimal) {
+    if (particle_case == ParticleCase::Decimal || rigid_mass == RigidMassCase::Absolute) {
         for (const auto* node : {"GRID,10,,", "GRID,20,,", "GRID,40,,", "GRID,99,,"}) {
             const auto begin = source_text.find(node);
             REQUIRE(begin != std::string::npos);
@@ -2278,17 +2345,39 @@ $EndElements
     }
     if (native_cards) {
         auto& model = config.field("model");
-        if (particle_case == ParticleCase::Decimal)
+        if (particle_case == ParticleCase::Decimal || rigid_mass == RigidMassCase::Absolute)
             model.field("geometry")
                 .elements.front()
                 .field("frame")
                 .set("origin", fixture::json("[0,0,0.1]"));
         model.field("beams").elements.push_back(fixture::fragment("Beam"));
-        auto mass = fixture::fragment("Mass.particle");
+        auto mass =
+            fixture::fragment(rigid_mass == RigidMassCase::None ? "Mass.particle" : "Mass.rigid");
         mass.set("mass", fixture::json(particle_case == ParticleCase::Mass ? "3" : "2"));
         if (particle_case == ParticleCase::Point)
             mass.field("target").set("coordinates", fixture::json("[1,0,0]"));
+        if (rigid_mass != RigidMassCase::None) {
+            auto& frame = mass.field("frame");
+            frame.set("rotation", fixture::json("[[0,-1,0],[1,0,0],[0,0,1]]"));
+            if (rigid_mass == RigidMassCase::Frame)
+                frame.set("origin", fixture::json("[0,0,0.5]"));
+            if (rigid_mass == RigidMassCase::Absolute)
+                frame.set("origin", fixture::json("[0,0,0.1]"));
+            mass.set("center",
+                     fixture::json(rigid_mass == RigidMassCase::Centre ? "[0.125,-0.25,0.375]"
+                                                                       : "[0.125,0.25,0.375]"));
+            mass.set("inertia", fixture::json(rigid_mass == RigidMassCase::Inertia
+                                                  ? "[[3,-0.25,0.5],[-0.25,4,0.75],[0.5,0.75,5]]"
+                                                  : "[[3,0.25,0.5],[0.25,4,0.75],[0.5,0.75,5]]"));
+        }
         model.field("masses").elements.push_back(std::move(mass));
+        if (mass_set) {
+            auto particle = fixture::fragment("Mass.particle");
+            particle.set("id", fixture::json(R"("20")"));
+            particle.set("mass", fixture::json("3"));
+            particle.field("target").set("coordinates", fixture::json("[1,0,0]"));
+            model.field("masses").elements.push_back(std::move(particle));
+        }
         model.field("joints").elements.push_back(fixture::fragment("Joint.rigid_attachment"));
         auto& scales = config.field("numerics").field("scales").elements;
         scales.back()
@@ -2299,6 +2388,12 @@ $EndElements
             scales.push_back(
                 fixture::json(std::string{R"({"kind":"uniform_components","field":")"} +
                               scale_name + R"(","targets":[],"values":[1,1,1]})"));
+        }
+        if (rigid_mass != RigidMassCase::None) {
+            for (const auto* scale_name : {"rigid_translation", "rigid_rotation"})
+                scales.push_back(
+                    fixture::json(std::string{R"({"kind":"uniform_components","field":")"} +
+                                  scale_name + R"(","targets":[],"values":[1,1,1]})"));
         }
     }
 
@@ -2530,7 +2625,7 @@ $EndElements
                                                                 {pg_limits, 300'000, 8},
                                                                 {pg_limits, 300'000},
                                                                 {pg_limits, 300'000, 8},
-                                                                3};
+                                                                mass_set ? 4U : 3U};
             CaseNastranReferenceDiagnostic provenance;
             const auto native = CaseNastranReferenceInputs::prepare(
                 si, *result, *native_quantities, preparation, qualification, native_limits,
@@ -2562,7 +2657,9 @@ $EndElements
                 return;
             }
             if (!native) {
-                FAIL("Native preparation failed");
+                FAIL("Native preparation failed " << static_cast<int>(native.error().code)
+                                                  << ", diagnostic variant "
+                                                  << provenance.card.index());
                 return;
             }
             CHECK_FALSE(provenance.selection);
@@ -2591,6 +2688,95 @@ $EndElements
             } else {
                 FAIL("Missing owned native beam");
             }
+            if (mass_set) {
+                using namespace uvlas::coupling::detail;
+                REQUIRE(native->masses().size() == 2);
+                std::optional<CaseNastranMassSetDiagnostic> mass_diagnostic;
+                if (duplicate_mass_target) {
+                    CaseNastranParticleDiagnostic single_diagnostic;
+                    const auto single = certify_case_nastran_rigid_mass(
+                        si, *native, CaseNastranMassId{1}, pg_limits, plan, &single_diagnostic);
+                    REQUIRE_FALSE(single);
+                    CHECK(single.error().code == core::FailureCode::InvalidInput);
+                    CHECK(single_diagnostic.reason == CaseNastranParticleFailure::Selection);
+                    CHECK(single_diagnostic.element == rd::NastranElementId{906});
+                    const auto set =
+                        CaseNastranMassSet::certify(si, *native, pg_limits, plan, &mass_diagnostic);
+                    REQUIRE_FALSE(set);
+                    CHECK(set.error().code == core::FailureCode::InvalidInput);
+                    REQUIRE(mass_diagnostic);
+                    CHECK(mass_diagnostic->declaration.case_id == 1);
+                    CHECK(mass_diagnostic->declaration.element == rd::NastranElementId{906});
+                    CHECK(mass_diagnostic->comparison.reason ==
+                          CaseNastranParticleFailure::Selection);
+                    return;
+                }
+                if (rigid_mass == RigidMassCase::Centre) {
+                    const auto rejected =
+                        CaseNastranMassSet::certify(si, *native, pg_limits, plan, &mass_diagnostic);
+                    REQUIRE_FALSE(rejected);
+                    CHECK(rejected.error().code == core::FailureCode::InvalidInput);
+                    REQUIRE(mass_diagnostic);
+                    CHECK(mass_diagnostic->declaration.case_id == 1);
+                    CHECK(mass_diagnostic->declaration.element == rd::NastranElementId{906});
+                    CHECK(mass_diagnostic->comparison.reason == CaseNastranParticleFailure::Centre);
+                    const auto field = mass_diagnostic->comparison.field;
+                    REQUIRE(field);
+                    CHECK(field->byte == source_text.find("-0.25", source_text.find("CONM2,906")));
+                    CHECK(certify_case_nastran_particle_mass(si, *native, CaseNastranMassId{20},
+                                                             pg_limits, plan));
+                    return;
+                }
+                auto no_forecast = pg_limits;
+                no_forecast.maximum_partition_visits = 1;
+                core::ResourcePlan rejected_plan{fixture::budget};
+                const auto short_forecast =
+                    CaseNastranMassSet::certify(si, *native, no_forecast, rejected_plan);
+                REQUIRE_FALSE(short_forecast);
+                CHECK(short_forecast.error().code == core::FailureCode::ResourceExceeded);
+                CHECK(rejected_plan.allocated_bytes() == 0);
+
+                namespace exact_detail = uvlas::structure::detail;
+                const exact_detail::ReferenceArithmetic forecast{pg_limits, rejected_plan};
+                constexpr auto limbs = exact_detail::IntegerBackend::limb_bits;
+                const auto rounded_width =
+                    (pg_limits.algebra.maximum_work_bits / limbs - 2) * limbs;
+                const auto single = fixture::take(exact_detail::exact_rational_admission(
+                    pg_limits.algebra, rounded_width,
+                    forecast.external_integer_payload(2 * exact_detail::reference_live_rationals +
+                                                      1)));
+                auto single_budget = pg_limits;
+                single_budget.algebra.external_memory =
+                    ExactEstimateAdmission{single.estimated_external_payload_bytes};
+                core::ResourcePlan short_external{fixture::budget};
+                const auto external_denied =
+                    CaseNastranMassSet::certify(si, *native, single_budget, short_external);
+                REQUIRE_FALSE(external_denied);
+                CHECK(external_denied.error().code == core::FailureCode::ResourceExceeded);
+                CHECK(short_external.allocated_bytes() == 0);
+                CHECK(certify_case_nastran_rigid_mass(si, *native, CaseNastranMassId{1},
+                                                      single_budget, plan));
+
+                const auto qualified =
+                    CaseNastranMassSet::certify(si, *native, pg_limits, plan, &mass_diagnostic);
+                REQUIRE(qualified);
+                CHECK_FALSE(mass_diagnostic);
+                const auto entries = qualified->masses();
+                REQUIRE(entries.size() == 2);
+                REQUIRE(entries[0]);
+                REQUIRE(entries[1]);
+                const auto* particle = std::get_if<CaseNastranParticleMass>(&entries[0].value());
+                const auto* rigid = std::get_if<CaseNastranRigidMass>(&entries[1].value());
+                REQUIRE(particle);
+                REQUIRE(rigid);
+                CHECK(particle->binding.target.value() == 20);
+                CHECK(particle->mass_kg == exact("3"));
+                CHECK(rigid->attachment.binding.target.value() == 1);
+                CHECK(rigid->attachment.mass_kg == exact("2"));
+                CHECK(rigid->centre_metres[2] == exact("0.375"));
+                CHECK(rigid->centre_inertia_kg_m2[3] == exact("-0.75"));
+                return;
+            }
             REQUIRE(native->masses().size() == 1);
             if (const auto& mass = native->masses().front()) {
                 CHECK(mass->binding.element == rd::NastranElementId{906});
@@ -2603,6 +2789,36 @@ $EndElements
             using uvlas::coupling::detail::CaseNastranParticleDiagnostic;
             using uvlas::coupling::detail::CaseNastranParticleFailure;
             using uvlas::coupling::detail::certify_case_nastran_particle_mass;
+            using uvlas::coupling::detail::certify_case_nastran_rigid_mass;
+            if (rigid_mass != RigidMassCase::None) {
+                CaseNastranParticleDiagnostic detail;
+                const auto rigid = certify_case_nastran_rigid_mass(
+                    si, *native, CaseNastranMassId{1}, pg_limits, plan, &detail);
+                if (rigid_mass == RigidMassCase::Matching ||
+                    rigid_mass == RigidMassCase::Absolute) {
+                    REQUIRE(rigid);
+                    CHECK(rigid->attachment.grid == rd::NastranGridId{10});
+                    CHECK(rigid->attachment.shell == rd::MeshShellId{1});
+                    CHECK(rigid->attachment.mass_kg == exact("2"));
+                    const auto height = rigid_mass == RigidMassCase::Absolute ? "0.475" : "0.375";
+                    CHECK(rigid->centre_metres ==
+                          (std::array{exact("-0.25"), exact("0.125"), exact(height)}));
+                    CHECK(rigid->centre_inertia_kg_m2 ==
+                          (std::array{exact("4"), exact("-0.25"), exact("3"), exact("-0.75"),
+                                      exact("0.5"), exact("5")}));
+                } else {
+                    REQUIRE_FALSE(rigid);
+                    CHECK(rigid.error().code == core::FailureCode::InvalidInput);
+                    CHECK(detail.element == rd::NastranElementId{906});
+                    CHECK(detail.field.has_value());
+                    CHECK(detail.reason == (rigid_mass == RigidMassCase::Frame
+                                                ? CaseNastranParticleFailure::Frame
+                                            : rigid_mass == RigidMassCase::Centre
+                                                ? CaseNastranParticleFailure::Centre
+                                                : CaseNastranParticleFailure::Inertia));
+                }
+                return;
+            }
             CaseNastranParticleDiagnostic particle_detail;
             const auto particle = certify_case_nastran_particle_mass(
                 si, *native, CaseNastranMassId{1}, pg_limits, plan, &particle_detail);
