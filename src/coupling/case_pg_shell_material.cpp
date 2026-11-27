@@ -1,11 +1,14 @@
 #include "case_pg_shell_material.hpp"
 
+#include "aero/certified_trigonometry_private.hpp"
 #include "io/si_case_detail.hpp"
+#include "structure/pg_rank_storage.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
 
 namespace uvlas::coupling::detail {
 namespace {
 namespace pg = structure;
+namespace phase = aero::detail::p1;
 using core::FailureCode;
 using pg::detail::partition_entry;
 using pg::detail::partition_fail;
@@ -17,14 +20,23 @@ constexpr io::SchemaDimension pressure{{-1, 1, -2, 0}};
 constexpr io::SchemaDimension density{{-3, 1, 0, 0}};
 constexpr io::SchemaDimension dimensionless{{0, 0, 0, 0}};
 constexpr io::SchemaDimension length{{1, 0, 0, 0}};
+constexpr io::SchemaDimension angle{{0, 0, 0, 1}};
 
 template <class Field>
 pg::ExactRational quantity(const io::SiCase& source, Field field, io::SchemaDimension dimension,
-                           ReferenceArithmetic& math) {
+                           ReferenceArithmetic& math, bool pi_multiple = false) {
     math.charge();
-    const auto recipe = partition_take(source.quantity(field)).recipe;
-    if (recipe.dimensions.exponents != dimension.exponents || recipe.pi_power != 0)
+    auto recipe = partition_take(source.quantity(field)).recipe;
+    if (recipe.dimensions.exponents != dimension.exponents ||
+        recipe.pi_power != static_cast<int>(pi_multiple))
         partition_fail(FailureCode::InvalidInput);
+    if (pi_multiple) {
+        recipe.units.angle = io::SiAngleUnit::Radian;
+        recipe.pi_power = 0;
+        const auto degrees =
+            partition_take(io::materialize_rational(recipe, math.leaf_limits, math.plan));
+        return math.div(degrees, math.constant("180"));
+    }
     return partition_take(io::materialize_rational(recipe, math.leaf_limits, math.plan));
 }
 
@@ -95,9 +107,12 @@ pg::PgReferenceScalar integer_power(pg::detail::ReferenceRadicals& field,
     return result;
 }
 
+template <std::size_t N>
 void sample_polynomial(const io::SiCase& source, const io::schema::ReferenceFieldPolynomial& input,
-                       const CasePgMaterialCoordinates& point, CasePgInitialGreenValue& out,
-                       ReferenceArithmetic& math) {
+                       const CasePgMaterialCoordinates& point,
+                       std::array<pg::PgReferenceScalar, N>& values,
+                       std::array<pg::ExactRational, N>& errors, io::SchemaDimension dimension,
+                       bool pi_multiple, ReferenceArithmetic& math) {
     const auto coordinates = input.coordinates.selected();
     using Coordinates = decltype(input.coordinates.selected());
     const auto measure = coordinates == Coordinates::ItemChart ? dimensionless : length;
@@ -120,26 +135,117 @@ void sample_polynomial(const io::SiCase& source, const io::schema::ReferenceFiel
             normalized[i].radical = math.mul(position.radical, scale);
         }
     }
-    for (std::size_t i = 0; i < out.mandel.size(); ++i) {
+    for (std::size_t i = 0; i < N; ++i) {
         const auto ordinal = partition_index(i);
-        out.declared_error[i] =
-            quantity(source, partition_take(input.error.at(ordinal)), dimensionless, math);
-        if (out.declared_error[i].sign() < 0)
+        errors[i] =
+            quantity(source, partition_take(input.error.at(ordinal)), dimension, math, pi_multiple);
+        if (errors[i].sign() < 0)
             partition_fail(FailureCode::InvalidInput);
         const auto terms = partition_take(input.components.at(ordinal));
         for (core::Index t = 0; t < partition_index(terms.size()); ++t) {
             math.visit(1);
             const auto term = partition_take(terms.at(t)).record();
-            pg::PgReferenceScalar value{quantity(source, term.coefficient, dimensionless, math),
-                                        {}};
+            pg::PgReferenceScalar value{
+                quantity(source, term.coefficient, dimension, math, pi_multiple), {}};
             for (std::size_t axis = 0; axis < normalized.size(); ++axis) {
                 const auto power = partition_take(term.powers.at(partition_index(axis)));
                 value = field.mul(
                     value, integer_power(field, normalized[axis], power.unsigned_value(), one));
             }
-            out.mandel[i] = field.add(out.mandel[i], value);
+            values[i] = field.add(values[i], value);
         }
     }
+}
+
+template <std::size_t N>
+void sample_field(const io::SiCase& source, const auto& field,
+                  const CasePgMaterialCoordinates& point,
+                  std::array<pg::PgReferenceScalar, N>& values,
+                  std::array<pg::ExactRational, N>& errors, io::SchemaDimension dimension,
+                  bool pi_multiple, ReferenceArithmetic& math) {
+    if (const auto* constant = std::get_if<io::schema::ReferenceFieldConstant>(&field)) {
+        for (std::size_t i = 0; i < N; ++i)
+            values[i].rational =
+                quantity(source, partition_take(constant->value.at(partition_index(i))), dimension,
+                         math, pi_multiple);
+    } else if (const auto* polynomial = std::get_if<io::schema::ReferenceFieldPolynomial>(&field)) {
+        sample_polynomial(source, *polynomial, point, values, errors, dimension, pi_multiple, math);
+    } else {
+        partition_fail(FailureCode::Unsupported);
+    }
+}
+
+phase::Interval phase_rational(const pg::ExactRational& value, phase::Work& work) {
+    work.step();
+    constexpr auto bits = static_cast<std::uint64_t>(std::numeric_limits<phase::Integer>::digits);
+    if (value.numerator_bits() > bits || value.denominator_bits() > bits)
+        partition_fail(FailureCode::ResourceExceeded);
+    const auto terms = pg::detail::rank_fraction<phase::Integer>(value);
+    const auto scalar = [](const phase::Integer& x) {
+        return phase::Interval{phase::rounded(x, 0, false), phase::rounded(x, 0, true)};
+    };
+    return phase::divide(scalar(terms.numerator), scalar(terms.denominator), work);
+}
+
+pg::ExactRational phase_endpoint(const phase::Bound& value, ReferenceArithmetic& math) {
+    if (value.mantissa == 0)
+        return {};
+    math.charge();
+    const auto power = static_cast<std::int64_t>(value.power);
+    constexpr std::int64_t wide_bits = 8192;
+    const auto magnitude_bits = static_cast<std::int64_t>(phase::bits(value.mantissa));
+    if (power <= -wide_bits || power > wide_bits - magnitude_bits)
+        partition_fail(FailureCode::ResourceExceeded);
+    using Wide = pg::detail::RankWide;
+    Wide units{value.mantissa};
+    if (power < 0)
+        return pg::detail::rank_materialize_dyadic(units, static_cast<std::uint32_t>(-power),
+                                                   math.leaf_limits, math.plan);
+    units = pg::detail::rank_abs(units) << static_cast<std::uint32_t>(power);
+    if (value.mantissa < 0)
+        units = -units;
+    return pg::detail::rank_exact(pg::detail::RankFraction<Wide>{std::move(units), Wide{1}},
+                                  math.leaf_limits, math.plan);
+}
+
+void enclose_rotation(const pg::PgReferenceScalar& centre, const pg::ExactRational& error,
+                      const pg::ExactRational& g, bool pi_multiple, CasePgProjectedAxisValue& out,
+                      ReferenceArithmetic& math) {
+    phase::Work work{0, math.limits.maximum_scalar_operations - math.scalar_operations,
+                     math.limits.cancellation};
+    try {
+        auto phase_value = phase_rational(centre.rational, work);
+        if (centre.radical.sign() != 0) {
+            const auto root = phase::square_root(phase_rational(g, work), work);
+            phase_value =
+                phase::add(phase_value,
+                           phase::multiply(phase_rational(centre.radical, work), root, work), work);
+        }
+        if (error.sign() != 0) {
+            const auto radius = phase_rational(error, work);
+            phase_value = {phase::subtract(phase_value, radius, work).lower,
+                           phase::add(phase_value, radius, work).upper};
+        }
+        const auto pi = phase::pi_constant(work);
+        const auto units = pi_multiple ? phase::PhaseUnits::PiMultiple : phase::PhaseUnits::Radians;
+        const auto rotation = phase::sine_cosine(phase_value, units, pi, work);
+        math.charge(work.used);
+        out.cosine = {phase_endpoint(rotation.cosine.lower, math),
+                      phase_endpoint(rotation.cosine.upper, math)};
+        out.sine = {phase_endpoint(rotation.sine.lower, math),
+                    phase_endpoint(rotation.sine.upper, math)};
+    } catch (const phase::ArithmeticFailure& failure) {
+        partition_fail(failure.code);
+    }
+}
+
+void validate_layer_point(const CasePgShellLayer& interval, const CasePgMaterialCoordinates& point,
+                          ReferenceArithmetic& math) {
+    if (point.g.sign() <= 0)
+        partition_fail(FailureCode::GeometryInvalid);
+    if (math.compare(point.chart[2], interval.lower) < 0 ||
+        math.compare(point.chart[2], interval.upper) > 0)
+        partition_fail(FailureCode::InvalidInput);
 }
 } // namespace
 
@@ -275,28 +381,63 @@ core::Result<CasePgInitialGreenValue> CasePgShellMaterials::sample_initial_green
         ReferenceArithmetic math{limits, memory};
         math.cancel();
         const auto selected = partition_take(source_layer(source, layer));
-        if (point.g.sign() <= 0)
-            partition_fail(FailureCode::GeometryInvalid);
         const auto& interval = layers_.values()[static_cast<std::size_t>(layer)];
         math.admit();
-        if (math.compare(point.chart[2], interval.lower) < 0 ||
-            math.compare(point.chart[2], interval.upper) > 0)
-            partition_fail(FailureCode::InvalidInput);
+        validate_layer_point(interval, point, math);
         CasePgInitialGreenValue out{interval.id, math.copy(point.g), {}, {}, {}};
-        const auto field = selected.initial_green.record();
-        if (const auto* constant = std::get_if<io::schema::ReferenceFieldConstant>(&field)) {
-            for (std::size_t i = 0; i < out.mandel.size(); ++i)
-                out.mandel[i].rational =
-                    quantity(source, partition_take(constant->value.at(partition_index(i))),
-                             dimensionless, math);
-        } else if (const auto* polynomial =
-                       std::get_if<io::schema::ReferenceFieldPolynomial>(&field)) {
-            sample_polynomial(source, *polynomial, point, out, math);
-        } else {
-            partition_fail(FailureCode::Unsupported);
-        }
+        sample_field(source, selected.initial_green.record(), point, out.mandel, out.declared_error,
+                     dimensionless, false, math);
         out.work = math.info();
         return out;
+    });
+    if (!result)
+        result.error().operation = core::Operation::EvaluateStructure;
+    return result;
+}
+
+pg::PgShellPointAxes CasePgAxisValue::axes() const& noexcept {
+    if (const auto* projected = std::get_if<CasePgProjectedAxisValue>(&value))
+        return pg::PgShellFieldFibre{projected->direction, projected->direction_error,
+                                     projected->cosine, projected->sine};
+    return pg::PgShellFieldAxes{std::get<CasePgExplicitAxisValue>(value).columns};
+}
+
+core::Result<CasePgAxisValue> CasePgShellMaterials::sample_axes(
+    const io::SiCase& source, core::Index layer, const CasePgMaterialCoordinates& point,
+    const pg::PgReferenceLimits& limits, core::ResourcePlan& memory) const noexcept {
+    auto result = partition_entry([&]() -> core::Result<CasePgAxisValue> {
+        ReferenceArithmetic math{limits, memory};
+        math.cancel();
+        const auto selected = partition_take(source_layer(source, layer));
+        const auto& interval = layers_.values()[static_cast<std::size_t>(layer)];
+        math.admit(384);
+        validate_layer_point(interval, point, math);
+        const auto axis = selected.axis.record();
+        if (const auto* projected = std::get_if<io::schema::AxisProjected>(&axis)) {
+            CasePgProjectedAxisValue value;
+            sample_field(source, projected->direction.record(), point, value.direction,
+                         value.direction_error, dimensionless, false, math);
+            const auto& typed = partition_take(source.source_case()).get();
+            const auto units = partition_take(typed.root()).units.record();
+            const auto unit = units.angle.selected();
+            const bool pi_multiple = unit == decltype(unit)::ItemDeg;
+            std::array<pg::PgReferenceScalar, 1> radians;
+            std::array<pg::ExactRational, 1> error;
+            sample_field(source, projected->angle.record(), point, radians, error, angle,
+                         pi_multiple, math);
+            enclose_rotation(radians.front(), error.front(), point.g, pi_multiple, value, math);
+            return CasePgAxisValue{interval.id, std::move(value), math.info()};
+        }
+        CasePgExplicitAxisValue value;
+        std::array<pg::ExactRational, 9> error;
+        const auto& explicit_axis = std::get<io::schema::AxisExplicit>(axis);
+        sample_field(source, explicit_axis.columns.record(), point, value.columns, error,
+                     dimensionless, false, math);
+        // A box of independently uncertain explicit entries cannot certify
+        // A^T A=I. A projected axis retains that identity by construction.
+        if (std::ranges::any_of(error, [](const auto& x) { return x.sign() != 0; }))
+            partition_fail(FailureCode::PrecisionUnresolved);
+        return CasePgAxisValue{interval.id, std::move(value), math.info()};
     });
     if (!result)
         result.error().operation = core::Operation::EvaluateStructure;

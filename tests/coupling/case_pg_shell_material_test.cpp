@@ -46,6 +46,7 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
           "[MAT-D06][MAT-D08][MAT-D09][MAT-D10][V-MAT][negative][verification]") {
     auto document = fixture::root("structural_static");
     document.field("units").set("length", fixture::json(R"("mm")"));
+    document.field("units").set("angle", fixture::json(R"("deg")"));
     auto& model = document.field("model");
     auto& materials = model.field("materials").elements;
     materials.front().set("young", fixture::json("100"));
@@ -80,6 +81,14 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
     }
     layers.front().set("initial_green",
                        fixture::json(R"({"kind":"constant","value":[0.125,0,0,0,0,0]})"));
+    layers.front().set(
+        "axis",
+        fixture::json(
+            R"({"kind":"explicit","columns":{"kind":"constant","value":[1,0,0,0,1,0,0,0,1]}})"));
+    layers.back().set(
+        "axis",
+        fixture::json(
+            R"({"kind":"projected","direction":{"kind":"constant","value":[1,0,0]},"angle":{"kind":"polynomial","coordinates":"chart","origin":[0,0,0],"lengths":[1,1,1],"components":[[{"powers":[1,0,0],"coefficient":360}]],"error":[0]}})"));
     layers.back().set(
         "initial_green",
         fixture::json(
@@ -116,6 +125,10 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
     local[0].rational = q("5", "1000");
     const auto g = q("2");
     const CasePgMaterialCoordinates point{chart, local, world, g};
+    const auto explicit_axes = owned->sample_axes(si, 0, point, limits, memory);
+    REQUIRE(explicit_axes);
+    const auto& explicit_columns = std::get<CasePgExplicitAxisValue>(explicit_axes->value).columns;
+    CHECK(explicit_columns[4].rational == q("1"));
     auto at_first = owned->sample_initial_green(si, 0, point, limits, memory);
     REQUIRE(at_first);
     CHECK(at_first->layer == core::LayerId{4});
@@ -154,24 +167,53 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
     CHECK(bounded->energy_joules_per_cubic_metre.lower == q("43923", "800"));
     CHECK(bounded->energy_joules_per_cubic_metre.upper == q("49923", "800"));
     // An undeformed point retains the stress from the Case's initial field.
-    std::array<pg::ExactRational, 9> cartesian;
     pg::PgShellTensorEnclosure identity;
     for (std::size_t i = 0; i < 3; ++i) {
-        cartesian[4 * i] = q("1");
         identity[4 * i] = {q("1"), q("1")};
     }
+    const auto case_axes = owned->sample_axes(si, 3, upper, limits, memory);
+    REQUIRE(case_axes);
+    const auto& axis = std::get<CasePgProjectedAxisValue>(case_axes->value);
+    CHECK(axis.cosine.lower.sign() == 0);
+    CHECK(axis.cosine.upper.sign() == 0);
+    CHECK(axis.sine.lower == q("1"));
+    CHECK(axis.sine.upper == q("1"));
+    pg::PgReferenceValue reference{};
+    reference.g = q("2");
+    reference.layer = core::LayerId{1};
+    for (std::size_t i = 0; i < 3; ++i)
+        reference.jacobian_columns_metres[i][i].rational = q("1");
+    const pg::PgShellPatchPoint trial{{}, std::move(reference), {}, {}, std::move(identity), {}};
     const auto material_point = pg::enclose_pg_shell_material_point(
-        shared, polynomial->enclosure(), pg::PgShellExplicitAxes{cartesian}, identity, limits,
-        memory);
+        shared, polynomial->enclosure(), case_axes->axes(), trial, limits, memory);
     REQUIRE(material_point);
-    CHECK(material_point->second_pk_world_pascal[0].lower == q("-3870"));
-    CHECK(material_point->first_pk_world_pascal[0].lower == q("-3870"));
-    CHECK(material_point->cauchy_world_pascal[0].upper == q("-3630"));
+    CHECK(material_point->reference_axes[3].lower == q("1"));
+    CHECK(material_point->second_pk_world_pascal[4].lower == q("-3870"));
+    CHECK(material_point->first_pk_world_pascal[4].lower == q("-3870"));
+    CHECK(material_point->cauchy_world_pascal[4].upper == q("-3630"));
     const std::array chart_right{q("3", "4"), q("0"), q("3", "4")};
     const auto second =
         owned->sample_initial_green(si, 3, {chart_right, local, world, g}, limits, memory);
     REQUIRE(second);
     CHECK(second->mandel[0].rational == q("3", "32"));
+    const auto turned = owned->sample_axes(si, 3, {chart_right, local, world, g}, limits, memory);
+    REQUIRE(turned);
+    CHECK(std::get<CasePgProjectedAxisValue>(turned->value).sine.lower == q("-1"));
+    const std::array chart_diagonal{q("1", "8"), q("0"), q("3", "4")};
+    const auto diagonal =
+        owned->sample_axes(si, 3, {chart_diagonal, local, world, g}, limits, memory);
+    REQUIRE(diagonal);
+    const auto& diagonal_axis = std::get<CasePgProjectedAxisValue>(diagonal->value);
+    const auto half = q("1", "2");
+    for (const auto* component : {&diagonal_axis.cosine, &diagonal_axis.sine}) {
+        REQUIRE(component->lower.sign() > 0);
+        const auto low_squared =
+            fixture::take(component->lower.multiply(component->lower, limits.algebra, memory));
+        const auto high_squared =
+            fixture::take(component->upper.multiply(component->upper, limits.algebra, memory));
+        CHECK(fixture::take(low_squared.compare(half, limits.algebra, memory)) <= 0);
+        CHECK(fixture::take(high_squared.compare(half, limits.algebra, memory)) >= 0);
+    }
 
     for (const bool use_world : {false, true}) {
         auto positioned = document;

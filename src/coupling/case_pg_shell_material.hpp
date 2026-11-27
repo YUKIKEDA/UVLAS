@@ -34,6 +34,25 @@ struct CasePgInitialGreenValue {
     [[nodiscard]] structure::PgInitialGreenEnclosure enclosure() const&& = delete;
 };
 
+struct CasePgProjectedAxisValue {
+    structure::PgReferenceVector direction;
+    std::array<structure::ExactRational, 3> direction_error;
+    structure::PgMaterialEnclosure cosine, sine;
+};
+
+struct CasePgExplicitAxisValue {
+    std::array<structure::PgReferenceScalar, 9> columns;
+};
+
+struct CasePgAxisValue {
+    core::LayerId layer;
+    std::variant<CasePgProjectedAxisValue, CasePgExplicitAxisValue> value;
+    structure::PgReferenceCallInfo work;
+
+    [[nodiscard]] structure::PgShellPointAxes axes() const& noexcept;
+    [[nodiscard]] structure::PgShellPointAxes axes() const&& = delete;
+};
+
 /// Own the layer intervals and reusable normalized laws for a qualified Case
 /// shell. Fields of the reference axis and initial strain still belong to the
 /// typed original Case. Retrieve them only against the same source identity.
@@ -69,6 +88,11 @@ public:
     [[nodiscard]] core::Result<CasePgInitialGreenValue>
     sample_initial_green(const io::SiCase&, core::Index layer, const CasePgMaterialCoordinates&,
                          const structure::PgReferenceLimits&, core::ResourcePlan&) const noexcept;
+
+    [[nodiscard]] core::Result<CasePgAxisValue> sample_axes(const io::SiCase&, core::Index layer,
+                                                            const CasePgMaterialCoordinates&,
+                                                            const structure::PgReferenceLimits&,
+                                                            core::ResourcePlan&) const noexcept;
 
 private:
     using Laws = core::PlannedBuffer<std::optional<structure::PgShellElasticLaw>>;

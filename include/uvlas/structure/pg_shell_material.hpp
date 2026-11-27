@@ -143,8 +143,28 @@ struct PgShellProjectedAxes {
     PgShellProjectedFibre fibre;
 };
 
-using PgShellReferenceAxes = std::variant<PgShellExplicitAxes, PgShellProjectedAxes>;
-using PgShellPointAxes = std::variant<PgShellExplicitAxes, PgShellProjectedFibre>;
+struct PgShellFieldFibre {
+    const PgReferenceVector& world_fibre;
+    const std::array<ExactRational, 3>& direction_error;
+    const PgMaterialEnclosure& cosine;
+    const PgMaterialEnclosure& sine;
+};
+
+struct PgShellFieldAxes {
+    const std::array<PgReferenceScalar, 9>& columns;
+};
+
+using PgShellSampledAxes = std::variant<PgShellFieldFibre, PgShellFieldAxes>;
+
+struct PgShellReferencedAxes {
+    const PgReferenceValue& reference;
+    PgShellSampledAxes field;
+};
+
+using PgShellReferenceAxes =
+    std::variant<PgShellExplicitAxes, PgShellProjectedAxes, PgShellReferencedAxes>;
+using PgShellPointAxes =
+    std::variant<PgShellExplicitAxes, PgShellProjectedFibre, PgShellFieldFibre, PgShellFieldAxes>;
 
 struct PgShellPatchState {
     PgPreparedPatchIdentity patch;

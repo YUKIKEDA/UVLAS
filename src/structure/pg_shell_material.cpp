@@ -421,18 +421,17 @@ Tensor material_axes(const PgShellExplicitAxes& input, const R& one, const Mater
     return axes;
 }
 
-Tensor material_axes(const PgShellProjectedAxes& input, const R& one,
-                     const MaterialBounds& bounds) {
+Tensor projected_axes(const PgReferenceValue& ref, const PgShellFieldFibre& input, const R& one,
+                      const MaterialBounds& bounds) {
     auto& math = bounds.math;
-    const auto& [world_fibre, cosine, sine] = input.fibre;
-    if (math.add(math.square(cosine), math.square(sine)) != one)
+    const auto& [fibre, errors, cosine, sine] = input;
+    if (math.compare(cosine.lower, cosine.upper) > 0 || math.compare(sine.lower, sine.upper) > 0)
         partition_fail(core::FailureCode::GeometryInvalid);
-    const auto& ref = input.reference;
+    const auto unit = bounds.add(bounds.square(cosine), bounds.square(sine));
+    if (math.compare(unit.lower, one) > 0 || math.compare(unit.upper, one) < 0)
+        partition_fail(core::FailureCode::GeometryInvalid);
     const auto root = bounds.root(ref.g);
     ReferenceRadicals exact{math, ref.g};
-    PgReferenceVector fibre;
-    for (std::size_t i = 0; i < 3; ++i)
-        fibre[i].rational = math.copy(world_fibre[i]);
     const auto area = exact.cross(ref.jacobian_columns_metres[0], ref.jacobian_columns_metres[1]);
     const auto oriented_volume = exact.dot(area, ref.jacobian_columns_metres[2]);
     if (exact.sign(oriented_volume) <= 0)
@@ -448,15 +447,73 @@ Tensor material_axes(const PgShellProjectedAxes& input, const R& one,
         }
         return result;
     };
+    const auto area_bounds = enclose(area);
+    auto projected_bounds = enclose(projected);
+    if (std::ranges::any_of(errors, [](const auto& error) { return error.sign() != 0; })) {
+        Vector perturbation;
+        for (std::size_t j = 0; j < perturbation.size(); ++j) {
+            if (errors[j].sign() < 0)
+                partition_fail(invalid);
+            perturbation[j] = {math.neg(errors[j]), math.copy(errors[j])};
+        }
+        const auto delta = cross(area_bounds, cross(perturbation, area_bounds, bounds), bounds);
+        for (std::size_t j = 0; j < projected_bounds.size(); ++j)
+            projected_bounds[j] = bounds.add(projected_bounds[j], delta[j]);
+    }
     const auto normal = normalize(enclose(area), one, bounds);
-    const auto along = normalize(enclose(projected), one, bounds);
+    const auto along = normalize(std::move(projected_bounds), one, bounds);
     const auto across = cross(normal, along, bounds);
     Tensor axes;
     for (std::size_t i = 0; i < 3; ++i) {
-        axes[3 * i] = bounds.add(bounds.scale(along[i], cosine), bounds.scale(across[i], sine));
-        axes[3 * i + 1] = bounds.sub(bounds.scale(across[i], cosine), bounds.scale(along[i], sine));
+        axes[3 * i] =
+            bounds.add(bounds.multiply(along[i], cosine), bounds.multiply(across[i], sine));
+        axes[3 * i + 1] =
+            bounds.sub(bounds.multiply(across[i], cosine), bounds.multiply(along[i], sine));
         axes[3 * i + 2] = {math.copy(normal[i].lower), math.copy(normal[i].upper)};
     }
+    return axes;
+}
+
+Tensor material_axes(const PgShellProjectedAxes& input, const R& one,
+                     const MaterialBounds& bounds) {
+    auto& math = bounds.math;
+    const auto& [world_fibre, cosine, sine] = input.fibre;
+    if (math.add(math.square(cosine), math.square(sine)) != one)
+        partition_fail(core::FailureCode::GeometryInvalid);
+    PgReferenceVector fibre;
+    const std::array<R, 3> error;
+    for (std::size_t j = 0; j < fibre.size(); ++j)
+        fibre[j].rational = math.copy(world_fibre[j]);
+    return projected_axes(input.reference, {fibre, error, point(cosine, math), point(sine, math)},
+                          one, bounds);
+}
+
+Tensor material_axes(const PgShellReferencedAxes& input, const R& one,
+                     const MaterialBounds& bounds) {
+    if (const auto* projected = std::get_if<PgShellFieldFibre>(&input.field))
+        return projected_axes(input.reference, *projected, one, bounds);
+    const auto& values = std::get<PgShellFieldAxes>(input.field).columns;
+    auto& math = bounds.math;
+    const auto& g = input.reference.g;
+    const auto root = bounds.root(g);
+    ReferenceRadicals exact{math, g};
+    std::array<PgReferenceVector, 3> columns;
+    for (std::size_t i = 0; i < 3; ++i)
+        for (std::size_t j = 0; j < 3; ++j)
+            columns[j][i] = exact.scale(values[3 * i + j], one);
+    const PgReferenceScalar unit{math.copy(one), {}};
+    for (std::size_t i = 0; i < 3; ++i) {
+        for (std::size_t j = i; j < 3; ++j) {
+            const auto dot = exact.dot(columns[i], columns[j]);
+            if (exact.sign(i == j ? exact.sub(dot, unit) : exact.scale(dot, one)) != 0)
+                partition_fail(core::FailureCode::GeometryInvalid);
+        }
+    }
+    if (exact.sign(exact.dot(columns[0], exact.cross(columns[1], columns[2]))) <= 0)
+        partition_fail(core::FailureCode::GeometryInvalid);
+    Tensor axes;
+    for (std::size_t i = 0; i < axes.size(); ++i)
+        axes[i] = bounds.radical(values[i], root);
     return axes;
 }
 
@@ -916,6 +973,8 @@ enclose_pg_shell_material_point(const PgShellElasticLaw& law, const PgInitialGre
                 using Sample = std::decay_t<decltype(sampled)>;
                 if constexpr (std::is_same_v<Sample, PgShellProjectedFibre>)
                     return PgShellProjectedAxes{point.reference, sampled};
+                else if constexpr (!std::is_same_v<Sample, PgShellExplicitAxes>)
+                    return PgShellReferencedAxes{point.reference, sampled};
                 else
                     return sampled;
             },
