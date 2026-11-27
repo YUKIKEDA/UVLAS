@@ -490,17 +490,24 @@ a::ContourInterval add_contour(a::ContourInterval a, a::ContourInterval b) {
             std::nextafter(a.upper + b.upper, infinity)};
 }
 
-double project_contour(a::ContourInterval interval, double budget) {
+std::optional<double> contour_center(a::ContourInterval interval, double budget) {
     if (!std::isfinite(interval.lower) || !std::isfinite(interval.upper))
-        reject(core::FailureCode::PrecisionUnresolved);
+        return std::nullopt;
     const auto center = std::midpoint(interval.lower, interval.upper);
     if (interval.lower == interval.upper)
         return center;
     const auto radius = std::nextafter(std::max(center - interval.lower, interval.upper - center),
                                        std::numeric_limits<double>::infinity());
     if (radius > budget)
-        reject(core::FailureCode::PrecisionUnresolved);
+        return std::nullopt;
     return center;
+}
+
+double project_contour(a::ContourInterval interval, double budget) {
+    const auto center = contour_center(interval, budget);
+    if (!center)
+        reject(core::FailureCode::PrecisionUnresolved);
+    return *center;
 }
 
 Vector native_velocity(const Vector& relative, const a::P1ActionValue& induced, p::Work& work) {
@@ -1875,29 +1882,32 @@ struct NonpenetrationBuilder {
         return result;
     }
 
-    static Vector apply_contour(const a::ClosedContour& contour, ContourSession& session,
-                                const a::ResolvedQuery& query, std::optional<a::EdgeId> self,
-                                std::span<const a::ContourInterval> strengths,
-                                const DiscreteNonpenetrationLimits& limits, p::Work& work) {
+    static Vector
+    apply_contour(const a::ClosedContour& contour, ContourSession& session,
+                  const a::ResolvedQuery& query, std::optional<a::EdgeId> self,
+                  std::span<const a::ContourInterval> strengths,
+                  const DiscreteNonpenetrationLimits& limits, p::Work& work,
+                  a::ContourCrossProduct cross = a::ContourCrossProduct::EndpointRelative) {
         auto action_limits = contour_limits(limits, work);
         action_limits.max_steps = std::min(action_limits.max_steps, limits.action_steps);
-        const auto value =
-            require(contour.apply(query, self, strengths, limits.induction.geometry, action_limits,
-                                  *session.geometry, *session.contact, session.values, work.stop));
+        const auto value = require(contour.apply(query, self, strengths, limits.induction.geometry,
+                                                 action_limits, *session.geometry, *session.contact,
+                                                 session.values, work.stop, cross));
         account(work, value.second);
         return import_contour(value.first);
     }
 
-    static void project_contour_row(const a::ClosedContour& contour, ContourSession& session,
-                                    const a::ResolvedQuery& query, const Vector& normal,
-                                    const NativeCirculationRows& owner,
-                                    std::span<a::ContourInterval> native,
-                                    std::span<a::ContourInterval> result,
-                                    const DiscreteNonpenetrationLimits& limits, p::Work& work) {
+    static void
+    project_contour_row(const a::ClosedContour& contour, ContourSession& session,
+                        const a::ResolvedQuery& query, const Vector& normal,
+                        const NativeCirculationRows& owner, std::span<a::ContourInterval> native,
+                        std::span<a::ContourInterval> result,
+                        const DiscreteNonpenetrationLimits& limits, p::Work& work,
+                        a::ContourCrossProduct cross = a::ContourCrossProduct::EndpointRelative) {
         account(work, require(contour.project(query, contour_bounds(normal), native,
                                               limits.induction.geometry,
                                               contour_limits(limits, work), *session.geometry,
-                                              *session.contact, session.values, work.stop)));
+                                              *session.contact, session.values, work.stop, cross)));
         account(work, result.size());
         std::ranges::fill(result, a::ContourInterval{});
         for (std::size_t i = 0; i < native.size(); ++i) {
@@ -2227,6 +2237,7 @@ struct NonpenetrationBuilder {
             allocate<a::ContourInterval>(memory, multiply_budget(workers, owner.ids.size()));
         auto projected = allocate<a::ContourInterval>(memory, multiply_budget(workers, order));
         auto original_rhs = allocate<Pair>(memory, order);
+        auto cross_products = allocate<a::ContourCrossProduct>(memory, solve_order);
         contour_ranges(
             order, workers, work,
             [&](std::size_t worker, std::size_t first, std::size_t last, p::Work& local) {
@@ -2248,17 +2259,30 @@ struct NonpenetrationBuilder {
                     rhs.values()[reduced] = {
                         project_binary64(value[0], request.rhs_absolute, rounding, local),
                         project_binary64(value[1], request.rhs_absolute, rounding, local)};
-                    project_contour_row(contour, *sessions[worker], supplied.query, normal, owner,
-                                        scratch, coefficients, limits, local);
-                    for (std::size_t column = 0; column < solve_order; ++column) {
-                        local.step();
-                        auto coefficient = coefficients[representative(column)];
-                        if (reflection)
-                            coefficient =
-                                add_contour(coefficient,
-                                            coefficients[reflection->rows.values()[column].second]);
-                        base.values()[column * solve_order + reduced] =
-                            project_contour(coefficient, request.matrix_absolute);
+                    const auto store_row = [&](a::ContourCrossProduct cross) {
+                        project_contour_row(contour, *sessions[worker], supplied.query, normal,
+                                            owner, scratch, coefficients, limits, local, cross);
+                        for (std::size_t column = 0; column < solve_order; ++column) {
+                            local.step();
+                            auto coefficient = coefficients[representative(column)];
+                            if (reflection)
+                                coefficient = add_contour(
+                                    coefficient,
+                                    coefficients[reflection->rows.values()[column].second]);
+                            const auto center =
+                                contour_center(coefficient, request.matrix_absolute);
+                            if (!center)
+                                return false;
+                            base.values()[column * solve_order + reduced] = *center;
+                        }
+                        return true;
+                    };
+                    auto& cross = cross_products.values()[reduced];
+                    cross = a::ContourCrossProduct::EndpointRelative;
+                    if (!store_row(cross)) {
+                        cross = a::ContourCrossProduct::MidpointRelative;
+                        if (!store_row(cross))
+                            reject(Code::PrecisionUnresolved);
                     }
                 }
             });
@@ -2342,10 +2366,12 @@ struct NonpenetrationBuilder {
                 for (std::size_t row = first; row < last; ++row) {
                     const auto& query = input.collocations[bound[row].caller].query;
                     const auto& normal = owner.rows.values()[row].normal;
+                    const auto reduced = reflection ? reflection->reduced.values()[row] : row;
+                    const auto cross = cross_products.values()[reduced];
                     const auto velocity = [&](std::span<const a::ContourInterval> strengths) {
                         return dot(normal,
                                    apply_contour(contour, *sessions[worker], query, {}, strengths,
-                                                 limits, local),
+                                                 limits, local, cross),
                                    local);
                     };
                     auto& value = original.values()[row];
