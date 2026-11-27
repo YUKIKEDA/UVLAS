@@ -358,6 +358,7 @@ void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id
     const auto third = fixture.r("1", "3"), half = fixture.r("1", "2");
     const std::array<ExactRational, 6> error;
     std::vector<PgShellLayerDensity> mass_layers;
+    mass_layers.reserve(layers.size());
     for (std::size_t i = 0; i < layers.size(); ++i)
         mass_layers.push_back({layers[i].id, densities[i]});
     std::vector<PgShellVolumeSample> samples;
