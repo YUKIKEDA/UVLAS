@@ -1,6 +1,10 @@
 # IM-01の終了審査とIM-02へ渡す状態
 
-審査対象は統合ローカル版 `2f70cff11ca9b7b55a6e1e1919a5cef9e03ecac0`。2026-11-25の参照時点では、originのHEADとmainは `60a356c7031e9ba5895527c4349209f92902a825`。公開PRの [#351](https://github.com/YUKIKEDA/UVLAS/pull/351) と [#361](https://github.com/YUKIKEDA/UVLAS/pull/361) はどちらも未統合で、両PRの公開headは審査対象の祖先にある。局所独立化の子 [#133](https://github.com/YUKIKEDA/UVLAS/issues/133) と親 [#17](https://github.com/YUKIKEDA/UVLAS/issues/17) は開いているため、IM-01の終了判定は保留とする。
+2026-11-27に `main` の `f23d409c` で参照引継ぎと拘束の実装を確認した。両方の変更が統合され、局所独立化の子Issueも終了した。IM-01の親Issueには、終了条件の照合とIM-02への引継ぎの承認が残る。 [#351](https://github.com/YUKIKEDA/UVLAS/pull/351)・[#361](https://github.com/YUKIKEDA/UVLAS/pull/361)・[#133](https://github.com/YUKIKEDA/UVLAS/issues/133)・[#17](https://github.com/YUKIKEDA/UVLAS/issues/17)
+
+以下の試験結果は、統合ローカル版 `2f70cff11ca9b7b55a6e1e1919a5cef9e03ecac0` を審査対象として記録した。各実行の対象ソースと成果物はリンク先に記す。
+
+凍結Case、曲面幾何、有限則、全厚拘束、R-02回復の台帳について、実行ソースと成果物のハッシュ74件を照合した。R4とR5の幾何テストは、その後のCI分割でファイルが変わった。実行時に記録された内容は、R4が `6c1b9fc3`、R5が `23dfe634` の履歴にそれぞれ一致する。 [R4台帳](im01-pg-r4-domain-geometry.json)・[R5台帳](im01-pg-r5-domain-geometry.json)
 
 ## 採用分担表との照合
 
@@ -38,7 +42,7 @@ R-02の4パッチ閉路は2か所に非整合辺を持つ。実PGの辞書、全
 
 - `prepare_case_pg_chart` または `prepare_case_pg_motion_chart` の所有結果は `CasePgChart`。`CasePgShellReference` が物理Shellの `PgPreparedPatch`、`PgConstraintPatchLayout`、`PgSparseChart` と `PgOwnedDiscreteVolumePoint` の必須範囲を同じ所有状態から借りる。点、層、片側、$N/G/X_0$、物理測度の厳密結果は `PgConditionedReferenceBatch`。設定した精度に収まる場合の投影結果は `PgProjectedReferenceBatch` で、固定点の順序を識別する。体積則の重みと射影した $N/J$ は `PgPreparedVolumeReference` が所有する。[Case引継ぎ契約](../../specs/structure/pg-case-chart-contract.md)
 - チャートの `PgGlobalConstraints` は元CSR、行来歴と右辺、列配置を保持する。`PgSparseChart` は位置、$J$、$J^\mathsf T$、元行乗数を同じ因子から返す。時変の場合は `CaseStructuralSupport` と `CaseStructuralSupportSample` が同じ因子・元行順に時刻と片側を結び、位置・速度・加速度を渡す。[疎チャート](../../specs/structure/pg-sparse-chart-contract.md)・[構造支持の型](../../specs/structure/pg-case-structural-support-contract.md)
-- 実Caseで同じ準備済み基底と拘束を消費できる。凍結R5の17×17×3正積則は、MSVC Releaseで全19体積のGram準備を4,643.68秒で終え、旧有限則で厳しい絶対枠に収まらなかった2点も投影できた。300秒の性能目標は未達。任意の変位への投影誤差の伝播、全域での物理作用と独立求積の照合はIM-02で行う。 [曲面積則の実測と範囲](pg-case-reference-handoff/verification.md)
-- IM-02のV-PGでは同じ凍結入力と独立荷重から、材料・整合質量・変位・仕事・層別応力・固有対まで観測する。IM-00の [#16](https://github.com/YUKIKEDA/UVLAS/issues/16) は終了済み。IM-01で残る子Issueの終了と審査の承認後、[#18](https://github.com/YUKIKEDA/UVLAS/issues/18) の着手分解を経て本体へ進む。 [V-PGの分担](../../plans/pg-verification-gate-ownership.md)
+- 凍結R5の曲面をCaseから準備し、全19体積の17×17×3正積則と元192行の固定支持を同じ所有結果から取得した。GCC 14 ReleaseでCase準備は62.815秒。全16,473点の座標と重みを独立な有理積と照合し、参照座標で元拘束の全残差が厳密に零になることを確認した。Gramの全25,440端点は直列と並列で一致した。300秒の目標に対する材料・求解・観測を含む所要時間と、物理作用の独立照合はIM-02で判定する。 [凍結R5の全点とCase引継ぎ](pg-case-reference-handoff/parallel-product-gram.md)
+- IM-02のV-PGでは同じ凍結入力と独立荷重から、材料・整合質量・変位・仕事・層別応力・固有対まで観測する。IM-00とIM-01の局所独立化は終了している。IM-01の終了審査で承認を得た後、IM-02の着手分解を経て本体へ進む。 [IM-00](https://github.com/YUKIKEDA/UVLAS/issues/16)・[IM-02](https://github.com/YUKIKEDA/UVLAS/issues/18)・[V-PGの分担](../../plans/pg-verification-gate-ownership.md)
 
 `CasePgChart::prepare_numerical` から、同じ元CSR・固定ピボットを保持する数値候補を準備できる。静止とY方向に変位する同じ2パッチCaseで、TwoWordの位置復元・転置・仕事と、取消・資源不足・係数精度不足後の所有保持を照合した。三成分を動かす対照では、内側の疎求解が成分別後退誤差で拒否した。元の厳密チャートからは位置・転置を評価できる。数値補正の実問題への適格性は、IM-02が対象の尺度と明示予算で確認する。 [Case所有での数値検証](pg-case-moving-chart/numerical-owner.md)・[数値補正契約](../../specs/structure/pg-chart-original-refinement-contract.md)・[R-02の実空間照合](pg-chart-refinement-series/physical-trace-verification.md)

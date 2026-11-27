@@ -12,6 +12,9 @@
 
 namespace uvlas::core {
 
+namespace detail {
+class WorkerPayloadReservation;
+}
 class ResourcePlan;
 
 /// Owns a fixed-size, value-initialized array; cannot grow outside its allocation budget.
@@ -154,6 +157,7 @@ public:
     }
 
 private:
+    friend class detail::WorkerPayloadReservation;
     std::uint64_t byte_limit_;
     std::uint64_t allocated_bytes_ = 0;
     std::uint64_t reserved_bytes_ = 0;
