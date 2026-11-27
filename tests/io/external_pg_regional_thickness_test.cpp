@@ -401,8 +401,15 @@ TEST_CASE("Whole-face thickness comparison charges inputs and reported copies to
     const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
     const auto reference = pg(input, false, arithmetic, plan);
     const auto evidence = two_quads(reference, input, arithmetic, plan);
-    const std::array values{input.r("1"), input.r("1"), input.r("1"), input.r("1"),
-                            input.r("1"), input.r("1"), input.r("1"), input.r("1")};
+    // Two distinct PSHELL properties reach the same Case thickness after TFLAG scaling.
+    const std::array base_thicknesses{input.r("1", "4"), input.r("1", "2")};
+    const std::array multipliers{input.r("4"), input.r("2")};
+    std::array<ExactRational, 8> values;
+    for (std::size_t i = 0; i < values.size(); ++i) {
+        const auto property = i / 4;
+        values[i] = take(
+            base_thicknesses[property].multiply(multipliers[property], arithmetic.algebra, plan));
+    }
     const std::array<ExternalPgCornerThicknessClaim, 4> left{
         {{1, &values[0]}, {2, &values[1]}, {5, &values[2]}, {4, &values[3]}}};
     const std::array<ExternalPgCornerThicknessClaim, 4> right{
@@ -443,5 +450,22 @@ TEST_CASE("Whole-face thickness comparison charges inputs and reported copies to
                                                               {arithmetic, 2, 4}, plan);
     REQUIRE(again);
     CHECK(again->matches.size() == 2);
+
+    // With two original PSHELL baselines, 18 slots for the claim data and result
+    // plus just one baseline slot must reject the pair before any allocation.
+    const auto both = required_estimate(arithmetic.algebra, 2 * (4 + 4 + 1 + 1));
+    limited.algebra.external_memory =
+        ExactEstimateAdmission{required_estimate(arithmetic.algebra, 19)};
+    REQUIRE(compare_external_pg_regional_thickness(evidence, reference, first, {limited, 2, 4, 1},
+                                                   plan));
+    const auto before_baselines = plan.allocated_bytes();
+    const auto missing_baseline_slot = compare_external_pg_regional_thickness(
+        evidence, reference, claims, {limited, 2, 4, base_thicknesses.size()}, plan);
+    REQUIRE_FALSE(missing_baseline_slot);
+    CHECK(missing_baseline_slot.error().code == Code::ResourceExceeded);
+    CHECK(plan.allocated_bytes() == before_baselines);
+    limited.algebra.external_memory = ExactEstimateAdmission{both};
+    REQUIRE(compare_external_pg_regional_thickness(evidence, reference, claims,
+                                                   {limited, 2, 4, base_thicknesses.size()}, plan));
 }
 } // namespace
