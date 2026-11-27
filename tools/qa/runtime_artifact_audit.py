@@ -519,6 +519,46 @@ def make_dependency_paths(build: Path, target: Path) -> list[Path]:
     return [build / re.sub(r"\\(.)", r"\1", name).replace("$$", "$") for name in names]
 
 
+def ninja_dependency_paths(build: Path, target: Path) -> list[Path]:
+    lines = (
+        output(["ninja", "-t", "deps", target.as_posix()], build, isolated_environment(build))
+        .rstrip("\n")
+        .splitlines()
+    )
+    if not lines:
+        raise RuntimeError("No Ninja dependency record for the built parser")
+    header = re.fullmatch(
+        rf"{re.escape(target.as_posix())}: #deps ([0-9]+), deps mtime [0-9]+ \(VALID\)",
+        lines[0],
+    )
+    if header is None:
+        raise RuntimeError("Expected a valid Ninja dependency record for the built parser")
+    entries = lines[1:]
+    require(
+        len(entries) == int(header[1])
+        and all(line.startswith("    ") and len(line) > 4 for line in entries),
+        "Incomplete Ninja dependencies for the built parser",
+    )
+    return [build / line[4:] for line in entries]
+
+
+def parser_dependencies(build: Path, target: Path) -> tuple[list[Path], Path, str]:
+    cache = (build / "CMakeCache.txt").read_text(encoding="utf-8")
+    generators = re.findall(r"^CMAKE_GENERATOR:INTERNAL=(.+)$", cache, re.MULTILINE)
+    if generators == ["Ninja"]:
+        record = build / ".ninja_deps"
+        before = digest(record)
+        paths = ninja_dependency_paths(build, target)
+    elif generators == ["Unix Makefiles"]:
+        record = build / target.with_suffix(".o.d")
+        before = digest(record)
+        paths = make_dependency_paths(build, target)
+    else:
+        raise RuntimeError("Expected a CMake Ninja or Unix Makefiles Release build")
+    require(digest(record) == before, "Parser dependency record changed during audit")
+    return paths, record.relative_to(build), before
+
+
 def verify_linux_parser_headers(
     inputs: LinuxParserInputs, producer: RuntimeArtifactProducer
 ) -> dict[str, object]:
@@ -541,7 +581,8 @@ def verify_linux_parser_headers(
     )
     require((build / GNU_PARSER_OBJECT).is_file(), "Missing built GNU parser object")
     observed: dict[str, str] = {}
-    for path in make_dependency_paths(build, GNU_PARSER_OBJECT):
+    paths, record, record_sha256 = parser_dependencies(build, GNU_PARSER_OBJECT)
+    for path in paths:
         if path.name not in expected:
             continue
         require(path.name not in observed, f"Multiple parser dependencies named {path.name}")
@@ -552,7 +593,11 @@ def verify_linux_parser_headers(
             f"does not match {expected[path.name]}",
         )
     require(observed.keys() == expected.keys(), "Missing a required GNU parser dependency")
-    return {"object": GNU_PARSER_OBJECT.as_posix(), "header_sha256": observed}
+    return {
+        "object": GNU_PARSER_OBJECT.as_posix(),
+        "dependency_record": {"path": record.as_posix(), "sha256": record_sha256},
+        "header_sha256": observed,
+    }
 
 
 def audit_linux_external_case(
@@ -714,7 +759,11 @@ def main() -> None:
         "--linux-exception-provider-sha256",
         help="SHA-256 required for the libstdc++ provider of the JSON exception constructor",
     )
-    parser.add_argument("--linux-parser-build", type=Path, help="GNU Make Release build directory")
+    parser.add_argument(
+        "--linux-parser-build",
+        type=Path,
+        help="CMake Ninja or Unix Makefiles Release build directory",
+    )
     parser.add_argument(
         "--linux-parser-header",
         nargs=2,
