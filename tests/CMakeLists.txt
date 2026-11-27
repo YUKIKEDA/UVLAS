@@ -779,6 +779,15 @@ uvlas_add_test(structure.pg_shell_material
     SOURCES structure/pg_shell_material_test.cpp
     LIBS uvlas_structure)
 
+uvlas_add_test(structure.pg_frozen_shell_material
+    LABELS verification V-MAT
+    SOURCES structure/pg_frozen_shell_material_test.cpp
+    LIBS uvlas_structure Boost::headers nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_pg_frozen_shell_material
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
+    UVLAS_PG_FROZEN_MATERIAL_PROBES="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-probes-v1.json")
+
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG
     TIMEOUT 180
