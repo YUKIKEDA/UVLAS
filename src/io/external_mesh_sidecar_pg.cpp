@@ -426,17 +426,17 @@ thickness_input_limits(Preparation& p, std::uint64_t uniform_values, std::uint64
 }
 
 template <class Geometry>
-[[nodiscard]] std::optional<ExternalPgThicknessReport>
-compare_thickness_regions(Preparation& p, const Geometry& corresponding,
-                          const structure::PgReferenceGeometry& reference,
-                          std::span<const ExternalPgThicknessClaim> claims) {
+[[nodiscard]] std::optional<ExternalPgThicknessReport> compare_thickness_regions(
+    Preparation& p, const Geometry& corresponding, const structure::PgReferenceGeometry& reference,
+    std::span<const ExternalPgThicknessClaim> claims, std::uint64_t additional_live_rationals = 0) {
     if (claims.empty()) {
         return {};
     }
     auto exact = p.limits.geometry.arithmetic;
     exact.cancellation = p.stop;
     const ExternalPgThicknessLimits limits{exact, p.limits.geometry.maximum_faces,
-                                           p.limits.case_thickness_vertices};
+                                           p.limits.case_thickness_vertices,
+                                           additional_live_rationals};
     std::optional<ExternalPgThicknessDiagnostic> detail;
     auto verified = compare_external_pg_regional_thickness(corresponding, reference, claims, limits,
                                                            p.plan, &detail);
@@ -750,6 +750,7 @@ struct PshellRegion {
     core::Index node{};
     structure::ExactRational metres;
     bool corner_qualified{};
+    bool has_uniform_claim{};
 };
 
 [[nodiscard]] std::uint64_t check_pshell_materials(Preparation& p, const NastranSidecar& source,
@@ -966,6 +967,7 @@ struct PshellClaims {
         } else if (const auto& declared = group->property->thickness) {
             claims[i] = {face.element->id.value(), group->metres, face.node,
                          declared->field.position};
+            group->has_uniform_claim = true;
         } else {
             continue;
         }
@@ -1011,10 +1013,17 @@ struct PshellClaims {
             claims.values()[used++] = claim;
         }
     }
+    const auto regions = pshell.regions.values().first(pshell.groups);
+    // A baseline used only to expand corners has no reference in a thickness claim.
+    const auto retained_baselines = std::ranges::count_if(regions, [&](const PshellRegion& region) {
+        p.step();
+        return region.property->thickness.has_value() && !region.has_uniform_claim;
+    });
     out.regional =
-        compare_thickness_regions(p, corresponding, reference, claims.values().first(used));
+        compare_thickness_regions(p, corresponding, reference, claims.values().first(used),
+                                  static_cast<std::uint64_t>(retained_baselines));
     out.thickness = out.regional.has_value();
-    for (const auto& group : pshell.regions.values().first(pshell.groups)) {
+    for (const auto& group : regions) {
         p.step();
         const auto compared =
             check_pshell_materials(p, source, deck, group, model, shell, case_units);

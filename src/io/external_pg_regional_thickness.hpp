@@ -47,12 +47,17 @@ struct ExternalPgThicknessDiagnostic {
 
 struct ExternalPgThicknessLimits {
     ExternalPgThicknessLimits(const structure::PgReferenceLimits& arithmetic_limits,
-                              std::uint64_t claims, std::uint64_t vertices) noexcept
-        : arithmetic(arithmetic_limits), maximum_claims(claims), case_vertices(vertices) {}
+                              std::uint64_t claims, std::uint64_t vertices,
+                              std::uint64_t held_inputs = 0) noexcept
+        : arithmetic(arithmetic_limits),
+          maximum_claims(claims),
+          case_vertices(vertices),
+          additional_live_rationals(held_inputs) {}
 
     structure::PgReferenceLimits arithmetic;
     std::uint64_t maximum_claims;
     std::uint64_t case_vertices;
+    std::uint64_t additional_live_rationals; // Caller-owned inputs not referenced by claims.
 };
 
 struct ExternalPgCornerThickness {
