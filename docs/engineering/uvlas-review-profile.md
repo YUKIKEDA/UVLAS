@@ -16,6 +16,7 @@
 | 時間・強連成・安定性 | [J1統合](../specs/coupled/coupled-adopted-specification.md)。輸送別初期微分と受理後荷重は[最終追加規約](../specs/coupled/j1-initialization-output-derivative-addendum.md)を優先 |
 | 型・数値・失敗 | [N4](../specs/foundation/numerical-foundation-adoption-specification.md)、[IO4](../specs/foundation/io-execution-adoption-specification.md)。N4-07の具体的な処理契約には[固有抽出の追加規約](../specs/foundation/eigen-extraction-contract.md)を適用する。旧案の密全域nullspaceやBDF1 accessorを流用しない |
 | チェックポイント容器 | IO4-06のファイル名、マニフェスト、復元時の照合手順は[チェックポイントのマニフェストとチャンク集合](../specs/foundation/checkpoint-manifest-contract.md)を参照 |
+| Case 指定の復元と互換性指紋 | ファイル・辞書 Case の相対パスの基準と、準備済み入力から七指紋を求める規則は[Case から指定するチェックポイントの復元契約](../specs/foundation/case-checkpoint-compatibility-contract.md)を参照 |
 | 観測CSV | IO4-05の列と、認定済み観測値をバイト列へ変換する手順は[観測CSVの内部出力契約](../specs/foundation/observation-csv-contract.md)を参照 |
 | SI入力変換 | [SI変換と入力精度](../specs/foundation/si-precision-conversion-contract.md)。元exact値、degのπ包絡、成分別単位、必須host要求、所有・資源と入力誤差のledger。prepareやQoI認定とは区別する |
 | 外部参照 | [外部参照と所有snapshot](../specs/foundation/reference-snapshot-start-contract.md)。根に相対の解決、元bytesとdigest、実体の一意性、依存辺、所有と資源。Importerは保存したbytesを消費する |
