@@ -2,6 +2,7 @@
 #include "coupling/case_external_pg.hpp"
 #include "coupling/case_external_pg_chart.hpp"
 #include "coupling/case_nastran_static_point_support.hpp"
+#include "coupling/case_pg_shell_material.hpp"
 #include "reference_file_test_fixture.hpp"
 #include "reference_resolution.hpp"
 #include "source_digest.hpp"
@@ -905,7 +906,7 @@ $EndElements
 }
 
 TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
-          "[FD-03][IO4-03][R-05][integration][verification][negative]") {
+          "[FD-03][IO4-03][MAT-D08][V-MAT][R-05][integration][verification][negative]") {
     using Code = core::FailureCode;
     using Reason = coupling::CaseNastranPointSupportFailure;
     enum class Trial : std::uint8_t {
@@ -1101,6 +1102,67 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     };
     CHECK(fixture::take(assemble(lower, lower_patch)).prescribed_metres[2] == oracle.r("5"));
     CHECK(fixture::take(assemble(upper, upper_patch)).prescribed_metres[2] == oracle.r("9"));
+    const auto& volume_patch = lower_patch.patch();
+    const auto volume_id = fixture::take(volume_patch.info()).identity;
+    const auto* volume_basis = fixture::take(volume_patch.conditioning().reference_basis());
+    const auto volume_partition = fixture::take(volume_basis->source());
+    const auto volume_count = fixture::take(volume_partition.partition.volumes()).size();
+    std::vector<PgOwnedDiscreteVolumePoint> volume_rule;
+    for (std::size_t j = 0; j < volume_count; ++j)
+        volume_rule.push_back({static_cast<core::Index>(j), oracle.r("1", "3"), oracle.r("1", "3"),
+                               oracle.r("1", "2"), oracle.r("1", "2")});
+    auto shell_volume = fixture::take(coupling::CasePgShellVolume::prepare(
+        pair_case, lower_patch, volume_rule, {}, pair_limits.patch, plan));
+    // The prepared volume owns its rule. Assemble after releasing the input.
+    volume_rule.clear();
+    const auto q0 = volume_patch.reference_coordinates();
+    std::vector<PgCartesianExactPosition> stretched(q0.size()), stretch(q0.size());
+    const auto two = oracle.r("2");
+    for (std::size_t j = 0; j < q0.size(); ++j) {
+        stretch[j][0] = fixture::take(q0[j][0].clone(arithmetic.algebra, plan));
+        stretched[j][0] = fixture::take(q0[j][0].multiply(two, arithmetic.algebra, plan));
+        for (std::size_t a = 1; a < 3; ++a)
+            stretched[j][a] = fixture::take(q0[j][a].clone(arithmetic.algebra, plan));
+    }
+    const auto width = oracle.r("1", "100000000000000000000");
+    const PgShellVolumeResolution resolution{96, width, width, width};
+    const auto action = fixture::take(shell_volume.elastic(
+        lower_patch, {volume_id, stretched}, PgShellPatchDirection{volume_id, stretch}, resolution,
+        pair_limits.patch, plan));
+    const auto energy = oracle.r("9", "32");
+    CHECK(fixture::take(action.energy_joules.lower.compare(energy, arithmetic.algebra, plan)) <= 0);
+    CHECK(fixture::take(action.energy_joules.upper.compare(energy, arithmetic.algebra, plan)) >= 0);
+    CHECK(action.tangent_action_newtons.size() == q0.size());
+    const auto work_encloses = [&](std::span<const PgShellCartesianEnclosure> force,
+                                   const ExactRational& expected) {
+        const auto& exact = arithmetic.algebra;
+        ExactRational lo, hi;
+        REQUIRE(force.size() == stretch.size());
+        for (std::size_t j = 0; j < force.size(); ++j) {
+            const auto& d = stretch[j][0];
+            const auto& bounds = force[j][0];
+            const bool negative = d.sign() < 0;
+            const auto a =
+                fixture::take(d.multiply(negative ? bounds.upper : bounds.lower, exact, plan));
+            const auto b =
+                fixture::take(d.multiply(negative ? bounds.lower : bounds.upper, exact, plan));
+            lo = fixture::take(lo.add(a, exact, plan));
+            hi = fixture::take(hi.add(b, exact, plan));
+        }
+        CHECK(fixture::take(lo.compare(expected, exact, plan)) <= 0);
+        CHECK(fixture::take(hi.compare(expected, exact, plan)) >= 0);
+    };
+    // For one unit square with thickness 1/4, F11=2, E=1 and nu=0,
+    // the directional work is (1/4)*P11 and (1/4)*dP11/dF11.
+    work_encloses(action.internal_force_newtons.values(), oracle.r("3", "4"));
+    work_encloses(action.tangent_action_newtons.values(), oracle.r("11", "8"));
+    core::ResourcePlan no_allocation{0};
+    const auto swapped_volume =
+        shell_volume.elastic(upper_patch, {volume_id, stretched}, std::nullopt, resolution,
+                             pair_limits.patch, no_allocation);
+    REQUIRE_FALSE(swapped_volume);
+    CHECK(swapped_volume.error().code == Code::StaleGeneration);
+    CHECK(no_allocation.allocated_bytes() == 0);
     const auto before_swap = plan.allocated_bytes();
     const auto reject_swap = [&](const auto& point, const auto& wrong_patch) {
         const auto swapped = assemble(point, wrong_patch);

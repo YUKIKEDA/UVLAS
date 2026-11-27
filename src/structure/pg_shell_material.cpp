@@ -687,14 +687,26 @@ void require_full_rule(core::Index count, core::Index last) {
         partition_fail(invalid);
 }
 
-void validate_samples(const PgPreparedPatch& patch, std::span<const PgShellVolumeSample> samples,
+const PgShellVolumeSample& bound_sample(const PgShellVolumeSample& sample) noexcept {
+    return sample;
+}
+
+const PgShellVolumeSample& bound_sample(const std::optional<PgShellVolumeSample>& sample) {
+    if (!sample)
+        partition_fail(invalid);
+    return *sample;
+}
+
+template <class Sample>
+void validate_samples(const PgPreparedPatch& patch, std::span<const Sample> samples,
                       ReferenceArithmetic& math) {
     const auto reference = patch_reference(patch);
     const auto volumes = partition_take(reference.partition.volumes());
     const auto layers = partition_take(reference.partition.layers());
     const auto count = detail::partition_index(volumes.size());
     core::Index previous = -1;
-    for (const auto& sample : samples) {
+    for (const auto& slot : samples) {
+        const auto& sample = bound_sample(slot);
         const auto volume = advance_volume(sample.quadrature, count, previous, math);
         const auto layer = static_cast<std::size_t>(volumes[volume].layer);
         if (sample.layer != layers[layer].id)
@@ -1027,13 +1039,13 @@ core::Result<PgShellMaterialPointLinearization> linearize_pg_shell_material_poin
         return PgShellMaterialPointLinearization{std::move(value), std::move(derivative)};
     });
 }
-core::Result<PgShellElasticVolumeAction>
-assemble_pg_shell_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& state,
-                                 std::span<const PgShellVolumeSample> samples,
-                                 const std::optional<PgShellPatchDirection>& direction,
-                                 const PgShellVolumeResolution& resolution,
-                                 const PgReferenceLimits& limits,
-                                 core::ResourcePlan& plan) noexcept {
+template <class Sample>
+static core::Result<PgShellElasticVolumeAction>
+assemble_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& state,
+                        std::span<const Sample> samples,
+                        const std::optional<PgShellPatchDirection>& direction,
+                        const PgShellVolumeResolution& resolution, const PgReferenceLimits& limits,
+                        core::ResourcePlan& plan) noexcept {
     return evaluate([&]() -> core::Result<PgShellElasticVolumeAction> {
         using Code = core::FailureCode;
         ReferenceArithmetic math{limits, plan};
@@ -1065,7 +1077,8 @@ assemble_pg_shell_elastic_volume(const PgPreparedPatch& patch, const PgShellPatc
         const MaterialBounds bounds{math};
         const VolumeSum sum{bounds, resolution.fractional_bits};
         Bound energy;
-        for (const auto& sample : samples) {
+        for (const auto& slot : samples) {
+            const auto& sample = bound_sample(slot);
             math.visit(1);
             const auto keep_direction = direction ? detail::partition_mul(3, rank) : 0;
             auto point = partition_take(enclose_pg_shell_patch_point(
@@ -1108,6 +1121,26 @@ assemble_pg_shell_elastic_volume(const PgPreparedPatch& patch, const PgShellPatc
                                           std::move(tangent), math.info()};
     });
 }
+core::Result<PgShellElasticVolumeAction>
+assemble_pg_shell_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& state,
+                                 std::span<const PgShellVolumeSample> samples,
+                                 const std::optional<PgShellPatchDirection>& direction,
+                                 const PgShellVolumeResolution& resolution,
+                                 const PgReferenceLimits& limits,
+                                 core::ResourcePlan& plan) noexcept {
+    return assemble_elastic_volume(patch, state, samples, direction, resolution, limits, plan);
+}
+
+core::Result<PgShellElasticVolumeAction>
+assemble_pg_shell_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& state,
+                                 std::span<const std::optional<PgShellVolumeSample>> samples,
+                                 const std::optional<PgShellPatchDirection>& direction,
+                                 const PgShellVolumeResolution& resolution,
+                                 const PgReferenceLimits& limits,
+                                 core::ResourcePlan& plan) noexcept {
+    return assemble_elastic_volume(patch, state, samples, direction, resolution, limits, plan);
+}
+
 core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
     const PgPreparedPatch& patch, std::span<const PgDiscreteVolumePoint> samples,
     std::span<const PgShellLayerDensity> densities, const PgShellPatchDirection& direction,

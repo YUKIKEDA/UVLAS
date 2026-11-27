@@ -263,6 +263,14 @@ struct PgShellElasticVolumeAction {
     const std::optional<PgShellPatchDirection>&, const PgShellVolumeResolution&,
     const PgReferenceLimits&, core::ResourcePlan&) noexcept;
 
+/// Same assembly for budgeted descriptor storage. Every slot must be bound.
+[[nodiscard]] core::Result<PgShellElasticVolumeAction>
+assemble_pg_shell_elastic_volume(const PgPreparedPatch&, const PgShellPatchState&,
+                                 std::span<const std::optional<PgShellVolumeSample>>,
+                                 const std::optional<PgShellPatchDirection>&,
+                                 const PgShellVolumeResolution&, const PgReferenceLimits&,
+                                 core::ResourcePlan&) noexcept;
+
 struct PgShellLayerDensity {
     core::LayerId layer;
     const ExactRational& kilograms_per_cubic_metre;

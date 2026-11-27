@@ -1,6 +1,7 @@
 #include "case_pg_shell_material.hpp"
 
 #include "aero/certified_trigonometry_private.hpp"
+#include "case_pg_chart.hpp"
 #include "io/si_case_detail.hpp"
 #include "structure/pg_rank_storage.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
@@ -115,6 +116,8 @@ void sample_polynomial(const io::SiCase& source, const io::schema::ReferenceFiel
                        bool pi_multiple, ReferenceArithmetic& math) {
     const auto coordinates = input.coordinates.selected();
     using Coordinates = decltype(input.coordinates.selected());
+    if (coordinates == Coordinates::ItemMaterial && !point.has_material_metres)
+        partition_fail(FailureCode::InvalidInput);
     const auto measure = coordinates == Coordinates::ItemChart ? dimensionless : length;
     const auto origin = triple(source, input.origin, measure, math);
     const auto lengths = triple(source, input.lengths, measure, math);
@@ -251,12 +254,14 @@ void validate_layer_point(const CasePgShellLayer& interval, const CasePgMaterial
 
 CasePgShellMaterials::CasePgShellMaterials(io::SchemaIdentity source, core::Index shell,
                                            core::PlannedBuffer<CasePgShellLayer>&& layers,
-                                           Laws&& laws, std::size_t law_count) noexcept
+                                           Laws&& laws, std::size_t law_count,
+                                           pg::PgReferenceCallInfo work) noexcept
     : source_(source),
       shell_(shell),
       layers_(std::move(layers)),
       laws_(std::move(laws)),
-      law_count_(law_count) {}
+      law_count_(law_count),
+      work_(work) {}
 
 core::Result<CasePgShellMaterials>
 CasePgShellMaterials::prepare(const io::SiCase& source, std::uint64_t shell_id,
@@ -348,8 +353,8 @@ CasePgShellMaterials::prepare(const io::SiCase& source, std::uint64_t shell_id,
             layers.values()[static_cast<std::size_t>(entry.ordinal)].law = prepared - 1;
         }
         math.cancel();
-        return CasePgShellMaterials{identity, shell_ordinal, std::move(layers), std::move(laws),
-                                    prepared};
+        return CasePgShellMaterials{identity,        shell_ordinal, std::move(layers),
+                                    std::move(laws), prepared,      math.info()};
     });
 }
 
@@ -442,5 +447,172 @@ core::Result<CasePgAxisValue> CasePgShellMaterials::sample_axes(
     if (!result)
         result.error().operation = core::Operation::EvaluateStructure;
     return result;
+}
+namespace {
+constexpr std::uint64_t volume_sample_rationals = 48;
+
+pg::PgReferenceLimits remaining(ReferenceArithmetic& math, std::uint64_t kept = 0) {
+    auto limits = math.limits;
+    limits.maximum_scalar_operations -= math.scalar_operations;
+    limits.maximum_partition_visits -= math.partition_visits;
+    math.reserve_nested_rationals(limits.algebra, kept);
+    return limits;
+}
+
+void record_work(ReferenceArithmetic& math, pg::PgReferenceCallInfo work) {
+    math.charge(work.scalar_operations);
+    math.visit(work.partition_visits);
+}
+
+std::uint64_t material_slots(const CasePgShellMaterials& materials) {
+    return pg::detail::partition_add(
+        pg::detail::partition_mul(materials.law_count(), law_rationals),
+        pg::detail::partition_mul(materials.layers().size(), 2));
+}
+} // namespace
+
+CasePgShellVolume::CasePgShellVolume(io::SchemaIdentity source, pg::PgPreparedPatchIdentity patch,
+                                     std::uint64_t shell, CasePgShellMaterials&& materials,
+                                     core::PlannedBuffer<Sample>&& samples) noexcept
+    : source_(source),
+      patch_(patch),
+      shell_(shell),
+      materials_(std::move(materials)),
+      samples_(std::move(samples)) {}
+
+core::Result<CasePgShellVolume>
+CasePgShellVolume::prepare(const io::SiCase& source, const CaseStaticPgPointPatch& bound,
+                           std::span<const pg::PgOwnedDiscreteVolumePoint> rule,
+                           std::span<const pg::PgReferenceVector> material_metres,
+                           const pg::PgReferenceLimits& limits,
+                           core::ResourcePlan& memory) noexcept {
+    return partition_entry([&]() -> core::Result<CasePgShellVolume> {
+        ReferenceArithmetic math{limits, memory};
+        math.cancel();
+        const auto& typed = partition_take(source.source_case()).get();
+        const auto identity = partition_take(typed.identity());
+        if (!io::detail::same_identity(identity, bound.source()))
+            partition_fail(FailureCode::StaleGeneration);
+        if (!material_metres.empty() && material_metres.size() != rule.size())
+            partition_fail(FailureCode::InvalidInput);
+        const auto& patch = bound.patch();
+        const auto info = partition_take(patch.info());
+        const auto* basis = partition_take(patch.conditioning().reference_basis());
+        const auto geometry = partition_take(basis->source());
+        const auto volumes = partition_take(geometry.partition.volumes());
+        const auto layers = partition_take(geometry.partition.layers());
+        const auto count = partition_index(volumes.size());
+        core::Index previous = -1;
+        for (const auto& sample : rule) {
+            math.visit(1);
+            if (sample.volume < 0 || sample.volume >= count || sample.volume < previous ||
+                sample.volume - previous > 1 || sample.weight.sign() <= 0)
+                partition_fail(FailureCode::InvalidInput);
+            previous = sample.volume;
+        }
+        if (count == 0 || previous != count - 1)
+            partition_fail(FailureCode::InvalidInput);
+        const auto shell = bound.shell().value();
+        auto materials =
+            partition_take(CasePgShellMaterials::prepare(source, shell, remaining(math), memory));
+        record_work(math, materials.call_info());
+        if (materials.layers().size() != layers.size())
+            partition_fail(FailureCode::StaleGeneration);
+        for (std::size_t j = 0; j < layers.size(); ++j) {
+            math.visit(1);
+            const auto& case_layer = materials.layers()[j];
+            if (case_layer.id != layers[j].id || case_layer.lower != layers[j].lower ||
+                case_layer.upper != layers[j].upper)
+                partition_fail(FailureCode::StaleGeneration);
+        }
+        const auto kept_rule =
+            pg::detail::partition_add(pg::detail::partition_mul(4, rule.size()),
+                                      pg::detail::partition_mul(6, material_metres.size()));
+        const auto persistent = pg::detail::partition_add(material_slots(materials), kept_rule);
+        math.admit(pg::detail::partition_add(
+            pg::detail::partition_add(persistent, 384),
+            pg::detail::partition_mul(rule.size(), volume_sample_rationals)));
+        auto samples =
+            partition_take(memory.allocate<Sample>(partition_index(rule.size()), operation));
+        const pg::PgReferenceVector no_material_coordinates;
+        for (std::size_t i = 0; i < rule.size(); ++i) {
+            math.visit(1);
+            const auto& point = rule[i];
+            const auto layer = volumes[static_cast<std::size_t>(point.volume)].layer;
+            const auto retained = pg::detail::partition_add(
+                persistent, pg::detail::partition_mul(i, volume_sample_rationals));
+            auto reference = partition_take(basis->evaluate_geometry(
+                pg::PgReferenceVolumePoint{point.volume, point.u, point.v, point.depth},
+                remaining(math, retained), memory));
+            record_work(math, reference.call_info);
+            const std::array chart{std::move(reference.s), std::move(reference.t),
+                                   std::move(reference.zeta)};
+            const bool has_material = !material_metres.empty();
+            const CasePgMaterialCoordinates coordinates{
+                chart, has_material ? material_metres[i] : no_material_coordinates,
+                reference.position_metres, reference.g, has_material};
+            auto initial = partition_take(materials.sample_initial_green(
+                source, layer, coordinates,
+                remaining(math, pg::detail::partition_add(retained, 110)), memory));
+            record_work(math, initial.work);
+            auto axes = partition_take(materials.sample_axes(
+                source, layer, coordinates,
+                remaining(math, pg::detail::partition_add(retained, 132)), memory));
+            record_work(math, axes.work);
+            auto& slot = samples.values()[i];
+            slot.quadrature = {point.volume, math.copy(point.u), math.copy(point.v),
+                               math.copy(point.depth), math.copy(point.weight)};
+            slot.layer = layer;
+            slot.initial.emplace(std::move(initial));
+            slot.axes.emplace(std::move(axes));
+        }
+        return CasePgShellVolume{identity, info.identity, shell, std::move(materials),
+                                 std::move(samples)};
+    });
+}
+
+core::Result<pg::PgShellElasticVolumeAction>
+CasePgShellVolume::elastic(const CaseStaticPgPointPatch& bound, const pg::PgShellPatchState& state,
+                           const std::optional<pg::PgShellPatchDirection>& direction,
+                           const pg::PgShellVolumeResolution& resolution,
+                           const pg::PgReferenceLimits& limits,
+                           core::ResourcePlan& memory) const noexcept {
+    auto out = partition_entry([&]() -> core::Result<pg::PgShellElasticVolumeAction> {
+        ReferenceArithmetic math{limits, memory};
+        math.cancel();
+        const auto& patch = bound.patch();
+        if (bound.shell().value() != shell_ ||
+            !io::detail::same_identity(bound.source(), source_) ||
+            partition_take(patch.info()).identity != patch_ || state.patch != patch_ ||
+            (direction && direction->patch != patch_))
+            partition_fail(FailureCode::StaleGeneration);
+        if (samples_.size() == 0)
+            partition_fail(FailureCode::InvalidInput);
+        const auto retained = pg::detail::partition_add(
+            material_slots(materials_),
+            pg::detail::partition_mul(samples_.size(), volume_sample_rationals));
+        auto rows = partition_take(memory.allocate<std::optional<pg::PgShellVolumeSample>>(
+            partition_index(samples_.size()), core::Operation::EvaluateStructure));
+        for (std::size_t i = 0; i < samples_.size(); ++i) {
+            math.visit(1);
+            const auto& sample = samples_.values()[i];
+            const auto& q = sample.quadrature;
+            const auto& law = partition_take(materials_.law_for(sample.layer)).get();
+            rows.values()[i].emplace(
+                pg::PgShellVolumeSample{{{q.volume, q.u, q.v, q.depth}, q.weight},
+                                        sample.initial->layer,
+                                        law,
+                                        sample.initial->enclosure(),
+                                        sample.axes->axes()});
+        }
+        auto action = partition_take(pg::assemble_pg_shell_elastic_volume(
+            patch, state, rows.values(), direction, resolution, remaining(math, retained), memory));
+        record_work(math, action.work);
+        action.work = math.info();
+        return action;
+    });
+    if (!out)
+        out.error().operation = core::Operation::EvaluateStructure;
+    return out;
 }
 } // namespace uvlas::coupling::detail

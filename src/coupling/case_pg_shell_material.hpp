@@ -5,6 +5,8 @@
 
 namespace uvlas::coupling::detail {
 
+class CaseStaticPgPointPatch;
+
 struct CasePgShellLayer {
     core::LayerId id{0};
     std::uint64_t material_id{};
@@ -19,6 +21,7 @@ struct CasePgMaterialCoordinates {
     const structure::PgReferenceVector& material_metres;
     const structure::PgReferenceVector& world_reference_metres;
     const structure::ExactRational& g;
+    bool has_material_metres = true;
 };
 
 struct CasePgInitialGreenValue {
@@ -74,6 +77,9 @@ public:
     [[nodiscard]] std::size_t law_count() const noexcept {
         return layers_.size() == 0 ? 0 : law_count_;
     }
+    [[nodiscard]] structure::PgReferenceCallInfo call_info() const noexcept {
+        return work_;
+    }
     [[nodiscard]] core::Result<std::reference_wrapper<const structure::PgShellElasticLaw>>
     law_for(core::Index layer) const& noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const structure::PgShellElasticLaw>>
@@ -97,14 +103,49 @@ public:
 private:
     using Laws = core::PlannedBuffer<std::optional<structure::PgShellElasticLaw>>;
     CasePgShellMaterials(io::SchemaIdentity, core::Index shell,
-                         core::PlannedBuffer<CasePgShellLayer>&&, Laws&&,
-                         std::size_t law_count) noexcept;
+                         core::PlannedBuffer<CasePgShellLayer>&&, Laws&&, std::size_t law_count,
+                         structure::PgReferenceCallInfo) noexcept;
 
     io::SchemaIdentity source_;
     core::Index shell_;
     core::PlannedBuffer<CasePgShellLayer> layers_;
     Laws laws_;
     std::size_t law_count_;
+    structure::PgReferenceCallInfo work_;
+};
+
+/// Own the rule and sampled fixed Case fields for one authenticated shell.
+class CasePgShellVolume {
+public:
+    /// When used by a field, supply material coordinates in the rule's order.
+    /// Chart and world coordinates come from the owning reference geometry.
+    [[nodiscard]] static core::Result<CasePgShellVolume>
+    prepare(const io::SiCase&, const CaseStaticPgPointPatch&,
+            std::span<const structure::PgOwnedDiscreteVolumePoint>,
+            std::span<const structure::PgReferenceVector> material_metres,
+            const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
+    [[nodiscard]] core::Result<structure::PgShellElasticVolumeAction>
+    elastic(const CaseStaticPgPointPatch&, const structure::PgShellPatchState&,
+            const std::optional<structure::PgShellPatchDirection>&,
+            const structure::PgShellVolumeResolution&, const structure::PgReferenceLimits&,
+            core::ResourcePlan&) const noexcept;
+
+private:
+    struct Sample {
+        structure::PgOwnedDiscreteVolumePoint quadrature;
+        core::Index layer{};
+        std::optional<CasePgInitialGreenValue> initial;
+        std::optional<CasePgAxisValue> axes;
+    };
+    CasePgShellVolume(io::SchemaIdentity, structure::PgPreparedPatchIdentity, std::uint64_t,
+                      CasePgShellMaterials&&, core::PlannedBuffer<Sample>&&) noexcept;
+
+    io::SchemaIdentity source_;
+    structure::PgPreparedPatchIdentity patch_;
+    std::uint64_t shell_;
+    CasePgShellMaterials materials_;
+    core::PlannedBuffer<Sample> samples_;
 };
 
 } // namespace uvlas::coupling::detail
