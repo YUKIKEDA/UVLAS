@@ -89,6 +89,8 @@ public:
     [[nodiscard]] static std::uint64_t payload_bytes() noexcept;
     /// Largest scalar work count of one local evaluation, including a cold workspace.
     [[nodiscard]] static std::uint64_t maximum_steps() noexcept;
+    /// Cold-work ceiling for a bound contour with any active edge subset.
+    [[nodiscard]] static std::uint64_t maximum_bound_steps() noexcept;
 
 private:
     friend class P1Engine;

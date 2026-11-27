@@ -1122,12 +1122,23 @@ TEST_CASE("Two bound circulation columns share the signed edge kernel",
     const std::array bound{p::P1FaceStrengths{geometry.base.faces[0].id, p::P0BoundColumn{}},
                            p::P1FaceStrengths{geometry.base.faces[1].id, p::P0BoundColumn{}}};
     auto resources = limits();
-    resources.steps *= 2;
+    const auto bound_steps = p::P1Workspace::maximum_bound_steps();
+    REQUIRE(bound_steps < p::P1Workspace::maximum_steps());
+    resources.kernel.max_steps = bound_steps;
+    const auto forecast =
+        test_geometry::take(p::forecast_bound_wake_induction(source, bound, ids, resources));
+    resources.steps = forecast.reserved_steps;
+    auto insufficient = resources;
+    --insufficient.kernel.max_steps;
+    rejected(p::forecast_bound_wake_induction(source, bound, ids, insufficient),
+             core::FailureCode::ResourceExceeded);
     const auto action = test_geometry::take(p::prepare_bound_wake_induction(
         source, bound, ids, {core::Precision::TwoWord, 1e-10},
         {core::Precision::TwoWord, 1e-10, 1e-10}, resources, prepared.shared_workspace,
         *prepared.local_workspace, *prepared.kernel_workspace, prepared.memory));
-    CHECK(test_geometry::take(action.report()).cancelled_analytic_pairs == 2);
+    const auto report = test_geometry::take(action.report());
+    CHECK(report.cancelled_analytic_pairs == 2);
+    CHECK(report.used_steps <= forecast.reserved_steps);
     const auto first = ring(geometry.base, .75, Big{0});
     // Re-pack the second quad's vertices in its declared clockwise loop.
     auto second_geometry = geometry.base;

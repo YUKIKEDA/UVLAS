@@ -33,11 +33,13 @@ bool supported_environment() noexcept {
 }
 constexpr std::uint64_t input_work = 13 * 4 + 4 * 3 * 4 + 3 * 3 * 6 + 3 * 3 * 6 + 3 * 3 + 3 * 3;
 constexpr std::uint64_t table_work = 8 * (5 * 8 + 8) + 12 * (5 * 12 + 8);
-constexpr std::uint64_t constant_work = 781 + 393;
+constexpr std::uint64_t pi_work = 781;
+constexpr std::uint64_t constant_work = pi_work + 393;
 constexpr std::uint64_t result_work = UINT64_C(126) * 14;
 struct Shape {
     std::size_t nodes = 0;
     std::uint64_t work = 0;
+    std::uint64_t bound_work = 0;
 };
 Shape build_maximum_shape() {
     Shape maximum;
@@ -68,8 +70,10 @@ Shape build_maximum_shape() {
         p1::Program contour{{}};
         (void)p1::bound_program(contour, options);
         maximum.nodes = std::max(maximum.nodes, contour.count);
-        maximum.work = std::max(maximum.work, contour.work);
+        maximum.bound_work = std::max(maximum.bound_work, contour.work);
     }
+    maximum.work = std::max(maximum.work, maximum.bound_work);
+    maximum.bound_work = p1::checked_sum(maximum.bound_work, input_work + pi_work + result_work);
     p1::Program far{{}};
     const auto far_program = p1::far_program(far);
     const auto far_nodes = p1::checked_sum(far.count, 18);
@@ -509,8 +513,10 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             return std::unexpected(failed(core::FailureCode::ResourceExceeded, context));
         // The immutable expression plan belongs to this prepared workspace.
         const Shape shape = workspace.scratch_.values()[0].shape;
+        const auto kernel_steps = bound ? shape.bound_work : shape.work;
         const bool paid = slot != nullptr && slot->value_.has_value();
-        if (limits.max_steps < shape.work || (!paid && plan.remaining_bytes() < sizeof(P1Storage)))
+        if (limits.max_steps < kernel_steps ||
+            (!paid && plan.remaining_bytes() < sizeof(P1Storage)))
             return std::unexpected(failed(core::FailureCode::ResourceExceeded, context));
         const auto& geometry = needed(packet.geometry()).get();
         if (geometry.context() != context ||
@@ -540,7 +546,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         if (!supported_environment())
             return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
         auto& scratch = workspace.scratch_.values()[0];
-        p1::Work work{0, shape.work, stop};
+        p1::Work work{0, kernel_steps, stop};
         load(geometry, query, ambient, scratch, work);
         auto [options, scale] = prepare_input(scratch, work);
         options.boundary = boundary;
@@ -620,7 +626,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             selected = P1Branch::FarGauss12;
         else if (options.exterior)
             selected = P1Branch::IdealCoplanarExterior;
-        const P1WorkPlan admitted{shape.nodes, shape.work,
+        const P1WorkPlan admitted{shape.nodes, kernel_steps,
                                   p1::checked_sum(shape_payload(shape), sizeof(P1Storage))};
         auto& result = reserved->values()[0].data.emplace(OwnedGeometry{geometry.data_, context},
                                                           query, ambient, accuracy, selected,
@@ -695,6 +701,13 @@ std::uint64_t P1Workspace::payload_bytes() noexcept {
 std::uint64_t P1Workspace::maximum_steps() noexcept {
     try {
         return maximum_shape().work;
+    } catch (...) {
+        return std::numeric_limits<std::uint64_t>::max();
+    }
+}
+std::uint64_t P1Workspace::maximum_bound_steps() noexcept {
+    try {
+        return maximum_shape().bound_work;
     } catch (...) {
         return std::numeric_limits<std::uint64_t>::max();
     }
