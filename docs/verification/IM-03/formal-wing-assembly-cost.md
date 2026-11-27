@@ -146,6 +146,24 @@ M2/N4の両翼で、迎角−1°に接触認定つきの閉輪郭を選び、通
 
 [独立幾何生成器](finite-wing-drag-refinement-v1/formal_geometry.py)の出力を `UVLAS_FORMAL_WING_GEOMETRY` に指定し、Releaseビルドで `UVLAS_FORMAL_WING_PRODUCT=ON` を設定する。CTestの `coupling.finite_wing_drag_refinement.fw_v01.m128n192_product` と `coupling.finite_wing_drag_refinement.fw_v02.m128n192_product` は、各形状で24,576未知数の循環・荷重を製品入口から求める。各試験の実行上限は1,200秒。試験の累積確保枠は24 GiB、LUの外部見積もり枠は14 GiB。実行環境でもプロセスのメモリ上限を設定し、実測のピークRSSを記録する。
 
+Linuxの再実行では、リポジトリのルートから次を実行する。生成器は書き出し先の上書きを拒否する。試験入力と別ディレクトリに再生成した5,449,115 Bはバイト一致し、SHA-256は `d6a18a7b4334ea09fcb76aaec43d6ae61cbaee6eeb9b310f1f9d98538a5e511b` だった。
+
+```sh
+geometry_dir=$(mktemp -d)
+python3 -I -B docs/verification/IM-03/finite-wing-drag-refinement-v1/formal_geometry.py \
+  --output "$geometry_dir/geometry.json"
+sha256sum "$geometry_dir/geometry.json"
+cmake --preset linux-release -DUVLAS_FORMAL_WING_GEOMETRY="$geometry_dir/geometry.json" \
+  -DUVLAS_FORMAL_WING_PRODUCT=ON
+cmake --build --preset linux-release --target \
+  uvlas_test_coupling_finite_wing_drag_refinement_fw_v01_m128n192_product \
+  uvlas_test_coupling_finite_wing_drag_refinement_fw_v02_m128n192_product
+(
+  ulimit -v $((24 * 1024 * 1024))
+  ctest --preset linux-release -V -R '^coupling[.]finite_wing_drag_refinement[.]fw_v0[12][.]m128n192_product$'
+)
+```
+
 この固定輪郭では循環が迎角の正弦に比例する。近傍抗力の規格化に必要な力の偶成分と奇成分を、一方の迎角の荷重と後縁の有向幅から求める。元残差は全行の返却包絡を二乗和に集約し、実際の接線から求めた右辺ノルムの下界で割る。近傍とTrefftz面の差、独立参照の推定極限との差と不確かさ、元残差を、それぞれ採用済みの上限と比較する。
 
 輪郭に4作業域、密行列の求解残差に1作業域を用いた斜翼の試行は、1,200秒で打ち切った。GCC 14.2 Releaseの隔離実行でピークRSSは19,134,084 KiBだった。17分台の短いスタック観測では、LU分解後の密行列の残差と成分別後退誤差を評価中だった。時間内に全行の元残差と荷重の判定結果を取得できなかった。
@@ -190,10 +208,21 @@ GCCの水平小格子で半径を零にした隔離ビルドは、両迎角で�
 
 ### 修正後の正式格子
 
-`19fcdebe` の試験をGCC 14.2 ReleaseのWSL2で実行した。論理CPU 4・6・8・10、輪郭と密残差は各4作業域、LUは1スレッド。1,200秒と仮想メモリ24 GiBの上限を維持した。後続のmain取り込みはロードマップのみの差分となり、製品ソース、試験、CMake設定は実行版と一致した。
+`19fcdebe` の試験をGCC 14.2 ReleaseのWSL2で実行した。論理CPU 4・6・8・10、輪郭と密残差は各4作業域、LUは1スレッド。1,200秒と仮想メモリ24 GiBの上限を維持した。後続のmain取り込みはロードマップのみの差分となった。提出差分に含まれる製品ソース、試験、CMakeの30ファイルを、実際にビルドしたファイルと改行コードをそろえて照合し、一致を確認した。
 
 | M128/N192 | 全24,576行の原残差の相対L2上限 | 近傍抗力中心 ± 半径 [N/rad²] | Trefftz面抗力中心 ± 半径 [N/rad²] | 近遠差の上限 | 凍結極限との差の上限 | CTest経過秒 | ピークRSS [KiB] |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 水平翼 FW-V01 | $5.5360\times10^{-12}$ | $1544.9227836266009\pm1.479\times10^{-7}$ | $1530.3183221793695\pm9.107\times10^{-24}$ | 0.9544% | 0.9225% | 915.76 | 19,133,148 |
 | 斜翼 FW-V02 | $5.5259\times10^{-12}$ | $1538.1958948780837\pm1.477\times10^{-7}$ | $1523.5948153780082\pm9.156\times10^{-24}$ | 0.9584% | 0.9263% | 960.11 | 19,132,884 |
 
-斜翼は460,233アサーションが通り、累積確保課金は10,401,852,842 Bだった。循環・荷重の製品呼出しは910.168秒。内訳は係数と右辺67.089秒、LU547.908秒、密残差の2回の認定50.845秒、求解後の全行の原残差と結果保持71.812秒、荷重評価と結果保持137.023秒、その他35.490秒だった。
+両翼ともそれぞれ460,233アサーションに合格した。累積確保課金は水平翼で10,351,782,422 B、斜翼で10,401,852,842 Bだった。
+
+| 製品入口の工程 | 水平翼 [秒] | 斜翼 [秒] |
+| --- | ---: | ---: |
+| 係数と右辺の組立て | 56.097 | 67.089 |
+| LU分解 | 534.548 | 547.908 |
+| 密残差と成分別後退誤差の2回の認定 | 53.189 | 50.845 |
+| 求解後の全行の原残差と結果保持 | 55.055 | 71.812 |
+| 荷重評価と結果保持 | 105.659 | 137.023 |
+| その他の準備と求解処理 | 31.239 | 35.490 |
+| 循環・荷重の製品呼出し全体 | 835.788 | 910.168 |
