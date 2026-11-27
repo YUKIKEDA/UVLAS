@@ -34,11 +34,6 @@ namespace p = a::pchip;
 namespace cf = coupling::detail;
 
 constexpr std::uint64_t budget = std::uint64_t{1} << 48U;
-#ifdef UVLAS_FINITE_WING_FORMAL_PRODUCT
-constexpr bool formal_product = true;
-#else
-constexpr bool formal_product = false;
-#endif
 const p::PchipInputStamp stamp{p::PchipIssuerId{71}, p::PchipInputGeneration{8}};
 
 structure::ExactLimits exact_limits() noexcept {
@@ -1240,6 +1235,12 @@ struct WingCondition {
     }
 }
 #ifdef UVLAS_FINITE_WING_REFINEMENT_FIXTURE
+#ifdef UVLAS_FINITE_WING_FORMAL_PRODUCT
+constexpr bool formal_product = true;
+#else
+constexpr bool formal_product = false;
+#endif
+
 #ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
 void verify_formal_wing_forecast(const CaseLattice& grid, const FiniteWingMesh& mesh,
                                  const a::OwnedGeometry& geometry,
