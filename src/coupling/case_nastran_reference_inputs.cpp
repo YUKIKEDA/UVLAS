@@ -1,9 +1,10 @@
 #include "case_nastran_reference_inputs.hpp"
 
 #include "io/si_case_detail.hpp"
-#include "structure/pg_reference_arithmetic.hpp"
+#include "structure/pg_reference_polynomials.hpp"
 
 #include <algorithm>
+#include <type_traits>
 #include <utility>
 
 namespace uvlas::coupling::detail {
@@ -226,17 +227,25 @@ core::Result<CaseNastranReferenceInputs> CaseNastranReferenceInputs::prepare(
     return result;
 }
 
-core::Result<CaseNastranParticleMass>
-certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
-                                   CaseNastranMassId id, const structure::PgReferenceLimits& limits,
-                                   core::ResourcePlan& plan,
-                                   CaseNastranParticleDiagnostic* diagnostic) noexcept {
+namespace {
+
+template <class CaseMass>
+using MassEvidence = std::conditional_t<std::is_same_v<CaseMass, io::schema::MassRigid>,
+                                        CaseNastranRigidMass, CaseNastranParticleMass>;
+
+template <class CaseMass>
+core::Result<MassEvidence<CaseMass>>
+certify_case_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
+                  CaseNastranMassId id, const structure::PgReferenceLimits& limits,
+                  core::ResourcePlan& plan, CaseNastranParticleDiagnostic* diagnostic) noexcept {
     namespace ref = structure::detail;
     using ref::partition_take;
     using Reason = CaseNastranParticleFailure;
+    using Result = core::Result<MassEvidence<CaseMass>>;
+    constexpr bool rigid = std::is_same_v<CaseMass, io::schema::MassRigid>;
     if (diagnostic)
         *diagnostic = {};
-    return ref::partition_entry([&]() -> core::Result<CaseNastranParticleMass> {
+    return ref::partition_entry([&]() -> Result {
         ref::ReferenceArithmetic math{limits, plan};
         CaseNastranParticleDiagnostic detail{};
         const auto mark = [&](Reason reason,
@@ -244,7 +253,7 @@ certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranRefere
             detail.reason = reason;
             detail.field = field;
         };
-        const auto reject = [&](FailureCode code) -> core::Result<CaseNastranParticleMass> {
+        const auto reject = [&](FailureCode code) -> Result {
             if (diagnostic)
                 *diagnostic = detail;
             return std::unexpected(Failure{code, operation});
@@ -280,35 +289,39 @@ certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranRefere
         }
 
         mark(Reason::Kind, original.card.id_field.position);
-        if (original.kind != native::NastranBasicMassKind::Particle)
+        constexpr auto required_kind =
+            rigid ? native::NastranBasicMassKind::Rigid : native::NastranBasicMassKind::Particle;
+        if (original.kind != required_kind)
             return reject(FailureCode::InvalidInput);
-        for (std::size_t axis = 0; axis < original.grid_to_centre_metres.size(); ++axis) {
-            math.visit(1);
-            const auto& lever = original.grid_to_centre_metres[axis];
-            if (lever.lower.sign() == 0 && lever.upper.sign() == 0)
-                continue;
-            const auto& field = original.card.position[axis].field;
-            mark(Reason::Kind, field ? field->position : original.card.grid_field.position);
-            return reject(lever.lower.sign() > 0 || lever.upper.sign() < 0
-                              ? FailureCode::InvalidInput
-                              : FailureCode::PrecisionUnresolved);
+        if constexpr (!rigid) {
+            for (std::size_t axis = 0; axis < original.grid_to_centre_metres.size(); ++axis) {
+                math.visit(1);
+                const auto& lever = original.grid_to_centre_metres[axis];
+                if (lever.lower.sign() == 0 && lever.upper.sign() == 0)
+                    continue;
+                const auto& field = original.card.position[axis].field;
+                mark(Reason::Kind, field ? field->position : original.card.grid_field.position);
+                return reject(lever.lower.sign() > 0 || lever.upper.sign() < 0
+                                  ? FailureCode::InvalidInput
+                                  : FailureCode::PrecisionUnresolved);
+            }
         }
 
         const auto model = partition_take(schema.root()).model.record();
-        std::optional<io::schema::MassParticle> particle;
+        std::optional<CaseMass> case_mass;
         for (std::size_t i = 0; i < model.masses.size(); ++i) {
             math.visit(1);
             const auto value = partition_take(model.masses.at(ref::partition_index(i))).record();
-            if (const auto* candidate = std::get_if<io::schema::MassParticle>(&value);
+            if (const auto* candidate = std::get_if<CaseMass>(&value);
                 candidate && candidate->id.unsigned_value() == id.value()) {
-                particle = *candidate;
+                case_mass = *candidate;
                 break;
             }
         }
-        if (!particle)
+        if (!case_mass)
             return reject(FailureCode::InvalidInput);
 
-        const auto point = particle->target.record();
+        const auto point = case_mass->target.record();
         const auto member = point.target.record();
         mark(Reason::Position, original.card.grid_field.position);
         if (member.kind.selected() != decltype(member.kind.selected())::ItemShell ||
@@ -350,7 +363,7 @@ certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranRefere
         };
         mark(Reason::Mass,
              original.card.mass.field.transform([](const auto& f) { return f.position; }));
-        auto mass = exact(particle->mass);
+        auto mass = exact(case_mass->mass);
         if (math.compare(mass, original.mass_kg) != 0)
             return reject(FailureCode::InvalidInput);
 
@@ -375,20 +388,117 @@ certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranRefere
                                                          return math.compare(a, b) == 0;
                                                      }))
                     return reject(FailureCode::InvalidInput);
-                return CaseNastranParticleMass{deck,
-                                               sidecar,
-                                               prepared.deck_digest(),
-                                               prepared.sidecar_digest(),
-                                               selected->binding,
-                                               shell,
-                                               patch,
-                                               original.card.grid,
-                                               face.element,
-                                               std::move(mass)};
+                CaseNastranMassAttachment attachment{deck,
+                                                     sidecar,
+                                                     prepared.deck_digest(),
+                                                     prepared.sidecar_digest(),
+                                                     selected->binding,
+                                                     shell,
+                                                     patch,
+                                                     original.card.grid,
+                                                     face.element,
+                                                     std::move(mass)};
+                if constexpr (!rigid) {
+                    return attachment;
+                } else {
+                    using R = structure::ExactRational;
+                    mark(Reason::Frame, original.card.grid_field.position);
+                    const auto frame = case_mass->frame.record();
+                    std::array<R, 3> origin, offset;
+                    std::array<R, 9> rotation, inertia;
+                    for (std::size_t i = 0; i < 3; ++i) {
+                        const auto row = ref::partition_index(i);
+                        origin[i] = exact(partition_take(frame.origin.at(row)));
+                        if (math.compare(origin[i], corner.position_metres[i]) != 0)
+                            return reject(FailureCode::InvalidInput);
+                        offset[i] = exact(partition_take(case_mass->center.at(row)));
+                        const auto rotation_row = partition_take(frame.rotation.at(row));
+                        const auto inertia_row = partition_take(case_mass->inertia.at(row));
+                        for (std::size_t j = 0; j < 3; ++j) {
+                            const auto column = ref::partition_index(j);
+                            rotation[3 * i + j] = exact(partition_take(rotation_row.at(column)));
+                            inertia[3 * i + j] = exact(partition_take(inertia_row.at(column)));
+                        }
+                    }
+                    const auto frame_valid = ref::partition_entry([&]() -> core::Result<void> {
+                        const auto one = math.constant("1");
+                        ref::validate_frame(math, {rotation, origin, one});
+                        return {};
+                    });
+                    if (!frame_valid)
+                        return reject(frame_valid.error().code);
+
+                    std::array<R, 3> centre;
+                    const bool absolute =
+                        std::holds_alternative<native::NastranBasicMassCentre>(original.card.frame);
+                    for (std::size_t i = 0; i < 3; ++i) {
+                        const auto& field = original.card.position[i].field;
+                        mark(Reason::Centre,
+                             field ? field->position : original.card.grid_field.position);
+                        auto displacement = R{};
+                        for (std::size_t j = 0; j < 3; ++j)
+                            displacement =
+                                math.add(displacement, math.mul(rotation[3 * i + j], offset[j]));
+                        centre[i] = math.add(origin[i], displacement);
+                        const auto& field_value = original.card_position_metres[i];
+                        const auto relation =
+                            absolute ? math.compare(centre[i], field_value)
+                                     : math.compare(centre[i], math.add(origin[i], field_value));
+                        if (relation != 0)
+                            return reject(FailureCode::InvalidInput);
+                    }
+
+                    const auto& original_inertia = original.card.inertia;
+                    const std::array inertia_fields{
+                        original_inertia.i11.field, original_inertia.i21.field,
+                        original_inertia.i22.field, original_inertia.i31.field,
+                        original_inertia.i32.field, original_inertia.i33.field};
+                    std::array<R, 6> centre_inertia;
+                    std::size_t packed = 0;
+                    for (std::size_t i = 0; i < 3; ++i) {
+                        for (std::size_t j = 0; j <= i; ++j, ++packed) {
+                            const auto& field = inertia_fields[packed];
+                            mark(Reason::Inertia,
+                                 field ? field->position : original.card.card.position);
+                            if (math.compare(inertia[3 * i + j], inertia[3 * j + i]) != 0)
+                                return reject(FailureCode::InvalidInput);
+                            auto& value = centre_inertia[packed];
+                            for (std::size_t k = 0; k < 3; ++k) {
+                                for (std::size_t l = 0; l < 3; ++l) {
+                                    value = math.add(value, math.mul(math.mul(rotation[3 * i + k],
+                                                                              inertia[3 * k + l]),
+                                                                     rotation[3 * j + l]));
+                                }
+                            }
+                            if (math.compare(value, original.centre_inertia_kg_m2[packed]) != 0)
+                                return reject(FailureCode::InvalidInput);
+                        }
+                    }
+                    return CaseNastranRigidMass{std::move(attachment), std::move(centre),
+                                                std::move(centre_inertia)};
+                }
             }
         }
         return reject(FailureCode::InvalidInput);
     });
+}
+
+} // namespace
+
+core::Result<CaseNastranParticleMass>
+certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
+                                   CaseNastranMassId id, const structure::PgReferenceLimits& limits,
+                                   core::ResourcePlan& plan,
+                                   CaseNastranParticleDiagnostic* diagnostic) noexcept {
+    return certify_case_mass<io::schema::MassParticle>(si, prepared, id, limits, plan, diagnostic);
+}
+
+core::Result<CaseNastranRigidMass>
+certify_case_nastran_rigid_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
+                                CaseNastranMassId id, const structure::PgReferenceLimits& limits,
+                                core::ResourcePlan& plan,
+                                CaseNastranParticleDiagnostic* diagnostic) noexcept {
+    return certify_case_mass<io::schema::MassRigid>(si, prepared, id, limits, plan, diagnostic);
 }
 
 } // namespace uvlas::coupling::detail

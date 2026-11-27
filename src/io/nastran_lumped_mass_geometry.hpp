@@ -37,6 +37,8 @@ struct NastranBasicMassGeometry {
     SiUnits input_units;
     NastranBasicMassKind kind = NastranBasicMassKind::Particle;
     structure::ExactRational mass_kg;
+    // Exact SI card fields: GRID-relative for CID 0, absolute for CID -1.
+    std::array<structure::ExactRational, 3> card_position_metres;
     std::array<NastranCartesianInterval, 3> grid_metres, centre_metres, grid_to_centre_metres;
     // Symmetric tensors in basic axes, lower triangle in row order (11,21,22,31,32,33).
     std::array<structure::ExactRational, 6> centre_inertia_kg_m2;

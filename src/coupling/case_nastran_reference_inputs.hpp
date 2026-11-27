@@ -119,7 +119,16 @@ private:
 
 using CaseNastranMassId = io::detail::MeshCaseId<io::SchemaNamespace::Mass>;
 
-enum class CaseNastranParticleFailure : std::uint8_t { Source, Selection, Kind, Mass, Position };
+enum class CaseNastranParticleFailure : std::uint8_t {
+    Source,
+    Selection,
+    Kind,
+    Mass,
+    Position,
+    Frame,
+    Centre,
+    Inertia,
+};
 
 struct CaseNastranParticleDiagnostic {
     CaseNastranParticleFailure reason = CaseNastranParticleFailure::Source;
@@ -127,7 +136,7 @@ struct CaseNastranParticleDiagnostic {
     std::optional<io::detail::NastranBulkPosition> field;
 };
 
-struct CaseNastranParticleMass {
+struct CaseNastranMassAttachment {
     io::detail::RootSnapshotLocation deck, sidecar;
     io::SourceDigest deck_digest, sidecar_digest;
     io::detail::NastranSidecarElementBinding<io::SchemaNamespace::Mass> binding;
@@ -138,6 +147,15 @@ struct CaseNastranParticleMass {
     structure::ExactRational mass_kg;
 };
 
+using CaseNastranParticleMass = CaseNastranMassAttachment;
+
+struct CaseNastranRigidMass {
+    CaseNastranMassAttachment attachment;
+    std::array<structure::ExactRational, 3> centre_metres;
+    // Centroidal tensor in basic axes, lower triangle in row order.
+    std::array<structure::ExactRational, 6> centre_inertia_kg_m2;
+};
+
 // A particle requires one authenticated CONM2, zero lever and centre inertia, and
 // the same original shell GRID at the Case material point on the midsurface.
 [[nodiscard]] core::Result<CaseNastranParticleMass>
@@ -145,5 +163,13 @@ certify_case_nastran_particle_mass(const io::SiCase&, const CaseNastranReference
                                    CaseNastranMassId, const structure::PgReferenceLimits&,
                                    core::ResourcePlan&,
                                    CaseNastranParticleDiagnostic* = nullptr) noexcept;
+
+/// Compare the same shell GRID, the centre p + R c and the centroidal tensor
+/// R I_c R^T in basic coordinates, using an authenticated rigid CONM2.
+[[nodiscard]] core::Result<CaseNastranRigidMass>
+certify_case_nastran_rigid_mass(const io::SiCase&, const CaseNastranReferenceInputs&,
+                                CaseNastranMassId, const structure::PgReferenceLimits&,
+                                core::ResourcePlan&,
+                                CaseNastranParticleDiagnostic* = nullptr) noexcept;
 
 } // namespace uvlas::coupling::detail

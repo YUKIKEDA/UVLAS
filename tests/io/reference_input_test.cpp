@@ -1515,6 +1515,8 @@ $EndElements
     bool thermal_link = false;
     enum class ParticleCase : std::uint8_t { Matching, Decimal, Mass, Point, Lever };
     auto particle_case = ParticleCase::Matching;
+    enum class RigidMassCase : std::uint8_t { None, Matching, Absolute, Frame, Centre, Inertia };
+    auto rigid_mass = RigidMassCase::None;
     bool case_millimetres = false;
     bool wrong_thickness_units = false;
     SECTION("Gmsh group expands and preserves the original rings") {
@@ -1769,6 +1771,36 @@ $EndElements
         native_cards = true;
         particle_case = ParticleCase::Lever;
     }
+    SECTION("An eccentric CONM2 has the same centroidal inertia in a rotated Case frame") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Matching;
+    }
+    SECTION("An absolute CONM2 centre can include an exact nonbinary GRID position") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Absolute;
+    }
+    SECTION("A rigid Case frame must originate at the authenticated GRID") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Frame;
+    }
+    SECTION("An offset with the wrong sign changes the rigid centre") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Centre;
+    }
+    SECTION("A changed product of inertia fails the rigid Case comparison") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Inertia;
+    }
     SECTION("The late native RBE2 error keeps its source field and Case declaration") {
         shell_set = true;
         physical = true;
@@ -1987,11 +2019,16 @@ $EndElements
     }
     if (native_cards) {
         source_text += "CBEAM,905,95,10,20,99\nPBEAM,95,6,2.0,3.0,4.0,,5.0\n";
-        source_text += particle_case == ParticleCase::Lever ? "CONM2,906,10,0,2.0,0.125\n"
-                                                            : "CONM2,906,10,0,2.0\n";
+        if (rigid_mass == RigidMassCase::Absolute)
+            source_text += "CONM2,906,10,-1,2.0,-0.25,0.125,0.475,\n,4.0,.25,3.0,.75,-.5,5.0\n";
+        else if (rigid_mass != RigidMassCase::None)
+            source_text += "CONM2,906,10,0,2.0,-0.25,0.125,0.375,\n,4.0,.25,3.0,.75,-.5,5.0\n";
+        else
+            source_text += particle_case == ParticleCase::Lever ? "CONM2,906,10,0,2.0,0.125\n"
+                                                                : "CONM2,906,10,0,2.0\n";
         source_text += thermal_link ? "RBE2,907,10,123,20,0.001,293.15\n" : "RBE2,907,10,123,20\n";
     }
-    if (particle_case == ParticleCase::Decimal) {
+    if (particle_case == ParticleCase::Decimal || rigid_mass == RigidMassCase::Absolute) {
         for (const auto* node : {"GRID,10,,", "GRID,20,,", "GRID,40,,", "GRID,99,,"}) {
             const auto begin = source_text.find(node);
             REQUIRE(begin != std::string::npos);
@@ -2278,16 +2315,31 @@ $EndElements
     }
     if (native_cards) {
         auto& model = config.field("model");
-        if (particle_case == ParticleCase::Decimal)
+        if (particle_case == ParticleCase::Decimal || rigid_mass == RigidMassCase::Absolute)
             model.field("geometry")
                 .elements.front()
                 .field("frame")
                 .set("origin", fixture::json("[0,0,0.1]"));
         model.field("beams").elements.push_back(fixture::fragment("Beam"));
-        auto mass = fixture::fragment("Mass.particle");
+        auto mass =
+            fixture::fragment(rigid_mass == RigidMassCase::None ? "Mass.particle" : "Mass.rigid");
         mass.set("mass", fixture::json(particle_case == ParticleCase::Mass ? "3" : "2"));
         if (particle_case == ParticleCase::Point)
             mass.field("target").set("coordinates", fixture::json("[1,0,0]"));
+        if (rigid_mass != RigidMassCase::None) {
+            auto& frame = mass.field("frame");
+            frame.set("rotation", fixture::json("[[0,-1,0],[1,0,0],[0,0,1]]"));
+            if (rigid_mass == RigidMassCase::Frame)
+                frame.set("origin", fixture::json("[0,0,0.5]"));
+            if (rigid_mass == RigidMassCase::Absolute)
+                frame.set("origin", fixture::json("[0,0,0.1]"));
+            mass.set("center",
+                     fixture::json(rigid_mass == RigidMassCase::Centre ? "[0.125,-0.25,0.375]"
+                                                                       : "[0.125,0.25,0.375]"));
+            mass.set("inertia", fixture::json(rigid_mass == RigidMassCase::Inertia
+                                                  ? "[[3,-0.25,0.5],[-0.25,4,0.75],[0.5,0.75,5]]"
+                                                  : "[[3,0.25,0.5],[0.25,4,0.75],[0.5,0.75,5]]"));
+        }
         model.field("masses").elements.push_back(std::move(mass));
         model.field("joints").elements.push_back(fixture::fragment("Joint.rigid_attachment"));
         auto& scales = config.field("numerics").field("scales").elements;
@@ -2299,6 +2351,12 @@ $EndElements
             scales.push_back(
                 fixture::json(std::string{R"({"kind":"uniform_components","field":")"} +
                               scale_name + R"(","targets":[],"values":[1,1,1]})"));
+        }
+        if (rigid_mass != RigidMassCase::None) {
+            for (const auto* scale_name : {"rigid_translation", "rigid_rotation"})
+                scales.push_back(
+                    fixture::json(std::string{R"({"kind":"uniform_components","field":")"} +
+                                  scale_name + R"(","targets":[],"values":[1,1,1]})"));
         }
     }
 
@@ -2562,7 +2620,9 @@ $EndElements
                 return;
             }
             if (!native) {
-                FAIL("Native preparation failed");
+                FAIL("Native preparation failed " << static_cast<int>(native.error().code)
+                                                  << ", diagnostic variant "
+                                                  << provenance.card.index());
                 return;
             }
             CHECK_FALSE(provenance.selection);
@@ -2603,6 +2663,36 @@ $EndElements
             using uvlas::coupling::detail::CaseNastranParticleDiagnostic;
             using uvlas::coupling::detail::CaseNastranParticleFailure;
             using uvlas::coupling::detail::certify_case_nastran_particle_mass;
+            using uvlas::coupling::detail::certify_case_nastran_rigid_mass;
+            if (rigid_mass != RigidMassCase::None) {
+                CaseNastranParticleDiagnostic detail;
+                const auto rigid = certify_case_nastran_rigid_mass(
+                    si, *native, CaseNastranMassId{1}, pg_limits, plan, &detail);
+                if (rigid_mass == RigidMassCase::Matching ||
+                    rigid_mass == RigidMassCase::Absolute) {
+                    REQUIRE(rigid);
+                    CHECK(rigid->attachment.grid == rd::NastranGridId{10});
+                    CHECK(rigid->attachment.shell == rd::MeshShellId{1});
+                    CHECK(rigid->attachment.mass_kg == exact("2"));
+                    const auto height = rigid_mass == RigidMassCase::Absolute ? "0.475" : "0.375";
+                    CHECK(rigid->centre_metres ==
+                          (std::array{exact("-0.25"), exact("0.125"), exact(height)}));
+                    CHECK(rigid->centre_inertia_kg_m2 ==
+                          (std::array{exact("4"), exact("-0.25"), exact("3"), exact("-0.75"),
+                                      exact("0.5"), exact("5")}));
+                } else {
+                    REQUIRE_FALSE(rigid);
+                    CHECK(rigid.error().code == core::FailureCode::InvalidInput);
+                    CHECK(detail.element == rd::NastranElementId{906});
+                    CHECK(detail.field.has_value());
+                    CHECK(detail.reason == (rigid_mass == RigidMassCase::Frame
+                                                ? CaseNastranParticleFailure::Frame
+                                            : rigid_mass == RigidMassCase::Centre
+                                                ? CaseNastranParticleFailure::Centre
+                                                : CaseNastranParticleFailure::Inertia));
+                }
+                return;
+            }
             CaseNastranParticleDiagnostic particle_detail;
             const auto particle = certify_case_nastran_particle_mass(
                 si, *native, CaseNastranMassId{1}, pg_limits, plan, &particle_detail);

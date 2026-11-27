@@ -223,6 +223,7 @@ prepare_nastran_basic_mass(const NastranShellCards& shells, const NastranLumpedM
             active = {Reason::Grid, id, card.grid_field.position, {}};
             const auto grid = grid_position(shells, card.grid, units.length, math, work, active);
             const auto length = scale(math, units, {{1, 0, 0, 0}});
+            std::array<Rational, 3> card_position_metres;
             std::array<NastranCartesianInterval, 3> grid_metres, centre_metres,
                 grid_to_centre_metres;
             d::Position lever;
@@ -231,7 +232,8 @@ prepare_nastran_basic_mass(const NastranShellCards& shells, const NastranLumpedM
                           id,
                           position(card.position[i].field).value_or(card.card.position),
                           {}};
-                const auto input = d::number(to_si(math, card.position[i], length), work);
+                card_position_metres[i] = to_si(math, card.position[i], length);
+                const auto input = d::number(card_position_metres[i], work);
                 const auto centre = absolute ? input : m::add(grid[i], input, work);
                 lever[i] = absolute ? m::subtract(input, grid[i], work) : input;
                 grid_metres[i] = retain(grid[i], math, work);
@@ -246,6 +248,7 @@ prepare_nastran_basic_mass(const NastranShellCards& shells, const NastranLumpedM
                                             units,
                                             kind,
                                             std::move(mass_kg),
+                                            std::move(card_position_metres),
                                             std::move(grid_metres),
                                             std::move(centre_metres),
                                             std::move(grid_to_centre_metres),
