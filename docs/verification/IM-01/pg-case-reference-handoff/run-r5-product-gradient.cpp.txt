@@ -1,3 +1,4 @@
+#include "exact_polynomial_detail.hpp"
 #include "r5-product-rule.hpp"
 #include "run-r5-handoff.cpp.txt"
 
@@ -15,6 +16,18 @@ struct LineRule {
         }
     }
 };
+
+auto product_limits() {
+    auto limits = chart_limits(2);
+    limits.gram.arithmetic.maximum_scalar_operations = 50'000'000'000;
+    limits.gram.arithmetic.maximum_partition_visits = 20'000'000'000;
+    limits.gram.arithmetic.algebra.external_memory = ExactEstimateAdmission{profile};
+    limits.gram.arithmetic.algebra.maximum_value_bits =
+        limits.chart.arithmetic.algebra.maximum_value_bits;
+    limits.gram.arithmetic.algebra.maximum_work_bits =
+        limits.chart.arithmetic.algebra.maximum_work_bits;
+    return limits;
+}
 } // namespace
 
 TEST_CASE("R5 tensor product conditioning at the same troublesome physical points",
@@ -24,16 +37,13 @@ TEST_CASE("R5 tensor product conditioning at the same troublesome physical point
     const std::string wire{std::istreambuf_iterator<char>{stream},
                            std::istreambuf_iterator<char>{}};
     const auto source = checked_case_wire(wire);
-    auto limits = chart_limits(2);
-    limits.gram.arithmetic.maximum_scalar_operations = 50'000'000'000;
-    limits.gram.arithmetic.maximum_partition_visits = 20'000'000'000;
-    limits.gram.arithmetic.algebra.external_memory = ExactEstimateAdmission{profile};
-    limits.gram.arithmetic.algebra.maximum_value_bits =
-        limits.chart.arithmetic.algebra.maximum_value_bits;
-    limits.gram.arithmetic.algebra.maximum_work_bits =
-        limits.chart.arithmetic.algebra.maximum_work_bits;
+    const auto limits = product_limits();
     core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+#if defined(UVLAS_R5_SERIAL_BUDGET)
+    core::ResourcePlan plan{1'800'000'000};
+#else
     core::ResourcePlan plan{profile};
+#endif
     core::ResourcePlan select_plan{profile};
     Fixture f;
     auto geometry =
@@ -66,6 +76,13 @@ TEST_CASE("R5 tensor product conditioning at the same troublesome physical point
               << std::chrono::duration<double>(std::chrono::steady_clock::now() - begin).count()
               << '\n'
               << std::flush;
+#if defined(UVLAS_R5_COMPARE_ENDPOINTS)
+    for (const auto& entry : take(gram.enclosure()).upper_triangle) {
+        using uvlas::structure::detail::ExactFactory;
+        std::cout << "R5_FINAL_ENTRY," << ExactFactory::value(entry.lower).str() << ','
+                  << ExactFactory::value(entry.upper).str() << '\n';
+    }
+#endif
     auto cert = take(
         std::move(gram).generate_and_certify(limits.factor_grid, limits.factor, workspace, plan));
     auto patch = take(PgPreparedPatch::prepare(std::move(cert), limits.patch, workspace, plan));
@@ -94,4 +111,60 @@ TEST_CASE("R5 tensor product conditioning at the same troublesome physical point
               << std::flush;
     CHECK(max_magnitude < Decimal("9.95e24"));
     REQUIRE(projected.has_value());
+}
+
+TEST_CASE("R5 retains the full product rule and original support through the Case entrance",
+          "[.r5-product-case-chart][V-PG][SH-D05][verification]") {
+    std::ifstream stream("r5-taper-00/case.json", std::ios::binary);
+    REQUIRE(stream);
+    const std::string wire{std::istreambuf_iterator<char>{stream},
+                           std::istreambuf_iterator<char>{}};
+    Fixture f;
+    const LineRule plane(f, g17);
+    const LineRule depth(f, g3);
+    const std::array binding{
+        cc::CasePgRuleBinding{1, PgVolumeProductRule{plane.views, plane.views, depth.views}}};
+    const auto limits = product_limits();
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    const auto begin = std::chrono::steady_clock::now();
+    const auto chart =
+        take(cc::prepare_case_pg_chart(checked_case_wire(wire), binding, limits, workspace, plan));
+    const double elapsed =
+        std::chrono::duration<double>(std::chrono::steady_clock::now() - begin).count();
+    const auto shell = take(chart.shell_reference(numerics::PatchId{1}, 1));
+    const auto rule = shell.fixed_rule();
+    REQUIRE(rule.size() == 16'473);
+    std::size_t index = 0;
+    for (core::Index volume = 0; volume < 19; ++volume) {
+        for (const auto& radial : plane.views) {
+            const Q width = 1 - q(radial.coordinate);
+            for (const auto& transverse : plane.views) {
+                const Q v = width * q(transverse.coordinate);
+                for (const auto& layer : depth.views) {
+                    const auto& actual = rule[index++];
+                    CHECK(actual.volume == volume);
+                    CHECK(q(actual.u) == q(radial.coordinate));
+                    CHECK(q(actual.v) == v);
+                    CHECK(q(actual.depth) == q(layer.coordinate));
+                    CHECK(q(actual.weight) ==
+                          width * q(radial.weight) * q(transverse.weight) * q(layer.weight));
+                }
+            }
+        }
+    }
+    const auto& original = shell.chart().original();
+    REQUIRE(original.sources().size() == 1);
+    CHECK(original.sources()[0].kind == PgTraceKind::Support);
+    CHECK(original.original_rows().size() == 192);
+    CHECK(shell.chart().pivots().size() == 45);
+    const auto x0 = shell.patch().reference_coordinates();
+    const auto residual = take(original.residual({original.layout(), x0}, limits.chart.arithmetic,
+                                                 workspace, plan));
+    for (const auto& item : residual.values())
+        for (const auto& value : item)
+            CHECK(value.sign() == 0);
+    std::clog << "R5_CASE_PRODUCT," << rule.size() << ',' << original.original_rows().size()
+              << ',' << shell.chart().pivots().size() << ',' << elapsed << ','
+              << plan.allocated_bytes() << '\n';
 }

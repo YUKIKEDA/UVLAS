@@ -1,0 +1,60 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-parallel-product-gram",
+  "ids": ["SH-D07", "N4-02", "N4-08", "V-PG"],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-27",
+  "source_commit": "494256de3281cabce0d58e3474d95477ea437ae2",
+  "scope": "凍結R5のGram端点を並列と直列で照合し、同じ曲面と固定支持をCaseの所有チャートとして準備する。",
+  "inputs": {
+    "frozen_case": "r5-taper-00",
+    "case_sha256": "80044242b860ef7f299bdf56373248b7009cac865a42b311ecd2176a47eeda95",
+    "line_rule_sha256": "35df00e407443c3a20f25b67a350d49a67a4b2ad18aa42c85f2198847c5d3d2a",
+    "volumes": 19,
+    "line_counts": [17, 17, 3],
+    "external_integer_estimate_bytes": 51539607552
+  },
+  "gcc_14_release": {
+    "kernel": "Linux 6.18.58.1-microsoft-standard-WSL2 x86_64",
+    "compiler": "GCC 14.2.0",
+    "cpu": "Intel Core i5-13400F",
+    "parallel": {
+      "payload_limit_bytes": 51539607552,
+      "gram_seconds": 56.5596,
+      "integer_steps": 79611726177,
+      "gram_cumulative_bytes": 1332322513,
+      "projection_cumulative_bytes": 1486760769
+    },
+    "serial": {
+      "payload_limit_bytes": 1800000000,
+      "gram_seconds": 230.836,
+      "integer_steps": 79608746917,
+      "gram_cumulative_bytes": 1225031857,
+      "projection_cumulative_bytes": 1379470113
+    },
+    "interval_endpoints": 25440,
+    "endpoint_rows_sha256": "7f68c5172b663248d27b45f75dd5c18dc79f3018c2658f8e24edb8c35eb2affa",
+    "gradient_projection_maximum_absolute_error_per_metre": 1.66867e-28,
+    "case_chart": {
+      "points": 16473,
+      "original_rows": 192,
+      "rank": 45,
+      "preparation_seconds": 62.815,
+      "cumulative_bytes_after_checks": 1442774721,
+      "assertions": 82947
+    },
+    "targeted_ctests_passed": 3
+  },
+  "windows_release": {
+    "compiler": "MSVC 19.52",
+    "targeted_ctests_passed": 3
+  },
+  "immutable": {
+    "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-domain-protocol.md": "62c963e29b1478c7e41fa57c6f5e130cd3bcbca35f41b0d469c3e2c6309cafe2"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-case-reference-handoff/run-r5-product-gradient.cpp.txt": "6d7fb9cbd3ae7eab0f62090680d119de149667264942c5160b9ffc205142bea9"
+  },
+  "evidence": ["docs/verification/IM-01/pg-case-reference-handoff/parallel-product-gram.md"]
+}
