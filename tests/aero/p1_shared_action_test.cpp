@@ -320,8 +320,9 @@ TEST_CASE("Gauss16 wake samples enclose the fixed age rule and complex phase",
     const std::array boundaries{0., .125, .5};
     const auto make = [&](double frequency, std::uint64_t sample_limit, std::uint64_t work,
                           core::ResourcePlan& plan) {
-        return p::prepare_straight_wake_age_quadrature(context, boundaries, frequency, sample_limit,
-                                                       work, plan);
+        return p::prepare_straight_wake_age_quadrature(context, std::span{boundaries}.first<2>(),
+                                                       {.5, .5}, frequency, sample_limit, work,
+                                                       plan);
     };
     using Gauss = boost::math::quadrature::gauss<Big, 16>;
     const auto& nodes = Gauss::abscissa();
@@ -378,10 +379,10 @@ TEST_CASE("Gauss16 wake samples enclose the fixed age rule and complex phase",
     rejected(make(32., sample_count, 1'000'000, short_storage),
              core::FailureCode::ResourceExceeded);
     CHECK(short_storage.allocated_bytes() == 0);
-    const std::array invalid_ages{0., .125, .125};
+    const std::array invalid_ages{0., 0.};
     core::ResourcePlan invalid{bytes};
-    rejected(p::prepare_straight_wake_age_quadrature(context, invalid_ages, 32., sample_count,
-                                                     1'000'000, invalid),
+    rejected(p::prepare_straight_wake_age_quadrature(context, invalid_ages, {.5, .5}, 32.,
+                                                     sample_count, 1'000'000, invalid),
              core::FailureCode::InvalidInput);
     CHECK(invalid.allocated_bytes() == 0);
 }

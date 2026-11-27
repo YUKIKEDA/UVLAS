@@ -1867,6 +1867,30 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
             reject(solve(steady_flow, request), core::FailureCode::InvalidInput);
             CHECK(steady_flow.source().jet.active());
             view.history.columns = {};
+            const std::array age_panels{0., .125};
+            const cf::StraightWakeHarmonicInput phase{coordinates(3., 0., 0.), age_panels, 4., 32};
+            const auto update =
+                take(cf::assemble_discrete_harmonic_wake(view, phase, solve_limits, memory));
+            CHECK(update.geometry == geometry.context());
+            REQUIRE(update.columns.size() == 1);
+            REQUIRE(update.rows.size() == 1);
+            REQUIRE(update.coefficients.size() == 1);
+            CHECK(update.columns.values().front().edge == fixture.edges[2].id);
+            CHECK(update.columns.values().front().bound_face == fixture.faces[0].id);
+            CHECK(update.rows.values().front().face == fixture.faces[0].id);
+            const auto& coefficient = update.coefficients.values().front();
+            // Independent planar strip integrals and Gauss16 on [0,1/8] and
+            // [1/8,1/3]. The physical closure is 1 m at 3 m/s.
+            CHECK(coefficient.real.lower <= .02372355017383860083);
+            CHECK(coefficient.real.upper >= .02372355017383860083);
+            CHECK(coefficient.imaginary.lower <= .07640431828473117643);
+            CHECK(coefficient.imaginary.upper >= .07640431828473117643);
+            CHECK(coefficient.real.upper - coefficient.real.lower < 1e-12);
+            CHECK(coefficient.imaginary.upper - coefficient.imaginary.lower < 1e-12);
+            auto skewed = phase;
+            skewed.convection_velocity = coordinates(3., .125, 0.);
+            reject(cf::assemble_discrete_harmonic_wake(view, skewed, solve_limits, memory),
+                   core::FailureCode::GeometryInvalid);
             const auto closed = take(solve(steady_flow, request));
             residual_small(take(closed.row(0)).original_residual, rational_word(1e-13));
             const auto& words =

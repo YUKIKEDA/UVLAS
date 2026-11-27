@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aero/p1_shared_action.hpp"
+#include "aero/closed_contour.hpp"
 #include "case_known_flow.hpp"
 
 #include <uvlas/numerics/linear_solve.hpp>
@@ -110,6 +110,38 @@ struct DiscreteNonpenetrationLimits {
     std::uint64_t action_steps;
     std::uint64_t steps;
 };
+
+struct StraightWakeHarmonicInput {
+    NonpenetrationVector convection_velocity;
+    std::span<const double> age_panel_starts_seconds;
+    double angular_frequency;
+    std::uint64_t maximum_samples;
+};
+
+struct HarmonicWakeColumn {
+    aero::detail::EdgeId edge{0};
+    aero::detail::PhysicalFaceId bound_face{
+        0}; ///< Owner of the circulation multiplying this column.
+};
+
+struct HarmonicWakeRow {
+    aero::detail::PhysicalFaceId face{0};
+};
+
+/// Own the finite complex correction to the steady contour. Columns are in
+/// canonical TE edge order. Coefficients are column-major, with rows in
+/// ascending physical bound face order and the TE transfer sign applied.
+struct DiscreteHarmonicWakeUpdate {
+    aero::detail::GeometryContext geometry;
+    core::PlannedBuffer<HarmonicWakeRow> rows;
+    core::PlannedBuffer<HarmonicWakeColumn> columns;
+    core::PlannedBuffer<aero::detail::StraightWakeColumnUpdate> coefficients;
+    std::uint64_t used_steps;
+};
+
+[[nodiscard]] core::Result<DiscreteHarmonicWakeUpdate> assemble_discrete_harmonic_wake(
+    const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+    const DiscreteNonpenetrationLimits&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
 struct DiscreteNonpenetrationRow {
     aero::detail::PhysicalFaceId face{0};

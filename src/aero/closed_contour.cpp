@@ -337,8 +337,8 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
 } // namespace
 
 AeroResult<StraightWakeAgeQuadrature>
-prepare_straight_wake_age_quadrature(const GeometryContext& context,
-                                     std::span<const double> boundaries, double frequency,
+prepare_straight_wake_age_quadrature(const GeometryContext& context, std::span<const double> starts,
+                                     ContourInterval retained_end, double frequency,
                                      std::uint64_t maximum_samples, std::uint64_t maximum_steps,
                                      core::ResourcePlan& plan, std::stop_token stop) noexcept {
     return guard<StraightWakeAgeQuadrature>(context, [&] {
@@ -346,17 +346,18 @@ prepare_straight_wake_age_quadrature(const GeometryContext& context,
             reject(core::FailureCode::Cancelled);
         if (!p1_environment_supported())
             reject(core::FailureCode::PrecisionUnsupported);
-        if (boundaries.size() < 2 || boundaries.front() != 0 || !std::isfinite(frequency))
+        if (starts.empty() || starts.front() != 0 || !std::isfinite(frequency) ||
+            !valid(retained_end) || !(retained_end.lower > starts.back()))
             reject(invalid);
         constexpr auto order = p1::gauss_16.size();
-        const auto count = times(boundaries.size() - 1, order);
+        const auto count = times(starts.size(), order);
         if (count > maximum_samples)
             reject(exhausted);
         p1::Work work{0, maximum_steps, stop};
         try {
-            for (std::size_t i = 1; i < boundaries.size(); ++i) {
+            for (std::size_t i = 1; i < starts.size(); ++i) {
                 work.step();
-                if (!std::isfinite(boundaries[i]) || boundaries[i] <= boundaries[i - 1])
+                if (!std::isfinite(starts[i]) || starts[i] <= starts[i - 1])
                     reject(invalid);
             }
             std::array<p1::Interval, order> nodes, weights;
@@ -380,9 +381,12 @@ prepare_straight_wake_age_quadrature(const GeometryContext& context,
             core::PlannedBuffer<StraightWakeAgeSample> samples;
             allocate(samples, count, plan, context);
             std::size_t out = 0;
-            auto left = decode_p1_word(boundaries.front());
-            for (const auto hi : boundaries.subspan(1)) {
-                const auto right = decode_p1_word(hi);
+            auto left = decode_p1_word(starts.front());
+            for (std::size_t panel = 0; panel < starts.size(); ++panel) {
+                const auto right = panel + 1 < starts.size()
+                                       ? decode_p1_word(starts[panel + 1])
+                                       : p1::Interval{decode_p1_word(retained_end.lower).lower,
+                                                      decode_p1_word(retained_end.upper).upper};
                 const auto width = p1::subtract(right, left, work);
                 for (std::size_t i = 0; i < order; ++i) {
                     const auto age = p1::add(left, p1::multiply(width, nodes[i], work), work);

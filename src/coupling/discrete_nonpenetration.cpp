@@ -1707,6 +1707,133 @@ struct NonpenetrationBuilder {
                 limits.induction.kernel.external_memory};
     }
 
+    static DiscreteHarmonicWakeUpdate harmonic_wake(const DiscreteNonpenetrationInput& input,
+                                                    const StraightWakeHarmonicInput& phase,
+                                                    const DiscreteNonpenetrationLimits& limits,
+                                                    core::ResourcePlan& memory,
+                                                    const std::stop_token& stop) {
+        if (input.wake.empty() ||
+            !std::holds_alternative<SteadyWakeClosure>(input.wake.front().trailing))
+            reject(core::FailureCode::InvalidInput);
+        p::Work work{0, limits.steps, stop};
+        const auto assembly = assemble(input, limits, memory, work, true);
+        const auto& geometry = require(input.contact.geometry()).get();
+        const auto velocity = import(phase.convection_velocity, work);
+        const auto component = std::ranges::find_if(velocity, [](const p::Interval& value) {
+            return p::compare(value.lower, {}) > 0 || p::compare(value.upper, {}) < 0;
+        });
+        if (component == velocity.end())
+            reject(core::FailureCode::InvalidInput);
+        const auto axis = static_cast<std::size_t>(component - velocity.begin());
+        const auto point = [&](a::PointId id) {
+            return import(require(geometry.point_words(id, a::Configuration::Current)), work);
+        };
+        const auto equal = [](const p::Interval& left, const p::Interval& right) {
+            if (p::compare(left.upper, right.lower) < 0 || p::compare(right.upper, left.lower) < 0)
+                reject(core::FailureCode::GeometryInvalid);
+            if (p::compare(left.lower, right.upper) != 0 ||
+                p::compare(left.upper, right.lower) != 0)
+                reject(core::FailureCode::PrecisionUnresolved);
+        };
+        struct Band {
+            HarmonicWakeColumn column;
+            a::ContourVector first{}, second{};
+            std::int8_t sign{};
+        };
+        auto bands = allocate<Band>(memory, input.wake.size());
+        Vector common_translation{};
+        for (std::size_t b = 0; b < bands.size(); ++b) {
+            const auto panel =
+                require(input.contact.uvlm_quad(input.wake[b].facet, remaining(work), stop));
+            account(work, panel.used_steps);
+            if (!panel.attachment)
+                reject(core::FailureCode::GeometryInvalid);
+            const auto& attached = *panel.attachment;
+            const auto first = point(panel.corners[0]), second = point(panel.corners[1]);
+            const auto left = difference(point(panel.corners[3]), first, work);
+            const auto right = difference(point(panel.corners[2]), second, work);
+            if (b == 0)
+                common_translation = left;
+            for (std::size_t j = 0; j < left.size(); ++j) {
+                equal(left[j], common_translation[j]);
+                equal(right[j], common_translation[j]);
+            }
+            bands.values()[b] = {{attached.edge, attached.bound_face},
+                                 contour_bounds(first),
+                                 contour_bounds(second),
+                                 attached.coefficient};
+        }
+        for (std::size_t j = 0; j < common_translation.size(); ++j) {
+            if (j != axis)
+                equal(p::multiply(common_translation[j], *component, work),
+                      p::multiply(common_translation[axis], velocity[j], work));
+        }
+        const auto end_age = p::divide(common_translation[axis], *component, work);
+        require_positive(end_age);
+        auto quadrature = require(a::prepare_straight_wake_age_quadrature(
+            geometry.context(), phase.age_panel_starts_seconds, contour_bounds(end_age),
+            phase.angular_frequency, phase.maximum_samples, remaining(work), memory, stop));
+        account(work, quadrature.interval_steps);
+        std::ranges::sort(bands.values(), [&](const Band& l, const Band& r) {
+            work.step();
+            return l.column.edge < r.column.edge;
+        });
+        auto columns = allocate<HarmonicWakeColumn>(memory, bands.size());
+        for (std::size_t i = 0; i < bands.size(); ++i) {
+            work.step();
+            columns.values()[i] = bands.values()[i].column;
+        }
+        const auto count = assembly.bound.size();
+        auto rows = allocate<HarmonicWakeRow>(memory, count);
+        auto coefficients =
+            allocate<a::StraightWakeColumnUpdate>(memory, multiply_budget(count, bands.size()));
+        const auto core = contour_bounds(import(require(geometry.core_radius()), work));
+        const auto speed = contour_bounds(velocity);
+        auto contact =
+            require(a::GlobalWorkspace::create(memory, limits.induction.kernel.external_memory));
+        auto coordinates = require(a::GeometryWorkspace::create(memory));
+        auto index = require(a::ContourContactIndex::prepare(
+            input.contact, contour_limits(limits, work), *contact, memory, stop));
+        account(work, index.preparation_steps());
+        for (std::size_t i = 0; i < count; ++i) {
+            const auto& row = assembly.bound.values()[i];
+            rows.values()[i].face = row.panel.face;
+            const auto& supplied = input.collocations[row.caller];
+            account(work, require(index.qualify(supplied.query, {}, limits.induction.geometry,
+                                                contour_limits(limits, work), *coordinates,
+                                                *contact, stop))
+                              .steps);
+            const auto normal = contour_bounds(qualify_normal(geometry, row.panel, supplied, work));
+            auto query_limits = limits.induction.geometry;
+            query_limits.max_steps = std::min(query_limits.max_steps, remaining(work));
+            const auto query = require(a::exact_query_coordinates(
+                geometry, supplied.query, query_limits, *coordinates, stop));
+            account(work, query.used_steps);
+            a::ContourVector location{};
+            for (std::size_t j = 0; j < location.size(); ++j)
+                location[j] = contour_bounds(
+                    p::exact(query.numerator[j],
+                             -static_cast<int>(a::ExactQueryCoordinates::denominator_shift)));
+            for (std::size_t b = 0; b < bands.size(); ++b) {
+                const auto& band = bands.values()[b];
+                const auto samples = quadrature.samples.values();
+                account(work, samples.size());
+                auto coefficient = require(a::project_straight_wake_column_update(
+                    geometry.context(), band.first, band.second, speed, core, location, normal,
+                    samples, samples.size(), stop));
+                if (band.sign < 0) {
+                    coefficient.real = {-coefficient.real.upper, -coefficient.real.lower};
+                    coefficient.imaginary = {-coefficient.imaginary.upper,
+                                             -coefficient.imaginary.lower};
+                }
+                coefficients.values()[b * count + i] = coefficient;
+            }
+        }
+        work.step();
+        return {geometry.context(), std::move(rows), std::move(columns), std::move(coefficients),
+                work.used};
+    }
+
     static ContourSession contour_session(const a::ClosedContour& contour,
                                           const DiscreteNonpenetrationLimits& limits,
                                           core::ResourcePlan& memory) {
@@ -4004,6 +4131,24 @@ struct NonpenetrationBuilder {
         return {std::move(solution), std::move(rows), sense, work.used};
     }
 };
+
+core::Result<DiscreteHarmonicWakeUpdate>
+assemble_discrete_harmonic_wake(const DiscreteNonpenetrationInput& input,
+                                const StraightWakeHarmonicInput& phase,
+                                const DiscreteNonpenetrationLimits& limits,
+                                core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::harmonic_wake(input, phase, limits, memory, stop);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
 
 core::Result<CirculationRowReplay> verify_discrete_circulation_row_replay(
     const DiscreteNonpenetrationInput& input, const DiscreteCirculation& retained,
