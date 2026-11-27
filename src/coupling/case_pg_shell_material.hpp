@@ -27,6 +27,11 @@ struct CasePgInitialGreenValue {
     std::array<structure::PgReferenceScalar, 6> mandel;
     std::array<structure::ExactRational, 6> declared_error;
     structure::PgReferenceCallInfo work;
+
+    [[nodiscard]] structure::PgInitialGreenEnclosure enclosure() const& noexcept {
+        return {g, mandel, declared_error};
+    }
+    [[nodiscard]] structure::PgInitialGreenEnclosure enclosure() const&& = delete;
 };
 
 /// Own the layer intervals and reusable normalized laws for a qualified Case

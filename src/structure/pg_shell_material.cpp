@@ -1,5 +1,7 @@
-#include "pg_reference_arithmetic.hpp"
+#include "pg_reference_projection.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <uvlas/structure/pg_shell_material.hpp>
 
 namespace uvlas::structure {
@@ -210,11 +212,101 @@ PgShellMaterialResponse response(const PgShellElasticLaw& law, const Mandel& ini
 }
 
 template <class F>
-core::Result<PgShellMaterialResponse> evaluate(F&& f) noexcept {
+auto evaluate(F&& f) noexcept {
     auto result = partition_entry(std::forward<F>(f));
     if (!result)
         result.error().operation = core::Operation::EvaluateStructure;
     return result;
+}
+
+using Bound = PgMaterialEnclosure;
+
+struct MaterialBounds {
+    ReferenceArithmetic& math;
+
+    Bound add(const Bound& a, const Bound& b) const {
+        return {math.add(a.lower, b.lower), math.add(a.upper, b.upper)};
+    }
+    Bound sub(const Bound& a, const Bound& b) const {
+        return {math.sub(a.lower, b.upper), math.sub(a.upper, b.lower)};
+    }
+    Bound scale(const Bound& a, const R& factor) const {
+        if (factor.sign() < 0)
+            return {math.mul(a.upper, factor), math.mul(a.lower, factor)};
+        return {math.mul(a.lower, factor), math.mul(a.upper, factor)};
+    }
+    Bound multiply(const Bound& a, const Bound& b) const {
+        if ((a.lower.sign() == 0 && a.upper.sign() == 0) ||
+            (b.lower.sign() == 0 && b.upper.sign() == 0))
+            return {};
+        std::array products{math.mul(a.lower, b.lower), math.mul(a.lower, b.upper),
+                            math.mul(a.upper, b.lower), math.mul(a.upper, b.upper)};
+        const auto [low, high] = std::ranges::minmax_element(
+            products, [&](const R& x, const R& y) { return math.compare(x, y) < 0; });
+        return {math.copy(*low), math.copy(*high)};
+    }
+    Bound square(const Bound& a) const {
+        auto left = math.square(a.lower), right = math.square(a.upper);
+        if (math.compare(left, right) > 0)
+            std::swap(left, right);
+        if (a.lower.sign() <= 0 && a.upper.sign() >= 0)
+            left = {};
+        return {std::move(left), std::move(right)};
+    }
+    Bound root(const R& g) const {
+        if (g.sign() <= 0)
+            partition_fail(invalid);
+        const R zero;
+        const detail::PgProjectionComparator squared{math, zero, 0};
+        const detail::PgPositiveRootComparator comparator{math, squared, g};
+        const auto high = detail::reference_binary64(math, detail::pg_round_word(comparator, {}));
+        if (comparator.compare({}, high) == 0)
+            return {math.copy(high), math.copy(high)};
+        const auto negative_high = math.neg(high);
+        const auto low = detail::pg_round_word(comparator, negative_high);
+        const auto low_exact = detail::reference_binary64(math, low);
+        if (comparator.compare(negative_high, low_exact) == 0) {
+            auto root_value = math.add(high, low_exact);
+            return {math.copy(root_value), std::move(root_value)};
+        }
+        // The two-word residual is rounded to nearest. Its adjacent words
+        // therefore enclose the exact residual even at subnormal boundaries.
+        const auto inf = std::numeric_limits<double>::infinity();
+        return {math.add(high, detail::reference_binary64(math, std::nextafter(low, -inf))),
+                math.add(high, detail::reference_binary64(math, std::nextafter(low, inf)))};
+    }
+    Bound radical(const PgReferenceScalar& value, const Bound& root) const {
+        if (value.radical.sign() == 0)
+            return {math.copy(value.rational), math.copy(value.rational)};
+        auto term = scale(root, value.radical);
+        return {math.add(value.rational, term.lower), math.add(value.rational, term.upper)};
+    }
+};
+
+void require_positive(const Bound& value) {
+    if (value.upper.sign() <= 0)
+        partition_fail(invalid);
+    if (value.lower.sign() <= 0)
+        partition_fail(unresolved);
+}
+
+void qualify_natural_metric(const std::array<Bound, order>& initial, const Bound& sqrt_two,
+                            const R& two, const MaterialBounds& bounds) {
+    const auto one = bounds.math.constant("1");
+    const Bound unit{bounds.math.copy(one), bounds.math.copy(one)};
+    const auto a = bounds.add(unit, bounds.scale(initial[0], two));
+    const auto b = bounds.add(unit, bounds.scale(initial[1], two));
+    const auto c = bounds.add(unit, bounds.scale(initial[2], two));
+    const auto yz = bounds.multiply(sqrt_two, initial[3]);
+    const auto xz = bounds.multiply(sqrt_two, initial[4]);
+    const auto xy = bounds.multiply(sqrt_two, initial[5]);
+    require_positive(a);
+    const auto leading = bounds.sub(bounds.multiply(a, b), bounds.square(xy));
+    require_positive(leading);
+    const auto triple = bounds.scale(bounds.multiply(xy, bounds.multiply(xz, yz)), two);
+    const auto cross =
+        bounds.add(bounds.multiply(a, bounds.square(yz)), bounds.multiply(b, bounds.square(xz)));
+    require_positive(bounds.sub(bounds.add(bounds.multiply(leading, c), triple), cross));
 }
 } // namespace
 
@@ -315,6 +407,56 @@ evaluate_pg_shell_material(const PgShellElasticLaw& law, const PgInitialGreenStr
         const auto two = math.constant("2");
         const auto strain = normalize_initial(initial, two, math);
         return response(law, strain, green, two, math);
+    });
+}
+
+core::Result<PgShellMaterialEnclosure>
+enclose_pg_shell_material(const PgShellElasticLaw& law, const PgInitialGreenEnclosure& input,
+                          const std::array<PgMaterialEnclosure, 6>& green,
+                          const PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellMaterialEnclosure> {
+        ReferenceArithmetic math{limits, plan};
+        math.admit();
+        if (law.density_kg_m3().sign() <= 0 || input.radicand.sign() <= 0)
+            partition_fail(invalid);
+        const MaterialBounds bounds{math};
+        const auto two = math.constant("2");
+        const auto sqrt_two = bounds.root(two);
+        const auto distinct_root =
+            input.radicand != two && std::ranges::any_of(input.mandel, [](const auto& value) {
+                return value.radical.sign() != 0;
+            });
+        const auto separate_root = distinct_root ? bounds.root(input.radicand) : Bound{};
+        const auto& field_root = distinct_root ? separate_root : sqrt_two;
+        std::array<Bound, order> initial, elastic, stress;
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto& error = input.absolute_error[i];
+            if (error.sign() < 0 || math.compare(green[i].lower, green[i].upper) > 0)
+                partition_fail(invalid);
+            auto centre = bounds.radical(input.mandel[i], field_root);
+            initial[i] = {math.sub(centre.lower, error), math.add(centre.upper, error)};
+            elastic[i] = bounds.sub(green[i], initial[i]);
+        }
+        qualify_natural_metric(initial, sqrt_two, two, bounds);
+        Bound doubled_energy;
+        for (std::size_t i = 0; i < order; ++i) {
+            for (std::size_t j = 0; j < order; ++j) {
+                const auto stiffness = bounds.radical(law.stiffness()[i * order + j], sqrt_two);
+                const auto linear = bounds.multiply(stiffness, elastic[j]);
+                stress[i] = bounds.add(stress[i], linear);
+                if (i == j) {
+                    doubled_energy = bounds.add(
+                        doubled_energy, bounds.multiply(stiffness, bounds.square(elastic[i])));
+                } else if (i < j) {
+                    const auto cross = bounds.multiply(elastic[i], linear);
+                    doubled_energy = bounds.add(doubled_energy, bounds.scale(cross, two));
+                }
+            }
+        }
+        if (doubled_energy.lower.sign() < 0)
+            doubled_energy.lower = {}; // Positive definite law bounds the energy from below.
+        Bound energy{math.div(doubled_energy.lower, two), math.div(doubled_energy.upper, two)};
+        return PgShellMaterialEnclosure{std::move(energy), std::move(stress), math.info()};
     });
 }
 } // namespace uvlas::structure

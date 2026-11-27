@@ -196,4 +196,56 @@ TEST_CASE("Material point energy and stress are conjugate in all Mandel componen
         CHECK(stress.radical.sign() == 0);
     }
 }
+TEST_CASE("Shell material bounds retain independent radicals and initial field errors",
+          "[MAT-D04][MAT-D08][V-MAT][verification][negative]") {
+    Fixture f;
+    auto stiffness = f.identity();
+    stiffness[3] = f.q("1", "8");
+    stiffness[18] = f.q("1", "8");
+    const auto law = PgShellElasticLaw::prepare(
+        PgEffectiveElasticity{stiffness, PgMaterialComponents::Engineering}, f.q("1"), f.limits,
+        f.memory);
+    REQUIRE(law);
+    const auto g = f.q("3");
+    std::array<PgReferenceScalar, 6> initial;
+    initial[0].radical = f.q("1", "8");
+    std::array<ExactRational, 6> uncertainty;
+    const std::array<PgMaterialEnclosure, 6> green;
+    const PgInitialGreenEnclosure input{g, initial, uncertainty};
+    const auto evaluated = enclose_pg_shell_material(*law, input, green, f.limits, f.memory);
+    REQUIRE(evaluated);
+    const auto compare = [&](const ExactRational& x, const ExactRational& y) {
+        const auto relation = x.compare(y, f.limits.algebra, f.memory);
+        REQUIRE(relation);
+        return *relation;
+    };
+    // S_yz in Mandel form is -sqrt(6)/64. Compare through the exact square
+    // so the test does not depend on a binary approximation of either radical.
+    const auto& shear = evaluated->second_pk_mandel_pascal[3];
+    REQUIRE(shear.upper.sign() < 0);
+    const auto lower_square = shear.lower.multiply(shear.lower, f.limits.algebra, f.memory);
+    const auto upper_square = shear.upper.multiply(shear.upper, f.limits.algebra, f.memory);
+    REQUIRE(lower_square);
+    REQUIRE(upper_square);
+    const auto expected_square = f.q("3", "2048");
+    CHECK(compare(*lower_square, expected_square) > 0);
+    CHECK(compare(*upper_square, expected_square) < 0);
+    const auto width = shear.upper.subtract(shear.lower, f.limits.algebra, f.memory);
+    REQUIRE(width);
+    CHECK(compare(*width, f.q("1", "100000000000000000000000000000")) < 0);
+    const auto& energy = evaluated->energy_joules_per_cubic_metre;
+    const auto expected_energy = f.q("3", "128");
+    CHECK(compare(energy.lower, expected_energy) < 0);
+    CHECK(compare(energy.upper, expected_energy) > 0);
+
+    initial[0] = {f.q("-49", "100"), {}};
+    uncertainty[0] = f.q("1", "50");
+    const auto unresolved = enclose_pg_shell_material(*law, input, green, f.limits, f.memory);
+    REQUIRE_FALSE(unresolved);
+    CHECK(unresolved.error().code == core::FailureCode::PrecisionUnresolved);
+    initial[0].rational = f.q("-3", "4");
+    const auto invalid = enclose_pg_shell_material(*law, input, green, f.limits, f.memory);
+    REQUIRE_FALSE(invalid);
+    CHECK(invalid.error().code == core::FailureCode::InvalidInput);
+}
 } // namespace

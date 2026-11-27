@@ -108,6 +108,29 @@ struct PgShellMaterialResponse {
     PgReferenceCallInfo work;
 };
 
+struct PgMaterialEnclosure {
+    ExactRational lower, upper;
+};
+
+struct PgInitialGreenEnclosure {
+    const ExactRational& radicand;
+    const std::array<PgReferenceScalar, 6>& mandel;
+    const std::array<ExactRational, 6>& absolute_error;
+};
+
+struct PgShellMaterialEnclosure {
+    PgMaterialEnclosure energy_joules_per_cubic_metre;
+    std::array<PgMaterialEnclosure, 6> second_pk_mandel_pascal;
+    PgReferenceCallInfo work;
+};
+
+/// Evaluate the whole input uncertainty in the fixed reference material frame.
+/// Require a positive natural metric throughout the initial strain enclosure.
+[[nodiscard]] core::Result<PgShellMaterialEnclosure>
+enclose_pg_shell_material(const PgShellElasticLaw&, const PgInitialGreenEnclosure&,
+                          const std::array<PgMaterialEnclosure, 6>& green_mandel,
+                          const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
 /// Evaluate the reference-volume law in the fixed material axes. Each
 /// Green strain component is an exact Mandel value a+b sqrt(2). The stress
 /// tangent with respect to these components is the prepared stiffness.

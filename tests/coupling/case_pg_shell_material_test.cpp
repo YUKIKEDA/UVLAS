@@ -144,6 +144,15 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
     CHECK(polynomial->mandel[0].rational == q("1", "32"));
     CHECK(polynomial->mandel[0].radical.sign() == 0);
     CHECK(polynomial->declared_error[0] == q("1", "1000"));
+    const std::array<pg::PgMaterialEnclosure, 6> unstrained;
+    const auto bounded =
+        pg::enclose_pg_shell_material(shared, polynomial->enclosure(), unstrained, limits, memory);
+    REQUIRE(bounded);
+    // For E=0, the two endpoints come from e0xx=1/32 +/- 1/1000.
+    CHECK(bounded->second_pk_mandel_pascal[0].lower == q("-3870"));
+    CHECK(bounded->second_pk_mandel_pascal[0].upper == q("-3630"));
+    CHECK(bounded->energy_joules_per_cubic_metre.lower == q("43923", "800"));
+    CHECK(bounded->energy_joules_per_cubic_metre.upper == q("49923", "800"));
     const std::array chart_right{q("3", "4"), q("0"), q("3", "4")};
     const auto second =
         owned->sample_initial_green(si, 3, {chart_right, local, world, g}, limits, memory);
