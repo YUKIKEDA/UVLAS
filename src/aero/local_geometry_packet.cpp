@@ -3,6 +3,7 @@
 #include "global_geometry.hpp"
 #include "local_geometry_bounds_private.hpp"
 #include "local_geometry_input_private.hpp"
+#include "shared_p1_reuse_private.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -198,7 +199,8 @@ public:
     prepare(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
             LocalAccuracy accuracy, const GeometryLimits& limits, LocalPacketWorkspace& workspace,
             core::ResourcePlan& plan, const std::stop_token& stop, bool bound = false,
-            std::optional<EdgeId> alias = {}, std::uint64_t alias_steps = 0) noexcept {
+            std::optional<EdgeId> alias = {}, std::uint64_t alias_steps = 0,
+            SharedP1ReuseSlot<LocalGeometryPacket>* slot = nullptr) noexcept {
         const auto context = geometry.context();
         auto lease = workspace.acquire(context.diagnostics);
         if (!lease)
@@ -225,7 +227,8 @@ public:
                 const LocalClock clock{accuracy.collect_timings ? &measured.classification
                                                                 : nullptr};
                 return GeometryPacketAccess::load(geometry, query, target, local_limits,
-                                                  *workspace.geometry_, *lease, plan, stop);
+                                                  *workspace.geometry_, *lease, plan, stop,
+                                                  slot != nullptr ? slot->predicate_ : nullptr);
             }();
             if (!input) {
                 auto failure = input.error();
@@ -234,7 +237,7 @@ public:
                     failure.problem.reset();
                 return std::unexpected(failure);
             }
-            const auto* outcome = input->classification.outcome();
+            const auto* outcome = input->outcome();
             if (!outcome)
                 return std::unexpected(packet_failure(core::FailureCode::InvalidInput, context));
             const auto* relation = std::get_if<NondegenerateTriangle>(outcome);
@@ -270,9 +273,24 @@ public:
                     packet_failure(core::FailureCode::ResourceExceeded, context));
             const auto& facet =
                 input->owner->facets.values()[static_cast<std::size_t>(input->facet)];
-            auto storage = plan.allocate<LocalPacketStorage>(1, operation);
-            if (!storage)
-                return std::unexpected(packet_failure(storage.error(), context));
+            core::PlannedBuffer<LocalPacketStorage> fresh;
+            if (slot == nullptr || !slot->value_) {
+                auto storage = plan.allocate<LocalPacketStorage>(1, operation);
+                if (!storage)
+                    return std::unexpected(packet_failure(storage.error(), context));
+                if (slot != nullptr)
+                    slot->value_.emplace(LocalGeometryPacket{std::move(*storage), context});
+                else
+                    fresh = std::move(*storage);
+            }
+            auto* storage = &fresh;
+            if (slot != nullptr) {
+                auto& current = slot->value_;
+                if (!current)
+                    return std::unexpected(
+                        packet_failure(core::FailureCode::InvalidInput, context));
+                storage = &current->storage_;
+            }
             const auto& data = *input->owner;
             std::array<PointId, 3> vertices{PointId{0}, PointId{0}, PointId{0}};
             std::array<EdgeId, 3> edges{EdgeId{0}, EdgeId{0}, EdgeId{0}};
@@ -534,23 +552,26 @@ AeroResult<LocalGeometryPacket>
 prepare_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
                      LocalAccuracy accuracy, const GeometryLimits& limits,
                      LocalPacketWorkspace& workspace, core::ResourcePlan& plan,
-                     const std::stop_token& stop) noexcept {
+                     const std::stop_token& stop,
+                     SharedP1ReuseSlot<LocalGeometryPacket>* slot) noexcept {
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop);
+                                      stop, false, {}, 0, slot);
 }
 AeroResult<LocalGeometryPacket>
 prepare_bound_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& query,
                            FacetId target, LocalAccuracy accuracy, const GeometryLimits& limits,
                            LocalPacketWorkspace& workspace, core::ResourcePlan& plan,
-                           const std::stop_token& stop) noexcept {
+                           const std::stop_token& stop,
+                           SharedP1ReuseSlot<LocalGeometryPacket>* slot) noexcept {
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop, true);
+                                      stop, true, {}, 0, slot);
 }
 AeroResult<LocalGeometryPacket>
 prepare_aliased_midpoint_packet(const GlobalContactState& contact, const ResolvedQuery& query,
                                 FacetId target, bool bound, LocalAccuracy accuracy,
                                 const GeometryLimits& limits, LocalPacketWorkspace& workspace,
-                                core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
+                                core::ResourcePlan& plan, const std::stop_token& stop,
+                                SharedP1ReuseSlot<LocalGeometryPacket>* slot) noexcept {
     const auto checked = contact.geometry();
     if (!checked)
         return std::unexpected(checked.error().origin);
@@ -573,6 +594,6 @@ prepare_aliased_midpoint_packet(const GlobalContactState& contact, const Resolve
         return std::unexpected(relationship.error().origin);
     const auto [alias, used_steps] = *relationship;
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop, bound, alias, 1 + used_steps);
+                                      stop, bound, alias, 1 + used_steps, slot);
 }
 } // namespace uvlas::aero::detail

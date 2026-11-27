@@ -48,6 +48,9 @@ public:
                                                         std::span<const Scalar> values,
                                                         core::ResourcePlan& plan,
                                                         core::Operation operation) noexcept;
+    /// Allocate zero-initialized column-major storage, including padding.
+    [[nodiscard]] static core::Result<DenseMatrix>
+    zeroed(DenseShape shape, core::ResourcePlan& plan, core::Operation operation) noexcept;
     /// Return dimensions and column stride.
     [[nodiscard]] DenseShape shape() const noexcept {
         return shape_;

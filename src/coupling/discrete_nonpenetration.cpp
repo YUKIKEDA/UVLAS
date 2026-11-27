@@ -350,11 +350,11 @@ std::pair<numerics::DenseReal, numerics::DenseReal> dense_inputs(std::size_t ord
     if (order != 0 && order > maximum / order)
         reject(core::FailureCode::ResourceExceeded);
     const auto n = static_cast<core::Index>(order);
-    const auto zeros = allocate<double>(memory, sum_budget(order * order, order));
-    return {require(numerics::DenseReal::copy({n, n, n}, zeros.values().first(order * order),
-                                              memory, core::Operation::SolveLinear)),
-            require(numerics::DenseReal::copy({n, 1, n}, zeros.values().subspan(order * order),
-                                              memory, core::Operation::SolveLinear))};
+    const auto elements = sum_budget(order * order, order);
+    if (elements > memory.remaining_bytes() / sizeof(double))
+        reject(core::FailureCode::ResourceExceeded);
+    return {require(numerics::DenseReal::zeroed({n, n, n}, memory, core::Operation::SolveLinear)),
+            require(numerics::DenseReal::zeroed({n, 1, n}, memory, core::Operation::SolveLinear))};
 }
 
 linear::Solution<double> solve_projected(const numerics::DenseReal& matrix, numerics::DenseReal rhs,
@@ -606,7 +606,6 @@ Vector ambient_direction_at(const KnownRowData& known, const DiscreteCirculation
 struct PrimalCirculationData {
     linear::Solution<double> solution;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows;
-    std::optional<a::P1ActionValue> geometry_owner;
     core::PlannedBuffer<NativeCirculationRows> operator_rows;
     a::PreparedTopologyOwner source;
     std::uint64_t steps;
@@ -1147,12 +1146,19 @@ struct NonpenetrationBuilder {
                                             const DiscreteNonpenetrationLimits& limits,
                                             a::SharedP1Workspace& shared,
                                             a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
-                                            core::ResourcePlan& memory, p::Work& work) {
+                                            core::ResourcePlan& memory, p::Work& work,
+                                            a::BoundWakeFacetStorage* storage = nullptr) {
         auto induction_limits = limits.induction;
         induction_limits.steps = std::min(induction_limits.steps, remaining(work));
-        auto action = require(a::prepare_bound_wake_induction(
-            source, assembly.maps.values(), assembly.ids.values(), limits.geometry_accuracy,
-            limits.induction_accuracy, induction_limits, shared, local, kernel, memory, work.stop));
+        auto action = require(
+            storage != nullptr ? a::prepare_bound_wake_induction_reusing_facets(
+                                     source, assembly.maps.values(), assembly.ids.values(),
+                                     limits.geometry_accuracy, limits.induction_accuracy,
+                                     induction_limits, shared, local, kernel, *storage, work.stop)
+                               : a::prepare_bound_wake_induction(
+                                     source, assembly.maps.values(), assembly.ids.values(),
+                                     limits.geometry_accuracy, limits.induction_accuracy,
+                                     induction_limits, shared, local, kernel, memory, work.stop));
         account(work, require(action.report()).used_steps);
         return action;
     }
@@ -1351,11 +1357,21 @@ struct NonpenetrationBuilder {
                        const Vector& normal, std::span<const a::P1ComplexWords> directions,
                        TransferAt transfer_at, a::SharedP1Workspace& shared,
                        core::ResourcePlan& memory, const DiscreteNonpenetrationLimits& limits,
-                       std::span<p::Interval> influence, p::Work& work) {
-        const auto transpose = [&](std::size_t axis) {
-            return adjoint_axis(action, source, directions, axis, limits, shared, memory, work);
-        };
-        const std::array coefficients{transpose(0), transpose(1), transpose(2)};
+                       std::span<p::Interval> influence, p::Work& work,
+                       std::span<p::Interval> strength_work = {}) {
+        std::optional<std::array<a::P1ActionAdjoint, 3>> coefficients;
+        if (strength_work.empty()) {
+            const auto transpose = [&](std::size_t axis) {
+                return adjoint_axis(action, source, directions, axis, limits, shared, memory, work);
+            };
+            coefficients.emplace(std::array{transpose(0), transpose(1), transpose(2)});
+        } else {
+            const auto available = remaining(work);
+            const auto steps =
+                limits.action_steps > available / 3 ? available : 3 * limits.action_steps;
+            account(work, require(a::project_real_strength_transpose(action, source, strength_work,
+                                                                     steps, shared, work.stop)));
+        }
         for (auto& entry : influence) {
             work.step();
             entry = {};
@@ -1365,9 +1381,14 @@ struct NonpenetrationBuilder {
             const auto transfer = transfer_at(i);
             if (!transfer)
                 continue;
-            const Vector spatial{import(require(coefficients[0].strength(i)).real, work),
-                                 import(require(coefficients[1].strength(i)).real, work),
-                                 import(require(coefficients[2].strength(i)).real, work)};
+            const auto spatial = [&] {
+                if (coefficients)
+                    return Vector{import(require((*coefficients)[0].strength(i)).real, work),
+                                  import(require((*coefficients)[1].strength(i)).real, work),
+                                  import(require((*coefficients)[2].strength(i)).real, work)};
+                return Vector{strength_work[3 * i], strength_work[3 * i + 1],
+                              strength_work[3 * i + 2]};
+            }();
             const auto projected = dot(normal, spatial, work);
             auto& column = influence[transfer->column];
             column = transfer->reverse ? p::subtract(column, projected, work)
@@ -1379,7 +1400,8 @@ struct NonpenetrationBuilder {
                                    const a::P1ActionSource& source, const Vector& normal,
                                    a::SharedP1Workspace& shared, core::ResourcePlan& memory,
                                    const DiscreteNonpenetrationLimits& limits,
-                                   std::span<p::Interval> influence, p::Work& work) {
+                                   std::span<p::Interval> influence, p::Work& work,
+                                   std::span<p::Interval> strength_work = {}) {
         const auto transfer_at =
             [&](std::size_t i) -> std::optional<NativeCirculationRows::Transfer> {
             const auto& transfer = assembly.traces.values()[i].transfer;
@@ -1389,7 +1411,7 @@ struct NonpenetrationBuilder {
                 transfer_column(assembly.bound.values(), *transfer, work), transfer->reverse};
         };
         assemble_influence(action, source, normal, assembly.directions.values(), transfer_at,
-                           shared, memory, limits, influence, work);
+                           shared, memory, limits, influence, work, strength_work);
     }
 
     static core::PlannedBuffer<NativeCirculationRows>
@@ -1449,44 +1471,73 @@ struct NonpenetrationBuilder {
     static void replay_row(const NativeCirculationRows& saved, std::size_t index,
                            a::SharedP1Workspace& shared, a::LocalPacketWorkspace& local,
                            a::P1Workspace& kernel, core::ResourcePlan& memory,
-                           std::span<p::Interval> output, p::Work& work) {
+                           std::span<p::Interval> output, p::Work& work,
+                           a::BoundWakeFacetStorage* storage = nullptr,
+                           std::span<p::Interval> strength_work = {}) {
         if (!saved.limits)
             reject(core::FailureCode::InvalidInput);
         const auto source = owned_source(saved, index);
         const auto& limits = *saved.limits;
         auto induction = limits.induction;
         induction.steps = std::min(induction.steps, remaining(work));
-        const auto action = require(a::prepare_bound_wake_induction(
-            source, saved.maps.values(), saved.ids.values(), limits.geometry_accuracy,
-            limits.induction_accuracy, induction, shared, local, kernel, memory, work.stop));
+        const auto action =
+            require(storage != nullptr ? a::prepare_bound_wake_induction_reusing_facets(
+                                             source, saved.maps.values(), saved.ids.values(),
+                                             limits.geometry_accuracy, limits.induction_accuracy,
+                                             induction, shared, local, kernel, *storage, work.stop)
+                                       : a::prepare_bound_wake_induction(
+                                             source, saved.maps.values(), saved.ids.values(),
+                                             limits.geometry_accuracy, limits.induction_accuracy,
+                                             induction, shared, local, kernel, memory, work.stop));
         account(work, require(action.report()).used_steps);
         const auto transfer_at = [&](std::size_t i) { return saved.transfer.values()[i]; };
         assemble_influence(action, source, saved.rows.values()[index].normal,
                            saved.directions.values(), transfer_at, shared, memory, limits, output,
-                           work);
+                           work, strength_work);
     }
 
-    static void admit_owned(const NativeCirculationRows& saved, core::ResourcePlan& memory,
-                            p::Work& work) {
-        if (!saved.limits)
-            reject(core::FailureCode::InvalidInput);
-        const auto& settings = *saved.limits;
-        const auto each = sum_budget(settings.action_steps, settings.action_steps);
-        const auto adjoints = sum_budget(each, sum_budget(each, each));
-        std::uint64_t bytes = 0, visits = 0;
-        for (std::size_t i = 0; i < saved.rows.size(); ++i) {
-            const auto source = owned_source(saved, i);
-            auto limit = settings.induction;
-            limit.steps = std::min(limit.steps, remaining(work));
-            const auto plan = require(a::forecast_bound_wake_induction(
-                source, saved.maps.values(), saved.ids.values(), limit, work.stop));
-            account(work, plan.preflight_steps);
-            bytes = sum_budget(bytes, sum_budget(plan.payload_bytes, plan.payload_bytes));
-            const auto preparations = sum_budget(plan.reserved_steps, plan.reserved_steps);
-            visits = sum_budget(visits, sum_budget(preparations, adjoints));
+    template <class SourceAt>
+    static bool admit_serial_induction(std::size_t rows, SourceAt source_at,
+                                       std::span<const a::P1FaceStrengths> maps,
+                                       std::span<const a::P1StrengthId> ids,
+                                       const DiscreteNonpenetrationLimits& limits,
+                                       std::uint64_t applications, const core::ResourcePlan& memory,
+                                       p::Work& work) {
+        std::uint64_t bytes = 0, visits = 0, serial_bytes = 0, serial_visits = 0;
+        std::uint64_t application_steps = 0;
+        for (std::uint64_t i = 0; i < applications; ++i)
+            application_steps = sum_budget(application_steps, limits.action_steps);
+        bool reusable = true;
+        for (std::size_t i = 0; i < rows; ++i) {
+            auto induction = limits.induction;
+            induction.steps = std::min(induction.steps, remaining(work));
+            const auto plan = require(a::forecast_bound_wake_serial_induction(
+                source_at(i), maps, ids, induction, work.stop));
+            const auto& ordinary = plan.ordinary;
+            account(work, ordinary.preflight_steps);
+            bytes = sum_budget(bytes, sum_budget(ordinary.payload_bytes, ordinary.payload_bytes));
+            visits = sum_budget(
+                visits, sum_budget(application_steps,
+                                   sum_budget(ordinary.reserved_steps, ordinary.reserved_steps)));
+            reusable = reusable && plan.reusable;
+            if (!reusable)
+                continue;
+            const auto first_bytes =
+                i == 0 ? plan.initial_payload_bytes : plan.repeated_payload_bytes;
+            const auto first_steps =
+                i == 0 ? ordinary.reserved_steps : plan.repeated_reserved_steps;
+            serial_bytes =
+                sum_budget(serial_bytes, sum_budget(first_bytes, plan.repeated_payload_bytes));
+            serial_visits = sum_budget(
+                serial_visits, sum_budget(application_steps,
+                                          sum_budget(first_steps, plan.repeated_reserved_steps)));
         }
+        if (reusable && serial_bytes < bytes && serial_bytes <= memory.remaining_bytes() &&
+            serial_visits <= remaining(work))
+            return true;
         if (bytes > memory.remaining_bytes() || visits > remaining(work))
             reject(core::FailureCode::ResourceExceeded);
+        return false;
     }
 
     static PrimalCirculationData solve_data(
@@ -1518,6 +1569,9 @@ struct NonpenetrationBuilder {
         auto results = allocate<std::optional<CirculationResidualRow>>(memory, order);
         auto operator_rows = retain_operator(input, assembly, limits, memory, work);
         auto native_row = allocate<p::Interval>(memory, order);
+        const auto strengths = assembly.directions.size();
+        auto strength_work =
+            allocate<p::Interval>(memory, sum_budget(strengths, sum_budget(strengths, strengths)));
         Vector ambient_direction{};
         if (direction != nullptr) {
             const auto counts = require(geometry.counts());
@@ -1553,7 +1607,14 @@ struct NonpenetrationBuilder {
                 objective.values()[i] = import(seed.value, work);
             }
         }
-        admit(assembly, input, limits, memory, 2, pullback != nullptr ? 8U : 5U, work);
+        a::BoundWakeFacetStorage action_storage{memory};
+        const auto source_at = [&](std::size_t i) {
+            return a::P1ActionSource{input.contact, input.collocations[bound[i].caller].query,
+                                     input.trial_stamp};
+        };
+        const auto reuse_actions =
+            admit_serial_induction(order, source_at, assembly.maps.values(), assembly.ids.values(),
+                                   limits, pullback != nullptr ? 8U : 5U, memory, work);
 
         const auto ambient = flow != nullptr ? ambient_velocity(*flow, work) : Vector{};
         a::LocalRootScratch rounding;
@@ -1581,7 +1642,8 @@ struct NonpenetrationBuilder {
             }();
             record.relative = difference(known_velocity, import(row.velocity, work), work);
             const auto action =
-                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work,
+                               reuse_actions ? &action_storage : nullptr);
             if (direction != nullptr && i == 0) {
                 if (action.point_count() != direction->points.size())
                     reject(core::FailureCode::InvalidInput);
@@ -1598,7 +1660,7 @@ struct NonpenetrationBuilder {
             rhs.values()[i] = project_binary64(record.rhs, request.rhs_absolute, rounding, work);
 
             assemble_influence(assembly, action, source, record.normal, shared, memory, limits,
-                               native_row.values(), work);
+                               native_row.values(), work, strength_work.values());
             for (std::size_t col = 0; col < order; ++col)
                 matrix.values()[col * order + i] = project_binary64(
                     native_row.values()[col], request.matrix_absolute, rounding, work);
@@ -1628,20 +1690,20 @@ struct NonpenetrationBuilder {
         }
 
         NativeResidualCheck check{request};
-        std::optional<a::P1ActionValue> geometry_parent;
         for (std::size_t i = 0; i < order; ++i) {
             const auto& item = bound[i];
             const auto& row = input.collocations[item.caller];
             const auto& record = data.values()[i];
             const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
             const auto action =
-                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work,
+                               reuse_actions ? &action_storage : nullptr);
             std::optional<a::P1ActionDirection> variation;
             if (direction != nullptr)
                 variation.emplace(
                     a::P1ActionDirection{direction->displacements, assembly.directions.values(),
                                          direction->rows[i].free_query, a::SingleWord{0}});
-            auto full = apply(action, source, variation);
+            const auto full = apply(action, source, variation);
             const auto* sample = known != nullptr ? &known->rows[i] : nullptr;
             if (direction != nullptr) {
                 const auto flow_direction =
@@ -1663,19 +1725,13 @@ struct NonpenetrationBuilder {
                 a::enclose_p1_value(original, limits.induction_accuracy.representation, rounding);
             results.values()[i].emplace(CirculationResidualRow{
                 item.panel.face, enclosed, require(action.report()).far_facets != 0});
-            if (i == 0)
-                geometry_parent.emplace(std::move(full));
         }
         check.finish();
         work.step();
         if (retained_assembly != nullptr)
             retained_assembly->emplace(std::move(assembly));
-        return {std::move(solution),
-                std::move(results),
-                std::move(geometry_parent),
-                std::move(operator_rows),
-                require(input.contact.reference_topology()),
-                work.used};
+        return {std::move(solution), std::move(results), std::move(operator_rows),
+                require(input.contact.reference_topology()), work.used};
     }
 
     static CirculationRowReplay replay_native_rows(
@@ -1889,13 +1945,8 @@ struct NonpenetrationBuilder {
 
     static DiscreteCirculation finish_primal(PrimalCirculationData&& data,
                                              ProjectedCaseUniformFlow&& flow) noexcept {
-        return {std::move(data.solution),
-                std::move(flow),
-                std::move(data.rows),
-                std::move(data.geometry_owner),
-                std::move(data.operator_rows),
-                std::move(data.source),
-                data.steps};
+        return {std::move(data.solution),      std::move(flow),        std::move(data.rows),
+                std::move(data.operator_rows), std::move(data.source), data.steps};
     }
 
     static DiscreteCirculation
@@ -3410,11 +3461,24 @@ struct NonpenetrationBuilder {
         if (saved.size() != 1 || saved.front().rows.size() != right.size())
             reject(core::FailureCode::InvalidInput);
         auto row = allocate<p::Interval>(memory, right.size());
+        const auto& retained = saved.front();
+        if (!retained.limits)
+            reject(core::FailureCode::InvalidInput);
+        const auto strengths = retained.directions.size();
+        auto strength_work =
+            allocate<p::Interval>(memory, sum_budget(strengths, sum_budget(strengths, strengths)));
+        a::BoundWakeFacetStorage action_storage{memory};
+        bool reuse_actions = false;
         const auto get = [&](std::size_t i) -> std::span<const p::Interval> {
-            replay_row(saved.front(), i, shared, local, kernel, memory, row.values(), work);
+            replay_row(retained, i, shared, local, kernel, memory, row.values(), work,
+                       reuse_actions ? &action_storage : nullptr, strength_work.values());
             return row.values();
         };
-        const auto admit = [&] { admit_owned(saved.front(), memory, work); };
+        const auto admit = [&] {
+            reuse_actions = admit_serial_induction(
+                right.size(), [&](std::size_t i) { return owned_source(retained, i); },
+                retained.maps.values(), retained.ids.values(), *retained.limits, 6, memory, work);
+        };
         return linearize_rows(sense, face_at, get, admit, right, request, memory, rounding, work);
     }
 
@@ -3550,13 +3614,11 @@ core::Result<DiscreteNonpenetration> evaluate_discrete_nonpenetration(
 DiscreteCirculation::DiscreteCirculation(
     linear::Solution<double> solution, ProjectedCaseUniformFlow&& flow,
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows,
-    std::optional<a::P1ActionValue> geometry_owner,
     core::PlannedBuffer<NativeCirculationRows> operator_rows, a::PreparedTopologyOwner source,
     std::uint64_t steps) noexcept
     : solution_(std::move(solution)),
       flow_(std::move(flow)),
       rows_(std::move(rows)),
-      geometry_owner_(std::move(geometry_owner)),
       operator_rows_(std::move(operator_rows)),
       source_(std::move(source)),
       steps_(steps) {}
@@ -3566,7 +3628,7 @@ DiscreteCirculation& DiscreteCirculation::operator=(DiscreteCirculation&&) noexc
 DiscreteCirculation::~DiscreteCirculation() = default;
 
 core::Result<CirculationResidualRow> DiscreteCirculation::row(std::size_t i) const noexcept {
-    if (i >= rows_.size() || !geometry_owner_)
+    if (i >= rows_.size())
         return std::unexpected(core::Failure{core::FailureCode::InvalidInput, evaluate});
     const auto& residual = rows_.values()[i];
     if (!residual)

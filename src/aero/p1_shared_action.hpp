@@ -7,6 +7,7 @@ namespace uvlas::aero::detail {
 class SharedP1Engine;
 struct SharedP1Data;
 struct SharedP1AdjointData;
+struct BoundWakeFacetStorageData;
 struct P1StrengthTag;
 /// Independent wake identifiers and bound circulation identities have disjoint domains.
 class P1StrengthId {
@@ -77,6 +78,15 @@ struct P1AssemblyPlan {
     std::uint64_t estimated_metadata_bytes = 0;
     std::uint64_t reserved_steps = 0;
     std::uint64_t preflight_steps = 0; ///< Measured visits spent producing the forecast.
+};
+
+/// The first successful action populates storage for later actions of the same shape.
+struct P1SerialAssemblyPlan {
+    P1AssemblyPlan ordinary;
+    std::uint64_t initial_payload_bytes;
+    std::uint64_t repeated_payload_bytes;
+    std::uint64_t repeated_reserved_steps;
+    bool reusable;
 };
 
 struct P1AssemblyReport {
@@ -207,6 +217,34 @@ forecast_bound_wake_induction(const P1ActionSource&, std::span<const P1FaceStren
     const P1ActionSource&, std::span<const P1FaceStrengths>, std::span<const P1StrengthId>,
     LocalAccuracy, P1Accuracy, const P1AssemblyLimits&, SharedP1Workspace&, LocalPacketWorkspace&,
     P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
+/// Optional facet, local packet and basis storage for a serial sequence of mixed actions.
+/// The accounting plan must outlive this storage. A previous action and its owning
+/// results must all be destroyed before preparing another action in this storage.
+class BoundWakeFacetStorage {
+public:
+    explicit BoundWakeFacetStorage(core::ResourcePlan& memory) noexcept : memory_(memory) {}
+    BoundWakeFacetStorage(const BoundWakeFacetStorage&) = delete;
+    BoundWakeFacetStorage& operator=(const BoundWakeFacetStorage&) = delete;
+
+private:
+    friend class SharedP1Engine;
+    core::ResourcePlan& memory_;
+    std::atomic_flag preparing_ = ATOMIC_FLAG_INIT;
+    std::shared_ptr<BoundWakeFacetStorageData> data_;
+};
+
+/// Forecast a serial sequence with the same source extents and scoped results.
+[[nodiscard]] AeroResult<P1SerialAssemblyPlan>
+forecast_bound_wake_serial_induction(const P1ActionSource&, std::span<const P1FaceStrengths>,
+                                     std::span<const P1StrengthId>, const P1AssemblyLimits&,
+                                     const std::stop_token& = {}) noexcept;
+
+/// Use this storage's resource plan for a new qualified query of the same facet count.
+[[nodiscard]] AeroResult<SharedP1Action> prepare_bound_wake_induction_reusing_facets(
+    const P1ActionSource&, std::span<const P1FaceStrengths>, std::span<const P1StrengthId>,
+    LocalAccuracy, P1Accuracy, const P1AssemblyLimits&, SharedP1Workspace&, LocalPacketWorkspace&,
+    P1Workspace&, BoundWakeFacetStorage&, const std::stop_token& = {}) noexcept;
 
 /// Prepare mixed induction at exactly the midpoint of a non-TE canonical bound edge.
 /// Exclude all occurrences of that bound contour only. Retain the full wake sheet.

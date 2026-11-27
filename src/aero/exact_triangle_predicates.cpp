@@ -174,9 +174,20 @@ ExactPredicateAccess::finish(PredicateWorkspace& workspace, const PredicateLease
                              core::PlannedBuffer<TriangleOutcome> owned, PredicateLimits limits,
                              std::stop_token cancellation, core::FailureDetails details,
                              std::uint64_t steps) noexcept {
+    auto used = finish_into(workspace, lease, owned.values()[0], limits, std::move(cancellation),
+                            details, steps);
+    if (!used)
+        return std::unexpected(used.error());
+    return ExactTriangleResult{std::move(owned), limits.external_memory, *used, details};
+}
+core::Result<std::uint64_t>
+ExactPredicateAccess::finish_into(PredicateWorkspace& workspace, const PredicateLease& lease,
+                                  TriangleOutcome& outcome, PredicateLimits limits,
+                                  std::stop_token cancellation, core::FailureDetails details,
+                                  std::uint64_t steps) noexcept {
     return core::guard_entry(
         operation, core::FailureCode::PrecisionUnresolved, details,
-        [&]() -> core::Result<ExactTriangleResult> {
+        [&]() -> core::Result<std::uint64_t> {
             auto points = coordinates(workspace, lease, details);
             if (!points)
                 return std::unexpected(points.error());
@@ -205,9 +216,10 @@ ExactPredicateAccess::finish(PredicateWorkspace& workspace, const PredicateLease
             scratch.r = subtract(scratch.points[3], scratch.points[0]);
             scratch.normal = cross(scratch.e, scratch.f);
             const auto jacobian_squared = dot(scratch.normal, scratch.normal);
-            if (jacobian_squared == 0)
-                return ExactTriangleResult{std::move(owned), limits.external_memory, steps,
-                                           details};
+            if (jacobian_squared == 0) {
+                outcome.emplace<DegenerateTriangle>();
+                return steps;
+            }
             if (auto check = checkpoint(); !check)
                 return std::unexpected(check.error());
             const auto ee = dot(scratch.e, scratch.e), ff = dot(scratch.f, scratch.f);
@@ -289,14 +301,13 @@ ExactPredicateAccess::finish(PredicateWorkspace& workspace, const PredicateLease
                                                : FarRelation::Near;
             if (best->numerator < 0 || best->denominator <= 0)
                 throw std::logic_error("Invalid exact distance candidate");
-            auto& outcome = owned.values()[0];
             outcome.emplace<NondegenerateTriangle>(
                 side, projection,
                 ExactSquaredDistance{best->numerator,
                                      best->numerator == 0 ? ExactInteger{1} : best->denominator,
                                      squared_unit},
                 longest, mask, far);
-            return ExactTriangleResult{std::move(owned), limits.external_memory, steps, details};
+            return steps;
         });
 }
 core::Result<ExactTriangleResult>
