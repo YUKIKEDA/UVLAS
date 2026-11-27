@@ -42,6 +42,14 @@ struct CaseGmshSupportLine {
     CaseGmshSupportPositionEvidence position = CaseGmshSupportPositionEvidence::FaceEquality;
 };
 
+struct CaseGmshEdgeEvidence {
+    io::detail::MeshShellId shell{0};
+    io::detail::GmshKey physical{};
+    core::Index boundary{};
+    structure::PgReferenceIdentity patch;
+    core::PlannedBuffer<CaseGmshSupportLine> lines;
+};
+
 struct CaseGmshSupportBoundary {
     io::detail::RootSnapshotLocation mesh;
     io::SourceDigest mesh_digest;
@@ -64,5 +72,28 @@ struct CaseGmshSupportBoundary {
     const io::SiCase&, const io::detail::ExternalMeshSidecarBinding&, const CaseGmshPgSet&,
     io::detail::MeshSupportId, io::detail::GmshKey, const CaseGmshSupportBoundaryLimits&,
     core::ResourcePlan&, std::optional<CaseGmshSupportBoundaryDiagnostic>* = nullptr) noexcept;
+
+struct CaseGmshJointBoundaryDiagnostic {
+    io::detail::MeshJointId joint{0};
+    std::optional<std::size_t> endpoint{}; // Case adhesive order, zero or one.
+    CaseGmshSupportBoundaryDiagnostic edge;
+};
+
+struct CaseGmshJointBoundary {
+    io::detail::RootSnapshotLocation mesh;
+    io::SourceDigest mesh_digest;
+    io::detail::RootSnapshotLocation sidecar;
+    io::SourceDigest sidecar_digest;
+    io::detail::MeshJointId joint{0};
+    core::Index declaration{};
+    std::array<CaseGmshEdgeEvidence, 2> endpoints;
+};
+
+/// Certify both original line groups against their respective Case adhesive regions.
+[[nodiscard]] core::Result<CaseGmshJointBoundary> certify_case_gmsh_joint_boundary(
+    const io::SiCase&, const io::detail::ExternalMeshSidecarBinding&, const CaseGmshPgSet&,
+    io::detail::MeshJointId, const std::array<io::detail::GmshKey, 2>&,
+    const CaseGmshSupportBoundaryLimits&, core::ResourcePlan&,
+    std::optional<CaseGmshJointBoundaryDiagnostic>* = nullptr) noexcept;
 
 } // namespace uvlas::coupling::detail
