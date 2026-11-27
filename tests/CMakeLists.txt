@@ -1103,7 +1103,7 @@ target_include_directories(uvlas_test_coupling_case_pg_support_motion PRIVATE
 add_test(NAME coupling.case_pg_chart_entry
     COMMAND uvlas_test_coupling_case_pg_support_motion "[case-pg-chart-entry]")
 set_tests_properties(coupling.case_pg_chart_entry PROPERTIES
-    LABELS "integration;verification;V-PG" TIMEOUT 180)
+    LABELS "integration;verification;V-PG" TIMEOUT "$<IF:$<CONFIG:Debug>,300,180>")
 # Run all exact PG preparations in Release. The same executable runs the
 # two-layer Case preparation and its negative checks in every configuration.
 if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE STREQUAL "Release")
