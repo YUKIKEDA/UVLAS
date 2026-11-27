@@ -1751,9 +1751,24 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             selected.original_absolute = .99 * std::abs(sin[sample].convert_to<double>()) *
                                          std::sqrt(static_cast<double>(count)) * 1e-11;
         }
+        auto selected_caps = caps;
+        // The contour action also pays for exact contact qualification. Preserve
+        // the fixture's existing induction ceiling for the positive contour run.
+        if (selected.certified_closed_contour)
+            selected_caps.action_steps = caps.induction.steps;
+        if (count == 8 && selected.certified_closed_contour) {
+            auto limited = selected_caps;
+            limited.action_steps = 1;
+            core::ResourcePlan denied_memory{UINT64_C(2000000000)};
+            const auto denied = cf::solve_discrete_circulation_loads(
+                input, write_loads, project_flow(), limited, selected, *geometry_work, shared,
+                *local, *kernel, denied_memory);
+            REQUIRE_FALSE(denied);
+            CHECK(denied.error().code == core::FailureCode::ResourceExceeded);
+        }
         const auto loads = take(cf::solve_discrete_circulation_loads(
-            input, write_loads, std::move(flow), caps, selected, *geometry_work, shared, *local,
-            *kernel, memory));
+            input, write_loads, std::move(flow), selected_caps, selected, *geometry_work, shared,
+            *local, *kernel, memory));
         if (formal_product) {
 #ifdef UVLAS_FINITE_WING_FORMAL_PRODUCT
             std::ifstream archive(UVLAS_FINITE_WING_COMMON_LIMIT);
@@ -1775,7 +1790,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             const cf::DiscreteNonpenetrationInput replay_input{
                 retained_contact, rows, wake, input.history, trial, stamp, input.flow_side};
             const auto evidence = take(cf::verify_discrete_circulation_row_replay(
-                replay_input, loads.primal(), caps, selected, shared, *local, *kernel,
+                replay_input, loads.primal(), selected_caps, selected, shared, *local, *kernel,
                 replay_memory));
             CHECK(evidence.rows == count);
             CHECK(evidence.coefficients == count * count);
@@ -1793,7 +1808,8 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
 
             core::ResourcePlan insufficient{0};
             const auto denied = cf::verify_discrete_circulation_row_replay(
-                input, loads.primal(), caps, selected, shared, *local, *kernel, insufficient);
+                input, loads.primal(), selected_caps, selected, shared, *local, *kernel,
+                insufficient);
             if (denied)
                 FAIL("The row replay must admit its payload before assembly");
             CHECK(denied.error().code == core::FailureCode::ResourceExceeded);
@@ -1801,7 +1817,8 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             auto changed = selected;
             changed.rhs_generation = core::RhsGeneration{9};
             const auto stale = cf::verify_discrete_circulation_row_replay(
-                input, loads.primal(), caps, changed, shared, *local, *kernel, insufficient);
+                input, loads.primal(), selected_caps, changed, shared, *local, *kernel,
+                insufficient);
             if (stale)
                 FAIL("A different RHS generation must not qualify a replay");
             CHECK(stale.error().code == core::FailureCode::StaleGeneration);
@@ -1811,8 +1828,8 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                 parallel.contour_workers = 4;
                 parallel.solver_limits.dense_residual_workers = 4;
                 const auto repeated = take(cf::solve_discrete_circulation_loads(
-                    input, write_loads, project_flow(), caps, parallel, *geometry_work, shared,
-                    *local, *kernel, memory));
+                    input, write_loads, project_flow(), selected_caps, parallel, *geometry_work,
+                    shared, *local, *kernel, memory));
                 const auto same_bits = [](double x, double y) {
                     CHECK(std::bit_cast<std::uint64_t>(x) == std::bit_cast<std::uint64_t>(y));
                 };

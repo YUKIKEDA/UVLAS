@@ -1857,9 +1857,11 @@ struct NonpenetrationBuilder {
                                 const a::ResolvedQuery& query, std::optional<a::EdgeId> self,
                                 std::span<const a::ContourInterval> strengths,
                                 const DiscreteNonpenetrationLimits& limits, p::Work& work) {
-        const auto value = require(contour.apply(query, self, strengths, limits.induction.geometry,
-                                                 contour_limits(limits, work), *session.geometry,
-                                                 *session.contact, session.values, work.stop));
+        auto action_limits = contour_limits(limits, work);
+        action_limits.max_steps = std::min(action_limits.max_steps, limits.action_steps);
+        const auto value =
+            require(contour.apply(query, self, strengths, limits.induction.geometry, action_limits,
+                                  *session.geometry, *session.contact, session.values, work.stop));
         account(work, value.second);
         return import_contour(value.first);
     }
