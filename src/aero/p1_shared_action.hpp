@@ -83,10 +83,10 @@ struct P1AssemblyPlan {
 /// The first successful action populates storage for later actions of the same shape.
 struct P1SerialAssemblyPlan {
     P1AssemblyPlan ordinary;
-    std::uint64_t initial_payload_bytes;
-    std::uint64_t repeated_payload_bytes;
-    std::uint64_t repeated_reserved_steps;
-    bool reusable;
+    std::uint64_t initial_payload_bytes{};
+    std::uint64_t repeated_payload_bytes{};
+    std::uint64_t repeated_reserved_steps{};
+    bool reusable{};
 };
 
 struct P1AssemblyReport {
