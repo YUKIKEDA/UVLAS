@@ -18,7 +18,7 @@ static_assert(std::is_nothrow_copy_constructible_v<LocalQualification>);
 static_assert(std::is_trivially_copyable_v<QueryRequest>);
 namespace {
 constexpr auto operation = core::Operation::EvaluateAero;
-constexpr std::uint64_t enclosure_steps = 12 * (257 + 2);
+constexpr std::uint64_t enclosure_steps = UINT64_C(12) * (257 + 2);
 OwnedGeometryFailure packet_failure(core::Failure failure, const GeometryContext& context,
                                     std::optional<GeometryProblem> problem = {}) noexcept {
     auto& d = failure.details;
@@ -418,7 +418,7 @@ LocalPacketWorkspace::~LocalPacketWorkspace() = default;
 std::uint64_t local_packet_step_ceiling(std::uint64_t facets,
                                         const GeometryLimits& limits) noexcept {
     // Three source vertices plus a material query with up to three vertices.
-    constexpr std::uint64_t decode_steps = 3 * (3 + 3);
+    constexpr std::uint64_t decode_steps = UINT64_C(3) * (3 + 3);
     // Initial classification, projection, six distance candidates, optional
     // face, seven minimum comparisons and the far-boundary comparison.
     constexpr std::uint64_t predicate_steps = 2 + 6 + 1 + 7 + 1;

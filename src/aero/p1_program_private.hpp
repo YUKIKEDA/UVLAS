@@ -289,8 +289,8 @@ inline Output bound_program(Program& p, const Options& options) {
 }
 struct FarOutput {
     Output output;
-    std::size_t sample_begin;
-    std::uint64_t setup_work;
+    std::size_t sample_begin{};
+    std::uint64_t setup_work{};
 };
 
 inline FarOutput far_program(Program& p) {
