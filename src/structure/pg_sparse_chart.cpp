@@ -1,6 +1,7 @@
 #include "pg_reference_hash.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <chrono>
 #include <uvlas/structure/pg_sparse_chart.hpp>
 
@@ -15,14 +16,17 @@ struct FactorRow {
 };
 
 void subtract_scaled(ReferenceArithmetic& math, Position& from, const ExactRational& scale,
-                     const Position& value) {
+                     const Position& value, std::uint8_t components = 7) {
     for (std::size_t k = 0; k < from.size(); ++k)
-        from[k] = math.sub(from[k], math.mul(scale, value[k]));
+        if ((components & (1U << k)) != 0)
+            from[k] = math.sub(from[k], math.mul(scale, value[k]));
 }
 
-void divide_by(ReferenceArithmetic& math, Position& value, const ExactRational& divisor) {
-    for (auto& component : value)
-        component = math.div(component, divisor);
+void divide_by(ReferenceArithmetic& math, Position& value, const ExactRational& divisor,
+               std::uint8_t components) {
+    for (std::size_t k = 0; k < value.size(); ++k)
+        if ((components & (1U << k)) != 0)
+            value[k] = math.div(value[k], divisor);
 }
 
 Position copy_position(ReferenceArithmetic& math, const Position& value) {
@@ -179,6 +183,79 @@ struct PgSparseChart::Data {
             stable_to_global.values()[static_cast<std::size_t>(stable)]);
     }
 
+    [[nodiscard]] std::array<std::size_t, 2>
+    factor(ReferenceArithmetic&, const PgGlobalConstraints&, std::uint64_t columns,
+           std::uint64_t pivots_capacity, std::uint64_t work_capacity, std::uint64_t terms_capacity,
+           std::uint8_t components);
+
+    template <class Rhs>
+    void solve_pivots(ReferenceArithmetic& math, std::span<Position> q,
+                      std::span<Position> transformed, const Rhs& rhs,
+                      std::uint8_t components) const {
+        // C_selected = L*U. First solve the unit triangular equations for the RHS.
+        for (std::size_t i = 0; i < rank; ++i) {
+            math.visit(1);
+            const auto& value = rhs(static_cast<std::size_t>(pivots.values()[i].original_row));
+            for (std::size_t axis = 0; axis < value.size(); ++axis)
+                if ((components & (1U << axis)) != 0)
+                    transformed[i][axis] = math.copy(value[axis]);
+            for (const auto& term : lower(i)) {
+                math.visit(1);
+                subtract_scaled(math, transformed[i], term.coefficient,
+                                transformed[static_cast<std::size_t>(term.column)], components);
+            }
+        }
+        // U may couple to the free coordinates, which have already been put in q.
+        for (std::size_t i = rank; i > 0;) {
+            --i;
+            math.visit(1);
+            auto& value = transformed[i];
+            const auto row = upper(i);
+            for (const auto& term : row.subspan(1)) {
+                math.visit(1);
+                subtract_scaled(math, value, term.coefficient, q[global(term.column)], components);
+            }
+            divide_by(math, value, row.front().coefficient, components);
+            auto& q_pivot = q[global(row.front().column)];
+            for (std::size_t axis = 0; axis < value.size(); ++axis)
+                if ((components & (1U << axis)) != 0)
+                    q_pivot[axis] = std::move(value[axis]);
+        }
+    }
+
+    void transpose_pivots(ReferenceArithmetic& math, std::span<Position> work,
+                          std::span<Position> multipliers, std::uint8_t components) const {
+        // U^T, scattering to the still unsolved pivots and to the free coordinates.
+        for (std::size_t i = 0; i < rank; ++i) {
+            math.visit(1);
+            const auto active = upper(i);
+            auto& pivot = work[global(active.front().column)];
+            divide_by(math, pivot, active.front().coefficient, components);
+            for (const auto& term : active.subspan(1)) {
+                math.visit(1);
+                subtract_scaled(math, work[global(term.column)], term.coefficient, pivot,
+                                components);
+            }
+        }
+        // L^T followed by injection into the original row numbering.
+        for (std::size_t i = rank; i > 0;) {
+            --i;
+            math.visit(1);
+            const auto pivot = pivots.values()[i];
+            auto& value = work[static_cast<std::size_t>(pivot.dependent_column)];
+            for (const auto& term : lower(i)) {
+                math.visit(1);
+                const auto earlier = pivots.values()[static_cast<std::size_t>(term.column)];
+                subtract_scaled(math, work[static_cast<std::size_t>(earlier.dependent_column)],
+                                term.coefficient, value, components);
+            }
+            auto& original = multipliers[static_cast<std::size_t>(pivot.original_row)];
+            for (std::size_t axis = 0; axis < value.size(); ++axis)
+                if ((components & (1U << axis)) != 0)
+                    original[axis] = std::move(value[axis]);
+        }
+    }
+
     template <class Rhs>
     [[nodiscard]] core::PlannedBuffer<Position>
     solve(ReferenceArithmetic& math, const PgGlobalConstraints& original,
@@ -190,30 +267,7 @@ struct PgSparseChart::Data {
             q.values()[static_cast<std::size_t>(free.values()[j])] =
                 copy_position(math, independent[j]);
         }
-        // C_selected = L*U. First solve the unit triangular equations for the RHS.
-        for (std::size_t i = 0; i < rank; ++i) {
-            math.visit(1);
-            transformed.values()[i] =
-                copy_position(math, rhs(static_cast<std::size_t>(pivots.values()[i].original_row)));
-            for (const auto& term : lower(i)) {
-                math.visit(1);
-                subtract_scaled(math, transformed.values()[i], term.coefficient,
-                                transformed.values()[static_cast<std::size_t>(term.column)]);
-            }
-        }
-        // U may couple to the free coordinates, which have already been put in q.
-        for (std::size_t i = rank; i > 0;) {
-            --i;
-            math.visit(1);
-            auto& value = transformed.values()[i];
-            const auto row = upper(i);
-            for (const auto& term : row.subspan(1)) {
-                math.visit(1);
-                subtract_scaled(math, value, term.coefficient, q.values()[global(term.column)]);
-            }
-            divide_by(math, value, row.front().coefficient);
-            q.values()[global(row.front().column)] = std::move(value);
-        }
+        solve_pivots(math, q.values(), transformed.values(), rhs, 7);
         // Check all original rows, including every skipped duplicate or dependent equation.
         const auto rows = original.original_rows();
         for (std::size_t i = 0; i < rows.size(); ++i) {
@@ -232,6 +286,129 @@ struct PgSparseChart::Data {
         return q;
     }
 };
+
+std::array<std::size_t, 2> PgSparseChart::Data::factor(ReferenceArithmetic& math,
+                                                       const PgGlobalConstraints& original,
+                                                       std::uint64_t columns, std::uint64_t pc,
+                                                       std::uint64_t wc, std::uint64_t fc,
+                                                       std::uint8_t components) {
+    auto& data = *this;
+    data.pivots = allocate<PgSparseChartPivot>(math, pc);
+    data.ranges = allocate<FactorRow>(math, pc);
+    data.terms = allocate<Term>(math, fc);
+    data.stable_to_global = allocate<core::Index>(math, columns);
+    auto global_to_stable = allocate<core::Index>(math, columns);
+    auto pivot_lookup = allocate<core::Index>(math, columns);
+    for (auto& slot : pivot_lookup.values()) {
+        math.visit(1);
+        slot = -1;
+    }
+    const auto patches = original.layout();
+    auto patch_order = allocate<core::Index>(math, patches.size());
+    ordered_indices(math, patch_order.values(), [&](std::size_t a, std::size_t b) {
+        return patches[a].id.value() < patches[b].id.value();
+    });
+    std::size_t stable = 0;
+    for (const auto block : patch_order.values()) {
+        const auto& patch = patches[static_cast<std::size_t>(block)];
+        for (core::Index j = 0; j < patch.count; ++j) {
+            math.visit(1);
+            const auto global = patch.first + j;
+            data.stable_to_global.values()[stable] = global;
+            global_to_stable.values()[static_cast<std::size_t>(global)] =
+                static_cast<core::Index>(stable++);
+        }
+    }
+    const auto sources = original.sources();
+    auto order = allocate<core::Index>(math, sources.size());
+    ordered_indices(math, order.values(), [&](std::size_t a, std::size_t b) {
+        const auto& x = sources[a];
+        const auto& y = sources[b];
+        return std::pair{x.kind != PgTraceKind::Support, x.id.value()} <
+               std::pair{y.kind != PgTraceKind::Support, y.id.value()};
+    });
+
+    auto first = allocate<Term>(math, wc);
+    auto second = allocate<Term>(math, wc);
+    auto lower_row = allocate<Term>(math, pc);
+    std::size_t retained = 0, retained_lower = 0;
+    for (const auto source : order.values()) {
+        math.visit(1);
+        const auto& block = sources[static_cast<std::size_t>(source)];
+        if ((block.world_components & components) == 0)
+            continue;
+        for (core::Index row = block.first_row; row < block.first_row + block.rows; ++row) {
+            math.visit(1);
+            const auto raw = partition_take(original.row(row));
+            if (raw.size() > wc)
+                partition_fail(core::FailureCode::ResourceExceeded);
+            auto active = first.values();
+            auto scratch = second.values();
+            auto size = raw.size();
+            for (std::size_t i = 0; i < size; ++i) {
+                math.visit(1);
+                const auto index = static_cast<std::size_t>(raw[i].column);
+                active[i] = {global_to_stable.values()[index], math.copy(raw[i].coefficient)};
+            }
+            std::ranges::sort(active.first(size), [&](const Term& x, const Term& y) {
+                math.visit(1);
+                return x.column < y.column;
+            });
+
+            std::size_t lower_size = 0;
+            while (size != 0) {
+                // Earlier U rows never contain an earlier pivot. Eliminate the
+                // least existing pivot that is actually present, from the sparse row.
+                core::Index earliest = static_cast<core::Index>(data.rank);
+                const Term* selected = nullptr;
+                for (const auto& term : active.first(size)) {
+                    math.visit(1);
+                    const auto owner_index =
+                        pivot_lookup.values()[static_cast<std::size_t>(term.column)];
+                    if (owner_index >= 0 && owner_index < earliest) {
+                        earliest = owner_index;
+                        selected = &term;
+                    }
+                }
+                if (selected == nullptr)
+                    break;
+                const auto upper = data.upper(static_cast<std::size_t>(earliest));
+                auto multiplier = math.div(selected->coefficient, upper.front().coefficient);
+                size = merge_eliminated(math, active.first(size), upper, multiplier, scratch);
+                lower_row.values()[lower_size++] = {earliest, std::move(multiplier)};
+                std::swap(active, scratch);
+            }
+            if (size == 0)
+                continue;
+            if (data.rank == data.pivots.size() || size + lower_size > data.terms.size() - retained)
+                partition_fail(core::FailureCode::ResourceExceeded);
+            const auto pivot = active.front().column;
+            const auto global = data.global(pivot);
+            pivot_lookup.values()[static_cast<std::size_t>(pivot)] =
+                static_cast<core::Index>(data.rank);
+            data.pivots.values()[data.rank] = {row, static_cast<core::Index>(global)};
+            const auto start = retained;
+            for (auto& term : lower_row.values().first(lower_size)) {
+                math.visit(1);
+                data.terms.values()[retained++] = std::move(term);
+            }
+            const auto upper_begin = retained;
+            retained_lower += lower_size;
+            for (auto& term : active.first(size)) {
+                math.visit(1);
+                data.terms.values()[retained++] = std::move(term);
+            }
+            data.ranges.values()[data.rank++] = {start, upper_begin, retained};
+        }
+    }
+    data.free = allocate<core::Index>(math, columns - data.rank);
+    for (std::size_t i = 0; i < pivot_lookup.size(); ++i) {
+        math.visit(1);
+        if (pivot_lookup.values()[i] < 0)
+            data.free.values()[data.free_size++] = data.stable_to_global.values()[i];
+    }
+    return {retained_lower, retained - retained_lower};
+}
 
 PgSparseChart::PgSparseChart(PgGlobalConstraints&& original,
                              core::PlannedBuffer<Data> data) noexcept
@@ -254,6 +431,8 @@ core::Result<PgSparseChart> PgSparseChart::prepare(PgGlobalConstraints&& origina
         const auto lease = partition_take(workspace.acquire());
         static_cast<void>(lease);
         const auto info = partition_take(original.info());
+        if (!info.common_cartesian)
+            partition_fail(core::FailureCode::Unsupported);
         const auto columns = static_cast<std::uint64_t>(info.columns);
         const auto rows = static_cast<std::uint64_t>(info.rows);
         const auto pc = std::min({limits.maximum_pivots, columns, rows});
@@ -266,119 +445,8 @@ core::Result<PgSparseChart> PgSparseChart::prepare(PgGlobalConstraints&& origina
 
         auto owner = allocate<Data>(math, 1);
         auto& data = owner.values().front();
-        data.pivots = allocate<PgSparseChartPivot>(math, pc);
-        data.ranges = allocate<FactorRow>(math, pc);
-        data.terms = allocate<Term>(math, fc);
-        data.stable_to_global = allocate<core::Index>(math, columns);
-        auto global_to_stable = allocate<core::Index>(math, columns);
-        auto pivot_lookup = allocate<core::Index>(math, columns);
-        for (auto& slot : pivot_lookup.values()) {
-            math.visit(1);
-            slot = -1;
-        }
-        const auto patches = original.layout();
-        auto patch_order = allocate<core::Index>(math, patches.size());
-        ordered_indices(math, patch_order.values(), [&](std::size_t a, std::size_t b) {
-            return patches[a].id.value() < patches[b].id.value();
-        });
-        std::size_t stable = 0;
-        for (const auto block : patch_order.values()) {
-            const auto& patch = patches[static_cast<std::size_t>(block)];
-            for (core::Index j = 0; j < patch.count; ++j) {
-                math.visit(1);
-                const auto global = patch.first + j;
-                data.stable_to_global.values()[stable] = global;
-                global_to_stable.values()[static_cast<std::size_t>(global)] =
-                    static_cast<core::Index>(stable++);
-            }
-        }
-        const auto sources = original.sources();
-        auto order = allocate<core::Index>(math, sources.size());
-        ordered_indices(math, order.values(), [&](std::size_t a, std::size_t b) {
-            const auto& x = sources[a];
-            const auto& y = sources[b];
-            return std::pair{x.kind != PgTraceKind::Support, x.id.value()} <
-                   std::pair{y.kind != PgTraceKind::Support, y.id.value()};
-        });
-
-        auto first = allocate<Term>(math, wc);
-        auto second = allocate<Term>(math, wc);
-        auto lower_row = allocate<Term>(math, pc);
-        std::size_t retained = 0, retained_lower = 0;
-        for (const auto source : order.values()) {
-            math.visit(1);
-            const auto& block = sources[static_cast<std::size_t>(source)];
-            for (core::Index row = block.first_row; row < block.first_row + block.rows; ++row) {
-                math.visit(1);
-                const auto raw = partition_take(original.row(row));
-                if (raw.size() > wc)
-                    partition_fail(core::FailureCode::ResourceExceeded);
-                auto active = first.values();
-                auto scratch = second.values();
-                auto size = raw.size();
-                for (std::size_t i = 0; i < size; ++i) {
-                    math.visit(1);
-                    const auto index = static_cast<std::size_t>(raw[i].column);
-                    active[i] = {global_to_stable.values()[index], math.copy(raw[i].coefficient)};
-                }
-                std::ranges::sort(active.first(size), [&](const Term& x, const Term& y) {
-                    math.visit(1);
-                    return x.column < y.column;
-                });
-
-                std::size_t lower_size = 0;
-                while (size != 0) {
-                    // Earlier U rows never contain an earlier pivot. Eliminate the
-                    // least existing pivot that is actually present, from the sparse row.
-                    core::Index earliest = static_cast<core::Index>(data.rank);
-                    const Term* selected = nullptr;
-                    for (const auto& term : active.first(size)) {
-                        math.visit(1);
-                        const auto owner_index =
-                            pivot_lookup.values()[static_cast<std::size_t>(term.column)];
-                        if (owner_index >= 0 && owner_index < earliest) {
-                            earliest = owner_index;
-                            selected = &term;
-                        }
-                    }
-                    if (selected == nullptr)
-                        break;
-                    const auto upper = data.upper(static_cast<std::size_t>(earliest));
-                    auto multiplier = math.div(selected->coefficient, upper.front().coefficient);
-                    size = merge_eliminated(math, active.first(size), upper, multiplier, scratch);
-                    lower_row.values()[lower_size++] = {earliest, std::move(multiplier)};
-                    std::swap(active, scratch);
-                }
-                if (size == 0)
-                    continue;
-                if (data.rank == data.pivots.size() ||
-                    size + lower_size > data.terms.size() - retained)
-                    partition_fail(core::FailureCode::ResourceExceeded);
-                const auto pivot = active.front().column;
-                const auto global = data.global(pivot);
-                pivot_lookup.values()[static_cast<std::size_t>(pivot)] =
-                    static_cast<core::Index>(data.rank);
-                data.pivots.values()[data.rank] = {row, static_cast<core::Index>(global)};
-                const auto start = retained;
-                for (auto& term : lower_row.values().first(lower_size)) {
-                    math.visit(1);
-                    data.terms.values()[retained++] = std::move(term);
-                }
-                const auto upper_begin = retained;
-                retained_lower += lower_size;
-                for (auto& term : active.first(size)) {
-                    math.visit(1);
-                    data.terms.values()[retained++] = std::move(term);
-                }
-                data.ranges.values()[data.rank++] = {start, upper_begin, retained};
-            }
-        }
-        data.free = allocate<core::Index>(math, columns - data.rank);
-        for (std::size_t i = 0; i < pivot_lookup.size(); ++i) {
-            math.visit(1);
-            if (pivot_lookup.values()[i] < 0)
-                data.free.values()[data.free_size++] = data.stable_to_global.values()[i];
-        }
+        const auto [retained_lower, retained_upper] =
+            data.factor(math, original, columns, pc, wc, fc, 7);
         const auto rows_view = original.original_rows();
         static_cast<void>(data.solve(math, original, {}, [&](std::size_t i) -> const Position& {
             return rows_view[i].prescribed;
@@ -394,7 +462,7 @@ core::Result<PgSparseChart> PgSparseChart::prepare(PgGlobalConstraints&& origina
         data.report = {data.rank,
                        static_cast<std::uint64_t>(info.nonzeros),
                        retained_lower,
-                       retained - retained_lower,
+                       retained_upper,
                        pc,
                        wc,
                        fc,
@@ -516,33 +584,7 @@ core::Result<PgSparseChartDual> PgSparseChart::transpose(PgSparseChartInput inpu
         }
         auto reduced = allocate<Position>(math, data.free.size());
         auto multipliers = allocate<Position>(math, static_cast<std::uint64_t>(info.rows));
-        // U^T, scattering to the still unsolved pivots and to the free coordinates.
-        for (std::size_t i = 0; i < data.rank; ++i) {
-            math.visit(1);
-            const auto upper = data.upper(i);
-            auto& pivot = work.values()[data.global(upper.front().column)];
-            divide_by(math, pivot, upper.front().coefficient);
-            for (const auto& term : upper.subspan(1)) {
-                math.visit(1);
-                subtract_scaled(math, work.values()[data.global(term.column)], term.coefficient,
-                                pivot);
-            }
-        }
-        // L^T followed by injection into the original row numbering.
-        for (std::size_t i = data.rank; i > 0;) {
-            --i;
-            math.visit(1);
-            const auto pivot = data.pivots.values()[i];
-            auto& value = work.values()[static_cast<std::size_t>(pivot.dependent_column)];
-            for (const auto& term : data.lower(i)) {
-                math.visit(1);
-                const auto earlier = data.pivots.values()[static_cast<std::size_t>(term.column)];
-                subtract_scaled(math,
-                                work.values()[static_cast<std::size_t>(earlier.dependent_column)],
-                                term.coefficient, value);
-            }
-            multipliers.values()[static_cast<std::size_t>(pivot.original_row)] = std::move(value);
-        }
+        data.transpose_pivots(math, work.values(), multipliers.values(), 7);
         for (std::size_t i = 0; i < reduced.size(); ++i) {
             math.visit(1);
             reduced.values()[i] =
@@ -550,6 +592,272 @@ core::Result<PgSparseChartDual> PgSparseChart::transpose(PgSparseChartInput inpu
         }
         math.cancel();
         return PgSparseChartDual{std::move(reduced), std::move(multipliers), math.info()};
+    });
+}
+
+struct PgComponentSparseChart::Data {
+    PgSparseChartIdentity identity;
+    PgComponentSparsePreparation report;
+    std::array<PgSparseChart::Data, 3> factors;
+    std::array<std::uint8_t, 3> components{};
+    std::size_t groups{}, maximum_rank{};
+    core::PlannedBuffer<core::Index> free;
+
+    [[nodiscard]] core::PlannedBuffer<Position>
+    solve(ReferenceArithmetic& math, const PgGlobalConstraints& original, std::uint64_t columns,
+          std::span<const ExactRational> independent, bool homogeneous) const {
+        auto q = allocate<Position>(math, columns);
+        auto transformed = allocate<Position>(math, maximum_rank);
+        for (std::size_t i = 0; i < independent.size(); ++i) {
+            math.visit(1);
+            const auto flat = static_cast<std::size_t>(free.values()[i]);
+            q.values()[flat / 3][flat % 3] = math.copy(independent[i]);
+        }
+        const auto rows = original.original_rows();
+        const auto sources = original.sources();
+        const Position zero{};
+        const auto rhs = [&](std::size_t i) -> const Position& {
+            return homogeneous ? zero : rows[i].prescribed;
+        };
+        for (std::size_t i = 0; i < groups; ++i)
+            factors[i].solve_pivots(math, q.values(), transformed.values(), rhs, components[i]);
+        for (std::size_t i = 0; i < rows.size(); ++i) {
+            math.visit(1);
+            const auto mask = sources[static_cast<std::size_t>(rows[i].source)].world_components;
+            auto residual = copy_position(math, rhs(i));
+            for (const auto& term : partition_take(original.row(partition_index(i)))) {
+                math.visit(1);
+                subtract_scaled(math, residual, term.coefficient,
+                                q.values()[static_cast<std::size_t>(term.column)], mask);
+            }
+            if (std::ranges::any_of(residual, [](const auto& value) { return value.sign() != 0; }))
+                partition_fail(core::FailureCode::InvalidInput);
+        }
+        math.cancel();
+        return q;
+    }
+};
+
+PgComponentSparseChart::PgComponentSparseChart(PgGlobalConstraints&& original,
+                                               core::PlannedBuffer<Data> data) noexcept
+    : original_(std::move(original)), data_(std::move(data)) {}
+
+PgComponentSparseChart::PgComponentSparseChart(PgComponentSparseChart&&) noexcept = default;
+PgComponentSparseChart&
+PgComponentSparseChart::operator=(PgComponentSparseChart&&) noexcept = default;
+PgComponentSparseChart::~PgComponentSparseChart() = default;
+
+core::Result<PgComponentSparseChart>
+PgComponentSparseChart::prepare(PgGlobalConstraints&& original, const PgSparseChartLimits& limits,
+                                core::Workspace& workspace, core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgComponentSparseChart> {
+        ReferenceArithmetic math{limits.arithmetic, plan};
+        math.cancel();
+        std::optional<std::chrono::steady_clock::time_point> started;
+        if (limits.measure_preparation)
+            started = std::chrono::steady_clock::now();
+        const auto lease = partition_take(workspace.acquire());
+        static_cast<void>(lease);
+        const auto info = partition_take(original.info());
+        const auto columns = static_cast<std::uint64_t>(info.columns);
+        const auto rows = static_cast<std::uint64_t>(info.rows);
+        const auto pc = std::min({limits.maximum_pivots, columns, rows});
+        const auto wc = std::min(limits.maximum_row_terms, columns);
+        const auto fc = limits.maximum_factor_terms;
+        std::array<std::uint8_t, 3> components{};
+        std::size_t groups = 0;
+        const auto sources = original.sources();
+        for (unsigned axis = 0; axis < 3; ++axis) {
+            const auto bit = static_cast<std::uint8_t>(1U << axis);
+            auto group = std::span{components}.first(groups);
+            const auto matching = std::ranges::find_if(group, [&](std::uint8_t previous) {
+                return std::ranges::all_of(sources, [&](const auto& source) {
+                    math.visit(1);
+                    const auto mask = source.world_components;
+                    return ((mask & bit) != 0) == ((mask & previous) != 0);
+                });
+            });
+            if (matching == group.end())
+                components[groups++] = bit;
+            else
+                *matching |= bit;
+        }
+        std::array<std::uint64_t, 3> active_rows{};
+        std::uint64_t active_factors = 0;
+        for (std::size_t i = 0; i < groups; ++i) {
+            for (const auto& source : sources) {
+                math.visit(1);
+                if ((source.world_components & components[i]) != 0)
+                    active_rows[i] =
+                        partition_add(active_rows[i], static_cast<std::uint64_t>(source.rows));
+            }
+            if (active_rows[i] != 0)
+                ++active_factors;
+        }
+        const auto factor_live = partition_mul(active_factors, fc);
+        const auto row_scratch = partition_add(partition_mul(2, wc), pc);
+        const auto lift_scratch = partition_mul(3, partition_add(columns, pc));
+        const auto live = partition_add(factor_live, std::max(row_scratch, lift_scratch));
+        math.admit(partition_add(reference_live_rationals, live));
+        auto owner = allocate<Data>(math, 1);
+        auto& data = owner.values().front();
+        data.components = components;
+        data.groups = groups;
+        auto free_mask = allocate<std::uint8_t>(math, columns);
+        std::uint64_t total_free = 0, lower_terms = 0, upper_terms = 0;
+        for (std::size_t i = 0; i < groups; ++i) {
+            auto& factor = data.factors[i];
+            const auto [lower, upper] = factor.factor(
+                math, original, columns, std::min(pc, active_rows[i]), active_rows[i] == 0 ? 0 : wc,
+                active_rows[i] == 0 ? 0 : fc, components[i]);
+            lower_terms = partition_add(lower_terms, lower);
+            upper_terms = partition_add(upper_terms, upper);
+            data.maximum_rank = std::max(data.maximum_rank, factor.rank);
+            const auto axes = static_cast<std::uint64_t>(std::popcount(components[i]));
+            total_free = partition_add(total_free, partition_mul(axes, factor.free.size()));
+            for (const auto column : factor.free.values()) {
+                math.visit(1);
+                free_mask.values()[static_cast<std::size_t>(column)] |= components[i];
+            }
+        }
+        data.free = allocate<core::Index>(math, total_free);
+        std::size_t next = 0;
+        for (std::size_t i = 0; i < free_mask.size(); ++i) {
+            math.visit(1);
+            for (unsigned axis = 0; axis < 3; ++axis)
+                if ((free_mask.values()[i] & (1U << axis)) != 0)
+                    data.free.values()[next++] = partition_index(3 * i + axis);
+        }
+        static_cast<void>(data.solve(math, original, columns, {}, false));
+        ReferenceHash hash{math};
+        constexpr std::string_view version = "uvlas.pg.component-sparse-chart.v1";
+        hash.bytes(version.data(), version.size());
+        const auto original_id = chart_identity(math, original, {});
+        hash.bytes(original_id.bytes.data(), original_id.bytes.size());
+        for (const auto& source : sources) {
+            math.visit(1);
+            hash.word(source.world_components);
+        }
+        hash.word(groups);
+        for (std::size_t i = 0; i < groups; ++i) {
+            const auto& factor = data.factors[i];
+            hash.word(data.components[i]);
+            hash.word(factor.rank);
+            for (const auto& pivot : factor.pivots.values().first(factor.rank)) {
+                math.visit(1);
+                hash.word(static_cast<std::uint64_t>(pivot.original_row));
+                hash.word(static_cast<std::uint64_t>(pivot.dependent_column));
+            }
+        }
+        data.identity = {hash.result().bytes};
+        std::optional<core::StageTiming> timing;
+        if (started) {
+            const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                     std::chrono::steady_clock::now() - *started)
+                                     .count();
+            timing = core::StageTiming{1, static_cast<std::uint64_t>(elapsed)};
+        }
+        const auto rank = partition_mul(3, columns) - total_free;
+        data.report = {active_factors, rank, lower_terms, upper_terms, math.info(), timing};
+        math.cancel();
+        return PgComponentSparseChart{std::move(original), std::move(owner)};
+    });
+}
+
+core::Result<PgSparseChartIdentity> PgComponentSparseChart::identity() const noexcept {
+    if (data_.size() == 0)
+        return std::unexpected(
+            core::Failure{core::FailureCode::StaleGeneration, partition_operation});
+    return data_.values().front().identity;
+}
+
+core::Result<PgComponentSparsePreparation> PgComponentSparseChart::preparation() const noexcept {
+    if (data_.size() == 0)
+        return std::unexpected(
+            core::Failure{core::FailureCode::StaleGeneration, partition_operation});
+    return data_.values().front().report;
+}
+
+const PgGlobalConstraints& PgComponentSparseChart::original() const& noexcept {
+    return original_;
+}
+
+std::span<const core::Index> PgComponentSparseChart::free_columns() const& noexcept {
+    return data_.size() == 0 ? std::span<const core::Index>{}
+                             : data_.values().front().free.values();
+}
+
+core::Result<core::PlannedBuffer<Position>>
+PgComponentSparseChart::lift_impl(PgComponentSparseInput input, bool homogeneous,
+                                  const PgReferenceLimits& limits, core::Workspace& workspace,
+                                  core::ResourcePlan& plan) const noexcept {
+    return partition_entry([&]() -> core::Result<core::PlannedBuffer<Position>> {
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto lease = partition_take(workspace.acquire());
+        static_cast<void>(lease);
+        if (input.identity != partition_take(identity()))
+            partition_fail(core::FailureCode::StaleGeneration);
+        const auto& data = data_.values().front();
+        if (input.values.size() != data.free.size())
+            partition_fail(core::FailureCode::InvalidInput);
+        const auto columns = static_cast<std::uint64_t>(partition_take(original_.info()).columns);
+        const auto live = partition_mul(3, partition_add(columns, data.maximum_rank));
+        math.admit(partition_add(reference_live_rationals, live));
+        return data.solve(math, original_, columns, input.values, homogeneous);
+    });
+}
+
+core::Result<core::PlannedBuffer<Position>>
+PgComponentSparseChart::lift(PgComponentSparseInput input, const PgReferenceLimits& limits,
+                             core::Workspace& workspace, core::ResourcePlan& plan) const noexcept {
+    return lift_impl(input, false, limits, workspace, plan);
+}
+
+core::Result<core::PlannedBuffer<Position>>
+PgComponentSparseChart::tangent(PgComponentSparseInput input, const PgReferenceLimits& limits,
+                                core::Workspace& workspace,
+                                core::ResourcePlan& plan) const noexcept {
+    return lift_impl(input, true, limits, workspace, plan);
+}
+
+core::Result<PgComponentSparseDual>
+PgComponentSparseChart::transpose(PgSparseChartInput input, const PgReferenceLimits& limits,
+                                  core::Workspace& workspace,
+                                  core::ResourcePlan& plan) const noexcept {
+    return partition_entry([&]() -> core::Result<PgComponentSparseDual> {
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto lease = partition_take(workspace.acquire());
+        static_cast<void>(lease);
+        if (input.identity != partition_take(identity()))
+            partition_fail(core::FailureCode::StaleGeneration);
+        const auto info = partition_take(original_.info());
+        const auto columns = static_cast<std::uint64_t>(info.columns);
+        const auto rows = static_cast<std::uint64_t>(info.rows);
+        if (input.values.size() != columns)
+            partition_fail(core::FailureCode::InvalidInput);
+        const auto& data = data_.values().front();
+        const auto live =
+            partition_add(partition_mul(3, partition_add(columns, rows)), data.free.size());
+        math.admit(partition_add(reference_live_rationals, live));
+        auto work = allocate<Position>(math, columns);
+        auto multipliers = allocate<Position>(math, rows);
+        auto reduced = allocate<ExactRational>(math, data.free.size());
+        for (std::size_t i = 0; i < input.values.size(); ++i) {
+            math.visit(1);
+            work.values()[i] = copy_position(math, input.values[i]);
+        }
+        for (std::size_t i = 0; i < data.groups; ++i)
+            data.factors[i].transpose_pivots(math, work.values(), multipliers.values(),
+                                             data.components[i]);
+        for (std::size_t i = 0; i < data.free.size(); ++i) {
+            math.visit(1);
+            const auto flat = static_cast<std::size_t>(data.free.values()[i]);
+            reduced.values()[i] = std::move(work.values()[flat / 3][flat % 3]);
+        }
+        math.cancel();
+        return PgComponentSparseDual{std::move(reduced), std::move(multipliers), math.info()};
     });
 }
 

@@ -32,6 +32,16 @@ struct PgConstraintTraceBinding {
     std::optional<core::Index> right_patch; ///< Empty for a fixed support.
 };
 
+/// A static material point row in one prepared basis, in increasing local column order.
+struct PgConstraintPointBinding {
+    PgConstraintId id;
+    PgPreparedPatchIdentity basis;
+    core::Index patch;
+    std::uint8_t world_components; ///< Bit 0/1/2 selects world X/Y/Z.
+    std::span<const PgTraceSparseEntry> terms;
+    const PgCartesianExactPosition& prescribed;
+};
+
 struct PgConstraintPatchLayout {
     numerics::PatchId id{0};
     PgPreparedPatchIdentity basis;
@@ -42,6 +52,7 @@ struct PgConstraintPatchLayout {
 struct PgConstraintSource {
     PgConstraintId id{0};
     PgTraceKind kind = PgTraceKind::Connection;
+    std::uint8_t world_components = 7;
     numerics::PatchId left{0};
     std::optional<numerics::PatchId> right;
     core::Index first_row{}, rows{};
@@ -49,7 +60,7 @@ struct PgConstraintSource {
 };
 
 struct PgConstraintOriginalRow {
-    core::Index source{}, source_row{}, source_overlap{};
+    core::Index source{}, source_row{}, source_overlap{}; ///< A point has no overlap (-1).
     PgCoefficientField field = PgCoefficientField::R;
     std::uint32_t power = 0;
     core::Index local_representative = -1;
@@ -63,7 +74,8 @@ struct PgGlobalConstraintLimits {
 };
 
 struct PgGlobalConstraintInfo {
-    core::Index columns{}, rows{}, nonzeros{}; ///< One scalar coefficient per Cartesian triple.
+    core::Index columns{}, rows{}, nonzeros{}; ///< One coefficient per participating triple.
+    bool common_cartesian = true;              ///< All rows act on three components.
     PgReferenceCallInfo preparation;
 };
 
@@ -87,6 +99,13 @@ public:
     prepare(std::span<const PgConstraintPatchBinding>, std::span<const PgConstraintTraceBinding>,
             const PgGlobalConstraintLimits&, core::Workspace&, core::ResourcePlan&) noexcept;
 
+    /// Append fixed point rows after the existing traces. Point and trace support
+    /// IDs belong to the same namespace. A point owns only its selected components.
+    [[nodiscard]] static core::Result<PgGlobalConstraints>
+    prepare(std::span<const PgConstraintPatchBinding>, std::span<const PgConstraintTraceBinding>,
+            std::span<const PgConstraintPointBinding>, const PgGlobalConstraintLimits&,
+            core::Workspace&, core::ResourcePlan&) noexcept;
+
     [[nodiscard]] core::Result<PgGlobalConstraintInfo> info() const noexcept;
     [[nodiscard]] std::span<const PgConstraintPatchLayout> layout() const& noexcept;
     [[nodiscard]] std::span<const PgConstraintPatchLayout> layout() const&& = delete;
@@ -107,7 +126,8 @@ public:
     [[nodiscard]] core::Result<core::PlannedBuffer<PgCartesianExactPosition>>
     residual(PgGlobalConstraintCoordinates, const PgReferenceLimits&, core::Workspace&,
              core::ResourcePlan&) const noexcept;
-    /// Lambda uses the original row order of this exact owner.
+    /// Lambda uses the original row order of this exact owner. Unselected components
+    /// of point rows contribute zero, as in the forward action.
     [[nodiscard]] core::Result<core::PlannedBuffer<PgCartesianExactPosition>>
     transpose(std::span<const PgCartesianExactPosition>, const PgReferenceLimits&, core::Workspace&,
               core::ResourcePlan&) const noexcept;

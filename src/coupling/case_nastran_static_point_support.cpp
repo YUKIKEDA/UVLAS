@@ -1,5 +1,7 @@
 #include "case_nastran_static_point_support.hpp"
 
+#include "case_material_reference.hpp"
+#include "case_pg_chart.hpp"
 #include "io/nastran_support_selection.hpp"
 #include "io/si_case_detail.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
@@ -82,22 +84,27 @@ select_shell(Query& q, const CaseNastranPlanarPgSet& set, const in::ParsedMeshSi
     q.reject(Reason::Position, Code::Unsupported);
 }
 
-[[nodiscard]] std::uint64_t compare_point(Query& q, const io::SiCase& si,
-                                          const s::MaterialPoint& target,
-                                          const in::ExternalPlanarPgView& geometry) {
+struct PointMatch {
+    std::uint64_t element;
+    structure::PgPartitionPoint chart;
+    structure::PgCartesianExactPosition world_metres;
+};
+
+[[nodiscard]] PointMatch compare_point(Query& q, const io::SiCase& si,
+                                       const s::MaterialPoint& target,
+                                       const in::ExternalPlanarPgView& geometry) {
     const auto coordinate = [&](core::Index i) {
         return q.exact(partition_take(si.quantity(partition_take(target.coordinates.at(i)))).recipe,
                        Reason::Position);
     };
     if (coordinate(2).sign() != 0)
         q.reject(Reason::Position);
-    const auto s_coordinate = coordinate(0);
-    const auto t_coordinate = coordinate(1);
+    structure::PgPartitionPoint chart{coordinate(0), coordinate(1)};
     for (const auto& face : geometry.faces) {
         for (const auto& corner : face.ring()) {
             q.math.visit(1);
-            if (corner.node != q.detail.grid.value() || !q.equal(corner.chart.s, s_coordinate) ||
-                !q.equal(corner.chart.t, t_coordinate))
+            if (corner.node != q.detail.grid.value() || !q.equal(corner.chart.s, chart.s) ||
+                !q.equal(corner.chart.t, chart.t))
                 continue;
             q.detail.element = face.element;
             if (corner.nastran && corner.nastran->unshifted_metres &&
@@ -109,7 +116,10 @@ select_shell(Query& q, const CaseNastranPlanarPgSet& set, const in::ParsedMeshSi
                     face.nastran_offset.transform([](const auto& offset) { return offset.byte; });
                 q.reject(Reason::Position);
             }
-            return face.element;
+            const auto& xyz = corner.position_metres;
+            return {face.element,
+                    std::move(chart),
+                    {q.math.copy(xyz[0]), q.math.copy(xyz[1]), q.math.copy(xyz[2])}};
         }
     }
     q.reject(Reason::Position);
@@ -175,10 +185,11 @@ void compare_components(Query& q, const in::NastranShellCards& shells, unsigned 
     if (std::popcount(local) != std::popcount(world))
         q.reject(Reason::Components);
     const auto& limits = q.math.limits;
-    // Borrow no support or chart rationals in this nested calculation.
+    // The matched chart point and its three basic GRID coordinates stay live.
+    auto algebra = limits.algebra;
+    q.math.reserve_nested_rationals(algebra, 5);
     const in::NastranSpcDirectionLimits directions{
-        limits.algebra, limits.maximum_partition_visits - q.math.partition_visits,
-        limits.cancellation};
+        algebra, limits.maximum_partition_visits - q.math.partition_visits, limits.cancellation};
     auto result = in::prepare_nastran_displacement_axes(
         shells, q.detail.grid, static_cast<std::uint8_t>(local), directions, q.math.plan,
         &q.detail.direction);
@@ -277,8 +288,8 @@ core::Result<CaseNastranPointSupport> certify_case_nastran_static_point_support(
             !deck->input.bulk.same_snapshot(geometry->source, geometry->digest))
             q.reject(Reason::Binding, Code::StaleGeneration);
 
-        q.math.admit();
-        const auto element = compare_point(q, si, target, *geometry);
+        q.math.admit(ref::reference_live_rationals + 5);
+        auto point = compare_point(q, si, target, *geometry);
         require_static(q, si, support.motion.record());
         const auto world = world_mask(q, support);
         std::size_t count = 0;
@@ -318,12 +329,203 @@ core::Result<CaseNastranPointSupport> certify_case_nastran_static_point_support(
                                        *row,
                                        shell,
                                        patch,
-                                       element,
+                                       point.element,
+                                       std::move(point.chart),
+                                       std::move(point.world_metres),
                                        node->id_field.position,
                                        node->displacement_system.id,
                                        q.detail.cd_field,
                                        static_cast<std::uint8_t>(world),
-                                       std::move(owned)};
+                                       std::move(owned),
+                                       q.math.info()};
+    });
+}
+
+namespace {
+struct PointRowInput {
+    PointRowInput(in::MeshSupportId support_id, in::MeshShellId shell_id, std::uint8_t components,
+                  const structure::PgPartitionPoint& point,
+                  const structure::PgReferenceIdentity* reference,
+                  const structure::PgCartesianExactPosition* position) noexcept
+        : support(support_id),
+          shell(shell_id),
+          world_components(components),
+          chart(point),
+          geometry(reference),
+          world_metres(position) {}
+
+    in::MeshSupportId support;
+    in::MeshShellId shell;
+    std::uint8_t world_components;
+    const structure::PgPartitionPoint& chart;
+    const structure::PgReferenceIdentity* geometry;
+    const structure::PgCartesianExactPosition* world_metres;
+};
+
+core::Result<CaseStaticPgPointRow> assemble_point_row(PointRowInput point,
+                                                      const structure::PgPreparedPatch& patch,
+                                                      const structure::PgReferenceLimits& limits,
+                                                      core::ResourcePlan& plan) noexcept {
+    return ref::partition_entry([&]() -> core::Result<CaseStaticPgPointRow> {
+        namespace pg = structure;
+        ref::ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto info = partition_take(patch.info());
+        if (point.geometry != nullptr && info.geometry != *point.geometry)
+            ref::partition_fail(Code::StaleGeneration);
+        if (point.world_components == 0 || (point.world_components & ~7U) != 0)
+            ref::partition_fail(Code::InvalidInput);
+        const auto* basis = partition_take(patch.conditioning().reference_basis());
+        const auto source = partition_take(basis->source());
+        const auto vertices = partition_take(source.partition.vertices());
+        const auto triangles = partition_take(source.partition.triangles());
+        const auto layers = partition_take(source.partition.layers());
+        const auto volumes = partition_take(source.partition.volumes());
+        const auto coordinates = patch.reference_coordinates();
+        const auto columns = static_cast<std::uint64_t>(coordinates.size());
+        // One live batch holds N and three physical-gradient scalars per column.
+        // Each scalar has two rationals. Also admit the retained row and RHS.
+        const auto local_slots = ref::partition_add(ref::basis_live_rationals, 12);
+        math.admit(ref::partition_add(local_slots, ref::partition_mul(9, columns)));
+        std::optional<CaseStaticPgPointRow> result;
+        for (std::size_t i = 0; i < volumes.size(); ++i) {
+            math.visit(1);
+            const auto& volume = volumes[i];
+            const auto& layer = layers[static_cast<std::size_t>(volume.layer)];
+            if (layer.lower.sign() > 0 || layer.upper.sign() < 0)
+                continue;
+            const auto& triangle = triangles[static_cast<std::size_t>(volume.triangle)];
+            const auto uv = case_material_triangle_coordinates(math, triangle, vertices,
+                                                               point.chart.s, point.chart.t);
+            if (!uv)
+                continue;
+            const auto u = math.div((*uv)[0], triangle.twice_area);
+            const auto v = math.div((*uv)[1], triangle.twice_area);
+            const auto depth = math.div(math.neg(layer.lower), math.sub(layer.upper, layer.lower));
+            const std::array<pg::PgReferencePoint, 1> query{
+                pg::PgReferenceVolumePoint{partition_index(i), u, v, depth}};
+            auto nested = limits;
+            nested.maximum_scalar_operations -= math.scalar_operations;
+            nested.maximum_partition_visits -= math.partition_visits;
+            const auto saved = result ? ref::partition_add(result->terms.size(), 3) : 0;
+            math.reserve_nested_rationals(nested.algebra, ref::partition_add(saved, 7));
+            auto evaluated = partition_take(patch.evaluate_reference(query, nested, plan));
+            math.charge(evaluated.call_info.scalar_operations);
+            math.visit(evaluated.call_info.partition_visits);
+            auto entries = evaluated.columns.values();
+            if (entries.size() != columns)
+                ref::partition_fail(Code::InvalidInput);
+            if (result) {
+                const auto terms = result->terms.values();
+                std::size_t next = 0;
+                for (std::size_t j = 0; j < entries.size(); ++j) {
+                    math.visit(1);
+                    const auto& value = entries[j].value;
+                    if (value.radical.sign() != 0)
+                        ref::partition_fail(Code::PrecisionUnresolved);
+                    if (value.rational.sign() == 0)
+                        continue;
+                    if (next >= terms.size() || terms[next].column != partition_index(j) ||
+                        math.compare(terms[next].coefficient, value.rational) != 0)
+                        ref::partition_fail(Code::GeometryInvalid);
+                    ++next;
+                }
+                if (next != terms.size())
+                    ref::partition_fail(Code::GeometryInvalid);
+                continue;
+            }
+            std::uint64_t nonzeros = 0;
+            for (const auto& entry : entries) {
+                math.visit(1);
+                if (entry.value.radical.sign() != 0)
+                    ref::partition_fail(Code::PrecisionUnresolved);
+                nonzeros += entry.value.rational.sign() != 0 ? 1U : 0U;
+            }
+            if (nonzeros == 0)
+                ref::partition_fail(Code::GeometryInvalid);
+            auto terms = partition_take(plan.allocate<pg::PgTraceSparseEntry>(
+                partition_index(nonzeros), ref::partition_operation));
+            pg::PgCartesianExactPosition actual;
+            std::size_t next = 0;
+            for (std::size_t j = 0; j < entries.size(); ++j) {
+                math.visit(1);
+                auto& value = entries[j].value.rational;
+                if (value.sign() == 0)
+                    continue;
+                for (std::size_t axis = 0; axis < actual.size(); ++axis)
+                    actual[axis] = math.add(actual[axis], math.mul(value, coordinates[j][axis]));
+                terms.values()[next++] = {partition_index(j), std::move(value)};
+            }
+            if (point.world_metres != nullptr)
+                for (std::size_t axis = 0; axis < actual.size(); ++axis)
+                    if (math.compare(actual[axis], (*point.world_metres)[axis]) != 0)
+                        ref::partition_fail(Code::GeometryInvalid);
+            result.emplace(CaseStaticPgPointRow{info.identity,
+                                                point.support,
+                                                point.shell,
+                                                point.world_components,
+                                                std::move(terms),
+                                                std::move(actual),
+                                                {}});
+        }
+        if (!result)
+            ref::partition_fail(Code::GeometryInvalid);
+        math.cancel();
+        result->call_info = math.info();
+        return std::move(*result);
+    });
+}
+} // namespace
+
+core::Result<CaseStaticPgPointRow> assemble_case_nastran_static_point_row(
+    const CaseNastranPointSupport& point, const structure::PgPreparedPatch& patch,
+    const structure::PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
+    return assemble_point_row({point.mapping.support, point.shell, point.world_components,
+                               point.chart, &point.patch, &point.world_metres},
+                              patch, limits, plan);
+}
+
+core::Result<CaseStaticPgPointRow> assemble_case_static_pg_point_row(
+    const io::SiCase& si, const s::SupportConstraint& support, const CaseStaticPgPointPatch& bound,
+    const structure::PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
+    return ref::partition_entry([&]() -> core::Result<CaseStaticPgPointRow> {
+        Query query{{limits, plan}, nullptr, {}};
+        query.math.cancel();
+        const auto identity = partition_take(partition_take(si.source_case()).get().identity());
+        if (!in::same_identity(identity, bound.source()))
+            query.reject(Reason::Binding, Code::StaleGeneration);
+        const auto target = support.target.record();
+        const auto member = target.target.record();
+        using Target = decltype(member.kind.selected());
+        using Side = decltype(target.side.selected());
+        if (member.kind.selected() != Target::ItemShell ||
+            target.side.selected() != Side::ItemInterior)
+            query.reject(Reason::Position, Code::Unsupported);
+        if (member.id.unsigned_value() != bound.shell().value())
+            query.reject(Reason::Position, Code::InvalidInput);
+        query.math.admit();
+        require_static(query, si, support.motion.record());
+        const auto coordinate = [&](core::Index i) {
+            return query.exact(
+                partition_take(si.quantity(partition_take(target.coordinates.at(i)))).recipe,
+                Reason::Position);
+        };
+        if (coordinate(2).sign() != 0)
+            query.reject(Reason::Position, Code::Unsupported);
+        const auto mask = static_cast<std::uint8_t>(world_mask(query, support));
+        const structure::PgPartitionPoint chart{coordinate(0), coordinate(1)};
+        auto remaining = limits;
+        remaining.maximum_scalar_operations -= query.math.scalar_operations;
+        remaining.maximum_partition_visits -= query.math.partition_visits;
+        query.math.reserve_nested_rationals(remaining.algebra, 2);
+        auto row = partition_take(assemble_point_row(
+            {in::MeshSupportId{support.id.unsigned_value()}, in::MeshShellId{bound.shell().value()},
+             mask, chart, nullptr, nullptr},
+            bound.patch(), remaining, plan));
+        query.math.charge(row.call_info.scalar_operations);
+        query.math.visit(row.call_info.partition_visits);
+        row.call_info = query.math.info();
+        return row;
     });
 }
 } // namespace uvlas::coupling::detail

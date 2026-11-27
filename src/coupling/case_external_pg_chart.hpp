@@ -1,6 +1,7 @@
 #pragma once
 
 #include "case_gmsh_support_boundary.hpp"
+#include "case_nastran_static_point_support.hpp"
 #include "case_pg_chart.hpp"
 
 namespace uvlas::coupling::detail {
@@ -56,5 +57,30 @@ prepare_case_nastran_pg_chart(const io::SiCase&, const io::detail::ExternalMeshS
                               std::span<const CasePgRuleBinding>, const CaseNastranPgChartLimits&,
                               core::Workspace&, core::ResourcePlan&, const std::stop_token& = {},
                               CaseNastranPgSetDiagnostic* = nullptr) noexcept;
+
+struct CaseNastranPointPgChartLimits {
+    CaseNastranPgChartLimits base;
+    CaseNastranPointSupportLimits support;
+    std::uint64_t maximum_support_mappings{};
+};
+
+struct CaseNastranPointPgChartDiagnostic {
+    CaseNastranPgSetDiagnostic shell;
+    std::optional<CaseNastranPointSupportDiagnostic> support;
+};
+
+/// Own the qualified Shells, the static point-support evidence in sidecar order,
+/// and the chart built from the same conditioned bases.
+struct CaseNastranPointPgChart {
+    CaseComponentPgChart structural;
+    core::PlannedBuffer<std::optional<CaseNastranPgMatch>> shells;
+    core::PlannedBuffer<std::optional<CaseNastranPointSupport>> supports;
+};
+
+[[nodiscard]] core::Result<CaseNastranPointPgChart> prepare_case_nastran_pg_chart(
+    const io::SiCase&, const io::detail::ExternalMeshSidecarBinding&,
+    const io::detail::NastranLaminateCards&, std::span<const CasePgRuleBinding>,
+    const CaseNastranPointPgChartLimits&, core::Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}, CaseNastranPointPgChartDiagnostic* = nullptr) noexcept;
 
 } // namespace uvlas::coupling::detail
