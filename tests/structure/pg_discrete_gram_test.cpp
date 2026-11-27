@@ -270,13 +270,12 @@ void check_curved_area_projection(Fixture& f, const PgPreparedPatch& patch,
 void check_retained_reference_projection(const PgPreparedPatch& patch,
                                          const PgReferenceLimits& limits,
                                          core::ResourcePlan& plan) {
-    const auto rule = patch.fixed_rule();
-    REQUIRE(rule);
-    REQUIRE(rule->size() > 2);
+    const auto rule = patch.fixed_rule().value_or(std::span<const PgOwnedDiscreteVolumePoint>{});
+    REQUIRE(rule.size() > 2);
     const auto query = [](const PgOwnedDiscreteVolumePoint& p) -> PgReferencePoint {
         return PgReferenceVolumePoint{p.volume, p.u, p.v, p.depth};
     };
-    const std::array points{query((*rule)[1]), query((*rule)[2])};
+    const std::array points{query(rule[1]), query(rule[2])};
     constexpr PgPreparedReferenceProjection accuracy{
         core::Precision::TwoWord, 0x1p-60, 0x1p-60, 0x1p-42, 0x1p-60, 0x1p-60};
     const auto direct = take(patch.project_reference(points, accuracy, limits, plan));
@@ -289,7 +288,7 @@ void check_retained_reference_projection(const PgPreparedPatch& patch,
     REQUIRE(retained.points().size() == points.size());
     for (std::size_t row = 0; row < points.size(); ++row) {
         CHECK(retained.points()[row].domain == PgProjectedReferenceDomain::Volume);
-        CHECK(retained.points()[row].partition_record == (*rule)[row + 1].volume);
+        CHECK(retained.points()[row].partition_record == rule[row + 1].volume);
         CHECK(retained.points()[row].layer == direct.points()[row].layer);
     }
     CHECK(std::ranges::equal(retained.high_words(), direct.high_words()));
