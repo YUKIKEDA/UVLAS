@@ -709,15 +709,27 @@ public:
         });
     }
 
-    static AeroResult<P1SerialAssemblyPlan> forecast_serial(const P1ActionSource& source,
-                                                            std::span<const P1FaceStrengths> faces,
-                                                            std::span<const P1StrengthId> strengths,
-                                                            const P1AssemblyLimits& limits,
-                                                            const std::stop_token& stop) noexcept {
+    static std::uint64_t midpoint_steps(const GeometryData& geometry,
+                                        const GlobalContactData& verified) {
+        return sum(sum(logarithmic_visits(geometry.edge_lookup.size()),
+                       logarithmic_visits(verified.topology->trailing.size())),
+                   sum(1, product(geometry.facets.size(), 6)));
+    }
+
+    static AeroResult<P1SerialAssemblyPlan>
+    forecast_serial(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+                    std::span<const P1StrengthId> strengths, const P1AssemblyLimits& limits,
+                    const std::stop_token& stop, bool midpoint = false) noexcept {
         return guarded<P1SerialAssemblyPlan>(source.query.context(), [&] {
             Work work{0, limits.steps, stop};
-            const auto ordinary = count(source, faces, strengths, limits, work, true);
-            const auto& geometry = *source_data(source).geometry->data_;
+            auto ordinary = count(source, faces, strengths, limits, work, true);
+            const auto& verified = source_data(source);
+            const auto& geometry = *verified.geometry->data_;
+            if (midpoint) {
+                ordinary.reserved_steps =
+                    sum(ordinary.reserved_steps, midpoint_steps(geometry, verified));
+                (void)checked_limit(ordinary.reserved_steps, limits.steps);
+            }
             const auto facets = geometry.facets.size();
             if (facets == 0)
                 return P1SerialAssemblyPlan{ordinary, ordinary.payload_bytes,
@@ -838,10 +850,7 @@ public:
             (void)checked_limit(plan.payload_bytes, memory.remaining_bytes());
             std::optional<std::size_t> excluded;
             if (self) {
-                const auto extra = sum(sum(logarithmic_visits(geometry.edge_lookup.size()),
-                                           logarithmic_visits(verified.topology->trailing.size())),
-                                       sum(1, product(geometry.facets.size(), 6)));
-                plan.reserved_steps = sum(plan.reserved_steps, extra);
+                plan.reserved_steps = sum(plan.reserved_steps, midpoint_steps(geometry, verified));
                 (void)checked_limit(plan.reserved_steps, limits.steps);
                 work.step();
                 const auto definition = needed(source.query.definition());
@@ -1024,16 +1033,18 @@ public:
         });
     }
 
-    static AeroResult<SharedP1Action> prepare_reusing_facets(
-        const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
-        std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
-        const P1AssemblyLimits& limits, SharedP1Workspace& workspace, LocalPacketWorkspace& local,
-        P1Workspace& kernel, BoundWakeFacetStorage& reuse, const std::stop_token& stop) noexcept {
+    static AeroResult<SharedP1Action>
+    prepare_reusing_facets(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+                           std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
+                           P1Accuracy accuracy, const P1AssemblyLimits& limits,
+                           SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+                           P1Workspace& kernel, BoundWakeFacetStorage& reuse,
+                           const std::stop_token& stop, std::optional<EdgeId> self = {}) noexcept {
         if (reuse.preparing_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(invalid, source.query.context()));
         const Lease lease{reuse.preparing_};
         return prepare(source, faces, strengths, local_accuracy, accuracy, limits, workspace, local,
-                       kernel, reuse.memory_, stop, true, {}, &reuse);
+                       kernel, reuse.memory_, stop, true, self, &reuse);
     }
 
     static AeroResult<P1ActionValue> apply(const SharedP1Action& action,
@@ -1466,6 +1477,23 @@ AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
     P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
     return SharedP1Engine::prepare(source, faces, strengths, local_accuracy, accuracy, limits,
                                    workspace, local, kernel, memory, stop, true, self);
+}
+
+AeroResult<P1SerialAssemblyPlan> forecast_bound_wake_midpoint_serial_induction(
+    const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+    std::span<const P1StrengthId> strengths, const P1AssemblyLimits& limits,
+    const std::stop_token& stop) noexcept {
+    return SharedP1Engine::forecast_serial(source, faces, strengths, limits, stop, true);
+}
+
+AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
+    const P1ActionSource& source, EdgeId self, std::span<const P1FaceStrengths> faces,
+    std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
+    const P1AssemblyLimits& limits, SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+    P1Workspace& kernel, BoundWakeFacetStorage& storage, const std::stop_token& stop) noexcept {
+    return SharedP1Engine::prepare_reusing_facets(source, faces, strengths, local_accuracy,
+                                                  accuracy, limits, workspace, local, kernel,
+                                                  storage, stop, self);
 }
 
 AeroResult<P1ActionValue> apply_shared_p1(const SharedP1Action& action,

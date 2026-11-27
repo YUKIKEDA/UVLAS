@@ -232,6 +232,11 @@ TEST_CASE("P1 owns original geometry and survives failures moves and workspace r
                                          p1_limits(), **kernel, setup));
     const auto saved = owned_bits(result);
     const auto admitted = take(result.work_plan());
+    const auto steps = take(result.steps());
+    arithmetic::Work constants{0, p1_limits().max_steps, {}};
+    (void)arithmetic::pi_constant(constants);
+    (void)arithmetic::logarithm_series(
+        arithmetic::divide(arithmetic::integer(1), arithmetic::integer(3), constants), constants);
     {
         core::ResourcePlan exact{P1Basis::payload_bytes()};
         auto value = evaluate_p1_basis(
@@ -239,6 +244,8 @@ TEST_CASE("P1 owns original geometry and survives failures moves and workspace r
             {numerics::linear::EstimateAdmission{28672}, admitted.maximum_steps}, **kernel, exact);
         REQUIRE(value);
         CHECK(owned_bits(*value) == saved);
+        CHECK(take(value->steps()) + constants.used == steps);
+        CHECK(take(value->work_plan()).maximum_steps == admitted.maximum_steps);
         CHECK(exact.allocated_bytes() == P1Basis::payload_bytes());
     }
     core::ResourcePlan short_result{P1Basis::payload_bytes() - 1};

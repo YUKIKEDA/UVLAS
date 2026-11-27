@@ -2660,6 +2660,8 @@ struct NonpenetrationBuilder {
         std::size_t original_edge_cursor = 0;
         LoadTotals totals;
         const auto ambient = flow != nullptr ? ambient_velocity(*flow, work) : Vector{};
+        a::BoundWakeFacetStorage midpoint_storage{memory};
+        std::optional<std::uint64_t> midpoint_reuse_steps;
         for (std::size_t i = 0; i < edges.size(); ++i) {
             work.step();
             const auto& edge = edges.values()[i];
@@ -2668,21 +2670,36 @@ struct NonpenetrationBuilder {
             auto center = a_pos;
             accumulate_vector(center, b_pos, work);
             center = scale_vector(center, half, work);
-            // The query API has no work readback. Charge its full explicit allowance.
             auto query_limits = limits.induction.geometry;
             query_limits.max_steps = std::min(query_limits.max_steps, remaining(work));
             const auto query = require(a::resolve_query(
                 geometry,
                 {a::QueryId{edge.edge.value()}, a::SourceEdgePoint{edge.edge, a::SingleWord{.5}}},
                 geometry.context(), query_limits, geometry_work, memory, stop));
-            account(work, query_limits.max_steps);
+            account(work, query.used_steps());
             const a::P1ActionSource source{input.contact, query, input.trial_stamp};
             auto action_limits = limits.induction;
             action_limits.steps = std::min(action_limits.steps, remaining(work));
-            const auto action = require(a::prepare_bound_wake_midpoint_induction(
-                source, edge.edge, assembly.maps.values(), assembly.ids.values(),
-                limits.geometry_accuracy, limits.induction_accuracy, action_limits, shared, local,
-                kernel, memory, stop));
+            if (i == 0 && edges.size() > 1) {
+                const auto plan = require(a::forecast_bound_wake_midpoint_serial_induction(
+                    source, assembly.maps.values(), assembly.ids.values(), action_limits, stop));
+                account(work, plan.ordinary.preflight_steps);
+                action_limits.steps = std::min(action_limits.steps, remaining(work));
+                if (plan.reusable && plan.initial_payload_bytes <= plan.ordinary.payload_bytes &&
+                    plan.repeated_payload_bytes < plan.ordinary.payload_bytes &&
+                    plan.repeated_reserved_steps <= action_limits.steps)
+                    midpoint_reuse_steps = plan.repeated_reserved_steps;
+            }
+            const auto action =
+                require(midpoint_reuse_steps && *midpoint_reuse_steps <= action_limits.steps
+                            ? a::prepare_bound_wake_midpoint_induction(
+                                  source, edge.edge, assembly.maps.values(), assembly.ids.values(),
+                                  limits.geometry_accuracy, limits.induction_accuracy,
+                                  action_limits, shared, local, kernel, midpoint_storage, stop)
+                            : a::prepare_bound_wake_midpoint_induction(
+                                  source, edge.edge, assembly.maps.values(), assembly.ids.values(),
+                                  limits.geometry_accuracy, limits.induction_accuracy,
+                                  action_limits, shared, local, kernel, memory, stop));
             const auto report = require(action.report());
             account(work, report.used_steps);
             std::optional<a::P1ActionDirection> variation;
