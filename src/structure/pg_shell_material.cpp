@@ -1,3 +1,4 @@
+#include "pg_conditioned_volume_row.hpp"
 #include "pg_conditioning_factor.hpp"
 #include "pg_reference_projection.hpp"
 
@@ -1196,11 +1197,10 @@ apply_consistent_mass(const PgPreparedPatch& patch, std::span<const Sample> samp
         for (const auto& entry : samples) {
             math.visit(1);
             const auto sample = quadrature_view(entry);
-            const PgReferencePoint query{sample.point};
-            auto row = partition_take(
-                patch.evaluate_reference(std::span{&query, 1}, remaining_limits(math, kept), plan));
-            record_work(math, row.call_info);
-            const auto& ref = row.points.values().front();
+            auto row = partition_take(detail::PgConditionedVolumeRow::evaluate(
+                patch.conditioning(), sample.point, remaining_limits(math, kept), plan));
+            record_work(math, row.work);
+            const auto& ref = row.reference;
             const auto root = bounds.root(ref.g);
             const auto& volume = volumes[static_cast<std::size_t>(sample.point.volume)];
             const auto layer = static_cast<std::size_t>(volume.layer);
@@ -1210,14 +1210,14 @@ apply_consistent_mass(const PgPreparedPatch& patch, std::span<const Sample> samp
             sum.add(mass, weighted_density);
             ReferenceRadicals exact{math, ref.g};
             PgReferenceVector displacement;
-            const auto shapes = row.columns.values();
+            const auto shapes = row.values.values();
             for (std::size_t j = 0; j < shapes.size(); ++j) {
                 math.visit(1);
                 for (std::size_t a = 0; a < displacement.size(); ++a) {
                     const auto& coefficient = direction.coefficients_metres[j][a];
                     if (coefficient.sign() != 0)
                         displacement[a] =
-                            exact.add(displacement[a], exact.scale(shapes[j].value, coefficient));
+                            exact.add(displacement[a], exact.scale(shapes[j], coefficient));
                 }
             }
             Vector weighted_displacement;
@@ -1226,7 +1226,7 @@ apply_consistent_mass(const PgPreparedPatch& patch, std::span<const Sample> samp
                     bounds.multiply(weighted_density, bounds.radical(displacement[a], root));
             for (std::size_t j = 0; j < shapes.size(); ++j) {
                 math.visit(1);
-                const auto n = bounds.radical(shapes[j].value, root);
+                const auto n = bounds.radical(shapes[j], root);
                 for (std::size_t a = 0; a < displacement.size(); ++a)
                     sum.add(action.values()[j][a], bounds.multiply(n, weighted_displacement[a]));
             }

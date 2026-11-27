@@ -1,3 +1,4 @@
+#include "pg_conditioned_volume_row.hpp"
 #include "pg_conditioning_factor.hpp"
 #include "pg_reference_arithmetic.hpp"
 #include "pg_reference_hash.hpp"
@@ -344,6 +345,52 @@ PgConditioningCertificate::evaluate(const PgReferencePoint& query, PgRankBasisCo
                             math.add(combined[field][d], math.mul(weight, source[field][d]));
         }
         return basis_.assemble(math, std::move(point), column, combined);
+    });
+}
+
+core::Result<detail::PgConditionedVolumeRow> detail::PgConditionedVolumeRow::evaluate(
+    const PgConditioningCertificate& certificate, const PgReferenceVolumePoint& query,
+    const PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgConditionedVolumeRow> {
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto& accepted = state(certificate.state_);
+        const auto rank = accepted.info.rank;
+        math.admit(partition_add(basis_live_rationals + 16 + 74, partition_mul(2, rank)));
+        auto values = partition_take(
+            plan.allocate<PgReferenceScalar>(partition_index(rank), partition_operation));
+        const auto& basis = certificate.basis_;
+        auto point = basis.locate(math, query);
+        const auto two = math.constant("2");
+        const auto z = math.mul(
+            math.div(point.reference.full_thickness_metres, math.mul(two, basis.length_metres())),
+            point.reference.zeta);
+        const auto half_z_squared = math.div(math.square(z), two);
+        const auto g_squared = math.square(point.reference.g);
+        auto row = values.values();
+        for (std::size_t i = 0; i < row.size(); ++i) {
+            math.visit(1);
+            const auto [r, p, c] =
+                basis.numerator_jet(math, {partition_index(i)}, point, /*derivatives=*/false);
+            row[i] = {math.add(r[0], math.mul(half_z_squared, c[0])),
+                      math.mul(z, math.div(p[0], g_squared))};
+        }
+        ReferenceRadicals field{math, point.reference.g};
+        for (std::size_t end = row.size(); end != 0; --end) {
+            const auto j = end - 1;
+            PgReferenceScalar combined{};
+            for (std::size_t i = 0; i <= j; ++i) {
+                math.visit(1);
+                if (accepted.transform.values()[packed(i, j)] == 0)
+                    continue;
+                const auto weight = entry(math, accepted, i, j);
+                combined = field.add(combined, field.scale(row[i], weight));
+            }
+            row[j] = std::move(combined);
+        }
+        math.cancel();
+        point.reference.call_info = math.info();
+        return PgConditionedVolumeRow{std::move(point.reference), std::move(values), math.info()};
     });
 }
 

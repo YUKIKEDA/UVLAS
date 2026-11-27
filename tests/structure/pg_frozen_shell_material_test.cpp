@@ -1,3 +1,4 @@
+#include "pg_conditioned_volume_row.hpp"
 #include "pg_conditioning_test_support.hpp"
 
 #include <nlohmann/json.hpp>
@@ -337,6 +338,30 @@ void check_action(std::span<const PgShellCartesianEnclosure> action,
     check_relative_enclosure(lo, hi, expected);
 }
 
+void compare_mass_row(const PgPreparedPatch& patch, const PgReferenceVolumePoint& point,
+                      const PgReferenceLimits& limits, core::ResourcePlan& plan) {
+    const auto slim =
+        checked(detail::PgConditionedVolumeRow::evaluate(patch.conditioning(), point, limits, plan),
+                "conditioned volume row");
+    const PgReferencePoint query{point};
+    const auto full = checked(patch.evaluate_reference(std::span{&query, 1}, limits, plan),
+                              "complete conditioned reference row");
+    const auto& reference = full.points.values().front();
+    REQUIRE(slim.reference.layer == reference.layer);
+    const auto& measure = std::get<PgReferenceVolumeMeasure>(slim.reference.measure).jacobian;
+    const auto& full_measure = std::get<PgReferenceVolumeMeasure>(reference.measure).jacobian;
+    CHECK(q(slim.reference.g) == q(reference.g));
+    CHECK(q(measure.rational) == q(full_measure.rational));
+    CHECK(q(measure.radical) == q(full_measure.radical));
+    const auto row = full.columns.values();
+    REQUIRE(slim.values.size() == row.size());
+    for (std::size_t j = 0; j < row.size(); ++j) {
+        CHECK(q(slim.values.values()[j].rational) == q(row[j].value.rational));
+        CHECK(q(slim.values.values()[j].radical) == q(row[j].value.radical));
+    }
+    CHECK(slim.work.allocated_owned_payload_bytes < full.call_info.allocated_owned_payload_bytes);
+}
+
 void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id,
                   const TrialState& state, const Json& material_input, const Json& expected,
                   Fixture& fixture, const PgReferenceLimits& limits, core::ResourcePlan& plan) {
@@ -380,6 +405,8 @@ void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id
         mass_rule.push_back(midpoint);
     }
     REQUIRE(layer_counts == std::array<std::size_t, 3>{8, 8, 8});
+    for (const auto i : {std::size_t{0}, volumes.size() / 2, volumes.size() - 1})
+        compare_mass_row(patch, mass_rule[i].point, limits, plan);
     const auto width = fixture.r("1", "1000000000000000000000");
     const PgShellPatchDirection displacement{patch_id, state.displacement};
     auto assembly_limits = limits;
