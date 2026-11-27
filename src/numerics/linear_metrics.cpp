@@ -144,6 +144,10 @@ MagnitudeBounds multiply_magnitudes(MagnitudeBounds a, MagnitudeBounds b) noexce
     return {multiply_bound(a.lower, b.lower, false), multiply_bound(a.upper, b.upper, true)};
 }
 
+double add_magnitude_product_lower(double sum, double a, double b) noexcept {
+    return add_bound(sum, multiply_bound(a, b, false), false);
+}
+
 template <StorageScalar Scalar>
 Result<MagnitudeBounds> actual_magnitude_bounds(Scalar high, Scalar low) noexcept {
     if constexpr (std::same_as<Scalar, double>) {

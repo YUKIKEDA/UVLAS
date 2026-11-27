@@ -5,6 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <array>
+#include <bit>
 #include <cmath>
 #include <complex>
 #include <limits>
@@ -77,6 +78,26 @@ TEST_CASE("Actual two-word magnitude encloses cancellation and extreme exponents
         const auto bound = metrics::actual_magnitude_bounds(hi, lo);
         REQUIRE(bound);
         encloses(bound->lower, bound->upper, sqrt(real * real + imag * imag));
+    }
+}
+
+TEST_CASE("A lower-only backward denominator retains the directed product and sum",
+          "[verification][N4-05][N4-06]") {
+    constexpr double maximum = std::numeric_limits<double>::max();
+    constexpr double subnormal = std::numeric_limits<double>::denorm_min();
+    const std::array inputs{std::array{0., 2., 0.},
+                            std::array{0., subnormal, .5},
+                            std::array{0., maximum, 2.},
+                            std::array{maximum, maximum, 1.},
+                            std::array{.1, std::nextafter(1., 2.), .2},
+                            std::array{1., 2., 3.}};
+    for (const auto& [base, a, b] : inputs) {
+        const double lower = metrics::add_magnitude_product_lower(base, a, b);
+        const auto both =
+            metrics::add_magnitudes({base, base}, metrics::multiply_magnitudes({a, a}, {b, b}));
+        CHECK(std::bit_cast<std::uint64_t>(lower) == std::bit_cast<std::uint64_t>(both.lower));
+        const Big exact = Big(base) + Big(a) * Big(b);
+        CHECK(Big(lower) <= exact);
     }
 }
 

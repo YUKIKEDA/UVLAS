@@ -26,6 +26,9 @@ struct MagnitudeBounds {
 // A finite overflow is represented by max-double lower / infinity upper.
 [[nodiscard]] MagnitudeBounds add_magnitudes(MagnitudeBounds a, MagnitudeBounds b) noexcept;
 [[nodiscard]] MagnitudeBounds multiply_magnitudes(MagnitudeBounds a, MagnitudeBounds b) noexcept;
+/// Accumulate one product of nonnegative lower bounds with the same downward
+/// rounding as the lower component of multiply_magnitudes and add_magnitudes.
+[[nodiscard]] double add_magnitude_product_lower(double sum, double a, double b) noexcept;
 
 // Enclose abs(high+low), not abs(high)+abs(low). Nonfinite words return Nonfinite.
 // A finite exact magnitude outside binary64 can have an infinite upper bound.

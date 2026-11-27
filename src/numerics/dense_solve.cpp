@@ -696,7 +696,7 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
                                                             data.rhs_lo.values()[at]);
                 if (!bmag)
                     return std::unexpected(bmag.error());
-                auto denominator = *bmag;
+                double denominator = bmag->lower;
                 for (Index j = 0; j < n; ++j) {
                     const Scalar a = coefficient(data, i, j);
                     if (!finite(a))
@@ -709,14 +709,19 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
                         if (!trailing)
                             return std::unexpected(trailing.error());
                     }
-                    auto amag = detail::actual_magnitude_bounds(a, Scalar{});
-                    if (!amag)
-                        return std::unexpected(amag.error());
-                    denominator = detail::add_magnitudes(
-                        denominator,
-                        detail::multiply_magnitudes(
-                            *amag,
-                            data.x_magnitude.values()[offset + static_cast<std::size_t>(j)]));
+                    double coefficient_lower = 0.;
+                    if constexpr (std::same_as<Scalar, double>) {
+                        // A finite binary64 coefficient has an exact magnitude.
+                        coefficient_lower = std::abs(a);
+                    } else {
+                        const auto magnitude = detail::actual_magnitude_bounds(a, Scalar{});
+                        if (!magnitude)
+                            return std::unexpected(magnitude.error());
+                        coefficient_lower = magnitude->lower;
+                    }
+                    denominator = detail::add_magnitude_product_lower(
+                        denominator, coefficient_lower,
+                        data.x_magnitude.values()[offset + static_cast<std::size_t>(j)].lower);
                 }
                 auto r = real.result();
                 if (!r)
@@ -733,7 +738,7 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
                     data.residual_error.values()[at] =
                         detail::add_magnitudes({r->error, r->error}, {im->error, im->error}).upper;
                 }
-                data.denominator_lower.values()[at] = denominator.lower;
+                data.denominator_lower.values()[at] = denominator;
             }
             return {};
         };
