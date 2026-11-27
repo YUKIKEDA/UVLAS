@@ -12,4 +12,4 @@ glibc 2.28、GCC 14.2.1、CPython 3.12.16、WSL2 6.18.58.1 で、候補 `a13bce0
 
 ヘッダー期待値または Case の期待 SHA-256 だけを違える対照でも、それぞれ終了コード1を返し、成功 JSON を出さなかった。
 
-監査の固定元は `bef6126f486152e50dadbdbefa435714766ca04a`。Ruff と Pyright strict が通った。外部参照の実行は上記カーネルの対象パスを確認したもので、古いカーネルへの適用、確保モデルの本体受入、正式な配布範囲は各ゲートに残る。[カーネル機能と試行の範囲](linux-release-runtime-qualification.md)
+監査の固定元は `bef6126f486152e50dadbdbefa435714766ca04a`。Ruff と Pyright strict が通った。同じ CLI と拡張を使った AlmaLinux 8.10 の 4.18 カーネルでの外部参照取得は別記録に示した。確保モデルの本体受入と正式な配布範囲は各ゲートに残る。[AlmaLinux 8.10 の実カーネル試行](alma-8-kernel-runtime.md)[カーネル機能と試行の範囲](linux-release-runtime-qualification.md)
