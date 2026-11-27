@@ -20,7 +20,7 @@ CLI と拡張が要求するシンボルの最大版は `GLIBC_2.26` と `GLIBCX
 
 Ubuntu Base 24.04.5 に移設した固定元 `3a140d7b` の CLI と wheel を、WSL2 カーネル `6.18.58.1-microsoft-standard-WSL2` 上のネットワークを遮断した環境で実行した。通常は `openat2` を6回使い、Case と4参照ファイルを受理した。最初の呼出しに `ENOSYS` を返すと CLI は Case 取得を拒否して終了コード2になった。3回目に `ENOSYS` または `EINVAL` を返すと、ルートと Case を開いた後、CLI は `/model/geometry/1/mesh` で終了コード2になった。同じ3回目の `ENOSYS` を受けた Python の `load_case` は `FailureCode.Unsupported` を返した。 [実行ログ](linux-release-runtime-qualification/openat2.log)
 
-配布対象では、`openat2` と使用するパス解決フラグが実際に利用できることを確認する。候補 wheel のタグや glibc の検査ではこの条件を判定できない。この試行は機能がない場合の外部参照取得を確認した。AlmaLinux 8.10 の署名済み 4.18 カーネルでの追加試行は別記録に示した。保存先ファイルシステムとチェックポイント公開・再開の認定は残る。 [AlmaLinux 8.10 の実カーネル試行](alma-8-kernel-runtime.md) [openat2 の仕様](https://man7.org/linux/man-pages/man2/openat2.2.html)
+配布対象では、`openat2` と使用するパス解決フラグが実際に利用できることを確認する。候補 wheel のタグや glibc の検査ではこの条件を判定できない。この試行は機能がない場合の外部参照取得を確認した。AlmaLinux 8.10 の署名済み 4.18 カーネルでの追加試行は別記録に示した。同じカーネルと ext4 の組で保存とチャンク読戻しを追加検証した。その他の保存先とソルバー再開の認定は残る。 [ext4 での保存と読戻し](alma-8-checkpoint-ext4.md) [AlmaLinux 8.10 の実カーネル試行](alma-8-kernel-runtime.md) [openat2 の仕様](https://man7.org/linux/man-pages/man2/openat2.2.html)
 
 ## 再実行
 

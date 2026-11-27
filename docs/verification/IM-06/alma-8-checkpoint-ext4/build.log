@@ -1,0 +1,62 @@
++ cd /mnt
++ build=/mnt/buildarea/build
++ src=/mnt/buildarea/source
++ catch=/mnt/buildarea/catch2
++ revision=a13bce0b1622b420a4b0a0083a0b8f3d9d70de66
+++ cat /mnt/buildarea/qualified-source-sha.txt
++ test a13bce0b1622b420a4b0a0083a0b8f3d9d70de66 = a13bce0b1622b420a4b0a0083a0b8f3d9d70de66
++ g++ --version
+g++ (GCC) 14.2.1 20250110 (Red Hat 14.2.1-11)
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
++ cxxflags=(-std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -I"$src/include" -I"$src/src/io" -I"$build/generated" -I/mnt/include -I"$catch" -isystem /mnt/deps/x64-linux/include)
++ libs=("$build/libuvlas_io.a" "$build/libuvlas_core.a" "$build/libuvlas_numerics.a")
++ for name in directory publication
++ g++ -std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -I/mnt/buildarea/source/include -I/mnt/buildarea/source/src/io -I/mnt/buildarea/build/generated -I/mnt/include -I/mnt/buildarea/catch2 -isystem /mnt/deps/x64-linux/include /mnt/buildarea/source/tests/io/checkpoint_directory_test.cpp /mnt/buildarea/catch2/catch-main.o -Wl,--start-group /mnt/buildarea/build/libuvlas_io.a /mnt/buildarea/build/libuvlas_core.a /mnt/buildarea/build/libuvlas_numerics.a -Wl,--end-group -pthread -o bin/checkpoint_directory
++ objdump -p bin/checkpoint_directory
++ grep -E 'NEEDED|GLIBC_2[.]'
+  NEEDED               libstdc++.so.6
+  NEEDED               libm.so.6
+  NEEDED               libgcc_s.so.1
+  NEEDED               libpthread.so.0
+  NEEDED               libc.so.6
+    0x06969197 0x00 26 GLIBC_2.17
+    0x06969194 0x00 18 GLIBC_2.14
+    0x0d696916 0x00 16 GLIBC_2.6
+    0x0d696913 0x00 11 GLIBC_2.3
+    0x0d696914 0x00 09 GLIBC_2.4
+    0x09691a75 0x00 05 GLIBC_2.2.5
+    0x09691a75 0x00 04 GLIBC_2.2.5
+    0x09691a75 0x00 03 GLIBC_2.2.5
++ for name in directory publication
++ g++ -std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -I/mnt/buildarea/source/include -I/mnt/buildarea/source/src/io -I/mnt/buildarea/build/generated -I/mnt/include -I/mnt/buildarea/catch2 -isystem /mnt/deps/x64-linux/include /mnt/buildarea/source/tests/io/checkpoint_publication_test.cpp /mnt/buildarea/catch2/catch-main.o -Wl,--start-group /mnt/buildarea/build/libuvlas_io.a /mnt/buildarea/build/libuvlas_core.a /mnt/buildarea/build/libuvlas_numerics.a -Wl,--end-group -pthread -o bin/checkpoint_publication
++ objdump -p bin/checkpoint_publication
++ grep -E 'NEEDED|GLIBC_2[.]'
+  NEEDED               libstdc++.so.6
+  NEEDED               libm.so.6
+  NEEDED               libgcc_s.so.1
+  NEEDED               libpthread.so.0
+  NEEDED               libc.so.6
+    0x06969197 0x00 27 GLIBC_2.17
+    0x06969194 0x00 20 GLIBC_2.14
+    0x0d696916 0x00 18 GLIBC_2.6
+    0x0d696913 0x00 13 GLIBC_2.3
+    0x0d696914 0x00 10 GLIBC_2.4
+    0x09691a75 0x00 05 GLIBC_2.2.5
+    0x09691a75 0x00 04 GLIBC_2.2.5
+    0x09691a75 0x00 03 GLIBC_2.2.5
++ g++ -std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -I/mnt/buildarea/source/include -I/mnt/buildarea/source/src/io -I/mnt/buildarea/build/generated -I/mnt/include -I/mnt/buildarea/catch2 -isystem /mnt/deps/x64-linux/include /mnt/recovery.cpp -Wl,--start-group /mnt/buildarea/build/libuvlas_io.a /mnt/buildarea/build/libuvlas_core.a /mnt/buildarea/build/libuvlas_numerics.a -Wl,--end-group -pthread -o bin/recovery_probe
++ sha256sum /mnt/recovery.cpp bin/recovery_probe
+aa6f5b81826911915d72c2fafbd7b2c69ea15e22ed1afe4540f430863ce20b59  /mnt/recovery.cpp
+d6e0b2d818fc7bdf3b0773b1416dffaacab1bc87874843092d6d2883a1b35054  bin/recovery_probe
++ sha256sum /mnt/buildarea/source/tests/io/checkpoint_directory_test.cpp /mnt/buildarea/source/tests/io/checkpoint_publication_test.cpp /mnt/buildarea/catch2/catch-main.o /mnt/buildarea/build/libuvlas_io.a /mnt/buildarea/build/libuvlas_core.a /mnt/buildarea/build/libuvlas_numerics.a bin/checkpoint_directory bin/checkpoint_publication
+e3b254adea07660ffb4f84548d7e553cd981253d5748a9188f375b0aa5c3b970  /mnt/buildarea/source/tests/io/checkpoint_directory_test.cpp
+982651b8c363d10ad51b180ba3d5d392174c6554e8e3f801ece0f1b7112d0dea  /mnt/buildarea/source/tests/io/checkpoint_publication_test.cpp
+cac0dc417d55515486e094331130791238d79045cc9f00e4fce4a0d5c813dd63  /mnt/buildarea/catch2/catch-main.o
+9e3888f48ef895712cb25addb7fa20f77884d70b62872da13d54fcf1677cc284  /mnt/buildarea/build/libuvlas_io.a
+5d1ef2c15a4aafabdae30efb6420ce18ad22e530ed9376aa28ed9e746ec453c3  /mnt/buildarea/build/libuvlas_core.a
+eb26f52dab21c2bc9f10e6276504399bd535c9cbfde33671d91305c64885746e  /mnt/buildarea/build/libuvlas_numerics.a
+e006b2dad2a53f9f477771424fc4e2d6a754b4f58284ed6b4054f4fcc8ba30c6  bin/checkpoint_directory
+90e0c4cbaa0296b3e0351d3e4341f9987e3ce8ae089951c215b33486ded04d80  bin/checkpoint_publication
