@@ -160,6 +160,11 @@ void sample_polynomial(const io::SiCase& source, const io::schema::ReferenceFiel
     }
 }
 
+void sample_expression(const io::SiCase&, const io::schema::ReferenceFieldExpression&,
+                       const CasePgMaterialCoordinates&, std::span<pg::PgReferenceScalar>,
+                       std::span<pg::ExactRational>, io::SchemaDimension, bool,
+                       ReferenceArithmetic&);
+
 template <std::size_t N>
 void sample_field(const io::SiCase& source, const auto& field,
                   const CasePgMaterialCoordinates& point,
@@ -174,7 +179,8 @@ void sample_field(const io::SiCase& source, const auto& field,
     } else if (const auto* polynomial = std::get_if<io::schema::ReferenceFieldPolynomial>(&field)) {
         sample_polynomial(source, *polynomial, point, values, errors, dimension, pi_multiple, math);
     } else {
-        partition_fail(FailureCode::Unsupported);
+        sample_expression(source, std::get<io::schema::ReferenceFieldExpression>(field), point,
+                          values, errors, dimension, pi_multiple, math);
     }
 }
 
@@ -198,7 +204,7 @@ pg::ExactRational phase_endpoint(const phase::Bound& value, ReferenceArithmetic&
     constexpr std::int64_t wide_bits = 8192;
     const auto magnitude_bits = static_cast<std::int64_t>(phase::bits(value.mantissa));
     if (power <= -wide_bits || power > wide_bits - magnitude_bits)
-        partition_fail(FailureCode::ResourceExceeded);
+        partition_fail(FailureCode::PrecisionUnresolved);
     using Wide = pg::detail::RankWide;
     Wide units{value.mantissa};
     if (power < 0)
@@ -211,19 +217,274 @@ pg::ExactRational phase_endpoint(const phase::Bound& value, ReferenceArithmetic&
                                   math.leaf_limits, math.plan);
 }
 
+phase::Interval phase_radical(const pg::PgReferenceScalar& value, const pg::ExactRational& g,
+                              phase::Work& work) {
+    auto base = phase_rational(value.rational, work);
+    if (value.radical.sign() == 0)
+        return base;
+    const auto root = phase::square_root(phase_rational(g, work), work);
+    return phase::add(base, phase::multiply(phase_rational(value.radical, work), root, work), work);
+}
+
+phase::Interval interval_power(phase::Interval base, std::int64_t exponent, phase::Work& work) {
+    // The schema admits int32, including its minimum. Widen before taking abs.
+    const auto power = static_cast<std::uint64_t>(exponent < 0 ? -exponent : exponent);
+    if ((power % 2) == 0)
+        base = phase::absolute(base);
+    auto result = phase::integer(1);
+    for (auto bits = power; bits != 0; bits >>= 1U) {
+        if ((bits % 2) != 0)
+            result = phase::multiply(result, base, work);
+        if (bits > 1) {
+            const auto absolute = phase::absolute(base);
+            base = phase::multiply(absolute, absolute, work);
+        }
+    }
+    return exponent < 0 ? phase::divide(phase::integer(1), result, work) : result;
+}
+
+phase::Interval exp_endpoint(const phase::Bound& x, phase::Work& work) {
+    if (x.mantissa == 0)
+        return phase::integer(1);
+    const auto magnitude = static_cast<std::int64_t>(phase::bits(x.mantissa)) + x.power;
+    // The returned SI enclosure has a bounded exponent representation.
+    if (magnitude > 14)
+        partition_fail(FailureCode::PrecisionUnresolved);
+    const auto halves = static_cast<int>(std::max<std::int64_t>(0, magnitude + 1));
+    const auto reduced = phase::scale({x, x}, -halves);
+    auto term = phase::integer(1);
+    auto total = term;
+    for (std::int64_t i = 1; i <= 64; ++i) {
+        term = phase::divide(phase::multiply(term, reduced, work), phase::integer(i), work);
+        total = phase::add(total, term, work);
+    }
+    // |reduced| <= 1/2. Twice the first omitted term bounds the entire tail.
+    const auto next = phase::divide(phase::multiply(term, reduced, work), phase::integer(65), work);
+    const phase::Interval radius{{}, phase::scale(phase::absolute(next), 1).upper};
+    auto result = phase::Interval{phase::subtract(total, radius, work).lower,
+                                  phase::add(total, radius, work).upper};
+    for (int i = 0; i < halves; ++i)
+        result = phase::multiply(result, result, work);
+    return result;
+}
+
+struct ExpressionMath {
+    explicit ExpressionMath(ReferenceArithmetic& reference)
+        : math(reference),
+          work{0, reference.limits.maximum_scalar_operations - reference.scalar_operations,
+               reference.limits.cancellation} {}
+
+    const phase::Interval& pi() {
+        if (!pi_value)
+            pi_value = phase::pi_constant(work);
+        return *pi_value;
+    }
+
+    phase::Interval constant(const io::SiCase& source, const io::schema::ExprNodeConstant& node) {
+        work.step();
+        auto recipe = partition_take(source.quantity(node.value)).recipe;
+        const auto power = recipe.pi_power;
+        recipe.pi_power = 0;
+        recipe.units.angle = io::SiAngleUnit::Radian;
+        const auto exact =
+            partition_take(io::materialize_rational(recipe, math.leaf_limits, math.plan));
+        auto result = phase_rational(exact, work);
+        if (power != 0 && exact.sign() != 0) {
+            const auto radians_per_degree = phase::divide(pi(), phase::integer(180), work);
+            result = phase::multiply(result, interval_power(radians_per_degree, power, work), work);
+        }
+        return result;
+    }
+
+    phase::Interval analytic(const io::schema::ExprNodeAnalytic& node, const phase::Interval& x) {
+        using Op = decltype(node.op.selected());
+        switch (node.op.selected()) {
+        case Op::ItemSin:
+        case Op::ItemCos:
+            try {
+                const auto rotation = phase::sine_cosine(x, phase::PhaseUnits::Radians, pi(), work);
+                return node.op.selected() == Op::ItemSin ? rotation.sine : rotation.cosine;
+            } catch (const phase::ArithmeticFailure& failure) {
+                if (failure.code != FailureCode::PrecisionUnresolved)
+                    throw;
+                // Every finite phase is in the function's domain, including
+                // boxes crossing several quadrants.
+                return {phase::integer(-1).lower, phase::integer(1).upper};
+            }
+        case Op::ItemExp:
+            return {exp_endpoint(x.lower, work).lower, exp_endpoint(x.upper, work).upper};
+        case Op::ItemLog:
+            if (!ln2)
+                ln2 = phase::logarithm_series(
+                    phase::divide(phase::integer(1), phase::integer(3), work), work);
+            return {phase::log_endpoint(x.lower, *ln2, work).lower,
+                    phase::log_endpoint(x.upper, *ln2, work).upper};
+        case Op::ItemSqrt:
+            return phase::square_root(x, work);
+        }
+        partition_fail(FailureCode::InvalidInput);
+    }
+
+    ReferenceArithmetic& math;
+    phase::Work work;
+    std::optional<phase::Interval> pi_value;
+    std::optional<phase::Interval> ln2;
+};
+
+using CoordinatesBox = std::array<phase::Interval, 3>;
+
+struct ExpressionCoordinates {
+    CoordinatesBox domain, point;
+};
+
+ExpressionCoordinates reference_coordinates(const io::SiCase& source,
+                                            const io::schema::ExpressionDomainReference& domain,
+                                            const CasePgMaterialCoordinates& point,
+                                            ReferenceArithmetic& math) {
+    using Coordinates = decltype(domain.coordinates.selected());
+    const auto kind = domain.coordinates.selected();
+    if (kind == Coordinates::ItemMaterial && !point.has_material_metres)
+        partition_fail(FailureCode::InvalidInput);
+    const auto dimension = kind == Coordinates::ItemChart ? dimensionless : length;
+    const auto lower = triple(source, domain.lower, dimension, math);
+    const auto upper = triple(source, domain.upper, dimension, math);
+    pg::detail::ReferenceRadicals exact{math, point.g};
+    ExpressionCoordinates coordinates{};
+    phase::Work work{0, math.limits.maximum_scalar_operations - math.scalar_operations,
+                     math.limits.cancellation};
+    for (std::size_t i = 0; i < 3; ++i) {
+        if (kind == Coordinates::ItemChart) {
+            if (math.compare(point.chart[i], lower[i]) < 0 ||
+                math.compare(point.chart[i], upper[i]) > 0)
+                partition_fail(FailureCode::InvalidInput);
+            coordinates.point[i] = phase_rational(point.chart[i], work);
+        } else {
+            const auto& value = kind == Coordinates::ItemMaterial ? point.material_metres[i]
+                                                                  : point.world_reference_metres[i];
+            const pg::PgReferenceScalar a{math.copy(lower[i]), {}}, b{math.copy(upper[i]), {}};
+            if (exact.sign(exact.sub(value, a)) < 0 || exact.sign(exact.sub(value, b)) > 0)
+                partition_fail(FailureCode::InvalidInput);
+            coordinates.point[i] = phase_radical(value, point.g, work);
+        }
+        coordinates.domain[i] = {phase_rational(lower[i], work).lower,
+                                 phase_rational(upper[i], work).upper};
+    }
+    math.charge(work.used);
+    return coordinates;
+}
+
+void evaluate_expression(const io::SiCase& source, const io::schema::Expression& expression,
+                         const CoordinatesBox& input, std::span<phase::Interval> rows,
+                         ExpressionMath& arithmetic) {
+    auto& work = arithmetic.work;
+    for (std::size_t i = 0; i < rows.size(); ++i) {
+        arithmetic.math.visit(1);
+        work.step();
+        const auto node = partition_take(expression.nodes.at(partition_index(i))).record();
+        const auto operand = [&](const auto& field) -> const phase::Interval& {
+            const auto ordinal = field.unsigned_value();
+            if (ordinal >= i)
+                partition_fail(FailureCode::InvalidInput);
+            return rows[static_cast<std::size_t>(ordinal)];
+        };
+        rows[i] = std::visit(
+            [&](const auto& typed) -> phase::Interval {
+                using Node = std::decay_t<decltype(typed)>;
+                if constexpr (std::is_same_v<Node, io::schema::ExprNodeConstant>) {
+                    return arithmetic.constant(source, typed);
+                } else if constexpr (std::is_same_v<Node, io::schema::ExprNodeVariable>) {
+                    const auto axis = typed.axis.unsigned_value();
+                    if (axis >= input.size())
+                        partition_fail(FailureCode::InvalidInput);
+                    return input[static_cast<std::size_t>(axis)];
+                } else if constexpr (std::is_same_v<Node, io::schema::ExprNodeBinary>) {
+                    const auto& a = operand(typed.first);
+                    const auto& b = operand(typed.second);
+                    using Op = decltype(typed.op.selected());
+                    switch (typed.op.selected()) {
+                    case Op::ItemAdd:
+                        return phase::add(a, b, work);
+                    case Op::ItemSubtract:
+                        return phase::subtract(a, b, work);
+                    case Op::ItemMultiply:
+                        return phase::multiply(a, b, work);
+                    case Op::ItemDivide:
+                        return phase::divide(a, b, work);
+                    }
+                    partition_fail(FailureCode::InvalidInput);
+                } else if constexpr (std::is_same_v<Node, io::schema::ExprNodeNegate>) {
+                    return phase::negate(operand(typed.operand), work);
+                } else if constexpr (std::is_same_v<Node, io::schema::ExprNodePower>) {
+                    return interval_power(operand(typed.operand), typed.exponent.signed_value(),
+                                          work);
+                } else {
+                    return arithmetic.analytic(typed, operand(typed.operand));
+                }
+            },
+            node);
+    }
+}
+
+void sample_expression(const io::SiCase& source, const io::schema::ReferenceFieldExpression& field,
+                       const CasePgMaterialCoordinates& point,
+                       std::span<pg::PgReferenceScalar> values, std::span<pg::ExactRational> errors,
+                       io::SchemaDimension dimension, bool pi_multiple, ReferenceArithmetic& math) {
+    const auto expr = field.expression.record();
+    const auto domain = expr.domain.record();
+    const auto* reference = std::get_if<io::schema::ExpressionDomainReference>(&domain);
+    if (!reference || expr.outputs.size() != values.size() || expr.nodes.size() == 0)
+        partition_fail(FailureCode::InvalidInput);
+    const auto& typed = partition_take(source.source_case()).get();
+    const auto input_quotas = partition_take(typed.root()).resources.record().input.record();
+    const auto nodes = expr.nodes.size();
+    // The typed schema has already certified edge count, depth, exponent
+    // bounds and operand order. Bound both passes before allocating their row.
+    if (nodes > input_quotas.maximum_expression_nodes.unsigned_value() ||
+        input_quotas.maximum_expression_points.unsigned_value() == 0 ||
+        nodes > (math.limits.maximum_partition_visits - math.partition_visits) / 2)
+        partition_fail(FailureCode::ResourceExceeded);
+    try {
+        const auto coordinates = reference_coordinates(source, *reference, point, math);
+        auto storage =
+            partition_take(math.plan.allocate<phase::Interval>(partition_index(nodes), operation));
+        ExpressionMath arithmetic{math};
+        evaluate_expression(source, expr, coordinates.domain, storage.values(), arithmetic);
+        evaluate_expression(source, expr, coordinates.point, storage.values(), arithmetic);
+        const auto two = math.constant("2");
+        for (std::size_t i = 0; i < values.size(); ++i) {
+            const auto ordinal =
+                partition_take(expr.outputs.at(partition_index(i))).unsigned_value();
+            if (ordinal >= nodes)
+                partition_fail(FailureCode::InvalidInput);
+            auto output = storage.values()[static_cast<std::size_t>(ordinal)];
+            if (pi_multiple)
+                output = phase::divide(output, arithmetic.pi(), arithmetic.work);
+            const auto lo = phase_endpoint(output.lower, math);
+            const auto hi = phase_endpoint(output.upper, math);
+            values[i].rational = math.div(math.add(lo, hi), two);
+            auto error = quantity(source, partition_take(field.error.at(partition_index(i))),
+                                  dimension, math, pi_multiple);
+            if (error.sign() < 0)
+                partition_fail(FailureCode::InvalidInput);
+            errors[i] = math.add(error, math.div(math.sub(hi, lo), two));
+        }
+        math.charge(arithmetic.work.used);
+    } catch (const phase::ArithmeticFailure& failure) {
+        partition_fail(failure.code);
+    } catch (const std::overflow_error&) {
+        partition_fail(FailureCode::PrecisionUnresolved);
+    } catch (const std::range_error&) {
+        partition_fail(FailureCode::PrecisionUnresolved);
+    }
+}
+
 void enclose_rotation(const pg::PgReferenceScalar& centre, const pg::ExactRational& error,
                       const pg::ExactRational& g, bool pi_multiple, CasePgProjectedAxisValue& out,
                       ReferenceArithmetic& math) {
     phase::Work work{0, math.limits.maximum_scalar_operations - math.scalar_operations,
                      math.limits.cancellation};
     try {
-        auto phase_value = phase_rational(centre.rational, work);
-        if (centre.radical.sign() != 0) {
-            const auto root = phase::square_root(phase_rational(g, work), work);
-            phase_value =
-                phase::add(phase_value,
-                           phase::multiply(phase_rational(centre.radical, work), root, work), work);
-        }
+        auto phase_value = phase_radical(centre, g, work);
         if (error.sign() != 0) {
             const auto radius = phase_rational(error, work);
             phase_value = {phase::subtract(phase_value, radius, work).lower,
@@ -469,6 +730,22 @@ std::uint64_t material_slots(const CasePgShellMaterials& materials) {
         pg::detail::partition_mul(materials.law_count(), law_rationals),
         pg::detail::partition_mul(materials.layers().size(), 2));
 }
+
+std::uint64_t expression_fields(const io::schema::Layer& layer) {
+    const auto expression = [](const auto& field) -> std::uint64_t {
+        return std::holds_alternative<io::schema::ReferenceFieldExpression>(field.record()) ? 1 : 0;
+    };
+    const auto axes = std::visit(
+        [&](const auto& axis) -> std::uint64_t {
+            using Axis = std::decay_t<decltype(axis)>;
+            if constexpr (std::is_same_v<Axis, io::schema::AxisProjected>)
+                return expression(axis.direction) + expression(axis.angle);
+            else
+                return expression(axis.columns);
+        },
+        layer.axis.record());
+    return expression(layer.initial_green) + axes;
+}
 } // namespace
 
 CasePgShellVolume::CasePgShellVolume(io::SchemaIdentity source, pg::PgPreparedPatchIdentity patch,
@@ -524,6 +801,22 @@ CasePgShellVolume::prepare(const io::SiCase& source, const CaseStaticPgPointPatc
             if (case_layer.id != layers[j].id || case_layer.lower != layers[j].lower ||
                 case_layer.upper != layers[j].upper)
                 partition_fail(FailureCode::StaleGeneration);
+        }
+        const auto quotas = partition_take(typed.root()).resources.record().input.record();
+        const auto point_cap = quotas.maximum_expression_points.unsigned_value();
+        core::Index previous_layer = -1;
+        std::uint64_t expressions = 0, evaluated_points = 0;
+        for (const auto& sample : rule) {
+            math.visit(1);
+            const auto layer = volumes[static_cast<std::size_t>(sample.volume)].layer;
+            if (layer != previous_layer) {
+                expressions =
+                    expression_fields(partition_take(materials.source_layer(source, layer)));
+                previous_layer = layer;
+            }
+            if (expressions > point_cap - evaluated_points)
+                partition_fail(FailureCode::ResourceExceeded);
+            evaluated_points += expressions;
         }
         const auto kept_rule =
             pg::detail::partition_add(pg::detail::partition_mul(4, rule.size()),

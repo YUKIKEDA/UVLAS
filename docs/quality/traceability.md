@@ -100,7 +100,7 @@
 | FD-09 | [case-schema-fields.md:182](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-10 | [case-schema-fields.md:231](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-11 | [case-schema-fields.md:319](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| FD-12 | [case-schema-fields.md:333](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-12 | [case-schema-fields.md:333](../specs/foundation/case-schema-fields.md) | 2 | 0 | 0 |
 | IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 188 | 52 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 14 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 79 | 34 | 0 |
@@ -122,7 +122,7 @@
 | MAT-D03 | [material-initial-strain-contract.md:129](../specs/structure/material-initial-strain-contract.md) | 0 | 0 | 0 |
 | MAT-D04 | [material-layer-adoption-contract.md:9](../specs/structure/material-layer-adoption-contract.md) | 4 | 0 | 0 |
 | MAT-D05 | [material-layer-adoption-contract.md:10](../specs/structure/material-layer-adoption-contract.md) | 1 | 4 | 0 |
-| MAT-D06 | [material-layer-adoption-contract.md:11](../specs/structure/material-layer-adoption-contract.md) | 1 | 0 | 0 |
+| MAT-D06 | [material-layer-adoption-contract.md:11](../specs/structure/material-layer-adoption-contract.md) | 2 | 0 | 0 |
 | MAT-D07 | [material-layer-adoption-contract.md:12](../specs/structure/material-layer-adoption-contract.md) | 0 | 0 | 0 |
 | MAT-D08 | [material-shell-adopted-specification.md:9](../specs/structure/material-shell-adopted-specification.md) | 9 | 0 | 0 |
 | MAT-D09 | [material-shell-adopted-specification.md:10](../specs/structure/material-shell-adopted-specification.md) | 4 | 0 | 0 |
@@ -210,7 +210,7 @@
 | V-J1 | [practical-acceptance-plan.md:38](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-JOINT | [practical-acceptance-plan.md:33](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
-| V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 10 | 0 | 0 |
+| V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 11 | 0 | 0 |
 | V-MULTI | [practical-acceptance-plan.md:37](../requirements/practical-acceptance-plan.md) | 4 | 4 | 0 |
 | V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 17 | 12 | 0 |
 | V-RECOVER | [practical-acceptance-plan.md:35](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |

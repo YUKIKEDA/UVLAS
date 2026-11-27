@@ -242,4 +242,114 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
     REQUIRE_FALSE(stale);
     CHECK(stale.error().code == core::FailureCode::StaleGeneration);
 }
+TEST_CASE("Fixed shell expressions certify their domain and preserve analytical field errors",
+          "[FD-12][MAT-D06][V-MAT][negative][verification]") {
+    auto input = fixture::root("structural_static");
+    input.field("units").set("angle", fixture::json(R"("deg")"));
+    auto& layer =
+        input.field("model").field("shells").elements.front().field("layers").elements.front();
+    layer.set("initial_green", fixture::json(R"({
+      "kind":"expression",
+      "expression":{
+        "domain":{"kind":"reference","coordinates":"chart","lower":[0,0,-1],"upper":[1,1,1]},
+        "nodes":[
+          {"op":"variable","axis":0},
+          {"op":"exp","operand":0},
+          {"op":"log","operand":1},
+          {"op":"sqrt","operand":0},
+          {"op":"add","first":2,"second":3},
+          {"op":"constant","value":2,"dimensions":[0,0,0,0]},
+          {"op":"integer_power","operand":5,"exponent":-1},
+          {"op":"multiply","first":4,"second":6},
+          {"op":"constant","value":90,"dimensions":[0,0,0,1]},
+          {"op":"sin","operand":8},
+          {"op":"cos","operand":8},
+          {"op":"constant","value":1,"dimensions":[0,0,0,0]},
+          {"op":"negate","operand":11},
+          {"op":"add","first":9,"second":12},
+          {"op":"subtract","first":10,"second":10}
+        ],
+        "outputs":[7,10,13,14,14,14]
+      },
+      "error":[0.001,0,0,0,0,0]
+    })"));
+    layer.set("axis", fixture::json(R"({
+      "kind":"projected",
+      "direction":{"kind":"constant","value":[1,0,0]},
+      "angle":{"kind":"expression",
+        "expression":{
+          "domain":{"kind":"reference","coordinates":"chart","lower":[0,0,-1],"upper":[1,1,1]},
+          "nodes":[{"op":"constant","value":90,"dimensions":[0,0,0,1]}],
+          "outputs":[0]
+        },
+        "error":[0]
+      }
+    })"));
+    core::ResourcePlan memory{budget};
+    const pg::PgReferenceLimits limits{algebra(), 200'000, 100'000, {}};
+    const auto q = [&](std::string_view n, std::string_view d = "1") {
+        return fixture::take(pg::ExactRational::from_integer_pair(n, d, limits.algebra, memory));
+    };
+    const auto source = materialize(input);
+    const auto shell = fixture::take(CasePgShellMaterials::prepare(source, 1, limits, memory));
+    const auto one = q("1");
+    const pg::PgReferenceVector origin;
+    const std::array chart{q("1", "4"), q("0"), q("0")};
+    const CasePgMaterialCoordinates point{chart, origin, origin, one};
+    const auto sampled =
+        fixture::take(shell.sample_initial_green(source, 0, point, limits, memory));
+    const auto contains = [&](std::size_t i, const pg::ExactRational& expected) {
+        const auto& value = sampled.mandel[i];
+        CHECK(value.radical.sign() == 0);
+        const auto lo = fixture::take(
+            value.rational.subtract(sampled.declared_error[i], limits.algebra, memory));
+        const auto hi =
+            fixture::take(value.rational.add(sampled.declared_error[i], limits.algebra, memory));
+        CHECK(fixture::take(lo.compare(expected, limits.algebra, memory)) <= 0);
+        CHECK(fixture::take(hi.compare(expected, limits.algebra, memory)) >= 0);
+    };
+    contains(0, q("3", "8"));
+    for (std::size_t i = 1; i < 6; ++i)
+        contains(i, q("0"));
+    REQUIRE(fixture::take(
+                sampled.declared_error[0].compare(q("1", "1000"), limits.algebra, memory)) >= 0);
+    CHECK(fixture::take(
+              sampled.declared_error[0].compare(q("11", "10000"), limits.algebra, memory)) < 0);
+    const auto limit = q("1", "100000000000000000000");
+    CHECK(fixture::take(sampled.declared_error[1].compare(limit, limits.algebra, memory)) < 0);
+    const auto orientation = fixture::take(shell.sample_axes(source, 0, point, limits, memory));
+    const auto& rotation = std::get<CasePgProjectedAxisValue>(orientation.value);
+    CHECK(rotation.cosine.lower.sign() <= 0);
+    CHECK(rotation.cosine.upper.sign() >= 0);
+    const auto cosine_width = fixture::take(
+        rotation.cosine.upper.subtract(rotation.cosine.lower, limits.algebra, memory));
+    CHECK(fixture::take(cosine_width.compare(limit, limits.algebra, memory)) < 0);
+    CHECK(fixture::take(rotation.sine.lower.compare(one, limits.algebra, memory)) <= 0);
+    CHECK(fixture::take(rotation.sine.upper.compare(one, limits.algebra, memory)) >= 0);
+    const std::array outside{q("5", "4"), q("0"), q("0")};
+    const auto rejected =
+        shell.sample_initial_green(source, 0, {outside, origin, origin, one}, limits, memory);
+    REQUIRE_FALSE(rejected);
+    CHECK(rejected.error().code == core::FailureCode::InvalidInput);
+
+    layer.set("initial_green", fixture::json(R"({
+      "kind":"expression",
+      "expression":{
+        "domain":{"kind":"reference","coordinates":"chart","lower":[0,0,-1],"upper":[1,1,1]},
+        "nodes":[{"op":"variable","axis":0},
+                 {"op":"constant","value":1,"dimensions":[0,0,0,0]},
+                 {"op":"divide","first":1,"second":0}],
+        "outputs":[2,2,2,2,2,2]
+      },
+      "error":[0,0,0,0,0,0]
+    })"));
+    const auto singular_source = materialize(input);
+    const auto singular_shell =
+        fixture::take(CasePgShellMaterials::prepare(singular_source, 1, limits, memory));
+    // The requested point is above zero, but the declared box includes zero.
+    const auto singular =
+        singular_shell.sample_initial_green(singular_source, 0, point, limits, memory);
+    REQUIRE_FALSE(singular);
+    CHECK(singular.error().code == core::FailureCode::PrecisionUnresolved);
+}
 } // namespace

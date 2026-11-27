@@ -906,7 +906,7 @@ $EndElements
 }
 
 TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
-          "[FD-03][IO4-03][MAT-D08][V-MAT][R-05][integration][verification][negative]") {
+          "[FD-03][FD-12][IO4-03][MAT-D08][V-MAT][R-05][integration][verification][negative]") {
     using Code = core::FailureCode;
     using Reason = coupling::CaseNastranPointSupportFailure;
     enum class Trial : std::uint8_t {
@@ -1077,6 +1077,17 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     high_shell.set("geometry", fixture::string("6"));
     high_shell.field("layers").elements.front().set("id", fixture::string("2"));
     pair_model.field("shells").elements.push_back(std::move(high_shell));
+    pair_model.field("shells").elements.front().field("layers").elements.front().set(
+        "initial_green", fixture::json(R"({
+          "kind":"expression",
+          "expression":{
+            "domain":{"kind":"reference","coordinates":"chart","lower":[0,0,-1],"upper":[1,1,1]},
+            "nodes":[{"op":"constant","value":0.125,"dimensions":[0,0,0,0]},
+                     {"op":"constant","value":0,"dimensions":[0,0,0,0]}],
+            "outputs":[0,1,1,1,1,1]
+          },
+          "error":[0,0,0,0,0,0]
+        })"));
     auto high_support = pair_model.field("supports").elements.front();
     high_support.set("id", fixture::string("2"));
     high_support.field("target").field("target").set("id", fixture::string("2"));
@@ -1129,7 +1140,7 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     const auto action = fixture::take(shell_volume.elastic(
         lower_patch, {volume_id, stretched}, PgShellPatchDirection{volume_id, stretch}, resolution,
         pair_limits.patch, plan));
-    const auto energy = oracle.r("9", "32");
+    const auto energy = oracle.r("121", "512");
     CHECK(fixture::take(action.energy_joules.lower.compare(energy, arithmetic.algebra, plan)) <= 0);
     CHECK(fixture::take(action.energy_joules.upper.compare(energy, arithmetic.algebra, plan)) >= 0);
     CHECK(action.tangent_action_newtons.size() == q0.size());
@@ -1155,10 +1166,10 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         CHECK(fixture::take(lo.compare(expected, exact, plan)) <= 0);
         CHECK(fixture::take(hi.compare(expected, exact, plan)) >= 0);
     };
-    // For one unit square with thickness 1/4, F11=2, E=1 and nu=0,
-    // the directional work is (1/4)*P11 and (1/4)*dP11/dF11.
-    work_encloses(action.internal_force_newtons.values(), stretch, oracle.r("3", "4"));
-    work_encloses(action.tangent_action_newtons.values(), stretch, oracle.r("11", "8"));
+    // One unit square with thickness 1/4, F11=2, E=1, nu=0 and E0,11=1/8:
+    // Elastic E11 is 11/8; the work is (1/4)*P11 and (1/4)*dP11/dF11.
+    work_encloses(action.internal_force_newtons.values(), stretch, oracle.r("11", "16"));
+    work_encloses(action.tangent_action_newtons.values(), stretch, oracle.r("43", "32"));
 
     const auto& exact = arithmetic.algebra;
     const auto one = oracle.r("1"), five = oracle.r("5");
