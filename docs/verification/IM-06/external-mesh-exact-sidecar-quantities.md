@@ -6,6 +6,8 @@ Case の最後の厚さ頂点だけを `0.00254000000000000000000000000001` m �
 
 Gmsh の材料対照では、同じ物性値を持つ別の Case 材料 ID を対応表に指定した。結び付けの失敗は物理グループ、対応表の行、Case Shell を示した。Nastran では MAT1 の E を `200000.00000000001` N/mm² に変え、E 欄のバイト位置を照合した。厚さの差と Nastran の E の差は binary64 に丸めると消える。負対照の後に正常な Case と認証済み参照を再利用すると、両形式で元と同じ PG 参照識別子を得た。
 
+Nastran の対応表だけに存在しない EID 999 を指定すると、認証には成功し、元面の結び付けで拒否された。診断は未解決の EID と対応表の元行を示した。
+
 ## 設計の完了条件と証拠
 
 | 完了条件 | 証拠 |
@@ -19,11 +21,11 @@ Gmsh の材料対照では、同じ物性値を持つ別の Case 材料 ID を�
 
 ## Ubuntu Release の再検証
 
-ソースは未コミットの変更がない `1665b99a0bb5096457ac16bb43ff24434cf6a5cd`。Ubuntu 24.04.5、GCC 14.2.0 Release の `linux-x64-gnu14.2-sse2` で、対象 CTest 4 件が通過した。新しい試験は 56 アサーションで、登録済みの形式間試験全体は 3 ケース、1851 アサーションだった。
+ソースは未コミットの変更がない `50d7c911ebef83a26c4a7d71558d964f900c222a`。Ubuntu 24.04.5、GCC 14.2.0 Release の `linux-x64-gnu14.2-sse2` で、対象 CTest 4 件が通過した。新しい試験は 67 アサーションで、登録済みの形式間試験全体は 3 ケース、1862 アサーションだった。
 
 ```bash
 cmake --build --preset linux-release --target uvlas_test_io_external_shell_cross_format uvlas_test_io_external_pg_regional_thickness uvlas_test_io_reference_input
 ctest --preset linux-release -R '^io[.](external_shell_cross_format|external_case_chart|external_pg_regional_thickness|reference_input)$'
 ```
 
-隔離した複製で、`external_pg_regional_thickness.cpp` の一定厚さ比較を `!= 0` から `< 0` に変えた。Case の厚さが外部指定を上回るときの拒否が消え、Gmsh と Nastran の両方の拒否アサーションが失敗した。元の実行ファイルでは 56 アサーションが通過した。
+隔離した複製で、`external_pg_regional_thickness.cpp` の一定厚さ比較を `!= 0` から `< 0` に変えた。Case の厚さが外部指定を上回るときの拒否が消え、Gmsh と Nastran の両方の拒否アサーションが失敗した。同じ厚さ検査を含む最終版は 67 アサーションが通過した。
