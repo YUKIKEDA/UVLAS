@@ -37,6 +37,14 @@ GCC 14 Releaseで凍結試験2件の2,551アサーションと既存の材料作
 
 同じ24点の質量作用で、累積所有確保は812,779,024 Bから255,333,520 Bに減った。作業量は27,227,928から17,761,728、分割訪問は669,981から665,829になった。力・接線の組立には物理勾配が必要なので、全参照行を使う。
 
+### 弾性組立で共有する合成基底
+
+弾性組立で呼出し側が合成を選ぶと、$n=1$ の認定済み基底 $B$ とその変換 $T$ をセル多項式の段階で合成する。既定の評価では、従来と同じ作業枠で作用を計算できる。$R$、$P$、$C$ の群ごとに分母をそろえ、合成の正負を保って整数で積和する。キャッシュは組立中だけ元の認定結果を借り、別の認定結果を渡したときは世代不一致を返す。
+
+準備では保有する $B$ と $T$ の整数を読み、係数幅、更新回数、保存配列の確保枠を先に照合する。係数は各群512 bit以内で保持する。点のセル局所座標の共通分母が32 bit以内なら、値と面内一次微分を1,536 bitの整数で集約する。積和の幅は係数512 bit、総次数21に対する $21\cdot32$ bit、加算項と微分倍率を合わせて1,202 bit以下となる。点が範囲外なら従来の参照評価へ戻り、照合で消費した作業も記録する。
+
+凍結171列の実係数を独立に合成すると、非零項数は34,050から160,528へ増えた。合成後の共通分母と分子の幅は最大285 bit、313 bitだった。4セルの各16点で、各列の $R$、$P$、$C$ とその面内微分を独立な有理積和と照合した98,496成分は、零を含めてすべて一致した。
+
 ## 凍結した高次則との比較
 
 凍結時の体積積分は、4背景セルの各軸45点と、3層の深さ各7点を合わせた170,100点を使う。凍結変位と同じ材料則でその点列を独立に再計算し、アーカイブに保存した内力仕事、接線と質量の縮約値を相対 $10^{-8}$ で照合した。表はその再計算を基準とする。面内点数は各軸、深さ点数は各層に対する数である。 [凍結時の求積と組立](../../../../rd/structure/material/experiments/check_material_shell_integration_v2.py) · [収束の再計算](convergence.py)
@@ -67,6 +75,18 @@ ctest --test-dir <build> --output-on-failure -R "^structure[.]pg_frozen_shell_ma
 <build>/tests/uvlas_test_structure_pg_frozen_shell_material "[.fixture]" > out/pg-frozen-material-basis.txt
 uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/transfer.py out/pg-frozen-material-basis.txt out/pg-frozen-material-state.json
 uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/convergence.py out/pg-frozen-material-basis.txt --mass-rule-output out/vmat-high-rule.json
+```
+
+3,672点の弾性試験では、面内と厚さ方向の座標を小数部28 bit、重みを44 bitに丸める。独立再計算で、丸め後のエネルギー、内力仕事、接線仕事の凍結則からの相対差は、それぞれ $2.33\times10^{-9}$、$2.27\times10^{-9}$、$2.15\times10^{-9}$ だった。製品試験は3層各1,224点を読み、3観測の包絡全体をそれぞれの凍結則の値の相対 $10^{-8}$ で検査する。組立には48 GiBの累積所有確保枠を使う。
+
+Ubuntu 24.04.5 の GCC 14.2.0 Release で、固定幅の有理数を外向きに丸める試験を実行した。分母が257 bitと9,001 bitの入力について、正負それぞれの上下端点と、作業幅を1 bit下げた場合の拒否を調べた。14アサーションが通過した。
+同じ構成の `structure.pg_shell_material`、`structure.pg_frozen_shell_material`、`structure.pg_discrete_gram`、`coupling.case_pg_shell_material` も通過した。凍結24点の比較と Case の材料作用への接続を含む。
+
+```bash
+uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/convergence.py out/pg-frozen-material-basis.txt --elastic-rule-output out/vmat-elastic-rule.json
+cmake --preset linux-release -DUVLAS_FORMAL_VMAT_ELASTIC_FIXTURE="$PWD/out/vmat-elastic-rule.json"
+cmake --build --preset linux-release --target uvlas_test_structure_pg_frozen_shell_material
+ctest --preset linux-release -R '^structure[.]pg_frozen_shell_material[.]high_elastic$'
 ```
 
 GCCで1,944点を再実行する場合は、Releaseで構築した3つの静的ライブラリとCatch2をリンクする。以下では `BUILD` にビルドディレクトリ、`EXACT_DEPS_INCLUDE` にBoostとnlohmann/jsonの依存ヘッダー、`CATCH_PREFIX` にCatch2のインストール先を指定する。

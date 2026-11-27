@@ -790,6 +790,22 @@ target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
     UVLAS_PG_FROZEN_MATERIAL_PROBES="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-probes-v1.json"
     UVLAS_PG_FROZEN_MATERIAL_TRANSFER="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-transfer-v1.json")
 
+set(UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE "" CACHE FILEPATH
+    "Optional independent fixture for the 3672-point frozen V-MAT elastic check")
+if(UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE)
+    get_filename_component(formal_vmat_fixture "${UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE}"
+        ABSOLUTE BASE_DIR "${PROJECT_SOURCE_DIR}")
+    if(NOT EXISTS "${formal_vmat_fixture}")
+        message(FATAL_ERROR "Formal V-MAT fixture not found: ${formal_vmat_fixture}")
+    endif()
+    target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
+        UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE="${formal_vmat_fixture}")
+    add_test(NAME structure.pg_frozen_shell_material.high_elastic
+        COMMAND uvlas_test_structure_pg_frozen_shell_material "[.high-elastic]")
+    set_tests_properties(structure.pg_frozen_shell_material.high_elastic PROPERTIES
+        LABELS "verification;V-MAT" TIMEOUT 14400 RUN_SERIAL ON)
+endif()
+
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG
     TIMEOUT 180

@@ -1,3 +1,4 @@
+#include "pg_composed_basis.hpp"
 #include "pg_rank_lift.hpp"
 #include "pg_rank_witness.hpp"
 #include "pg_reference_polynomials.hpp"
@@ -746,6 +747,16 @@ PgRankPreparation::basis_indices(PgRankBasisColumn column) const& noexcept {
         const auto end = static_cast<std::size_t>(state.basis_offsets.values()[k + 1]);
         return state.basis_rows.values().subspan(start, end - start);
     });
+}
+
+detail::PgComposedBasis::SourceColumn
+detail::PgComposedBasis::source_column(const PgRankPreparation& rank, PgRankBasisColumn column) {
+    const auto& state = rank_state(rank.state_);
+    const auto k = rank_index(column.value, state.info.rank);
+    const auto start = static_cast<std::size_t>(state.basis_offsets.values()[k]);
+    const auto end = static_cast<std::size_t>(state.basis_offsets.values()[k + 1]);
+    return {state.basis_rows.values().subspan(start, end - start),
+            state.basis_values.values().subspan(start, end - start)};
 }
 
 core::Result<ExactRational> PgRankPreparation::basis(PgRankBasisColumn column, core::Index row,

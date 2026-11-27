@@ -1,4 +1,4 @@
-"""Replay frozen V-MAT observables and export a smaller positive mass rule."""
+"""Replay frozen V-MAT observables and export smaller positive volume rules."""
 
 import argparse
 import json
@@ -153,6 +153,27 @@ def points_for(baseline, mats, order, depth, *, transverse=None):
     return np.concatenate(points), np.concatenate(weights), np.concatenate(layer)
 
 
+def dyadic_rule(rule):
+    points, weights, layers = rule
+    points = np.rint(points * (1 << 28)) / (1 << 28)
+    weights = np.rint(weights * (1 << 44)) / (1 << 44)
+    if np.any(weights <= 0):
+        raise ValueError("The exported finite rule must have positive weights")
+    return points, weights, layers
+
+
+def serialize_rule(rule):
+    points, weights, layers = rule
+    return [
+        {
+            "coordinates": [str(Fraction(float(value))) for value in coord],
+            "layer": int(layer),
+            "weight": str(Fraction(float(weight))),
+        }
+        for coord, layer, weight in zip(points, layers, weights, strict=True)
+    ]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("product_coefficients", type=Path)
@@ -160,6 +181,7 @@ def main():
         "--archive", type=Path, default=oracle.ROOT / "out" / "rd-evidence" / oracle.ARCHIVE
     )
     parser.add_argument("--mass-rule-output", type=Path)
+    parser.add_argument("--elastic-rule-output", type=Path)
     args = parser.parse_args()
     baseline, materials, target, degree, frozen = reference_data(args.archive)
     fields = (
@@ -206,29 +228,36 @@ def main():
         )
 
     if args.mass_rule_output is not None:
-        points, weights, layers = points_for(baseline, materials, 9, 2)
-        points = np.rint(points * (1 << 28)) / (1 << 28)
-        weights = np.rint(weights * (1 << 44)) / (1 << 44)
-        if np.any(weights <= 0):
-            raise ValueError("The exported finite rule must have positive weights")
-        values = actions(inputs, (points, weights, layers))[3:]
+        rule = dyadic_rule(points_for(baseline, materials, 9, 2))
+        values = actions(inputs, rule)[3:]
         expected = np.array([reference[3], frozen[fields[4]]])
         if np.max(abs((values - expected) / expected)) > 1e-8:
             raise ValueError("The rounded finite rule failed a frozen mass observable")
         print("rounded 9 x 9 x 2", values.tolist(), abs((values - expected) / expected).tolist())
         result = {
-            "points": [
-                {
-                    "coordinates": [str(Fraction(float(value))) for value in coord],
-                    "layer": int(layer),
-                    "weight": str(Fraction(float(weight))),
-                }
-                for coord, layer, weight in zip(points, layers, weights, strict=True)
-            ],
+            "points": serialize_rule(rule),
             "frozen_mass": float(reference[3]),
             "frozen_mass_work": frozen[fields[4]],
         }
         with args.mass_rule_output.open("x", encoding="utf-8", newline="\n") as output:
+            json.dump(result, output)
+
+    if args.elastic_rule_output is not None:
+        rule = dyadic_rule(points_for(baseline, materials, 9, 2, transverse=17))
+        values = actions(inputs, rule)[:3]
+        expected = reference[:3]
+        relative = abs((values - expected) / expected)
+        if np.max(relative) > 1e-8:
+            raise ValueError("The rounded finite rule failed a frozen elastic observable")
+        print("rounded 9 x 17 x 2", values.tolist(), relative.tolist())
+        result = {
+            "schema": "uvlas.pg-frozen-material-elastic-rule/1",
+            "archive_sha256": oracle.ARCHIVE_SHA256,
+            "points": serialize_rule(rule),
+            "reference": dict(zip(fields[:3], expected.tolist(), strict=True)),
+            "finite": dict(zip(fields[:3], values.tolist(), strict=True)),
+        }
+        with args.elastic_rule_output.open("x", encoding="utf-8", newline="\n") as output:
             json.dump(result, output)
 
 

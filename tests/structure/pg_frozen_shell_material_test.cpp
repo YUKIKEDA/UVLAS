@@ -1,5 +1,7 @@
+#include "pg_composed_basis.hpp"
 #include "pg_conditioned_volume_row.hpp"
 #include "pg_conditioning_test_support.hpp"
+#include "pg_material_grid.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -343,6 +345,41 @@ void check_action(std::span<const PgShellCartesianEnclosure> action,
     check_relative_enclosure(lo, hi, expected);
 }
 
+struct VolumeRuleSite {
+    ProbeLocation location;
+    ExactRational weight;
+};
+
+[[maybe_unused]] std::vector<VolumeRuleSite>
+import_volume_rule(const Json& points, const PgIntegrationPartition& partition, Fixture& fixture) {
+    const auto volumes = take(partition.volumes());
+    const auto triangles = take(partition.triangles());
+    const auto vertices = take(partition.vertices());
+    const auto layers = take(partition.layers());
+    std::vector<VolumeRuleSite> rule;
+    rule.reserve(points.size());
+    for (const auto& point : points) {
+        const auto& input = point.at("coordinates");
+        const std::array chart{Q{input.at(0).get<std::string>()}, Q{input.at(1).get<std::string>()},
+                               Q{input.at(2).get<std::string>()}};
+        auto site = locate_chart(fixture, partition, chart, point.at("layer").get<core::Index>());
+        const auto& volume = volumes[static_cast<std::size_t>(site.volume)];
+        const auto& tri = triangles[static_cast<std::size_t>(volume.triangle)];
+        const auto& a = vertices[static_cast<std::size_t>(tri.vertices[0])];
+        const auto& b = vertices[static_cast<std::size_t>(tri.vertices[1])];
+        const auto& c = vertices[static_cast<std::size_t>(tri.vertices[2])];
+        const Q determinant =
+            (q(b.s) - q(a.s)) * (q(c.t) - q(a.t)) - (q(b.t) - q(a.t)) * (q(c.s) - q(a.s));
+        const auto& layer = layers[static_cast<std::size_t>(volume.layer)];
+        const Q weight = Q{point.at("weight").get<std::string>()} /
+                         (determinant * (q(layer.upper) - q(layer.lower)));
+        REQUIRE(weight > 0);
+        rule.push_back({std::move(site), rat(fixture, numerator(weight), denominator(weight))});
+    }
+    std::ranges::stable_sort(rule, {}, [](const auto& site) { return site.location.volume; });
+    return rule;
+}
+
 void compare_mass_row(const PgPreparedPatch& patch, const PgReferenceVolumePoint& point,
                       const PgReferenceLimits& limits, core::ResourcePlan& plan) {
     const auto slim =
@@ -367,9 +404,78 @@ void compare_mass_row(const PgPreparedPatch& patch, const PgReferenceVolumePoint
     CHECK(slim.work.allocated_owned_payload_bytes < full.call_info.allocated_owned_payload_bytes);
 }
 
+void check_same_enclosure(const PgMaterialEnclosure& a, const PgMaterialEnclosure& b) {
+    CHECK(q(a.lower) == q(b.lower));
+    CHECK(q(a.upper) == q(b.upper));
+}
+
+void compare_composed_rows(const PgPreparedPatch& patch, const PgPreparedPatch& other,
+                           std::span<const PgDiscreteVolumePoint> rule, Fixture& fixture,
+                           const PgReferenceLimits& limits) {
+    core::ResourcePlan comparison_plan{profile};
+    detail::ReferenceArithmetic preparation{limits, comparison_plan};
+    const auto cache = detail::PgComposedBasis::prepare(patch.conditioning(), preparation);
+    REQUIRE(cache);
+    for (const auto& point : rule) {
+        CAPTURE(point.point.volume);
+        detail::ReferenceArithmetic evaluation{limits, comparison_plan};
+        const auto actual = cache->evaluate(patch.conditioning(), point.point, evaluation);
+        REQUIRE(actual);
+        const PgReferencePoint query{point.point};
+        const auto direct =
+            checked(patch.evaluate_reference(std::span{&query, 1}, limits, comparison_plan),
+                    "direct conditioned reference row");
+        const auto input = actual->columns.values();
+        const auto reference = direct.columns.values();
+        REQUIRE(input.size() == reference.size());
+        const auto compare = [](const PgReferenceScalar& a, const PgReferenceScalar& b) {
+            CHECK(q(a.rational) == q(b.rational));
+            CHECK(q(a.radical) == q(b.radical));
+        };
+        CHECK(q(actual->points.values().front().g) == q(direct.points.values().front().g));
+        for (std::size_t j = 0; j < input.size(); ++j) {
+            compare(input[j].value, reference[j].value);
+            for (std::size_t a = 0; a < 3; ++a)
+                compare(input[j].physical_gradient_per_metre[a],
+                        reference[j].physical_gradient_per_metre[a]);
+        }
+        CHECK(actual->call_info.allocated_owned_payload_bytes <
+              direct.call_info.allocated_owned_payload_bytes);
+    }
+    const auto small = fixture.r("1", "35184372088833");
+    const auto& original = rule.front().point;
+    detail::ReferenceArithmetic wide{limits, comparison_plan};
+    CHECK_FALSE(cache->evaluate(patch.conditioning(),
+                                {original.volume, small, original.v, original.depth}, wide));
+    core::ResourcePlan no_storage{0};
+    detail::ReferenceArithmetic rejected{limits, no_storage};
+    CHECK_FALSE(detail::PgComposedBasis::prepare(patch.conditioning(), rejected));
+    CHECK(no_storage.allocated_bytes() == 0);
+
+    detail::ReferenceArithmetic different{limits, comparison_plan};
+    const auto stale = detail::partition_entry([&]() -> core::Result<void> {
+        static_cast<void>(cache->evaluate(other.conditioning(), original, different));
+        return {};
+    });
+    REQUIRE_FALSE(stale);
+    CHECK(stale.error().code == core::FailureCode::StaleGeneration);
+    CHECK(different.info().allocated_owned_payload_bytes == 0);
+
+    auto stopped = limits;
+    stopped.cancellation = requested_stop_token();
+    detail::ReferenceArithmetic cancelled{stopped, comparison_plan};
+    const auto failure = detail::partition_entry([&]() -> core::Result<void> {
+        static_cast<void>(cache->evaluate(patch.conditioning(), original, cancelled));
+        return {};
+    });
+    REQUIRE_FALSE(failure);
+    CHECK(failure.error().code == core::FailureCode::Cancelled);
+}
+
 void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id,
                   const TrialState& state, const Json& material_input, const Json& expected,
-                  Fixture& fixture, const PgReferenceLimits& limits, core::ResourcePlan& plan) {
+                  Fixture& fixture, const PgReferenceLimits& limits, core::ResourcePlan& plan,
+                  const PgPreparedPatch* other_owner = nullptr) {
     const auto& partition = take(take(patch.conditioning().reference_basis())->source()).partition;
     const auto layers = take(partition.layers());
     const auto volumes = take(partition.volumes());
@@ -422,11 +528,37 @@ void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id
     assembly_limits.algebra.maximum_value_bits = 16'384;
     assembly_limits.algebra.maximum_work_bits = 65'536;
     core::ResourcePlan elastic_plan{profile};
-    auto elastic_action =
-        assemble_pg_shell_elastic_volume(patch, {patch_id, state.current}, samples, displacement,
-                                         {112, width, width, width}, assembly_limits, elastic_plan);
+    auto elastic_action = assemble_pg_shell_elastic_volume(
+        patch, {patch_id, state.current}, samples, displacement,
+        {112, width, width, width, PgShellReferencePath::Composed}, assembly_limits, elastic_plan);
     CAPTURE(elastic_plan.allocated_bytes());
     const auto elastic = checked(std::move(elastic_action), "frozen trial elastic assembly");
+    if (other_owner) {
+        compare_composed_rows(patch, *other_owner, mass_rule, fixture, assembly_limits);
+        core::ResourcePlan direct_plan{profile};
+        auto direct_limits = assembly_limits;
+        direct_limits.maximum_scalar_operations = 550'000'000;
+        const auto direct = checked(assemble_pg_shell_elastic_volume(
+                                        patch, {patch_id, state.current}, samples, displacement,
+                                        {112, width, width, width}, direct_limits, direct_plan),
+                                    "direct elastic assembly");
+        CAPTURE(elastic.work.scalar_operations, direct.work.scalar_operations,
+                elastic_plan.allocated_bytes(), direct_plan.allocated_bytes());
+        CHECK(elastic_plan.allocated_bytes() < direct_plan.allocated_bytes());
+        check_same_enclosure(elastic.energy_joules, direct.energy_joules);
+        for (std::size_t j = 0; j < state.displacement.size(); ++j)
+            for (std::size_t a = 0; a < 3; ++a) {
+                check_same_enclosure(elastic.internal_force_newtons.values()[j][a],
+                                     direct.internal_force_newtons.values()[j][a]);
+                check_same_enclosure(elastic.tangent_action_newtons.values()[j][a],
+                                     direct.tangent_action_newtons.values()[j][a]);
+            }
+        std::clog << "VMAT_COMPOSED_24," << elastic_plan.allocated_bytes() << ','
+                  << elastic.work.scalar_operations << ',' << elastic.work.partition_visits << ','
+                  << direct_plan.allocated_bytes() << ',' << direct.work.scalar_operations << ','
+                  << direct.work.partition_visits << '\n';
+    }
+
     core::ResourcePlan mass_plan{profile};
     auto mass_action =
         apply_pg_shell_consistent_mass(patch, mass_rule, mass_layers, displacement,
@@ -574,4 +706,142 @@ TEST_CASE("Frozen V-MAT selected coefficients produce the same trial through the
     check_volume(patch, info.identity, state, materials, selected.at("midpoint_actions"), fixture,
                  limits, plan);
 }
+TEST_CASE("The frozen composed jet and elastic action match the original exact path",
+          "[.composed-vmat][V-MAT][SH-D04]") {
+    const auto frozen = Json::parse(std::ifstream{UVLAS_PG_FROZEN_MATERIAL_PROBES});
+    const auto selected = Json::parse(std::ifstream{UVLAS_PG_FROZEN_MATERIAL_TRANSFER});
+    auto limits = query_limits();
+    limits.maximum_scalar_operations = 500'000'000;
+    limits.maximum_partition_visits = 250'000'000;
+    core::ResourcePlan plan{profile};
+    core::Workspace scratch{core::PlannedBuffer<std::byte>{}};
+    Fixture fixture;
+    const auto& materials = frozen.at("material_input");
+    const auto patch =
+        prepare_patch(geometry(fixture, frozen.at("height_coefficients"), materials, limits, plan),
+                      fixture, limits, scratch, plan);
+    const auto state = transferred_state(selected.at("transfer").at("displacement_metres"), patch,
+                                         fixture, limits, plan);
+    const auto other =
+        prepare_patch(geometry(fixture, frozen.at("height_coefficients"), materials, limits, plan),
+                      fixture, limits, scratch, plan);
+    check_volume(patch, take(patch.info()).identity, state, materials,
+                 selected.at("midpoint_actions"), fixture, limits, plan, &other);
+}
+
+TEST_CASE("Elastic volume grid rounds signed endpoints in their outward directions",
+          "[V-MAT][SH-D04][negative]") {
+    Fixture fixture;
+    for (const auto source_bits : {256U, 9000U}) {
+        CAPTURE(source_bits);
+        const I denominator = (I{1} << source_bits) + 1;
+        const I numerator = denominator + 1;
+        const auto positive = rat(fixture, numerator, denominator);
+        const auto negative = rat(fixture, -numerator, denominator);
+        constexpr std::uint32_t grid = 112;
+        const Q increment = Q{1} / (I{1} << grid);
+        auto limits = query_limits();
+        limits.algebra.maximum_work_bits = positive.numerator_bits() + grid;
+        core::ResourcePlan plan{profile};
+        detail::ReferenceArithmetic math{limits, plan};
+        const auto project = [&](const ExactRational& value, detail::GridEnd side) {
+            return q(detail::outward_material_grid(value, grid, side, math));
+        };
+        CHECK(project(positive, detail::GridEnd::Lower) == Q{1});
+        CHECK(project(positive, detail::GridEnd::Upper) == Q{1} + increment);
+        CHECK(project(negative, detail::GridEnd::Lower) == Q{-1} - increment);
+        CHECK(project(negative, detail::GridEnd::Upper) == Q{-1});
+
+        --limits.algebra.maximum_work_bits;
+        core::ResourcePlan rejected{profile};
+        detail::ReferenceArithmetic short_work{limits, rejected};
+        const auto failure = detail::partition_entry([&]() -> core::Result<ExactRational> {
+            return detail::outward_material_grid(positive, grid, detail::GridEnd::Upper,
+                                                 short_work);
+        });
+        REQUIRE_FALSE(failure);
+        CHECK(failure.error().code == core::FailureCode::ResourceExceeded);
+        CHECK(rejected.allocated_bytes() == 0);
+    }
+}
+#ifdef UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE
+TEST_CASE("Frozen V-MAT elastic action at 3672 points", "[.high-elastic][V-MAT][SH-D04]") {
+    const auto input = Json::parse(std::ifstream{UVLAS_PG_FROZEN_MATERIAL_PROBES});
+    const auto transfer = Json::parse(std::ifstream{UVLAS_PG_FROZEN_MATERIAL_TRANSFER});
+    const auto cubature = Json::parse(std::ifstream{UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE});
+    const auto& archive = input.at("archive").at("sha256");
+    REQUIRE(transfer.at("archive_sha256") == archive);
+    REQUIRE(cubature.at("schema") == "uvlas.pg-frozen-material-elastic-rule/1");
+    REQUIRE(cubature.at("archive_sha256") == archive);
+    auto limits = query_limits();
+    limits.maximum_scalar_operations = 500'000'000;
+    limits.maximum_partition_visits = 250'000'000;
+    core::ResourcePlan plan{profile};
+    core::Workspace scratch{core::PlannedBuffer<std::byte>{}};
+    Fixture fixture;
+    const auto& materials = input.at("material_input");
+    const auto patch =
+        prepare_patch(geometry(fixture, input.at("height_coefficients"), materials, limits, plan),
+                      fixture, limits, scratch, plan);
+    const auto state = transferred_state(transfer.at("transfer").at("displacement_metres"), patch,
+                                         fixture, limits, plan);
+    const auto& partition = take(take(patch.conditioning().reference_basis())->source()).partition;
+    const auto volumes = take(partition.volumes());
+    const auto layers = take(partition.layers());
+    const auto rule = import_volume_rule(cubature.at("points"), partition, fixture);
+    REQUIRE(rule.size() == 3'672);
+
+    std::vector<MaterialInput> material_inputs;
+    material_inputs.reserve(layers.size());
+    for (const auto& material : materials)
+        material_inputs.push_back(read_material(material, limits, plan));
+    REQUIRE(material_inputs.size() == layers.size());
+
+    const auto one = fixture.r("1"), zero = fixture.r("0");
+    const std::array<ExactRational, 6> error;
+    std::vector<PgShellVolumeSample> samples;
+    samples.reserve(rule.size());
+    std::array<std::size_t, 3> layer_points{};
+    REQUIRE(layers.size() == layer_points.size());
+    for (const auto& site : rule) {
+        const auto& volume = volumes[static_cast<std::size_t>(site.location.volume)];
+        const auto layer = static_cast<std::size_t>(volume.layer);
+        ++layer_points.at(layer);
+        const auto& material = material_inputs.at(layer);
+        samples.push_back({{site.location.point(), site.weight},
+                           layers[layer].id,
+                           material.elastic,
+                           {one, material.initial, error},
+                           PgShellProjectedFibre{material.fibre, one, zero}});
+    }
+    REQUIRE(layer_points == std::array<std::size_t, 3>{1'224, 1'224, 1'224});
+    auto assembly_limits = limits;
+    assembly_limits.maximum_scalar_operations = 500'000'000'000ULL;
+    assembly_limits.maximum_partition_visits = 2'000'000'000;
+    assembly_limits.algebra.maximum_value_bits = 16'384;
+    assembly_limits.algebra.maximum_work_bits = 65'536;
+    assembly_limits.algebra.external_memory = ExactEstimateAdmission{profile};
+
+    core::ResourcePlan elastic_plan{profile};
+    const auto identity = take(patch.info()).identity;
+    const auto width = fixture.r("1", "1000000000000000000000");
+    const PgShellPatchDirection displacement{identity, state.displacement};
+    auto outcome = assemble_pg_shell_elastic_volume(
+        patch, {identity, state.current}, samples, displacement,
+        {112, width, width, width, PgShellReferencePath::Composed}, assembly_limits, elastic_plan);
+    CAPTURE(elastic_plan.allocated_bytes());
+    const auto elastic = checked(std::move(outcome), "high order elastic assembly");
+    CHECK(elastic.work.allocated_owned_payload_bytes == elastic_plan.allocated_bytes());
+    std::clog << "VMAT_ELASTIC_3672," << elastic_plan.allocated_bytes() << ','
+              << elastic.work.scalar_operations << ',' << elastic.work.partition_visits << '\n';
+
+    const auto& expected = cubature.at("reference");
+    check_relative_enclosure(q(elastic.energy_joules.lower), q(elastic.energy_joules.upper),
+                             expected.at("energy_joules"));
+    check_action(elastic.internal_force_newtons.values(), state.displacement,
+                 expected.at("displacement_internal_work_joules"));
+    check_action(elastic.tangent_action_newtons.values(), state.displacement,
+                 expected.at("displacement_tangent_quadratic_joules"));
+}
+#endif
 } // namespace

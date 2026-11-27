@@ -9,6 +9,7 @@ namespace detail {
 struct BasisReferencePoint;
 struct BasisReferenceSample;
 struct PgConditionedVolumeRow;
+class PgComposedBasis;
 } // namespace detail
 
 /// An owned reference point and one scalar basis column.
@@ -61,6 +62,7 @@ private:
     friend class PgFlatGram;
     friend class PgDiscreteGram;
     friend struct detail::PgConditionedVolumeRow;
+    friend class detail::PgComposedBasis;
     [[nodiscard]] const ExactRational& length_metres() const& noexcept;
     [[nodiscard]] detail::BasisReferencePoint locate(detail::ReferenceArithmetic&,
                                                      const PgReferencePoint&) const;

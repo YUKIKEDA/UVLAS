@@ -237,11 +237,16 @@ struct PgShellVolumeSample {
     PgShellPointAxes axes;
 };
 
+/// Exact reference evaluation used by elastic volume assembly.
+enum class PgShellReferencePath : std::uint8_t { Direct, Composed };
+
 struct PgShellVolumeResolution {
     std::uint32_t fractional_bits; ///< Outward dyadic rounding of each SI contribution.
     const ExactRational& energy_width_joules;
     const ExactRational& force_width_newtons;
     const ExactRational& tangent_width_newtons;
+    /// Composed permits counted preparation and falls back at unsupported points.
+    PgShellReferencePath reference_path = PgShellReferencePath::Direct;
 };
 
 using PgShellCartesianEnclosure = std::array<PgMaterialEnclosure, 3>;

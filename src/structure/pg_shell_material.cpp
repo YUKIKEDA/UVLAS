@@ -1,5 +1,6 @@
+#include "pg_composed_basis.hpp"
 #include "pg_conditioned_volume_row.hpp"
-#include "pg_conditioning_factor.hpp"
+#include "pg_material_grid.hpp"
 #include "pg_reference_projection.hpp"
 
 #include <algorithm>
@@ -624,39 +625,14 @@ Tensor first_pk_derivative(const PgShellElasticLaw& law, const PgShellMaterialPo
         derivative[k] = bounds.add(derivative[k], geometric[k]);
     return derivative;
 }
-enum class Endpoint { Lower, Upper };
-
-R outward_grid(const R& value, std::uint32_t bits, Endpoint endpoint, ReferenceArithmetic& math) {
-    if (value.sign() == 0)
-        return {};
-    constexpr std::uint64_t max_bits = 8192;
-    constexpr auto limb_bits = std::numeric_limits<detail::RankWord>::digits;
-    const auto numerator_bits = detail::partition_add(value.numerator_bits(), bits);
-    const auto denominator_bits = value.denominator_bits();
-    if (std::max(numerator_bits, denominator_bits) > max_bits)
-        partition_fail(core::FailureCode::ResourceExceeded);
-    math.charge(2 + numerator_bits / limb_bits + denominator_bits / limb_bits);
-    const auto fraction = detail::rank_fraction<detail::RankWide>(value);
-    const detail::RankWide scaled = detail::rank_abs(fraction.numerator) << bits;
-    auto units = detail::conditioning_divide(math, scaled, fraction.denominator);
-    const bool negative = value.sign() < 0;
-    const bool away_from_zero =
-        negative ? endpoint == Endpoint::Lower : endpoint == Endpoint::Upper;
-    if (away_from_zero && detail::rank_product(math, units, fraction.denominator) != scaled)
-        ++units;
-    if (negative)
-        units = -units;
-    math.charge();
-    return detail::rank_materialize_dyadic(units, bits, math.leaf_limits, math.plan);
-}
-
 struct VolumeSum {
     const MaterialBounds& bounds;
     std::uint32_t bits;
 
     void add(Bound& result, const Bound& term) const {
-        const Bound enclosed{outward_grid(term.lower, bits, Endpoint::Lower, bounds.math),
-                             outward_grid(term.upper, bits, Endpoint::Upper, bounds.math)};
+        const Bound enclosed{
+            detail::outward_material_grid(term.lower, bits, detail::GridEnd::Lower, bounds.math),
+            detail::outward_material_grid(term.upper, bits, detail::GridEnd::Upper, bounds.math)};
         result = bounds.add(result, enclosed);
     }
 
@@ -917,11 +893,10 @@ enclose_pg_shell_material_point(const PgShellElasticLaw& law, const PgInitialGre
     });
 }
 
-core::Result<PgShellPatchPoint> enclose_pg_shell_patch_point(const PgPreparedPatch& patch,
-                                                             const PgShellPatchState& state,
-                                                             const PgReferencePoint& query,
-                                                             const PgReferenceLimits& limits,
-                                                             core::ResourcePlan& plan) noexcept {
+static core::Result<PgShellPatchPoint>
+enclose_patch_point(const PgPreparedPatch& patch, const PgShellPatchState& state,
+                    const PgReferencePoint& query, const PgReferenceLimits& limits,
+                    core::ResourcePlan& plan, const detail::PgComposedBasis* composed) noexcept {
     return evaluate([&]() -> core::Result<PgShellPatchPoint> {
         ReferenceArithmetic math{limits, plan};
         math.cancel();
@@ -937,8 +912,20 @@ core::Result<PgShellPatchPoint> enclose_pg_shell_patch_point(const PgPreparedPat
         const auto coordinates = detail::partition_mul(6, info.basis.rank);
         auto reference_limits = limits;
         math.reserve_nested_rationals(reference_limits.algebra, coordinates);
-        auto row =
-            partition_take(patch.evaluate_reference(std::span{&query, 1}, reference_limits, plan));
+        const auto load_reference = [&]() {
+            const auto* volume = std::get_if<PgReferenceVolumePoint>(&query);
+            if (composed && volume) {
+                ReferenceArithmetic loading{reference_limits, plan};
+                if (auto fast = composed->evaluate(patch.conditioning(), *volume, loading))
+                    return std::move(*fast);
+                record_work(math, loading.info());
+                reference_limits.maximum_scalar_operations -= loading.scalar_operations;
+                reference_limits.maximum_partition_visits -= loading.partition_visits;
+            }
+            return partition_take(
+                patch.evaluate_reference(std::span{&query, 1}, reference_limits, plan));
+        };
+        auto row = load_reference();
         math.charge(row.call_info.scalar_operations);
         math.visit(row.call_info.partition_visits);
         math.admit(detail::partition_add(384, detail::partition_mul(14, info.basis.rank)));
@@ -977,6 +964,14 @@ core::Result<PgShellPatchPoint> enclose_pg_shell_patch_point(const PgPreparedPat
         return PgShellPatchPoint{info.identity, std::move(reference), std::move(row.columns),
                                  std::move(x),  std::move(f),         math.info()};
     });
+}
+
+core::Result<PgShellPatchPoint> enclose_pg_shell_patch_point(const PgPreparedPatch& patch,
+                                                             const PgShellPatchState& state,
+                                                             const PgReferencePoint& query,
+                                                             const PgReferenceLimits& limits,
+                                                             core::ResourcePlan& plan) noexcept {
+    return enclose_patch_point(patch, state, query, limits, plan, nullptr);
 }
 
 core::Result<PgShellMaterialPointResponse>
@@ -1073,6 +1068,9 @@ assemble_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& s
             partition_fail(invalid);
         if (resolution.fractional_bits > 1024)
             partition_fail(Code::PrecisionUnsupported);
+        if (resolution.reference_path != PgShellReferencePath::Direct &&
+            resolution.reference_path != PgShellReferencePath::Composed)
+            partition_fail(invalid);
         validate_samples(patch, samples, math);
 
         const auto live_results = detail::partition_mul(direction ? 12 : 6, rank);
@@ -1088,13 +1086,17 @@ assemble_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& s
         const MaterialBounds bounds{math};
         const VolumeSum sum{bounds, resolution.fractional_bits};
         Bound energy;
+        const auto composed = resolution.reference_path == PgShellReferencePath::Composed
+                                  ? detail::PgComposedBasis::prepare(patch.conditioning(), math)
+                                  : std::nullopt;
         for (const auto& slot : samples) {
             const auto& sample = bound_descriptor(slot);
             math.visit(1);
             const auto keep_direction = direction ? detail::partition_mul(3, rank) : 0;
-            auto point = partition_take(enclose_pg_shell_patch_point(
+            auto point = partition_take(enclose_patch_point(
                 patch, state, PgReferencePoint{sample.quadrature.point},
-                remaining_limits(math, detail::partition_add(live_results, keep_direction)), plan));
+                remaining_limits(math, detail::partition_add(live_results, keep_direction)), plan,
+                composed ? &*composed : nullptr));
             record_work(math, point.work);
             const auto& ref = point.reference;
             const auto root = bounds.root(ref.g);

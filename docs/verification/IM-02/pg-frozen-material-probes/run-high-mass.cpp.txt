@@ -20,9 +20,6 @@ TEST_CASE("Frozen V-MAT mass action at 1944 points", "[.high-mass]") {
     const auto state = transferred_state(transfer.at("transfer").at("displacement_metres"), patch,
                                          fixture, limits, plan);
     const auto& partition = take(take(patch.conditioning().reference_basis())->source()).partition;
-    const auto volumes = take(partition.volumes());
-    const auto triangles = take(partition.triangles());
-    const auto vertices = take(partition.vertices());
     const auto layers = take(partition.layers());
     std::vector<ExactRational> densities;
     densities.reserve(layers.size());
@@ -32,33 +29,7 @@ TEST_CASE("Frozen V-MAT mass action at 1944 points", "[.high-mass]") {
     mass_layers.reserve(layers.size());
     for (std::size_t i = 0; i < layers.size(); ++i)
         mass_layers.push_back({layers[i].id, densities[i]});
-    struct Site {
-        ProbeLocation location;
-        ExactRational weight;
-    };
-    std::vector<Site> sites;
-    sites.reserve(cubature.at("points").size());
-    for (const auto& input_point : cubature.at("points")) {
-        const auto& input_chart = input_point.at("coordinates");
-        const std::array chart{Q{input_chart.at(0).get<std::string>()},
-                               Q{input_chart.at(1).get<std::string>()},
-                               Q{input_chart.at(2).get<std::string>()}};
-        const auto layer_index = input_point.at("layer").get<core::Index>();
-        auto loc = locate_chart(fixture, partition, chart, layer_index);
-        const auto& volume = volumes[static_cast<std::size_t>(loc.volume)];
-        const auto& tri = triangles[static_cast<std::size_t>(volume.triangle)];
-        const auto& a = vertices[static_cast<std::size_t>(tri.vertices[0])];
-        const auto& b = vertices[static_cast<std::size_t>(tri.vertices[1])];
-        const auto& c = vertices[static_cast<std::size_t>(tri.vertices[2])];
-        const Q determinant =
-            (q(b.s) - q(a.s)) * (q(c.t) - q(a.t)) - (q(b.t) - q(a.t)) * (q(c.s) - q(a.s));
-        const auto& layer = layers[static_cast<std::size_t>(volume.layer)];
-        const Q physical_rule{input_point.at("weight").get<std::string>()};
-        const Q local = physical_rule / (determinant * (q(layer.upper) - q(layer.lower)));
-        REQUIRE(local > 0);
-        sites.push_back({std::move(loc), rat(fixture, numerator(local), denominator(local))});
-    }
-    std::ranges::stable_sort(sites, {}, [](const auto& site) { return site.location.volume; });
+    const auto sites = import_volume_rule(cubature.at("points"), partition, fixture);
     std::vector<PgDiscreteVolumePoint> rule;
     rule.reserve(sites.size());
     for (const auto& site : sites)

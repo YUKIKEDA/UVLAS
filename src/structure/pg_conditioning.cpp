@@ -1,3 +1,4 @@
+#include "pg_composed_basis.hpp"
 #include "pg_conditioned_volume_row.hpp"
 #include "pg_conditioning_factor.hpp"
 #include "pg_reference_arithmetic.hpp"
@@ -392,6 +393,225 @@ core::Result<detail::PgConditionedVolumeRow> detail::PgConditionedVolumeRow::eva
         point.reference.call_info = math.info();
         return PgConditionedVolumeRow{std::move(point.reference), std::move(values), math.info()};
     });
+}
+
+namespace {
+[[nodiscard]] std::size_t composed_group(const PgRankRow& row) noexcept {
+    return 3 * (2 * static_cast<std::size_t>(row.cell.first) +
+                static_cast<std::size_t>(row.cell.second)) +
+           static_cast<std::size_t>(row.field);
+}
+
+template <class I>
+[[nodiscard]] I exact_divide(ReferenceArithmetic& math, const I& a, const I& d) {
+    math.charge(partition_mul(a.backend().size(), d.backend().size()));
+    return a / d;
+}
+} // namespace
+
+std::optional<detail::PgComposedBasis>
+detail::PgComposedBasis::prepare(const PgConditioningCertificate& certificate,
+                                 ReferenceArithmetic& math) {
+    math.cancel();
+    const auto& accepted = state(certificate.state_);
+    const auto source = partition_take(certificate.basis_.source());
+    const auto graph = partition_take(source.dictionary.graph());
+    // Fixed composed scratch stays inside the caller's exact work-bit budget.
+    if (graph.n != 1 || accepted.transform_scale >= coefficient_bits ||
+        math.limits.algebra.maximum_work_bits < std::numeric_limits<RankCell>::digits)
+        return std::nullopt;
+    const auto* rank = partition_take(certificate.basis_.rank());
+    const auto rows = partition_take(rank->rows());
+    const auto n = static_cast<std::size_t>(accepted.info.rank);
+    const auto transform_slots = accepted.transform.values().size();
+    if (partition_add(n, transform_slots) >
+        math.limits.maximum_partition_visits - math.partition_visits)
+        return std::nullopt;
+    std::uint64_t used = 0, updates = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        math.visit(1);
+        const auto indices = partition_take(rank->basis_indices({partition_index(i)}));
+        used = partition_add(used, indices.size());
+        updates = partition_add(updates, partition_mul(indices.size(), n - i));
+    }
+    constexpr auto limbs = coefficient_bits / std::numeric_limits<RankWord>::digits;
+    const auto storage = partition_mul(partition_mul(rows.size(), n), sizeof(Units));
+    const auto estimated_contract =
+        partition_add(partition_mul(updates, 1 + limbs + limbs * limbs),
+                      partition_mul(used, 1 + 2 * limbs + 2 * limbs * limbs));
+    if (storage > math.plan.remaining_bytes() ||
+        estimated_contract > math.limits.maximum_scalar_operations - math.scalar_operations ||
+        partition_add(transform_slots, partition_mul(2, used)) >
+            math.limits.maximum_partition_visits - math.partition_visits)
+        return std::nullopt;
+    std::uint64_t t_bits = 0;
+    for (const auto& value : accepted.transform.values()) {
+        math.visit(1);
+        t_bits = std::max(t_bits, rank_bits(value));
+    }
+    if (t_bits > coefficient_bits)
+        return std::nullopt;
+
+    PgComposedBasis result;
+    result.owner_ = &certificate;
+    result.basis_ = &certificate.basis_;
+    result.rows_ = rows;
+    result.rank_ = n;
+    result.denominators_.fill(Units{1});
+    std::uint64_t b_bits = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        const auto column = source_column(*rank, {partition_index(i)});
+        for (std::size_t term = 0; term < column.rows.size(); ++term) {
+            math.visit(1);
+            math.charge(1 + 2 * limbs);
+            const auto& value = column.values[term];
+            const auto numerator_bits = rank_bits(value.numerator);
+            const auto denominator_bits = rank_bits(value.denominator);
+            auto& common = result.denominators_[composed_group(rows[column.rows[term]])];
+            if (numerator_bits > coefficient_bits ||
+                rank_bits(common) + denominator_bits > coefficient_bits)
+                return std::nullopt;
+            b_bits = std::max(b_bits, numerator_bits);
+            common = rank_lcm(math, common, rank_copy_integer<Units>(value.denominator.backend()));
+        }
+    }
+    for (const auto& common : result.denominators_) {
+        if (rank_bits(common) + accepted.transform_scale > coefficient_bits ||
+            b_bits + rank_bits(common) + t_bits + static_cast<std::uint64_t>(std::bit_width(n)) >
+                coefficient_bits)
+            return std::nullopt;
+    }
+
+    if (estimated_contract > math.limits.maximum_scalar_operations - math.scalar_operations)
+        return std::nullopt;
+
+    result.entries_ = partition_take(math.plan.allocate<Units>(
+        partition_index(partition_mul(rows.size(), n)), partition_operation));
+    for (std::size_t i = 0; i < n; ++i) {
+        const auto column = source_column(*rank, {partition_index(i)});
+        for (std::size_t term = 0; term < column.rows.size(); ++term) {
+            math.visit(1);
+            math.charge(1 + 2 * limbs);
+            const auto index = static_cast<std::size_t>(column.rows[term]);
+            const auto& fraction = column.values[term];
+            const auto& common = result.denominators_[composed_group(rows[index])];
+            const auto denominator = rank_copy_integer<Units>(fraction.denominator.backend());
+            const auto scaled =
+                rank_product(math, rank_copy_integer<Units>(fraction.numerator.backend()),
+                             exact_divide(math, common, denominator));
+            auto out = result.entries_.values().subspan(index * n, n);
+            for (std::size_t j = i; j < n; ++j) {
+                math.charge(1 + limbs);
+                const auto& transform = accepted.transform.values()[packed(i, j)];
+                if (transform != 0)
+                    out[j] +=
+                        rank_product(math, scaled, rank_copy_integer<Units>(transform.backend()));
+            }
+        }
+    }
+    for (auto& common : result.denominators_)
+        common <<= accepted.transform_scale;
+    return result;
+}
+
+std::optional<PgConditionedReferenceBatch>
+detail::PgComposedBasis::evaluate(const PgConditioningCertificate& certificate,
+                                  const PgReferenceVolumePoint& query,
+                                  ReferenceArithmetic& math) const {
+    math.cancel();
+    if (&certificate != owner_)
+        partition_fail(core::FailureCode::StaleGeneration);
+    math.admit(partition_add(basis_live_rationals + 16 + 74, partition_mul(8, rank_)));
+    auto point = basis_->locate(math, query);
+    if (std::max({point.u.numerator_bits(), point.u.denominator_bits(), point.v.numerator_bits(),
+                  point.v.denominator_bits()}) > coordinate_bits)
+        return std::nullopt;
+    const auto u = rank_fraction<RankCell>(point.u), v = rank_fraction<RankCell>(point.v);
+    const auto common = rank_lcm(math, u.denominator, v.denominator);
+    if (rank_bits(common) > coordinate_bits)
+        return std::nullopt;
+    const auto x = rank_product(math, u.numerator, exact_divide(math, common, u.denominator));
+    const auto y = rank_product(math, v.numerator, exact_divide(math, common, v.denominator));
+    if (rank_abs(x) > common || rank_abs(y) > common)
+        return std::nullopt;
+
+    const auto powers = [&](const RankCell& value) {
+        std::array<RankCell, degree + 1> out;
+        out.front() = 1;
+        for (std::size_t j = 1; j < out.size(); ++j)
+            out[j] = rank_product(math, out[j - 1], value);
+        return out;
+    };
+    const auto xp = powers(x), yp = powers(y), dp = powers(common);
+    using Jet = std::array<std::array<RankCell, 3>, 3>;
+    // The temporary is allocated through the caller's bounded plan and its
+    // signed accumulators are at most 512 + 21*32 + ceil(log2 rows) + 7 bits.
+    auto sums =
+        partition_take(math.plan.allocate<Jet>(partition_index(rank_), partition_operation));
+    const auto cell = point.reference.cell;
+    const auto base =
+        3 * (2 * static_cast<std::size_t>(cell.first) + static_cast<std::size_t>(cell.second));
+    constexpr auto width = std::numeric_limits<RankCell>::digits;
+    constexpr auto limbs = width / std::numeric_limits<RankWord>::digits;
+    for (std::size_t i = 0; i < rows_.size(); ++i) {
+        math.visit(1);
+        const auto& row = rows_[i];
+        if (row.cell != cell)
+            continue;
+        const auto field = static_cast<std::size_t>(row.field);
+        const auto a = static_cast<std::size_t>(row.powers.first);
+        const auto b = static_cast<std::size_t>(row.powers.second);
+        const auto monomial = [&](std::size_t s, std::size_t t) {
+            return rank_product(math, rank_product(math, xp[s], yp[t]), dp[degree - s - t]);
+        };
+        const std::array scales{
+            monomial(a, b),
+            a == 0 ? RankCell{} : rank_product(math, RankCell{4 * a}, monomial(a - 1, b)),
+            b == 0 ? RankCell{} : rank_product(math, RankCell{4 * b}, monomial(a, b - 1))};
+        const auto entries = entries_.values().subspan(i * rank_, rank_);
+        for (std::size_t j = 0; j < entries.size(); ++j) {
+            math.charge();
+            if (entries[j] == 0)
+                continue;
+            const auto coefficient = rank_copy_integer<RankCell>(entries[j].backend());
+            for (std::size_t d = 0; d < scales.size(); ++d) {
+                if (scales[d] == 0)
+                    continue;
+                math.charge(limbs);
+                sums.values()[j][field][d] += rank_product(math, coefficient, scales[d]);
+            }
+        }
+    }
+    std::array<RankCell, 3> output_denominators;
+    for (std::size_t f = 0; f < output_denominators.size(); ++f)
+        output_denominators[f] = rank_product(
+            math, rank_copy_integer<RankCell>(denominators_[base + f].backend()), dp.back());
+
+    auto points = partition_take(math.plan.allocate<PgReferenceValue>(1, partition_operation));
+    auto columns = partition_take(math.plan.allocate<PgConditionedReferenceColumn>(
+        partition_index(rank_), partition_operation));
+    for (std::size_t j = 0; j < rank_; ++j) {
+        std::array<std::array<ExactRational, 3>, 3> jet;
+        for (std::size_t f = 0; f < jet.size(); ++f)
+            for (std::size_t d = 0; d < jet[f].size(); ++d) {
+                const auto& numerator = sums.values()[j][f][d];
+                if (numerator == 0)
+                    continue;
+                const auto& denominator = output_denominators[f];
+                const auto divisor = rank_gcd(math, numerator, denominator);
+                const RankFraction<RankCell> reduced{exact_divide(math, numerator, divisor),
+                                                     exact_divide(math, denominator, divisor)};
+                math.charge();
+                jet[f][d] = rank_exact(reduced, math.leaf_limits, math.plan);
+            }
+        auto value = basis_->sample(math, point, jet);
+        columns.values()[j] = {std::move(value.value),
+                               std::move(value.physical_gradient_per_metre)};
+    }
+    math.cancel();
+    point.reference.call_info = math.info();
+    points.values().front() = std::move(point.reference);
+    return PgConditionedReferenceBatch{rank_, std::move(points), std::move(columns), math.info()};
 }
 
 core::Result<PgConditionedReferenceBatch>

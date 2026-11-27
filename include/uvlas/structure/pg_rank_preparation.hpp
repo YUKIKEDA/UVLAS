@@ -105,6 +105,7 @@ namespace detail {
 struct PgRankState;
 struct ReferenceArithmetic;
 class PgRankMonomialPowers;
+class PgComposedBasis;
 } // namespace detail
 
 /// Owns one bounded, unconditioned local basis and its exact reconstruction maps.
@@ -191,6 +192,7 @@ public:
 private:
     friend class PgReferenceBasis;
     friend class PgFlatGram;
+    friend class detail::PgComposedBasis;
     [[nodiscard]] std::array<std::array<ExactRational, 3>, 3>
     basis_cell_jet(detail::ReferenceArithmetic&, PgRankBasisColumn, PgCellIndex,
                    const ExactRational& u, const ExactRational& v, const ExactRational& axis_scale,
