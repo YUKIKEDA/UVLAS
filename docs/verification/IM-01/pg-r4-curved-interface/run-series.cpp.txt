@@ -1,0 +1,580 @@
+#include "pg_conditioning_test_support.hpp"
+
+#include <catch2/generators/catch_generators.hpp>
+
+#include <algorithm>
+#include <array>
+#include <iostream>
+#include <uvlas/structure/pg_discrete_gram.hpp>
+#include <uvlas/structure/pg_full_trace.hpp>
+#include <uvlas/structure/pg_sparse_chart.hpp>
+
+namespace {
+using namespace uvlas;
+using namespace uvlas::structure;
+using namespace partition_test;
+using namespace pg_conditioning_test;
+
+struct HeightTerm {
+    unsigned x, y;
+    int numerator, denominator;
+};
+
+// Frozen R4 interface geometry in world coordinates before any chart substitution.
+constexpr std::array<HeightTerm, 6> world_height{{
+    {2, 0, 1, 5},
+    {0, 2, 1, 10},
+    {1, 1, 7, 100},
+    {3, 0, 1, 30},
+    {0, 3, -1, 50},
+    {2, 2, 1, 40},
+}};
+
+ExactRational owned(Fixture& f, const Q& value) {
+    return rat(f, numerator(value), denominator(value));
+}
+
+struct RuleNode {
+    ExactRational u, v, depth;
+};
+
+std::vector<RuleNode> finite_rule(Fixture& f) {
+    // Finite rule solely for the geometry inner-product certificate of this fixture.
+    // The R4 mechanics quadrature is not used by the trace operation.
+    constexpr unsigned order = 10;
+    const std::array<Q, 3> depths{Q{1, 4}, Q{1, 2}, Q{3, 4}};
+    std::vector<RuleNode> nodes;
+    nodes.reserve(3 * (order + 1) * (order + 2) / 2);
+    for (unsigned i = 0; i <= order; ++i)
+        for (unsigned j = 0; j <= order - i; ++j) {
+            const Q u = Q{512 * (i + 1) + (j + 1) * (j + 2), 512 * (order + 3)};
+            const Q v = Q{512 * (j + 1) + (i + 1) * (i + 3), 512 * (order + 3)};
+            REQUIRE(u > 0);
+            REQUIRE(v > 0);
+            REQUIRE(u + v < 1);
+            for (const auto& depth : depths)
+                nodes.push_back({owned(f, u), owned(f, v), owned(f, depth)});
+        }
+    return nodes;
+}
+
+constexpr std::uint64_t sample_prime = 1'000'000'007;
+
+std::uint64_t sample_power(std::uint64_t base, std::uint64_t exponent) {
+    std::uint64_t result = 1;
+    while (exponent != 0) {
+        if ((exponent & 1U) != 0)
+            result = result * base % sample_prime;
+        exponent >>= 1U;
+        base = base * base % sample_prime;
+    }
+    return result;
+}
+
+std::uint64_t residue(const Q& value) {
+    I numerator_units = numerator(value) % sample_prime;
+    if (numerator_units < 0)
+        numerator_units += sample_prime;
+    const I denominator_units = denominator(value) % sample_prime;
+    REQUIRE(denominator_units != 0);
+    return numerator_units.convert_to<std::uint64_t>() *
+           sample_power(denominator_units.convert_to<std::uint64_t>(), sample_prime - 2) %
+           sample_prime;
+}
+
+struct SampleTerm {
+    std::size_t column, field;
+    std::uint64_t x, y;
+    std::uint64_t value;
+};
+
+class SampleRank {
+public:
+    SampleRank(const PgRankPreparation& basis, std::size_t columns, std::size_t extent,
+               core::ResourcePlan& plan)
+        : terms_(extent * extent), pivots_(columns), columns_(columns), extent_(extent) {
+        const auto rows = take(basis.rows());
+        const auto exact = query_limits().algebra;
+        for (std::size_t col = 0; col < columns; ++col) {
+            const PgRankBasisColumn column{static_cast<core::Index>(col)};
+            for (const auto i : take(basis.basis_indices(column))) {
+                const auto& row = rows[i];
+                const auto value =
+                    take(basis.basis(column, static_cast<core::Index>(i), exact, plan));
+                terms_[cell(row.cell)].push_back({col, static_cast<std::size_t>(row.field),
+                                                  static_cast<std::uint64_t>(row.powers.first),
+                                                  static_cast<std::uint64_t>(row.powers.second),
+                                                  residue(q(value))});
+            }
+        }
+    }
+
+    [[nodiscard]] bool add(const PgCellIndex& index, const Q& s, const Q& t) {
+        if (rank_ == columns_)
+            return false;
+        const auto x = residue(2 * extent_ * s - 2 * index.first - 1);
+        const auto y = residue(2 * extent_ * t - 2 * index.second - 1);
+        std::array<std::vector<std::uint64_t>, 3> values;
+        for (auto& field : values)
+            field.resize(columns_);
+        for (const auto& term : terms_[cell(index)]) {
+            auto& value = values[term.field][term.column];
+            value = (value + term.value * sample_power(x, term.x) % sample_prime *
+                                 sample_power(y, term.y) % sample_prime) %
+                    sample_prime;
+        }
+        const auto before = rank_;
+        for (auto& field : values)
+            add_row(std::move(field));
+        return rank_ != before;
+    }
+
+    [[nodiscard]] std::size_t rank() const noexcept {
+        return rank_;
+    }
+
+private:
+    [[nodiscard]] std::size_t cell(const PgCellIndex& index) const {
+        return static_cast<std::size_t>(index.first) * extent_ +
+               static_cast<std::size_t>(index.second);
+    }
+
+    void add_row(std::vector<std::uint64_t> row) {
+        for (std::size_t i = 0; i < row.size(); ++i) {
+            if (row[i] == 0)
+                continue;
+            if (pivots_[i].empty()) {
+                const auto inverse = sample_power(row[i], sample_prime - 2);
+                for (std::size_t j = i; j < row.size(); ++j)
+                    row[j] = row[j] * inverse % sample_prime;
+                pivots_[i] = std::move(row);
+                ++rank_;
+                return;
+            }
+            const auto scale = row[i];
+            for (std::size_t j = i; j < row.size(); ++j)
+                row[j] =
+                    (row[j] + sample_prime - scale * pivots_[i][j] % sample_prime) % sample_prime;
+        }
+    }
+
+    std::vector<std::vector<SampleTerm>> terms_;
+    std::vector<std::vector<std::uint64_t>> pivots_;
+    std::size_t columns_, extent_, rank_{};
+};
+
+std::vector<PgDiscreteVolumePoint> select_rule(Fixture& f, const PgReferenceBasis& basis,
+                                               core::Index n, std::span<const RuleNode> nodes,
+                                               std::vector<ExactRational>& weights,
+                                               core::ResourcePlan& plan) {
+    const auto& partition = take(basis.source()).partition;
+    const auto volumes = take(partition.volumes());
+    const auto triangles = take(partition.triangles());
+    const auto vertices = take(partition.vertices());
+    const auto pieces = take(partition.pieces());
+    const auto columns = static_cast<std::size_t>(take(basis.size()));
+    SampleRank selection{*take(basis.rank()), columns, 2 * static_cast<std::size_t>(n), plan};
+    std::vector<std::vector<std::size_t>> selected(volumes.size());
+    constexpr std::size_t stride = 3;
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        const auto& tri = triangles[static_cast<std::size_t>(volumes[i].triangle)];
+        const auto& a = vertices[static_cast<std::size_t>(tri.vertices[0])];
+        const auto& b = vertices[static_cast<std::size_t>(tri.vertices[1])];
+        const auto& c = vertices[static_cast<std::size_t>(tri.vertices[2])];
+        const auto& index = pieces[static_cast<std::size_t>(tri.piece)].cell;
+        const auto material_coordinate = [&](const RuleNode& p, auto member) -> Q {
+            return q(a.*member) + q(p.u) * (q(b.*member) - q(a.*member)) +
+                   q(p.v) * (q(c.*member) - q(a.*member));
+        };
+        for (std::size_t j = 0; j < nodes.size(); j += stride) {
+            const auto& p = nodes[j];
+            const auto gain = selection.add(index, material_coordinate(p, &PgPartitionPoint::s),
+                                            material_coordinate(p, &PgPartitionPoint::t));
+            if (gain || j == 0)
+                selected[i].push_back(j);
+        }
+    }
+    // Three distinct depths at each point separate the three field powers.
+    // The finite-field sweep only chooses positive test samples. The normal
+    // product's interval factor and congruence checks still decide acceptance.
+    CAPTURE(n, columns, selection.rank());
+    REQUIRE(selection.rank() == columns);
+    weights.reserve(volumes.size());
+    std::vector<PgDiscreteVolumePoint> points;
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        const auto& weight =
+            weights.emplace_back(owned(f, Q{1} / (2 * stride * selected[i].size())));
+        for (const auto j : selected[i])
+            for (const auto& node : nodes.subspan(j, stride))
+                points.push_back(
+                    {{static_cast<core::Index>(i), node.u, node.v, node.depth}, weight});
+    }
+    return points;
+}
+
+PgPreparedPatch prepare_patch(core::Index n, const Q& offset, core::Workspace& ws,
+                              core::ResourcePlan& plan) {
+    CAPTURE(n, offset);
+    Fixture f{n};
+    const Q width{1, 2};
+    auto x0 = owned(f, offset);
+    const auto w = owned(f, width), zero = f.r("0"), one = f.r("1");
+    std::array<std::array<Q, 5>, 5> converted{};
+    for (const auto& item : world_height) {
+        const Q coefficient{item.numerator, item.denominator};
+        unsigned binomial = 1;
+        for (unsigned k = 0; k <= item.x; ++k) {
+            converted[k][item.y] +=
+                coefficient * binomial * power(offset, item.x - k) * power(width, k);
+            if (k != item.x)
+                binomial = binomial * (item.x - k) / (k + 1);
+        }
+    }
+    std::array<std::array<ExactRational, 5>, 5> coefficients;
+    std::vector<ExactInputTerm> terms;
+    terms.reserve(15);
+    for (unsigned x = 0; x < 5; ++x)
+        for (unsigned y = 0; y < 5 - x; ++y)
+            if (converted[x][y] != 0) {
+                coefficients[x][y] = owned(f, converted[x][y]);
+                terms.push_back({{x, y}, coefficients[x][y]});
+            }
+    auto curve = take(ExactChartPolynomial::make(terms, exact_limits(), f.input_plan));
+    f.graph = take(PgGraph::prepare({x0, w, zero, curve, n, PgGraphConvention::Version1},
+                                    {exact_limits(), 64, {}}, f.input_plan));
+    for (auto& height : f.heights)
+        height = f.r("1", "20");
+    f.layers.clear();
+    f.layers.push_back({core::LayerId{1}, f.zeta.front(), f.zeta.back()});
+    std::array<ExactRational, 9> rotation;
+    for (const auto i : {0U, 4U, 8U})
+        rotation[i] = f.r("1");
+    const std::array<ExactRational, 3> origin;
+    auto basis = make_basis(f, {rotation, origin, one}, ws, plan);
+    const auto nodes = finite_rule(f);
+    std::vector<ExactRational> weights;
+    const auto points = select_rule(f, basis, n, nodes, weights, plan);
+    CAPTURE(weights.size(), points.size());
+    auto gram_arithmetic = query_limits();
+    gram_arithmetic.maximum_scalar_operations = 1'000'000'000;
+    gram_arithmetic.maximum_partition_visits = 300'000'000;
+    auto enclosure = PgDiscreteGram::prepare(std::move(basis), points, {768, 704},
+                                             {gram_arithmetic, steps}, ws, plan);
+    if (!enclosure)
+        FAIL("Curved Gram preparation code " << static_cast<unsigned>(enclosure.error().code)
+                                             << " after " << plan.allocated_bytes() << " bytes");
+    auto certificate =
+        std::move(*enclosure).generate_and_certify({768, 128}, {profile, steps, {}}, ws, plan);
+    if (!certificate)
+        FAIL("Curved Gram certificate code " << static_cast<unsigned>(certificate.error().code)
+                                             << " after " << plan.allocated_bytes() << " bytes");
+    std::clog << "R4_WORK certificate n=" << n << " offset=" << offset
+              << " points=" << points.size() << " charged_bytes=" << plan.allocated_bytes() << '\n'
+              << std::flush;
+    auto patch_arithmetic = gram_arithmetic;
+    patch_arithmetic.algebra.maximum_value_bits = 65'536;
+    patch_arithmetic.algebra.maximum_work_bits = 262'144;
+    auto result = PgPreparedPatch::prepare(std::move(*certificate), patch_arithmetic, ws, plan);
+    if (!result)
+        FAIL("Curved patch preparation code " << static_cast<unsigned>(result.error().code)
+                                              << " after " << plan.allocated_bytes() << " bytes");
+    std::clog << "R4_WORK prepared_patch n=" << n << " offset=" << offset
+              << " charged_bytes=" << plan.allocated_bytes() << '\n'
+              << std::flush;
+    return std::move(*result);
+}
+
+const PgIntegrationPartition& partition(const PgPreparedPatch& patch) {
+    return take(take(patch.conditioning().reference_basis())->source()).partition;
+}
+
+struct Edge {
+    core::Index index;
+    ExactRational first, last;
+    bool forward;
+};
+
+std::vector<Edge> ordered_edges(Fixture& f, const PgPreparedPatch& patch, const Q& s) {
+    const auto& part = partition(patch);
+    const auto vertices = take(part.vertices());
+    const auto edges = take(part.edges());
+    std::vector<Edge> result;
+    for (std::size_t i = 0; i < edges.size(); ++i) {
+        const auto& e = edges[i];
+        if (!e.external)
+            continue;
+        const auto& a = vertices[static_cast<std::size_t>(e.vertices[0])];
+        const auto& b = vertices[static_cast<std::size_t>(e.vertices[1])];
+        if (q(a.s) == s && q(b.s) == s)
+            result.push_back({static_cast<core::Index>(i), owned(f, std::min(q(a.t), q(b.t))),
+                              owned(f, std::max(q(a.t), q(b.t))), q(a.t) < q(b.t)});
+    }
+    std::ranges::sort(result, {}, [](const auto& edge) -> const Q& { return q(edge.first); });
+    REQUIRE_FALSE(result.empty());
+    REQUIRE(q(result.front().first) == 0);
+    REQUIRE(q(result.back().last) == 1);
+    for (std::size_t i = 1; i < result.size(); ++i)
+        REQUIRE(q(result[i - 1].last) == q(result[i].first));
+    return result;
+}
+
+std::vector<PgTraceEdgeSpan> spans(std::span<const Edge> edges, const ExactRational& zero,
+                                   const ExactRational& one) {
+    std::vector<PgTraceEdgeSpan> result;
+    result.reserve(edges.size());
+    for (const auto& e : edges)
+        result.push_back({e.index, e.first, e.last, e.forward ? zero : one, e.forward ? one : zero,
+                          std::nullopt});
+    return result;
+}
+
+using Radical = std::array<Q, 2>;
+using Physical = std::array<Radical, 3>;
+
+Radical exact_parts(const PgReferenceScalar& value) {
+    return {q(value.rational), q(value.radical)};
+}
+
+struct IndependentPoint {
+    Physical position, normal;
+    Q g;
+};
+
+// Differentiate the frozen world polynomial directly; the patch dictionary and
+// its coordinate pullback do not enter this oracle.
+IndependentPoint physical_point(const Q& x, const Q& y, const Q& z) {
+    Q f = 0, fx = 0, fy = 0;
+    for (const auto& term : world_height) {
+        const Q coefficient{term.numerator, term.denominator};
+        f += coefficient * power(x, term.x) * power(y, term.y);
+        if (term.x != 0)
+            fx += coefficient * term.x * power(x, term.x - 1) * power(y, term.y);
+        if (term.y != 0)
+            fy += coefficient * term.y * power(x, term.x) * power(y, term.y - 1);
+    }
+    const Q g = 1 + fx * fx + fy * fy;
+    const std::array<Q, 3> midpoint{x, y, f}, numerator{-fx, -fy, Q{1}};
+    IndependentPoint result;
+    result.g = g;
+    for (std::size_t i = 0; i < midpoint.size(); ++i) {
+        result.normal[i] = {Q{0}, numerator[i] / g};
+        result.position[i] = {midpoint[i], z * numerator[i] / g};
+    }
+    return result;
+}
+
+PgConditionedReferenceBatch boundary_point(Fixture& f, const PgPreparedPatch& patch,
+                                           std::span<const Edge> edges, const Q& t, const Q& z,
+                                           core::ResourcePlan& plan) {
+    const auto chosen =
+        std::ranges::find_if(edges, [&](const auto& e) { return q(e.first) < t && t < q(e.last); });
+    REQUIRE(chosen != edges.end());
+    const auto faces = take(partition(patch).lateral_faces());
+    const auto face =
+        std::ranges::find_if(faces, [&](const auto& item) { return item.edge == chosen->index; });
+    REQUIRE(face != faces.end());
+    const Q ratio = (t - q(chosen->first)) / (q(chosen->last) - q(chosen->first));
+    const auto along =
+        owned(f, chosen->forward == face->canonical_direction ? Q{ratio} : Q{1 - ratio});
+    const auto depth = owned(f, Q{1, 2} + 20 * z);
+    const std::array<PgReferencePoint, 1> input{
+        PgReferenceLateralPoint{static_cast<core::Index>(face - faces.begin()), along, depth}};
+    auto result = take(patch.evaluate_reference(input, query_limits(), plan));
+    REQUIRE(result.points.size() == 1);
+    CHECK(q(result.points.values()[0].t) == t);
+    CHECK(q(result.points.values()[0].full_thickness_metres) == Q{1, 20});
+    CHECK(q(result.points.values()[0].zeta) == 40 * z);
+    return result;
+}
+
+void check_geometry(const PgConditionedReferenceBatch& actual, const IndependentPoint& expected) {
+    const auto& point = actual.points.values()[0];
+    CHECK(q(point.g) == expected.g);
+    for (std::size_t axis = 0; axis < expected.position.size(); ++axis) {
+        CHECK(exact_parts(point.position_metres[axis]) == expected.position[axis]);
+        CHECK(exact_parts(point.normal[axis]) == expected.normal[axis]);
+    }
+}
+
+Physical position(const PgConditionedReferenceBatch& sample,
+                  std::span<const PgCartesianExactPosition> state) {
+    REQUIRE(sample.column_count == state.size());
+    Physical result{};
+    for (std::size_t j = 0; j < state.size(); ++j) {
+        const auto n = exact_parts(sample.columns.values()[j].value);
+        for (std::size_t axis = 0; axis < result.size(); ++axis)
+            for (std::size_t term = 0; term < n.size(); ++term)
+                result[axis][term] += n[term] * q(state[j][axis]);
+    }
+    return result;
+}
+
+void check_zero(std::span<const PgCartesianExactPosition> values) {
+    for (const auto& v : values)
+        for (const auto& x : v)
+            CHECK(x.sign() == 0);
+}
+
+Q work(std::span<const PgCartesianExactPosition> a, std::span<const PgCartesianExactPosition> b) {
+    REQUIRE(a.size() == b.size());
+    Q result = 0;
+    for (std::size_t i = 0; i < a.size(); ++i)
+        for (std::size_t axis = 0; axis < a[i].size(); ++axis)
+            result += q(a[i][axis]) * q(b[i][axis]);
+    return result;
+}
+
+std::vector<PgCartesianExactPosition> state(Fixture& f, std::size_t columns, std::size_t offset) {
+    std::vector<PgCartesianExactPosition> result(columns);
+    for (std::size_t i = 0; i < columns; ++i)
+        for (std::size_t axis = 0; axis < result[i].size(); ++axis)
+            result[i][axis] = owned(f, Q{static_cast<int>((i + 3 * axis + offset) % 11) - 5, 13});
+    return result;
+}
+
+void check_interface_force(Fixture& f, const PgSparseChart& chart,
+                           const PgConditionedReferenceBatch& left,
+                           const PgConditionedReferenceBatch& right,
+                           std::span<const PgCartesianExactPosition> tangent,
+                           const PgReferenceLimits& limits, core::Workspace& ws,
+                           core::ResourcePlan& plan) {
+    const auto identity = take(chart.identity());
+    const auto left_count = static_cast<std::size_t>(left.column_count);
+    const auto right_count = static_cast<std::size_t>(right.column_count);
+    const std::array<int, 3> force{1, 2, -1};
+    // The two sides act at the same point with opposite tractions. For each
+    // rational coefficient of 1 and sqrt(g), compare the work and the transpose.
+    for (std::size_t term = 0; term < 2; ++term) {
+        std::vector<PgCartesianExactPosition> loads(left_count + right_count);
+        for (std::size_t j = 0; j < left_count + right_count; ++j) {
+            const Q value = j < left_count
+                                ? exact_parts(left.columns.values()[j].value)[term]
+                                : -exact_parts(right.columns.values()[j - left_count].value)[term];
+            for (std::size_t axis = 0; axis < force.size(); ++axis)
+                loads[j][axis] = owned(f, value * force[axis]);
+        }
+        REQUIRE(std::ranges::any_of(loads, [](const auto& lane) { return lane[0].sign() != 0; }));
+        CHECK(work(loads, tangent) == 0);
+        const auto dual = take(chart.transpose({identity, loads}, limits, ws, plan));
+        check_zero(dual.independent_force.values());
+    }
+}
+
+} // namespace
+
+TEST_CASE("PG connects the same frozen R4 curves at matching and nonmatching resolutions",
+          "[GEO-01][SH-D02][SH-D05][SH-D06][N4-04][V-PG][verification][negative]") {
+    const auto n = GENERATE(core::Index{1}, core::Index{2});
+    core::Workspace ws{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    const auto left = prepare_patch(1, Q{0}, ws, plan);
+    const auto right = prepare_patch(n, Q{1, 2}, ws, plan);
+    const auto left_rank = take(left.info()).basis.rank;
+    const auto right_rank = take(right.info()).basis.rank;
+    CAPTURE(left_rank, right_rank);
+    CHECK(left_rank + right_rank == (n == 1 ? 344U : 521U));
+    Fixture exact;
+    const auto zero = exact.r("0"), one = exact.r("1");
+    const auto left_edges = ordered_edges(exact, left, Q{1});
+    const auto right_edges = ordered_edges(exact, right, Q{0});
+    const auto root_edges = ordered_edges(exact, left, Q{0});
+    const auto left_spans = spans(left_edges, zero, one);
+    const auto right_spans = spans(right_edges, zero, one);
+    const auto root_spans = spans(root_edges, zero, one);
+    auto arithmetic = query_limits();
+    arithmetic.maximum_scalar_operations = 300'000'000;
+    arithmetic.maximum_partition_visits = 100'000'000;
+    arithmetic.algebra.maximum_value_bits = 65'536;
+    arithmetic.algebra.maximum_work_bits = 262'144;
+    const PgTraceLimits trace_limits{arithmetic, 2'000'000};
+    const auto left_id = take(left.info()).identity;
+    const auto right_id = take(right.info()).identity;
+    check_failure(PgFullTrace::prepare(left, left_spans, left, left_spans, trace_limits, ws, plan),
+                  core::FailureCode::GeometryInvalid);
+    const auto interface =
+        take(PgFullTrace::prepare(left, left_spans, right, right_spans, trace_limits, ws, plan));
+    const auto support = take(PgFullTrace::prepare_support(
+        left, root_spans, left_id, left.reference_coordinates(), trace_limits, ws, plan));
+    std::clog << "R4_WORK traces n=" << n << " charged_bytes=" << plan.allocated_bytes() << '\n'
+              << std::flush;
+    const auto intervals = interface.overlaps();
+    REQUIRE(intervals.size() == static_cast<std::size_t>(2 * n));
+    for (std::size_t i = 0; i < intervals.size(); ++i) {
+        const auto& overlap = intervals[i];
+        CHECK(q(overlap.first) == Q{i} / intervals.size());
+        CHECK(q(overlap.last) == (Q{i} + 1) / intervals.size());
+        CHECK(q(overlap.active_first) == 0);
+        CHECK(q(overlap.active_last) == 1);
+        for (const auto* z : {&overlap.left_depth, &overlap.right_depth}) {
+            CHECK(q(z->lower_first) == Q{-1, 40});
+            CHECK(q(z->lower_last) == Q{-1, 40});
+            CHECK(q(z->upper_first) == Q{1, 40});
+            CHECK(q(z->upper_last) == Q{1, 40});
+        }
+    }
+    const auto reference_residual = take(interface.residual(
+        {left_id, right_id, left.reference_coordinates(), right.reference_coordinates()},
+        arithmetic, ws, plan));
+    check_zero(reference_residual.values());
+    const std::array patches{PgConstraintPatchBinding{numerics::PatchId{13}, left},
+                             PgConstraintPatchBinding{numerics::PatchId{29}, right}};
+    const std::array constraints{PgConstraintTraceBinding{PgConstraintId{41}, interface, 0, 1},
+                                 PgConstraintTraceBinding{PgConstraintId{59}, support, 0, {}}};
+    auto original = take(PgGlobalConstraints::prepare(
+        patches, constraints, {arithmetic, 2, 2, 4096, 2'000'000}, ws, plan));
+    auto chart = take(
+        PgSparseChart::prepare(std::move(original), {arithmetic, 384, 1024, 100'000}, ws, plan));
+    std::clog << "R4_WORK sparse_chart n=" << n << " charged_bytes=" << plan.allocated_bytes()
+              << '\n'
+              << std::flush;
+    const auto identity = take(chart.identity());
+    const auto rank = chart.pivots().size(), free_count = chart.free_columns().size();
+    CHECK(rank == (n == 1 ? 116U : 171U));
+    CHECK(free_count == (n == 1 ? 228U : 350U));
+    const auto free = state(exact, free_count, 2);
+    const std::vector<PgCartesianExactPosition> independent_zero(free_count);
+    const auto lifted = take(chart.lift({identity, free}, arithmetic, ws, plan));
+    const auto base = take(chart.lift({identity, independent_zero}, arithmetic, ws, plan));
+    const auto tangent = take(chart.tangent({identity, free}, arithmetic, ws, plan));
+    for (std::size_t i = 0; i < lifted.size(); ++i)
+        for (std::size_t axis = 0; axis < lifted.values()[i].size(); ++axis)
+            CHECK(q(lifted.values()[i][axis]) - q(base.values()[i][axis]) ==
+                  q(tangent.values()[i][axis]));
+    const auto force = state(exact, lifted.size(), 4);
+    const auto dual = take(chart.transpose({identity, force}, arithmetic, ws, plan));
+    CHECK(work(force, tangent.values()) == work(dual.independent_force.values(), free));
+    const auto& all = chart.original();
+    const auto affine = take(all.apply({all.layout(), lifted.values()}, arithmetic, ws, plan));
+    auto affine_work = work(dual.independent_force.values(), free);
+    for (std::size_t row = 0; row < affine.size(); ++row) {
+        const auto& target = all.original_rows()[row].prescribed;
+        CHECK(affine.values()[row] == target);
+        for (std::size_t axis = 0; axis < target.size(); ++axis)
+            affine_work += q(dual.original_multipliers.values()[row][axis]) * q(target[axis]);
+    }
+    CHECK(work(force, lifted.values()) == affine_work);
+
+    const auto left_size = left.reference_coordinates().size();
+    const std::span<const PgCartesianExactPosition> coordinates = lifted.values();
+    const std::array<Q, 3> depths{Q{-1, 40}, Q{1, 100}, Q{1, 40}};
+    for (std::size_t i = 0; i < intervals.size(); ++i) {
+        const Q y = (Q{i} + Q{1, 3}) / intervals.size();
+        for (std::size_t k = 0; k < depths.size(); ++k) {
+            const auto& z = depths[k];
+            CAPTURE(i, y, z);
+            const auto expected = physical_point(Q{1, 2}, y, z);
+            const auto l = boundary_point(exact, left, left_edges, y, z, plan);
+            const auto r = boundary_point(exact, right, right_edges, y, z, plan);
+            check_geometry(l, expected);
+            check_geometry(r, expected);
+            CHECK(position(l, coordinates.first(left_size)) ==
+                  position(r, coordinates.subspan(left_size)));
+            const auto root = boundary_point(exact, left, root_edges, y, z, plan);
+            const auto fixed = physical_point(Q{0}, y, z);
+            check_geometry(root, fixed);
+            CHECK(position(root, coordinates.first(left_size)) == fixed.position);
+            if (i == 0 && k == 1)
+                check_interface_force(exact, chart, l, r, tangent.values(), arithmetic, ws, plan);
+        }
+    }
+}

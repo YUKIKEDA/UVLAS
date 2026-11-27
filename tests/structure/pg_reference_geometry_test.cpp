@@ -316,7 +316,7 @@ R5Integrals r5_quadrature(Fixture& fixture, const PgReferenceGeometry& geometry,
 } // namespace
 
 TEST_CASE("PG reproduces the independent reference geometry across all frozen R4 inputs",
-          "[GEO-01][SH-D02][SH-D07][V-PG][verification]") {
+          "[GEO-01][SH-D02][SH-D07][V-PG][verification][pg-r4-reference]") {
     struct Input {
         std::string_view name;
         core::Index coarse;
@@ -484,7 +484,7 @@ TEST_CASE("PG reproduces the independent reference geometry across all frozen R4
 }
 
 TEST_CASE("PG reference geometry matches the frozen swept-taper R5 footprint",
-          "[GEO-01][SH-D02][SH-D07][V-PG][verification]") {
+          "[GEO-01][SH-D02][SH-D07][V-PG][verification][pg-r5-integrals]") {
     for (const core::Index resolution : {1, 2}) {
         for (const auto denominator : {"100", "10000"}) {
             CAPTURE(resolution, denominator);

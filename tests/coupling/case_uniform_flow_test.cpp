@@ -15,11 +15,19 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <nlohmann/json.hpp>
 
 #include <algorithm>
+#include <bit>
+#include <chrono>
 #include <cmath>
+#include <fstream>
+#include <iostream>
 #include <limits>
+#include <map>
+#include <uvlas/core/instrumentation.hpp>
 #include <uvlas/structure/pg_flat_gram.hpp>
+#include <vector>
 
 namespace {
 using namespace uvlas;
@@ -4887,4 +4895,624 @@ TEST_CASE("Fixed case BDF2 circulation feeds loads and the live-history dual pai
     right.add(row_dual.velocity[2], unit_z[2]);
     CHECK(abs(left.value) > rational_word(.01));
     CHECK(abs(left.value - right.value) <= left.radius + right.radius + rational_word(1e-15));
+}
+
+namespace {
+struct WakeCostMesh {
+    explicit WakeCostMesh(std::size_t wake) {
+        const auto panels = wake + 1;
+        const auto point = [](std::size_t line, std::size_t side) {
+            return a::PointId{2 * line + side + 1};
+        };
+        const auto edge = [&](a::PointId from, a::PointId to) {
+            const a::EdgeId id{1000 + edges.size()};
+            edges.push_back({id, {from, to}});
+            edge_owners.emplace_back(id, a::CanonicalEdge{});
+            return id;
+        };
+        std::vector<a::EdgeId> transverse;
+        for (std::size_t row = 0; row <= panels; ++row) {
+            for (std::size_t side = 0; side < 2; ++side) {
+                ids.push_back(point(row, side));
+                bindings.push_back(test_geometry::binding());
+                xyz.insert(xyz.end(), {static_cast<double>(row), static_cast<double>(side), 0.});
+            }
+            transverse.push_back(edge(point(row, 1), point(row, 0)));
+        }
+        trailing.push_back({transverse[1], {point(1, 0), point(1, 1)}});
+        for (std::size_t row = 0; row < panels; ++row) {
+            const std::array vertices{point(row, 0), point(row, 1), point(row + 1, 1),
+                                      point(row + 1, 0)};
+            const a::PhysicalFaceId face{100 + row};
+            const a::BandId band{50 + row};
+            bands.push_back(band);
+            faces.push_back({face, band});
+            roles.push_back({face, row == 0 ? a::AeroFaceRole::Bound : a::AeroFaceRole::Wake});
+            quads.push_back(a::QuadInput{face,
+                                         vertices,
+                                         {transverse[row], edge(vertices[1], vertices[2]),
+                                          transverse[row + 1], edge(vertices[3], vertices[0])},
+                                         edge(vertices[0], vertices[2]),
+                                         {a::FacetId{200 + 2 * row}, a::FacetId{201 + 2 * row}}});
+        }
+    }
+
+    [[nodiscard]] a::GeometryInput input(std::span<const double> current, const Number& time,
+                                         double time_word) const {
+        auto context = test_geometry::context();
+        context.time = time_word;
+        return {ids,
+                bindings,
+                a::SinglePositions{xyz},
+                a::SinglePositions{current},
+                edges,
+                faces,
+                bands,
+                {},
+                quads,
+                a::SingleWord{.125},
+                context,
+                time.view()};
+    }
+
+    std::vector<a::PointId> ids;
+    std::vector<a::PointBinding> bindings;
+    std::vector<double> xyz;
+    std::vector<a::EdgeInput> edges;
+    std::vector<a::EdgeBindingInput> edge_owners;
+    std::vector<a::BandId> bands;
+    std::vector<a::FaceInput> faces;
+    std::vector<a::FaceRoleInput> roles;
+    std::vector<a::QuadInput> quads;
+    std::vector<a::TrailingEdgeInput> trailing;
+};
+
+struct WakeCostWords {
+    void add(const a::ScaledEnclosure& x) {
+        const auto word = [&](double value) {
+            words.push_back(std::bit_cast<std::uint64_t>(value));
+        };
+        const auto center = x.center();
+        words.push_back(center.index());
+        if (const auto* single = std::get_if<a::SingleWord>(&center))
+            word(single->value);
+        else {
+            const auto& pair = std::get<a::DoubleWord>(center);
+            word(pair.high);
+            word(pair.low);
+        }
+        words.push_back(std::bit_cast<std::uint64_t>(static_cast<std::int64_t>(x.exponent())));
+        word(x.radius());
+    }
+    void add(const cf::DiscreteLoadVector& values) {
+        for (const auto& value : values)
+            add(value);
+    }
+    void add(const std::optional<cf::DiscreteLoadVector>& value) {
+        words.push_back(value.has_value());
+        if (value)
+            add(*value);
+    }
+
+    void compare_reference(const cf::DiscreteFreeWakeVelocity& result,
+                           const std::array<double, 2>& expected) const {
+        for (std::size_t end = 0; end < expected.size(); ++end) {
+            const auto row = take(result.row(end == 0 ? 0 : result.size() - 1));
+            const auto& vertical = row.velocity[2];
+            const auto quantum = two_power(vertical.exponent());
+            const Rat center = sum_words(vertical.center()) * quantum;
+            const Rat radius = rational_word(vertical.radius()) * quantum;
+            CHECK(abs(center - rational_word(expected[end])) <= radius + rational_word(1e-12));
+        }
+    }
+
+    void consume(const cf::DiscreteFreeWakeVelocity& result) {
+        for (std::size_t i = 0; i < result.size(); ++i) {
+            const auto row = take(result.row(i));
+            words.push_back(row.owner.value());
+            add(row.velocity);
+            add(row.direction);
+            source_facets += row.source_facets;
+            far_facets += row.far_facets;
+            cancelled_pairs += row.cancelled_analytic_pairs;
+        }
+        for (std::size_t i = 0; i < result.point_count(); ++i) {
+            const auto point = take(result.point_dual(i));
+            words.push_back(point.point.value());
+            add(point.position);
+        }
+        for (std::size_t i = 0; i < result.strength_count(); ++i) {
+            const auto strength = take(result.strength_dual(i));
+            add(strength.value);
+        }
+        if (result.strength_count() != 0) {
+            const auto field = take(result.field_dual());
+            add(field.uniform_flow);
+            add(field.flow_time);
+            add(field.core_radius);
+        }
+        steps = result.used_steps();
+    }
+
+    void consume(const cf::WakeTransportResult& result, bool dual) {
+        consume(take(result.free_velocity()).get());
+        for (std::size_t i = 0; i < result.size(); ++i) {
+            const auto row = take(result.row(i));
+            words.push_back(row.release.point.value());
+            words.push_back(row.release.epoch.value());
+            add(row.residual);
+            add(row.direction);
+            if (dual) {
+                const auto transpose = take(result.position_dual(i));
+                for (const auto& term : transpose.stencil)
+                    add(term);
+            }
+        }
+    }
+
+    [[nodiscard]] std::uint64_t fingerprint() const {
+        std::uint64_t value = 14695981039346656037ULL;
+        for (const auto word : words) {
+            value ^= word;
+            value *= 1099511628211ULL;
+        }
+        return value;
+    }
+    std::uint64_t source_facets{}, far_facets{}, cancelled_pairs{}, steps{};
+    std::vector<std::uint64_t> words;
+};
+
+void observe_wake_cost(std::size_t rows) {
+    using Clock = std::chrono::steady_clock;
+    constexpr auto operation = core::Operation::EvaluateAero;
+    const auto elapsed = [](Clock::time_point start) {
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - start).count();
+    };
+    const auto prepare_begin = Clock::now();
+    const WakeCostMesh mesh{rows};
+    const Number now{5, 4}, then{9, 8}, older{1};
+    const a::GlobalLimits contact_caps{std::numeric_limits<std::uint64_t>::max() / 4,
+                                       numerics::linear::EstimateAdmission{4096}};
+    auto geometry_caps = test_geometry::limits();
+    geometry_caps.max_steps = 1000000;
+    geometry_caps.predicate.max_steps = 10000;
+    constexpr std::uint64_t bytes = 512ULL * 1024 * 1024;
+    core::ResourcePlan preparation{bytes};
+    auto geometry_work = test_geometry::workspace(preparation);
+    auto global = take(a::GlobalWorkspace::create(preparation, contact_caps.metadata));
+    const auto geometry = test_geometry::take(a::prepare_owned_geometry(
+        mesh.input(mesh.xyz, now, 1.25), geometry_caps, *geometry_work, preparation));
+    const auto topology = take_global(
+        a::build_global_topology(geometry, {mesh.roles, mesh.edge_owners, mesh.trailing},
+                                 contact_caps, *global, preparation));
+    REQUIRE(topology.trailing_edges().size() == 1);
+    const auto contact = take_global(
+        a::check_global_geometry(topology, geometry, contact_caps, *global, preparation));
+    const auto history = [&](const Number& time, double elapsed_seconds, double shift) {
+        auto xyz = mesh.xyz;
+        for (std::size_t line = 2; line < mesh.ids.size() / 2; ++line) {
+            const auto dx = static_cast<double>(line - 1) * shift;
+            xyz[6 * line] -= dx;
+            xyz[6 * line + 3] -= dx;
+        }
+        const auto sample = test_geometry::take(a::prepare_owned_geometry(
+            mesh.input(xyz, time, elapsed_seconds), geometry_caps, *geometry_work, preparation));
+        return take_global(
+            a::check_global_geometry(topology, sample, contact_caps, *global, preparation));
+    };
+    const auto previous_contact = history(then, 1.125, .125);
+    const auto older_contact = history(older, 1., .25);
+    const auto geometry_ns = elapsed(prepare_begin);
+    const auto geometry_payload = preparation.allocated_bytes();
+    const auto prepared_memory = take(core::sample_process_memory(operation));
+    const auto case_begin = Clock::now();
+    auto recipe = source(R"({"kind":"constant","value":[1,0,0.125]})",
+                         R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
+    recipe.field("units").set("length", string("m"));
+    recipe.field("units").set("time", string("s"));
+    recipe.field("analysis").field("wake").set("convection", parse(R"({"kind":"free"})"));
+    const auto si = materialize(recipe, io::SourceId{490});
+    const cf::CaseFlowClockLimits clock_limits{limits, 1, 4};
+    const auto clock =
+        take(cf::prepare_case_reference_clock(si, stamp, clock_limits, 1000000, preparation));
+    const auto destination = cf::CaseFlowClockQuery{stamp, 0, 2, p::RequestedSide::Automatic};
+    const cf::WakeTransportClock transport_clock{clock, clock, destination};
+    a::UniformFlowWorkspace uniform;
+    const auto provider =
+        take(cf::prepare_case_known_flow(si, stamp, {}, uniform, gust_limits, preparation));
+    const auto q = test_geometry::take(
+        a::resolve_query(geometry, {a::QueryId{42}, a::FreePoint{a::FreeSingle{{.75, .5, 0}}}},
+                         geometry.context(), geometry_caps, *geometry_work, preparation));
+    const auto zero = coordinates(0, 0, 0);
+    const std::array tangents{coordinates(1, 0, 0), coordinates(0, 1, 0)};
+    const std::array bound{cf::DiscreteCollocation{mesh.quads.front().facets[0], q, tangents, zero,
+                                                   a::SingleWord{.5}, a::SingleWord{.0625}}};
+    std::vector<cf::FrozenWakeTrace> traces, trace_direction;
+    std::vector<cf::DiscreteWakePanel> wake;
+    for (std::size_t i = 0; i < rows; ++i) {
+        const a::P1StrengthId right{1000 + i};
+        traces.push_back({right, a::DoubleWord{-.25 + static_cast<double>(i) / 64, 0x1p-58}});
+        trace_direction.push_back({right, a::SingleWord{.03125}});
+        wake.emplace_back(
+            mesh.quads[i + 1].facets[0],
+            i == 0 ? std::variant<cf::AttachedWakeFront, a::P1StrengthId>{cf::AttachedWakeFront{}}
+                   : std::variant<cf::AttachedWakeFront, a::P1StrengthId>{traces[i - 1].id},
+            right);
+    }
+    const cf::DiscreteNonpenetrationInput input{
+        contact, bound, wake, {core::AcceptedStateId{2}, traces}, {7, 11}, stamp, destination.side};
+    std::vector<cf::WakeMaterialPoint> material;
+    std::vector<a::PointId> particles;
+    for (std::size_t side = 0; side < 2; ++side) {
+        for (std::size_t i = 0; i < rows; ++i) {
+            const auto release =
+                take_global(topology.release_key(mesh.ids[2 + side], a::ReleaseEpoch{8 + i}));
+            const auto point = mesh.ids[2 * (i + 2) + side];
+            material.push_back({release, point, wake[i].facet});
+            particles.push_back(point);
+        }
+    }
+    const std::array snapshots{cf::WakeMaterialSnapshot{contact, material},
+                               cf::WakeMaterialSnapshot{previous_contact, material},
+                               cf::WakeMaterialSnapshot{older_contact, material}};
+    const std::vector variations(mesh.ids.size(), coordinates(.125, 0, 0));
+    const std::vector previous_direction(particles.size(), coordinates(.25, 0, 0));
+    const std::vector older_direction(particles.size(), coordinates(.375, 0, 0));
+    const std::vector seeds(particles.size(), coordinates(.125, -.25, .375));
+    const cf::DiscreteFreeWakeDirection direction{mesh.ids,           variations,
+                                                  trace_direction,    coordinates(.125, 0, 0),
+                                                  a::SingleWord{.25}, a::SingleWord{.03125}};
+    const cf::WakeTransportHistoryDirection history_direction{previous_direction, older_direction};
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(preparation));
+    auto kernel = take(a::P1Workspace::create(preparation));
+    const auto case_ns = elapsed(case_begin);
+    const auto provider_memory = take(core::sample_process_memory(operation));
+    std::cout << "WAKE_PREP," << rows << ',' << geometry_ns << ',' << case_ns << ','
+              << geometry_payload << ',' << preparation.allocated_bytes() << ','
+              << prepared_memory.resident_bytes << ',' << provider_memory.resident_bytes << ','
+              << provider_memory.peak_resident_bytes << '\n';
+
+    struct Role {
+        std::string_view name;
+        bool transport;
+        bool tangent;
+        bool adjoint;
+    };
+    constexpr std::array roles{
+        Role{"velocity_value", false, false, false}, Role{"velocity_jvp", false, true, false},
+        Role{"velocity_vjp", false, false, true}, Role{"transport_value", true, false, false},
+        Role{"transport_full", true, true, true}};
+    constexpr std::array end_velocity{
+        std::array{.247542502068428649, .152597465749261047},
+        std::array{.241277910608254584, .140543900713236010},
+        std::array{.240636854147210874, .134174028149262049},
+    };
+    const auto& expected = end_velocity[rows == 2 ? 0 : rows == 4 ? 1 : 2];
+    const Number enclosure{1, 1000000000};
+    for (const auto precision : {core::Precision::Binary64, core::Precision::TwoWord}) {
+        const cf::DiscreteKnownFlowInput known{
+            provider,    provider,      {stamp, now.view()}, gust_projection(precision, enclosure),
+            gust_limits, geometry_caps, *geometry_work,      uniform};
+        const cf::DiscreteFreeWakeLimits velocity_limits{
+            {{precision, 1e-10},
+             {precision, 1e-10, 1e-10},
+             {geometry_caps,
+              {numerics::linear::EstimateAdmission{65536}, 1000000000},
+              UINT64_C(24000000000)},
+             10000000,
+             UINT64_C(1000000000000)},
+            particles.size()};
+        const cf::WakeTransportLimits transport_limits{clock_limits, particles.size(), 1000000,
+                                                       4096, precision};
+        for (const auto role : roles) {
+            std::vector<std::uint64_t> first;
+            for (std::uint64_t iteration = 0; iteration < 3; ++iteration) {
+                const auto before = take(core::sample_process_memory(operation));
+                core::ResourcePlan plan{bytes};
+                const auto* tangent = role.tangent ? &direction : nullptr;
+                const auto dual = role.adjoint ? std::span<const cf::NonpenetrationVector>{seeds}
+                                               : std::span<const cf::NonpenetrationVector>{};
+                const auto start = Clock::now();
+                WakeCostWords observed;
+                std::int64_t ns{};
+                core::ProcessMemory after{};
+                if (role.transport) {
+                    const auto value = take(cf::evaluate_fixed_free_wake_transport(
+                        transport_clock, snapshots, input, known, particles, tangent,
+                        role.tangent ? history_direction : cf::WakeTransportHistoryDirection{},
+                        dual, transport_limits, velocity_limits, shared, *local, *kernel, plan));
+                    ns = elapsed(start);
+                    after = take(core::sample_process_memory(operation));
+                    observed.compare_reference(take(value.free_velocity()).get(), expected);
+                    observed.consume(value, role.adjoint);
+                } else {
+                    const auto value = take(cf::evaluate_discrete_free_wake_velocity(
+                        input, known, particles, tangent, dual, velocity_limits, shared, *local,
+                        *kernel, plan));
+                    ns = elapsed(start);
+                    after = take(core::sample_process_memory(operation));
+                    observed.compare_reference(value, expected);
+                    observed.consume(value);
+                }
+                REQUIRE(observed.source_facets == 2 * (rows + 1) * particles.size());
+                if (iteration == 0)
+                    first = observed.words;
+                else
+                    CHECK(first == observed.words);
+                std::cout << "WAKE_COST," << rows << ','
+                          << (precision == core::Precision::Binary64 ? "binary64" : "two_word")
+                          << ',' << role.name << ',' << iteration << ',' << particles.size() << ','
+                          << observed.source_facets << ',' << observed.far_facets << ','
+                          << observed.cancelled_pairs << ',' << observed.steps << ',' << ns << ','
+                          << plan.allocated_bytes() << ',' << before.resident_bytes << ','
+                          << after.resident_bytes << ',' << after.peak_resident_bytes << ','
+                          << observed.fingerprint() << '\n'
+                          << std::flush;
+            }
+        }
+    }
+}
+} // namespace
+
+TEST_CASE("Wake cost with two retained panels", "[.wake-cost-2]") {
+    observe_wake_cost(2);
+}
+TEST_CASE("Wake cost with four retained panels", "[.wake-cost-4]") {
+    observe_wake_cost(4);
+}
+TEST_CASE("Wake cost with eight retained panels", "[.wake-cost-8]") {
+    observe_wake_cost(8);
+}
+
+namespace {
+struct FiniteWingMesh {
+    explicit FiniteWingMesh(const nlohmann::json& coordinates) {
+        const auto point = [](std::size_t chord, std::size_t span) {
+            return a::PointId{1 + 5 * chord + span};
+        };
+        for (std::size_t i = 0; i < coordinates.size(); ++i) {
+            ids.emplace_back(i + 1);
+            bindings.push_back(test_geometry::binding());
+            const auto x = coordinates[i].get<std::array<double, 3>>();
+            xyz.insert(xyz.end(), x.begin(), x.end());
+        }
+        std::map<std::array<a::PointId, 2>, a::EdgeId> by_ends;
+        const auto edge = [&](a::PointId from, a::PointId to) {
+            const std::array key{std::min(from, to), std::max(from, to)};
+            const a::EdgeId new_id{1000 + edges.size()};
+            const auto [found, inserted] = by_ends.try_emplace(key, new_id);
+            if (inserted) {
+                edges.push_back({new_id, {from, to}});
+                owners.emplace_back(new_id, a::CanonicalEdge{});
+            }
+            return found->second;
+        };
+        for (std::size_t chord = 0; chord < 3; ++chord) {
+            for (std::size_t span = 0; span < 4; ++span) {
+                const auto index = 4 * chord + span;
+                const a::PhysicalFaceId face{100 + index};
+                const a::BandId band{50 + span};
+                const std::array vertex{point(chord, span), point(chord, span + 1),
+                                        point(chord + 1, span + 1), point(chord + 1, span)};
+                const std::array outline{edge(vertex[0], vertex[1]), edge(vertex[1], vertex[2]),
+                                         edge(vertex[2], vertex[3]), edge(vertex[3], vertex[0])};
+                faces.push_back({face, band});
+                roles.push_back(
+                    {face, chord == 2 ? a::AeroFaceRole::Wake : a::AeroFaceRole::Bound});
+                quads.emplace_back(
+                    face, vertex, outline, edge(vertex[0], vertex[2]),
+                    std::array{a::FacetId{200 + 2 * index}, a::FacetId{201 + 2 * index}});
+                if (chord == 2)
+                    trailing.push_back({outline[0], {vertex[0], vertex[1]}});
+            }
+        }
+    }
+
+    std::vector<a::PointId> ids;
+    std::vector<a::PointBinding> bindings;
+    std::vector<double> xyz;
+    std::vector<a::EdgeInput> edges;
+    std::vector<a::EdgeBindingInput> owners;
+    std::vector<a::FaceInput> faces;
+    std::vector<a::FaceRoleInput> roles;
+    std::vector<a::QuadInput> quads;
+    std::vector<a::TrailingEdgeInput> trailing;
+};
+
+JsonToken finite_wing_case(const nlohmann::json& fixture, const nlohmann::json& wing) {
+    auto recipe = root("aerodynamic_steady");
+    recipe.field("model").set("geometry", parse(wing.at("case_geometry").dump()));
+    recipe.field("model").set("aero_surfaces", parse(wing.at("case_surfaces").dump()));
+    recipe.field("flow").set("density", parse("1.2"));
+    recipe.field("flow").set(
+        "reference",
+        parse(
+            R"({"density":1.2,"speed":20,"area":8.4,"chord":1.114285714285714,"span":8,"moment_origin":[0.375,0,0]})"));
+    recipe.field("flow").field("uniform").set("value", parse(wing.at("flow_m_s").dump()));
+    recipe.field("analysis").field("speed").set("value", parse("20"));
+    recipe.field("observations").elements[0].set("surfaces", parse(R"(["1","2"])"));
+    auto& wake = recipe.field("analysis").field("wake");
+    wake.set("core_radius", parse(fixture.at("core_radius_m").dump()));
+    wake.set("convection",
+             parse(R"({"kind":"prescribed","velocity":{"kind":"constant","value":[20,0,0]}})"));
+    return recipe;
+}
+
+bool entire_wing_enclosure_fits(const Rat& center, const Rat& radius, const Rat& oracle,
+                                const Rat& tolerance) {
+    return abs(center - oracle) + radius <= tolerance;
+}
+
+void check_frozen_wing_enclosure(const a::ScaledEnclosure& value, const Rat& oracle,
+                                 const Rat& tolerance) {
+    const auto scale = two_power(value.exponent());
+    const Rat center = sum_words(value.center()) * scale;
+    const Rat radius = rational_word(value.radius()) * scale;
+    CHECK(entire_wing_enclosure_fits(center, radius, oracle, tolerance));
+}
+
+void verify_finite_wing(const nlohmann::json& fixture, const nlohmann::json& wing) {
+    const auto recipe = finite_wing_case(fixture, wing);
+    const auto si = materialize(recipe, io::SourceId{532});
+    const auto typed = take(take(si.source_case()).get().root());
+    const auto analysis = std::get<io::schema::AnalysisStatic>(typed.analysis.record());
+    const auto wake_case = std::get<io::schema::WakeActive>(analysis.wake.record());
+    const auto radius = take(si.quantity(wake_case.core_radius));
+    CHECK(std::holds_alternative<io::schema::ConvectionPrescribed>(wake_case.convection.record()));
+    const auto model = typed.model.record();
+    REQUIRE(model.aero_surfaces.size() == 2);
+    for (core::Index half = 0; half < 2; ++half) {
+        const auto surface = take(model.aero_surfaces.at(half)).record();
+        CHECK(std::holds_alternative<io::schema::AeroAttachmentFixed>(surface.attachment.record()));
+        CHECK(surface.chord.size() == 3);
+        CHECK(surface.span.size() == 3);
+        CHECK(surface.sharing.size() == 1);
+    }
+    const double core_radius = std::visit(
+        [](const auto& value) {
+            using T = std::decay_t<decltype(value)>;
+            if constexpr (std::is_same_v<T, io::ScaledBinary64>)
+                return std::scalbn(value.center, static_cast<int>(value.exponent2));
+            else
+                return std::scalbn(value.high, static_cast<int>(value.exponent2));
+        },
+        radius.enclosure);
+    REQUIRE(core_radius == fixture.at("core_radius_m").get<double>());
+
+    const FiniteWingMesh mesh{wing.at("vertices_m")};
+    const std::array bands{a::BandId{50}, a::BandId{51}, a::BandId{52}, a::BandId{53}};
+    auto geometry_caps = test_geometry::limits();
+    geometry_caps.max_steps = 1000000;
+    geometry_caps.predicate.max_steps = 10000;
+    constexpr std::uint64_t bytes = 256ULL * 1024 * 1024;
+    core::ResourcePlan memory{bytes};
+    auto geometry_work = test_geometry::workspace(memory);
+    const Number instant{5, 4};
+    const a::SinglePositions xyz{mesh.xyz};
+    const auto geometry =
+        test_geometry::take(a::prepare_owned_geometry({mesh.ids,
+                                                       mesh.bindings,
+                                                       xyz,
+                                                       xyz,
+                                                       mesh.edges,
+                                                       mesh.faces,
+                                                       bands,
+                                                       {},
+                                                       mesh.quads,
+                                                       a::SingleWord{core_radius},
+                                                       test_geometry::context(),
+                                                       instant.view()},
+                                                      geometry_caps, *geometry_work, memory));
+    const a::GlobalLimits contact_caps{std::numeric_limits<std::uint64_t>::max() / 4,
+                                       numerics::linear::EstimateAdmission{65536}};
+    auto global = take(a::GlobalWorkspace::create(memory, contact_caps.metadata));
+    const auto topology = take_global(a::build_global_topology(
+        geometry, {mesh.roles, mesh.owners, mesh.trailing}, contact_caps, *global, memory));
+    REQUIRE(topology.trailing_edges().size() == 4);
+    const auto contact =
+        take_global(a::check_global_geometry(topology, geometry, contact_caps, *global, memory));
+
+    std::vector<a::ResolvedQuery> queries;
+    constexpr std::size_t bound_count = 8;
+    queries.reserve(bound_count);
+    for (std::size_t i = 0; i < bound_count; ++i) {
+        const auto selected = wing.at("collocations_m").at(i).get<std::array<double, 3>>();
+        queries.push_back(test_geometry::take(
+            a::resolve_query(geometry, {a::QueryId{i + 1}, a::FreePoint{a::FreeSingle{selected}}},
+                             geometry.context(), geometry_caps, *geometry_work, memory)));
+    }
+    const auto gamma = wing.at("circulation_m2_s").get<std::array<double, bound_count>>();
+    const auto reference = wing.at("first_bound_column").get<std::array<double, bound_count>>();
+    std::vector<cf::DiscreteCollocation> rows;
+    for (std::size_t i = 0; i < bound_count; ++i) {
+        const auto axis = wing.at("tangents_y").at(i).get<std::array<double, 3>>();
+        const std::array tangent{coordinates(1, 0, 0), coordinates(axis[0], axis[1], axis[2])};
+        rows.emplace_back(mesh.quads[i].facets[0], queries[i], tangent, coordinates(0, 0, 0),
+                          a::SingleWord{gamma[i]}, a::SingleWord{i == 0 ? 1. : 0.});
+    }
+    std::vector<cf::FrozenWakeTrace> traces;
+    std::vector<cf::DiscreteWakePanel> wake;
+    for (std::size_t span = 0; span < 4; ++span) {
+        const a::P1StrengthId history{700 + span};
+        traces.push_back({history, a::SingleWord{gamma[4 + span]}});
+        wake.emplace_back(mesh.quads[8 + span].facets[0], cf::AttachedWakeFront{}, history);
+    }
+    const cf::DiscreteNonpenetrationInput input{contact,
+                                                rows,
+                                                wake,
+                                                {core::AcceptedStateId{2}, traces},
+                                                {815, 6},
+                                                stamp,
+                                                p::RequestedSide::Automatic};
+    const cf::DiscreteNonpenetrationLimits caps{
+        {core::Precision::TwoWord, 1e-12},
+        {core::Precision::TwoWord, 1e-12, 1e-12},
+        {geometry_caps,
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(32000000000)},
+        1000000,
+        UINT64_C(1000000000000)};
+    a::UniformFlowWorkspace flow_work;
+    const auto flow = take(cf::prepare_case_uniform_flow(si, stamp, {}, flow_work, limits, memory));
+    const auto prescribed =
+        take(cf::prepare_case_prescribed_wake(si, stamp, {}, flow_work, limits, memory));
+    const auto transport = take(cf::evaluate_case_prescribed_wake(
+        prescribed, prescribed, {stamp, instant.view()}, flow_work, limits.flow, memory));
+    const Number speed{20};
+    exact(take(transport.jet().velocity(0)), speed);
+    exact(take(transport.jet().velocity(1)), Number{0});
+    exact(take(transport.jet().velocity(2)), Number{0});
+    auto sampled = evaluate(flow, flow, flow_work, instant);
+    const Number one{1}, absolute{1, 1000000000}, zero{0};
+    const cf::CaseFlowComponentBudget component{one.view(), absolute.view(), zero.view()};
+    const std::array bounds{component, component, component};
+    auto projected = take(cf::project_case_uniform_flow(
+        std::move(sampled), {core::Precision::TwoWord, bounds, bounds, {4096, budget}}));
+    a::SharedP1Workspace shared;
+    auto local = take(a::LocalPacketWorkspace::create(memory));
+    auto kernel = take(a::P1Workspace::create(memory));
+    const auto result = take(cf::evaluate_discrete_nonpenetration(input, std::move(projected), caps,
+                                                                  shared, *local, *kernel, memory));
+    REQUIRE(result.size() == bound_count);
+    const auto tolerance = rational_word(2e-10);
+    for (std::size_t i = 0; i < bound_count; ++i) {
+        CAPTURE(i);
+        const auto row = take(result.row(i));
+        CHECK(row.face == mesh.faces[i].id);
+        check_frozen_wing_enclosure(row.residual, Rat{0}, tolerance);
+        check_frozen_wing_enclosure(row.circulation_action, rational_word(reference[i]), tolerance);
+    }
+}
+} // namespace
+
+TEST_CASE("Frozen finite wing closes all discrete residual rows and a bound direction",
+          "[V-AERO][AE-02][UW-D03][N4-06][verification]") {
+    std::ifstream input{UVLAS_FINITE_WING_CASE_FIXTURE};
+    REQUIRE(input);
+    const auto fixture = nlohmann::json::parse(input);
+    CHECK(fixture.at("wake_length_m").get<int>() == 32);
+    CHECK(fixture.at("chord_panels").get<int>() == 2);
+    CHECK(fixture.at("span_panels").get<int>() == 4);
+    REQUIRE(fixture.at("cases").size() == 2);
+    for (const auto& wing : fixture.at("cases")) {
+        const auto angle = wing.at("dihedral_degrees").get<int>();
+        CAPTURE(angle);
+        verify_finite_wing(fixture, wing);
+    }
+}
+
+TEST_CASE("A frozen-wing reference window bounds both enclosure endpoints",
+          "[V-AERO][AE-02][UW-D03][N4-06][verification][negative]") {
+    const Rat oracle{5, 4};
+    const Rat tolerance{1, 8};
+    const Rat radius{1, 16};
+    for (const int sign : {-1, 1}) {
+        CAPTURE(sign);
+        const Rat center = oracle + Rat{3 * sign, 32};
+        REQUIRE(abs(center - oracle) < tolerance);
+        REQUIRE(radius < tolerance);
+        CHECK_FALSE(entire_wing_enclosure_fits(center, radius, oracle, tolerance));
+        CHECK(entire_wing_enclosure_fits(center, Rat{1, 32}, oracle, tolerance));
+    }
 }

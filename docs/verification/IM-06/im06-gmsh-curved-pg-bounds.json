@@ -1,0 +1,75 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-gmsh-curved-pg-bounds",
+  "ids": [
+    "IO4-04",
+    "N4-02",
+    "SH-D02",
+    "R-05"
+  ],
+  "package": "IM-06",
+  "parent_issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "dd47268f4bb9860b6988a8f9e94b75f64ec3321d",
+  "scope": "Attested original MSH triangles and bilinear quadrangles over a declared affine or degree-four PG chart. Entire-face outward-rounded distance and unit-normal chord. Geometry only.",
+  "sources": {
+    "src/io/external_planar_pg.cpp": "ff0bf1f1bce2464f8533a9fdf7acfdb5fb2e49311c952474fdc2a6bd71c6d88a",
+    "src/io/external_planar_pg.hpp": "9dde6d61f6ec2f005d93e60088756764c66a90587b6a65365fb0aa5f5ede9612",
+    "src/io/gmsh_mesh.cpp": "d74083a3ed76adf34a1c13e5a351e8560498f4c3edaadd59afe49059f4086097",
+    "src/io/gmsh_surface_topology.cpp": "63a31df4a746d5c0acccbb5713d26441defa661287805bba41af5d2541dc3e34",
+    "src/aero/p1_interval_private.hpp": "aa2d6ed189ae13710d07e033f824876c53de4bc13455324f9f341736491c3e57",
+    "tests/io/external_planar_pg_test.cpp": "7bca4e674c85e2572ece357071054413a0ee093cb64351e92caa666b3f8c2953"
+  },
+  "artifacts": {
+    "docs/verification/IM-06/gmsh-curved-pg-bounds.md": "bebfa5acff1211f5511d72dfb77d529e8322ce3654cd208a0dd9591633097725"
+  },
+  "tests": [
+    {
+      "name": "io.external_planar_pg",
+      "cases": 9,
+      "assertions": 238
+    },
+    {
+      "name": "io.gmsh_mesh",
+      "cases": 8,
+      "assertions": 308
+    },
+    {
+      "name": "io.gmsh_surface_topology",
+      "cases": 5,
+      "assertions": 165
+    }
+  ],
+  "verification": {
+    "windows": {
+      "compiler": "MSVC 19.51.36260",
+      "configuration": "Debug",
+      "ctest_passed": 3
+    },
+    "linux": {
+      "compiler": "GCC 14.2.0",
+      "distribution": "Ubuntu 24.04.5 LTS",
+      "configuration": "Debug ASan and UBSan",
+      "ctest_passed": 3
+    },
+    "format": "clang-format 21.1.2",
+    "lint": "Linux clang-tidy 21.1.1"
+  },
+  "mutation_checks": [
+    {
+      "change": "Use only the first corner cross product for the Gmsh quad.",
+      "failed_assertions": 2,
+      "exit": 42
+    },
+    {
+      "change": "Reduce the Hessian interpolation factor from 2^-3 to 2^-20.",
+      "failed_assertions": 1,
+      "exit": 42
+    }
+  ],
+  "mutation_control_restored": {
+    "cases": 4,
+    "assertions": 95,
+    "exit": 0
+  }
+}

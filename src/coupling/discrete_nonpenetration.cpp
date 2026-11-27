@@ -2725,11 +2725,11 @@ struct NonpenetrationBuilder {
             }
             if (!sample.jet)
                 reject(core::FailureCode::InvalidInput);
-            out.rows.values()[i].emplace(
-                FreeWakeSample{{particles[i], a::PointId{queries.canonical.values()[i]},
-                                finish(native_velocity(sample.velocity, induced, work)), jvp,
-                                report.far_facets != 0},
-                               std::move(*sample.jet)});
+            out.rows.values()[i].emplace(FreeWakeSample{
+                {particles[i], a::PointId{queries.canonical.values()[i]},
+                 finish(native_velocity(sample.velocity, induced, work)), jvp, report.facets,
+                 report.far_facets, report.cancelled_analytic_pairs, report.far_facets != 0},
+                std::move(*sample.jet)});
         }
         if (!seeds.empty())
             finish_wake_dual(out, dual, assembly, input, representation, rounding, memory, work);
