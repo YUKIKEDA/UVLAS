@@ -1,6 +1,6 @@
 #pragma once
 
-#include <uvlas/structure/pg_reference_geometry.hpp>
+#include <uvlas/structure/pg_prepared_patch.hpp>
 
 namespace uvlas::structure {
 
@@ -131,15 +131,41 @@ struct PgShellExplicitAxes {
     const std::array<ExactRational, 9>& columns;
 };
 
-struct PgShellProjectedAxes {
-    const PgReferenceValue& reference;
+struct PgShellProjectedFibre {
     const std::array<ExactRational, 3>& world_fibre;
     /// Exact unit pair for the right-handed in-plane rotation.
     const ExactRational& cosine;
     const ExactRational& sine;
 };
 
+struct PgShellProjectedAxes {
+    const PgReferenceValue& reference;
+    PgShellProjectedFibre fibre;
+};
+
 using PgShellReferenceAxes = std::variant<PgShellExplicitAxes, PgShellProjectedAxes>;
+using PgShellPointAxes = std::variant<PgShellExplicitAxes, PgShellProjectedFibre>;
+
+struct PgShellPatchState {
+    PgPreparedPatchIdentity patch;
+    std::span<const PgCartesianExactPosition> coordinates_metres;
+};
+
+struct PgShellPatchPoint {
+    PgPreparedPatchIdentity patch;
+    PgReferenceValue reference;
+    core::PlannedBuffer<PgConditionedReferenceColumn> shapes;
+    std::array<PgMaterialEnclosure, 3> current_position_metres;
+    PgShellTensorEnclosure deformation_gradient;
+    PgReferenceCallInfo work;
+};
+
+/// Assemble x and F at a volume or one-sided boundary query from the exact
+/// conditioned columns and the current and reference Cartesian coefficients.
+[[nodiscard]] core::Result<PgShellPatchPoint>
+enclose_pg_shell_patch_point(const PgPreparedPatch&, const PgShellPatchState&,
+                             const PgReferencePoint&, const PgReferenceLimits&,
+                             core::ResourcePlan&) noexcept;
 
 struct PgShellMaterialPointResponse {
     PgShellMaterialEnclosure material;
@@ -157,6 +183,12 @@ struct PgShellMaterialPointResponse {
 enclose_pg_shell_material_point(const PgShellElasticLaw&, const PgInitialGreenEnclosure&,
                                 const PgShellReferenceAxes&,
                                 const PgShellTensorEnclosure& deformation_gradient,
+                                const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
+/// Use the same physical point and its retained layer tangents for projection.
+[[nodiscard]] core::Result<PgShellMaterialPointResponse>
+enclose_pg_shell_material_point(const PgShellElasticLaw&, const PgInitialGreenEnclosure&,
+                                const PgShellPointAxes&, const PgShellPatchPoint&,
                                 const PgReferenceLimits&, core::ResourcePlan&) noexcept;
 
 /// Evaluate the whole input uncertainty in the fixed reference material frame.

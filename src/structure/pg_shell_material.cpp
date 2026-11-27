@@ -423,32 +423,22 @@ Tensor material_axes(const PgShellExplicitAxes& input, const R& one, const Mater
 Tensor material_axes(const PgShellProjectedAxes& input, const R& one,
                      const MaterialBounds& bounds) {
     auto& math = bounds.math;
-    if (math.add(math.square(input.cosine), math.square(input.sine)) != one)
+    const auto& [world_fibre, cosine, sine] = input.fibre;
+    if (math.add(math.square(cosine), math.square(sine)) != one)
         partition_fail(core::FailureCode::GeometryInvalid);
     const auto& ref = input.reference;
     const auto root = bounds.root(ref.g);
     ReferenceRadicals exact{math, ref.g};
-    const auto cross_exact = [&](const PgReferenceVector& a, const PgReferenceVector& b) {
-        PgReferenceVector result;
-        for (std::size_t i = 0; i < result.size(); ++i) {
-            const auto j = (i + 1) % 3, k = (i + 2) % 3;
-            result[i] = exact.sub(exact.mul(a[j], b[k]), exact.mul(a[k], b[j]));
-        }
-        return result;
-    };
     PgReferenceVector fibre;
     for (std::size_t i = 0; i < 3; ++i)
-        fibre[i].rational = math.copy(input.world_fibre[i]);
-    const auto area = cross_exact(ref.jacobian_columns_metres[0], ref.jacobian_columns_metres[1]);
-    PgReferenceScalar oriented_volume;
-    for (std::size_t i = 0; i < area.size(); ++i)
-        oriented_volume =
-            exact.add(oriented_volume, exact.mul(area[i], ref.jacobian_columns_metres[2][i]));
+        fibre[i].rational = math.copy(world_fibre[i]);
+    const auto area = exact.cross(ref.jacobian_columns_metres[0], ref.jacobian_columns_metres[1]);
+    const auto oriented_volume = exact.dot(area, ref.jacobian_columns_metres[2]);
     if (exact.sign(oriented_volume) <= 0)
         partition_fail(core::FailureCode::GeometryInvalid);
     // n x (w x n) is |n|^2 times the projected fibre. Form it before
     // enclosing either direction so exact parallelism stays distinguishable.
-    const auto projected = cross_exact(area, cross_exact(fibre, area));
+    const auto projected = exact.cross(area, exact.cross(fibre, area));
     const auto enclose = [&](const PgReferenceVector& value) {
         Vector result;
         for (std::size_t i = 0; i < result.size(); ++i) {
@@ -462,10 +452,8 @@ Tensor material_axes(const PgShellProjectedAxes& input, const R& one,
     const auto across = cross(normal, along, bounds);
     Tensor axes;
     for (std::size_t i = 0; i < 3; ++i) {
-        axes[3 * i] =
-            bounds.add(bounds.scale(along[i], input.cosine), bounds.scale(across[i], input.sine));
-        axes[3 * i + 1] =
-            bounds.sub(bounds.scale(across[i], input.cosine), bounds.scale(along[i], input.sine));
+        axes[3 * i] = bounds.add(bounds.scale(along[i], cosine), bounds.scale(across[i], sine));
+        axes[3 * i + 1] = bounds.sub(bounds.scale(across[i], cosine), bounds.scale(along[i], sine));
         axes[3 * i + 2] = {math.copy(normal[i].lower), math.copy(normal[i].upper)};
     }
     return axes;
@@ -678,6 +666,98 @@ enclose_pg_shell_material_point(const PgShellElasticLaw& law, const PgInitialGre
         return PgShellMaterialPointResponse{std::move(local), std::move(axes),   std::move(green),
                                             std::move(det),   std::move(second), std::move(first),
                                             std::move(cauchy)};
+    });
+}
+
+core::Result<PgShellPatchPoint> enclose_pg_shell_patch_point(const PgPreparedPatch& patch,
+                                                             const PgShellPatchState& state,
+                                                             const PgReferencePoint& query,
+                                                             const PgReferenceLimits& limits,
+                                                             core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellPatchPoint> {
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto info = partition_take(patch.info());
+        if (info.identity != state.patch)
+            partition_fail(core::FailureCode::StaleGeneration);
+        const auto q0 = patch.reference_coordinates();
+        const auto q = state.coordinates_metres;
+        if (q.size() != q0.size() || q.size() != info.basis.rank)
+            partition_fail(invalid);
+        // Keep both Cartesian vectors alive during reference evaluation. Each
+        // returned column then holds eight more rational coefficients.
+        const auto coordinates = detail::partition_mul(6, info.basis.rank);
+        auto reference_limits = limits;
+        math.reserve_nested_rationals(reference_limits.algebra, coordinates);
+        auto row =
+            partition_take(patch.evaluate_reference(std::span{&query, 1}, reference_limits, plan));
+        math.charge(row.call_info.scalar_operations);
+        math.visit(row.call_info.partition_visits);
+        math.admit(detail::partition_add(384, detail::partition_mul(14, info.basis.rank)));
+
+        auto& reference = row.points.values().front();
+        ReferenceRadicals exact{math, reference.g};
+        PgReferenceVector position;
+        std::array<PgReferenceScalar, 9> gradient;
+        for (std::size_t a = 0; a < 3; ++a) {
+            position[a] = {math.copy(reference.position_metres[a].rational),
+                           math.copy(reference.position_metres[a].radical)};
+            gradient[4 * a].rational = math.constant("1");
+        }
+        // x = X0 + sum N_j (q_j - q0_j), F = I + sum (q_j - q0_j) (G_j)^T.
+        // Accumulate exactly before enclosing to retain affine and translation
+        // modes of the conditioned basis, including when q0 is much larger.
+        for (std::size_t j = 0; j < q.size(); ++j) {
+            math.visit(1);
+            const auto& shape = row.columns.values()[j];
+            for (std::size_t a = 0; a < 3; ++a) {
+                if (q[j][a] == q0[j][a])
+                    continue;
+                const auto delta = math.sub(q[j][a], q0[j][a]);
+                position[a] = exact.add(position[a], exact.scale(shape.value, delta));
+                for (std::size_t b = 0; b < 3; ++b) {
+                    auto& entry = gradient[3 * a + b];
+                    entry =
+                        exact.add(entry, exact.scale(shape.physical_gradient_per_metre[b], delta));
+                }
+            }
+        }
+        const MaterialBounds bounds{math};
+        const auto root = bounds.root(reference.g);
+        std::array<Bound, 3> x;
+        Tensor f;
+        for (std::size_t j = 0; j < x.size(); ++j)
+            x[j] = bounds.radical(position[j], root);
+        for (std::size_t j = 0; j < f.size(); ++j)
+            f[j] = bounds.radical(gradient[j], root);
+        return PgShellPatchPoint{info.identity, std::move(reference), std::move(row.columns),
+                                 std::move(x),  std::move(f),         math.info()};
+    });
+}
+
+core::Result<PgShellMaterialPointResponse>
+enclose_pg_shell_material_point(const PgShellElasticLaw& law, const PgInitialGreenEnclosure& input,
+                                const PgShellPointAxes& axes, const PgShellPatchPoint& point,
+                                const PgReferenceLimits& limits,
+                                core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellMaterialPointResponse> {
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        auto point_limits = limits;
+        // The reference and shapes remain live for later physical assembly.
+        const auto kept = detail::partition_add(88, detail::partition_mul(8, point.shapes.size()));
+        math.reserve_nested_rationals(point_limits.algebra, kept);
+        const auto source = std::visit(
+            [&](const auto& sampled) -> PgShellReferenceAxes {
+                using Sample = std::decay_t<decltype(sampled)>;
+                if constexpr (std::is_same_v<Sample, PgShellProjectedFibre>)
+                    return PgShellProjectedAxes{point.reference, sampled};
+                else
+                    return sampled;
+            },
+            axes);
+        return enclose_pg_shell_material_point(law, input, source, point.deformation_gradient,
+                                               point_limits, plan);
     });
 }
 } // namespace uvlas::structure

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_prepared_patch.hpp>
+#include <uvlas/structure/pg_shell_material.hpp>
 
 namespace {
 using namespace uvlas;
@@ -13,7 +14,7 @@ using namespace pg_conditioning_test;
 } // namespace
 
 TEST_CASE("PG prepared patch reconstructs fixed physical position and translation",
-          "[SH-D02][SH-D03][N4-03][N4-06][N4-08][verification]") {
+          "[SH-D02][SH-D03][MAT-D08][N4-03][N4-06][N4-08][V-MAT][verification]") {
     Fixture f;
     for (auto& h : f.heights)
         h = f.r("2");
@@ -77,6 +78,28 @@ TEST_CASE("PG prepared patch reconstructs fixed physical position and translatio
         return (1 - q(u) - q(v)) * q(a) + q(u) * q(b) + q(v) * q(c);
     };
     const auto flat = [](const PgReferenceScalar& x) -> Q { return q(x.rational) + q(x.radical); };
+    const auto as_rational = [&](const Q& value) {
+        return f.r(numerator(value).str(), denominator(value).str());
+    };
+    // This affine field deliberately mixes world x and y, with a separate
+    // constant translation represented by the protected constant mode.
+    std::vector<PgCartesianExactPosition> current(patch.reference_coordinates().size());
+    for (std::size_t j = 0; j < current.size(); ++j) {
+        const auto& xyz = patch.reference_coordinates()[j];
+        const auto shift = q(patch.translation()[j]);
+        current[j] = {as_rational(2 * q(xyz[0]) + q(xyz[1]) + 3 * shift),
+                      as_rational(q(xyz[1]) - 4 * shift), as_rational(q(xyz[2]) + 5 * shift)};
+    }
+    const PgShellPatchState affine_state{recorded.identity, current};
+    const PgShellPatchState reference_state{recorded.identity, patch.reference_coordinates()};
+    const auto one = f.r("1"), zero = f.r("0"), young = f.r("10");
+    const auto law =
+        take(PgShellElasticLaw::prepare(PgIsotropicElasticity{young, zero}, one, caps, setup));
+    const std::array<PgReferenceScalar, 6> initial;
+    const std::array<ExactRational, 6> error;
+    const PgInitialGreenEnclosure strain{one, initial, error};
+    const std::array fibre{f.r("0"), f.r("1"), f.r("0")};
+    const PgShellPointAxes axes = PgShellProjectedFibre{fibre, one, zero};
     for (std::size_t p = 0; p < queries.size(); ++p) {
         CAPTURE(p);
         const auto triangle = p == 0 ? volumes.front().triangle : faces.front().triangle;
@@ -117,7 +140,54 @@ TEST_CASE("PG prepared patch reconstructs fixed physical position and translatio
             for (std::size_t j = 0; j < expected.size(); ++j)
                 CHECK(derivative[j][a] == (j == a ? 1 : 0));
         }
+        core::ResourcePlan assembly{profile};
+        auto state =
+            take(enclose_pg_shell_patch_point(patch, affine_state, queries[p], caps, assembly));
+        CHECK(state.patch == recorded.identity);
+        CHECK(state.reference.layer == layer.id);
+        CHECK(state.shapes.size() == row.size());
+        CHECK(state.work.allocated_owned_payload_bytes == assembly.allocated_bytes());
+        const std::array<Q, 3> moved{2 * expected[0] + expected[1] + 3, expected[1] - 4,
+                                     expected[2] + 5};
+        for (std::size_t a = 0; a < moved.size(); ++a) {
+            CHECK(q(state.current_position_metres[a].lower) == moved[a]);
+            CHECK(q(state.current_position_metres[a].upper) == moved[a]);
+        }
+        const std::array affine_gradient{2, 1, 0, 0, 1, 0, 0, 0, 1};
+        for (std::size_t k = 0; k < affine_gradient.size(); ++k) {
+            CHECK(q(state.deformation_gradient[k].lower) == affine_gradient[k]);
+            CHECK(q(state.deformation_gradient[k].upper) == affine_gradient[k]);
+        }
+        const auto material =
+            take(enclose_pg_shell_material_point(law, strain, axes, state, caps, assembly));
+        const auto encloses = [&](const PgMaterialEnclosure& bound, const Q& target) {
+            CHECK(q(bound.lower) <= target);
+            CHECK(q(bound.upper) >= target);
+            CHECK(q(bound.upper) - q(bound.lower) < Q("1/100000000000000000000000000"));
+        };
+        CHECK(q(material.determinant.lower) == 2);
+        encloses(material.material.energy_joules_per_cubic_metre, Q("45/2"));
+        encloses(material.second_pk_world_pascal[0], Q("15"));
+        encloses(material.first_pk_world_pascal[0], Q("40"));
+        encloses(material.cauchy_world_pascal[0], Q("105/2"));
+
+        auto rest =
+            take(enclose_pg_shell_patch_point(patch, reference_state, queries[p], caps, assembly));
+        const auto rest_material =
+            take(enclose_pg_shell_material_point(law, strain, axes, rest, caps, assembly));
+        CHECK(rest_material.material.energy_joules_per_cubic_metre.upper.sign() == 0);
+        CHECK(rest_material.cauchy_world_pascal[0].lower.sign() == 0);
     }
+
+    auto stale = affine_state;
+    stale.patch.bytes[0] ^= std::byte{1};
+    check_failure(enclose_pg_shell_patch_point(patch, stale, queries[0], caps, none),
+                  core::FailureCode::StaleGeneration);
+    auto incomplete = affine_state;
+    incomplete.coordinates_metres = incomplete.coordinates_metres.first(1);
+    check_failure(enclose_pg_shell_patch_point(patch, incomplete, queries[0], caps, none),
+                  core::FailureCode::InvalidInput);
+    CHECK(none.allocated_bytes() == 0);
 
     const auto interior = std::ranges::find_if(
         faces, [&](const auto& face) { return face.side != faces.front().side; });

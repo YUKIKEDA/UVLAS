@@ -346,7 +346,7 @@ TEST_CASE("Projected material axes use the physical layer tangents and in-plane 
     tilted.jacobian_columns_metres[2][2].rational = f.q("1");
     const std::array fibre{f.q("1"), f.q("0"), f.q("0")};
     const auto axes = enclose_pg_shell_material_point(
-        *law, initial, PgShellProjectedAxes{tilted, fibre, zero, one}, deformation, f.limits,
+        *law, initial, PgShellProjectedAxes{tilted, {fibre, zero, one}}, deformation, f.limits,
         f.memory);
     REQUIRE(axes);
     // ds=(1,0,3/4) and dt=(0,2,0) give n=(-3/5,0,4/5).
@@ -361,13 +361,13 @@ TEST_CASE("Projected material axes use the physical layer tangents and in-plane 
 
     const std::array normal{f.q("-3"), f.q("0"), f.q("4")};
     const auto parallel = enclose_pg_shell_material_point(
-        *law, initial, PgShellProjectedAxes{tilted, normal, one, zero}, deformation, f.limits,
+        *law, initial, PgShellProjectedAxes{tilted, {normal, one, zero}}, deformation, f.limits,
         f.memory);
     REQUIRE_FALSE(parallel);
     CHECK(parallel.error().code == core::FailureCode::GeometryInvalid);
     tilted.jacobian_columns_metres[2][2].rational = f.q("-1");
     const auto reversed = enclose_pg_shell_material_point(
-        *law, initial, PgShellProjectedAxes{tilted, fibre, one, zero}, deformation, f.limits,
+        *law, initial, PgShellProjectedAxes{tilted, {fibre, one, zero}}, deformation, f.limits,
         f.memory);
     REQUIRE_FALSE(reversed);
     CHECK(reversed.error().code == core::FailureCode::GeometryInvalid);
