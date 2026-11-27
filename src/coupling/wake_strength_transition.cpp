@@ -397,9 +397,11 @@ core::Result<core::PlannedBuffer<FrozenWakeTrace>> apply_wake_strength_transfer(
 
 core::Result<FreeWakeStrengthCovector> WakeStrengthPullback::row(std::size_t i) const noexcept {
     const auto rows = rows_.values();
-    if (i >= rows.size() || !rows[i])
-        return std::unexpected(core::Failure{InvalidInput, operation});
-    return *rows[i];
+    if (i < rows.size()) {
+        if (const auto& row = rows[i])
+            return *row;
+    }
+    return std::unexpected(core::Failure{InvalidInput, operation});
 }
 
 core::Result<WakeStrengthPullback>
