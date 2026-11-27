@@ -325,6 +325,14 @@ TEST_CASE("Frozen dictionary numeric leaves share the production SI scalar kerne
              coverage);
     auto value = root("coupled_flutter");
     value.set("restart", fragment("Restart"));
+    value.field("model")
+        .field("aero_surfaces")
+        .elements.at(0)
+        .field("attachment")
+        .set(
+            "material_map",
+            parse(
+                R"({"pieces":[{"chord_cells":[0,1],"span_cells":[0,1],"layer":"1","side":"interior","terms":[{"powers":[1,0],"coefficient":[{"numerator":"1","denominator":"1"},{"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}]}]}]})"));
     value.set("provenance",
               parse(R"({"description":"explicit SI control","references":[],"assumptions":[]})"));
     auto& graph = value.field("model").field("geometry").elements[0];
@@ -356,8 +364,8 @@ TEST_CASE("Frozen dictionary numeric leaves share the production SI scalar kerne
         CHECK(coverage.fields.contains(std::string{expected.record} + "/" +
                                        std::string{expected.name}));
     }
-    CHECK(coverage.records.size() == 191);
-    CHECK(coverage.fields.size() == 806);
+    CHECK(coverage.records.size() == 194);
+    CHECK(coverage.fields.size() == 815);
     CHECK(coverage.numbers > 0);
     CHECK(coverage.native > 0);
 }
