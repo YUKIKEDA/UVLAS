@@ -37,6 +37,26 @@ GCC 14 Releaseで凍結試験2件の2,551アサーションと既存の材料作
 
 同じ24点の質量作用で、累積所有確保は812,779,024 Bから255,333,520 Bに減った。作業量は27,227,928から17,761,728、分割訪問は669,981から665,829になった。力・接線の組立には物理勾配が必要なので、全参照行を使う。
 
+## 凍結した高次則との比較
+
+凍結時の体積積分は、4背景セルの各軸45点と、3層の深さ各7点を合わせた170,100点を使う。凍結変位と同じ材料則でその点列を独立に再計算し、アーカイブに保存した内力仕事、接線と質量の縮約値を相対 $10^{-8}$ で照合した。表はその再計算を基準とする。面内点数は各軸、深さ点数は各層に対する数である。 [凍結時の求積と組立](../../../../rd/structure/material/experiments/check_material_shell_integration_v2.py) · [収束の再計算](convergence.py)
+
+| 面内 × 深さ | 全点数 | 弾性3観測の最大相対差 | 総質量の相対差 | 質量仕事の相対差 |
+| --- | ---: | ---: | ---: | ---: |
+| $6^2\times3$ | 1,296 | $1.08\times10^{-4}$ | $3.95\times10^{-16}$ | $1.62\times10^{-6}$ |
+| $9^2\times1$ | 972 | $6.04\times10^{-6}$ | $1.71\times10^{-6}$ | $6.20\times10^{-5}$ |
+| $9^2\times2$ | 1,944 | $4.97\times10^{-6}$ | $1.97\times10^{-16}$ | $3.15\times10^{-10}$ |
+| $16^2\times2$ | 6,144 | $6.72\times10^{-8}$ | $0$ | $1.56\times10^{-10}$ |
+| $9\times17\times2$ | 3,672 | $2.34\times10^{-9}$ | $3.95\times10^{-16}$ | $8.78\times10^{-11}$ |
+| $17^2\times2$ | 6,936 | $2.46\times10^{-10}$ | $3.95\times10^{-16}$ | $5.37\times10^{-11}$ |
+| $24^2\times3$ | 20,736 | $2.50\times10^{-12}$ | $3.95\times10^{-16}$ | $5.44\times10^{-16}$ |
+
+24点の弾性組立から単純に点数比例で見積もると、170,100点で累積所有確保約6.35 TB、同じ許容差を満たした面内9×17、深さ2の3,672点でも約137 GBとなる。これは累積確保の目安であり、プロセスのピークや未計測の実行時間は含めない。48 GiBのプランでの弾性3観測を確認するには、同じ凍結変位、求積精度、作用を保つ実装の追加検証が必要である。
+
+1,944点の質量候補は座標を小数部28 bit、重みを44 bitに丸めた。丸め後の総質量の独立差は $1.04\times10^{-11}$、変位に沿う質量仕事は $1.64\times10^{-10}$ だった。試験には背景セル内の各点を所有三角形へ写し、層幅と三角形の座標変換を重みから除いた局所則を渡す。 [高次質量試験](run-high-mass.cpp.txt)
+
+GCC 14 Releaseで、この1,944点を製品の整合質量入口へ渡した。総質量の包絡と凍結変位に沿う質量仕事の包絡は、どちらもそれぞれの独立参照値の相対 $10^{-8}$ 以内に収まり、8,995アサーションが合格した。作用に要した時間は731.424秒、累積所有確保は19,402,002,064 B、作業量は4,279,433,365、分割訪問は53,931,909だった。計測は作用だけを対象とし、48 GiBの独立のResourcePlanを使用した。
+
 ## 再現
 
 原本NPZを `tools.rd.evidence` のキャッシュに置く。抽出コードは原本、凍結結果、結果が引用する生成ソースのSHA-256を確認し、新しい出力ファイルを作る。
@@ -46,7 +66,25 @@ uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.
 ctest --test-dir <build> --output-on-failure -R "^structure[.]pg_frozen_shell_material$"
 <build>/tests/uvlas_test_structure_pg_frozen_shell_material "[.fixture]" > out/pg-frozen-material-basis.txt
 uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/transfer.py out/pg-frozen-material-basis.txt out/pg-frozen-material-state.json
+uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/convergence.py out/pg-frozen-material-basis.txt --mass-rule-output out/vmat-high-rule.json
 ```
+
+GCCで1,944点を再実行する場合は、Releaseで構築した3つの静的ライブラリとCatch2をリンクする。以下では `BUILD` にビルドディレクトリ、`EXACT_DEPS_INCLUDE` にBoostとnlohmann/jsonの依存ヘッダー、`CATCH_PREFIX` にCatch2のインストール先を指定する。
+
+```bash
+g++-14 -std=c++23 -O2 -pthread -Iinclude -Isrc/structure -Itests/structure \
+  -isystem "$EXACT_DEPS_INCLUDE" -isystem "$CATCH_PREFIX/include" \
+  "-DUVLAS_PG_FROZEN_MATERIAL_PROBES=\"$PWD/tests/structure/fixtures/pg-frozen-material-probes-v1.json\"" \
+  "-DUVLAS_PG_FROZEN_MATERIAL_TRANSFER=\"$PWD/tests/structure/fixtures/pg-frozen-material-transfer-v1.json\"" \
+  -x c++ docs/verification/IM-02/pg-frozen-material-probes/run-high-mass.cpp.txt -x none \
+  -Wl,--start-group "$BUILD/libuvlas_structure.a" "$BUILD/libuvlas_numerics.a" \
+  "$BUILD/libuvlas_core.a" -Wl,--end-group \
+  "$CATCH_PREFIX/lib/manual-link/libCatch2Main.a" "$CATCH_PREFIX/lib/libCatch2.a" \
+  -o out/vmat-high
+(cd out && ./vmat-high '[.high-mass]' --rng-seed 34324)
+```
+
+有理点列は再生成で一致した。SHA-256は `bb5ea724af885cbba4bd01212697f9f4cd7101f411c903b4995104043e05d39c` だった。
 
 同じWindows環境で独立に2回抽出したfixtureのSHA-256は `83ea890fbc83d651d63c51477c197b5e2ed8c167b08e6714758fa3715d51df97` で一致した。
 最初の3D材料点の証拠では、GCC 14 Releaseで577アサーションが合格した。

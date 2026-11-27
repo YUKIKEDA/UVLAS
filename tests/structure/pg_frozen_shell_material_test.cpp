@@ -123,13 +123,9 @@ struct ProbeLocation {
     [[nodiscard]] PgReferenceVolumePoint point() const&& = delete;
 };
 
-ProbeLocation locate(Fixture& fixture, const PgIntegrationPartition& partition, const Json& input,
-                     const PgReferenceLimits& limits, core::ResourcePlan& plan) {
-    const auto& coordinates = input.at("coordinates");
-    const auto s = decimal(coordinates.at(0), limits.algebra, plan);
-    const auto t = decimal(coordinates.at(1), limits.algebra, plan);
-    const auto zeta = decimal(coordinates.at(2), limits.algebra, plan);
-    const auto layer = input.at("layer").get<core::Index>();
+ProbeLocation locate_chart(Fixture& fixture, const PgIntegrationPartition& partition,
+                           const std::array<Q, 3>& coordinates, core::Index layer) {
+    const auto& [s, t, zeta] = coordinates;
     const auto vertices = take(partition.vertices());
     const auto triangles = take(partition.triangles());
     const auto volumes = take(partition.volumes());
@@ -161,6 +157,15 @@ ProbeLocation locate(Fixture& fixture, const PgIntegrationPartition& partition, 
     }
     FAIL("Frozen V-MAT point is outside the physical partition");
     throw std::runtime_error("Missing V-MAT point");
+}
+
+ProbeLocation locate(Fixture& fixture, const PgIntegrationPartition& partition, const Json& input,
+                     const PgReferenceLimits& limits, core::ResourcePlan& plan) {
+    const auto& coordinates = input.at("coordinates");
+    const std::array converted{decimal(coordinates.at(0), limits.algebra, plan),
+                               decimal(coordinates.at(1), limits.algebra, plan),
+                               decimal(coordinates.at(2), limits.algebra, plan)};
+    return locate_chart(fixture, partition, converted, input.at("layer").get<core::Index>());
 }
 
 template <class Value>
