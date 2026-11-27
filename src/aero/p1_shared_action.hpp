@@ -254,6 +254,17 @@ forecast_bound_wake_serial_induction(const P1ActionSource&, std::span<const P1Fa
     SharedP1Workspace&, LocalPacketWorkspace&, P1Workspace&, core::ResourcePlan&,
     const std::stop_token& = {}) noexcept;
 
+/// Include canonical-edge lookup and contour exclusion in the serial forecast.
+[[nodiscard]] AeroResult<P1SerialAssemblyPlan> forecast_bound_wake_midpoint_serial_induction(
+    const P1ActionSource&, std::span<const P1FaceStrengths>, std::span<const P1StrengthId>,
+    const P1AssemblyLimits&, const std::stop_token& = {}) noexcept;
+
+[[nodiscard]] AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
+    const P1ActionSource&, EdgeId self_edge, std::span<const P1FaceStrengths>,
+    std::span<const P1StrengthId>, LocalAccuracy, P1Accuracy, const P1AssemblyLimits&,
+    SharedP1Workspace&, LocalPacketWorkspace&, P1Workspace&, BoundWakeFacetStorage&,
+    const std::stop_token& = {}) noexcept;
+
 /// The input coefficient order matches the prepared IDs exactly. Geometry is unchanged.
 [[nodiscard]] AeroResult<P1ActionValue>
 apply_shared_p1(const SharedP1Action&, const P1ActionSource&, std::span<const P1ComplexWords>,

@@ -919,6 +919,84 @@ TEST_CASE("Mixed induction reuses unowned facet packets and bases",
     CHECK(retry_memory.allocated_bytes() - before_retry == reuse_charge);
 }
 
+TEST_CASE("Serial bound midpoints exclude each new self edge and retain its wake alias",
+          "[UW-D01][UW-D07][N4-06][negative][verification]") {
+    GeometryFixture geometry;
+    geometry.roles[0].role = p::AeroFaceRole::Bound;
+    geometry.share_by_alias();
+    Prepared prepared{geometry};
+    const std::array ids{strength[0], strength[1], p::P1StrengthId::bound(geometry.faces[0].id)};
+    const std::array maps{
+        p::P1FaceStrengths{geometry.faces[0].id, p::P0BoundColumn{}},
+        p::P1FaceStrengths{geometry.faces[1].id, std::array{ids[0], ids[1], ids[0]}}};
+    const auto first = geometry.edges[0].id, second = geometry.edges[1].id;
+    const auto midpoint = [&](p::EdgeId edge) {
+        return prepared.query({p::QueryId{edge.value()}, p::SourceEdgePoint{edge, word(.5)}});
+    };
+    const auto first_query = midpoint(first), second_query = midpoint(second);
+    const p::P1ActionSource first_source{prepared.contact, first_query, {3, 5}};
+    const p::P1ActionSource second_source{prepared.contact, second_query, {3, 5}};
+    const auto forecast = test_geometry::take(
+        p::forecast_bound_wake_midpoint_serial_induction(first_source, maps, ids, limits()));
+    REQUIRE(forecast.reusable);
+    const auto cap = forecast.initial_payload_bytes + forecast.repeated_payload_bytes;
+    CHECK(cap < 2 * forecast.ordinary.payload_bytes);
+    const auto make = [&](const p::P1ActionSource& source, p::EdgeId edge, auto& target) {
+        return p::prepare_bound_wake_midpoint_induction(
+            source, edge, maps, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            *prepared.local_workspace, *prepared.kernel_workspace, target);
+    };
+    const auto velocity = [&](const p::SharedP1Action& action, const p::P1ActionSource& source) {
+        return test_geometry::take(p::apply_shared_p1(action, source, mu, std::nullopt, apply_steps,
+                                                      prepared.shared_workspace));
+    };
+
+    core::ResourcePlan memory{cap};
+    p::BoundWakeFacetStorage storage{memory};
+    rejected(make(first_source, second, storage), core::FailureCode::InvalidInput);
+    CHECK(memory.allocated_bytes() == 0);
+    for (const auto& [edge, source] :
+         {std::pair{first, &first_source}, std::pair{second, &second_source}}) {
+        CAPTURE(edge.value());
+        core::ResourcePlan fresh_memory{forecast.ordinary.payload_bytes};
+        const auto fresh = test_geometry::take(make(*source, edge, fresh_memory));
+        const auto reused = test_geometry::take(make(*source, edge, storage));
+        const auto report = test_geometry::take(reused.report());
+        REQUIRE(report.excluded_bound_occurrences == 1);
+        CHECK(report.plan.reserved_steps == (edge == first ? forecast.ordinary.reserved_steps
+                                                           : forecast.repeated_reserved_steps));
+        const auto expected = velocity(fresh, *source);
+        const auto observed = velocity(reused, *source);
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            const auto original = decode(expected.velocity()[axis].real);
+            const auto current = decode(observed.velocity()[axis].real);
+            CHECK(current.center == original.center);
+            CHECK(current.radius == original.radius);
+        }
+        if (edge == first) {
+            auto wake_strengths = mu;
+            wake_strengths.back() = {};
+            const auto wake = test_geometry::take(
+                p::apply_shared_p1(reused, *source, wake_strengths, std::nullopt, apply_steps,
+                                   prepared.shared_workspace));
+            CHECK(std::ranges::any_of(wake.velocity(), [](const auto& v) {
+                const auto enclosure = decode(v.real);
+                return abs(enclosure.center) > enclosure.radius;
+            }));
+        }
+    }
+    CHECK(memory.remaining_bytes() == 0);
+    core::ResourcePlan short_memory{cap - 1};
+    p::BoundWakeFacetStorage short_storage{short_memory};
+    {
+        const auto first_result = test_geometry::take(make(first_source, first, short_storage));
+        CHECK(first_result.active());
+    }
+    rejected(make(second_source, second, short_storage), core::FailureCode::ResourceExceeded);
+    CHECK(short_memory.allocated_bytes() == forecast.initial_payload_bytes);
+}
+
 TEST_CASE("Bound collocation may lie on a planar panel and its artificial diagonal",
           "[UW-D01][UW-D02][UW-D07][verification]") {
     for (const double radius : {0., .125}) {
