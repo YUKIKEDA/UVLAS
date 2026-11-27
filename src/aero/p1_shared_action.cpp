@@ -5,6 +5,7 @@
 #include "local_geometry_bounds_private.hpp"
 #include "p1_interval_private.hpp"
 #include "p1_shared_kernel.hpp"
+#include "shared_p1_reuse_private.hpp"
 
 #include <bit>
 #include <tuple>
@@ -341,6 +342,18 @@ void group_bound_edges(std::span<EdgeOccurrence> edges, std::span<Facet> facets,
 }
 } // namespace shared_p1
 
+struct BoundWakeFacetStorageData {
+    core::PlannedBuffer<shared_p1::Facet> idle;
+    core::PlannedBuffer<std::optional<LocalGeometryPacket>> packets;
+    core::PlannedBuffer<TriangleOutcome> predicate;
+    core::PlannedBuffer<std::uint64_t> points;
+    core::PlannedBuffer<P1StrengthId> strengths;
+    core::PlannedBuffer<std::size_t> point_columns;
+    core::PlannedBuffer<shared_p1::EdgeOccurrence> edges;
+    core::PlannedBuffer<shared_p1::EdgeOccurrence> edge_scratch;
+    std::atomic_bool checked_out = false;
+};
+
 struct SharedP1Data {
     std::shared_ptr<const GlobalTopologyData> topology;
     std::optional<OwnedGeometry> geometry;
@@ -409,6 +422,29 @@ struct ActionHolder {
     explicit ActionHolder(core::PlannedBuffer<SharedP1Data> result) noexcept
         : payload(std::move(result)) {}
     core::PlannedBuffer<SharedP1Data> payload;
+};
+
+struct ReusingActionHolder : ActionHolder {
+    using ActionHolder::ActionHolder;
+    ~ReusingActionHolder() {
+        if (reuse) {
+            auto& action = payload.values()[0];
+            reuse->idle = std::move(action.facets);
+            reuse->packets = std::move(packets);
+            if (action.points.size() != 0)
+                reuse->points = std::move(action.points);
+            if (action.strengths.size() != 0)
+                reuse->strengths = std::move(action.strengths);
+            if (action.occurrences.size() != 0) {
+                auto& sorted_storage = sorted_into_scratch ? reuse->edge_scratch : reuse->edges;
+                sorted_storage = std::move(action.occurrences);
+            }
+            reuse->checked_out.store(false, std::memory_order_release);
+        }
+    }
+    std::shared_ptr<BoundWakeFacetStorageData> reuse;
+    core::PlannedBuffer<std::optional<LocalGeometryPacket>> packets;
+    bool sorted_into_scratch = false;
 };
 
 [[nodiscard]] std::uint64_t checked_limit(std::uint64_t needed, std::uint64_t available) {
@@ -539,16 +575,18 @@ class SharedP1Engine {
             }
         };
         finite_outer();
+        std::size_t bound_facets = 0;
         for (const auto& record : geometry.facets.values()) {
             scan.step();
             const auto face = geometry.faces.values()[static_cast<std::size_t>(record.face)].id;
             const auto row =
                 locate(faces, face, [](const P1FaceStrengths& f) { return f.face.value(); }, scan);
             const auto& columns = faces[row].columns;
+            const bool bound = std::holds_alternative<P0BoundColumn>(columns);
             if (std::holds_alternative<QuadOrigin>(record.origin) !=
-                (std::holds_alternative<std::array<P1StrengthId, 2>>(columns) ||
-                 std::holds_alternative<P0BoundColumn>(columns)))
+                (std::holds_alternative<std::array<P1StrengthId, 2>>(columns) || bound))
                 throw ArithmeticFailure{invalid};
+            bound_facets += static_cast<std::size_t>(bound);
         }
         const auto n = geometry.facets.size();
         const auto e = product(n, 3);
@@ -578,9 +616,16 @@ class SharedP1Engine {
                                                              product(3, logarithmic_visits(s))))),
                                       64));
         result.preflight_steps = scan.used;
+        // A caller may allow much more work than any local expression executes.
+        // Reserve the ceiling the local evaluator actually enforces.
+        const auto bound_steps = bound_facets == 0 ? 0 : P1Workspace::maximum_bound_steps();
+        const auto wake_steps = bound_facets == n ? 0 : P1Workspace::maximum_steps();
+        (void)checked_limit(std::max(bound_steps, wake_steps), limits.kernel.max_steps);
+        const auto kernel_steps =
+            sum(product(bound_facets, bound_steps), product(n - bound_facets, wake_steps));
+        const auto packet_steps = local_packet_step_ceiling(n, limits.geometry);
         result.reserved_steps =
-            sum(result.preflight_steps,
-                sum(metadata, product(n, sum(limits.geometry.max_steps, limits.kernel.max_steps))));
+            sum(result.preflight_steps, sum(metadata, sum(product(n, packet_steps), kernel_steps)));
         (void)checked_limit(result.reserved_steps, limits.steps);
         return result;
     }
@@ -673,13 +718,57 @@ public:
         });
     }
 
+    static std::uint64_t midpoint_steps(const GeometryData& geometry,
+                                        const GlobalContactData& verified) {
+        return sum(sum(logarithmic_visits(geometry.edge_lookup.size()),
+                       logarithmic_visits(verified.topology->trailing.size())),
+                   sum(1, product(geometry.facets.size(), 6)));
+    }
+
+    static AeroResult<P1SerialAssemblyPlan>
+    forecast_serial(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+                    std::span<const P1StrengthId> strengths, const P1AssemblyLimits& limits,
+                    const std::stop_token& stop, bool midpoint = false) noexcept {
+        return guarded<P1SerialAssemblyPlan>(source.query.context(), [&] {
+            Work work{0, limits.steps, stop};
+            auto ordinary = count(source, faces, strengths, limits, work, true);
+            const auto& verified = source_data(source);
+            const auto& geometry = *verified.geometry->data_;
+            if (midpoint) {
+                ordinary.reserved_steps =
+                    sum(ordinary.reserved_steps, midpoint_steps(geometry, verified));
+                (void)checked_limit(ordinary.reserved_steps, limits.steps);
+            }
+            const auto facets = geometry.facets.size();
+            if (facets == 0)
+                return P1SerialAssemblyPlan{ordinary, ordinary.payload_bytes,
+                                            ordinary.payload_bytes, ordinary.reserved_steps, true};
+            const auto first_payload = sum(
+                ordinary.payload_bytes - product(facets - 1, ExactTriangleResult::payload_bytes()),
+                bytes<BoundWakeFacetStorageData>(1));
+            const auto repeated_payload = bytes<SharedP1Data>(1);
+            const auto repeated_steps =
+                sum(ordinary.reserved_steps, sum(product(2, facets), geometry.points.size()));
+            const auto metadata =
+                sum(ordinary.estimated_metadata_bytes,
+                    sum(sizeof(ReusingActionHolder) - sizeof(ActionHolder),
+                        sum(sizeof(core::PlannedBuffer<BoundWakeFacetStorageData>),
+                            allocator_estimate)));
+            const auto mode = limits.kernel.external_memory.selection();
+            const auto* estimate = std::get_if<numerics::linear::EstimateAdmission>(&mode);
+            return P1SerialAssemblyPlan{ordinary, first_payload, repeated_payload, repeated_steps,
+                                        estimate != nullptr && metadata <= estimate->bytes &&
+                                            repeated_steps <= limits.steps};
+        });
+    }
+
     static AeroResult<SharedP1Action>
     prepare(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
             std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
             P1Accuracy accuracy, const P1AssemblyLimits& limits, SharedP1Workspace& workspace,
             LocalPacketWorkspace& local, P1Workspace& kernel, core::ResourcePlan& memory,
-            const std::stop_token& stop, bool mixed = false,
-            std::optional<EdgeId> self = {}) noexcept {
+            const std::stop_token& stop, bool mixed = false, std::optional<EdgeId> self = {},
+            BoundWakeFacetStorage* reuse = nullptr) noexcept {
         const auto context = source.query.context();
         if (workspace.entered_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(invalid, context));
@@ -692,17 +781,85 @@ public:
                 throw ArithmeticFailure{*error};
             Work work{0, limits.steps, stop};
             auto plan = count(source, faces, strengths, limits, work, mixed);
-            (void)checked_limit(plan.payload_bytes, memory.remaining_bytes());
             const auto& verified = source_data(source);
             if (!verified.geometry || !verified.geometry->data_)
                 throw ArithmeticFailure{invalid};
             const auto& geometry = *verified.geometry->data_;
+            const auto facet_count = geometry.facets.size();
+            const auto point_slots = geometry.points.size();
+            const auto edges = product(facet_count, 3);
+            const bool use_storage = reuse != nullptr && facet_count != 0;
+            if (reuse != nullptr && reuse->data_ &&
+                reuse->data_->checked_out.load(std::memory_order_acquire))
+                throw ArithmeticFailure{invalid};
+            const bool has_idle =
+                reuse != nullptr && reuse->data_ && reuse->data_->idle.size() != 0;
+            const bool has_packets = has_idle && reuse->data_->packets.size() != 0;
+            if (has_idle) {
+                if (reuse->data_->idle.size() != facet_count ||
+                    (has_packets && reuse->data_->packets.size() != facet_count))
+                    throw ArithmeticFailure{invalid};
+                plan.reserved_steps = sum(plan.reserved_steps, product(2, facet_count));
+                (void)checked_limit(plan.reserved_steps, limits.steps);
+                plan.payload_bytes -= bytes<Facet>(facet_count);
+                if (has_packets)
+                    plan.payload_bytes -= bytes<std::optional<LocalGeometryPacket>>(facet_count);
+                for (std::size_t i = 0; i < facet_count; ++i) {
+                    work.step();
+                    if (has_packets && reuse->data_->packets.values()[i])
+                        plan.payload_bytes -= LocalGeometryPacket::payload_bytes();
+                    if (reuse->data_->idle.values()[i].basis)
+                        plan.payload_bytes -= P1Basis::payload_bytes();
+                }
+            }
+            const bool has_predicate =
+                use_storage && reuse->data_ && reuse->data_->predicate.size() != 0;
+            const bool has_point_columns =
+                use_storage && reuse->data_ && reuse->data_->point_columns.size() == point_slots;
+            const bool has_points =
+                use_storage && reuse->data_ && reuse->data_->points.size() == point_slots;
+            const bool has_strengths =
+                use_storage && reuse->data_ && reuse->data_->strengths.size() == strengths.size();
+            if (use_storage)
+                plan.payload_bytes -= product(facet_count - (has_predicate ? 0U : 1U),
+                                              ExactTriangleResult::payload_bytes());
+            if (use_storage && reuse->data_) {
+                const auto& stored = *reuse->data_;
+                if (has_point_columns) {
+                    plan.payload_bytes -= bytes<std::size_t>(point_slots);
+                    plan.reserved_steps = sum(plan.reserved_steps, point_slots);
+                    (void)checked_limit(plan.reserved_steps, limits.steps);
+                }
+                if (stored.edges.size() == edges)
+                    plan.payload_bytes -= bytes<EdgeOccurrence>(edges);
+                if (stored.edge_scratch.size() == edges)
+                    plan.payload_bytes -= bytes<EdgeOccurrence>(edges);
+                if (has_points)
+                    plan.payload_bytes -= bytes<std::uint64_t>(point_slots);
+                if (has_strengths)
+                    plan.payload_bytes -= bytes<P1StrengthId>(strengths.size());
+            }
+            if (use_storage && !reuse->data_) {
+                plan.payload_bytes = sum(plan.payload_bytes, bytes<BoundWakeFacetStorageData>(1));
+                plan.estimated_metadata_bytes =
+                    sum(plan.estimated_metadata_bytes,
+                        sum(sizeof(core::PlannedBuffer<BoundWakeFacetStorageData>),
+                            allocator_estimate));
+            }
+            if (use_storage) {
+                plan.estimated_metadata_bytes =
+                    sum(plan.estimated_metadata_bytes,
+                        sizeof(ReusingActionHolder) - sizeof(ActionHolder));
+                const auto mode = limits.kernel.external_memory.selection();
+                const auto* estimate = std::get_if<numerics::linear::EstimateAdmission>(&mode);
+                if (estimate == nullptr)
+                    throw ArithmeticFailure{core::FailureCode::Unsupported};
+                (void)checked_limit(plan.estimated_metadata_bytes, estimate->bytes);
+            }
+            (void)checked_limit(plan.payload_bytes, memory.remaining_bytes());
             std::optional<std::size_t> excluded;
             if (self) {
-                const auto extra = sum(sum(logarithmic_visits(geometry.edge_lookup.size()),
-                                           logarithmic_visits(verified.topology->trailing.size())),
-                                       sum(1, product(geometry.facets.size(), 6)));
-                plan.reserved_steps = sum(plan.reserved_steps, extra);
+                plan.reserved_steps = sum(plan.reserved_steps, midpoint_steps(geometry, verified));
                 (void)checked_limit(plan.reserved_steps, limits.steps);
                 work.step();
                 const auto definition = needed(source.query.definition());
@@ -727,21 +884,70 @@ public:
                     throw ArithmeticFailure{invalid};
                 excluded = ordinal;
             }
-            const auto facet_count = geometry.facets.size();
-            const auto point_slots = geometry.points.size();
-            const auto edges = product(facet_count, 3);
+            if (use_storage && !reuse->data_) {
+                auto storage = allocate<BoundWakeFacetStorageData>(memory, 1, context, stop);
+                auto pool = std::make_shared<core::PlannedBuffer<BoundWakeFacetStorageData>>(
+                    std::move(storage));
+                auto* state = pool->values().data();
+                reuse->data_ = {std::move(pool), state};
+            }
+            if (use_storage && !has_predicate)
+                reuse->data_->predicate = allocate<TriangleOutcome>(memory, 1, context, stop);
+            auto* predicate = use_storage ? reuse->data_->predicate.values().data() : nullptr;
             auto storage = allocate<SharedP1Data>(memory, 1, context, stop);
-            auto holder = std::make_shared<ActionHolder>(std::move(storage));
+            std::shared_ptr<ActionHolder> holder;
+            ReusingActionHolder* reusable_holder = nullptr;
+            if (use_storage) {
+                auto reusable = std::make_shared<ReusingActionHolder>(std::move(storage));
+                reusable_holder = reusable.get();
+                holder = std::move(reusable);
+            } else {
+                holder = std::make_shared<ActionHolder>(std::move(storage));
+            }
             auto& data = holder->payload.values()[0];
-            data.points = allocate<std::uint64_t>(memory, point_slots, context, stop);
-            data.strengths = allocate<P1StrengthId>(memory, strengths.size(), context, stop);
-            data.facets = allocate<Facet>(memory, facet_count, context, stop);
-            auto packets =
-                allocate<std::optional<LocalGeometryPacket>>(memory, facet_count, context, stop);
-            auto point_columns = allocate<std::size_t>(memory, point_slots, context, stop);
-            auto occurrences = allocate<EdgeOccurrence>(memory, edges, context, stop);
-            auto sorting = allocate<EdgeOccurrence>(memory, edges, context, stop);
+            data.facets = has_idle ? std::move(reuse->data_->idle)
+                                   : allocate<Facet>(memory, facet_count, context, stop);
+            if (reusable_holder) {
+                reusable_holder->reuse = reuse->data_;
+                reuse->data_->checked_out.store(true, std::memory_order_relaxed);
+            }
+            data.points = has_points ? std::move(reuse->data_->points)
+                                     : allocate<std::uint64_t>(memory, point_slots, context, stop);
+            data.strengths = has_strengths
+                                 ? std::move(reuse->data_->strengths)
+                                 : allocate<P1StrengthId>(memory, strengths.size(), context, stop);
+            core::PlannedBuffer<std::optional<LocalGeometryPacket>> ordinary_packets;
+            auto& packet_storage =
+                reusable_holder != nullptr ? reusable_holder->packets : ordinary_packets;
+            packet_storage = has_packets ? std::move(reuse->data_->packets)
+                                         : allocate<std::optional<LocalGeometryPacket>>(
+                                               memory, facet_count, context, stop);
+            auto packets = packet_storage.values();
+            core::PlannedBuffer<std::size_t> local_point_columns;
+            core::PlannedBuffer<EdgeOccurrence> local_edges, local_edge_scratch;
+            auto& point_columns = use_storage ? reuse->data_->point_columns : local_point_columns;
+            auto& occurrences = use_storage ? reuse->data_->edges : local_edges;
+            auto& sorting = use_storage ? reuse->data_->edge_scratch : local_edge_scratch;
+            const auto fit = [&]<class T>(core::PlannedBuffer<T>& buffer, std::uint64_t count) {
+                if (buffer.size() != count)
+                    buffer = allocate<T>(memory, count, context, stop);
+            };
+            fit(point_columns, point_slots);
+            fit(occurrences, edges);
+            fit(sorting, edges);
+            if (has_point_columns) {
+                charge(work, point_slots);
+                std::ranges::fill(point_columns.values(), std::size_t{0});
+            }
             operator_environment();
+            if (has_idle) {
+                for (auto& facet : data.facets.values()) {
+                    work.step();
+                    auto basis = std::move(facet.basis);
+                    facet = Facet{};
+                    facet.basis = std::move(basis);
+                }
+            }
             data.query = needed(source.query.definition());
             data.stamp = source.stamp;
             data.topology = verified.topology;
@@ -757,6 +963,8 @@ public:
             }
             map_facets(data, geometry, faces, strengths, point_columns.values(),
                        occurrences.values(), work);
+            auto packet_limits = limits.geometry;
+            packet_limits.max_steps = local_packet_step_ceiling(facet_count, packet_limits);
             for (std::size_t i = 0; i < facet_count; ++i) {
                 auto& facet = data.facets.values()[i];
                 const auto prepare_packet =
@@ -773,18 +981,21 @@ public:
                     }
                 }
                 const auto id = FacetId{original.id};
+                SharedP1ReuseSlot<LocalGeometryPacket> slot{packets[i], predicate};
+                auto* storage_slot = use_storage ? &slot : nullptr;
                 auto packet = needed(
                     has_alias ? prepare_aliased_midpoint_packet(
                                     source.contact, source.query, id, facet.bound, local_accuracy,
-                                    limits.geometry, local, memory, stop)
+                                    packet_limits, local, memory, stop, storage_slot)
                               : prepare_packet(*verified.geometry, source.query, id, local_accuracy,
-                                               limits.geometry, local, memory, stop));
-                charge(work, needed(packet.steps()));
+                                               packet_limits, local, memory, stop, storage_slot));
+                const auto steps = needed(packet.steps());
                 const bool far = !facet.bound && needed(packet.far()) == FarRelation::Far;
+                packets[i].emplace(std::move(packet));
+                charge(work, steps);
                 facet.far = far;
                 if (far)
                     ++data.report.far_facets;
-                packets.values()[i].emplace(std::move(packet));
             }
             const auto ordered = sort_edges(occurrences.values(), sorting.values(), work);
             data.report.cancelled_analytic_pairs =
@@ -803,28 +1014,48 @@ public:
             }
             if (mixed) {
                 group_bound_edges(ordered, data.facets.values(), work);
-                data.occurrences = ordered.data() == occurrences.values().data()
-                                       ? std::move(occurrences)
-                                       : std::move(sorting);
+                const bool sorted_into_scratch = ordered.data() != occurrences.values().data();
+                data.occurrences =
+                    sorted_into_scratch ? std::move(sorting) : std::move(occurrences);
+                if (reusable_holder)
+                    reusable_holder->sorted_into_scratch = sorted_into_scratch;
             }
             for (std::size_t i = 0; i < facet_count; ++i) {
                 auto& entry = data.facets.values()[i];
-                const auto& packet = packets.values()[i];
+                const auto& packet = packets[i];
                 if (!packet)
                     throw ArithmeticFailure{invalid};
+                SharedP1ReuseSlot<P1Basis> slot{entry.basis};
+                auto* storage_slot = use_storage ? &slot : nullptr;
                 auto basis = needed(
-                    entry.bound ? evaluate_bound_partition(*packet, entry.boundary, accuracy,
-                                                           limits.kernel, kernel, memory, stop)
-                                : evaluate_p1_partition(*packet, entry.boundary, accuracy,
-                                                        limits.kernel, kernel, memory, stop));
-                charge(work, needed(basis.steps()));
+                    entry.bound
+                        ? evaluate_bound_partition(*packet, entry.boundary, accuracy, limits.kernel,
+                                                   kernel, memory, stop, storage_slot)
+                        : evaluate_p1_partition(*packet, entry.boundary, accuracy, limits.kernel,
+                                                kernel, memory, stop, storage_slot));
+                const auto steps = needed(basis.steps());
                 entry.basis.emplace(std::move(basis));
+                charge(work, steps);
             }
             work.step();
             data.report.used_steps = work.used;
             return SharedP1Action{std::shared_ptr<const SharedP1Data>{std::move(holder), &data},
                                   context};
         });
+    }
+
+    static AeroResult<SharedP1Action>
+    prepare_reusing_facets(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+                           std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
+                           P1Accuracy accuracy, const P1AssemblyLimits& limits,
+                           SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+                           P1Workspace& kernel, BoundWakeFacetStorage& reuse,
+                           const std::stop_token& stop, std::optional<EdgeId> self = {}) noexcept {
+        if (reuse.preparing_.test_and_set(std::memory_order_acquire))
+            return std::unexpected(failure(invalid, source.query.context()));
+        const Lease lease{reuse.preparing_};
+        return prepare(source, faces, strengths, local_accuracy, accuracy, limits, workspace, local,
+                       kernel, reuse.memory_, stop, true, self, &reuse);
     }
 
     static AeroResult<P1ActionValue> apply(const SharedP1Action& action,
@@ -881,6 +1112,52 @@ public:
             }
             work.step();
             return P1ActionValue{action.data_, velocity, derivative, work.used};
+        });
+    }
+
+    static AeroResult<std::uint64_t>
+    strength_transpose(const SharedP1Action& action, const P1ActionSource& source,
+                       std::span<Interval> output, std::uint64_t steps,
+                       SharedP1Workspace& workspace, const std::stop_token& stop) noexcept {
+        const auto context = source.query.context();
+        if (workspace.entered_.test_and_set(std::memory_order_acquire))
+            return std::unexpected(failure(invalid, context));
+        const Lease lease{workspace.entered_};
+        return guarded<std::uint64_t>(context, [&] {
+            operator_environment();
+            const auto& data = matches(action, source);
+            constexpr std::size_t axes = 3;
+            if (output.size() != product(data.strengths.size(), axes))
+                throw ArithmeticFailure{invalid};
+            Work work{0, steps, stop};
+            for (auto& value : output) {
+                work.step();
+                value = {};
+            }
+            for (const auto& facet : data.facets.values()) {
+                if (!facet.basis)
+                    throw ArithmeticFailure{invalid};
+                for (std::size_t k = 0; k < axes; ++k) {
+                    if (facet.bound && !facet.boundary[k])
+                        continue;
+                    for (std::size_t axis = 0; axis < axes; ++axis) {
+                        const auto value =
+                            enclosure(needed(facet.basis->basis(k, axis)).get(), work);
+                        visit_coefficients(data, facet, k, work, [&](std::size_t id, bool forward) {
+                            auto& entry = output[axes * id + axis];
+                            entry = forward ? p1::add(entry, value, work)
+                                            : p1::subtract(entry, value, work);
+                        });
+                    }
+                }
+            }
+            LocalRootScratch rounding;
+            for (auto& value : output) {
+                work.step();
+                value = enclosure(enclose_p1_value(value, data.precision, rounding), work);
+            }
+            work.step();
+            return work.used;
         });
     }
 
@@ -1181,6 +1458,29 @@ AeroResult<SharedP1Action> prepare_bound_wake_induction(
                                    workspace, local, kernel, memory, stop, true);
 }
 
+AeroResult<SharedP1Action> prepare_bound_wake_induction_reusing_facets(
+    const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+    std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
+    const P1AssemblyLimits& limits, SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+    P1Workspace& kernel, BoundWakeFacetStorage& reuse, const std::stop_token& stop) noexcept {
+    return SharedP1Engine::prepare_reusing_facets(source, faces, strengths, local_accuracy,
+                                                  accuracy, limits, workspace, local, kernel, reuse,
+                                                  stop);
+}
+
+AeroResult<P1SerialAssemblyPlan> forecast_bound_wake_serial_induction(
+    const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+    std::span<const P1StrengthId> strengths, const P1AssemblyLimits& limits,
+    const std::stop_token& stop) noexcept {
+    return SharedP1Engine::forecast_serial(source, faces, strengths, limits, stop);
+}
+
+AeroResult<std::uint64_t> project_real_strength_transpose(
+    const SharedP1Action& action, const P1ActionSource& source, std::span<p1::Interval> output,
+    std::uint64_t steps, SharedP1Workspace& workspace, const std::stop_token& stop) noexcept {
+    return SharedP1Engine::strength_transpose(action, source, output, steps, workspace, stop);
+}
+
 AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
     const P1ActionSource& source, EdgeId self, std::span<const P1FaceStrengths> faces,
     std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
@@ -1188,6 +1488,23 @@ AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
     P1Workspace& kernel, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
     return SharedP1Engine::prepare(source, faces, strengths, local_accuracy, accuracy, limits,
                                    workspace, local, kernel, memory, stop, true, self);
+}
+
+AeroResult<P1SerialAssemblyPlan> forecast_bound_wake_midpoint_serial_induction(
+    const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+    std::span<const P1StrengthId> strengths, const P1AssemblyLimits& limits,
+    const std::stop_token& stop) noexcept {
+    return SharedP1Engine::forecast_serial(source, faces, strengths, limits, stop, true);
+}
+
+AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(
+    const P1ActionSource& source, EdgeId self, std::span<const P1FaceStrengths> faces,
+    std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
+    const P1AssemblyLimits& limits, SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+    P1Workspace& kernel, BoundWakeFacetStorage& storage, const std::stop_token& stop) noexcept {
+    return SharedP1Engine::prepare_reusing_facets(source, faces, strengths, local_accuracy,
+                                                  accuracy, limits, workspace, local, kernel,
+                                                  storage, stop, self);
 }
 
 AeroResult<P1ActionValue> apply_shared_p1(const SharedP1Action& action,

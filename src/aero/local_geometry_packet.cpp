@@ -3,8 +3,10 @@
 #include "global_geometry.hpp"
 #include "local_geometry_bounds_private.hpp"
 #include "local_geometry_input_private.hpp"
+#include "shared_p1_reuse_private.hpp"
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <limits>
 #include <new>
@@ -16,6 +18,7 @@ static_assert(std::is_nothrow_copy_constructible_v<LocalQualification>);
 static_assert(std::is_trivially_copyable_v<QueryRequest>);
 namespace {
 constexpr auto operation = core::Operation::EvaluateAero;
+constexpr std::uint64_t enclosure_steps = UINT64_C(12) * (257 + 2);
 OwnedGeometryFailure packet_failure(core::Failure failure, const GeometryContext& context,
                                     std::optional<GeometryProblem> problem = {}) noexcept {
     auto& d = failure.details;
@@ -198,7 +201,8 @@ public:
     prepare(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
             LocalAccuracy accuracy, const GeometryLimits& limits, LocalPacketWorkspace& workspace,
             core::ResourcePlan& plan, const std::stop_token& stop, bool bound = false,
-            std::optional<EdgeId> alias = {}, std::uint64_t alias_steps = 0) noexcept {
+            std::optional<EdgeId> alias = {}, std::uint64_t alias_steps = 0,
+            SharedP1ReuseSlot<LocalGeometryPacket>* slot = nullptr) noexcept {
         const auto context = geometry.context();
         auto lease = workspace.acquire(context.diagnostics);
         if (!lease)
@@ -206,7 +210,7 @@ public:
         try {
             if (stop.stop_requested())
                 return std::unexpected(packet_failure(core::FailureCode::Cancelled, context));
-            if (alias_steps > limits.max_steps || limits.max_steps - alias_steps < 3108)
+            if (alias_steps > limits.max_steps || limits.max_steps - alias_steps < enclosure_steps)
                 return std::unexpected(
                     packet_failure(core::FailureCode::ResourceExceeded, context));
             if (const auto error = accuracy.validation_error())
@@ -225,7 +229,8 @@ public:
                 const LocalClock clock{accuracy.collect_timings ? &measured.classification
                                                                 : nullptr};
                 return GeometryPacketAccess::load(geometry, query, target, local_limits,
-                                                  *workspace.geometry_, *lease, plan, stop);
+                                                  *workspace.geometry_, *lease, plan, stop,
+                                                  slot != nullptr ? slot->predicate_ : nullptr);
             }();
             if (!input) {
                 auto failure = input.error();
@@ -234,7 +239,7 @@ public:
                     failure.problem.reset();
                 return std::unexpected(failure);
             }
-            const auto* outcome = input->classification.outcome();
+            const auto* outcome = input->outcome();
             if (!outcome)
                 return std::unexpected(packet_failure(core::FailureCode::InvalidInput, context));
             const auto* relation = std::get_if<NondegenerateTriangle>(outcome);
@@ -265,14 +270,29 @@ public:
             if (stop.stop_requested())
                 return std::unexpected(packet_failure(core::FailureCode::Cancelled, context));
             if (input->preparation_steps > local_limits.max_steps ||
-                local_limits.max_steps - input->preparation_steps < 3108)
+                local_limits.max_steps - input->preparation_steps < enclosure_steps)
                 return std::unexpected(
                     packet_failure(core::FailureCode::ResourceExceeded, context));
             const auto& facet =
                 input->owner->facets.values()[static_cast<std::size_t>(input->facet)];
-            auto storage = plan.allocate<LocalPacketStorage>(1, operation);
-            if (!storage)
-                return std::unexpected(packet_failure(storage.error(), context));
+            core::PlannedBuffer<LocalPacketStorage> fresh;
+            if (slot == nullptr || !slot->value_) {
+                auto storage = plan.allocate<LocalPacketStorage>(1, operation);
+                if (!storage)
+                    return std::unexpected(packet_failure(storage.error(), context));
+                if (slot != nullptr)
+                    slot->value_.emplace(LocalGeometryPacket{std::move(*storage), context});
+                else
+                    fresh = std::move(*storage);
+            }
+            auto* storage = &fresh;
+            if (slot != nullptr) {
+                auto& current = slot->value_;
+                if (!current)
+                    return std::unexpected(
+                        packet_failure(core::FailureCode::InvalidInput, context));
+                storage = &current->storage_;
+            }
             const auto& data = *input->owner;
             std::array<PointId, 3> vertices{PointId{0}, PointId{0}, PointId{0}};
             std::array<EdgeId, 3> edges{EdgeId{0}, EdgeId{0}, EdgeId{0}};
@@ -296,8 +316,19 @@ public:
                                                 facet.incidence,
                                                 physical,
                                                 facet_scatter(facet)};
-            auto& packet = storage->values()[0].payload.emplace(
-                GeometryPacketAccess::retain(*input), layout, *expression, accuracy, limits);
+            auto& payload = storage->values()[0].payload;
+            std::optional<std::array<std::optional<ScaledEnclosure>, 7>> retained;
+            if (payload && payload->steps != 0 && payload->snapshot.data_.get() == &data &&
+                payload->ambient.facet == target &&
+                payload->requested.representation == accuracy.representation &&
+                payload->requested.tau == accuracy.tau) {
+                // These slots depend only on the three immutable facet vertices.
+                const auto constants = std::span{payload->values}.subspan<3, 7>();
+                auto& cached = retained.emplace();
+                std::ranges::copy(constants, cached.begin());
+            }
+            auto& packet = payload.emplace(GeometryPacketAccess::retain(*input), layout,
+                                           *expression, accuracy, limits);
             packet.qualification = *qualification;
             packet.closest = nearest(*input, *relation);
             packet.far = relation->far;
@@ -305,26 +336,34 @@ public:
             auto e = std::span{scratch.integers}.subspan<13, 3>();
             auto f = std::span{scratch.integers}.subspan<16, 3>();
             auto c = std::span{scratch.integers}.subspan<19, 3>();
-            for (std::size_t i = 0; i < 3; ++i) {
-                e[i] = points[1][i] - points[0][i];
-                f[i] = points[2][i] - points[0][i];
-            }
-            for (std::size_t i = 0; i < 3; ++i) {
-                const auto j = (i + 1) % 3, k = (i + 2) % 3;
-                c[i] = e[j] * f[k];
-                c[i] -= e[k] * f[j];
-            }
             auto& j2 = scratch.integers[22];
-            j2 = 0;
-            for (const auto& component : c) {
-                temp = component * component;
-                j2 += temp;
+            if (!retained) {
+                for (std::size_t i = 0; i < 3; ++i) {
+                    e[i] = points[1][i] - points[0][i];
+                    f[i] = points[2][i] - points[0][i];
+                }
+                for (std::size_t i = 0; i < 3; ++i) {
+                    const auto j = (i + 1) % 3, k = (i + 2) % 3;
+                    c[i] = e[j] * f[k];
+                    c[i] -= e[k] * f[j];
+                }
+                j2 = 0;
+                for (const auto& component : c) {
+                    temp = component * component;
+                    j2 += temp;
+                }
             }
             LocalWork work{alias_steps + input->preparation_steps, limits.max_steps, stop};
             {
                 const LocalClock enclosure_clock{accuracy.collect_timings ? &measured.enclosure
                                                                           : nullptr};
                 for (std::size_t i = 0; i < 12; ++i) {
+                    if (retained && i >= 3 && i < 10) {
+                        if (auto check = work.step(); !check)
+                            return std::unexpected(packet_failure(check.error(), context));
+                        packet.values[i] = (*retained)[i - 3];
+                        continue;
+                    }
                     core::Result<ScaledEnclosure> value = std::unexpected(
                         core::Failure{core::FailureCode::PrecisionUnresolved, operation});
                     if (i < 3)
@@ -395,6 +434,19 @@ LocalPacketWorkspace::LocalPacketWorkspace(Key, std::unique_ptr<GeometryWorkspac
                                            core::PlannedBuffer<LocalRootScratch> scratch) noexcept
     : geometry_(std::move(geometry)), scratch_(std::move(scratch)) {}
 LocalPacketWorkspace::~LocalPacketWorkspace() = default;
+std::uint64_t local_packet_step_ceiling(std::uint64_t facets,
+                                        const GeometryLimits& limits) noexcept {
+    // Three source vertices plus a material query with up to three vertices.
+    constexpr std::uint64_t decode_steps = UINT64_C(3) * (3 + 3);
+    // Initial classification, projection, six distance candidates, optional
+    // face, seven minimum comparisons and the far-boundary comparison.
+    constexpr std::uint64_t predicate_steps = 2 + 6 + 1 + 7 + 1;
+    // Check the alias call and its search, then examine all three facet edges.
+    const auto alias_steps = 2 + static_cast<std::uint64_t>(std::bit_width(facets)) + 3;
+    const auto total = enclosure_steps + decode_steps +
+                       std::min(limits.predicate.max_steps, predicate_steps) + alias_steps;
+    return std::min(total, limits.max_steps);
+}
 core::Result<std::unique_ptr<LocalPacketWorkspace>>
 LocalPacketWorkspace::create(core::ResourcePlan& plan, core::FailureDetails details) noexcept {
     auto geometry = GeometryWorkspace::create(plan, details);
@@ -534,23 +586,26 @@ AeroResult<LocalGeometryPacket>
 prepare_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& query, FacetId target,
                      LocalAccuracy accuracy, const GeometryLimits& limits,
                      LocalPacketWorkspace& workspace, core::ResourcePlan& plan,
-                     const std::stop_token& stop) noexcept {
+                     const std::stop_token& stop,
+                     SharedP1ReuseSlot<LocalGeometryPacket>* slot) noexcept {
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop);
+                                      stop, false, {}, 0, slot);
 }
 AeroResult<LocalGeometryPacket>
 prepare_bound_local_packet(const OwnedGeometry& geometry, const ResolvedQuery& query,
                            FacetId target, LocalAccuracy accuracy, const GeometryLimits& limits,
                            LocalPacketWorkspace& workspace, core::ResourcePlan& plan,
-                           const std::stop_token& stop) noexcept {
+                           const std::stop_token& stop,
+                           SharedP1ReuseSlot<LocalGeometryPacket>* slot) noexcept {
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop, true);
+                                      stop, true, {}, 0, slot);
 }
 AeroResult<LocalGeometryPacket>
 prepare_aliased_midpoint_packet(const GlobalContactState& contact, const ResolvedQuery& query,
                                 FacetId target, bool bound, LocalAccuracy accuracy,
                                 const GeometryLimits& limits, LocalPacketWorkspace& workspace,
-                                core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
+                                core::ResourcePlan& plan, const std::stop_token& stop,
+                                SharedP1ReuseSlot<LocalGeometryPacket>* slot) noexcept {
     const auto checked = contact.geometry();
     if (!checked)
         return std::unexpected(checked.error().origin);
@@ -573,6 +628,6 @@ prepare_aliased_midpoint_packet(const GlobalContactState& contact, const Resolve
         return std::unexpected(relationship.error().origin);
     const auto [alias, used_steps] = *relationship;
     return LocalPacketEngine::prepare(geometry, query, target, accuracy, limits, workspace, plan,
-                                      stop, bound, alias, 1 + used_steps);
+                                      stop, bound, alias, 1 + used_steps, slot);
 }
 } // namespace uvlas::aero::detail

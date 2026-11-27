@@ -1,10 +1,13 @@
+#include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_action.hpp"
+#include "aero/p1_shared_kernel.hpp"
 #include "geometry_snapshot_fixture.hpp"
 
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <nlohmann/json.hpp>
 
+#include <bit>
 #include <fstream>
 
 namespace {
@@ -627,10 +630,11 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
         p::P1FaceStrengths{geometry.faces[0].id, std::array{wake_ids[2], wake_ids[2]}},
         bound_wake[1]};
     const auto prepare_mixed = [&](const p::P1ActionSource& source, auto maps, auto keys,
-                                   core::ResourcePlan& memory) {
+                                   core::ResourcePlan& memory,
+                                   const p::P1AssemblyLimits& caps = limits()) {
         return p::prepare_bound_wake_induction(
             source, maps, keys, {core::Precision::TwoWord, 1e-10},
-            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            {core::Precision::TwoWord, 1e-10, 1e-10}, caps, prepared.shared_workspace,
             *prepared.local_workspace, *prepared.kernel_workspace, memory);
     };
     for (const double z : {.75, 12.}) {
@@ -639,9 +643,24 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
         const p::P1ActionSource source{prepared.contact, query, {3, 5}};
         const auto forecast = test_geometry::take(
             p::forecast_bound_wake_induction(source, bound_wake, ids, limits()));
+        auto tight = limits();
+        const auto kernel_steps = p::P1Workspace::maximum_steps();
+        REQUIRE(kernel_steps > 0);
+        REQUIRE(kernel_steps < tight.kernel.max_steps);
+        tight.kernel.max_steps = kernel_steps;
+        tight.geometry.max_steps = UINT64_C(500000000);
+        tight.steps = forecast.reserved_steps;
+        const auto at_limit =
+            test_geometry::take(p::forecast_bound_wake_induction(source, bound_wake, ids, tight));
+        CHECK(at_limit.reserved_steps == forecast.reserved_steps);
         core::ResourcePlan memory{forecast.payload_bytes};
-        const auto mixed = test_geometry::take(prepare_mixed(source, bound_wake, ids, memory));
+        const auto mixed =
+            test_geometry::take(prepare_mixed(source, bound_wake, ids, memory, tight));
         const auto report = test_geometry::take(mixed.report());
+        CHECK(report.used_steps <= forecast.reserved_steps);
+        --tight.kernel.max_steps;
+        rejected(p::forecast_bound_wake_induction(source, bound_wake, ids, tight),
+                 core::FailureCode::ResourceExceeded);
         CHECK(memory.allocated_bytes() == forecast.payload_bytes);
         CHECK(report.far_facets == (z > 1 ? 1 : 0));
         CHECK(report.cancelled_analytic_pairs == 1);
@@ -710,6 +729,315 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
                       center[axis] * high(direction_mu[2].imaginary));
         }
     }
+}
+
+TEST_CASE("Mixed induction reuses unowned facet packets and bases",
+          "[UW-D01][UW-D07][N4-06][verification]") {
+    GeometryFixture geometry;
+    geometry.roles[0].role = p::AeroFaceRole::Bound;
+    geometry.share_by_alias();
+    Prepared prepared{geometry};
+    const std::array ids{strength[0], strength[1], p::P1StrengthId::bound(geometry.faces[0].id)};
+    const std::array maps{
+        p::P1FaceStrengths{geometry.faces[0].id, p::P0BoundColumn{}},
+        p::P1FaceStrengths{geometry.faces[1].id, std::array{ids[0], ids[1], ids[0]}}};
+    const auto near = prepared.query(geometry.query(.75));
+    const auto far = prepared.query(geometry.query(12.));
+    const p::P1ActionSource near_source{prepared.contact, near, {3, 5}};
+    const p::P1ActionSource far_source{prepared.contact, far, {3, 5}};
+    const p::P1ActionDirection direction{direction_points, direction_mu, direction_query,
+                                         word(.015625)};
+    const auto near_plan =
+        test_geometry::take(p::forecast_bound_wake_induction(near_source, maps, ids, limits()));
+    const auto far_plan =
+        test_geometry::take(p::forecast_bound_wake_induction(far_source, maps, ids, limits()));
+    const auto serial = test_geometry::take(
+        p::forecast_bound_wake_serial_induction(far_source, maps, ids, limits()));
+    REQUIRE(serial.reusable);
+    CHECK(serial.ordinary.payload_bytes == far_plan.payload_bytes);
+
+    const auto recycled = [&](const p::P1ActionSource& src, p::BoundWakeFacetStorage& storage,
+                              const p::P1AssemblyLimits& maximum,
+                              const std::stop_token& token = {}) {
+        return p::prepare_bound_wake_induction_reusing_facets(
+            src, maps, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, maximum, prepared.shared_workspace,
+            *prepared.local_workspace, *prepared.kernel_workspace, storage, token);
+    };
+    const auto bits = [](double x) { return std::bit_cast<std::uint64_t>(x); };
+    const auto same = [&](const p::ScaledEnclosure& a, const p::ScaledEnclosure& b) {
+        CHECK(a.exponent() == b.exponent());
+        CHECK(bits(a.radius()) == bits(b.radius()));
+        const auto a_words = a.center(), b_words = b.center();
+        const auto* a_pair = std::get_if<p::DoubleWord>(&a_words);
+        const auto* b_pair = std::get_if<p::DoubleWord>(&b_words);
+        if (a_pair == nullptr || b_pair == nullptr)
+            FAIL("Expected a two-word enclosure");
+        CHECK(bits(a_pair->high) == bits(b_pair->high));
+        CHECK(bits(a_pair->low) == bits(b_pair->low));
+    };
+    const auto same_complex = [&](const p::P1ComplexEnclosure& a, const p::P1ComplexEnclosure& b) {
+        same(a.real, b.real);
+        same(a.imaginary, b.imaginary);
+    };
+
+    core::ResourcePlan memory{2 * (near_plan.payload_bytes + far_plan.payload_bytes)};
+    p::BoundWakeFacetStorage storage{memory};
+    {
+        const auto previous = [&] {
+            const auto near_action = test_geometry::take(recycled(near_source, storage, limits()));
+            return test_geometry::take(p::apply_shared_p1(near_action, near_source, mu, direction,
+                                                          apply_steps, prepared.shared_workspace));
+        }();
+        const auto first_charge = memory.allocated_bytes();
+        CHECK(first_charge < near_plan.payload_bytes);
+        rejected(recycled(far_source, storage, limits()), core::FailureCode::InvalidInput);
+        CHECK(memory.allocated_bytes() == first_charge);
+        CHECK(previous.used_steps() > 0);
+    }
+    const auto first_charge = memory.allocated_bytes();
+    CHECK(first_charge == serial.initial_payload_bytes);
+    auto step_too_short = limits();
+    step_too_short.steps = far_plan.reserved_steps;
+    rejected(recycled(far_source, storage, step_too_short), core::FailureCode::ResourceExceeded);
+    CHECK(memory.allocated_bytes() == first_charge);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 declares request_stop non-const.
+    std::stop_source cancelled;
+    REQUIRE(cancelled.request_stop());
+    rejected(recycled(far_source, storage, limits(), cancelled.get_token()),
+             core::FailureCode::Cancelled);
+    CHECK(memory.allocated_bytes() == first_charge);
+    std::uint64_t reuse_charge = 0;
+    {
+        const auto reused = test_geometry::take(recycled(far_source, storage, limits()));
+        const auto report = test_geometry::take(reused.report());
+        reuse_charge = memory.allocated_bytes() - first_charge;
+        CAPTURE(first_charge, reuse_charge);
+        CHECK(reuse_charge == report.plan.payload_bytes);
+        CHECK(reuse_charge == serial.repeated_payload_bytes);
+        CHECK(report.plan.reserved_steps == serial.repeated_reserved_steps);
+        REQUIRE(far_plan.payload_bytes > reuse_charge);
+        CHECK(far_plan.payload_bytes - reuse_charge >
+              report.facets *
+                  (p::LocalGeometryPacket::payload_bytes() + p::P1Basis::payload_bytes() +
+                   p::ExactTriangleResult::payload_bytes()));
+        CHECK(report.plan.reserved_steps > far_plan.reserved_steps);
+        CHECK(report.far_facets == 1);
+
+        core::ResourcePlan fresh_memory{far_plan.payload_bytes};
+        const auto fresh = test_geometry::take(p::prepare_bound_wake_induction(
+            far_source, maps, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            *prepared.local_workspace, *prepared.kernel_workspace, fresh_memory));
+        CHECK(report.used_steps < test_geometry::take(fresh.report()).used_steps);
+        CAPTURE(fresh_memory.allocated_bytes());
+        CHECK(fresh_memory.allocated_bytes() == far_plan.payload_bytes);
+        const auto evaluate = [&](const p::SharedP1Action& action) {
+            return test_geometry::take(p::apply_shared_p1(action, far_source, mu, direction,
+                                                          apply_steps, prepared.shared_workspace));
+        };
+        const auto compare_adjoint = [&](const p::SharedP1Action& action) {
+            return test_geometry::take(p::adjoint_shared_p1(action, far_source, mu, dual,
+                                                            apply_steps, prepared.shared_workspace,
+                                                            prepared.memory));
+        };
+        const auto original = evaluate(fresh);
+        const auto current = evaluate(reused);
+        const auto& original_jvp = original.jvp();
+        const auto& current_jvp = current.jvp();
+        if (!original_jvp || !current_jvp)
+            FAIL("Missing simultaneous directional derivative");
+        const auto original_dual = compare_adjoint(fresh);
+        const auto current_dual = compare_adjoint(reused);
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            same_complex(original.velocity()[axis], current.velocity()[axis]);
+            same_complex((*original_jvp)[axis], (*current_jvp)[axis]);
+            const auto a = test_geometry::take(original_dual.free_query(axis));
+            const auto b = test_geometry::take(current_dual.free_query(axis));
+            if (!a || !b)
+                FAIL("Missing free-query covector");
+            same(*a, *b);
+            for (std::size_t point = 0; point < fresh.point_count(); ++point)
+                same(test_geometry::take(original_dual.point(point, axis)),
+                     test_geometry::take(current_dual.point(point, axis)));
+        }
+        for (std::size_t i = 0; i < ids.size(); ++i)
+            same_complex(test_geometry::take(original_dual.strength(i)),
+                         test_geometry::take(current_dual.strength(i)));
+        same(test_geometry::take(original_dual.radius()),
+             test_geometry::take(current_dual.radius()));
+
+        std::vector<p::p1::Interval> projected(3 * ids.size());
+        rejected(p::project_real_strength_transpose(reused, far_source,
+                                                    std::span{projected}.subspan(1), apply_steps,
+                                                    prepared.shared_workspace, {}),
+                 core::FailureCode::InvalidInput);
+        rejected(p::project_real_strength_transpose(reused, far_source, projected, 1,
+                                                    prepared.shared_workspace, {}),
+                 core::FailureCode::ResourceExceeded);
+        REQUIRE(p::project_real_strength_transpose(reused, far_source, projected, apply_steps,
+                                                   prepared.shared_workspace, {}));
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            std::array<p::P1ComplexWords, 3> unit{};
+            unit[axis].real = p::SingleWord{1};
+            const auto full = test_geometry::take(
+                p::adjoint_shared_p1(fresh, far_source, mu, unit, apply_steps,
+                                     prepared.shared_workspace, prepared.memory));
+            for (std::size_t i = 0; i < ids.size(); ++i) {
+                const auto expected = decode(test_geometry::take(full.strength(i)).real);
+                const auto& actual = projected[3 * i + axis];
+                CHECK(ldexp(Big{actual.lower.mantissa}, actual.lower.power) ==
+                      expected.center - expected.radius);
+                CHECK(ldexp(Big{actual.upper.mantissa}, actual.upper.power) ==
+                      expected.center + expected.radius);
+            }
+        }
+    }
+    const auto before_second_reuse = memory.allocated_bytes();
+    const auto back = test_geometry::take(recycled(near_source, storage, limits()));
+    CHECK(test_geometry::take(back.report()).far_facets == 0);
+    CHECK(memory.allocated_bytes() - before_second_reuse == reuse_charge);
+
+    core::ResourcePlan byte_short{first_charge + reuse_charge - 1};
+    p::BoundWakeFacetStorage short_storage{byte_short};
+    {
+        const auto admitted = test_geometry::take(recycled(near_source, short_storage, limits()));
+        CHECK(admitted.active());
+    }
+    rejected(recycled(far_source, short_storage, limits()), core::FailureCode::ResourceExceeded);
+    CHECK(byte_short.allocated_bytes() == first_charge);
+
+    core::ResourcePlan exact{first_charge + reuse_charge};
+    p::BoundWakeFacetStorage exact_storage{exact};
+    {
+        const auto admitted = test_geometry::take(recycled(near_source, exact_storage, limits()));
+        CHECK(admitted.active());
+    }
+    const auto completed = test_geometry::take(recycled(far_source, exact_storage, limits()));
+    CHECK(completed.active());
+    CHECK(exact.remaining_bytes() == 0);
+
+    core::ResourcePlan retry_memory{3 * (near_plan.payload_bytes + far_plan.payload_bytes)};
+    p::BoundWakeFacetStorage retry_storage{retry_memory};
+    {
+        const auto admitted = test_geometry::take(recycled(near_source, retry_storage, limits()));
+        CHECK(admitted.active());
+    }
+    const auto before_refusal = retry_memory.allocated_bytes();
+    rejected(p::prepare_bound_wake_induction_reusing_facets(
+                 far_source, maps, ids, {core::Precision::TwoWord, 0},
+                 {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+                 *prepared.local_workspace, *prepared.kernel_workspace, retry_storage),
+             core::FailureCode::PrecisionUnresolved);
+    CHECK(retry_memory.allocated_bytes() > before_refusal);
+    const auto before_retry = retry_memory.allocated_bytes();
+    const auto retried = test_geometry::take(recycled(far_source, retry_storage, limits()));
+    CHECK(test_geometry::take(retried.report()).far_facets == 1);
+    CHECK(retry_memory.allocated_bytes() - before_retry == reuse_charge);
+
+    // Keep the same IDs and diagnostic revisions but change an actual vertex.
+    auto updated = geometry;
+    updated.coordinates[8] = .5;
+    Prepared updated_geometry{updated};
+    const auto updated_query = updated_geometry.query(updated.query(12.));
+    const p::P1ActionSource updated_source{updated_geometry.contact, updated_query, {3, 5}};
+    const auto same_size_fresh = [&](p::BoundWakeFacetStorage& arena) {
+        return p::prepare_bound_wake_induction_reusing_facets(
+            updated_source, maps, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), updated_geometry.shared_workspace,
+            *updated_geometry.local_workspace, *updated_geometry.kernel_workspace, arena);
+    };
+    core::ResourcePlan changed_memory{2 * (near_plan.payload_bytes + far_plan.payload_bytes)};
+    p::BoundWakeFacetStorage changed_storage{changed_memory}, last_storage{changed_memory};
+    {
+        const auto first = test_geometry::take(recycled(near_source, changed_storage, limits()));
+        CHECK(first.active());
+    }
+    const auto changed = test_geometry::take(same_size_fresh(changed_storage));
+    const auto cold = test_geometry::take(same_size_fresh(last_storage));
+    const auto warm_report = test_geometry::take(changed.report());
+    const auto cold_report = test_geometry::take(cold.report());
+    // Storage reuse has its own initialization visits. The new snapshot must
+    // pay the same numerical preparation costs as the empty storage.
+    CHECK(warm_report.used_steps >= cold_report.used_steps);
+}
+
+TEST_CASE("Serial bound midpoints exclude each new self edge and retain its wake alias",
+          "[UW-D01][UW-D07][N4-06][negative][verification]") {
+    GeometryFixture geometry;
+    geometry.roles[0].role = p::AeroFaceRole::Bound;
+    geometry.share_by_alias();
+    Prepared prepared{geometry};
+    const std::array ids{strength[0], strength[1], p::P1StrengthId::bound(geometry.faces[0].id)};
+    const std::array maps{
+        p::P1FaceStrengths{geometry.faces[0].id, p::P0BoundColumn{}},
+        p::P1FaceStrengths{geometry.faces[1].id, std::array{ids[0], ids[1], ids[0]}}};
+    const auto first = geometry.edges[0].id, second = geometry.edges[1].id;
+    const auto midpoint = [&](p::EdgeId edge) {
+        return prepared.query({p::QueryId{edge.value()}, p::SourceEdgePoint{edge, word(.5)}});
+    };
+    const auto first_query = midpoint(first), second_query = midpoint(second);
+    const p::P1ActionSource first_source{prepared.contact, first_query, {3, 5}};
+    const p::P1ActionSource second_source{prepared.contact, second_query, {3, 5}};
+    const auto forecast = test_geometry::take(
+        p::forecast_bound_wake_midpoint_serial_induction(first_source, maps, ids, limits()));
+    REQUIRE(forecast.reusable);
+    const auto cap = forecast.initial_payload_bytes + forecast.repeated_payload_bytes;
+    CHECK(cap < 2 * forecast.ordinary.payload_bytes);
+    const auto make = [&](const p::P1ActionSource& source, p::EdgeId edge, auto& target) {
+        return p::prepare_bound_wake_midpoint_induction(
+            source, edge, maps, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            *prepared.local_workspace, *prepared.kernel_workspace, target);
+    };
+    const auto velocity = [&](const p::SharedP1Action& action, const p::P1ActionSource& source) {
+        return test_geometry::take(p::apply_shared_p1(action, source, mu, std::nullopt, apply_steps,
+                                                      prepared.shared_workspace));
+    };
+
+    core::ResourcePlan memory{cap};
+    p::BoundWakeFacetStorage storage{memory};
+    rejected(make(first_source, second, storage), core::FailureCode::InvalidInput);
+    CHECK(memory.allocated_bytes() == 0);
+    for (const auto& [edge, source] :
+         {std::pair{first, &first_source}, std::pair{second, &second_source}}) {
+        CAPTURE(edge.value());
+        core::ResourcePlan fresh_memory{forecast.ordinary.payload_bytes};
+        const auto fresh = test_geometry::take(make(*source, edge, fresh_memory));
+        const auto reused = test_geometry::take(make(*source, edge, storage));
+        const auto report = test_geometry::take(reused.report());
+        REQUIRE(report.excluded_bound_occurrences == 1);
+        CHECK(report.plan.reserved_steps == (edge == first ? forecast.ordinary.reserved_steps
+                                                           : forecast.repeated_reserved_steps));
+        const auto expected = velocity(fresh, *source);
+        const auto observed = velocity(reused, *source);
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            const auto original = decode(expected.velocity()[axis].real);
+            const auto current = decode(observed.velocity()[axis].real);
+            CHECK(current.center == original.center);
+            CHECK(current.radius == original.radius);
+        }
+        if (edge == first) {
+            auto wake_strengths = mu;
+            wake_strengths.back() = {};
+            const auto wake = test_geometry::take(
+                p::apply_shared_p1(reused, *source, wake_strengths, std::nullopt, apply_steps,
+                                   prepared.shared_workspace));
+            CHECK(std::ranges::any_of(wake.velocity(), [](const auto& v) {
+                const auto enclosure = decode(v.real);
+                return abs(enclosure.center) > enclosure.radius;
+            }));
+        }
+    }
+    CHECK(memory.remaining_bytes() == 0);
+    core::ResourcePlan short_memory{cap - 1};
+    p::BoundWakeFacetStorage short_storage{short_memory};
+    {
+        const auto first_result = test_geometry::take(make(first_source, first, short_storage));
+        CHECK(first_result.active());
+    }
+    rejected(make(second_source, second, short_storage), core::FailureCode::ResourceExceeded);
+    CHECK(short_memory.allocated_bytes() == forecast.initial_payload_bytes);
 }
 
 TEST_CASE("Bound collocation may lie on a planar panel and its artificial diagonal",
@@ -821,12 +1149,23 @@ TEST_CASE("Two bound circulation columns share the signed edge kernel",
     const std::array bound{p::P1FaceStrengths{geometry.base.faces[0].id, p::P0BoundColumn{}},
                            p::P1FaceStrengths{geometry.base.faces[1].id, p::P0BoundColumn{}}};
     auto resources = limits();
-    resources.steps *= 2;
+    const auto bound_steps = p::P1Workspace::maximum_bound_steps();
+    REQUIRE(bound_steps < p::P1Workspace::maximum_steps());
+    resources.kernel.max_steps = bound_steps;
+    const auto forecast =
+        test_geometry::take(p::forecast_bound_wake_induction(source, bound, ids, resources));
+    resources.steps = forecast.reserved_steps;
+    auto insufficient = resources;
+    --insufficient.kernel.max_steps;
+    rejected(p::forecast_bound_wake_induction(source, bound, ids, insufficient),
+             core::FailureCode::ResourceExceeded);
     const auto action = test_geometry::take(p::prepare_bound_wake_induction(
         source, bound, ids, {core::Precision::TwoWord, 1e-10},
         {core::Precision::TwoWord, 1e-10, 1e-10}, resources, prepared.shared_workspace,
         *prepared.local_workspace, *prepared.kernel_workspace, prepared.memory));
-    CHECK(test_geometry::take(action.report()).cancelled_analytic_pairs == 2);
+    const auto report = test_geometry::take(action.report());
+    CHECK(report.cancelled_analytic_pairs == 2);
+    CHECK(report.used_steps <= forecast.reserved_steps);
     const auto first = ring(geometry.base, .75, Big{0});
     // Re-pack the second quad's vertices in its declared clockwise loop.
     auto second_geometry = geometry.base;

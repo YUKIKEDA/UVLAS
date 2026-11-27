@@ -83,6 +83,92 @@ TEST_CASE("P1 scalar primitives enclose independent higher precision values",
     CHECK_THROWS_AS(arithmetic::divide(one, arithmetic::integer(0), work),
                     arithmetic::ArithmeticFailure);
 }
+TEST_CASE("P1 interval corners round products and quotients in both directions",
+          "[UI-D06][N4-06][negative][verification]") {
+    using Rational = boost::multiprecision::cpp_rational;
+    using arithmetic::Bound;
+    using arithmetic::Integer;
+    using arithmetic::Interval;
+    const Integer large = (Integer{1} << 255U) + 17;
+    const std::array intervals{Interval{{-large, -255}, {-3, -4}},
+                               Interval{{-7, -8}, {large, -258}}, Interval{{}, {3, -1}},
+                               Interval{{5, -1074}, {large, -1326}}, Interval{{3, 0}, {3, 0}}};
+    const auto compare_extrema = [](const Interval& observed, auto operation, const Interval& a,
+                                    const Interval& b) {
+        const auto lo_a = exact_bound(a.lower), hi_a = exact_bound(a.upper);
+        const auto lo_b = exact_bound(b.lower), hi_b = exact_bound(b.upper);
+        const std::array<Rational, 4> corners{operation(lo_a, lo_b), operation(lo_a, hi_b),
+                                              operation(hi_a, lo_b), operation(hi_a, hi_b)};
+        const auto expected = std::minmax_element(corners.begin(), corners.end());
+        const auto lower = exact_bound(observed.lower), upper = exact_bound(observed.upper);
+        CHECK(lower <= *expected.first);
+        CHECK(upper >= *expected.second);
+        CHECK(*expected.first - lower <= exact_bound(Bound{1, observed.lower.power}));
+        CHECK(upper - *expected.second <= exact_bound(Bound{1, observed.upper.power}));
+    };
+    arithmetic::Work work{0, 128, {}};
+    for (const auto& a : intervals) {
+        for (const auto& b : intervals) {
+            const auto other = b;
+            compare_extrema(
+                arithmetic::multiply(a, other, work),
+                [](const Rational& x, const Rational& y) { return Rational{x * y}; }, a, b);
+            if (exact_bound(b.lower) <= 0 && exact_bound(b.upper) >= 0) {
+                CHECK_THROWS_AS(arithmetic::divide(a, b, work), arithmetic::ArithmeticFailure);
+            } else {
+                compare_extrema(
+                    arithmetic::divide(a, b, work),
+                    [](const Rational& x, const Rational& y) { return Rational{x / y}; }, a, b);
+            }
+        }
+    }
+    const auto square = arithmetic::multiply(intervals[1], intervals[1], work);
+    CHECK(exact_bound(square.lower) == 0);
+    CHECK(work.used == 2 * intervals.size() * intervals.size() + 1);
+}
+
+TEST_CASE("Binary root trials preserve adjacent endpoints and exact equality",
+          "[UI-D06][N4-06][verification]") {
+    using arithmetic::Bound;
+    using arithmetic::Integer;
+    using arithmetic::Interval;
+    const std::array inputs{Bound{1, 0}, Bound{2, 0}, Bound{3, -1074},
+                            Bound{(Integer{1} << 256U) - 1, -254}};
+    arithmetic::Work work{0, inputs.size() * 514, {}};
+    for (const auto& input : inputs) {
+        const auto result = arithmetic::square_root(Interval{input, input}, work);
+        const auto exact = exact_bound(input);
+        const auto lower = exact_bound(result.lower);
+        const auto upper = exact_bound(result.upper);
+        const boost::multiprecision::cpp_rational next =
+            lower + exact_bound(Bound{1, result.lower.power});
+        CHECK(lower * lower <= exact);
+        CHECK(upper * upper >= exact);
+        CHECK(next * next > exact);
+        if (lower * lower == exact)
+            CHECK(upper == lower);
+        else
+            CHECK(upper == next);
+    }
+    CHECK(work.used == inputs.size() * 514);
+
+    // A square integer quotient does not imply equality for the original ratio.
+    const ExactInteger denominator = ExactInteger{1} << 600U;
+    LocalRootScratch scratch;
+    LocalWork local{0, 514, {}};
+    const auto exact = LocalBounds::root(denominator, denominator, 0, false,
+                                         core::Precision::TwoWord, scratch, local);
+    REQUIRE(exact);
+    const auto remainder = LocalBounds::root(denominator + 1, denominator, 0, false,
+                                             core::Precision::TwoWord, scratch, local);
+    REQUIRE(remainder);
+    CHECK(center(*exact) == 1.);
+    CHECK(exact->radius() == 0.);
+    CHECK(center(*remainder) == 1.);
+    CHECK(remainder->radius() == 0x1p-256);
+    CHECK(local.used == 514);
+}
+
 TEST_CASE("Product Gauss brackets match independently isolated exact Sturm roots",
           "[UI-D02][N4-06][verification]") {
     std::ifstream input{UVLAS_P1_GAUSS_FIXTURE};
@@ -232,6 +318,11 @@ TEST_CASE("P1 owns original geometry and survives failures moves and workspace r
                                          p1_limits(), **kernel, setup));
     const auto saved = owned_bits(result);
     const auto admitted = take(result.work_plan());
+    const auto steps = take(result.steps());
+    arithmetic::Work constants{0, p1_limits().max_steps, {}};
+    (void)arithmetic::pi_constant(constants);
+    (void)arithmetic::logarithm_series(
+        arithmetic::divide(arithmetic::integer(1), arithmetic::integer(3), constants), constants);
     {
         core::ResourcePlan exact{P1Basis::payload_bytes()};
         auto value = evaluate_p1_basis(
@@ -239,6 +330,8 @@ TEST_CASE("P1 owns original geometry and survives failures moves and workspace r
             {numerics::linear::EstimateAdmission{28672}, admitted.maximum_steps}, **kernel, exact);
         REQUIRE(value);
         CHECK(owned_bits(*value) == saved);
+        CHECK(take(value->steps()) + constants.used == steps);
+        CHECK(take(value->work_plan()).maximum_steps == admitted.maximum_steps);
         CHECK(exact.allocated_bytes() == P1Basis::payload_bytes());
     }
     core::ResourcePlan short_result{P1Basis::payload_bytes() - 1};

@@ -146,10 +146,6 @@ public:
         auto& d = scratch.integers[1];
         auto& a = scratch.integers[2];
         auto& b = scratch.integers[3];
-        auto& root = scratch.integers[4];
-        auto& candidate = scratch.integers[5];
-        auto& square = scratch.integers[6];
-        auto& product = scratch.integers[7];
         n = numerator;
         d = denominator;
         if (n < 0 || d <= 0)
@@ -176,24 +172,36 @@ public:
         const auto common = std::min(boost::multiprecision::lsb(a), boost::multiprecision::lsb(b));
         a >>= common;
         b >>= common;
-        root = 0;
+        if (auto check = work.step(); !check)
+            return std::unexpected(check.error());
+        // Compare against floor(a/b). The remainder distinguishes exact roots.
+        auto& quotient = n;
+        auto& remainder = d;
+        boost::multiprecision::divide_qr(a, b, quotient, remainder);
+        // Both the normalized quotient and all trial squares are below 2^514.
+        using TrialInteger = boost::multiprecision::checked_uint1024_t;
+        const auto target = quotient.convert_to<TrialInteger>();
+        TrialInteger root = 0;
+        TrialInteger square = 0;
         for (int bit = 256; bit >= 0; --bit) {
-            if (auto check = work.step(); !check)
-                return std::unexpected(check.error());
-            candidate = 1;
-            candidate <<= static_cast<unsigned>(bit);
-            candidate += root;
-            square = candidate * candidate;
-            product = square * b;
-            if (product <= a)
-                root = candidate;
+            const auto i = static_cast<unsigned>(bit);
+            const TrialInteger candidate_square =
+                square + (root << (i + 1U)) + (TrialInteger{1} << (2U * i));
+            if (candidate_square <= target) {
+                root += TrialInteger{1} << i;
+                square = candidate_square;
+            }
+            if (bit != 0) {
+                if (auto check = work.step(); !check)
+                    return std::unexpected(check.error());
+            }
         }
-        square = root * root;
-        product = square * b;
-        const bool uncertain = product != a;
+        const bool uncertain = square != target || remainder != 0;
+        auto& signed_root = scratch.integers[4];
+        signed_root = root.convert_to<ExactInteger>();
         if (negative)
-            root = -root;
-        return dyadic(root, exponent + t - 256, precision, scratch, uncertain);
+            signed_root = -signed_root;
+        return dyadic(signed_root, exponent + t - 256, precision, scratch, uncertain);
     }
     /// Compare full width 2r (not radius) against the requested original scale.
     [[nodiscard]] static bool width(const ScaledEnclosure& value, double tau,

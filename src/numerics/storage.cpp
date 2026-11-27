@@ -22,6 +22,13 @@ Result<Index> length(std::size_t size, Operation operation) noexcept {
     }
     return static_cast<Index>(size);
 }
+Result<Index> dense_extent(DenseShape shape, Operation operation) noexcept {
+    if (shape.rows < 0 || shape.columns < 0 || shape.leading_dimension < shape.rows)
+        return fail(FailureCode::InvalidInput, operation);
+    const std::array<Index, 3> dimensions{shape.rows == 0 ? 0 : 1, shape.leading_dimension,
+                                          shape.columns};
+    return core::checked_extent_product(dimensions, operation);
+}
 bool valid_index(Index index, std::size_t size) noexcept {
     return index >= 0 && std::cmp_less(index, size);
 }
@@ -84,12 +91,7 @@ template <StorageScalar Scalar>
 Result<DenseMatrix<Scalar>>
 DenseMatrix<Scalar>::copy(DenseShape shape, std::span<const Scalar> values,
                           core::ResourcePlan& plan, Operation operation) noexcept {
-    if (shape.rows < 0 || shape.columns < 0 || shape.leading_dimension < shape.rows) {
-        return fail(FailureCode::InvalidInput, operation);
-    }
-    const std::array<Index, 3> dimensions{shape.rows == 0 ? 0 : 1, shape.leading_dimension,
-                                          shape.columns};
-    const auto elements = core::checked_extent_product(dimensions, operation);
+    const auto elements = dense_extent(shape, operation);
     if (!elements) {
         return std::unexpected(elements.error());
     }
@@ -103,6 +105,18 @@ DenseMatrix<Scalar>::copy(DenseShape shape, std::span<const Scalar> values,
     if (!owned) {
         return std::unexpected(owned.error());
     }
+    return DenseMatrix{shape, std::move(*owned)};
+}
+
+template <StorageScalar Scalar>
+Result<DenseMatrix<Scalar>> DenseMatrix<Scalar>::zeroed(DenseShape shape, core::ResourcePlan& plan,
+                                                        Operation operation) noexcept {
+    const auto elements = dense_extent(shape, operation);
+    if (!elements)
+        return std::unexpected(elements.error());
+    auto owned = plan.allocate<Scalar>(*elements, operation);
+    if (!owned)
+        return std::unexpected(owned.error());
     return DenseMatrix{shape, std::move(*owned)};
 }
 template <StorageScalar Scalar>

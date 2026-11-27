@@ -221,6 +221,11 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
         LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
     target_include_directories(uvlas_test_io_external_shell_cross_format PRIVATE
         "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+    add_test(NAME io.external_case_chart
+        COMMAND uvlas_test_io_external_shell_cross_format "[.external-case-chart]")
+    set_tests_properties(io.external_case_chart PROPERTIES
+        LABELS "V-USE;V-PG;integration;negative;verification"
+        TIMEOUT "$<IF:$<CONFIG:Debug>,300,120>")
 endif()
 
 if(WIN32)
@@ -1014,10 +1019,25 @@ foreach(wing_index RANGE 0 1)
     endforeach()
 endforeach()
 set(finite_wing_drag_grids m2n4 m4n8)
+set(UVLAS_FORMAL_WING_GEOMETRY "" CACHE FILEPATH
+    "Optional independent geometry fixture for the M128/N192 finite-wing checks")
+if(UVLAS_FORMAL_WING_GEOMETRY)
+    get_filename_component(formal_wing_fixture "${UVLAS_FORMAL_WING_GEOMETRY}"
+        ABSOLUTE BASE_DIR "${PROJECT_SOURCE_DIR}")
+    if(NOT EXISTS "${formal_wing_fixture}")
+        message(FATAL_ERROR "Formal finite-wing geometry fixture not found: ${formal_wing_fixture}")
+    endif()
+    list(APPEND finite_wing_drag_grids m128n192_geometry)
+endif()
 foreach(wing_index RANGE 0 1)
     list(GET finite_wing_shapes ${wing_index} wing_shape)
-    foreach(level RANGE 0 1)
-        list(GET finite_wing_drag_grids ${level} grid)
+    foreach(grid IN LISTS finite_wing_drag_grids)
+        list(FIND finite_wing_drag_grids ${grid} level)
+        set(refinement_fixture "${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-drag-refinement-v1.json")
+        if(grid STREQUAL "m128n192_geometry")
+            set(refinement_fixture "${formal_wing_fixture}")
+            set(level 0)
+        endif()
         set(test_name coupling.finite_wing_drag_refinement.${wing_shape}.${grid})
         set(target uvlas_test_coupling_finite_wing_drag_refinement_${wing_shape}_${grid})
         uvlas_add_test(${test_name}
@@ -1035,11 +1055,13 @@ foreach(wing_index RANGE 0 1)
             UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json"
             UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json"
             UVLAS_FINITE_WING_SPAN_LINES_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-span-lines-v1.json"
-            UVLAS_FINITE_WING_REFINEMENT_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-drag-refinement-v1.json")
+            UVLAS_FINITE_WING_REFINEMENT_FIXTURE="${refinement_fixture}")
         set(drag_timeout 1200)
         if(grid STREQUAL "m4n8")
             # FW-V02 took 1321 seconds with MSVC Debug. Keep the Release limit fixed.
             set(drag_timeout "$<IF:$<CONFIG:Debug>,1800,1200>")
+        elseif(grid STREQUAL "m128n192_geometry")
+            target_compile_definitions(${target} PRIVATE UVLAS_FINITE_WING_FORMAL_GEOMETRY)
         endif()
         set_tests_properties(${test_name} PROPERTIES TIMEOUT ${drag_timeout})
     endforeach()

@@ -7,6 +7,8 @@
 #include <uvlas/core/instrumentation.hpp>
 
 namespace uvlas::aero::detail {
+template <class Result>
+class SharedP1ReuseSlot;
 class GlobalContactState;
 class LocalPacketEngine;
 class LocalBounds;
@@ -134,6 +136,9 @@ private:
     std::unique_ptr<GeometryWorkspace> geometry_;
     core::PlannedBuffer<LocalRootScratch> scratch_;
 };
+/// A local packet ceiling within the caller's budget, including midpoint alias lookup.
+[[nodiscard]] std::uint64_t local_packet_step_ceiling(std::uint64_t facets,
+                                                      const GeometryLimits&) noexcept;
 /// Independent immutable local result; it never confers global geometry qualification.
 class LocalGeometryPacket {
 public:
@@ -186,19 +191,21 @@ private:
 [[nodiscard]] AeroResult<LocalGeometryPacket>
 prepare_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalAccuracy,
                      const GeometryLimits&, LocalPacketWorkspace&, core::ResourcePlan&,
-                     const std::stop_token& = {}) noexcept;
+                     const std::stop_token& = {},
+                     SharedP1ReuseSlot<LocalGeometryPacket>* = nullptr) noexcept;
 /// Evaluate bound-contour geometry. Interior faces and artificial diagonals
 /// carry no vortex source, while unqualified contact with a physical edge fails.
 [[nodiscard]] AeroResult<LocalGeometryPacket>
 prepare_bound_local_packet(const OwnedGeometry&, const ResolvedQuery&, FacetId, LocalAccuracy,
                            const GeometryLimits&, LocalPacketWorkspace&, core::ResourcePlan&,
-                           const std::stop_token&) noexcept;
+                           const std::stop_token&,
+                           SharedP1ReuseSlot<LocalGeometryPacket>* = nullptr) noexcept;
 /// Verify a declared alias of the query's canonical edge in the contact-owned
 /// topology, then require the exact material midpoint and matching local edge.
 [[nodiscard]] AeroResult<LocalGeometryPacket>
 prepare_aliased_midpoint_packet(const GlobalContactState&, const ResolvedQuery&, FacetId,
                                 bool bound, LocalAccuracy, const GeometryLimits&,
-                                LocalPacketWorkspace&, core::ResourcePlan&,
-                                const std::stop_token&) noexcept;
+                                LocalPacketWorkspace&, core::ResourcePlan&, const std::stop_token&,
+                                SharedP1ReuseSlot<LocalGeometryPacket>* = nullptr) noexcept;
 
 } // namespace uvlas::aero::detail

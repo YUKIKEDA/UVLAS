@@ -78,6 +78,29 @@ TEST_CASE("Dense rejects invalid storage and accepts empty shapes", "[negative][
     failure(DenseReal::copy({1, 1, 1}, one, empty_plan, op), FailureCode::ResourceExceeded);
 }
 
+TEST_CASE("Dense zero initialization charges only the final matrix", "[unit][negative][N4-02]") {
+    constexpr DenseShape padded{2, 2, 3};
+    constexpr auto bytes = 6 * sizeof(double);
+    ResourcePlan short_plan{bytes - 1};
+    failure(DenseReal::zeroed(padded, short_plan, op), FailureCode::ResourceExceeded);
+    CHECK(short_plan.allocated_bytes() == 0);
+
+    ResourcePlan exact{bytes};
+    const auto initialized = DenseReal::zeroed(padded, exact, op);
+    REQUIRE(initialized);
+    CHECK(initialized->shape().leading_dimension == 3);
+    REQUIRE(initialized->values().size() == 6);
+    for (const double value : initialized->values()) {
+        CHECK(value == 0);
+        CHECK_FALSE(std::signbit(value));
+    }
+    CHECK(exact.allocated_bytes() == bytes);
+    failure(DenseReal::zeroed({2, 1, 1}, exact, op), FailureCode::InvalidInput);
+    const auto empty = DenseReal::zeroed({0, 3, 7}, exact, op);
+    REQUIRE(empty);
+    CHECK(empty->values().empty());
+}
+
 TEST_CASE("Sparse compression preserves compensated duplicate sums", "[unit][N4-02]") {
     ResourcePlan plan{8192};
     const std::array<Triplet, 6> input{

@@ -9,6 +9,8 @@
 
 namespace uvlas::coupling::detail {
 
+struct CaseExternalPgChartBuilder;
+
 template <class Match>
 class CaseExternalPg {
 public:
@@ -24,6 +26,7 @@ public:
 
 private:
     friend struct CaseExternalPgFactory;
+    friend struct CaseExternalPgChartBuilder;
     CaseExternalPg(structure::PgReferenceGeometry&& reference, Match&& match) noexcept
         : reference_(std::move(reference)), match_(std::move(match)) {}
 
@@ -93,6 +96,7 @@ public:
         at(core::Index) const&& = delete;
 
 private:
+    friend struct CaseExternalPgChartBuilder;
     explicit CaseNastranPlanarPgSet(core::PlannedBuffer<std::optional<Shell>>&& shells) noexcept
         : shells_(std::move(shells)) {}
 
@@ -131,6 +135,7 @@ public:
         at(core::Index) const&& = delete;
 
 private:
+    friend struct CaseExternalPgChartBuilder;
     explicit CaseGmshPgSet(core::PlannedBuffer<std::optional<Shell>>&& shells) noexcept
         : shells_(std::move(shells)) {}
 

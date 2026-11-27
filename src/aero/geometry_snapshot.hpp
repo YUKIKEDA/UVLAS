@@ -281,6 +281,7 @@ public:
 
 private:
     friend class GeometryEngine;
+    friend class LocalPacketEngine;
     friend class P1Engine;
     friend class GlobalEngine;
     friend class SharedP1Engine;

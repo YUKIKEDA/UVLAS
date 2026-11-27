@@ -54,6 +54,18 @@ $$
 
 他の場合だけ $$ I_0=(s/r_a-z/r_b)/k^2 $$ とする。符号は元dyadic内積から厳密に選ぶ。理想核の辺延長上でk²=0でも前者は有限。直線寄与が零でも幾何微分を消さない。正の重み $$ \mu_{\rm eff}=(\mu_a r_b+\mu_b r_a)/(r_a+r_b) $$ を使う。
 
+束縛輪郭の一定循環列では、辺ベクトル $e=x_b-x_a$ を単位化せずに使う。$d=e\cdot e$、$r=q-x_a$、$p=e\cdot r$、$z'=p-d$、$c=e\times r$、$K=c\cdot c+\epsilon^2d$ とおく。端点距離 $r_i=\sqrt{|q-x_i|^2+\epsilon^2}$ は、同じ三角形でその端点を使う辺に共通である。単位循環の速度は次式で、符号の分岐は元の厳密な方向判定に従う。
+
+$$
+v_{ab}=-\frac{c}{4\pi}
+\begin{cases}
+\dfrac{p+z'}{r_a r_b(p r_b+z' r_a)} & pz'>0,\\
+\dfrac{p/r_a-z'/r_b}{K} & pz'\le 0 .
+\end{cases}
+$$
+
+$s=p/\sqrt d$、$z=z'/\sqrt d$、$k^2=K/d$ を従来式へ代入すると、単位化された外積と長さの因子が消える。端点距離は $r_a^2=(p^2+K)/d$ と $r_b^2=(z'^2+K)/d$ を満たす。この同値性は各滑らかな枝の全幾何微分にも成り立つ。有効な辺がない端点は距離を評価しない。
+
 面内項は採用仕様4節の $$ {\cal I} $$ 。各辺の対数は $$ \log1p(2L_e/g_e) $$ とし、
 
 $$
@@ -112,7 +124,7 @@ $$
 x=\sum_i\beta_i x_i,\quad dS=J(1-u)\,du\,dv
 $$
 
-でGauss–Legendre12×12と8×8、計208点を評価する。順はu外側/v内側/基底/xyz。各点でnormal/Jを含む13jetを作り、12次を返す。未解決時に黙って解析枝へ切り替えない。
+でGauss–Legendre12×12と8×8、計208点を評価する。順はu外側/v内側/基底/xyz。各点でnormal/Jを含む13jetを作り、12次を返す。求積座標と重みに依存しないnormal、J、半径と定数のjetは同じfacetと照会の中で一度だけ評価し、両次数で共用する。未解決時に黙って解析枝へ切り替えない。
 
 節点・重みは256bit dyadic区間の固定表。実装時に有理Sturm列で各Legendre根区間の一意性・全根被覆・順序を独立確認し、 $$ w_i=2/((1-z_i^2)P'_n(z_i)^2) $$ を囲む。[0,1]へ移した重みの和1と0〜2n−1次モーメント1/(k+1)の包含も検査する。binary64表を高精度へ拡張しただけの表を使わない。
 
@@ -128,10 +140,10 @@ $$
 
 ## 6. 全callのpayload・work・失敗保証
 
-容量は式の静的命令列から計算する。近接の全枝を持つP_near、farの1点を持つP_sample、定数/元位置/認定のP_setupを作る。共通の辺長・端点距離・normal/Jは全基底で共有し、各命令は既存結果のindexだけを読む。1命令1Jet13 slotを割り当て、使用済みslotの削減で容量を楽観化しない。各命令列の節点数をNとすると
+容量は式の静的命令列から計算する。近接の全枝を持つP_near、遠方の共通jetを持つP_far,setup、farの1点を持つP_sample、定数/元位置/認定のP_setupを作る。共通の辺長・端点距離・normal/Jは全基底で共有し、各命令は既存結果のindexだけを読む。1命令1Jet13 slotを割り当て、使用済みslotの削減で容量を楽観化しない。各命令列の節点数をNとすると
 
 $$
-S=\max(N(P_{\rm near}),N(P_{\rm sample})+18)+N(P_{\rm setup})
+S=\max(N(P_{\rm near}),N(P_{\rm far,setup})+N(P_{\rm sample})+18)+N(P_{\rm setup})
 $$
 
 がjetの同時slot上限である。18はGauss8/12各9累積jet。sampleは208点に再利用し、全点のjetを保持しない。Jet13は14区間、区間は2端点、端点は仮数/指数である。固定scalar scratchは各primitiveの命令列から同じ方法で求める最大slot R、元exact scratchも同時生存する元式命令から求めるEとする。全byteは
@@ -160,10 +172,12 @@ workの単位を区間基本演算1回、sqrtのbit候補1回、区間演算の�
 
 $$
 W(P_{\rm setup})+
-\max\{W(P_{\rm near}),208W(P_{\rm sample})+W(P_{\rm accumulation/check})\}
+\max\{W(P_{\rm near}),W(P_{\rm far,setup})+208W(P_{\rm sample})+W(P_{\rm accumulation/check})\}
 $$
 
 である。nearの各分岐は選ぶ一方のcostの最大を取り、未評価の枝を実課金しない。固定208点の各基底/xyzの加算もaccumulationに展開する。計画のsum/product/byte/indexを全てcheckedに計算する。
+
+束縛輪郭では共有の入力準備、π、輪郭命令列、全成分の出力認定を積み、遠方の求積と対数用の定数は予約しない。輪郭命令列の上限は、各辺の分岐の大きい方を三辺分積む。共有作用は、後流側と束縛輪郭側の三角形を数え、それぞれの冷間上限を使って仕事を予約する。
 
 結果は126成分と診断/owner headerをPlannedBuffer<P1Storage>(1)で所有し、packet ownerは共有保持する。一回の累積owned payloadはworkspace準備分（必要時）と結果の実sizeof。準備済みworkspaceの評価中にscratchを追加確保しない。結果予約とleaseを構築前に確立し、失敗した自身の予約だけを戻す。max_stepsは全callのchecked累積上限で、不足は既存FailureCode::ResourceExceeded。各求積点・級数項・bit候補前に取消と残量を検査する。admissionは時間/RSSの証明ではない。
 固定1024bit backendはallocatorを持たない。既存32768bit演算の外部scratchはpacketと同じforecastを別計上し、同時積を重ねない。owner/control block、allocator overhead、RSSの証明は持たないため、EstimateAdmissionとRequireProvenBoundを区別し、後者に十分な証明がなければUnsupported。

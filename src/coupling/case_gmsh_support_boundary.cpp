@@ -24,12 +24,16 @@ struct Query {
     ref::ReferenceArithmetic math;
     std::optional<CaseGmshSupportBoundaryDiagnostic>* diagnostic{};
     CaseGmshSupportBoundaryDiagnostic detail{};
+    std::optional<CaseGmshJointBoundaryDiagnostic>* joint_diagnostic{};
+    in::MeshJointId joint{0};
+    std::optional<std::size_t> endpoint{};
 
     [[noreturn]] void reject(Reason reason, Code code = Code::InvalidInput) {
-        if (diagnostic) {
-            detail.reason = reason;
+        detail.reason = reason;
+        if (diagnostic)
             *diagnostic = detail;
-        }
+        if (joint_diagnostic)
+            *joint_diagnostic = CaseGmshJointBoundaryDiagnostic{joint, endpoint, detail};
         partition_fail(code);
     }
 };
@@ -37,6 +41,14 @@ struct Query {
 [[nodiscard]] bool same_parent(const io::SchemaIdentity& a, const io::SchemaIdentity& b) {
     return a.source == b.source && a.contract_revision == b.contract_revision &&
            a.representation_revision == b.representation_revision;
+}
+
+void verify_edge_region(Query& q, const s::Region& region) {
+    const auto target = region.target.record();
+    if (target.kind.selected() != decltype(target.kind.selected())::ItemShell ||
+        region.kind.selected() != decltype(region.kind.selected())::ItemEdge ||
+        region.side.selected() != decltype(region.side.selected())::ItemInterior)
+        q.reject(Reason::Support, Code::Unsupported);
 }
 
 [[nodiscard]] s::Region support_region(Query& q, const s::Model& model, in::MeshSupportId support) {
@@ -53,13 +65,25 @@ struct Query {
             q.reject(Reason::Support, Code::Unsupported);
         }
         const auto region = trace->region.record();
-        const auto target = region.target.record();
-        if (target.kind.selected() != decltype(target.kind.selected())::ItemShell ||
-            region.kind.selected() != decltype(region.kind.selected())::ItemEdge ||
-            region.side.selected() != decltype(region.side.selected())::ItemInterior) {
-            q.reject(Reason::Support, Code::Unsupported);
-        }
+        verify_edge_region(q, region);
         return region;
+    }
+    q.reject(Reason::Support);
+}
+
+[[nodiscard]] std::array<s::Region, 2> joint_regions(Query& q, const s::Model& model,
+                                                     in::MeshJointId joint) {
+    for (std::size_t i = 0; i < model.joints.size(); ++i) {
+        q.math.visit(1);
+        const auto declaration = partition_take(model.joints.at(partition_index(i))).record();
+        const auto id =
+            std::visit([](const auto& value) { return value.id.unsigned_value(); }, declaration);
+        if (id != joint.value())
+            continue;
+        const auto* adhesive = std::get_if<s::JointAdhesive>(&declaration);
+        if (adhesive == nullptr)
+            q.reject(Reason::Support, Code::Unsupported);
+        return {adhesive->first.record(), adhesive->second.record()};
     }
     q.reject(Reason::Support);
 }
@@ -302,6 +326,75 @@ cover(Query& q, const in::GmshMeshView& source, in::GmshKey group, const auto fa
     }
     return result;
 }
+
+struct Source {
+    Source(s::Model model, const in::GmshSidecar& sidecar, in::GmshMeshView mesh_view) noexcept
+        : case_model(model), mapping(sidecar), mesh(mesh_view) {}
+
+    s::Model case_model;
+    const in::GmshSidecar& mapping;
+    in::GmshMeshView mesh;
+};
+
+[[nodiscard]] Source authenticated_source(Query& q, const io::SiCase& si,
+                                          const in::ExternalMeshSidecarBinding& bound) {
+    const auto& schema = partition_take(si.source_case()).get();
+    if (!same_parent(partition_take(schema.identity()), bound.sidecar().source().parent))
+        q.reject(Reason::Binding, Code::StaleGeneration);
+    const auto* mapping = std::get_if<in::GmshSidecar>(&bound.sidecar().payload());
+    const auto* mesh = std::get_if<in::GmshMesh>(&bound.source());
+    if (mapping == nullptr || mesh == nullptr)
+        q.reject(Reason::Binding, Code::Unsupported);
+    const auto view = mesh->view();
+    if (!view)
+        q.reject(Reason::Binding);
+    return {partition_take(schema.root()).model.record(), *mapping, *view};
+}
+
+[[nodiscard]] CaseGmshEdgeEvidence certify_edge(Query& q, const Source& source,
+                                                const in::ExternalMeshSidecarBinding& bound,
+                                                const CaseGmshPgSet& set, const s::Region& region,
+                                                in::GmshKey physical, std::uint64_t maximum_lines) {
+    q.detail.physical = physical;
+    if (physical.dimension != 1)
+        q.reject(Reason::Support, Code::Unsupported);
+    verify_edge_region(q, region);
+    const auto shell = in::MeshShellId{region.target.record().id.unsigned_value()};
+    const auto pg = in::MeshGeometryId{region.geometry.unsigned_value()};
+    const auto name = partition_index(region.boundary.unsigned_value());
+    q.detail.boundary = name;
+
+    const auto& original = prepared_shell(q, set, bound, shell, pg);
+    const auto patch = partition_take(original.reference().identity());
+    const auto reference = partition_take(original.reference().source());
+    const auto graph = partition_take(reference.graph.view());
+    const auto frame = partition_take(original.reference().frame());
+    const auto& partition = reference.partition;
+    const ChartBoundary chart{partition_take(partition.edges()),
+                              partition_take(partition.sources()),
+                              partition_take(partition.edge_source_indices()),
+                              partition_take(partition.vertices()), name};
+    auto lines = std::visit(
+        [&](const auto& geometry) {
+            const auto view = [&] {
+                if constexpr (std::same_as<std::decay_t<decltype(geometry)>,
+                                           in::GmshPgConversionEvidence>) {
+                    return geometry.geometry.view();
+                } else {
+                    return geometry.view();
+                }
+            }();
+            if (!view || view->patch != patch ||
+                view->source.source != source.mesh.location.source ||
+                !same_parent(view->source.parent, source.mesh.location.parent) ||
+                view->digest != source.mesh.digest)
+                q.reject(Reason::Binding, Code::StaleGeneration);
+            return cover(q, source.mesh, physical, view->faces, chart, graph, frame, maximum_lines);
+        },
+        original.match().geometry);
+    q.math.cancel();
+    return {shell, physical, name, patch, std::move(lines)};
+}
 } // namespace
 
 core::Result<CaseGmshSupportBoundary> certify_case_gmsh_support_boundary(
@@ -317,16 +410,8 @@ core::Result<CaseGmshSupportBoundary> certify_case_gmsh_support_boundary(
         q.detail.support = requested;
         q.detail.physical = physical;
         q.math.cancel();
-        const auto& schema = partition_take(si.source_case()).get();
-        if (!same_parent(partition_take(schema.identity()), bound.sidecar().source().parent)) {
-            q.reject(Reason::Binding, Code::StaleGeneration);
-        }
-        const auto* gmsh = std::get_if<in::GmshSidecar>(&bound.sidecar().payload());
-        const auto* mesh = std::get_if<in::GmshMesh>(&bound.source());
-        if (gmsh == nullptr || mesh == nullptr) {
-            q.reject(Reason::Binding, Code::Unsupported);
-        }
-        const auto mappings = gmsh->supports.values();
+        const auto source = authenticated_source(q, si, bound);
+        const auto mappings = source.mapping.supports.values();
         const auto row = std::ranges::find_if(mappings, [&](const auto& candidate) {
             q.math.visit(1);
             return candidate.support == requested && candidate.physical == physical;
@@ -335,63 +420,59 @@ core::Result<CaseGmshSupportBoundary> certify_case_gmsh_support_boundary(
             q.reject(Reason::Support);
         }
         q.detail.declaration = row->node;
-        if (row->physical.dimension != 1) {
+        if (physical.dimension != 1)
             q.reject(Reason::Support, Code::Unsupported);
-        }
-        const auto region =
-            support_region(q, partition_take(schema.root()).model.record(), requested);
-        const auto shell = in::MeshShellId{region.target.record().id.unsigned_value()};
-        const auto pg = in::MeshGeometryId{region.geometry.unsigned_value()};
-        const auto name = partition_index(region.boundary.unsigned_value());
-        q.detail.boundary = name;
-
-        const auto& original = prepared_shell(q, set, bound, shell, pg);
-        const auto patch = partition_take(original.reference().identity());
-        const auto reference = partition_take(original.reference().source());
-        const auto graph = partition_take(reference.graph.view());
-        const auto frame = partition_take(original.reference().frame());
-        const auto& partition = reference.partition;
-        const ChartBoundary chart{partition_take(partition.edges()),
-                                  partition_take(partition.sources()),
-                                  partition_take(partition.edge_source_indices()),
-                                  partition_take(partition.vertices()), name};
-        const auto source = mesh->view();
-        if (!source) {
-            q.reject(Reason::Binding);
-        }
+        const auto region = support_region(q, source.case_model, requested);
         q.math.admit();
-        auto lines = std::visit(
-            [&](const auto& geometry) {
-                const auto view = [&] {
-                    if constexpr (std::same_as<std::decay_t<decltype(geometry)>,
-                                               in::GmshPgConversionEvidence>) {
-                        return geometry.geometry.view();
-                    } else {
-                        return geometry.view();
-                    }
-                }();
-                if (!view || view->patch != patch ||
-                    view->source.source != source->location.source ||
-                    !same_parent(view->source.parent, source->location.parent) ||
-                    view->digest != source->digest) {
-                    q.reject(Reason::Binding, Code::StaleGeneration);
-                }
-                return cover(q, *source, row->physical, view->faces, chart, graph, frame,
-                             limits.maximum_lines);
-            },
-            original.match().geometry);
-        q.math.cancel();
-        return CaseGmshSupportBoundary{source->location,
-                                       source->digest,
+        auto edge = certify_edge(q, source, bound, set, region, physical, limits.maximum_lines);
+        return CaseGmshSupportBoundary{source.mesh.location,
+                                       source.mesh.digest,
                                        bound.sidecar().source(),
                                        bound.sidecar().digest(),
                                        requested,
-                                       shell,
-                                       row->physical,
+                                       edge.shell,
+                                       edge.physical,
                                        row->node,
-                                       name,
-                                       patch,
-                                       std::move(lines)};
+                                       edge.boundary,
+                                       edge.patch,
+                                       std::move(edge.lines)};
+    });
+}
+
+core::Result<CaseGmshJointBoundary> certify_case_gmsh_joint_boundary(
+    const io::SiCase& si, const in::ExternalMeshSidecarBinding& bound, const CaseGmshPgSet& set,
+    in::MeshJointId requested, const std::array<in::GmshKey, 2>& physical,
+    const CaseGmshSupportBoundaryLimits& limits, core::ResourcePlan& plan,
+    std::optional<CaseGmshJointBoundaryDiagnostic>* diagnostic) noexcept {
+    if (diagnostic)
+        diagnostic->reset();
+    return ref::partition_entry([&]() -> core::Result<CaseGmshJointBoundary> {
+        Query q{{limits.arithmetic, plan}, nullptr, {}, diagnostic, requested, {}};
+        q.math.cancel();
+        const auto source = authenticated_source(q, si, bound);
+        const auto rows = source.mapping.joints.values();
+        const auto row = std::ranges::find_if(rows, [&](const auto& candidate) {
+            q.math.visit(1);
+            return candidate.joint == requested && candidate.first == physical[0] &&
+                   candidate.second == physical[1];
+        });
+        if (row == rows.end())
+            q.reject(Reason::Support);
+        q.detail.declaration = row->node;
+        const auto regions = joint_regions(q, source.case_model, requested);
+        q.math.admit();
+        std::array<CaseGmshEdgeEvidence, 2> endpoints;
+        for (std::size_t i = 0; i < endpoints.size(); ++i) {
+            q.endpoint = i;
+            q.detail.boundary.reset();
+            q.detail.world_component.reset();
+            endpoints[i] =
+                certify_edge(q, source, bound, set, regions[i], physical[i], limits.maximum_lines);
+        }
+        return CaseGmshJointBoundary{
+            source.mesh.location,     source.mesh.digest, bound.sidecar().source(),
+            bound.sidecar().digest(), requested,          row->node,
+            std::move(endpoints)};
     });
 }
 

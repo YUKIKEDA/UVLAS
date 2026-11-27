@@ -138,12 +138,12 @@ public:
 private:
     friend struct NonpenetrationBuilder;
     DiscreteNonpenetration(core::PlannedBuffer<NonpenetrationStorage>, ProjectedCaseUniformFlow&&,
-                           std::optional<aero::detail::P1ActionValue>,
+                           std::optional<aero::detail::GlobalContactState>,
                            aero::detail::GeometryContext, aero::detail::P1ActionStamp,
                            std::uint64_t) noexcept;
     core::PlannedBuffer<NonpenetrationStorage> rows_;
     ProjectedCaseUniformFlow flow_;
-    std::optional<aero::detail::P1ActionValue> geometry_owner_;
+    std::optional<aero::detail::GlobalContactState> geometry_owner_;
     aero::detail::GeometryContext geometry_context_;
     aero::detail::P1ActionStamp trial_stamp_;
     std::uint64_t used_steps_;
@@ -225,13 +225,11 @@ private:
     friend struct NonpenetrationBuilder;
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
-                        std::optional<aero::detail::P1ActionValue>,
                         core::PlannedBuffer<NativeCirculationRows>,
                         aero::detail::PreparedTopologyOwner, std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
-    std::optional<aero::detail::P1ActionValue> geometry_owner_;
     core::PlannedBuffer<NativeCirculationRows> operator_rows_;
     aero::detail::PreparedTopologyOwner source_;
     std::uint64_t steps_;

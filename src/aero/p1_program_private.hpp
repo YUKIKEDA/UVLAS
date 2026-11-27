@@ -266,47 +266,73 @@ inline Output bound_program(Program& p, const Options& options) {
     const auto in = inputs(p);
     const auto zero = p.constant(0);
     const auto factor = p.constant(-1) / (p.pi() * 4);
+    const auto radius_squared = in.radius * in.radius;
+    std::array<Vector, 3> relative{};
+    std::array<Expression, 3> endpoint{};
+    for (std::size_t vertex = 0; vertex < 3; ++vertex) {
+        if (options.boundary[vertex] || options.boundary[(vertex + 2) % 3]) {
+            relative[vertex] = in.point - in.vertices[vertex];
+            endpoint[vertex] = sqrt(dot(relative[vertex], relative[vertex]) + radius_squared);
+        }
+    }
     Output out;
     for (std::size_t edge = 0; edge < 3; ++edge) {
         Vector velocity{zero, zero, zero};
         if (options.boundary[edge]) {
-            const auto delta = in.vertices[(edge + 1) % 3] - in.vertices[edge];
-            const auto length = norm(delta);
-            const auto tangent = delta / length;
-            const auto r = in.point - in.vertices[edge];
-            const auto s = dot(r, tangent), z = s - length;
-            const auto perpendicular = cross(tangent, r);
-            const auto k2 = dot(perpendicular, perpendicular) + in.radius * in.radius;
-            const auto ra = sqrt(s * s + k2), rb = sqrt(z * z + k2);
+            const auto next = (edge + 1) % 3;
+            const auto delta = in.vertices[next] - in.vertices[edge];
+            const auto length_squared = dot(delta, delta);
+            const auto from = dot(relative[edge], delta);
+            const auto to = from - length_squared;
+            const auto perpendicular = cross(delta, relative[edge]);
+            const auto ra = endpoint[edge], rb = endpoint[next];
             const bool same = options.start_sign[edge] * options.end_sign[edge] > 0;
-            const auto integral = contour_integral(length, s, z, ra, rb, k2, same);
-            velocity = perpendicular * (factor * integral);
+            const auto contour = [&] {
+                if (same)
+                    return (from + to) / (ra * rb * (from * rb + to * ra));
+                const auto cross_squared = dot(perpendicular, perpendicular);
+                return (from / ra - to / rb) / (cross_squared + radius_squared * length_squared);
+            }();
+            velocity = perpendicular * (factor * contour);
         }
         for (std::size_t axis = 0; axis < 3; ++axis)
             out.nodes[3 * edge + axis] = velocity[axis].index;
     }
     return out;
 }
-inline Output far_program(Program& p) {
+struct FarOutput {
+    Output output;
+    std::size_t sample_begin{};
+    std::uint64_t setup_work{};
+};
+
+inline FarOutput far_program(Program& p) {
     const auto in = inputs(p);
-    const auto u = p.input(13), v = p.input(14), weight = p.input(15);
     const auto one = p.constant(1);
-    const std::array<Expression, 3> bary{(one - u) * (one - v), u, (one - u) * v};
+    const auto three = p.constant(3);
     const auto cross_product =
         cross(in.vertices[1] - in.vertices[0], in.vertices[2] - in.vertices[0]);
     const auto jac = norm(cross_product);
     const auto n = cross_product * (one / jac);
+    const auto radius_squared = in.radius * in.radius;
+    const auto twice_radius_squared = radius_squared * 2;
+    const auto four_pi = p.pi() * 4;
+    // These jets depend only on the facet and query, not on the Gauss point.
+    const auto sample_begin = p.count;
+    const auto setup_work = p.work;
+    const auto u = p.input(13), v = p.input(14), weight = p.input(15);
+    const std::array<Expression, 3> bary{(one - u) * (one - v), u, (one - u) * v};
     const auto point =
         in.vertices[0] * bary[0] + in.vertices[1] * bary[1] + in.vertices[2] * bary[2];
     const auto r = in.point - point;
-    const auto r2 = dot(r, r), den = r2 + in.radius * in.radius, rn = dot(r, n);
-    const auto kernel = (n * (r2 - in.radius * in.radius * 2) - r * (rn * 3)) *
-                        (jac * weight * (one - u) / (den * den * sqrt(den))) / (p.pi() * 4);
+    const auto r2 = dot(r, r), den = r2 + radius_squared, rn = dot(r, n);
+    const auto kernel = (n * (r2 - twice_radius_squared) - r * (rn * three)) *
+                        (jac * weight * (one - u) / (den * den * sqrt(den))) / four_pi;
     Output out;
     for (std::size_t k = 0; k < 3; ++k)
         for (std::size_t axis = 0; axis < 3; ++axis)
             out.nodes[3 * k + axis] = (kernel[axis] * bary[k]).index;
-    return out;
+    return {out, sample_begin, setup_work};
 }
 struct Jet {
     std::array<Interval, 14> components;
