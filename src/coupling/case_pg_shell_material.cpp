@@ -6,6 +6,8 @@
 #include "structure/pg_rank_storage.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
 
+#include <tuple>
+
 namespace uvlas::coupling::detail {
 namespace {
 namespace pg = structure;
@@ -711,6 +713,8 @@ core::Result<CasePgAxisValue> CasePgShellMaterials::sample_axes(
 }
 namespace {
 constexpr std::uint64_t volume_sample_rationals = 48;
+constexpr std::uint64_t recovered_side_rationals = 128;
+constexpr std::uint64_t live_reference_rationals = 110;
 
 pg::PgReferenceLimits remaining(ReferenceArithmetic& math, std::uint64_t kept = 0) {
     auto limits = math.limits;
@@ -745,6 +749,54 @@ std::uint64_t expression_fields(const io::schema::Layer& layer) {
         },
         layer.axis.record());
     return expression(layer.initial_green) + axes;
+}
+
+struct ShellFields {
+    CasePgInitialGreenValue initial;
+    CasePgAxisValue axes;
+};
+
+ShellFields sample_shell_fields(const CasePgShellMaterials& materials, const io::SiCase& source,
+                                core::Index layer, const pg::PgReferenceValue& reference,
+                                const pg::PgReferenceVector* material_metres,
+                                std::uint64_t retained, ReferenceArithmetic& math) {
+    const std::array chart{math.copy(reference.s), math.copy(reference.t),
+                           math.copy(reference.zeta)};
+    const pg::PgReferenceVector absent;
+    const CasePgMaterialCoordinates coordinates{chart, material_metres ? *material_metres : absent,
+                                                reference.position_metres, reference.g,
+                                                material_metres != nullptr};
+    const auto held = pg::detail::partition_add(retained, live_reference_rationals);
+    auto initial = partition_take(materials.sample_initial_green(source, layer, coordinates,
+                                                                 remaining(math, held), math.plan));
+    record_work(math, initial.work);
+    // The initial strain keeps its radicand and six value and error entries.
+    auto axes = partition_take(
+        materials.sample_axes(source, layer, coordinates,
+                              remaining(math, pg::detail::partition_add(held, 22)), math.plan));
+    record_work(math, axes.work);
+    return {std::move(initial), std::move(axes)};
+}
+
+core::Index find_horizontal_face(std::span<const pg::PgPartitionHorizontalFace> faces,
+                                 core::Index triangle, core::Index layer,
+                                 pg::PgPartitionFaceSide outward, ReferenceArithmetic& math) {
+    using Key = std::tuple<core::Index, core::Index, pg::PgPartitionFaceSide>;
+    const auto key = [](const pg::PgPartitionHorizontalFace& face) {
+        return Key{face.triangle, face.layer, face.side};
+    };
+    const Key wanted{triangle, layer, outward};
+    // The partition publishes horizontal faces by triangle, layer, then side.
+    const auto found = std::ranges::lower_bound(
+        faces, wanted,
+        [&](const Key& a, const Key& b) {
+            math.visit(1);
+            return a < b;
+        },
+        key);
+    if (found == faces.end() || key(*found) != wanted)
+        partition_fail(FailureCode::InvalidInput);
+    return static_cast<core::Index>(found - faces.begin());
 }
 } // namespace
 
@@ -827,7 +879,6 @@ CasePgShellVolume::prepare(const io::SiCase& source, const CaseStaticPgPointPatc
             pg::detail::partition_mul(rule.size(), volume_sample_rationals)));
         auto samples =
             partition_take(memory.allocate<Sample>(partition_index(rule.size()), operation));
-        const pg::PgReferenceVector no_material_coordinates;
         for (std::size_t i = 0; i < rule.size(); ++i) {
             math.visit(1);
             const auto& point = rule[i];
@@ -838,26 +889,15 @@ CasePgShellVolume::prepare(const io::SiCase& source, const CaseStaticPgPointPatc
                 pg::PgReferenceVolumePoint{point.volume, point.u, point.v, point.depth},
                 remaining(math, retained), memory));
             record_work(math, reference.call_info);
-            const std::array chart{std::move(reference.s), std::move(reference.t),
-                                   std::move(reference.zeta)};
-            const bool has_material = !material_metres.empty();
-            const CasePgMaterialCoordinates coordinates{
-                chart, has_material ? material_metres[i] : no_material_coordinates,
-                reference.position_metres, reference.g, has_material};
-            auto initial = partition_take(materials.sample_initial_green(
-                source, layer, coordinates,
-                remaining(math, pg::detail::partition_add(retained, 110)), memory));
-            record_work(math, initial.work);
-            auto axes = partition_take(materials.sample_axes(
-                source, layer, coordinates,
-                remaining(math, pg::detail::partition_add(retained, 132)), memory));
-            record_work(math, axes.work);
+            auto fields = sample_shell_fields(
+                materials, source, layer, reference,
+                material_metres.empty() ? nullptr : &material_metres[i], retained, math);
             auto& slot = samples.values()[i];
             slot.quadrature = {point.volume, math.copy(point.u), math.copy(point.v),
                                math.copy(point.depth), math.copy(point.weight)};
             slot.layer = layer;
-            slot.initial.emplace(std::move(initial));
-            slot.axes.emplace(std::move(axes));
+            slot.initial.emplace(std::move(fields.initial));
+            slot.axes.emplace(std::move(fields.axes));
         }
         return CasePgShellVolume{identity, info.identity, shell, std::move(materials),
                                  std::move(samples)};
@@ -951,5 +991,90 @@ core::Result<pg::PgShellMassVolumeAction> CasePgShellVolume::mass(
     if (!out)
         out.error().operation = core::Operation::EvaluateStructure;
     return out;
+}
+core::Result<CasePgInterfaceStress> CasePgShellVolume::recover_interface(
+    const io::SiCase& source, const CaseStaticPgPointPatch& bound,
+    const pg::PgShellPatchState& state, const CasePgInterfacePoint& query,
+    const pg::PgReferenceLimits& limits, core::ResourcePlan& memory) const noexcept {
+    auto result = partition_entry([&]() -> core::Result<CasePgInterfaceStress> {
+        using Face = pg::PgPartitionFaceSide;
+        ReferenceArithmetic math{limits, memory};
+        math.cancel();
+        const auto& patch = checked_patch(bound);
+        if (state.patch != patch_)
+            partition_fail(FailureCode::StaleGeneration);
+        const auto& typed = partition_take(source.source_case()).get();
+        if (!io::detail::same_identity(partition_take(typed.identity()), source_))
+            partition_fail(FailureCode::StaleGeneration);
+        const auto layers = materials_.layers();
+        const auto lower = std::ranges::find_if(layers, [&](const CasePgShellLayer& layer) {
+            math.visit(1);
+            return layer.id == query.lower_layer;
+        });
+        if (lower == layers.end() || lower + 1 == layers.end() ||
+            (lower + 1)->id != query.upper_layer)
+            partition_fail(FailureCode::InvalidInput);
+        const auto lower_layer = static_cast<core::Index>(lower - layers.begin());
+        const auto upper_layer = lower_layer + 1;
+        const auto* basis = partition_take(patch.conditioning().reference_basis());
+        const auto reference = partition_take(basis->source());
+        const auto faces = partition_take(reference.partition.horizontal_faces());
+        const auto lower_face =
+            find_horizontal_face(faces, query.triangle, lower_layer, Face::Upper, math);
+        const auto upper_face =
+            find_horizontal_face(faces, query.triangle, upper_layer, Face::Lower, math);
+        const auto quotas = partition_take(typed.root()).resources.record().input.record();
+        const auto used =
+            expression_fields(partition_take(materials_.source_layer(source, lower_layer))) +
+            expression_fields(partition_take(materials_.source_layer(source, upper_layer)));
+        if (used > quotas.maximum_expression_points.unsigned_value())
+            partition_fail(FailureCode::ResourceExceeded);
+        const auto rank = partition_take(patch.info()).basis.rank;
+        if (state.coordinates_metres.size() != rank)
+            partition_fail(FailureCode::InvalidInput);
+        const auto retained = retained_slots();
+        const auto live_columns = pg::detail::partition_mul(14, rank);
+        math.admit(
+            pg::detail::partition_add(512, pg::detail::partition_add(retained, live_columns)));
+        const auto read = [&](core::Index layer, core::Index face, Face outward,
+                              const pg::PgReferenceVector* material_metres, std::uint64_t keep) {
+            auto point = partition_take(pg::enclose_pg_shell_patch_point(
+                patch, state, pg::PgReferenceHorizontalPoint{face, query.u, query.v},
+                remaining(math, keep), memory));
+            record_work(math, point.work);
+            auto& ref = point.reference;
+            auto& surface = std::get<pg::PgReferenceHorizontalMeasure>(ref.measure);
+            const auto& model_layer = layers[static_cast<std::size_t>(layer)];
+            if (ref.layer != model_layer.id || surface.side != outward)
+                partition_fail(FailureCode::StaleGeneration);
+            auto fields = sample_shell_fields(materials_, source, layer, ref, material_metres,
+                                              pg::detail::partition_add(keep, live_columns), math);
+            const auto& law = partition_take(materials_.law_for(layer)).get();
+            const auto response_limits =
+                remaining(math, pg::detail::partition_add(pg::detail::partition_add(keep, 48),
+                                                          pg::detail::partition_mul(6, rank)));
+            auto stress = partition_take(pg::enclose_pg_shell_material_point(
+                law, fields.initial.enclosure(), fields.axes.axes(), point, response_limits,
+                memory));
+            record_work(math, stress.material.work);
+            return CasePgLayerStress{ref.layer,
+                                     face,
+                                     outward,
+                                     std::move(ref.zeta),
+                                     std::move(ref.g),
+                                     std::move(ref.position_metres),
+                                     std::move(surface.area.outward),
+                                     std::move(point.current_position_metres),
+                                     std::move(stress)};
+        };
+        auto below =
+            read(lower_layer, lower_face, Face::Upper, query.lower_material_metres, retained);
+        auto above = read(upper_layer, upper_face, Face::Lower, query.upper_material_metres,
+                          pg::detail::partition_add(retained, recovered_side_rationals));
+        return CasePgInterfaceStress{patch_, std::move(below), std::move(above), math.info()};
+    });
+    if (!result)
+        result.error().operation = core::Operation::EvaluateStructure;
+    return result;
 }
 } // namespace uvlas::coupling::detail

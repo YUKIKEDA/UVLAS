@@ -906,7 +906,8 @@ $EndElements
 }
 
 TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
-          "[FD-03][FD-12][IO4-03][MAT-D08][V-MAT][R-05][integration][verification][negative]") {
+          "[FD-03][FD-12][IO4-03][MAT-D08][MAT-D10][V-MAT][V-RECOVER][R-05][integration]["
+          "verification][negative]") {
     using Code = core::FailureCode;
     using Reason = coupling::CaseNastranPointSupportFailure;
     enum class Trial : std::uint8_t {
@@ -1088,6 +1089,23 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
           },
           "error":[0,0,0,0,0,0]
         })"));
+    auto& laminate = pair_model.field("shells").elements.front().field("layers").elements;
+    auto top_layer = laminate.front();
+    top_layer.set("id", fixture::string("3"));
+    top_layer.set(
+        "interval",
+        fixture::json(
+            R"([{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}])"));
+    top_layer.set(
+        "axis",
+        fixture::json(
+            R"({"kind":"explicit","columns":{"kind":"constant","value":[0,-1,0,1,0,0,0,0,1]}})"));
+    top_layer.set("initial_green", fixture::json(R"({"kind":"constant","value":[0,0,0,0,0,0]})"));
+    laminate.front().set(
+        "interval",
+        fixture::json(
+            R"([{"numerator":"-1","denominator":"1"},{"numerator":"0","denominator":"1"}])"));
+    laminate.push_back(std::move(top_layer));
     auto high_support = pair_model.field("supports").elements.front();
     high_support.set("id", fixture::string("2"));
     high_support.field("target").field("target").set("id", fixture::string("2"));
@@ -1140,7 +1158,7 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     const auto action = fixture::take(shell_volume.elastic(
         lower_patch, {volume_id, stretched}, PgShellPatchDirection{volume_id, stretch}, resolution,
         pair_limits.patch, plan));
-    const auto energy = oracle.r("121", "512");
+    const auto energy = oracle.r("265", "1024");
     CHECK(fixture::take(action.energy_joules.lower.compare(energy, arithmetic.algebra, plan)) <= 0);
     CHECK(fixture::take(action.energy_joules.upper.compare(energy, arithmetic.algebra, plan)) >= 0);
     CHECK(action.tangent_action_newtons.size() == q0.size());
@@ -1166,15 +1184,61 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         CHECK(fixture::take(lo.compare(expected, exact, plan)) <= 0);
         CHECK(fixture::take(hi.compare(expected, exact, plan)) >= 0);
     };
-    // One unit square with thickness 1/4, F11=2, E=1, nu=0 and E0,11=1/8:
-    // Elastic E11 is 11/8; the work is (1/4)*P11 and (1/4)*dP11/dF11.
-    work_encloses(action.internal_force_newtons.values(), stretch, oracle.r("11", "16"));
-    work_encloses(action.tangent_action_newtons.values(), stretch, oracle.r("43", "32"));
+    // Each layer occupies 1/8 m³ with F11=2, E=1 and nu=0.
+    // The elastic E11 values are 11/8 below the interface and 3/2 above it.
+    work_encloses(action.internal_force_newtons.values(), stretch, oracle.r("23", "32"));
+    work_encloses(action.tangent_action_newtons.values(), stretch, oracle.r("87", "64"));
+    const auto third = oracle.r("1", "3");
+    const auto interface_stress = fixture::take(shell_volume.recover_interface(
+        pair_case, lower_patch, {volume_id, stretched},
+        {0, core::LayerId{1}, core::LayerId{3}, third, third}, pair_limits.patch, plan));
+    REQUIRE(interface_stress.lower.layer == core::LayerId{1});
+    REQUIRE(interface_stress.upper.layer == core::LayerId{3});
+    CHECK(interface_stress.lower.face != interface_stress.upper.face);
+    CHECK(interface_stress.lower.outward == PgPartitionFaceSide::Upper);
+    CHECK(interface_stress.upper.outward == PgPartitionFaceSide::Lower);
+    CHECK(interface_stress.lower.zeta.sign() == 0);
+    CHECK(interface_stress.upper.zeta.sign() == 0);
+    REQUIRE(interface_stress.lower.g == oracle.r("1"));
+    REQUIRE(interface_stress.upper.g == oracle.r("1"));
+    const auto encloses = [&](const PgMaterialEnclosure& value, const ExactRational& expected) {
+        CHECK(fixture::take(value.lower.compare(expected, arithmetic.algebra, plan)) <= 0);
+        CHECK(fixture::take(value.upper.compare(expected, arithmetic.algebra, plan)) >= 0);
+    };
+    const auto physical = [&](const PgReferenceScalar& value) {
+        return fixture::take(value.rational.add(value.radical, arithmetic.algebra, plan));
+    };
+    for (std::size_t j = 0; j < 3; ++j) {
+        CHECK(physical(interface_stress.lower.reference_position_metres[j]) ==
+              physical(interface_stress.upper.reference_position_metres[j]));
+        CHECK(interface_stress.lower.current_position_metres[j].lower ==
+              interface_stress.upper.current_position_metres[j].lower);
+        CHECK(interface_stress.lower.current_position_metres[j].upper ==
+              interface_stress.upper.current_position_metres[j].upper);
+    }
+    CHECK(physical(interface_stress.lower.outward_area_vector_metres_squared[2]).sign() > 0);
+    CHECK(physical(interface_stress.upper.outward_area_vector_metres_squared[2]).sign() < 0);
+    CHECK(physical(interface_stress.lower.reference_position_metres[2]) == oracle.r("5"));
+    encloses(interface_stress.lower.stress.second_pk_world_pascal[0], oracle.r("11", "8"));
+    encloses(interface_stress.upper.stress.second_pk_world_pascal[0], oracle.r("3", "2"));
+    encloses(interface_stress.lower.stress.cauchy_world_pascal[0], oracle.r("11", "4"));
+    encloses(interface_stress.upper.stress.cauchy_world_pascal[0], oracle.r("3"));
+    CHECK(interface_stress.lower.stress.reference_axes[0].lower == oracle.r("1"));
+    CHECK(interface_stress.upper.stress.reference_axes[3].lower == oracle.r("1"));
+    core::ResourcePlan rejected_interface_plan{0};
+    const auto reversed_interface =
+        shell_volume.recover_interface(pair_case, lower_patch, {volume_id, stretched},
+                                       {0, core::LayerId{3}, core::LayerId{1}, third, third},
+                                       pair_limits.patch, rejected_interface_plan);
+    REQUIRE_FALSE(reversed_interface);
+    CHECK(reversed_interface.error().code == Code::InvalidInput);
+    CHECK(rejected_interface_plan.allocated_bytes() == 0);
 
     const auto& exact = arithmetic.algebra;
     const auto one = oracle.r("1"), five = oracle.r("5");
-    // Augment the in-plane displacement by the through-thickness field Z-5.
+    // The through-thickness field Z-5 is constant in the triangle coordinates.
     for (std::size_t j = 0; j < q0.size(); ++j) {
+        stretch[j][0] = {};
         const auto middle =
             fixture::take(volume_patch.translation()[j].multiply(five, exact, plan));
         stretch[j][2] = fixture::take(q0[j][2].subtract(middle, exact, plan));
@@ -1200,19 +1264,14 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
                                             {oracle.r("2", "3"), oracle.r("27", "840")},
                                             {oracle.r("5", "6"), oracle.r("216", "840")},
                                             {oracle.r("1"), oracle.r("41", "840")}}};
-    const auto low = oracle.r("1", "6"), high = oracle.r("2", "3");
-    const std::array triangle{std::pair{&low, &low}, std::pair{&high, &low},
-                              std::pair{&low, &high}};
     const auto mass_for_rule = [&](std::span<const PointWeight> depth_rule) {
         std::vector<PgOwnedDiscreteVolumePoint> mass_rule;
         for (std::size_t j = 0; j < volume_count; ++j) {
-            for (const auto& [u, v] : triangle) {
-                for (const auto& [z, w] : depth_rule) {
-                    mass_rule.push_back(
-                        {static_cast<core::Index>(j), fixture::take(u->clone(exact, plan)),
-                         fixture::take(v->clone(exact, plan)), fixture::take(z.clone(exact, plan)),
-                         fixture::take(w.multiply(low, exact, plan))});
-                }
+            for (const auto& [z, w] : depth_rule) {
+                mass_rule.push_back(
+                    {static_cast<core::Index>(j), fixture::take(third.clone(exact, plan)),
+                     fixture::take(third.clone(exact, plan)), fixture::take(z.clone(exact, plan)),
+                     fixture::take(w.multiply(half, exact, plan))});
             }
         }
         const PgShellMassResolution mass_resolution{96, width, width};
@@ -1222,8 +1281,8 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         const auto quarter_mass = oracle.r("1", "4");
         CHECK(fixture::take(mass.mass_kg.lower.compare(quarter_mass, exact, plan)) <= 0);
         CHECK(fixture::take(mass.mass_kg.upper.compare(quarter_mass, exact, plan)) >= 0);
-        // Integral of X²+(Z-5)² over [2,3] × [3,4] × [5-1/8,5+1/8].
-        work_encloses(mass.action_kg_metres.values(), stretch, oracle.r("1217", "768"));
+        // Integral of (Z-5)² over [2,3] × [3,4] × [5-1/8,5+1/8].
+        work_encloses(mass.action_kg_metres.values(), stretch, oracle.r("1", "768"));
     };
     mass_for_rule(gauss);
     mass_for_rule(seven);

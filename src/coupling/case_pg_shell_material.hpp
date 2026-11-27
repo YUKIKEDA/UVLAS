@@ -114,6 +114,32 @@ private:
     structure::PgReferenceCallInfo work_;
 };
 
+struct CasePgInterfacePoint {
+    core::Index triangle;
+    core::LayerId lower_layer, upper_layer;
+    const structure::ExactRational& u;
+    const structure::ExactRational& v;
+    const structure::PgReferenceVector* lower_material_metres{};
+    const structure::PgReferenceVector* upper_material_metres{};
+};
+
+struct CasePgLayerStress {
+    core::LayerId layer;
+    core::Index face;
+    structure::PgPartitionFaceSide outward;
+    structure::ExactRational zeta, g;
+    structure::PgReferenceVector reference_position_metres;
+    structure::PgReferenceVector outward_area_vector_metres_squared;
+    structure::PgShellCartesianEnclosure current_position_metres;
+    structure::PgShellMaterialPointResponse stress;
+};
+
+struct CasePgInterfaceStress {
+    structure::PgPreparedPatchIdentity patch;
+    CasePgLayerStress lower, upper;
+    structure::PgReferenceCallInfo work;
+};
+
 /// Own the rule and sampled fixed Case fields for one authenticated shell.
 class CasePgShellVolume {
 public:
@@ -136,6 +162,12 @@ public:
     mass(const CaseStaticPgPointPatch&, std::span<const structure::PgOwnedDiscreteVolumePoint>,
          const structure::PgShellPatchDirection&, const structure::PgShellMassResolution&,
          const structure::PgReferenceLimits&, core::ResourcePlan&) const noexcept;
+
+    /// Return elastic stresses on the two physical sides of a named interface.
+    [[nodiscard]] core::Result<CasePgInterfaceStress>
+    recover_interface(const io::SiCase&, const CaseStaticPgPointPatch&,
+                      const structure::PgShellPatchState&, const CasePgInterfacePoint&,
+                      const structure::PgReferenceLimits&, core::ResourcePlan&) const noexcept;
 
 private:
     struct Sample {
