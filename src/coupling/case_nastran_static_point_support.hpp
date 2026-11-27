@@ -3,6 +3,9 @@
 #include "case_external_pg.hpp"
 #include "io/nastran_position_enclosures.hpp"
 
+#include <uvlas/structure/pg_full_trace.hpp>
+#include <uvlas/structure/pg_prepared_patch.hpp>
+
 namespace uvlas::coupling::detail {
 
 struct CaseNastranPointSupportLimits {
@@ -43,12 +46,28 @@ struct CaseNastranPointSupport {
     io::detail::MeshShellId shell{0};
     structure::PgReferenceIdentity patch;
     std::uint64_t element{};
+    structure::PgPartitionPoint chart;                ///< Exact (s,t) at zeta=0.
+    structure::PgCartesianExactPosition world_metres; ///< Original GRID in basic SI coordinates.
     io::detail::NastranBulkPosition grid_field;
     io::detail::NastranCoordinateId cd{0};
     std::optional<io::detail::NastranBulkPosition> cd_field{};
     std::uint8_t world_components{};
     core::PlannedBuffer<CaseNastranPointSupportTerm> terms;
 };
+
+/// Exact dimensionless point evaluation coefficients in the same prepared basis.
+struct CaseNastranPointSupportRow {
+    structure::PgPreparedPatchIdentity basis;
+    io::detail::MeshSupportId support;
+    io::detail::MeshShellId shell;
+    std::uint8_t world_components;
+    core::PlannedBuffer<structure::PgTraceSparseEntry> terms;
+    structure::PgCartesianExactPosition prescribed_metres;
+};
+
+[[nodiscard]] core::Result<CaseNastranPointSupportRow> assemble_case_nastran_static_point_row(
+    const CaseNastranPointSupport&, const structure::PgPreparedPatch&,
+    const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
 
 // Compare a homogeneous translational SPC selection to a static Case point support
 // on an original node of its qualified planar Shell. The result owns the evidence.

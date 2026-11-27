@@ -923,8 +923,8 @@ TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
     auto& model = config.field("model");
     auto& pg = model.field("geometry").elements.front();
     pg.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
-    if (trial == Trial::Offset)
-        pg.field("frame").set("origin", fixture::json("[0,0,0.125]"));
+    pg.field("frame").set("origin",
+                          fixture::json(trial == Trial::Offset ? "[2,3,5.125]" : "[2,3,5]"));
     auto support = fixture::fragment("Support.constraint");
     support.set("components",
                 fixture::json(trial == Trial::DifferentComponents ? "[0,2]" : "[1,2]"));
@@ -933,10 +933,10 @@ TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
     auto& supports = model.field("supports").elements;
     supports.clear();
     supports.push_back(std::move(support));
-    std::string native{R"BDF(GRID,10,,0.0,0.0,0.0,12
-GRID,20,,1.0,0.0,0.0
-GRID,40,,1.0,1.0,0.0
-GRID,99,,0.0,1.0,0.0
+    std::string native{R"BDF(GRID,10,,2.0,3.0,5.0,12
+GRID,20,,3.0,3.0,5.0
+GRID,40,,3.0,4.0,5.0
+GRID,99,,2.0,4.0,5.0
 CORD2R,12,,0.0,0.0,0.0,0.0,0.0,1.0
 ,0.0,1.0,0.0
 CQUAD4,701,90,10,20,40,99,0.0)BDF"};
@@ -1055,6 +1055,192 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     CHECK(result->mapping.component_bits == 5U); // Native x,z.
     CHECK(result->world_components == 6U);       // World y,z from the declared CORD2R.
     CHECK(result->element == 701);
+    CHECK(result->chart.s.sign() == 0);
+    CHECK(result->chart.t.sign() == 0);
+    const auto coordinate = [&](std::string_view word) {
+        return fixture::take(ExactRational::from_decimal(word, arithmetic.algebra, plan));
+    };
+    CHECK(result->world_metres[0] == coordinate("2"));
+    CHECK(result->world_metres[1] == coordinate("3"));
+    CHECK(result->world_metres[2] == coordinate("5"));
+
+    // Prepare the reference basis without the point constraint. The exact
+    // point row must attach to this same physical reference and basis order.
+    auto reference_input = config;
+    reference_input.field("model").field("supports").elements[0] =
+        fixture::fragment("Support.trace_constraint");
+    const auto reference_case =
+        convert(fixture::checked(reference_input), arithmetic.algebra, plan);
+    const RectangleOracle oracle{arithmetic, plan};
+    const auto plane_weight = oracle.r("1", "6");
+    const auto depth_weight = oracle.r("1", "3");
+    std::array<ExactRational, 6> positions;
+    std::vector<PgLineQuadratureNode> plane;
+    plane.reserve(positions.size());
+    for (std::size_t i = 0; i < positions.size(); ++i) {
+        positions[i] = oracle.r(std::to_string(2 * i + 1), "12");
+        plane.push_back({positions[i], plane_weight});
+    }
+    const auto quarter = oracle.r("1", "4"), half = oracle.r("1", "2"), last = oracle.r("3", "4");
+    const std::array depth{PgLineQuadratureNode{quarter, depth_weight},
+                           PgLineQuadratureNode{half, depth_weight},
+                           PgLineQuadratureNode{last, depth_weight}};
+    const std::array rules{
+        coupling::CasePgRuleBinding{1, PgVolumeProductRule{plane, plane, depth}}};
+    const auto chart_limits = chart_preparation(preparation, 1, 1);
+    const auto reference_chart = fixture::take(
+        coupling::prepare_case_pg_chart(reference_case, rules, chart_limits, workspace, plan));
+    const auto* conditioned = fixture::take(reference_chart.patch(0));
+    REQUIRE(conditioned != nullptr);
+    const auto point_row = fixture::take(coupling::assemble_case_nastran_static_point_row(
+        *result, *conditioned, chart_limits.patch, plan));
+    CHECK(point_row.basis == fixture::take(conditioned->info()).identity);
+    CHECK(point_row.world_components == 6U);
+    REQUIRE(point_row.terms.size() != 0);
+    const auto translation = conditioned->translation();
+    ExactRational response;
+    for (const auto& term : point_row.terms.values()) {
+        const auto j = static_cast<std::size_t>(term.column);
+        REQUIRE(j < translation.size());
+        const auto contribution = fixture::take(
+            term.coefficient.multiply(translation[j], chart_limits.patch.algebra, plan));
+        response = fixture::take(response.add(contribution, chart_limits.patch.algebra, plan));
+    }
+    CHECK(response == coordinate("1"));
+    CHECK(point_row.prescribed_metres[1] == coordinate("3"));
+    CHECK(point_row.prescribed_metres[2] == coordinate("5"));
+    const std::array patch_bindings{
+        PgConstraintPatchBinding{uvlas::numerics::PatchId{1}, *conditioned}};
+    const std::array point_bindings{PgConstraintPointBinding{
+        PgConstraintId{point_row.support.value()}, point_row.basis, 0, point_row.world_components,
+        point_row.terms.values(), point_row.prescribed_metres}};
+    auto global_limits = chart_limits.constraints;
+    global_limits.maximum_sources = 2;
+    auto original = fixture::take(PgGlobalConstraints::prepare(patch_bindings, {}, point_bindings,
+                                                               global_limits, workspace, plan));
+    CHECK_FALSE(fixture::take(original.info()).common_cartesian);
+    REQUIRE(original.sources().size() == 1);
+    CHECK(original.sources()[0].world_components == 6U);
+    CHECK(original.original_rows()[0].source_overlap == -1);
+    const auto residual =
+        fixture::take(original.residual({original.layout(), conditioned->reference_coordinates()},
+                                        chart_limits.patch, workspace, plan));
+    REQUIRE(residual.size() == 1);
+    for (const auto& axis : residual.values()[0])
+        CHECK(axis.sign() == 0);
+
+    std::vector<PgCartesianExactPosition> horizontal_motion(translation.size());
+    for (std::size_t j = 0; j < translation.size(); ++j)
+        horizontal_motion[j][0] =
+            fixture::take(translation[j].clone(chart_limits.patch.algebra, plan));
+    const auto applied = fixture::take(original.apply({original.layout(), horizontal_motion},
+                                                      chart_limits.patch, workspace, plan));
+    for (const auto& axis : applied.values()[0])
+        CHECK(axis.sign() == 0);
+    const std::array<PgCartesianExactPosition, 1> dual{
+        PgCartesianExactPosition{coordinate("17"), coordinate("2"), coordinate("-3")}};
+    const auto reaction =
+        fixture::take(original.transpose(dual, chart_limits.patch, workspace, plan));
+    for (const auto& coefficient : reaction.values())
+        CHECK(coefficient[0].sign() == 0);
+    for (const auto& entry : point_row.terms.values()) {
+        const auto& coefficient = reaction.values()[static_cast<std::size_t>(entry.column)];
+        CHECK(coefficient[1] == fixture::take(entry.coefficient.multiply(
+                                    dual[0][1], chart_limits.patch.algebra, plan)));
+        CHECK(coefficient[2] == fixture::take(entry.coefficient.multiply(
+                                    dual[0][2], chart_limits.patch.algebra, plan)));
+    }
+    const std::array duplicate{point_bindings[0], point_bindings[0]};
+    const auto duplicate_support =
+        PgGlobalConstraints::prepare(patch_bindings, {}, duplicate, global_limits, workspace, plan);
+    REQUIRE_FALSE(duplicate_support);
+    CHECK(duplicate_support.error().code == Code::InvalidInput);
+    const auto unusable_legacy =
+        PgSparseChart::prepare(std::move(original), chart_limits.chart, workspace, plan);
+    REQUIRE_FALSE(unusable_legacy);
+    CHECK(unusable_legacy.error().code == Code::Unsupported);
+    REQUIRE(original.info());
+    const auto component_chart = fixture::take(
+        PgComponentSparseChart::prepare(std::move(original), chart_limits.chart, workspace, plan));
+    const auto component_report = fixture::take(component_chart.preparation());
+    CHECK(component_report.factors == 1);
+    CHECK(component_report.scalar_rank == 2);
+    const auto chart_id = fixture::take(component_chart.identity());
+    const auto free_columns = component_chart.free_columns();
+    const auto all_coordinates = conditioned->reference_coordinates();
+    REQUIRE(free_columns.size() == 3 * all_coordinates.size() - 2);
+    std::vector<ExactRational> reference_free, motion_free;
+    reference_free.reserve(free_columns.size());
+    motion_free.reserve(free_columns.size());
+    for (const auto index : free_columns) {
+        const auto flat = static_cast<std::size_t>(index);
+        reference_free.push_back(fixture::take(
+            all_coordinates[flat / 3][flat % 3].clone(chart_limits.patch.algebra, plan)));
+        motion_free.push_back(fixture::take(
+            horizontal_motion[flat / 3][flat % 3].clone(chart_limits.patch.algebra, plan)));
+    }
+    const auto lifted = fixture::take(
+        component_chart.lift({chart_id, reference_free}, chart_limits.patch, workspace, plan));
+    const auto tangent = fixture::take(
+        component_chart.tangent({chart_id, motion_free}, chart_limits.patch, workspace, plan));
+    for (std::size_t j = 0; j < all_coordinates.size(); ++j) {
+        CHECK(lifted.values()[j] == all_coordinates[j]);
+        CHECK(tangent.values()[j] == horizontal_motion[j]);
+    }
+    std::vector<PgCartesianExactPosition> force(all_coordinates.size());
+    for (auto& entry : force)
+        entry = {coordinate("1"), coordinate("2"), coordinate("-3")};
+    const auto pulled = fixture::take(
+        component_chart.transpose({chart_id, force}, chart_limits.patch, workspace, plan));
+    REQUIRE(pulled.original_multipliers.size() == 1);
+    CHECK(pulled.original_multipliers.values()[0][0].sign() == 0);
+    const auto constrained = fixture::take(component_chart.original().transpose(
+        pulled.original_multipliers.values(), chart_limits.patch, workspace, plan));
+    std::size_t free_at = 0;
+    ExactRational original_work, reduced_work;
+    for (std::size_t flat = 0; flat < 3 * force.size(); ++flat) {
+        const auto column = flat / 3;
+        const auto axis = flat % 3;
+        const auto add_product = [&](const ExactRational& sum, const ExactRational& a,
+                                     const ExactRational& b) {
+            const auto product = fixture::take(a.multiply(b, chart_limits.patch.algebra, plan));
+            return fixture::take(sum.add(product, chart_limits.patch.algebra, plan));
+        };
+        original_work =
+            add_product(original_work, force[column][axis], tangent.values()[column][axis]);
+        auto recovered = fixture::take(
+            constrained.values()[column][axis].clone(chart_limits.patch.algebra, plan));
+        if (free_at < free_columns.size() &&
+            free_columns[free_at] == static_cast<core::Index>(flat)) {
+            const auto& reduced_force = pulled.independent_force.values()[free_at];
+            recovered =
+                fixture::take(recovered.add(reduced_force, chart_limits.patch.algebra, plan));
+            reduced_work = add_product(reduced_work, reduced_force, motion_free[free_at]);
+            ++free_at;
+        }
+        CHECK(recovered == force[column][axis]);
+    }
+    CHECK(free_at == free_columns.size());
+    CHECK(original_work == reduced_work);
+    const auto conflicting_position =
+        PgCartesianExactPosition{coordinate("2"), coordinate("4"), coordinate("5")};
+    const std::array conflict{
+        point_bindings[0],
+        PgConstraintPointBinding{PgConstraintId{2}, point_row.basis, 0, point_row.world_components,
+                                 point_row.terms.values(), conflicting_position}};
+    auto overconstrained = fixture::take(
+        PgGlobalConstraints::prepare(patch_bindings, {}, conflict, global_limits, workspace, plan));
+    const auto refused = PgComponentSparseChart::prepare(std::move(overconstrained),
+                                                         chart_limits.chart, workspace, plan);
+    REQUIRE_FALSE(refused);
+    CHECK(refused.error().code == Code::InvalidInput);
+    REQUIRE(overconstrained.info());
+    auto limited_row = chart_limits.patch;
+    limited_row.maximum_partition_visits = 0;
+    const auto exhausted =
+        coupling::assemble_case_nastran_static_point_row(*result, *conditioned, limited_row, plan);
+    REQUIRE_FALSE(exhausted);
+    CHECK(exhausted.error().code == Code::ResourceExceeded);
     CHECK(result->cd == rd::NastranCoordinateId{12});
     CHECK(result->grid_field.byte == native.find("10"));
     const auto terms = result->terms.values();

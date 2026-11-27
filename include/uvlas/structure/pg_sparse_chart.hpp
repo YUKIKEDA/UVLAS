@@ -82,12 +82,75 @@ public:
                                                             core::ResourcePlan&) const noexcept;
 
 private:
+    friend class PgComponentSparseChart;
     struct Data;
     PgSparseChart(PgGlobalConstraints&&, core::PlannedBuffer<Data>) noexcept;
     enum class RhsKind : std::uint8_t { Fixed, Zero, Explicit };
     [[nodiscard]] core::Result<core::PlannedBuffer<PgCartesianExactPosition>>
     lift_impl(PgSparseChartInput, PgSparseChartInput, RhsKind, const PgReferenceLimits&,
               core::Workspace&, core::ResourcePlan&) const noexcept;
+
+    PgGlobalConstraints original_;
+    core::PlannedBuffer<Data> data_;
+};
+
+struct PgComponentSparseInput {
+    PgSparseChartIdentity identity;
+    std::span<const ExactRational> values;
+};
+
+struct PgComponentSparseDual {
+    core::PlannedBuffer<ExactRational> independent_force;
+    core::PlannedBuffer<PgCartesianExactPosition> original_multipliers;
+    PgReferenceCallInfo call_info;
+};
+
+struct PgComponentSparsePreparation {
+    std::uint64_t factors{}, scalar_rank{}, lower_terms{}, upper_terms{};
+    PgReferenceCallInfo arithmetic;
+    std::optional<core::StageTiming> timing;
+};
+
+/// Static affine chart for Cartesian rows with component selection. Axes with
+/// identical row sets share one exact sparse factor.
+class PgComponentSparseChart {
+public:
+    PgComponentSparseChart(PgComponentSparseChart&&) noexcept;
+    PgComponentSparseChart& operator=(PgComponentSparseChart&&) noexcept;
+    ~PgComponentSparseChart();
+
+    /// Pivot, row-work and factor-term limits apply to each distinct factor.
+    /// The common arithmetic and ResourcePlan limits cover all factors.
+    [[nodiscard]] static core::Result<PgComponentSparseChart> prepare(PgGlobalConstraints&&,
+                                                                      const PgSparseChartLimits&,
+                                                                      core::Workspace&,
+                                                                      core::ResourcePlan&) noexcept;
+
+    [[nodiscard]] core::Result<PgSparseChartIdentity> identity() const noexcept;
+    [[nodiscard]] core::Result<PgComponentSparsePreparation> preparation() const noexcept;
+    [[nodiscard]] const PgGlobalConstraints& original() const& noexcept;
+    [[nodiscard]] const PgGlobalConstraints& original() const&& = delete;
+    /// Increasing Cartesian-interleaved scalar indices, 3*column + axis.
+    [[nodiscard]] std::span<const core::Index> free_columns() const& noexcept;
+    [[nodiscard]] std::span<const core::Index> free_columns() const&& = delete;
+
+    [[nodiscard]] core::Result<core::PlannedBuffer<PgCartesianExactPosition>>
+    lift(PgComponentSparseInput, const PgReferenceLimits&, core::Workspace&,
+         core::ResourcePlan&) const noexcept;
+    [[nodiscard]] core::Result<core::PlannedBuffer<PgCartesianExactPosition>>
+    tangent(PgComponentSparseInput, const PgReferenceLimits&, core::Workspace&,
+            core::ResourcePlan&) const noexcept;
+    [[nodiscard]] core::Result<PgComponentSparseDual> transpose(PgSparseChartInput force,
+                                                                const PgReferenceLimits&,
+                                                                core::Workspace&,
+                                                                core::ResourcePlan&) const noexcept;
+
+private:
+    struct Data;
+    PgComponentSparseChart(PgGlobalConstraints&&, core::PlannedBuffer<Data>) noexcept;
+    [[nodiscard]] core::Result<core::PlannedBuffer<PgCartesianExactPosition>>
+    lift_impl(PgComponentSparseInput, bool homogeneous, const PgReferenceLimits&, core::Workspace&,
+              core::ResourcePlan&) const noexcept;
 
     PgGlobalConstraints original_;
     core::PlannedBuffer<Data> data_;

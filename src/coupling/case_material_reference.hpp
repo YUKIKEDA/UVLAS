@@ -5,7 +5,19 @@
 
 #include <optional>
 
+namespace uvlas::structure::detail {
+struct ReferenceArithmetic;
+}
+
 namespace uvlas::coupling::detail {
+
+/// Return the two unnormalized barycentric coordinates in a closed triangle.
+[[nodiscard]] std::optional<std::array<structure::ExactRational, 2>>
+case_material_triangle_coordinates(structure::detail::ReferenceArithmetic&,
+                                   const structure::PgPartitionTriangle&,
+                                   std::span<const structure::PgPartitionPoint>,
+                                   const structure::ExactRational& s,
+                                   const structure::ExactRational& t);
 
 struct CaseMaterialReferenceCandidate {
     core::Index partition_record{};

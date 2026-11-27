@@ -19,6 +19,20 @@ std::size_t checked_index(core::Index i, std::size_t size) {
     return static_cast<std::size_t>(i);
 }
 
+template <class Identity>
+void check_unique(std::span<Identity> ids, ReferenceArithmetic& math) {
+    const auto less = [&](const Identity& a, const Identity& b) {
+        math.visit(1);
+        return a < b;
+    };
+    std::ranges::sort(ids, less);
+    for (std::size_t i = 1; i < ids.size(); ++i) {
+        math.visit(1);
+        if (ids[i - 1] == ids[i])
+            partition_fail(core::FailureCode::InvalidInput);
+    }
+}
+
 template <class Binding, class Key>
 void unique_ids(std::span<const Binding> bindings, ReferenceArithmetic& math, Key key) {
     if (bindings.size() < 2)
@@ -32,16 +46,34 @@ void unique_ids(std::span<const Binding> bindings, ReferenceArithmetic& math, Ke
         math.cancel();
         ids[i] = key(bindings[i]);
     }
-    const auto less = [&](const Identity& a, const Identity& b) {
-        math.visit(1);
-        return a < b;
+    check_unique(ids, math);
+}
+
+void unique_sources(std::span<const PgConstraintTraceBinding> traces,
+                    std::span<const PgConstraintPointBinding> points, ReferenceArithmetic& math) {
+    const auto key = [](const PgConstraintTraceBinding& binding) {
+        return std::pair{partition_take(binding.trace.info()).kind, binding.id.value()};
     };
-    std::ranges::sort(ids, less);
-    for (std::size_t i = 1; i < ids.size(); ++i) {
-        math.visit(1);
-        if (ids[i - 1] == ids[i])
-            partition_fail(core::FailureCode::InvalidInput);
+    if (points.empty()) {
+        unique_ids(traces, math, key);
+        return;
     }
+    using Identity = decltype(key(traces.front()));
+    const auto count = partition_add(traces.size(), points.size());
+    math.visit(count);
+    auto keys =
+        partition_take(math.plan.allocate<Identity>(partition_index(count), partition_operation));
+    auto entries = keys.values();
+    std::size_t i = 0;
+    for (const auto& trace : traces) {
+        math.cancel();
+        entries[i++] = key(trace);
+    }
+    for (const auto& point : points) {
+        math.cancel();
+        entries[i++] = {PgTraceKind::Support, point.id.value()};
+    }
+    check_unique(entries, math);
 }
 
 PgTraceDepth copy_depth(ReferenceArithmetic& math, const PgTraceDepth& x) {
@@ -79,10 +111,15 @@ PgConstraintSource bind_source(const PgConstraintTraceBinding& connection, const
     } else if (connection.right_patch) {
         partition_fail(core::FailureCode::InvalidInput);
     }
-    return {connection.id, info.kind,
-            left.id,       right,
-            first_row,     partition_index(info.original_rows),
-            first_overlap, partition_index(info.overlaps)};
+    return {connection.id,
+            info.kind,
+            7,
+            left.id,
+            right,
+            first_row,
+            partition_index(info.original_rows),
+            first_overlap,
+            partition_index(info.overlaps)};
 }
 
 /// Local columns are ordered left then right. Emit the two contiguous spans in global order.
@@ -115,9 +152,11 @@ void scatter_row(ReferenceArithmetic& math, std::span<const PgTraceSparseEntry> 
 }
 
 void accumulate(ReferenceArithmetic& math, PgCartesianExactPosition& value,
-                const ExactRational& coefficient, const PgCartesianExactPosition& input) {
+                const ExactRational& coefficient, const PgCartesianExactPosition& input,
+                std::uint8_t components) {
     for (std::size_t axis = 0; axis < value.size(); ++axis)
-        value[axis] = math.add(value[axis], math.mul(coefficient, input[axis]));
+        if ((components & (1U << axis)) != 0)
+            value[axis] = math.add(value[axis], math.mul(coefficient, input[axis]));
 }
 } // namespace
 
@@ -148,24 +187,32 @@ PgGlobalConstraints::prepare(std::span<const PgConstraintPatchBinding> patches,
                              std::span<const PgConstraintTraceBinding> bindings,
                              const PgGlobalConstraintLimits& limits, core::Workspace& workspace,
                              core::ResourcePlan& plan) noexcept {
+    return prepare(patches, bindings, {}, limits, workspace, plan);
+}
+
+core::Result<PgGlobalConstraints>
+PgGlobalConstraints::prepare(std::span<const PgConstraintPatchBinding> patches,
+                             std::span<const PgConstraintTraceBinding> bindings,
+                             std::span<const PgConstraintPointBinding> points,
+                             const PgGlobalConstraintLimits& limits, core::Workspace& workspace,
+                             core::ResourcePlan& plan) noexcept {
     return partition_entry([&]() -> core::Result<PgGlobalConstraints> {
         ReferenceArithmetic math{limits.arithmetic, plan};
         math.cancel();
         const auto lease = partition_take(workspace.acquire());
         static_cast<void>(lease);
         require_capacity(patches.size(), limits.maximum_patches);
-        require_capacity(bindings.size(), limits.maximum_sources);
+        const auto source_count = partition_add(bindings.size(), points.size());
+        require_capacity(source_count, limits.maximum_sources);
         unique_ids(patches, math, [](const auto& binding) { return binding.id.value(); });
-        unique_ids(bindings, math, [](const auto& binding) {
-            return std::pair{partition_take(binding.trace.info()).kind, binding.id.value()};
-        });
+        unique_sources(bindings, points, math);
 
         auto owner = partition_take(plan.allocate<Data>(1, partition_operation));
         auto& data = owner.values().front();
         data.layout = partition_take(plan.allocate<PgConstraintPatchLayout>(
             partition_index(patches.size()), partition_operation));
-        data.sources = partition_take(plan.allocate<PgConstraintSource>(
-            partition_index(bindings.size()), partition_operation));
+        data.sources = partition_take(
+            plan.allocate<PgConstraintSource>(partition_index(source_count), partition_operation));
         std::uint64_t columns = 0, rows = 0, overlaps = 0, nonzeros = 0;
         for (std::size_t i = 0; i < patches.size(); ++i) {
             math.visit(1);
@@ -195,11 +242,49 @@ PgGlobalConstraints::prepare(std::span<const PgConstraintPatchBinding> patches,
                 require_capacity(nonzeros, limits.maximum_nonzeros);
             }
         }
+        std::uint64_t point_nonzeros = 0;
+        bool common_cartesian = true;
+        for (std::size_t i = 0; i < points.size(); ++i) {
+            math.visit(1);
+            const auto& point = points[i];
+            const auto& patch = data.layout.values()[checked_index(point.patch, patches.size())];
+            if (point.basis != patch.basis)
+                partition_fail(core::FailureCode::StaleGeneration);
+            if (point.terms.empty() || point.world_components == 0 ||
+                (point.world_components & ~7U) != 0)
+                partition_fail(core::FailureCode::InvalidInput);
+            common_cartesian &= point.world_components == 7;
+            data.sources.values()[bindings.size() + i] = {point.id,
+                                                          PgTraceKind::Support,
+                                                          point.world_components,
+                                                          patch.id,
+                                                          std::nullopt,
+                                                          partition_index(rows),
+                                                          1,
+                                                          partition_index(overlaps),
+                                                          0};
+            rows = partition_add(rows, 1);
+            require_capacity(rows, limits.maximum_rows);
+            point_nonzeros = partition_add(point_nonzeros, point.terms.size());
+            require_capacity(partition_add(nonzeros, point_nonzeros), limits.maximum_nonzeros);
+            core::Index previous = -1;
+            for (const auto& term : point.terms) {
+                math.visit(1);
+                if (term.column <= previous || term.column >= patch.count ||
+                    term.coefficient.sign() == 0)
+                    partition_fail(core::FailureCode::InvalidInput);
+                previous = term.column;
+            }
+        }
+        nonzeros = partition_add(nonzeros, point_nonzeros);
         static_cast<void>(partition_index(partition_mul(3, rows)));
         const auto offset_count = partition_add(rows, 1);
         const auto retained = partition_add(
             nonzeros, partition_add(partition_mul(4, rows), partition_mul(12, overlaps)));
-        math.admit(partition_add(reference_live_rationals, retained));
+        const auto source_point_values =
+            partition_add(point_nonzeros, partition_mul(3, points.size()));
+        math.admit(
+            partition_add(partition_add(reference_live_rationals, retained), source_point_values));
         data.overlaps = partition_take(
             plan.allocate<PgTraceOverlap>(partition_index(overlaps), partition_operation));
         data.rows = partition_take(
@@ -246,9 +331,32 @@ PgGlobalConstraints::prepare(std::span<const PgConstraintPatchBinding> patches,
                 data.offsets.values()[++row_at] = term_at;
             }
         }
+        for (std::size_t i = 0; i < points.size(); ++i) {
+            math.visit(1);
+            const auto& point = points[i];
+            const auto& patch = data.layout.values()[static_cast<std::size_t>(point.patch)];
+            auto& row = data.rows.values()[row_at];
+            row = {partition_index(bindings.size() + i),
+                   0,
+                   -1,
+                   PgCoefficientField::R,
+                   0,
+                   0,
+                   math.constant("1"),
+                   {}};
+            for (std::size_t axis = 0; axis < row.prescribed.size(); ++axis)
+                if ((point.world_components & (1U << axis)) != 0)
+                    row.prescribed[axis] = math.copy(point.prescribed[axis]);
+            for (const auto& term : point.terms) {
+                math.visit(1);
+                data.terms.values()[term_at++] = {patch.first + term.column,
+                                                  math.copy(term.coefficient)};
+            }
+            data.offsets.values()[++row_at] = term_at;
+        }
         math.cancel();
         data.info = {partition_index(columns), partition_index(rows), partition_index(nonzeros),
-                     math.info()};
+                     common_cartesian, math.info()};
         return PgGlobalConstraints{std::move(owner)};
     });
 }
@@ -314,14 +422,18 @@ PgGlobalConstraints::apply_impl(PgGlobalConstraintCoordinates input, bool subtra
         for (std::size_t i = 0; i < output.size(); ++i) {
             math.visit(1);
             auto& value = output.values()[i];
+            const auto& original = data.rows.values()[i];
+            const auto components =
+                data.sources.values()[static_cast<std::size_t>(original.source)].world_components;
             for (const auto& term : data.row(i)) {
                 math.visit(1);
                 accumulate(math, value, term.coefficient,
-                           input.values[static_cast<std::size_t>(term.column)]);
+                           input.values[static_cast<std::size_t>(term.column)], components);
             }
             if (subtract_prescribed)
                 for (std::size_t axis = 0; axis < value.size(); ++axis)
-                    value[axis] = math.sub(value[axis], data.rows.values()[i].prescribed[axis]);
+                    if ((components & (1U << axis)) != 0)
+                        value[axis] = math.sub(value[axis], original.prescribed[axis]);
         }
         math.cancel();
         return output;
@@ -360,10 +472,12 @@ PgGlobalConstraints::transpose(std::span<const PgCartesianExactPosition> lambda,
         const auto& data = data_.values().front();
         for (std::size_t i = 0; i < lambda.size(); ++i) {
             math.visit(1);
+            const auto source = static_cast<std::size_t>(data.rows.values()[i].source);
+            const auto components = data.sources.values()[source].world_components;
             for (const auto& term : data.row(i)) {
                 math.visit(1);
                 accumulate(math, output.values()[static_cast<std::size_t>(term.column)],
-                           term.coefficient, lambda[i]);
+                           term.coefficient, lambda[i], components);
             }
         }
         math.cancel();
