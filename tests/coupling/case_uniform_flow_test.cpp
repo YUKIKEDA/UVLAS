@@ -1910,6 +1910,14 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
             too_tight_projection.matrix_absolute = 0.;
             reject(solve_harmonic(phase, too_tight_projection),
                    core::FailureCode::PrecisionUnresolved);
+            auto initially_qualified = harmonic_request;
+            initially_qualified.solver_limits.maximum_refinements = 0;
+            initially_qualified.algebraic.absolute_tolerance = 1e-9;
+            initially_qualified.algebraic.componentwise_backward_tolerance = 1e-9;
+            const auto early_solution = take(solve_harmonic(phase, initially_qualified));
+            CHECK(early_solution.solution.certificate().retention_path() ==
+                  numerics::linear::RetentionPath::InitiallyTwoWord);
+            CHECK(early_solution.solution.values().precision() == core::Precision::TwoWord);
             const auto compare_harmonic = [&](const cf::StraightWakeHarmonicInput& wake_phase,
                                               std::complex<double> expected) {
                 const cf::HarmonicLoadInput loads{a::SingleWord{1.25}, coordinates(.375, 0, 0)};

@@ -2281,8 +2281,13 @@ struct NonpenetrationBuilder {
         }
         const auto& context = scales.context;
         const linear::ColumnUpdatedOperator op{base, left, right, context};
-        const auto rhs_buffer = require(numerics::PrecisionBuffer<Complex>::binary64(
-            std::move(rhs), core::NumericalGeneration{request.rhs_generation.value()}));
+        // Residual replay and loads consume retained TwoWord circulation even
+        // when the first algebraic solution already meets its tolerance.
+        auto rhs_low = require(
+            numerics::DenseComplex::zeroed({n, 1, n}, memory, core::Operation::SolveLinear));
+        const auto rhs_buffer = require(numerics::PrecisionBuffer<Complex>::two_word(
+            std::move(rhs), std::move(rhs_low),
+            core::NumericalGeneration{request.rhs_generation.value()}));
         auto factor =
             require(linear::UpdatedPrepared::prepare(op, scales, request.solver_limits, memory));
         work.step();
