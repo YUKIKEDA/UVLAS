@@ -33,27 +33,23 @@ struct PgInitialGreenStrain {
 
 /// Reference-volume elastic law shared by all three material input forms.
 /// Each stored Mandel value represents rational + radical * sqrt(2) exactly.
-class PgShellMaterial {
+class PgShellElasticLaw {
 public:
-    PgShellMaterial(PgShellMaterial&&) noexcept = default;
-    PgShellMaterial& operator=(PgShellMaterial&&) noexcept = default;
-    PgShellMaterial(const PgShellMaterial&) = delete;
-    PgShellMaterial& operator=(const PgShellMaterial&) = delete;
+    PgShellElasticLaw(PgShellElasticLaw&&) noexcept = default;
+    PgShellElasticLaw& operator=(PgShellElasticLaw&&) noexcept = default;
+    PgShellElasticLaw(const PgShellElasticLaw&) = delete;
+    PgShellElasticLaw& operator=(const PgShellElasticLaw&) = delete;
 
-    /// Qualify the supplied SI law, density and natural metric before publishing it.
-    /// The input spans and values are borrowed only during this call.
-    [[nodiscard]] static core::Result<PgShellMaterial>
-    prepare(const PgElasticity&, const ExactRational& density_kg_m3, const PgInitialGreenStrain&,
-            const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+    /// Qualify the supplied SI law and density independently of any material point.
+    [[nodiscard]] static core::Result<PgShellElasticLaw> prepare(const PgElasticity&,
+                                                                 const ExactRational& density_kg_m3,
+                                                                 const PgReferenceLimits&,
+                                                                 core::ResourcePlan&) noexcept;
 
     [[nodiscard]] const std::array<PgReferenceScalar, 36>& stiffness() const& noexcept {
         return stiffness_;
     }
     [[nodiscard]] const std::array<PgReferenceScalar, 36>& stiffness() const&& = delete;
-    [[nodiscard]] const std::array<PgReferenceScalar, 6>& initial_strain() const& noexcept {
-        return initial_;
-    }
-    [[nodiscard]] const std::array<PgReferenceScalar, 6>& initial_strain() const&& = delete;
     [[nodiscard]] const ExactRational& density_kg_m3() const& noexcept {
         return density_;
     }
@@ -68,11 +64,41 @@ public:
     }
 
 private:
-    PgShellMaterial(std::array<PgReferenceScalar, 36>&&, std::array<PgReferenceScalar, 6>&&,
-                    ExactRational&&, ExactRational&&, PgReferenceCallInfo) noexcept;
+    PgShellElasticLaw(std::array<PgReferenceScalar, 36>&&, ExactRational&&, ExactRational&&,
+                      PgReferenceCallInfo) noexcept;
     std::array<PgReferenceScalar, 36> stiffness_;
-    std::array<PgReferenceScalar, 6> initial_;
     ExactRational density_, correction_squared_;
+    PgReferenceCallInfo work_;
+};
+
+/// An elastic law and fixed initial Green strain at one material point.
+class PgShellMaterial {
+public:
+    PgShellMaterial(PgShellMaterial&&) noexcept = default;
+    PgShellMaterial& operator=(PgShellMaterial&&) noexcept = default;
+    PgShellMaterial(const PgShellMaterial&) = delete;
+    PgShellMaterial& operator=(const PgShellMaterial&) = delete;
+
+    [[nodiscard]] static core::Result<PgShellMaterial>
+    prepare(const PgElasticity&, const ExactRational& density_kg_m3, const PgInitialGreenStrain&,
+            const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+    [[nodiscard]] const PgShellElasticLaw& law() const& noexcept {
+        return law_;
+    }
+    [[nodiscard]] const PgShellElasticLaw& law() const&& = delete;
+    [[nodiscard]] const std::array<PgReferenceScalar, 6>& initial_strain() const& noexcept {
+        return initial_;
+    }
+    [[nodiscard]] const std::array<PgReferenceScalar, 6>& initial_strain() const&& = delete;
+    [[nodiscard]] PgReferenceCallInfo call_info() const noexcept {
+        return work_;
+    }
+
+private:
+    PgShellMaterial(PgShellElasticLaw&&, std::array<PgReferenceScalar, 6>&&,
+                    PgReferenceCallInfo) noexcept;
+    PgShellElasticLaw law_;
+    std::array<PgReferenceScalar, 6> initial_;
     PgReferenceCallInfo work_;
 };
 
@@ -87,6 +113,12 @@ struct PgShellMaterialResponse {
 /// tangent with respect to these components is the prepared stiffness.
 [[nodiscard]] core::Result<PgShellMaterialResponse>
 evaluate_pg_shell_material(const PgShellMaterial&,
+                           const std::array<PgReferenceScalar, 6>& green_mandel,
+                           const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
+/// Evaluate an explicitly sampled initial field against a reusable elastic law.
+[[nodiscard]] core::Result<PgShellMaterialResponse>
+evaluate_pg_shell_material(const PgShellElasticLaw&, const PgInitialGreenStrain&,
                            const std::array<PgReferenceScalar, 6>& green_mandel,
                            const PgReferenceLimits&, core::ResourcePlan&) noexcept;
 

@@ -46,14 +46,14 @@ TEST_CASE("Isotropic and reciprocal orthotropic inputs yield the full 3D Mandel 
     REQUIRE(iso);
     for (std::size_t i = 0; i < 6; ++i) {
         for (std::size_t j = 0; j < 6; ++j) {
-            const auto& value = iso->stiffness()[i * 6 + j];
+            const auto& value = iso->law().stiffness()[i * 6 + j];
             const auto expected = i == j ? (i < 3 ? "120" : "80") : (i < 3 && j < 3 ? "40" : "0");
             CHECK(value.rational == f.q(expected));
             CHECK(value.radical.sign() == 0);
         }
     }
-    CHECK(iso->density_kg_m3() == rho);
-    CHECK(iso->symmetry_correction_squared().sign() == 0);
+    CHECK(iso->law().density_kg_m3() == rho);
+    CHECK(iso->law().symmetry_correction_squared().sign() == 0);
 
     const std::array axes{f.q("120"), f.q("90"), f.q("60")};
     const std::array ratios{f.q("1", "4"), f.q("1", "5"), f.q("1", "3")};
@@ -67,7 +67,7 @@ TEST_CASE("Isotropic and reciprocal orthotropic inputs yield the full 3D Mandel 
                                 "961200",  "734400",  "961200", "2470500"};
     for (std::size_t i = 0; i < 6; ++i) {
         for (std::size_t j = 0; j < 6; ++j) {
-            const auto& value = ortho->stiffness()[i * 6 + j];
+            const auto& value = ortho->law().stiffness()[i * 6 + j];
             CHECK(value.radical.sign() == 0);
             if (i < 3 && j < 3)
                 CHECK(value.rational == f.q(numerators[3 * i + j], "36391"));
@@ -93,25 +93,25 @@ TEST_CASE("Effective material preserves normal-shear coupling and initial strain
         PgEffectiveElasticity{values, PgMaterialComponents::Engineering}, rho,
         PgInitialGreenStrain{e0, PgMaterialComponents::Engineering}, f.limits, f.memory);
     REQUIRE(effective);
-    CHECK(effective->stiffness()[3].radical == f.q("1", "8"));
-    CHECK(effective->stiffness()[18].radical == f.q("1", "8"));
-    CHECK(effective->stiffness()[3].rational.sign() == 0);
-    CHECK(effective->stiffness()[21].rational == f.q("2"));
-    CHECK(effective->stiffness()[22].rational == f.q("1", "8"));
+    CHECK(effective->law().stiffness()[3].radical == f.q("1", "8"));
+    CHECK(effective->law().stiffness()[18].radical == f.q("1", "8"));
+    CHECK(effective->law().stiffness()[3].rational.sign() == 0);
+    CHECK(effective->law().stiffness()[21].rational == f.q("2"));
+    CHECK(effective->law().stiffness()[22].rational == f.q("1", "8"));
     CHECK(effective->initial_strain()[3].radical == f.q("1", "16"));
     CHECK(effective->initial_strain()[4].radical == f.q("-1", "32"));
-    CHECK(effective->symmetry_correction_squared().sign() == 0);
+    CHECK(effective->law().symmetry_correction_squared().sign() == 0);
 
     values[1] = f.q("1", "10000000000000");
     const auto rounded = PgShellMaterial::prepare(
         PgEffectiveElasticity{values, PgMaterialComponents::Engineering}, rho,
         PgInitialGreenStrain{e0, PgMaterialComponents::Mandel}, f.limits, f.memory);
     REQUIRE(rounded);
-    CHECK(rounded->stiffness()[1].rational == f.q("1", "20000000000000"));
-    CHECK(rounded->stiffness()[6].rational == f.q("1", "20000000000000"));
+    CHECK(rounded->law().stiffness()[1].rational == f.q("1", "20000000000000"));
+    CHECK(rounded->law().stiffness()[6].rational == f.q("1", "20000000000000"));
     CHECK(rounded->initial_strain()[3].rational == f.q("1", "8"));
-    CHECK(rounded->symmetry_correction_squared().sign() > 0);
-    CHECK(effective->stiffness()[1].rational.sign() == 0);
+    CHECK(rounded->law().symmetry_correction_squared().sign() > 0);
+    CHECK(effective->law().stiffness()[1].rational.sign() == 0);
 }
 
 TEST_CASE("Materials reject invalid metrics, unresolved stiffness and resource exhaustion",

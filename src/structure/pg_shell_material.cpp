@@ -173,29 +173,69 @@ void qualify_natural_metric(const std::array<PgReferenceScalar, 6>& strain, cons
     if (exact.sign(determinant) <= 0)
         partition_fail(invalid);
 }
+
+using Mandel = std::array<PgReferenceScalar, 6>;
+
+Mandel normalize_initial(const PgInitialGreenStrain& initial, const R& two,
+                         ReferenceArithmetic& math) {
+    const bool initial_engineering = engineering(initial.convention);
+    Mandel strain;
+    for (std::size_t i = 0; i < order; ++i) {
+        if (initial_engineering && i >= 3)
+            strain[i].radical = math.div(initial.components[i], two);
+        else
+            strain[i].rational = math.copy(initial.components[i]);
+    }
+    qualify_natural_metric(strain, math.constant("1"), two, math);
+    return strain;
+}
+
+PgShellMaterialResponse response(const PgShellElasticLaw& law, const Mandel& initial,
+                                 const Mandel& green, const R& two, ReferenceArithmetic& math) {
+    if (law.density_kg_m3().sign() <= 0)
+        partition_fail(invalid);
+    ReferenceRadicals exact{math, two};
+    Mandel elastic, stress;
+    for (std::size_t i = 0; i < order; ++i)
+        elastic[i] = exact.sub(green[i], initial[i]);
+    PgReferenceScalar doubled_energy;
+    for (std::size_t i = 0; i < order; ++i) {
+        for (std::size_t j = 0; j < order; ++j)
+            stress[i] = exact.add(stress[i], exact.mul(law.stiffness()[i * order + j], elastic[j]));
+        doubled_energy = exact.add(doubled_energy, exact.mul(elastic[i], stress[i]));
+    }
+    PgReferenceScalar energy{math.div(doubled_energy.rational, two),
+                             math.div(doubled_energy.radical, two)};
+    return {std::move(energy), std::move(stress), math.info()};
+}
+
+template <class F>
+core::Result<PgShellMaterialResponse> evaluate(F&& f) noexcept {
+    auto result = partition_entry(std::forward<F>(f));
+    if (!result)
+        result.error().operation = core::Operation::EvaluateStructure;
+    return result;
+}
 } // namespace
 
-PgShellMaterial::PgShellMaterial(std::array<PgReferenceScalar, 36>&& stiffness,
-                                 std::array<PgReferenceScalar, 6>&& initial, R&& density,
-                                 R&& correction_squared, PgReferenceCallInfo work) noexcept
+PgShellElasticLaw::PgShellElasticLaw(std::array<PgReferenceScalar, 36>&& stiffness, R&& density,
+                                     R&& correction_squared, PgReferenceCallInfo work) noexcept
     : stiffness_(std::move(stiffness)),
-      initial_(std::move(initial)),
       density_(std::move(density)),
       correction_squared_(std::move(correction_squared)),
       work_(work) {}
 
-core::Result<PgShellMaterial> PgShellMaterial::prepare(const PgElasticity& input, const R& density,
-                                                       const PgInitialGreenStrain& initial,
-                                                       const PgReferenceLimits& limits,
-                                                       core::ResourcePlan& plan) noexcept {
-    return partition_entry([&]() -> core::Result<PgShellMaterial> {
+core::Result<PgShellElasticLaw> PgShellElasticLaw::prepare(const PgElasticity& input,
+                                                           const R& density,
+                                                           const PgReferenceLimits& limits,
+                                                           core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgShellElasticLaw> {
         ReferenceArithmetic math{limits, plan};
         math.cancel();
         if (density.sign() <= 0)
             partition_fail(invalid);
-        const bool initial_engineering = engineering(initial.convention);
         // Covers borrowed inputs, compliance/adjugate, normalization and LDL copies,
-        // the two coefficients of every normalized value and the natural metric.
+        // and the two coefficients of every normalized value.
         math.admit(384);
         const auto one = math.constant("1"), two = math.constant("2");
         math.charge();
@@ -231,48 +271,50 @@ core::Result<PgShellMaterial> PgShellMaterial::prepare(const PgElasticity& input
                     output.radical = std::move(input_value);
             }
         }
-        std::array<PgReferenceScalar, order> strain;
-        for (std::size_t i = 0; i < order; ++i) {
-            if (initial_engineering && i >= 3)
-                strain[i].radical = math.div(initial.components[i], two);
-            else
-                strain[i].rational = math.copy(initial.components[i]);
-        }
-        qualify_natural_metric(strain, one, two, math);
         auto rho = math.copy(density);
-        return PgShellMaterial{std::move(stiffness), std::move(strain), std::move(rho),
-                               std::move(law.correction_squared), math.info()};
+        return PgShellElasticLaw{std::move(stiffness), std::move(rho),
+                                 std::move(law.correction_squared), math.info()};
+    });
+}
+
+PgShellMaterial::PgShellMaterial(PgShellElasticLaw&& law, Mandel&& initial,
+                                 PgReferenceCallInfo work) noexcept
+    : law_(std::move(law)), initial_(std::move(initial)), work_(work) {}
+
+core::Result<PgShellMaterial> PgShellMaterial::prepare(const PgElasticity& input, const R& density,
+                                                       const PgInitialGreenStrain& initial,
+                                                       const PgReferenceLimits& limits,
+                                                       core::ResourcePlan& plan) noexcept {
+    return partition_entry([&]() -> core::Result<PgShellMaterial> {
+        ReferenceArithmetic math{limits, plan};
+        auto law = partition_take(PgShellElasticLaw::prepare(input, density, limits, plan));
+        math.charge(law.call_info().scalar_operations);
+        math.admit();
+        auto strain = normalize_initial(initial, math.constant("2"), math);
+        return PgShellMaterial{std::move(law), std::move(strain), math.info()};
     });
 }
 
 core::Result<PgShellMaterialResponse>
-evaluate_pg_shell_material(const PgShellMaterial& material,
-                           const std::array<PgReferenceScalar, 6>& green,
+evaluate_pg_shell_material(const PgShellMaterial& material, const Mandel& green,
                            const PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
-    auto result = partition_entry([&]() -> core::Result<PgShellMaterialResponse> {
+    return evaluate([&]() -> core::Result<PgShellMaterialResponse> {
         ReferenceArithmetic math{limits, plan};
-        math.cancel();
-        if (material.density_kg_m3().sign() <= 0)
-            partition_fail(invalid);
+        math.admit();
+        return response(material.law(), material.initial_strain(), green, math.constant("2"), math);
+    });
+}
+
+core::Result<PgShellMaterialResponse>
+evaluate_pg_shell_material(const PgShellElasticLaw& law, const PgInitialGreenStrain& initial,
+                           const Mandel& green, const PgReferenceLimits& limits,
+                           core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellMaterialResponse> {
+        ReferenceArithmetic math{limits, plan};
         math.admit();
         const auto two = math.constant("2");
-        ReferenceRadicals exact{math, two};
-        std::array<PgReferenceScalar, order> elastic, stress;
-        for (std::size_t i = 0; i < order; ++i)
-            elastic[i] = exact.sub(green[i], material.initial_strain()[i]);
-        PgReferenceScalar doubled_energy;
-        for (std::size_t i = 0; i < order; ++i) {
-            for (std::size_t j = 0; j < order; ++j)
-                stress[i] = exact.add(stress[i],
-                                      exact.mul(material.stiffness()[i * order + j], elastic[j]));
-            doubled_energy = exact.add(doubled_energy, exact.mul(elastic[i], stress[i]));
-        }
-        PgReferenceScalar energy{math.div(doubled_energy.rational, two),
-                                 math.div(doubled_energy.radical, two)};
-        return PgShellMaterialResponse{std::move(energy), std::move(stress), math.info()};
+        const auto strain = normalize_initial(initial, two, math);
+        return response(law, strain, green, two, math);
     });
-    if (!result)
-        result.error().operation = core::Operation::EvaluateStructure;
-    return result;
 }
 } // namespace uvlas::structure

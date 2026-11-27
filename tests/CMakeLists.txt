@@ -979,6 +979,13 @@ uvlas_add_test(aero.uniform_flow
     LIBS uvlas_aero)
 target_include_directories(uvlas_test_aero_uniform_flow PRIVATE "${PROJECT_SOURCE_DIR}/src")
 
+uvlas_add_test(coupling.case_pg_shell_material
+    LABELS V-MAT integration negative verification
+    SOURCES coupling/case_pg_shell_material_test.cpp
+    LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_pg_shell_material PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(coupling.case_uniform_flow
     LABELS V-AERO property negative verification
     SOURCES coupling/case_uniform_flow_test.cpp
