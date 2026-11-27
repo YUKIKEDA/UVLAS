@@ -101,13 +101,13 @@
 | FD-10 | [case-schema-fields.md:231](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-11 | [case-schema-fields.md:319](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-12 | [case-schema-fields.md:333](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
-| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 188 | 53 | 0 |
+| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 188 | 54 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 14 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 79 | 34 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 38 | 20 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 17 | 7 | 0 |
 | IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 21 | 5 | 0 |
-| IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 4 | 0 |
+| IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 5 | 0 |
 | J1-D01 | [j1-discrete-equilibrium-and-chart-contract.md:5](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 2 | 3 | 0 |
 | J1-D02 | [j1-discrete-equilibrium-and-chart-contract.md:10](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
 | J1-D03 | [j1-discrete-equilibrium-and-chart-contract.md:11](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
@@ -246,5 +246,5 @@
 | R-03 | [implementation-start-review.md:71](../plans/implementation-start-review.md) | 0 | 1 | 0 |
 | R-04 | [implementation-start-review.md:72](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | R-05 | [implementation-start-review.md:73](../plans/implementation-start-review.md) | 16 | 23 | 0 |
-| R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 11 | 0 |
+| R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 12 | 0 |
 | R-07 | [implementation-start-review.md:75](../plans/implementation-start-review.md) | 0 | 0 | 0 |

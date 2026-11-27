@@ -1,0 +1,172 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-ninja-parser-input-qualification",
+  "ids": [
+    "IO4-01",
+    "IO4-07",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-28",
+  "source_commit": "eb88c6d882f52e5b45c57986fe5595d39d9d70a0",
+  "claimed_state": "固定Ninjaビルドの実依存DBで四ヘッダーを照合し、移設CLIと拡張で同じ外部Caseを検証する。",
+  "ninja_run": {
+    "frozen": {
+      "build": "build",
+      "files": {
+        "cli": {
+          "path": "uvlas",
+          "sha256": "31790b9949b5135a18579e1cff602e00c65f1e8a10d90cc08cafb334b3fe6268"
+        },
+        "extension": {
+          "path": "src/python/_uvlas.cpython-312-x86_64-linux-gnu.so",
+          "sha256": "be08f7239ed663cb3ca67f915250d600afb895698078d271f734bb07193a3e34"
+        },
+        "parser_object": {
+          "path": "CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o",
+          "sha256": "ffe9db1f18d38657d0b251cfe14298ece9bc0ff930de44d3e356853e4f49ee72"
+        },
+        "producer": {
+          "path": "runtime-artifacts-Release.json",
+          "sha256": "0b59e0d5863391804bdee3abb5104f4e170b1c2d3a4f1f3122bb046ca17205ba"
+        },
+        "dependency_database": {
+          "path": ".ninja_deps",
+          "sha256": "5a6d59563c1dda393e01cf829d33a6ca881473fd7544ac2d1c8fd308579838d9"
+        }
+      },
+      "ninja_dependency_status": "VALID",
+      "ninja_dependency_count": 449,
+      "source_and_abi": {
+        "commit": "3a140d7bfbffef797a3fb7b29187dc458e50f53a",
+        "compiler": "GNU 14.2.0",
+        "configuration": "Release",
+        "dependencies": {
+          "boost": "1.92.0",
+          "eigen": "5.0.1",
+          "nlohmann_json": "3.12.0",
+          "spectra": "1.2.0"
+        },
+        "dependency_repairs": {
+          "nlohmann_json_sax_allocation": 1
+        },
+        "floating_point": "-ffp-contract=off -fno-fast-math",
+        "instruction_set": "sse2",
+        "platform": "Linux x86_64",
+        "platform_key": "linux-x64-gnu14.2-sse2",
+        "schema": "uvlas.build-info/1",
+        "uncommitted_changes": false,
+        "version": "0.1.0-dev"
+      },
+      "glibc": [
+        "glibc",
+        "2.39"
+      ],
+      "kernel_release": "6.18.58.1-microsoft-standard-WSL2",
+      "ninja": "1.11.1",
+      "headers": {
+        "basic_string.tcc": "4f8dbb49a708622d994acc0b6ad3e69cf72a746732c4ff2362d078b4699d478d",
+        "stl_bvector.h": "7abd919ef3579f6199fb87981f80239e25ec57bc0f80e16e0ca792d44bb14f29",
+        "stl_vector.h": "b896547442cc7fa6e6eea35f94a64e0b32431e1e3d8abee301bd5aa1f5ff8c0f",
+        "vector.tcc": "dc5dad860d9f9add7ccbbea1e67f315c6f0f74d6398ccdd6459391a976cd0dc2"
+      },
+      "exception_provider": {
+        "cli": {
+          "file": "libstdc++.so.6.0.33",
+          "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+        },
+        "extension": {
+          "file": "libstdc++.so.6.0.33",
+          "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+        },
+        "symbol": "std::runtime_error(char const*)@GLIBCXX_3.4.21"
+      },
+      "external_case": {
+        "case_sha256": "741e954d7cdbf8882f9f8876efbeed287e304403d284de5a0e3e2bbef90c298b",
+        "cli": "accepted",
+        "python_file": "accepted"
+      },
+      "raw_audit_report_sha256": "031221b758a03779eb0ee881ceedfe7bb682e3a6e1a442d646962ee1d41a7318"
+    },
+    "stale": {
+      "build": "r06-ninja-stale",
+      "files": {
+        "cli": {
+          "path": "uvlas",
+          "sha256": "31790b9949b5135a18579e1cff602e00c65f1e8a10d90cc08cafb334b3fe6268"
+        },
+        "extension": {
+          "path": "src/python/_uvlas.cpython-312-x86_64-linux-gnu.so",
+          "sha256": "be08f7239ed663cb3ca67f915250d600afb895698078d271f734bb07193a3e34"
+        },
+        "parser_object": {
+          "path": "CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o",
+          "sha256": "ffe9db1f18d38657d0b251cfe14298ece9bc0ff930de44d3e356853e4f49ee72"
+        },
+        "producer": {
+          "path": "runtime-artifacts-Release.json",
+          "sha256": "0b59e0d5863391804bdee3abb5104f4e170b1c2d3a4f1f3122bb046ca17205ba"
+        },
+        "dependency_database": {
+          "path": ".ninja_deps",
+          "sha256": "5a6d59563c1dda393e01cf829d33a6ca881473fd7544ac2d1c8fd308579838d9"
+        }
+      },
+      "ninja_dependency_status": "STALE",
+      "only_changed_input": "parser object modification time",
+      "audit_exit": 1,
+      "success_report_emitted": false,
+      "raw_audit_rejection_sha256": "98e9fe8d644f6039371a6b63e8148dd0e935e7bbd7d1e9d757fdf88147c40430"
+    },
+    "alternate_header": {
+      "build": "r06-ninja-alternate",
+      "files": {
+        "cli": {
+          "path": "uvlas",
+          "sha256": "31790b9949b5135a18579e1cff602e00c65f1e8a10d90cc08cafb334b3fe6268"
+        },
+        "extension": {
+          "path": "src/python/_uvlas.cpython-312-x86_64-linux-gnu.so",
+          "sha256": "be08f7239ed663cb3ca67f915250d600afb895698078d271f734bb07193a3e34"
+        },
+        "parser_object": {
+          "path": "CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o",
+          "sha256": "ffe9db1f18d38657d0b251cfe14298ece9bc0ff930de44d3e356853e4f49ee72"
+        },
+        "producer": {
+          "path": "runtime-artifacts-Release.json",
+          "sha256": "0b59e0d5863391804bdee3abb5104f4e170b1c2d3a4f1f3122bb046ca17205ba"
+        },
+        "dependency_database": {
+          "path": ".ninja_deps",
+          "sha256": "3bbcad7afbfeb7d148b5172a1e6dbcfb3c4907d8c88748409db9622ad8b4be7b"
+        }
+      },
+      "ninja_dependency_status": "VALID",
+      "glibcxx_header_date": 20240908,
+      "actual_stl_bvector_sha256": "a5e4a8743d833591f6809d5d2bdb9998f7f681c1248a5e2c49623676d29ab4ea",
+      "expected_stl_bvector_sha256": "7abd919ef3579f6199fb87981f80239e25ec57bc0f80e16e0ca792d44bb14f29",
+      "audit_exit": 1,
+      "success_report_emitted": false,
+      "raw_build_and_audit_log_sha256": "36c48ca209fa3dca9fbd952d255f242c46545c82b4dc680e9943bd74d4b530e6"
+    }
+  },
+  "checks": {
+    "wrong_expected_header_exit": 1,
+    "unix_makefiles_regression": true
+  },
+  "unix_makefiles_regression": {
+    "candidate_commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+    "dependency_record": {
+      "path": "CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o.d",
+      "sha256": "b438a37c99df20fc3d9ff8cdfd54bcaa53773515aa28962b0923817e02005996"
+    },
+    "raw_audit_report_sha256": "32f3cf26d2126454e31278ea75a4c463b76719ad8b73cd51ee420fa8724af1de"
+  },
+  "artifacts": {
+    "tools/qa/runtime_artifact_audit.py": "0be7e4b29f586b84e30b6c83993025a040a8f7b24c3e973beaf389e2c7c1a34d",
+    "docs/build.md": "4086e8cc72a74964fee4ff1be2fd18658d0907f0b9466178af87cea5a5596546",
+    "docs/verification/IM-06/ninja-parser-input-qualification.md": "61071700de2680b56779d654b2657203c301470f2c781bff28658ee94af6dfb9"
+  }
+}
