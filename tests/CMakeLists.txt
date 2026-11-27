@@ -1011,10 +1011,15 @@ target_include_directories(uvlas_test_coupling_case_structural_pg_support PRIVAT
 uvlas_add_test(coupling.case_pg_support_motion
     LABELS V-PG V-AERO property negative verification
     TIMEOUT 180
+    TEST_SPEC "~[case-pg-chart-entry]"
     SOURCES coupling/case_pg_support_motion_test.cpp
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_pg_support_motion PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
+add_test(NAME coupling.case_pg_chart_entry
+    COMMAND uvlas_test_coupling_case_pg_support_motion "[case-pg-chart-entry]")
+set_tests_properties(coupling.case_pg_chart_entry PROPERTIES
+    LABELS "integration;verification;V-PG" TIMEOUT 180)
 # Run all exact PG preparations in Release. The same executable runs the
 # two-layer Case preparation and its negative checks in every configuration.
 if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE STREQUAL "Release")

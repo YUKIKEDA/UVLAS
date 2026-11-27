@@ -20,7 +20,7 @@ struct CasePgRuleBinding {
 struct CasePgChartLimits {
     CasePgReferenceLimits reference;
     structure::PgRankPreparationLimits rank;
-    structure::PgDiscreteGramGrid gram_grid;
+    structure::PgDiscreteGramGrid gram_grid{};
     structure::PgDiscreteGramLimits gram;
     structure::PgConditioningGeneration factor_grid;
     structure::PgConditioningLimits factor;
@@ -29,7 +29,7 @@ struct CasePgChartLimits {
     structure::PgTraceLimits trace;
     structure::PgGlobalConstraintLimits constraints;
     structure::PgSparseChartLimits chart;
-    std::uint64_t maximum_input_work;
+    std::uint64_t maximum_input_work{};
 };
 
 namespace case_pg_chart_detail {
