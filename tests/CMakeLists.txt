@@ -991,6 +991,17 @@ if(MSVC)
         "$<$<CONFIG:Debug>:/STACK:8388608>")
 endif()
 
+uvlas_add_test(coupling.case_known_bdf2_loads
+    LABELS V-AERO verification negative
+    SOURCES coupling/case_known_bdf2_loads_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_known_bdf2_loads PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+if(MSVC)
+    target_link_options(uvlas_test_coupling_case_known_bdf2_loads PRIVATE
+        "$<$<CONFIG:Debug>:/STACK:8388608>")
+endif()
+
 set(finite_wing_shapes fw_v01 fw_v02)
 set(finite_wing_series steady wake_length core_radius)
 foreach(wing_index RANGE 0 1)

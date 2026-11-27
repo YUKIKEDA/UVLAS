@@ -37,14 +37,19 @@ bool same_rational(p::RationalView a, p::RationalView b, m::Work& work) {
     return a.sign == b.sign && compare_words(a.numerator, b.numerator, work) &&
            compare_words(a.denominator, b.denominator, work);
 }
-bool same_case(const CaseClockedFlowSample& a, const CaseClockedFlowSample& b) {
+bool same_identity(const io::SchemaIdentity& x, const io::SchemaIdentity& y) {
+    return x.source == y.source && x.contract_revision == y.contract_revision &&
+           x.representation_revision == y.representation_revision;
+}
+
+template <class Sample>
+bool same_case(const Sample& a, const Sample& b) {
     const auto x = a.source();
     const auto y = b.source();
     const auto ax = a.address();
     const auto ay = b.address();
-    return x.source == y.source && x.contract_revision == y.contract_revision &&
-           x.representation_revision == y.representation_revision && ax.stamp == ay.stamp &&
-           ax.interval == ay.interval && a.restart() == b.restart();
+    return same_identity(x, y) && ax.stamp == ay.stamp && ax.interval == ay.interval &&
+           a.restart() == b.restart();
 }
 
 void verify_ambient(const CaseClockedFlowSample& clock, const ProjectedCaseUniformFlow& flow,
@@ -58,6 +63,45 @@ void verify_ambient(const CaseClockedFlowSample& clock, const ProjectedCaseUnifo
         if (!same_rational(read(x.jet.velocity(k)), read(y.jet.velocity(k)), work) ||
             !same_rational(read(x.jet.time_partial(k)), read(y.jet.time_partial(k)), work))
             reject(StaleGeneration);
+}
+
+void verify_history(const CaseClockedFlowSample& clock, const DiscreteCirculation& result,
+                    m::Work& work) {
+    verify_ambient(clock, result.flow(), work);
+}
+
+void verify_known_time(const CaseClockedKnownFlowSample& clock, p::PchipInputStamp stamp,
+                       p::RequestedSide side, p::RationalView time, m::Work& work) {
+    const auto& ambient = clock.ambient();
+    if (read(ambient.stamp()) != stamp || ambient.requested_side() != side ||
+        !same_rational(read(clock.time()), time, work))
+        reject(StaleGeneration);
+}
+
+void verify_history(const CaseClockedKnownFlowSample& clock, const DiscreteKnownCirculation& result,
+                    m::Work& work) {
+    if (!same_identity(clock.source(), read(result.case_identity())))
+        reject(StaleGeneration);
+    // The known solve samples every collocation with a single common flow query.
+    const auto& sample = read(result.flow(0)).get();
+    verify_known_time(clock, read(sample.stamp()), sample.requested_side(), read(sample.time()),
+                      work);
+}
+
+a::PreparedTopologyOwner topology(const DiscreteCirculation& result) {
+    return result.source();
+}
+
+a::PreparedTopologyOwner topology(const DiscreteKnownCirculation& result) {
+    return read(result.source());
+}
+
+const numerics::linear::Solution<double>& retained(const DiscreteCirculation& result) {
+    return result.solution();
+}
+
+const numerics::linear::Solution<double>& retained(const DiscreteKnownCirculation& result) {
+    return read(result.solution()).get();
 }
 
 a::ScalarWords coefficient(const numerics::PrecisionBuffer<double>& words, std::size_t i) {
@@ -83,7 +127,9 @@ struct FixedBdf2Circulation::Data {
         a::ScalarWords previous{a::SingleWord{0}}, older{a::SingleWord{0}};
     };
 
-    std::optional<CaseClockedFlowSample> destination;
+    using Destination = std::variant<CaseClockedFlowSample, CaseClockedKnownFlowSample>;
+    std::optional<Destination> destination;
+    std::optional<core::AcceptedStateId> parent;
     std::optional<a::PreparedTopologyOwner> source;
     std::array<core::NumericalGeneration, 2> history{core::NumericalGeneration{0},
                                                      core::NumericalGeneration{0}};
@@ -102,6 +148,28 @@ core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare(
     const CaseClockedFlowSample& older, const DiscreteCirculation& previous_solution,
     const DiscreteCirculation& older_solution, std::uint64_t maximum_integer_bits,
     std::uint64_t maximum_steps, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
+    return prepare_history(std::move(destination), previous, older, previous_solution,
+                           older_solution, std::nullopt, maximum_integer_bits, maximum_steps,
+                           memory, stop);
+}
+
+core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare(
+    CaseClockedKnownFlowSample&& destination, const CaseClockedKnownFlowSample& previous,
+    const CaseClockedKnownFlowSample& older, const DiscreteKnownCirculation& previous_solution,
+    const DiscreteKnownCirculation& older_solution, core::AcceptedStateId parent,
+    std::uint64_t maximum_integer_bits, std::uint64_t maximum_steps, core::ResourcePlan& memory,
+    const std::stop_token& stop) noexcept {
+    return prepare_history(std::move(destination), previous, older, previous_solution,
+                           older_solution, parent, maximum_integer_bits, maximum_steps, memory,
+                           stop);
+}
+
+template <class Sample, class Solve>
+core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare_history(
+    Sample&& destination, const Sample& previous, const Sample& older,
+    const Solve& previous_solution, const Solve& older_solution,
+    std::optional<core::AcceptedStateId> parent, std::uint64_t maximum_integer_bits,
+    std::uint64_t maximum_steps, core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
     return core::guard_entry(
         operation, PrecisionUnresolved, {}, [&]() -> core::Result<FixedBdf2Circulation> {
             try {
@@ -116,16 +184,17 @@ core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare(
                     !same_rational(h, read(older.step_seconds()), work))
                     reject(StaleGeneration);
                 (void)read(destination.time());
-                verify_ambient(previous, previous_solution.flow(), work);
-                verify_ambient(older, older_solution.flow(), work);
-                if (!previous_solution.source().same_owner(older_solution.source()))
+                verify_history(previous, previous_solution, work);
+                verify_history(older, older_solution, work);
+                auto source = topology(previous_solution);
+                if (!source.same_owner(topology(older_solution)))
                     reject(StaleGeneration);
                 const auto twice_h =
                     m::scale(case_components::rational(h, maximum_integer_bits, work), 1);
                 if (m::compare(twice_h.lower, {}) <= 0)
                     reject(InvalidInput);
-                const auto& last = previous_solution.solution().values();
-                const auto& before = older_solution.solution().values();
+                const auto& last = retained(previous_solution).values();
+                const auto& before = retained(older_solution).values();
                 const auto size = last.shape();
                 if (size.rows != before.shape().rows || before.shape().columns != 1 ||
                     size.rows <= 0 || size.columns != 1 || last.generation() == before.generation())
@@ -144,9 +213,10 @@ core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare(
                 }
                 work.step();
                 owner.history = {last.generation(), before.generation()};
-                owner.source.emplace(previous_solution.source());
+                owner.source.emplace(std::move(source));
+                owner.parent = parent;
                 owner.twice_step = twice_h;
-                owner.destination.emplace(std::move(destination));
+                owner.destination.emplace(std::in_place_type<Sample>, std::move(destination));
                 return FixedBdf2Circulation{std::move(data)};
             } catch (const core::Failure& error) {
                 return std::unexpected(error);
@@ -156,10 +226,10 @@ core::Result<FixedBdf2Circulation> FixedBdf2Circulation::prepare(
         });
 }
 
-void FixedBdf2Circulation::bind(const a::PreparedTopologyOwner& current,
-                                const ProjectedCaseUniformFlow& flow,
-                                core::NumericalGeneration generation, std::size_t size,
-                                m::Work& work) const {
+const FixedBdf2Circulation::Data&
+FixedBdf2Circulation::validate_source(const a::PreparedTopologyOwner& current,
+                                      core::NumericalGeneration generation, std::size_t size,
+                                      m::Work& work) const {
     work.step();
     const auto storage = data_.values();
     if (storage.empty())
@@ -170,7 +240,31 @@ void FixedBdf2Circulation::bind(const a::PreparedTopologyOwner& current,
     if (!current.same_owner(*owner.source) || owner.rows.size() != size ||
         generation == owner.history[0] || generation == owner.history[1])
         reject(StaleGeneration);
-    verify_ambient(*owner.destination, flow, work);
+    return owner;
+}
+
+void FixedBdf2Circulation::bind(const a::PreparedTopologyOwner& current,
+                                const ProjectedCaseUniformFlow& flow,
+                                core::NumericalGeneration generation, std::size_t size,
+                                m::Work& work) const {
+    const auto& owner = validate_source(current, generation, size, work);
+    const auto* clock = std::get_if<CaseClockedFlowSample>(&*owner.destination);
+    if (clock == nullptr)
+        reject(StaleGeneration);
+    verify_ambient(*clock, flow, work);
+}
+
+void FixedBdf2Circulation::bind(const a::PreparedTopologyOwner& current,
+                                const DiscreteKnownFlowInput& flow, core::AcceptedStateId parent,
+                                core::NumericalGeneration generation, std::size_t size,
+                                m::Work& work) const {
+    const auto& owner = validate_source(current, generation, size, work);
+    const auto* clock = std::get_if<CaseClockedKnownFlowSample>(&*owner.destination);
+    if (clock == nullptr || owner.parent != parent ||
+        !same_identity(clock->source(), read(flow.source.case_identity())) ||
+        !same_identity(clock->source(), read(flow.current.case_identity())))
+        reject(StaleGeneration);
+    verify_known_time(*clock, flow.time.stamp, flow.time.side, flow.time.time, work);
 }
 
 m::Interval FixedBdf2Circulation::value(std::size_t i, a::PhysicalFaceId face,
