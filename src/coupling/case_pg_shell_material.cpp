@@ -16,6 +16,7 @@ constexpr auto operation = core::Operation::PrepareModel;
 constexpr io::SchemaDimension pressure{{-1, 1, -2, 0}};
 constexpr io::SchemaDimension density{{-3, 1, 0, 0}};
 constexpr io::SchemaDimension dimensionless{{0, 0, 0, 0}};
+constexpr io::SchemaDimension length{{1, 0, 0, 0}};
 
 template <class Field>
 pg::ExactRational quantity(const io::SiCase& source, Field field, io::SchemaDimension dimension,
@@ -74,6 +75,70 @@ pg::PgShellElasticLaw prepare_law(const io::SiCase& source, const auto& record,
                                     ? pg::PgMaterialComponents::Engineering
                                     : pg::PgMaterialComponents::Mandel;
         return qualify(pg::PgEffectiveElasticity{stiffness, convention});
+    }
+}
+
+pg::PgReferenceScalar integer_power(pg::detail::ReferenceRadicals& field,
+                                    const pg::PgReferenceScalar& base, std::uint64_t exponent,
+                                    const pg::ExactRational& one) {
+    pg::PgReferenceScalar result{field.math.copy(one), {}};
+    if (exponent == 0)
+        return result;
+    auto factor = field.scale(base, one);
+    while (exponent != 0) {
+        if (exponent % 2 != 0)
+            result = field.mul(result, factor);
+        exponent /= 2;
+        if (exponent != 0)
+            factor = field.mul(factor, factor);
+    }
+    return result;
+}
+
+void sample_polynomial(const io::SiCase& source, const io::schema::ReferenceFieldPolynomial& input,
+                       const CasePgMaterialCoordinates& point, CasePgInitialGreenValue& out,
+                       ReferenceArithmetic& math) {
+    const auto coordinates = input.coordinates.selected();
+    using Coordinates = decltype(input.coordinates.selected());
+    const auto measure = coordinates == Coordinates::ItemChart ? dimensionless : length;
+    const auto origin = triple(source, input.origin, measure, math);
+    const auto lengths = triple(source, input.lengths, measure, math);
+    const auto one = math.constant("1");
+    pg::detail::ReferenceRadicals field{math, point.g};
+    pg::PgReferenceVector normalized;
+    for (std::size_t i = 0; i < normalized.size(); ++i) {
+        if (lengths[i].sign() <= 0)
+            partition_fail(FailureCode::InvalidInput);
+        const auto scale = math.div(one, lengths[i]);
+        if (coordinates == Coordinates::ItemChart) {
+            normalized[i].rational = math.mul(math.sub(point.chart[i], origin[i]), scale);
+        } else {
+            const auto& position = coordinates == Coordinates::ItemMaterial
+                                       ? point.material_metres[i]
+                                       : point.world_reference_metres[i];
+            normalized[i].rational = math.mul(math.sub(position.rational, origin[i]), scale);
+            normalized[i].radical = math.mul(position.radical, scale);
+        }
+    }
+    for (std::size_t i = 0; i < out.mandel.size(); ++i) {
+        const auto ordinal = partition_index(i);
+        out.declared_error[i] =
+            quantity(source, partition_take(input.error.at(ordinal)), dimensionless, math);
+        if (out.declared_error[i].sign() < 0)
+            partition_fail(FailureCode::InvalidInput);
+        const auto terms = partition_take(input.components.at(ordinal));
+        for (core::Index t = 0; t < partition_index(terms.size()); ++t) {
+            math.visit(1);
+            const auto term = partition_take(terms.at(t)).record();
+            pg::PgReferenceScalar value{quantity(source, term.coefficient, dimensionless, math),
+                                        {}};
+            for (std::size_t axis = 0; axis < normalized.size(); ++axis) {
+                const auto power = partition_take(term.powers.at(partition_index(axis)));
+                value = field.mul(
+                    value, integer_power(field, normalized[axis], power.unsigned_value(), one));
+            }
+            out.mandel[i] = field.add(out.mandel[i], value);
+        }
     }
 }
 } // namespace
@@ -201,5 +266,40 @@ CasePgShellMaterials::source_layer(const io::SiCase& source, core::Index layer) 
         const auto shell = partition_take(model.shells.at(shell_)).record();
         return partition_take(shell.layers.at(layer)).record();
     });
+}
+
+core::Result<CasePgInitialGreenValue> CasePgShellMaterials::sample_initial_green(
+    const io::SiCase& source, core::Index layer, const CasePgMaterialCoordinates& point,
+    const pg::PgReferenceLimits& limits, core::ResourcePlan& memory) const noexcept {
+    auto result = partition_entry([&]() -> core::Result<CasePgInitialGreenValue> {
+        ReferenceArithmetic math{limits, memory};
+        math.cancel();
+        const auto selected = partition_take(source_layer(source, layer));
+        if (point.g.sign() <= 0)
+            partition_fail(FailureCode::GeometryInvalid);
+        const auto& interval = layers_.values()[static_cast<std::size_t>(layer)];
+        math.admit();
+        if (math.compare(point.chart[2], interval.lower) < 0 ||
+            math.compare(point.chart[2], interval.upper) > 0)
+            partition_fail(FailureCode::InvalidInput);
+        CasePgInitialGreenValue out{interval.id, math.copy(point.g), {}, {}, {}};
+        const auto field = selected.initial_green.record();
+        if (const auto* constant = std::get_if<io::schema::ReferenceFieldConstant>(&field)) {
+            for (std::size_t i = 0; i < out.mandel.size(); ++i)
+                out.mandel[i].rational =
+                    quantity(source, partition_take(constant->value.at(partition_index(i))),
+                             dimensionless, math);
+        } else if (const auto* polynomial =
+                       std::get_if<io::schema::ReferenceFieldPolynomial>(&field)) {
+            sample_polynomial(source, *polynomial, point, out, math);
+        } else {
+            partition_fail(FailureCode::Unsupported);
+        }
+        out.work = math.info();
+        return out;
+    });
+    if (!result)
+        result.error().operation = core::Operation::EvaluateStructure;
+    return result;
 }
 } // namespace uvlas::coupling::detail

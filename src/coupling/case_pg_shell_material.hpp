@@ -12,6 +12,23 @@ struct CasePgShellLayer {
     std::size_t law{};
 };
 
+/// Fixed coordinates of one reference point. Material and Cartesian
+/// coordinates are SI lengths and use the same exact radical sqrt(g).
+struct CasePgMaterialCoordinates {
+    const std::array<structure::ExactRational, 3>& chart; ///< s, t, zeta.
+    const structure::PgReferenceVector& material_metres;
+    const structure::PgReferenceVector& world_reference_metres;
+    const structure::ExactRational& g;
+};
+
+struct CasePgInitialGreenValue {
+    core::LayerId layer;
+    structure::ExactRational g;
+    std::array<structure::PgReferenceScalar, 6> mandel;
+    std::array<structure::ExactRational, 6> declared_error;
+    structure::PgReferenceCallInfo work;
+};
+
 /// Own the layer intervals and reusable normalized laws for a qualified Case
 /// shell. Fields of the reference axis and initial strain still belong to the
 /// typed original Case. Retrieve them only against the same source identity.
@@ -41,6 +58,12 @@ public:
                                                                core::Index layer) const noexcept;
     [[nodiscard]] core::Result<io::schema::Layer> source_layer(const io::SiCase&&,
                                                                core::Index) const = delete;
+
+    /// Evaluate the fixed initial field for this selected layer. At a shared
+    /// interface, the caller selects the layer for the requested physical side.
+    [[nodiscard]] core::Result<CasePgInitialGreenValue>
+    sample_initial_green(const io::SiCase&, core::Index layer, const CasePgMaterialCoordinates&,
+                         const structure::PgReferenceLimits&, core::ResourcePlan&) const noexcept;
 
 private:
     using Laws = core::PlannedBuffer<std::optional<structure::PgShellElasticLaw>>;
