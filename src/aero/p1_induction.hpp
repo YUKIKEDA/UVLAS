@@ -87,6 +87,8 @@ public:
     create(core::ResourcePlan&, core::FailureDetails = {}) noexcept;
     /// Exact cumulatively charged object and arithmetic payload, excluding allocator overhead.
     [[nodiscard]] static std::uint64_t payload_bytes() noexcept;
+    /// Largest scalar work count of one local evaluation, including a cold workspace.
+    [[nodiscard]] static std::uint64_t maximum_steps() noexcept;
 
 private:
     friend class P1Engine;

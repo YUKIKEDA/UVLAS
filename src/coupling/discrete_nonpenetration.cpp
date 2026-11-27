@@ -64,6 +64,11 @@ std::uint64_t sum_budget(std::uint64_t a, std::uint64_t b) {
         reject(core::FailureCode::ResourceExceeded);
     return a + b;
 }
+std::uint64_t multiply_budget(std::uint64_t value, std::uint64_t count) {
+    if (count != 0 && value > std::numeric_limits<std::uint64_t>::max() / count)
+        reject(core::FailureCode::ResourceExceeded);
+    return value * count;
+}
 void account(p::Work& work, std::uint64_t amount) {
     if (amount > remaining(work))
         reject(core::FailureCode::ResourceExceeded);
@@ -898,7 +903,7 @@ struct NonpenetrationStorage {
 };
 DiscreteNonpenetration::DiscreteNonpenetration(core::PlannedBuffer<NonpenetrationStorage> storage,
                                                ProjectedCaseUniformFlow&& flow,
-                                               std::optional<a::P1ActionValue> geometry_owner,
+                                               std::optional<a::GlobalContactState> geometry_owner,
                                                a::GeometryContext geometry_context,
                                                a::P1ActionStamp trial, std::uint64_t steps) noexcept
     : rows_(std::move(storage)),
@@ -1117,11 +1122,6 @@ struct NonpenetrationBuilder {
                       const DiscreteNonpenetrationLimits& limits, const core::ResourcePlan& memory,
                       std::uint64_t preparations, std::uint64_t applications, p::Work& work) {
         std::uint64_t payload = 0, reserved_steps = 0;
-        const auto multiply_budget = [](std::uint64_t value, std::uint64_t count) {
-            if (count != 0 && value > std::numeric_limits<std::uint64_t>::max() / count)
-                reject(core::FailureCode::ResourceExceeded);
-            return value * count;
-        };
         const auto application_reserve = multiply_budget(limits.action_steps, applications);
         for (const auto& item : assembly.bound.values()) {
             const auto& row = input.collocations[item.caller];
@@ -1196,9 +1196,18 @@ struct NonpenetrationBuilder {
         const auto assembly = assemble(input, limits, memory, work, false);
         const auto bound = assembly.bound.values();
         auto rows = allocate<NonpenetrationStorage>(memory, bound.size());
-        admit(assembly, input, limits, memory, 1, 2, work);
+        std::optional<a::GlobalContactState> geometry_retainer;
+        if (!bound.empty())
+            geometry_retainer.emplace(require(input.contact.retain_checked(memory, stop)));
+        const auto source_at = [&](std::size_t i) {
+            return a::P1ActionSource{input.contact, input.collocations[bound[i].caller].query,
+                                     input.trial_stamp};
+        };
+        const auto reuse_actions =
+            admit_serial_induction(bound.size(), source_at, assembly.maps.values(),
+                                   assembly.ids.values(), limits, false, 2, memory, work);
+        a::BoundWakeFacetStorage action_storage{memory};
         const auto ambient = ambient_velocity(flow, work);
-        std::optional<a::P1ActionValue> geometry_retainer;
         for (std::size_t i = 0; i < bound.size(); ++i) {
             const auto& item = bound[i];
             const auto& row = input.collocations[item.caller];
@@ -1206,7 +1215,8 @@ struct NonpenetrationBuilder {
             const auto relative = difference(ambient, import(row.velocity, work), work);
             const a::P1ActionSource source{input.contact, row.query, input.trial_stamp};
             const auto action =
-                prepare_action(assembly, source, limits, shared, local, kernel, memory, work);
+                prepare_action(assembly, source, limits, shared, local, kernel, memory, work,
+                               reuse_actions ? &action_storage : nullptr);
             const auto report = require(action.report());
             auto full = require(
                 a::apply_shared_p1(action, source, assembly.values.values(), std::nullopt,
@@ -1231,8 +1241,6 @@ struct NonpenetrationBuilder {
                 dot(normal, delta, work), limits.induction_accuracy.representation, rounding);
             rows.values()[i].value.emplace(DiscreteNonpenetrationRow{
                 item.panel.face, value, direction, report.far_facets != 0});
-            if (i == 0)
-                geometry_retainer.emplace(std::move(full));
         }
         work.step();
         return {std::move(rows),    std::move(flow),   std::move(geometry_retainer),
@@ -1500,13 +1508,12 @@ struct NonpenetrationBuilder {
     static bool admit_serial_induction(std::size_t rows, SourceAt source_at,
                                        std::span<const a::P1FaceStrengths> maps,
                                        std::span<const a::P1StrengthId> ids,
-                                       const DiscreteNonpenetrationLimits& limits,
+                                       const DiscreteNonpenetrationLimits& limits, bool replay,
                                        std::uint64_t applications, const core::ResourcePlan& memory,
                                        p::Work& work) {
         std::uint64_t bytes = 0, visits = 0, serial_bytes = 0, serial_visits = 0;
-        std::uint64_t application_steps = 0;
-        for (std::uint64_t i = 0; i < applications; ++i)
-            application_steps = sum_budget(application_steps, limits.action_steps);
+        const auto application_steps = multiply_budget(limits.action_steps, applications);
+        const auto preparations = replay ? 2U : 1U;
         bool reusable = true;
         for (std::size_t i = 0; i < rows; ++i) {
             auto induction = limits.induction;
@@ -1515,10 +1522,10 @@ struct NonpenetrationBuilder {
                 source_at(i), maps, ids, induction, work.stop));
             const auto& ordinary = plan.ordinary;
             account(work, ordinary.preflight_steps);
-            bytes = sum_budget(bytes, sum_budget(ordinary.payload_bytes, ordinary.payload_bytes));
-            visits = sum_budget(
-                visits, sum_budget(application_steps,
-                                   sum_budget(ordinary.reserved_steps, ordinary.reserved_steps)));
+            bytes = sum_budget(bytes, multiply_budget(ordinary.payload_bytes, preparations));
+            visits = sum_budget(visits,
+                                sum_budget(application_steps,
+                                           multiply_budget(ordinary.reserved_steps, preparations)));
             reusable = reusable && plan.reusable;
             if (!reusable)
                 continue;
@@ -1526,11 +1533,12 @@ struct NonpenetrationBuilder {
                 i == 0 ? plan.initial_payload_bytes : plan.repeated_payload_bytes;
             const auto first_steps =
                 i == 0 ? ordinary.reserved_steps : plan.repeated_reserved_steps;
-            serial_bytes =
-                sum_budget(serial_bytes, sum_budget(first_bytes, plan.repeated_payload_bytes));
+            serial_bytes = sum_budget(
+                serial_bytes, sum_budget(first_bytes, replay ? plan.repeated_payload_bytes : 0));
             serial_visits = sum_budget(
-                serial_visits, sum_budget(application_steps,
-                                          sum_budget(first_steps, plan.repeated_reserved_steps)));
+                serial_visits,
+                sum_budget(application_steps,
+                           sum_budget(first_steps, replay ? plan.repeated_reserved_steps : 0)));
         }
         if (reusable && serial_bytes < bytes && serial_bytes <= memory.remaining_bytes() &&
             serial_visits <= remaining(work))
@@ -1614,7 +1622,7 @@ struct NonpenetrationBuilder {
         };
         const auto reuse_actions =
             admit_serial_induction(order, source_at, assembly.maps.values(), assembly.ids.values(),
-                                   limits, pullback != nullptr ? 8U : 5U, memory, work);
+                                   limits, true, pullback != nullptr ? 8U : 5U, memory, work);
 
         const auto ambient = flow != nullptr ? ambient_velocity(*flow, work) : Vector{};
         a::LocalRootScratch rounding;
@@ -2959,6 +2967,7 @@ struct NonpenetrationBuilder {
     struct WakeQueries {
         core::PlannedBuffer<std::optional<a::ResolvedQuery>> resolved;
         core::PlannedBuffer<std::uint64_t> canonical;
+        bool reuse_actions{};
     };
 
     static WakeQueries
@@ -3007,7 +3016,6 @@ struct NonpenetrationBuilder {
             }) != sorted.values().end())
             reject(core::FailureCode::InvalidInput);
 
-        std::uint64_t bytes = 0, steps = 0;
         for (std::size_t i = 0; i < particles.size(); ++i) {
             auto coordinate_limits = flow.coordinate_limits;
             coordinate_limits.max_steps = std::min(coordinate_limits.max_steps, remaining(work));
@@ -3017,21 +3025,18 @@ struct NonpenetrationBuilder {
                  a::SourceVertex{a::PointId{canonical.values()[i]}}},
                 geometry.context(), coordinate_limits, flow.coordinates, memory, work.stop));
             account(work, query.used_steps());
-            const a::P1ActionSource source{input.contact, query, input.trial_stamp};
-            auto action_limits = limits.action.induction;
-            action_limits.steps = std::min(action_limits.steps, remaining(work));
-            const auto plan = require(a::forecast_bound_wake_induction(
-                source, assembly.maps.values(), assembly.ids.values(), action_limits, work.stop));
-            account(work, plan.preflight_steps);
-            bytes = sum_budget(bytes, plan.payload_bytes);
-            steps = sum_budget(sum_budget(steps, plan.reserved_steps), limits.action.action_steps);
-            if (adjoint)
-                steps = sum_budget(steps, limits.action.action_steps);
             resolved.values()[i].emplace(std::move(query));
         }
-        if (bytes > memory.remaining_bytes() || steps > remaining(work))
-            reject(core::FailureCode::ResourceExceeded);
-        return {std::move(resolved), std::move(canonical)};
+        const auto source_at = [&](std::size_t i) {
+            const auto& query = resolved.values()[i];
+            if (!query)
+                reject(core::FailureCode::InvalidInput);
+            return a::P1ActionSource{input.contact, *query, input.trial_stamp};
+        };
+        const auto reuse_actions = admit_serial_induction(
+            particles.size(), source_at, assembly.maps.values(), assembly.ids.values(),
+            limits.action, false, adjoint ? 2U : 1U, memory, work);
+        return {std::move(resolved), std::move(canonical), reuse_actions};
     }
 
     struct WakeDualAccumulator {
@@ -3181,14 +3186,16 @@ struct NonpenetrationBuilder {
         const auto finish = [&](const Vector& value) {
             return enclose_vector(value, representation, rounding, work);
         };
+        a::BoundWakeFacetStorage action_storage{memory};
         for (std::size_t i = 0; i < particles.size(); ++i) {
             work.step();
             const auto& query = queries.resolved.values()[i];
             if (!query)
                 reject(core::FailureCode::InvalidInput);
             const a::P1ActionSource source{input.contact, *query, input.trial_stamp};
-            const auto action = prepare_action(assembly, source, limits.action, shared, local,
-                                               kernel, memory, work);
+            const auto action =
+                prepare_action(assembly, source, limits.action, shared, local, kernel, memory, work,
+                               queries.reuse_actions ? &action_storage : nullptr);
             auto sample = evaluate_known_row(geometry, *query, flow, memory, work);
             const auto report = require(action.report());
             std::optional<a::P1ActionDirection> variation;
@@ -3494,7 +3501,8 @@ struct NonpenetrationBuilder {
         const auto admit = [&] {
             reuse_actions = admit_serial_induction(
                 right.size(), [&](std::size_t i) { return owned_source(retained, i); },
-                retained.maps.values(), retained.ids.values(), *retained.limits, 6, memory, work);
+                retained.maps.values(), retained.ids.values(), *retained.limits, true, 6, memory,
+                work);
         };
         return linearize_rows(sense, face_at, get, admit, right, request, memory, rounding, work);
     }

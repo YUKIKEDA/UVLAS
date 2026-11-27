@@ -614,9 +614,13 @@ class SharedP1Engine {
                                                              product(3, logarithmic_visits(s))))),
                                       64));
         result.preflight_steps = scan.used;
+        // A caller may allow much more work than any local expression executes.
+        // Reserve the ceiling the local evaluator actually enforces.
+        const auto kernel_steps = n == 0 ? 0 : P1Workspace::maximum_steps();
+        (void)checked_limit(kernel_steps, limits.kernel.max_steps);
         result.reserved_steps =
             sum(result.preflight_steps,
-                sum(metadata, product(n, sum(limits.geometry.max_steps, limits.kernel.max_steps))));
+                sum(metadata, product(n, sum(limits.geometry.max_steps, kernel_steps))));
         (void)checked_limit(result.reserved_steps, limits.steps);
         return result;
     }

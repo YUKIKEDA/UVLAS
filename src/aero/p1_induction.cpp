@@ -39,7 +39,7 @@ struct Shape {
     std::size_t nodes = 0;
     std::uint64_t work = 0;
 };
-Shape maximum_shape() {
+Shape build_maximum_shape() {
     Shape maximum;
     for (unsigned pattern = 0; pattern < 729U; ++pattern) {
         unsigned remaining = pattern;
@@ -90,6 +90,10 @@ Shape maximum_shape() {
     maximum.work =
         p1::checked_sum(maximum.work, input_work + table_work + constant_work + result_work);
     return maximum;
+}
+const Shape& maximum_shape() {
+    static const Shape shape = build_maximum_shape();
+    return shape;
 }
 OwnedGeometryFailure failed(core::FailureCode code, const GeometryContext& context) noexcept {
     auto details = context.diagnostics;
@@ -536,7 +540,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         if (!supported_environment())
             return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
         auto& scratch = workspace.scratch_.values()[0];
-        p1::Work work{0, limits.max_steps, stop};
+        p1::Work work{0, shape.work, stop};
         load(geometry, query, ambient, scratch, work);
         auto [options, scale] = prepare_input(scratch, work);
         options.boundary = boundary;
@@ -676,6 +680,13 @@ P1Workspace::create(core::ResourcePlan& plan, core::FailureDetails details) noex
 std::uint64_t P1Workspace::payload_bytes() noexcept {
     try {
         return shape_payload(maximum_shape());
+    } catch (...) {
+        return std::numeric_limits<std::uint64_t>::max();
+    }
+}
+std::uint64_t P1Workspace::maximum_steps() noexcept {
+    try {
+        return maximum_shape().work;
     } catch (...) {
         return std::numeric_limits<std::uint64_t>::max();
     }

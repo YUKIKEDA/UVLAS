@@ -138,12 +138,12 @@ public:
 private:
     friend struct NonpenetrationBuilder;
     DiscreteNonpenetration(core::PlannedBuffer<NonpenetrationStorage>, ProjectedCaseUniformFlow&&,
-                           std::optional<aero::detail::P1ActionValue>,
+                           std::optional<aero::detail::GlobalContactState>,
                            aero::detail::GeometryContext, aero::detail::P1ActionStamp,
                            std::uint64_t) noexcept;
     core::PlannedBuffer<NonpenetrationStorage> rows_;
     ProjectedCaseUniformFlow flow_;
-    std::optional<aero::detail::P1ActionValue> geometry_owner_;
+    std::optional<aero::detail::GlobalContactState> geometry_owner_;
     aero::detail::GeometryContext geometry_context_;
     aero::detail::P1ActionStamp trial_stamp_;
     std::uint64_t used_steps_;
