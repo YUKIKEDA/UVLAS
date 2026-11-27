@@ -1,0 +1,52 @@
++ cd /mnt/case-bound
++ src=/mnt/buildarea/source
++ build=/mnt/buildarea/build
++ catch=/mnt/buildarea/catch2
++ cxxflags=(-std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -Ichanged -I"$src/include" -I"$src/src/io" -I"$build/generated" -I"$src/tests/io" -isystem /mnt/include -isystem "$catch" -isystem /mnt/deps/x64-linux/include)
++ libs=("$catch/catch-main.o" -Wl,--start-group "$build/libuvlas_io.a" "$build/libuvlas_core.a" "$build/libuvlas_numerics.a" -Wl,--end-group -pthread)
++ g++ -std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -Ichanged -I/mnt/buildarea/source/include -I/mnt/buildarea/source/src/io -I/mnt/buildarea/build/generated -I/mnt/buildarea/source/tests/io -isystem /mnt/include -isystem /mnt/buildarea/catch2 -isystem /mnt/deps/x64-linux/include /mnt/buildarea/source/tests/io/checkpoint_manifest_test.cpp checkpoint_manifest.o /mnt/buildarea/catch2/catch-main.o -Wl,--start-group /mnt/buildarea/build/libuvlas_io.a /mnt/buildarea/build/libuvlas_core.a /mnt/buildarea/build/libuvlas_numerics.a -Wl,--end-group -pthread -o checkpoint_manifest
++ ./checkpoint_manifest
+Randomness seeded to: 3231701184
+===============================================================================
+All tests passed (112 assertions in 4 test cases)
+
++ /mnt/bin/checkpoint_publication
+Randomness seeded to: 355203137
+===============================================================================
+All tests passed (92 assertions in 6 test cases)
+
++ /opt/python/cp312-cp312/bin/python3 -
++ g++ -std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -Ichanged -I/mnt/buildarea/source/include -I/mnt/buildarea/source/src/io -I/mnt/buildarea/build/generated -I/mnt/buildarea/source/tests/io -isystem /mnt/include -isystem /mnt/buildarea/catch2 -isystem /mnt/deps/x64-linux/include -c without_digest_guard.cpp -o without_digest_guard.o
++ g++ -std=c++23 -O3 -march=x86-64 -mtune=generic -ffp-contract=off -fno-fast-math -UNDEBUG -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Werror -DEIGEN_RUNTIME_NO_MALLOC -DUVLAS_NLOHMANN_JSON_ALLOCATION_REPAIR=1 -Ichanged -I/mnt/buildarea/source/include -I/mnt/buildarea/source/src/io -I/mnt/buildarea/build/generated -I/mnt/buildarea/source/tests/io -isystem /mnt/include -isystem /mnt/buildarea/catch2 -isystem /mnt/deps/x64-linux/include changed/checkpoint_directory_test.cpp without_digest_guard.o checkpoint_manifest.o /mnt/buildarea/catch2/catch-main.o -Wl,--start-group /mnt/buildarea/build/libuvlas_io.a /mnt/buildarea/build/libuvlas_core.a /mnt/buildarea/build/libuvlas_numerics.a -Wl,--end-group -pthread -o checkpoint_directory_mutation
++ cd run
++ set +e
++ ../checkpoint_directory_mutation 'A Case restart pins the exact checkpoint manifest before reading chunks'
++ rc=42
++ set -e
++ cat ../mutation.log
+Filters: "A Case restart pins the exact checkpoint manifest before reading chunks"
+Randomness seeded to: 1193404853
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+checkpoint_directory_mutation is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+A Case restart pins the exact checkpoint manifest before reading chunks
+-------------------------------------------------------------------------------
+changed/checkpoint_directory_test.cpp:229
+...............................................................................
+
+changed/checkpoint_directory_test.cpp:298: FAILED:
+  CHECK( rejected.error().code == core::FailureCode::CheckpointCorrupt )
+with expansion:
+  '\f' == 15
+
+===============================================================================
+test cases:  1 |  0 passed | 1 failed
+assertions: 16 | 15 passed | 1 failed
+
++ test 42 -ne 0
++ grep -q 'rejected.error().code == core::FailureCode::CheckpointCorrupt' ../mutation.log
++ printf 'mutation_detected_exit=%s\n' 42
+mutation_detected_exit=42

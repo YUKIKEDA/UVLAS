@@ -1,0 +1,8 @@
+Case validation succeeded.
+normal_cli_exit=0
+1888  openat2(AT_FDCWD, "/case", {flags=O_RDONLY|O_CLOEXEC|O_PATH|O_DIRECTORY, resolve=RESOLVE_NO_SYMLINKS}, 24) = 3
+1888  openat2(3, "external case.json", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 4
+1888  openat2(3, "wing.msh", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 5
+1888  openat2(3, "gmsh.json", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 5
+1888  openat2(3, "wing.bdf", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 5
+1888  openat2(3, "nastran.json", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 5

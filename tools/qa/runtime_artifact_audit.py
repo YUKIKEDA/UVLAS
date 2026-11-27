@@ -86,8 +86,17 @@ if os.name == "nt":
     python_license = Path(sys.base_prefix) / "LICENSE.txt"
     notice_path = "base_python/LICENSE.txt"
 else:
-    python_license = Path("/usr/share/doc/python3.12/copyright")
-    notice_path = str(python_license)
+    base = Path(sys.base_prefix).resolve()
+    stdlib = Path(sysconfig.get_path("stdlib")).resolve()
+    if not stdlib.is_relative_to(base):
+        raise RuntimeError("CPython stdlib notice is outside the base interpreter")
+    packaged_notice = Path("/usr/share/doc/python3.12/copyright")
+    if base == Path("/usr") and packaged_notice.is_file():
+        python_license = packaged_notice
+        notice_path = str(python_license)
+    else:
+        python_license = stdlib / "LICENSE.txt"
+        notice_path = "stdlib/LICENSE.txt"
 try:
     notice_bytes = python_license.read_bytes()
 except OSError as error:
@@ -144,6 +153,49 @@ if os.name == "nt":
     }
 
 print(json.dumps(result, sort_keys=True))
+"""
+
+
+PYTHON_EXCEPTION_PROBE = """
+import importlib
+from pathlib import Path
+import sys
+
+module, source = map(Path, sys.argv[1:])
+sys.path.insert(0, str(module.parent))
+uvlas = importlib.import_module("_uvlas")
+if Path(uvlas.__file__).resolve() != module:
+    raise RuntimeError("Resolved a different extension")
+loaded = uvlas.load_case(source)
+if loaded.ok or loaded.failure.code != uvlas.FailureCode.InvalidInput:
+    raise RuntimeError("Malformed JSON did not return InvalidInput")
+print("Malformed JSON rejected.")
+"""
+
+# GLIBC's binding report distinguishes the caller from the selected provider.
+GNU_EXCEPTION_BINDING = re.compile(
+    r"^\s*\d+:\s*binding file (.+?) \[[0-9]+\] to (.+?) \[[0-9]+\]: "
+    r"normal symbol `_ZNSt13runtime_errorC1EPKc' \[GLIBCXX_3\.4\.21\]\s*$"
+)
+
+
+GNU_PARSER_HEADERS = frozenset(("stl_vector.h", "vector.tcc", "stl_bvector.h", "basic_string.tcc"))
+GNU_PARSER_OBJECT = Path("CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o")
+
+PYTHON_EXTERNAL_CASE_PROBE = """
+import importlib
+from pathlib import Path
+import sys
+
+module, source = map(Path, sys.argv[1:3])
+sys.path.insert(0, str(module.parent))
+uvlas = importlib.import_module("_uvlas")
+if Path(uvlas.__file__).resolve() != module:
+    raise RuntimeError("Resolved a different extension")
+loaded = uvlas.load_case(source)
+if not loaded.ok or loaded.value.source_sha256.hex() != sys.argv[3]:
+    raise RuntimeError("Python did not accept the pinned external Case")
+print("External Case accepted.")
 """
 
 
@@ -394,6 +446,196 @@ def verify_python(
     return tested
 
 
+def exception_provider(trace: Path, caller: Path) -> Path:
+    providers: set[Path] = set()
+    with trace.open(encoding="utf-8", errors="replace") as lines:
+        for line in lines:
+            binding = GNU_EXCEPTION_BINDING.match(line)
+            if binding is None or Path(binding[1]) != caller:
+                continue
+            provider = Path(binding[2])
+            require(provider.is_absolute(), f"Non-absolute exception provider for {caller.name}")
+            providers.add(provider.resolve(strict=True))
+    if len(providers) != 1:
+        raise RuntimeError(f"Expected one observed exception provider for {caller.name}")
+    return providers.pop()
+
+
+def audit_linux_exception_provider(
+    python: Path, cli: Path, extension: Path, stage: Path, env: dict[str, str], *, expected: str
+) -> dict[str, object]:
+    # The byte offset in the normal CLI diagnostic establishes parser entry.
+    source = stage / "invalid.json"
+    source.write_bytes(b'{"schema":x}')
+    runs = (
+        ("cli", cli, [str(cli), "validate", str(source)], 2, "validate: JSON document at byte 10"),
+        (
+            "extension",
+            extension,
+            [str(python), "-I", "-B", "-c", PYTHON_EXCEPTION_PROBE, str(extension), str(source)],
+            0,
+            "Malformed JSON rejected.",
+        ),
+    )
+    observations: dict[str, object] = {}
+    for name, caller, command, status, message in runs:
+        prefix = stage / f"binding-{name}"
+        result = run(
+            command, stage, {**env, "LD_DEBUG": "bindings", "LD_DEBUG_OUTPUT": str(prefix)}
+        )
+        report = result.stderr if name == "cli" else result.stdout
+        require(
+            result.returncode == status and report.strip() == message,
+            f"{name} did not reach the malformed JSON path: {result.stderr.strip()}",
+        )
+        traces = list(stage.glob(f"{prefix.name}.*"))
+        if len(traces) != 1:
+            raise RuntimeError(f"Expected one glibc loader binding trace for {name}")
+        provider = exception_provider(traces[0], caller)
+        observed = digest(provider)
+        require(
+            observed == expected,
+            f"{name} exception provider {provider.name} SHA-256 {observed} "
+            f"does not match {expected}",
+        )
+        observations[name] = {"file": provider.name, "sha256": observed}
+    return {"symbol": "std::runtime_error(char const*)@GLIBCXX_3.4.21", **observations}
+
+
+class LinuxParserInputs(NamedTuple):
+    build: Path
+    expected_headers: dict[str, str]
+    case: Path
+    case_sha256: str
+
+
+def make_dependency_paths(build: Path, target: Path) -> list[Path]:
+    # GCC's -MD file is one Make rule; escaped line ends and names are significant.
+    data = (build / target.with_suffix(".o.d")).read_text(encoding="utf-8")
+    target_name, _, dependencies = data.replace("\\\n", " ").strip().partition(":")
+    require(target_name == target.as_posix(), "Unexpected GNU Make parser dependency target")
+    require("\n" not in dependencies, "Expected a single GNU Make parser dependency rule")
+    names = re.findall(r"(?:\\.|[^\s\\])+", dependencies)
+    return [build / re.sub(r"\\(.)", r"\1", name).replace("$$", "$") for name in names]
+
+
+def ninja_dependency_paths(build: Path, target: Path) -> list[Path]:
+    lines = (
+        output(["ninja", "-t", "deps", target.as_posix()], build, isolated_environment(build))
+        .rstrip("\n")
+        .splitlines()
+    )
+    if not lines:
+        raise RuntimeError("No Ninja dependency record for the built parser")
+    header = re.fullmatch(
+        rf"{re.escape(target.as_posix())}: #deps ([0-9]+), deps mtime [0-9]+ \(VALID\)",
+        lines[0],
+    )
+    if header is None:
+        raise RuntimeError("Expected a valid Ninja dependency record for the built parser")
+    entries = lines[1:]
+    require(
+        len(entries) == int(header[1])
+        and all(line.startswith("    ") and len(line) > 4 for line in entries),
+        "Incomplete Ninja dependencies for the built parser",
+    )
+    return [build / line[4:] for line in entries]
+
+
+def parser_dependencies(build: Path, target: Path) -> tuple[list[Path], Path, str]:
+    cache = (build / "CMakeCache.txt").read_text(encoding="utf-8")
+    generators = re.findall(r"^CMAKE_GENERATOR:INTERNAL=(.+)$", cache, re.MULTILINE)
+    if generators == ["Ninja"]:
+        record = build / ".ninja_deps"
+        before = digest(record)
+        paths = ninja_dependency_paths(build, target)
+    elif generators == ["Unix Makefiles"]:
+        record = build / target.with_suffix(".o.d")
+        before = digest(record)
+        paths = make_dependency_paths(build, target)
+    else:
+        raise RuntimeError("Expected a CMake Ninja or Unix Makefiles Release build")
+    require(digest(record) == before, "Parser dependency record changed during audit")
+    return paths, record.relative_to(build), before
+
+
+def verify_linux_parser_headers(
+    inputs: LinuxParserInputs, producer: RuntimeArtifactProducer
+) -> dict[str, object]:
+    expected = inputs.expected_headers
+    require(
+        expected.keys() == GNU_PARSER_HEADERS, "Expected all four libstdc++ parser header hashes"
+    )
+    require(
+        all(re.fullmatch(r"[0-9a-f]{64}", value) for value in expected.values()),
+        "Invalid parser header SHA-256",
+    )
+    require(
+        re.fullmatch(r"[0-9a-f]{64}", inputs.case_sha256) is not None,
+        "Invalid external Case SHA-256",
+    )
+    build = inputs.build.resolve(strict=True)
+    # Reuse the producer receipts against their original build outputs.
+    verify_producer_artifacts(
+        producer, build / producer.cli.relative_path, build / producer.extension.relative_path
+    )
+    require((build / GNU_PARSER_OBJECT).is_file(), "Missing built GNU parser object")
+    observed: dict[str, str] = {}
+    paths, record, record_sha256 = parser_dependencies(build, GNU_PARSER_OBJECT)
+    for path in paths:
+        if path.name not in expected:
+            continue
+        require(path.name not in observed, f"Multiple parser dependencies named {path.name}")
+        observed[path.name] = digest(path)
+        require(
+            observed[path.name] == expected[path.name],
+            f"Built parser header {path.name} SHA-256 {observed[path.name]} "
+            f"does not match {expected[path.name]}",
+        )
+    require(observed.keys() == expected.keys(), "Missing a required GNU parser dependency")
+    return {
+        "object": GNU_PARSER_OBJECT.as_posix(),
+        "dependency_record": {"path": record.as_posix(), "sha256": record_sha256},
+        "header_sha256": observed,
+    }
+
+
+def audit_linux_external_case(
+    python: Path,
+    cli: Path,
+    extension: Path,
+    stage: Path,
+    env: dict[str, str],
+    *,
+    inputs: LinuxParserInputs,
+) -> dict[str, object]:
+    case = inputs.case.resolve(strict=True)
+    require(digest(case) == inputs.case_sha256, "External Case SHA-256 differs before audit")
+    result = output([str(cli), "validate", str(case)], stage, env)
+    require(
+        result.strip() == "Case validation succeeded.", "CLI did not validate the external Case"
+    )
+    result = output(
+        [
+            str(python),
+            "-I",
+            "-B",
+            "-c",
+            PYTHON_EXTERNAL_CASE_PROBE,
+            str(extension),
+            str(case),
+            inputs.case_sha256,
+        ],
+        stage,
+        env,
+    )
+    require(
+        result.strip() == "External Case accepted.", "Python did not validate the external Case"
+    )
+    require(digest(case) == inputs.case_sha256, "External Case SHA-256 differs after audit")
+    return {"case_sha256": inputs.case_sha256, "cli": "accepted", "python_file": "accepted"}
+
+
 def audit(
     cli: Path,
     extension: Path,
@@ -403,11 +645,26 @@ def audit(
     commit: str,
     producer_manifest: Path,
     dumpbin: str,
+    linux_exception_provider_sha256: str | None = None,
+    linux_parser_inputs: LinuxParserInputs | None = None,
 ) -> dict[str, object]:
+    require(
+        linux_parser_inputs is None or linux_exception_provider_sha256 is not None,
+        "Combined audit requires an expected Linux exception provider",
+    )
+    if linux_exception_provider_sha256 is not None:
+        require(sys.platform == "linux", "The exception provider audit requires Linux/glibc")
+        require(
+            re.fullmatch(r"[0-9a-f]{64}", linux_exception_provider_sha256) is not None,
+            "Invalid expected exception provider SHA-256",
+        )
     # The audit interpreter is outside the build; never resolve a venv's python symlink.
     require(python.is_absolute(), "Use an absolute path to the fresh venv interpreter")
     producer = read_producer_manifest(producer_manifest, commit)
     verify_producer_artifacts(producer, cli, extension)
+    parser_headers = None
+    if linux_parser_inputs is not None:
+        parser_headers = verify_linux_parser_headers(linux_parser_inputs, producer)
     with tempfile.TemporaryDirectory(prefix="uvlas-runtime-audit-") as prepared:
         stage = Path(prepared).resolve()
         for source in (cli, extension, source_test):
@@ -462,7 +719,7 @@ def audit(
             stage=stage,
             env=env,
         )
-        return {
+        report: dict[str, object] = {
             "platform": platform.system(),
             "producer_manifest_sha256": producer.sha256,
             "kernel_release": platform.release(),
@@ -474,6 +731,21 @@ def audit(
             "relocated_cli": {"build_info": banner, "invalid_option_status": negative.returncode},
             "relocated_python": python_info,
         }
+        if linux_exception_provider_sha256 is not None:
+            report["linux_parser_exception_runtime"] = audit_linux_exception_provider(
+                python,
+                staged_cli,
+                staged_extension,
+                stage,
+                env,
+                expected=linux_exception_provider_sha256,
+            )
+        if linux_parser_inputs is not None:
+            report["linux_parser_build"] = parser_headers
+            report["linux_external_case"] = audit_linux_external_case(
+                python, staged_cli, staged_extension, stage, env, inputs=linux_parser_inputs
+            )
+        return report
 
 
 def main() -> None:
@@ -483,7 +755,37 @@ def main() -> None:
     parser.add_argument("--commit", required=True)
     parser.add_argument("--producer-manifest", required=True, type=Path)
     parser.add_argument("--dumpbin", default="dumpbin")
+    parser.add_argument(
+        "--linux-exception-provider-sha256",
+        help="SHA-256 required for the libstdc++ provider of the JSON exception constructor",
+    )
+    parser.add_argument(
+        "--linux-parser-build",
+        type=Path,
+        help="CMake Ninja or Unix Makefiles Release build directory",
+    )
+    parser.add_argument(
+        "--linux-parser-header",
+        nargs=2,
+        metavar=("NAME", "SHA256"),
+        action="append",
+        help="Expected header SHA-256; repeat for the four parser headers",
+    )
+    parser.add_argument("--linux-external-case", type=Path, help="Already prepared external Case")
+    parser.add_argument("--linux-external-case-sha256")
     args = parser.parse_args()
+    build: Path | None = args.linux_parser_build
+    header_pairs: list[tuple[str, str]] | None = args.linux_parser_header
+    case: Path | None = args.linux_external_case
+    case_sha256: str | None = args.linux_external_case_sha256
+    qualification = None
+    if any(value is not None for value in (build, header_pairs, case, case_sha256)):
+        if build is None or header_pairs is None or case is None or case_sha256 is None:
+            parser.error("Supply build, four header hashes, external Case and its SHA-256 together")
+        headers = dict(header_pairs)
+        if len(headers) != len(header_pairs):
+            parser.error("Supply each parser header only once")
+        qualification = LinuxParserInputs(build, headers, case, case_sha256)
     result = audit(
         args.cli,
         args.extension,
@@ -492,6 +794,8 @@ def main() -> None:
         commit=args.commit,
         producer_manifest=args.producer_manifest,
         dumpbin=args.dumpbin,
+        linux_exception_provider_sha256=args.linux_exception_provider_sha256,
+        linux_parser_inputs=qualification,
     )
     result["vcpkg_notice_sha256"] = notice_hashes(args.notices, args.vcpkg_share)
     print(json.dumps(result, indent=2, sort_keys=True))

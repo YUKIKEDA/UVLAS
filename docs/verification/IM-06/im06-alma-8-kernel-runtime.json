@@ -1,0 +1,133 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-alma-8-kernel-runtime",
+  "ids": [
+    "IO4-01",
+    "IO4-07",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-28",
+  "source_commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+  "claimed_state": "署名を確認したAlmaLinux 8.10の実カーネルと同じ移設物で、外部参照取得および実例外提供元を検証する。",
+  "candidate": {
+    "image": "sha256:55a36963bc0504cdf004011001c1072306402f0b8b83be5a5eba7068f93eec53",
+    "libc": "glibc 2.28",
+    "cpython": "3.12.16",
+    "compiler": "GNU 14.2.1",
+    "configuration": "Release",
+    "wheel_sha256": "dcd3e889e0a451c7cca723658325db3b01d31f0228f2f2a406115dedb8d80977",
+    "producer_manifest_sha256": "2ddd32581a917c8b64a165228be930759648d044b6e7b2a5cbf3b477426fa0c8",
+    "build_evidence": {
+      "path": "im06-linux-parser-input-qualification.json",
+      "compile_dependency_file_sha256": "b438a37c99df20fc3d9ff8cdfd54bcaa53773515aa28962b0923817e02005996",
+      "header_sha256": {
+        "basic_string.tcc": "7c8e15840577ec46af320cb89ee5898efdb08301ce05d3739f414797c31c417f",
+        "stl_bvector.h": "d17336c83d5b5f17fcfab5712e091446995ccfb65351bd0798baccdd41e00b8d",
+        "stl_vector.h": "466fdab9756343b1fca4c36cb5105db50654fbf9f32166ce0cde5e369901fe26",
+        "vector.tcc": "852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68"
+      }
+    },
+    "files_sha256_in_both_environments": {
+      "/runtime/uvlas": "bb9c2ccb8c2b42bcf15770334ce1b58d69932a55b726baf2b731cfc0c4be6944",
+      "/work/qualified-tested/venv/lib/python3.12/site-packages/_uvlas.cpython-312-x86_64-linux-gnu.so": "8488cc1f93ded36d819091544dbefdb25e036371768aa7159fc5fa310f702ffc",
+      "/usr/lib64/libc-2.28.so": "867aee8b9dc11ef71edf63c8300105d9e7a2df3ca4235c9528f8685de64161ea",
+      "/usr/lib64/libstdc++.so.6.0.25": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134",
+      "/case/external case.json": "741e954d7cdbf8882f9f8876efbeed287e304403d284de5a0e3e2bbef90c298b",
+      "/case/wing.bdf": "a02d07c9e93ce20900ae3bfe42475348f4d7eea178e9e1ea69017a2ea50c9ffa",
+      "/case/wing.msh": "9543d355442833d70f8a49fd512a114dfa1d279b1f70e0923c74ff30a165a037",
+      "/case/gmsh.json": "c0c7ba785b4a304f7f2d2c2c34b37ea97d6985c19e820eac00108a654a18c02e",
+      "/case/nastran.json": "97056a41d580a5e44465c322234a8d024730476c8e772671d84c5b86f83eb2d9"
+    }
+  },
+  "guest": {
+    "kernel": "4.18.0-553.189.1.el8_10.x86_64",
+    "kernel_rpm_url": "https://repo.almalinux.org/almalinux/8/BaseOS/x86_64/os/Packages/kernel-core-4.18.0-553.189.1.el8_10.x86_64.rpm",
+    "kernel_rpm_sha256": "e266435f6d3b65cd94010fb2d2660d51b292634ad55ab0741bc8de08b3d13ecf",
+    "kernel_rpm_signing_key_id": "ced7258b",
+    "kernel_sha256": "6c68c16ecb83e4884b10e3cb5b9f9814cdff9127264a1ec32e7edfc910565a69",
+    "initramfs_sha256": "622fdb7d684516c20ff8a4c73cd6d518f4b8bb722f19b41fbac76c25cd86910c",
+    "qemu": "6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.31), TCG, x86_64, no network",
+    "qemu_system_x86_deb_sha256": "154327d064e982cd13fc26f1957f4a76054f89e5805427667d6d524af4c9fd5d",
+    "openat2": {
+      "root_no_symlinks": "fd=3",
+      "child_no_symlinks_beneath": "fd=4"
+    },
+    "case": {
+      "cli_exit": 0,
+      "python_file_ok": true,
+      "python_dict_ok": true
+    },
+    "exception_provider": {
+      "symbol": "std::runtime_error(char const*)@GLIBCXX_3.4.21",
+      "cli_and_extension_loader_path": "/lib64/libstdc++.so.6",
+      "resolved_path": "/usr/lib64/libstdc++.so.6.0.25",
+      "sha256": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134",
+      "malformed_cli_exit": 2,
+      "malformed_python_file_code": "InvalidInput"
+    }
+  },
+  "wsl_control": {
+    "kernel": "6.18.58.1-microsoft-standard-WSL2",
+    "openat2": {
+      "root_no_symlinks": "fd=3",
+      "child_no_symlinks_beneath": "fd=4"
+    },
+    "case": {
+      "cli_exit": 0,
+      "python_file_ok": true,
+      "python_dict_ok": true
+    },
+    "injected_failures": {
+      "root_ENOSYS": {
+        "cli_exit": 2,
+        "diagnostic": "manifest acquisition"
+      },
+      "wing.msh_ENOSYS": {
+        "cli_exit": 2,
+        "pointer": "/model/geometry/1/mesh",
+        "python_file_code": "Unsupported",
+        "python_dict_code": "Unsupported"
+      },
+      "wing.msh_EINVAL": {
+        "cli_exit": 2,
+        "pointer": "/model/geometry/1/mesh"
+      }
+    }
+  },
+  "evidence": [
+    {
+      "path": "alma-8-kernel-runtime/boot.log",
+      "sha256": "612c2d1f047577b52054fae34990bed20878a15ed746cf56cd496bd30877fa59"
+    },
+    {
+      "path": "alma-8-kernel-runtime/control.log",
+      "sha256": "4b5c949d60b32d5c704d13bac78eae9653472a14ef6b8f093a6ae27ad2b016af"
+    },
+    {
+      "path": "alma-8-kernel-runtime/trace-cli.log",
+      "sha256": "3ebc96665092ae212e257e35ea2c13e24bc78715416036004082ae48b04f20ae"
+    },
+    {
+      "path": "alma-8-kernel-runtime/injected-openat2.log",
+      "sha256": "8e001a09bce505def3692fe6307972cefa156626455a6d71511de6457e5c278f"
+    },
+    {
+      "path": "alma-8-kernel-runtime/kernel-signature.log",
+      "sha256": "83d6cf4d7c940984e000f8dc9c9819b872a20d1067774a8447eea62a9aa73a1d"
+    },
+    {
+      "path": "alma-8-kernel-runtime/init.sh",
+      "sha256": "b48ed664406a330584cf32783aec59585240d02124f5b4792bec5e0ff9d69b87"
+    },
+    {
+      "path": "alma-8-kernel-runtime/run-probe.sh",
+      "sha256": "77afbb83e834f7081a3b4422f82b1865b347ee4de1f07caacfd63fa590ba86a4"
+    },
+    {
+      "path": "alma-8-kernel-runtime/probe.py",
+      "sha256": "56e07a8cf1b1f690b9ef28e6da4ca26f637c1da12c0710db2e748ae6d55a5fec"
+    }
+  ]
+}

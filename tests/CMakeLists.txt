@@ -189,7 +189,7 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.checkpoint_directory
         LABELS integration negative verification
         SOURCES io/checkpoint_directory_test.cpp
-        LIBS uvlas_io)
+        LIBS uvlas_io nlohmann_json::nlohmann_json)
     target_include_directories(uvlas_test_io_checkpoint_directory PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 endif()
 

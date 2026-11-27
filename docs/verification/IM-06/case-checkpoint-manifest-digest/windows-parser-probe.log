@@ -1,0 +1,2 @@
+MSVC_STL_VERSION=145 MSVC_STL_UPDATE=202609
+FailureCode::Unsupported / InputDiagnosticReason::UnsupportedMemoryModel

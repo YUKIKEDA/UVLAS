@@ -1,0 +1,59 @@
+8d4caafd77ffd4786d8fb3c56373fd3f6cabfeea150ce2912b00f7de6166430b  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/initramfs.cpio.gz
+f6ee6fa71e17b036caf675a5726f82ba6b3206629c1c613a9684b86f52470f06  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/init
+8b258fbf5c4747b3a4f3ec09d80c9b424f6fa6dff4c3d82b769d32a640d561d6  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/ext4.ko
+020559fb7c9522e067550eaa5fe61a86a63596998a888623fe3519f8d3de507a  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/jbd2.ko
+198fb70f5bc72515d349a01b9bc92c8f8da1fbaa9d69977b20a444370507cc67  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/libcrc32c.ko
+e759436576abf5b9eba137ea338391f81bd75d85bb84b965e275a379d579fe33  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/mbcache.ko
+2b87bb4fe056b035e009340eae458b7f380575a57e8fb19731bba2192be56d88  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/virtio_blk.ko
+70d190a4ada805684670bf0df4e8fd8f241847ce5dae33ed72be3d9608f31b80  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/save.ext4
+6c68c16ecb83e4884b10e3cb5b9f9814cdff9127264a1ec32e7edfc910565a69  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-boot/kernel/lib/modules/4.18.0-553.189.1.el8_10.x86_64/vmlinuz
+Linux (none) 4.18.0-553.189.1.el8_10.x86_64 #1 SMP Mon Nov 23 05:59:51 EST 2026 x86_64 GNU/Linux
+/dev/vda /save ext4 rw,relatime 0 0
+e006b2dad2a53f9f477771424fc4e2d6a754b4f58284ed6b4054f4fcc8ba30c6  /tests/checkpoint_directory
+90e0c4cbaa0296b3e0351d3e4341f9987e3ce8ae089951c215b33486ded04d80  /tests/checkpoint_publication
+d6e0b2d818fc7bdf3b0773b1416dffaacab1bc87874843092d6d2883a1b35054  /tests/recovery_probe
+867aee8b9dc11ef71edf63c8300105d9e7a2df3ca4235c9528f8685de64161ea  /lib64/libc.so.6
+d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134  /lib64/libstdc++.so.6
+=== existing directory tests at /save ===
+Randomness seeded to: 1492057353
+[1;31m[1;33m[0m[0m[1;32m===============================================================================[0m[0;37m[0m
+[1;32mAll tests passed[0m (120 assertions in 3 test cases)
+
+=== existing publication tests at TMPDIR=/save/tmp ===
+Randomness seeded to: 1644342973
+[1;31m[1;33m[0m[0m[1;32m===============================================================================[0m[0;37m[0m
+[1;32mAll tests passed[0m (92 assertions in 6 test cases)
+
+=== interrupted publication and recovery under the same parent ===
+interrupted: SIGXFSZ, chunks=8/12 bytes, no manifest, explicit=CheckpointCorrupt, latest=12, value=42
+published retry: latest=13, values=42/100/200, duplicate number rejected
+/save/recovery-proof/.uvlas-checkpoint-192-1/chunk-first.bin
+/save/recovery-proof/.uvlas-checkpoint-192-1/chunk-second.bin
+/save/recovery-proof/checkpoint-12/chunk-first.bin
+/save/recovery-proof/checkpoint-12/manifest.json
+/save/recovery-proof/checkpoint-13/chunk-first.bin
+/save/recovery-proof/checkpoint-13/chunk-second.bin
+/save/recovery-proof/checkpoint-13/manifest.json
+UVLAS_CHECKPOINT_GUEST_COMPLETE
+[    8.173734] reboot: Power down
+e2fsck 1.46.5 (30-Dec-2021)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+uvlas-checkpoint: 23/32768 files (4.3% non-contiguous), 6181/32768 blocks
+8a262eb23894aab34ae223795a0ba838ad2a731edf0e5e87a531df26f28d55fb  /var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/save.ext4
+debugfs 1.46.5 (30-Dec-2021)
+     13   40755 (2)      0      0    4096 28-Nov-2026 01:07 .
+      2   40755 (2)      0      0    4096 28-Nov-2026 01:07 ..
+     17   40700 (2)      0      0    4096 28-Nov-2026 01:07 .uvlas-checkpoint-192-1
+     14   40700 (2)      0      0    4096 28-Nov-2026 01:07 checkpoint-12
+     20   40700 (2)      0      0    4096 28-Nov-2026 01:07 checkpoint-13
+
+debugfs 1.46.5 (30-Dec-2021)
+     20   40700 (2)      0      0    4096 28-Nov-2026 01:07 .
+     13   40755 (2)      0      0    4096 28-Nov-2026 01:07 ..
+     21  100600 (1)      0      0       8 28-Nov-2026 01:07 chunk-first.bin
+     22  100600 (1)      0      0      16 28-Nov-2026 01:07 chunk-second.bin
+     23  100600 (1)      0      0     884 28-Nov-2026 01:07 manifest.json

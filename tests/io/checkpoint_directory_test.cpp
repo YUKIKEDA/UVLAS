@@ -1,3 +1,4 @@
+#include "case_schema_test_adapter.hpp"
 #include "checkpoint_directory.hpp"
 #include "checkpoint_directory_name.hpp"
 
@@ -12,6 +13,7 @@
 #include <atomic>
 #include <chrono>
 #include <fstream>
+#include <limits>
 #include <stdexcept>
 
 namespace {
@@ -222,6 +224,102 @@ TEST_CASE("Checkpoint directories round-trip typed data and discover the latest 
         REQUIRE_FALSE(bounded);
         CHECK(bounded.error().code == core::FailureCode::ResourceExceeded);
     }
+}
+
+TEST_CASE("A Case restart pins the exact checkpoint manifest before reading chunks",
+          "[IO4-06][IO4-07][negative]") {
+    using namespace uvlas::test::schema_adapter;
+    constexpr std::string_view original =
+        "9a2b121a467ad1651f3f02b8a35884ddcb3afa6b77b9c4f80089f05e7be34647";
+    constexpr std::string_view with_space =
+        "33ebefe08a223ea66fb60d0014e98e4057e6c4f8dd772df16aa12d73be3536fa";
+    const TestDirectory dir;
+    const auto checkpoint = dir.path() / "checkpoint-12";
+    core::ResourcePlan plan{12'000'000};
+    auto context = cp::CheckpointFingerprints{};
+    context.version.bytes[0] = std::byte{0xa7};
+    const std::array words{std::uint64_t{42}};
+    const auto chunk = take(cp::CheckpointChunk::encode({}, std::span<const std::uint64_t>{words},
+                                                        limits.chunk, plan, {}));
+    const std::array chunks{cp::NamedCheckpointChunk{"first", chunk}};
+    REQUIRE(cp::save_checkpoint_directory(dir.path(), 12, chunks, context, limits, publication,
+                                          plan, {}));
+
+    const auto case_with_digest = [&](std::string_view hash) {
+        auto wire_case = root("coupled_flutter");
+        if (!hash.empty()) {
+            auto restart = fragment("Restart");
+            restart.set("directory", string("checkpoint-12"));
+            restart.set("manifest_sha256", string(hash));
+            wire_case.set("restart", std::move(restart));
+        }
+        const auto wire = wire_case.wire();
+        const uvlas::io::InputLimits syntax{1'000'000,
+                                            256,
+                                            100'000,
+                                            100'000,
+                                            1'000'000,
+                                            1'000'000,
+                                            1'000'000,
+                                            {uvlas::io::ParserAllocationMode::EstimateAdmission,
+                                             std::numeric_limits<std::uint64_t>::max()}};
+        std::array<std::uint64_t, static_cast<std::size_t>(uvlas::io::SchemaQuota::Count)> quotas{};
+        quotas.fill(1'000'000);
+        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::TypedBytes)] = 64ULL * 1024 * 1024;
+        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::ScratchBytes)] =
+            16ULL * 1024 * 1024;
+        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::Work)] = 1000000000;
+        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::ExactDigits)] = 4096;
+        core::ResourcePlan schema_plan{128ULL * 1024 * 1024};
+        std::optional<uvlas::io::InputDiagnostic> diagnostic;
+        auto document =
+            take(uvlas::io::read_input_document(std::as_bytes(std::span{wire.data(), wire.size()}),
+                                                input, syntax, schema_plan, diagnostic));
+        return take(uvlas::io::validate_case_schema(document, uvlas::io::SchemaLimits{quotas},
+                                                    schema_plan, nullptr));
+    };
+    const auto declared = case_with_digest(original);
+    const auto accepted = take(cp::read_case_checkpoint_directory(
+        declared, checkpoint, input, context, limits, files, plan, {}));
+    CHECK(accepted.number == 12);
+
+    // Whitespace preserves the entire parsed manifest but changes the declared source digest.
+    std::ofstream modify(checkpoint / "manifest.json", std::ios::binary | std::ios::app);
+    REQUIRE(modify.is_open());
+    modify.put(' ');
+    modify.close();
+    REQUIRE(modify.good());
+    REQUIRE(cp::read_checkpoint_directory(checkpoint, input, context, limits, files, plan, {}));
+    auto no_enumeration = files;
+    no_enumeration.maximum_entries = 0;
+    const auto rejected = cp::read_case_checkpoint_directory(declared, checkpoint, input, context,
+                                                             limits, no_enumeration, plan, {});
+    REQUIRE_FALSE(rejected);
+    CHECK(rejected.error().code == core::FailureCode::CheckpointCorrupt);
+    CHECK(rejected.error().operation == core::Operation::Recover);
+    const auto updated = case_with_digest(with_space);
+    const auto bounded = cp::read_case_checkpoint_directory(updated, checkpoint, input, context,
+                                                            limits, no_enumeration, plan, {});
+    REQUIRE_FALSE(bounded);
+    CHECK(bounded.error().code == core::FailureCode::ResourceExceeded);
+    const auto matching = take(cp::read_case_checkpoint_directory(
+        updated, checkpoint, input, context, limits, files, plan, {}));
+    CHECK(matching.number == 12);
+
+    context.material.bytes[0] = std::byte{1};
+    const auto incompatible = cp::read_case_checkpoint_directory(updated, checkpoint, input,
+                                                                 context, limits, files, plan, {});
+    REQUIRE_FALSE(incompatible);
+    CHECK(incompatible.error().code == core::FailureCode::CheckpointIncompatible);
+    const auto previous = take(take(accepted.payloads.at(0)).get().decode(plan, {}));
+    CHECK(std::get<core::PlannedBuffer<std::uint64_t>>(previous).values().front() == 42);
+
+    const auto missing = case_with_digest({});
+    core::ResourcePlan no_io{0};
+    const auto absent = cp::read_case_checkpoint_directory(missing, checkpoint, input, context,
+                                                           limits, files, no_io, {});
+    REQUIRE_FALSE(absent);
+    CHECK(absent.error().code == core::FailureCode::InvalidInput);
 }
 
 #ifdef __linux__
