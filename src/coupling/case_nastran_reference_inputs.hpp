@@ -5,9 +5,11 @@
 #include "io/nastran_lumped_mass_geometry.hpp"
 #include "io/nastran_rigid_attachment.hpp"
 
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <utility>
 #include <variant>
 
 namespace uvlas::coupling::detail {
@@ -171,5 +173,32 @@ certify_case_nastran_rigid_mass(const io::SiCase&, const CaseNastranReferenceInp
                                 CaseNastranMassId, const structure::PgReferenceLimits&,
                                 core::ResourcePlan&,
                                 CaseNastranParticleDiagnostic* = nullptr) noexcept;
+
+struct CaseNastranMassSetDiagnostic {
+    CaseNastranCardSelection declaration;
+    CaseNastranParticleDiagnostic comparison;
+};
+
+/// Case-equivalent masses in sidecar declaration order. Each slot owns its
+/// qualified physical values and provenance. A failure publishes no slots.
+class CaseNastranMassSet {
+public:
+    using Mass = std::variant<CaseNastranParticleMass, CaseNastranRigidMass>;
+
+    [[nodiscard]] static core::Result<CaseNastranMassSet>
+    certify(const io::SiCase&, const CaseNastranReferenceInputs&,
+            const structure::PgReferenceLimits&, core::ResourcePlan&,
+            std::optional<CaseNastranMassSetDiagnostic>* = nullptr) noexcept;
+
+    [[nodiscard]] std::span<const std::optional<Mass>> masses() const& noexcept {
+        return masses_.values();
+    }
+    [[nodiscard]] std::span<const std::optional<Mass>> masses() const&& = delete;
+
+private:
+    explicit CaseNastranMassSet(core::PlannedBuffer<std::optional<Mass>>&& masses) noexcept
+        : masses_(std::move(masses)) {}
+    core::PlannedBuffer<std::optional<Mass>> masses_;
+};
 
 } // namespace uvlas::coupling::detail

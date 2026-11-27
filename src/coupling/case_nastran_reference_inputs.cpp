@@ -229,6 +229,8 @@ core::Result<CaseNastranReferenceInputs> CaseNastranReferenceInputs::prepare(
 
 namespace {
 
+namespace ref = structure::detail;
+
 template <class CaseMass>
 using MassEvidence = std::conditional_t<std::is_same_v<CaseMass, io::schema::MassRigid>,
                                         CaseNastranRigidMass, CaseNastranParticleMass>;
@@ -236,9 +238,8 @@ using MassEvidence = std::conditional_t<std::is_same_v<CaseMass, io::schema::Mas
 template <class CaseMass>
 core::Result<MassEvidence<CaseMass>>
 certify_case_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
-                  CaseNastranMassId id, const structure::PgReferenceLimits& limits,
-                  core::ResourcePlan& plan, CaseNastranParticleDiagnostic* diagnostic) noexcept {
-    namespace ref = structure::detail;
+                  CaseNastranMassId id, ref::ReferenceArithmetic& math, bool admitted,
+                  CaseNastranParticleDiagnostic* diagnostic) noexcept {
     using ref::partition_take;
     using Reason = CaseNastranParticleFailure;
     using Result = core::Result<MassEvidence<CaseMass>>;
@@ -246,7 +247,6 @@ certify_case_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepar
     if (diagnostic)
         *diagnostic = {};
     return ref::partition_entry([&]() -> Result {
-        ref::ReferenceArithmetic math{limits, plan};
         CaseNastranParticleDiagnostic detail{};
         const auto mark = [&](Reason reason,
                               std::optional<native::NastranBulkPosition> field = {}) {
@@ -355,11 +355,12 @@ certify_case_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepar
             return reject(FailureCode::StaleGeneration);
         }
 
-        math.admit();
+        if (!admitted)
+            math.admit();
         const auto exact = [&](const auto& field) {
             math.charge();
             return partition_take(io::materialize_rational(
-                partition_take(si.quantity(field)).recipe, math.leaf_limits, plan));
+                partition_take(si.quantity(field)).recipe, math.leaf_limits, math.plan));
         };
         mark(Reason::Mass,
              original.card.mass.field.transform([](const auto& f) { return f.position; }));
@@ -490,7 +491,8 @@ certify_case_nastran_particle_mass(const io::SiCase& si, const CaseNastranRefere
                                    CaseNastranMassId id, const structure::PgReferenceLimits& limits,
                                    core::ResourcePlan& plan,
                                    CaseNastranParticleDiagnostic* diagnostic) noexcept {
-    return certify_case_mass<io::schema::MassParticle>(si, prepared, id, limits, plan, diagnostic);
+    ref::ReferenceArithmetic math{limits, plan};
+    return certify_case_mass<io::schema::MassParticle>(si, prepared, id, math, false, diagnostic);
 }
 
 core::Result<CaseNastranRigidMass>
@@ -498,7 +500,67 @@ certify_case_nastran_rigid_mass(const io::SiCase& si, const CaseNastranReference
                                 CaseNastranMassId id, const structure::PgReferenceLimits& limits,
                                 core::ResourcePlan& plan,
                                 CaseNastranParticleDiagnostic* diagnostic) noexcept {
-    return certify_case_mass<io::schema::MassRigid>(si, prepared, id, limits, plan, diagnostic);
+    ref::ReferenceArithmetic math{limits, plan};
+    return certify_case_mass<io::schema::MassRigid>(si, prepared, id, math, false, diagnostic);
+}
+
+core::Result<CaseNastranMassSet>
+CaseNastranMassSet::certify(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
+                            const structure::PgReferenceLimits& limits, core::ResourcePlan& plan,
+                            std::optional<CaseNastranMassSetDiagnostic>* diagnostic) noexcept {
+    if (diagnostic)
+        diagnostic->reset();
+    return ref::partition_entry([&]() -> core::Result<CaseNastranMassSet> {
+        ref::ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto& schema = ref::partition_take(si.source_case()).get();
+        const auto identity = ref::partition_take(schema.identity());
+        if (!native::same_identity(identity, prepared.sidecar_source().parent) ||
+            !native::same_identity(identity, prepared.deck_source().parent))
+            ref::partition_fail(FailureCode::StaleGeneration);
+
+        const auto rows = prepared.masses();
+        if (rows.empty())
+            return CaseNastranMassSet{core::PlannedBuffer<std::optional<Mass>>{}};
+        auto live_rationals = ref::reference_live_rationals;
+        for (const auto& row : rows) {
+            math.visit(1);
+            if (!row)
+                ref::partition_fail(FailureCode::InvalidInput);
+            // A particle retains mass. A rigid mass also retains three centre
+            // coordinates and six centroidal inertia components.
+            const auto retained =
+                row->physical.kind == native::NastranBasicMassKind::Rigid ? 10U : 1U;
+            live_rationals = ref::partition_add(live_rationals, retained);
+        }
+        math.admit(live_rationals);
+        auto owned = ref::partition_take(
+            plan.allocate<std::optional<Mass>>(ref::partition_index(rows.size()), operation));
+        const auto match = [&](const auto& row, auto tag) -> core::Result<Mass> {
+            CaseNastranParticleDiagnostic detail;
+            const auto& binding = row.binding;
+            auto qualified = certify_case_mass<typename decltype(tag)::type>(
+                si, prepared, binding.target, math, true, &detail);
+            if (!qualified && diagnostic) {
+                *diagnostic =
+                    CaseNastranMassSetDiagnostic{{io::SchemaNamespace::Mass, binding.target.value(),
+                                                  binding.element, binding.node},
+                                                 detail};
+            }
+            if (!qualified)
+                return std::unexpected(qualified.error());
+            return Mass{std::move(*qualified)};
+        };
+        for (std::size_t i = 0; i < rows.size(); ++i) {
+            const auto& row = rows[i].value();
+            auto result = row.physical.kind == native::NastranBasicMassKind::Rigid
+                              ? match(row, std::type_identity<io::schema::MassRigid>{})
+                              : match(row, std::type_identity<io::schema::MassParticle>{});
+            owned.values()[i].emplace(ref::partition_take(std::move(result)));
+        }
+        math.cancel();
+        return CaseNastranMassSet{std::move(owned)};
+    });
 }
 
 } // namespace uvlas::coupling::detail
