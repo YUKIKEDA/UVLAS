@@ -1,3 +1,4 @@
+#include "compensated.hpp"
 #include "linear_solve_detail.hpp"
 
 #include <algorithm>
@@ -24,7 +25,8 @@ double adjacent(double value, bool up) noexcept {
 }
 // Nonnegative directed arithmetic. Exact zero and exact representable operations
 // are retained, while overflow/underflow remain honest one-sided enclosures.
-double add_bound(double a, double b, bool up) noexcept {
+template <class Eft = uvlas::numerics::detail::PerOperationEft>
+double add_bound(double a, double b, bool up, const Eft& eft = {}) noexcept {
     if (a == 0) {
         return b;
     }
@@ -34,7 +36,7 @@ double add_bound(double a, double b, bool up) noexcept {
     if (!finite(a) || !finite(b)) {
         return up ? infinity : std::numeric_limits<double>::max();
     }
-    const auto value = two_sum(a, b);
+    const auto value = eft.sum(a, b);
     if (!value) {
         return up ? infinity : std::numeric_limits<double>::max();
     }
@@ -43,7 +45,8 @@ double add_bound(double a, double b, bool up) noexcept {
     }
     return value->hi;
 }
-double multiply_bound(double a, double b, bool up) noexcept {
+template <class Eft = uvlas::numerics::detail::PerOperationEft>
+double multiply_bound(double a, double b, bool up, const Eft& eft = {}) noexcept {
     if (a == 0 || b == 0) {
         return 0;
     }
@@ -51,7 +54,7 @@ double multiply_bound(double a, double b, bool up) noexcept {
     if (!finite(rounded)) {
         return up ? infinity : std::numeric_limits<double>::max();
     }
-    const auto value = two_product(a, b);
+    const auto value = eft.product(a, b);
     if (!value) {
         // An exact product below the subnormal grid is not an EFT, but its
         // correctly-rounded binary64 result still has adjacent outward bounds.
@@ -142,6 +145,11 @@ MagnitudeBounds add_magnitudes(MagnitudeBounds a, MagnitudeBounds b) noexcept {
 }
 MagnitudeBounds multiply_magnitudes(MagnitudeBounds a, MagnitudeBounds b) noexcept {
     return {multiply_bound(a.lower, b.lower, false), multiply_bound(a.upper, b.upper, true)};
+}
+
+double add_magnitude_product_lower(double sum, double a, double b,
+                                   const uvlas::numerics::detail::CheckedEft& eft) noexcept {
+    return add_bound(sum, multiply_bound(a, b, false, eft), false, eft);
 }
 
 template <StorageScalar Scalar>

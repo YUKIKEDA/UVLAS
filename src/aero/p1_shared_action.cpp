@@ -99,15 +99,15 @@ struct Facet {
     std::array<std::size_t, 3> point{}, strength{};
     std::array<bool, 3> boundary{true, true, true};
     std::optional<P1Basis> basis;
-    std::array<EdgeRange, 3> bound_edges{};
-    bool far = false, bound = false;
+    std::array<EdgeRange, 3> contour_edges{};
+    bool far = false, bound = false, contour = false;
 };
 struct EdgeOccurrence {
     std::size_t owner = 0;
     std::array<std::size_t, 2> trace{};
     std::size_t facet = 0, edge = 0;
     bool positive = false;
-    bool retained_bound = false;
+    bool retained_contour = false;
 };
 struct PointGradient {
     std::array<Interval, 3> value{};
@@ -315,8 +315,8 @@ template <class T, class Id, class Key>
     }
     return cancellations;
 }
-/// Pick one representative analytic edge per canonical bound-edge owner.
-void group_bound_edges(std::span<EdgeOccurrence> edges, std::span<Facet> facets, Work& work) {
+/// Pick one representative analytic edge per canonical constant-contour owner.
+void group_contour_edges(std::span<EdgeOccurrence> edges, std::span<Facet> facets, Work& work) {
     for (std::size_t first = 0; first < edges.size();) {
         auto last = first;
         auto representative = edges.size();
@@ -324,8 +324,8 @@ void group_bound_edges(std::span<EdgeOccurrence> edges, std::span<Facet> facets,
             work.step();
             auto& edge = edges[last];
             auto& facet = facets[edge.facet];
-            edge.retained_bound = facet.bound && facet.boundary[edge.edge];
-            if (edge.retained_bound) {
+            edge.retained_contour = facet.contour && facet.boundary[edge.edge];
+            if (edge.retained_contour) {
                 if (representative == edges.size())
                     representative = last;
                 else
@@ -335,7 +335,7 @@ void group_bound_edges(std::span<EdgeOccurrence> edges, std::span<Facet> facets,
         }
         if (representative != edges.size()) {
             const auto& edge = edges[representative];
-            facets[edge.facet].bound_edges[edge.edge] = {first, last, edge.positive};
+            facets[edge.facet].contour_edges[edge.edge] = {first, last, edge.positive};
         }
         first = last;
     }
@@ -367,6 +367,7 @@ struct SharedP1Data {
     P1AssemblyReport report;
     std::size_t canonical_points = 0;
     core::Precision precision = core::Precision::Binary64;
+    bool values_only{};
 };
 
 namespace shared_p1 {
@@ -379,15 +380,15 @@ namespace shared_p1 {
 template <class Operation>
 void visit_coefficients(const SharedP1Data& action, const Facet& facet, std::size_t column,
                         Work& work, Operation&& visit) {
-    if (!facet.bound) {
+    if (!facet.contour) {
         std::invoke(visit, facet.strength[column], true);
         return;
     }
-    const auto& range = facet.bound_edges[column];
+    const auto& range = facet.contour_edges[column];
     for (std::size_t i = range.first; i < range.last; ++i) {
         work.step();
         const auto& edge = action.occurrences.values()[i];
-        if (edge.retained_bound)
+        if (edge.retained_contour)
             std::invoke(visit, action.facets.values()[edge.facet].strength[edge.edge],
                         edge.positive == range.positive);
     }
@@ -396,7 +397,7 @@ void visit_coefficients(const SharedP1Data& action, const Facet& facet, std::siz
 [[nodiscard]] Complex coefficient(const SharedP1Data& action, const Facet& facet,
                                   std::size_t column, std::span<const P1ComplexWords> strengths,
                                   Work& work) {
-    if (!facet.bound)
+    if (!facet.contour)
         return words(strengths[facet.strength[column]], work);
     Complex result{};
     visit_coefficients(action, facet, column, work, [&](std::size_t id, bool forward) {
@@ -557,6 +558,8 @@ class SharedP1Engine {
                 const auto face = faces[i].face.value();
                 const auto index = ordinal(geometry.face_lookup.values(), face, scan);
                 const bool bound = std::holds_alternative<P0BoundColumn>(faces[i].columns);
+                if (!mixed && std::holds_alternative<ConstantWakeColumn>(faces[i].columns))
+                    throw ArithmeticFailure{invalid};
                 if (mixed ? bound != (verified.topology->roles.values()[index] ==
                                       GlobalTopologyData::bound_role)
                           : bound)
@@ -566,6 +569,9 @@ class SharedP1Engine {
                         if constexpr (std::is_same_v<std::decay_t<decltype(keys)>, P0BoundColumn>)
                             (void)locate(strengths, P1StrengthId::bound(PhysicalFaceId{face}),
                                          std::identity{}, scan);
+                        else if constexpr (std::is_same_v<std::decay_t<decltype(keys)>,
+                                                          ConstantWakeColumn>)
+                            (void)locate(strengths, keys.id, std::identity{}, scan);
                         else {
                             for (const auto& key : keys)
                                 (void)locate(strengths, key, std::identity{}, scan);
@@ -575,7 +581,7 @@ class SharedP1Engine {
             }
         };
         finite_outer();
-        std::size_t bound_facets = 0;
+        std::size_t contour_facets = 0;
         for (const auto& record : geometry.facets.values()) {
             scan.step();
             const auto face = geometry.faces.values()[static_cast<std::size_t>(record.face)].id;
@@ -583,10 +589,11 @@ class SharedP1Engine {
                 locate(faces, face, [](const P1FaceStrengths& f) { return f.face.value(); }, scan);
             const auto& columns = faces[row].columns;
             const bool bound = std::holds_alternative<P0BoundColumn>(columns);
+            const bool contour = bound || std::holds_alternative<ConstantWakeColumn>(columns);
             if (std::holds_alternative<QuadOrigin>(record.origin) !=
-                (std::holds_alternative<std::array<P1StrengthId, 2>>(columns) || bound))
+                (std::holds_alternative<std::array<P1StrengthId, 2>>(columns) || contour))
                 throw ArithmeticFailure{invalid};
-            bound_facets += static_cast<std::size_t>(bound);
+            contour_facets += static_cast<std::size_t>(contour);
         }
         const auto n = geometry.facets.size();
         const auto e = product(n, 3);
@@ -618,11 +625,11 @@ class SharedP1Engine {
         result.preflight_steps = scan.used;
         // A caller may allow much more work than any local expression executes.
         // Reserve the ceiling the local evaluator actually enforces.
-        const auto bound_steps = bound_facets == 0 ? 0 : P1Workspace::maximum_bound_steps();
-        const auto wake_steps = bound_facets == n ? 0 : P1Workspace::maximum_steps();
+        const auto bound_steps = contour_facets == 0 ? 0 : P1Workspace::maximum_bound_steps();
+        const auto wake_steps = contour_facets == n ? 0 : P1Workspace::maximum_steps();
         (void)checked_limit(std::max(bound_steps, wake_steps), limits.kernel.max_steps);
         const auto kernel_steps =
-            sum(product(bound_facets, bound_steps), product(n - bound_facets, wake_steps));
+            sum(product(contour_facets, bound_steps), product(n - contour_facets, wake_steps));
         const auto packet_steps = local_packet_step_ceiling(n, limits.geometry);
         result.reserved_steps =
             sum(result.preflight_steps, sum(metadata, sum(product(n, packet_steps), kernel_steps)));
@@ -675,9 +682,13 @@ class SharedP1Engine {
                 }
             };
             target.bound = std::holds_alternative<P0BoundColumn>(map);
+            const auto* constant = std::get_if<ConstantWakeColumn>(&map);
+            target.contour = target.bound || constant != nullptr;
             if (target.bound) {
                 target.strength.fill(locate(strengths, P1StrengthId::bound(PhysicalFaceId{face}),
                                             std::identity{}, work));
+            } else if (constant != nullptr) {
+                target.strength.fill(locate(strengths, constant->id, std::identity{}, work));
             } else if (const auto* quad = std::get_if<QuadLRScatter>(&scatter)) {
                 const auto* keys = std::get_if<std::array<P1StrengthId, 2>>(&map);
                 if (keys == nullptr)
@@ -768,7 +779,7 @@ public:
             P1Accuracy accuracy, const P1AssemblyLimits& limits, SharedP1Workspace& workspace,
             LocalPacketWorkspace& local, P1Workspace& kernel, core::ResourcePlan& memory,
             const std::stop_token& stop, bool mixed = false, std::optional<EdgeId> self = {},
-            BoundWakeFacetStorage* reuse = nullptr) noexcept {
+            BoundWakeFacetStorage* reuse = nullptr, bool values_only = false) noexcept {
         const auto context = source.query.context();
         if (workspace.entered_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(invalid, context));
@@ -953,6 +964,7 @@ public:
             data.topology = verified.topology;
             data.geometry.emplace(OwnedGeometry{verified.geometry->data_, context});
             data.precision = accuracy.representation;
+            data.values_only = values_only;
             data.report.plan = plan;
             data.report.facets = facet_count;
             data.canonical_points = populate_points(data, geometry, point_columns.values(), work);
@@ -990,7 +1002,7 @@ public:
                               : prepare_packet(*verified.geometry, source.query, id, local_accuracy,
                                                packet_limits, local, memory, stop, storage_slot));
                 const auto steps = needed(packet.steps());
-                const bool far = !facet.bound && needed(packet.far()) == FarRelation::Far;
+                const bool far = !facet.contour && needed(packet.far()) == FarRelation::Far;
                 packets[i].emplace(std::move(packet));
                 charge(work, steps);
                 facet.far = far;
@@ -1013,7 +1025,7 @@ public:
                     throw ArithmeticFailure{invalid};
             }
             if (mixed) {
-                group_bound_edges(ordered, data.facets.values(), work);
+                group_contour_edges(ordered, data.facets.values(), work);
                 const bool sorted_into_scratch = ordered.data() != occurrences.values().data();
                 data.occurrences =
                     sorted_into_scratch ? std::move(sorting) : std::move(occurrences);
@@ -1027,12 +1039,18 @@ public:
                     throw ArithmeticFailure{invalid};
                 SharedP1ReuseSlot<P1Basis> slot{entry.basis};
                 auto* storage_slot = use_storage ? &slot : nullptr;
-                auto basis = needed(
-                    entry.bound
-                        ? evaluate_bound_partition(*packet, entry.boundary, accuracy, limits.kernel,
-                                                   kernel, memory, stop, storage_slot)
-                        : evaluate_p1_partition(*packet, entry.boundary, accuracy, limits.kernel,
-                                                kernel, memory, stop, storage_slot));
+                auto basis = needed([&] {
+                    if (values_only)
+                        return evaluate_partition_values(*packet, entry.boundary, entry.contour,
+                                                         accuracy, limits.kernel, kernel, memory,
+                                                         stop, storage_slot);
+                    if (entry.contour)
+                        return evaluate_bound_partition(*packet, entry.boundary, accuracy,
+                                                        limits.kernel, kernel, memory, stop,
+                                                        storage_slot);
+                    return evaluate_p1_partition(*packet, entry.boundary, accuracy, limits.kernel,
+                                                 kernel, memory, stop, storage_slot);
+                }());
                 const auto steps = needed(basis.steps());
                 entry.basis.emplace(std::move(basis));
                 charge(work, steps);
@@ -1044,18 +1062,17 @@ public:
         });
     }
 
-    static AeroResult<SharedP1Action>
-    prepare_reusing_facets(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
-                           std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
-                           P1Accuracy accuracy, const P1AssemblyLimits& limits,
-                           SharedP1Workspace& workspace, LocalPacketWorkspace& local,
-                           P1Workspace& kernel, BoundWakeFacetStorage& reuse,
-                           const std::stop_token& stop, std::optional<EdgeId> self = {}) noexcept {
+    static AeroResult<SharedP1Action> prepare_reusing_facets(
+        const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+        std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
+        const P1AssemblyLimits& limits, SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+        P1Workspace& kernel, BoundWakeFacetStorage& reuse, const std::stop_token& stop,
+        std::optional<EdgeId> self = {}, bool values_only = false) noexcept {
         if (reuse.preparing_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(invalid, source.query.context()));
         const Lease lease{reuse.preparing_};
         return prepare(source, faces, strengths, local_accuracy, accuracy, limits, workspace, local,
-                       kernel, reuse.memory_, stop, true, self, &reuse);
+                       kernel, reuse.memory_, stop, true, self, &reuse, values_only);
     }
 
     static AeroResult<P1ActionValue> apply(const SharedP1Action& action,
@@ -1071,6 +1088,8 @@ public:
         return guarded<P1ActionValue>(context, [&] {
             operator_environment();
             const auto& data = matches(action, source);
+            if (data.values_only && direction)
+                throw ArithmeticFailure{invalid};
             verify_shapes(data, strengths, direction);
             (void)checked_limit(
                 apply_work(data.facets.size(), data.canonical_points, data.strengths.size(), false),
@@ -1083,7 +1102,7 @@ public:
                 if (!facet.basis)
                     throw ArithmeticFailure{invalid};
                 for (std::size_t k = 0; k < 3; ++k) {
-                    if (facet.bound && !facet.boundary[k])
+                    if (facet.contour && !facet.boundary[k])
                         continue;
                     const auto mu = coefficient(data, facet, k, strengths, work);
                     const auto delta_mu =
@@ -1138,7 +1157,7 @@ public:
                 if (!facet.basis)
                     throw ArithmeticFailure{invalid};
                 for (std::size_t k = 0; k < axes; ++k) {
-                    if (facet.bound && !facet.boundary[k])
+                    if (facet.contour && !facet.boundary[k])
                         continue;
                     for (std::size_t axis = 0; axis < axes; ++axis) {
                         const auto value =
@@ -1173,6 +1192,8 @@ public:
         return guarded<P1ActionAdjoint>(context, [&] {
             operator_environment();
             const auto& data = matches(action, source);
+            if (data.values_only)
+                throw ArithmeticFailure{invalid};
             verify_shapes(data, strengths, std::nullopt);
             const auto p = data.canonical_points;
             const auto s = data.strengths.size();
@@ -1201,7 +1222,7 @@ public:
                 if (!facet.basis)
                     throw ArithmeticFailure{invalid};
                 for (std::size_t k = 0; k < 3; ++k) {
-                    if (facet.bound && !facet.boundary[k])
+                    if (facet.contour && !facet.boundary[k])
                         continue;
                     const auto mu = coefficient(data, facet, k, strengths, work);
                     for (std::size_t a = 0; a < 3; ++a) {
@@ -1473,6 +1494,21 @@ AeroResult<P1SerialAssemblyPlan> forecast_bound_wake_serial_induction(
     std::span<const P1StrengthId> strengths, const P1AssemblyLimits& limits,
     const std::stop_token& stop) noexcept {
     return SharedP1Engine::forecast_serial(source, faces, strengths, limits, stop);
+}
+
+AeroResult<SharedP1Action>
+prepare_bound_wake_values(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+                          std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
+                          P1Accuracy accuracy, const P1AssemblyLimits& limits,
+                          SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+                          P1Workspace& kernel, core::ResourcePlan& memory,
+                          BoundWakeFacetStorage* reuse, const std::stop_token& stop) noexcept {
+    if (reuse != nullptr)
+        return SharedP1Engine::prepare_reusing_facets(source, faces, strengths, local_accuracy,
+                                                      accuracy, limits, workspace, local, kernel,
+                                                      *reuse, stop, {}, true);
+    return SharedP1Engine::prepare(source, faces, strengths, local_accuracy, accuracy, limits,
+                                   workspace, local, kernel, memory, stop, true, {}, nullptr, true);
 }
 
 AeroResult<std::uint64_t> project_real_strength_transpose(

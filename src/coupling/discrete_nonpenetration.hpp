@@ -47,14 +47,16 @@ struct DiscreteCollocation {
 };
 
 struct AttachedWakeFront {};
+/// Fixed steady strip. The downstream trace uses the signed attached front column.
+struct SteadyWakeClosure {};
 struct DiscreteWakePanel {
     DiscreteWakePanel(aero::detail::FacetId source,
                       std::variant<AttachedWakeFront, aero::detail::P1StrengthId> left,
-                      aero::detail::P1StrengthId right) noexcept
+                      std::variant<aero::detail::P1StrengthId, SteadyWakeClosure> right) noexcept
         : facet(source), leading(left), trailing(right) {}
     aero::detail::FacetId facet; ///< Either child of the retained wake quadrilateral.
     std::variant<AttachedWakeFront, aero::detail::P1StrengthId> leading;
-    aero::detail::P1StrengthId trailing;
+    std::variant<aero::detail::P1StrengthId, SteadyWakeClosure> trailing;
 };
 
 struct FrozenWakeTrace {
@@ -185,6 +187,11 @@ struct DiscreteCirculationRequest {
     double rhs_absolute;
     double original_absolute; ///< Multiplier of the supplied velocity scales.
     double original_relative; ///< Multiplier of the unprojected affine RHS magnitude.
+    /// Use outward Binary64 contour assembly for a primal fixed steady closure.
+    bool certified_closed_contour{};
+    /// Admit one to four independent workspaces for the steady contour solve.
+    /// Each parallel range receives its own share of the remaining step budget.
+    std::size_t contour_workers{1};
 };
 
 struct CirculationResidualRow {
@@ -235,8 +242,9 @@ private:
     std::uint64_t steps_;
 };
 
-/// Synchronous witness for replay of one exact qualified real operator. The legacy
-/// solution and its dense native coefficients are only the witness's comparison data.
+/// Synchronous replay witness for a qualified real operator. The P1 route compares
+/// dense reference coefficients. The closed-contour route replays the same projection
+/// and compares retained circulation and residual words without a dense interval copy.
 struct CirculationRowReplay {
     std::size_t rows, coefficients;
     std::uint64_t replay_row_bytes, reference_dense_bytes, allocated_bytes, used_steps;

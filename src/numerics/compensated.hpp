@@ -5,6 +5,32 @@
 
 namespace uvlas::numerics::detail {
 using core::Result;
+
+struct PerOperationEft {
+    [[nodiscard]] Result<TwoWordValue> sum(double a, double b) const noexcept {
+        return two_sum(a, b);
+    }
+    [[nodiscard]] Result<TwoWordValue> product(double a, double b) const noexcept {
+        return two_product(a, b);
+    }
+};
+
+/// A checked environment for a synchronous, callback-free computation on
+/// the thread that obtained it. Validate again after changing the environment.
+class CheckedEft {
+public:
+    CheckedEft(CheckedEft&&) noexcept = default;
+    CheckedEft(const CheckedEft&) = delete;
+    CheckedEft& operator=(CheckedEft&&) = delete;
+    CheckedEft& operator=(const CheckedEft&) = delete;
+    [[nodiscard]] static Result<CheckedEft> prepare() noexcept;
+    [[nodiscard]] Result<TwoWordValue> sum(double a, double b) const noexcept;
+    [[nodiscard]] Result<TwoWordValue> product(double a, double b) const noexcept;
+
+private:
+    CheckedEft() = default;
+};
+
 // Shared fixed-order compensated accumulation with an absolute enclosure of every
 // discarded correction. No allocation or untracked precision conversion occurs here.
 inline double outward_add(double a, double b) noexcept {
@@ -22,12 +48,13 @@ struct SumEvaluation {
 };
 class CompensatedAccumulator {
 public:
-    Result<void> add(double value) noexcept {
-        const auto leading = two_sum(sum_, value);
+    template <class Eft = PerOperationEft>
+    Result<void> add(double value, const Eft& eft = {}) noexcept {
+        const auto leading = eft.sum(sum_, value);
         if (!leading) {
             return std::unexpected(leading.error());
         }
-        const auto trailing = two_sum(correction_, leading->lo);
+        const auto trailing = eft.sum(correction_, leading->lo);
         if (!trailing) {
             return std::unexpected(trailing.error());
         }
@@ -37,19 +64,21 @@ public:
         correction_ = trailing->hi;
         return {};
     }
-    Result<void> product(double a, double b, double sign) noexcept {
-        const auto value = two_product(a, b);
+    template <class Eft = PerOperationEft>
+    Result<void> product(double a, double b, double sign, const Eft& eft = {}) noexcept {
+        const auto value = eft.product(a, b);
         if (!value) {
             return std::unexpected(value.error());
         }
-        const auto leading = add(sign * value->hi);
+        const auto leading = add(sign * value->hi, eft);
         if (!leading) {
             return leading;
         }
-        return add(sign * value->lo);
+        return add(sign * value->lo, eft);
     }
-    [[nodiscard]] Result<SumEvaluation> result() const noexcept {
-        const auto value = two_sum(sum_, correction_);
+    template <class Eft = PerOperationEft>
+    [[nodiscard]] Result<SumEvaluation> result(const Eft& eft = {}) const noexcept {
+        const auto value = eft.sum(sum_, correction_);
         if (!value) {
             return std::unexpected(value.error());
         }

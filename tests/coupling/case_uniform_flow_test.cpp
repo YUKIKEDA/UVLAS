@@ -1860,6 +1860,32 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
             return cf::solve_discrete_circulation(view, std::move(projected), solve_limits,
                                                   selected, shared, *local, *kernel, memory);
         };
+        {
+            const auto prescribed = collocation[0].circulation;
+            wake[0].trailing = cf::SteadyWakeClosure{};
+            auto steady_flow = projected_at(time);
+            reject(solve(steady_flow, request), core::FailureCode::InvalidInput);
+            CHECK(steady_flow.source().jet.active());
+            view.history.columns = {};
+            const auto closed = take(solve(steady_flow, request));
+            residual_small(take(closed.row(0)).original_residual, rational_word(1e-13));
+            const auto& words =
+                std::get<numerics::TwoWord<double>>(closed.solution().values().storage());
+            const auto hi = words.hi.values().front(), lo = words.lo.values().front();
+            collocation[0].circulation = a::DoubleWord{hi, lo};
+
+            // Re-evaluate the solved circulation with a separately supplied
+            // fixed downstream strength. Both directions of the TE transfer apply.
+            const std::array fixed{cf::FrozenWakeTrace{
+                historical_id, reversed ? a::DoubleWord{-hi, -lo} : a::DoubleWord{hi, lo}}};
+            wake[0].trailing = historical_id;
+            view.history.columns = fixed;
+            auto replay_flow = projected_at(time);
+            const auto replay = take(run(replay_flow, residual_limits, memory));
+            residual_small(take(replay.row(0)).residual, rational_word(1e-13));
+            collocation[0].circulation = prescribed;
+            view.history.columns = history;
+        }
         auto solve_flow = projected_at(time);
         auto too_tight = request;
         too_tight.matrix_absolute = 0;

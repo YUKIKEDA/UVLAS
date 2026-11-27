@@ -133,6 +133,75 @@ bool box_overlap(const GeometryData& g, const Node& a, const Node& b, Run& r) {
     }
     return true;
 }
+
+bool box_contains(const GeometryData& g, const Node& box, const Vector& point, Run& run) {
+    for (std::size_t axis = 0; axis < point.size(); ++axis) {
+        const auto low = coordinate(g, box.extrema[2 * axis], axis, Configuration::Current, run);
+        if (compare(point[axis], low, run) < 0)
+            return false;
+        const auto high =
+            coordinate(g, box.extrema[2 * axis + 1], axis, Configuration::Current, run);
+        if (compare(point[axis], high, run) > 0)
+            return false;
+    }
+    return true;
+}
+
+enum class PointContact : std::uint8_t { Clear, Self, Unsupported, Forbidden };
+
+PointContact contour_contact(const GeometryData& geometry, const GlobalTopologyData& topology,
+                             const FacetStorage& facet, const Vector& point,
+                             std::optional<EdgeId> self, Run& run) {
+    std::array<Vector, 3> vertices;
+    for (std::size_t i = 0; i < vertices.size(); ++i)
+        for (std::size_t axis = 0; axis < point.size(); ++axis)
+            vertices[i][axis] =
+                coordinate(geometry, facet.points[i], axis, Configuration::Current, run);
+    const auto n = cross(subtract(vertices[1], vertices[0], run),
+                         subtract(vertices[2], vertices[0], run), run);
+    if (dot(n, subtract(point, vertices[0], run), run) != 0)
+        return PointContact::Clear;
+    // With a nonzero dropped normal component, planar edge signs require only
+    // two products per side. Use the sign of the same component of the normal.
+    std::size_t axis = 0;
+    while (axis + 1 < n.size() && n[axis] == 0) {
+        run.step();
+        ++axis;
+    }
+    const auto x = (axis + 1) % n.size(), y = (axis + 2) % n.size();
+    std::optional<core::Index> on_edge;
+    unsigned zero_sides = 0;
+    for (std::size_t i = 0; i < vertices.size(); ++i) {
+        run.step();
+        const auto& a = vertices[i];
+        const auto& b = vertices[(i + 1) % vertices.size()];
+        const auto side = sub(multiply(sub(b[x], a[x], run), sub(point[y], a[y], run), run),
+                              multiply(sub(b[y], a[y], run), sub(point[x], a[x], run), run), run);
+        if (side != 0 && ((side < 0) != (n[axis] < 0)))
+            return PointContact::Clear;
+        if (side == 0) {
+            on_edge = facet.edges[i];
+            ++zero_sides;
+        }
+    }
+    run.step();
+    const bool bound = topology.roles.values()[static_cast<std::size_t>(facet.face)] ==
+                       GlobalTopologyData::bound_role;
+    if (bound && zero_sides == 0)
+        return PointContact::Clear;
+    if (zero_sides == 1 && on_edge) {
+        const auto raw = static_cast<std::size_t>(*on_edge);
+        const auto* quad = std::get_if<QuadOrigin>(&facet.origin);
+        if (quad != nullptr &&
+            geometry.edges.values()[raw].id ==
+                geometry.quads.values()[static_cast<std::size_t>(quad->source)].diagonal)
+            return bound ? PointContact::Clear : PointContact::Forbidden;
+        const auto owner = static_cast<std::size_t>(topology.edges.values()[raw].owner);
+        if (self && geometry.edges.values()[owner].id == self->value())
+            return bound ? PointContact::Self : PointContact::Unsupported;
+    }
+    return PointContact::Forbidden;
+}
 } // namespace
 std::uint64_t tree_shape(std::uint64_t f) {
     return f == 0 ? 0 : plus(f, f - 1);
@@ -222,5 +291,49 @@ TraversalResult traverse(const GeometryData& g, const GlobalTopologyData& topolo
     if (invalid)
         reject(core::FailureCode::GeometryInvalid, FacetId{(*invalid)[0]}, FacetId{(*invalid)[1]});
     return {count, r.used - begin - narrow_steps};
+}
+
+ContourContactWork qualify_contour_point(const GeometryData& geometry,
+                                         const GlobalTopologyData& topology,
+                                         std::span<const Node> nodes, const Vector& point,
+                                         QueryId query, std::optional<EdgeId> self, Run& run) {
+    std::array<std::size_t, std::numeric_limits<std::size_t>::digits + 1> stack{};
+    std::size_t size = 0;
+    const auto push = [&](std::size_t index) {
+        run.step();
+        if (size == stack.size())
+            reject(core::FailureCode::ResourceExceeded);
+        stack[size++] = index;
+    };
+    if (!nodes.empty())
+        push(nodes.size() - 1);
+    bool incident = false, unsupported = false;
+    std::optional<FacetId> forbidden;
+    std::uint64_t candidates = 0;
+    while (size != 0) {
+        run.step(2);
+        const auto& node = nodes[stack[--size]];
+        if (!box_contains(geometry, node, point, run))
+            continue;
+        if (node.count != 1) {
+            push(static_cast<std::size_t>(node.right));
+            push(static_cast<std::size_t>(node.left));
+            continue;
+        }
+        ++candidates;
+        const auto& facet = geometry.facets.values()[static_cast<std::size_t>(node.facet)];
+        const auto relation = contour_contact(geometry, topology, facet, point, self, run);
+        incident = incident || relation == PointContact::Self;
+        unsupported = unsupported || relation == PointContact::Unsupported;
+        if (const auto id = FacetId{facet.id};
+            relation == PointContact::Forbidden && (!forbidden || id < *forbidden))
+            forbidden = id;
+    }
+    run.step(0);
+    if (forbidden)
+        reject(core::FailureCode::GeometryInvalid, query, forbidden);
+    if (unsupported || (self && !incident))
+        reject(core::FailureCode::Unsupported, query);
+    return {run.used, candidates};
 }
 } // namespace uvlas::aero::detail::global_detail

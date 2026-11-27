@@ -59,7 +59,7 @@ set(UVLAS_NUMERICS_SOURCES src/numerics/storage.cpp src/numerics/precision.cpp
 add_library(uvlas_numerics STATIC ${UVLAS_NUMERICS_SOURCES})
 uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
+target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2 Threads::Threads)
 
 # Exact reference algebra is a preparation component, separate from physical kernels.
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
@@ -91,6 +91,7 @@ endif()
 # Internal geometry preparation and local qualification; no global or kernel acceptance.
 set(UVLAS_AERO_SOURCES src/aero/exact_triangle_predicates.cpp src/aero/geometry_snapshot.cpp
     src/aero/local_geometry_packet.cpp src/aero/p1_induction.cpp src/aero/p1_shared_action.cpp
+    src/aero/closed_contour.cpp
     src/aero/global_geometry.cpp src/aero/global_bvh.cpp src/aero/global_intersections.cpp
     src/aero/alias_kinematics.cpp src/aero/pchip_rational_slots.cpp src/aero/pchip_slot_integer.cpp src/aero/pchip_coefficients.cpp src/aero/pchip_interval_jet.cpp src/aero/pchip_knot_locator.cpp src/aero/pchip_domain_route.cpp src/aero/pchip_boundary.cpp src/aero/pchip_side.cpp src/aero/pchip_preparation_input.cpp src/aero/pchip_shared_preparation_input.cpp src/aero/pchip_curve.cpp src/aero/uniform_flow.cpp)
 add_library(uvlas_aero STATIC ${UVLAS_AERO_SOURCES})
@@ -182,7 +183,7 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
 uvlas_configure_target(uvlas_coupling)
 target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero
-    PRIVATE uvlas_numerics Boost::multiprecision)
+    PRIVATE uvlas_numerics Boost::multiprecision Threads::Threads)
 
 add_library(uvlas_app_io STATIC src/app/validate_case.cpp src/app/inspect_result.cpp)
 uvlas_configure_target(uvlas_app_io)
@@ -246,7 +247,7 @@ if(BUILD_TESTING)
     uvlas_configure_target(uvlas_numerics_audit)
     uvlas_enable_allocation_audit(uvlas_numerics_audit)
     target_include_directories(uvlas_numerics_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
+    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2 Threads::Threads)
     uvlas_require_audited_dependencies(uvlas_numerics_audit)
     add_library(uvlas_structure_audit STATIC ${UVLAS_STRUCTURE_SOURCES})
     uvlas_configure_target(uvlas_structure_audit)

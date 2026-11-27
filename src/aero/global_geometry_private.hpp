@@ -19,6 +19,14 @@ public:
                                                          const AliasKinematicsInput&, GlobalLimits,
                                                          GlobalWorkspace&, core::ResourcePlan&,
                                                          std::stop_token) noexcept;
+    static GlobalResult<ContourContactIndex> prepare_contour(const GlobalContactState&,
+                                                             GlobalLimits, GlobalWorkspace&,
+                                                             core::ResourcePlan&,
+                                                             std::stop_token) noexcept;
+    static GlobalResult<ContourContactWork>
+    qualify_contour(const ContourContactIndex&, const ResolvedQuery&, std::optional<EdgeId>,
+                    const GeometryLimits&, GlobalLimits, GeometryWorkspace&, GlobalWorkspace&,
+                    std::stop_token) noexcept;
     static const std::shared_ptr<const GeometryData>& source(const OwnedGeometry& g) noexcept {
         return g.data_;
     }
@@ -292,6 +300,9 @@ struct TraversalResult {
 };
 TraversalResult traverse(const GeometryData&, const GlobalTopologyData&, std::span<const Node>,
                          std::span<NodePair>, bool, Run&);
+ContourContactWork qualify_contour_point(const GeometryData&, const GlobalTopologyData&,
+                                         std::span<const Node>, const Vector&, QueryId,
+                                         std::optional<EdgeId>, Run&);
 std::uint64_t tree_shape(std::uint64_t);
 std::uint64_t pair_stack(std::uint64_t);
 inline std::size_t lookup(std::span<const IdLookup> table, std::uint64_t id, Run& r,
