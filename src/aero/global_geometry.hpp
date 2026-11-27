@@ -239,6 +239,7 @@ public:
 private:
     friend class GlobalEngine;
     friend class SharedP1Engine;
+    friend class ClosedContour;
     explicit GlobalContactState(core::PlannedBuffer<GlobalContactData>, GeometryContext) noexcept;
     core::PlannedBuffer<GlobalContactData> data_;
     GeometryContext context_;

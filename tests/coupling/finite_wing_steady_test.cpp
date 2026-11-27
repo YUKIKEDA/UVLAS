@@ -1,3 +1,4 @@
+#include "aero/closed_contour.hpp"
 #include "aero/geometry_snapshot_fixture.hpp"
 #include "aero/p1_shared_action.hpp"
 #include "coupling/case_reference_graph.hpp"
@@ -1312,6 +1313,101 @@ void verify_formal_wing_contacts(const CaseLattice& grid, const FiniteWingMesh& 
 }
 #endif
 
+void verify_prepared_contour(const FiniteWingMesh& mesh, const a::OwnedGeometry& geometry,
+                             const a::GlobalContactState& contact,
+                             std::span<const a::ResolvedQuery> queries,
+                             std::span<const a::TrailingEdgeRow> transfers, a::EdgeId self,
+                             const cf::DiscreteNonpenetrationLimits& caps,
+                             a::GlobalLimits contact_caps, a::GeometryWorkspace& geometry_work,
+                             a::GlobalWorkspace& global_work, a::SharedP1Workspace& shared,
+                             a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+                             core::ResourcePlan& memory) {
+    std::vector<a::P1StrengthId> ids;
+    std::vector<a::P1FaceStrengths> maps;
+    for (const auto& face : std::span{mesh.faces}.first(queries.size())) {
+        ids.push_back(a::P1StrengthId::bound(face.id));
+        maps.emplace_back(face.id, a::P0BoundColumn{});
+    }
+    for (std::size_t i = 0; i < transfers.size(); ++i) {
+        auto key = a::P1StrengthId::bound(transfers[i].bound_face);
+        if (transfers[i].coefficient == -1) {
+            key = a::P1StrengthId{i};
+            ids.push_back(key);
+        }
+        maps.emplace_back(mesh.faces[queries.size() + i].id, a::ConstantWakeColumn{key});
+    }
+    std::ranges::sort(ids);
+    const auto check_bounds = [](a::ContourInterval candidate, const a::ScaledEnclosure& exact) {
+        const auto value = unpack(exact);
+        CHECK(rational_word(candidate.lower) <= value.center - value.radius);
+        CHECK(rational_word(candidate.upper) >= value.center + value.radius);
+        CHECK(candidate.upper - candidate.lower < 1e-10);
+    };
+    core::ResourcePlan measured{memory.remaining_bytes()};
+    const auto contour = test_geometry::take(
+        a::ClosedContour::prepare(contact, maps, ids, contact_caps, global_work, measured));
+    CHECK(contour.preparation_steps() > 0);
+    core::ResourcePlan one_short{measured.allocated_bytes() - 1};
+    const auto denied =
+        a::ClosedContour::prepare(contact, maps, ids, contact_caps, global_work, one_short);
+    REQUIRE_FALSE(denied);
+    CHECK(denied.error().cause.code == core::FailureCode::ResourceExceeded);
+    CHECK(one_short.allocated_bytes() == 0);
+    auto workspace = test_geometry::take(contour.workspace(memory));
+    std::vector<a::ContourInterval> row(ids.size());
+    const a::ContourVector normal{{{}, {}, {1, 1}}};
+    const auto& query = queries.front();
+    const auto steps =
+        test_geometry::take(contour.project(query, normal, row, caps.induction.geometry,
+                                            contact_caps, geometry_work, global_work, workspace));
+    auto too_short = contact_caps;
+    too_short.max_steps = steps - 1;
+    const auto exceeded = contour.project(query, normal, row, caps.induction.geometry, too_short,
+                                          geometry_work, global_work, workspace);
+    REQUIRE_FALSE(exceeded);
+    CHECK(exceeded.error().cause.code == core::FailureCode::ResourceExceeded);
+    CHECK(test_geometry::take(contour.project(query, normal, row, caps.induction.geometry,
+                                              contact_caps, geometry_work, global_work,
+                                              workspace)) == steps);
+
+    constexpr a::P1ActionStamp action_stamp{125, 2};
+    const a::P1ActionSource source{contact, query, action_stamp};
+    const auto full = test_geometry::take(a::prepare_bound_wake_induction(
+        source, maps, ids, caps.geometry_accuracy, caps.induction_accuracy, caps.induction, shared,
+        local, kernel, memory));
+    const a::P1ComplexWords zero{a::SingleWord{0}, a::SingleWord{0}};
+    const a::P1ComplexWords one{a::SingleWord{1}, a::SingleWord{0}};
+    std::vector<a::P1ComplexWords> strengths(ids.size(), zero);
+    for (std::size_t i = 0; i < strengths.size(); ++i) {
+        strengths[i] = one;
+        const auto reference = test_geometry::take(
+            a::apply_shared_p1(full, source, strengths, {}, caps.action_steps, shared));
+        check_bounds(row[i], reference.velocity()[2].real);
+        strengths[i] = zero;
+    }
+
+    const auto midpoint = test_geometry::take(
+        a::resolve_query(geometry, {a::QueryId{812}, a::SourceEdgePoint{self, a::SingleWord{0.5}}},
+                         geometry.context(), caps.induction.geometry, geometry_work, memory));
+    const a::P1ActionSource midpoint_source{contact, midpoint, action_stamp};
+    const auto midpoint_action = test_geometry::take(a::prepare_bound_wake_midpoint_induction(
+        midpoint_source, self, maps, ids, caps.geometry_accuracy, caps.induction_accuracy,
+        caps.induction, shared, local, kernel, memory));
+    std::vector<a::ContourInterval> weights(ids.size());
+    for (std::size_t i = 0; i < strengths.size(); ++i) {
+        const double value = static_cast<double>(i) / 8. - .25;
+        weights[i] = {value, value};
+        strengths[i].real = a::SingleWord{value};
+    }
+    const auto candidate =
+        test_geometry::take(contour.apply(midpoint, self, weights, caps.induction.geometry,
+                                          contact_caps, geometry_work, global_work, workspace));
+    const auto reference = test_geometry::take(a::apply_shared_p1(
+        midpoint_action, midpoint_source, strengths, {}, caps.action_steps, shared));
+    for (std::size_t axis = 0; axis < candidate.first.size(); ++axis)
+        check_bounds(candidate.first[axis], reference.velocity()[axis].real);
+}
+
 void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                       const nlohmann::json& oracle, double length, double radius) {
     const auto m = oracle.at("chord_panels").get<core::Index>();
@@ -1464,6 +1560,12 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
     a::SharedP1Workspace shared;
     auto local = take(a::LocalPacketWorkspace::create(memory));
     auto kernel = take(a::P1Workspace::create(memory));
+    if (count == 8) {
+        core::ResourcePlan contour_test{UINT64_C(2000000000)};
+        verify_prepared_contour(mesh, geometry, contact, queries, transfers, midpoint.front().edge,
+                                caps, contact_caps, *geometry_work, *global, shared, *local,
+                                *kernel, contour_test);
+    }
     const auto& gamma_prime = oracle.at("gamma_derivative_m2_s_per_rad");
     REQUIRE(gamma_prime.size() == count);
     std::array<Enclosure, 2> near{};
