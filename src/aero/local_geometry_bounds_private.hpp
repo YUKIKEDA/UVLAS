@@ -146,9 +146,6 @@ public:
         auto& d = scratch.integers[1];
         auto& a = scratch.integers[2];
         auto& b = scratch.integers[3];
-        auto& root = scratch.integers[4];
-        auto& square = scratch.integers[6];
-        auto& candidate_square = scratch.integers[7];
         n = numerator;
         d = denominator;
         if (n < 0 || d <= 0)
@@ -181,13 +178,17 @@ public:
         auto& quotient = n;
         auto& remainder = d;
         boost::multiprecision::divide_qr(a, b, quotient, remainder);
-        root = 0;
-        square = 0;
+        // Both the normalized quotient and all trial squares are below 2^514.
+        using TrialInteger = boost::multiprecision::checked_uint1024_t;
+        const auto target = quotient.convert_to<TrialInteger>();
+        TrialInteger root = 0;
+        TrialInteger square = 0;
         for (int bit = 256; bit >= 0; --bit) {
             const auto i = static_cast<unsigned>(bit);
-            candidate_square = square + (root << (i + 1U)) + (ExactInteger{1} << (2U * i));
-            if (candidate_square <= quotient) {
-                root += ExactInteger{1} << i;
+            const TrialInteger candidate_square =
+                square + (root << (i + 1U)) + (TrialInteger{1} << (2U * i));
+            if (candidate_square <= target) {
+                root += TrialInteger{1} << i;
                 square = candidate_square;
             }
             if (bit != 0) {
@@ -195,10 +196,12 @@ public:
                     return std::unexpected(check.error());
             }
         }
-        const bool uncertain = square != quotient || remainder != 0;
+        const bool uncertain = square != target || remainder != 0;
+        auto& signed_root = scratch.integers[4];
+        signed_root = root.convert_to<ExactInteger>();
         if (negative)
-            root = -root;
-        return dyadic(root, exponent + t - 256, precision, scratch, uncertain);
+            signed_root = -signed_root;
+        return dyadic(signed_root, exponent + t - 256, precision, scratch, uncertain);
     }
     /// Compare full width 2r (not radius) against the requested original scale.
     [[nodiscard]] static bool width(const ScaledEnclosure& value, double tau,

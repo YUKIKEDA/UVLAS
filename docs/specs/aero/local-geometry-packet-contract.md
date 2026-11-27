@@ -35,6 +35,8 @@ N=0は厳密零を返す。平方根を必要とする非零量では $$ k=\lflo
 
 $$ A/B=(N/D)2^{512-2t} $$ となるよう、シフトの正負に応じてNまたはDだけを左シフトする。A/Bに残る共通の2冪因子は、両整数のtrailing zeroの小さい方だけを左右から除く。正の同じ因子を消すので、以下の全比較と最終等号は不変である。257bit整数sを上位bitから逐次構成し、各候補に対して $$ s^2B\le A $$ を厳密比較する。257回後のsは $$ s/2^{256}\le\sqrt z<(s+1)/2^{256} $$ を与える。等号 $$ s^2B=A $$ なら上下端を同じにする。平方根の符号を比較する許容差はない。各候補の判定は、先に整数商 $q=\lfloor A/B\rfloor$ を求めて $s^2\le q$ と比較しても同じになる。元の等号は $s^2=q$ かつ剰余が零の場合に成立する。
 
+正規化で $A/B<2^{514}$ となる。各候補の二乗もこの範囲に収まるため、試行中の商、候補と二乗は検査付き固定1024bit整数で保持できる。元の除算、剰余と返却用の符号付き整数には32768bit領域を使う。
+
 この有理区間から指定表現の有限中心h（またはh+l）を作る。中心との差と区間半幅を厳密な整数差で評価し、上向きに丸めた有限double半径へ含める。指数E+tを別保持し、中間scalbnや平方根doubleのunderflow/overflowで真値を失わない。符号が負なら区間端を反転する。256fraction-bitは内部の固定精度であり、利用者のtauを緩める根拠ではない。包含できても幅超過なら失敗する。tau=0では幅が厳密零の場合だけ成功する。
 
 ## 3. 幅認定と整数容量
@@ -55,7 +57,7 @@ LocalPacketWorkspaceは既存GeometryWorkspaceと同じlease境界を使い、�
 
 共有作用を組み立てる前には、三角形と照会位置の読取り18 step、A0の17 stepと述語subcapの小さい方、包絡の3108 stepを合算する。中点の別名経路は、入口2 step、元facet索引の二分探索、三辺の照合3 stepで覆う。共有作用はこの上限と呼出し側のgeometry予算の小さい方を局所準備の予約と上限に使い、実行したstepを計上する。
 
-32768bit/et_offの積は逐次実行し、既存の固定Boost外部scratch forecast `7L limb = 28672byte` を再利用する。除算・平方根をBoostの別algorithmへ委譲せず、上記bit試行と比較で評価する。新しい同時積・動的精度型・再帰階層を重ねない。allocator overhead/RSSのhard capとは呼ばず、proven boundなしのstrict要求は既存と同じUnsupportedとする。結果確保と外部scratchのbad_allocは既存cause/detailsを保ち、leaseを解放する。
+32768bit/et_offの積と整数除算は逐次実行し、既存の固定Boost外部scratch forecast `7L limb = 28672byte` を再利用する。平方根は上記bit試行と比較で評価する。新しい同時積・動的精度型・再帰階層を重ねない。allocator overhead/RSSのhard capとは呼ばず、proven boundなしのstrict要求は既存と同じUnsupportedとする。結果確保と外部scratchのbad_allocは既存cause/detailsを保ち、leaseを解放する。
 
 任意の計測要求は数学のaccuracyと分離したmetadataである。disabledを既定とし、時計読みを行わない。enabledでは既存StageTimingで分類、接触資格、包絡、および包絡内のroot/幅認定を記録する。root/幅は包絡時間へ内包されるため合計へ重複加算しない。計測の有無で中心/半径/資格/実stepを変えない。準備段階の観測を物理kernelや実務全体の性能へ一般化しない。
 
