@@ -111,11 +111,15 @@ inline Bound sum_bound(const Bound& a, const Bound& b, bool upper) {
     const int common = exponent(top - 258);
     return rounded(at_power(a, common, upper) + at_power(b, common, upper), common, upper);
 }
-inline Bound product_bound(const Bound& a, const Bound& b, bool upper) {
-    return rounded(a.mantissa * b.mantissa, exponent(static_cast<std::int64_t>(a.power) + b.power),
-                   upper);
+struct Interval {
+    Bound lower, upper;
+};
+inline Interval product_enclosure(const Bound& a, const Bound& b) {
+    const Integer product = a.mantissa * b.mantissa;
+    const auto power = exponent(static_cast<std::int64_t>(a.power) + b.power);
+    return {rounded(product, power, false), rounded(product, power, true)};
 }
-inline Bound quotient_bound(const Bound& a, const Bound& b, bool upper) {
+inline Interval quotient_enclosure(const Bound& a, const Bound& b) {
     if (b.mantissa == 0)
         throw ArithmeticFailure{core::FailureCode::PrecisionUnresolved};
     if (a.mantissa == 0)
@@ -124,15 +128,27 @@ inline Bound quotient_bound(const Bound& a, const Bound& b, bool upper) {
     const Integer numerator = magnitude(a.mantissa), denominator = magnitude(b.mantissa);
     const int shift = 256 - static_cast<int>(bits(numerator)) + static_cast<int>(bits(denominator));
     const Integer enlarged = numerator << static_cast<unsigned>(shift);
-    Integer quotient = enlarged / denominator;
-    if (enlarged % denominator != 0 && (upper != negative))
-        ++quotient;
-    return rounded(negative ? -quotient : quotient,
-                   exponent(static_cast<std::int64_t>(a.power) - b.power - shift), upper);
+    Integer quotient, remainder;
+    boost::multiprecision::divide_qr(enlarged, denominator, quotient, remainder);
+    const Integer outward = remainder == 0 ? quotient : quotient + 1;
+    const auto power = exponent(static_cast<std::int64_t>(a.power) - b.power - shift);
+    if (negative)
+        return {rounded(-outward, power, false), rounded(-quotient, power, true)};
+    return {rounded(quotient, power, false), rounded(outward, power, true)};
 }
-struct Interval {
-    Bound lower, upper;
-};
+template <class Pair>
+inline Interval corner_enclosure(const Interval& a, const Interval& b, Pair enclose) {
+    const std::array corners{enclose(a.lower, b.lower), enclose(a.lower, b.upper),
+                             enclose(a.upper, b.lower), enclose(a.upper, b.upper)};
+    const auto lower_less = [](const Interval& x, const Interval& y) {
+        return compare(x.lower, y.lower) < 0;
+    };
+    const auto upper_less = [](const Interval& x, const Interval& y) {
+        return compare(x.upper, y.upper) < 0;
+    };
+    return {std::min_element(corners.begin(), corners.end(), lower_less)->lower,
+            std::max_element(corners.begin(), corners.end(), upper_less)->upper};
+}
 inline Interval integer(std::int64_t value) {
     const Bound b{Integer{value}, 0};
     return {b, b};
@@ -172,31 +188,16 @@ inline Interval subtract(const Interval& a, const Interval& b, Work& work) {
 }
 inline Interval multiply(const Interval& a, const Interval& b, Work& work) {
     work.step();
-    std::array<Bound, 4> low{
-        product_bound(a.lower, b.lower, false), product_bound(a.lower, b.upper, false),
-        product_bound(a.upper, b.lower, false), product_bound(a.upper, b.upper, false)};
-    std::array<Bound, 4> high{
-        product_bound(a.lower, b.lower, true), product_bound(a.lower, b.upper, true),
-        product_bound(a.upper, b.lower, true), product_bound(a.upper, b.upper, true)};
-    const auto less = [](const Bound& x, const Bound& y) { return compare(x, y) < 0; };
-    const Bound lower = (&a == &b && compare(a.lower, {}) <= 0 && compare(a.upper, {}) >= 0)
-                            ? Bound{}
-                            : *std::min_element(low.begin(), low.end(), less);
-    return {lower, *std::max_element(high.begin(), high.end(), less)};
+    auto result = corner_enclosure(a, b, product_enclosure);
+    if (&a == &b && compare(a.lower, {}) <= 0 && compare(a.upper, {}) >= 0)
+        result.lower = {};
+    return result;
 }
 inline Interval divide(const Interval& a, const Interval& b, Work& work) {
     work.step();
     if (compare(b.lower, {}) <= 0 && compare(b.upper, {}) >= 0)
         throw ArithmeticFailure{core::FailureCode::PrecisionUnresolved};
-    std::array<Bound, 4> low{
-        quotient_bound(a.lower, b.lower, false), quotient_bound(a.lower, b.upper, false),
-        quotient_bound(a.upper, b.lower, false), quotient_bound(a.upper, b.upper, false)};
-    std::array<Bound, 4> high{
-        quotient_bound(a.lower, b.lower, true), quotient_bound(a.lower, b.upper, true),
-        quotient_bound(a.upper, b.lower, true), quotient_bound(a.upper, b.upper, true)};
-    const auto less = [](const Bound& x, const Bound& y) { return compare(x, y) < 0; };
-    return {*std::min_element(low.begin(), low.end(), less),
-            *std::max_element(high.begin(), high.end(), less)};
+    return corner_enclosure(a, b, quotient_enclosure);
 }
 inline Bound root_bound(const Bound& input, bool upper, Work& work) {
     if (input.mantissa < 0)

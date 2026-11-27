@@ -83,6 +83,50 @@ TEST_CASE("P1 scalar primitives enclose independent higher precision values",
     CHECK_THROWS_AS(arithmetic::divide(one, arithmetic::integer(0), work),
                     arithmetic::ArithmeticFailure);
 }
+TEST_CASE("P1 interval corners round products and quotients in both directions",
+          "[UI-D06][N4-06][negative][verification]") {
+    using Rational = boost::multiprecision::cpp_rational;
+    using arithmetic::Bound;
+    using arithmetic::Integer;
+    using arithmetic::Interval;
+    const Integer large = (Integer{1} << 255U) + 17;
+    const std::array intervals{Interval{{-large, -255}, {-3, -4}},
+                               Interval{{-7, -8}, {large, -258}}, Interval{{}, {3, -1}},
+                               Interval{{5, -1074}, {large, -1326}}, Interval{{3, 0}, {3, 0}}};
+    const auto compare_extrema = [](const Interval& observed, auto operation, const Interval& a,
+                                    const Interval& b) {
+        const auto lo_a = exact_bound(a.lower), hi_a = exact_bound(a.upper);
+        const auto lo_b = exact_bound(b.lower), hi_b = exact_bound(b.upper);
+        const std::array<Rational, 4> corners{operation(lo_a, lo_b), operation(lo_a, hi_b),
+                                              operation(hi_a, lo_b), operation(hi_a, hi_b)};
+        const auto expected = std::minmax_element(corners.begin(), corners.end());
+        const auto lower = exact_bound(observed.lower), upper = exact_bound(observed.upper);
+        CHECK(lower <= *expected.first);
+        CHECK(upper >= *expected.second);
+        CHECK(*expected.first - lower <= exact_bound(Bound{1, observed.lower.power}));
+        CHECK(upper - *expected.second <= exact_bound(Bound{1, observed.upper.power}));
+    };
+    arithmetic::Work work{0, 128, {}};
+    for (const auto& a : intervals) {
+        for (const auto& b : intervals) {
+            const auto other = b;
+            compare_extrema(
+                arithmetic::multiply(a, other, work),
+                [](const Rational& x, const Rational& y) { return Rational{x * y}; }, a, b);
+            if (exact_bound(b.lower) <= 0 && exact_bound(b.upper) >= 0) {
+                CHECK_THROWS_AS(arithmetic::divide(a, b, work), arithmetic::ArithmeticFailure);
+            } else {
+                compare_extrema(
+                    arithmetic::divide(a, b, work),
+                    [](const Rational& x, const Rational& y) { return Rational{x / y}; }, a, b);
+            }
+        }
+    }
+    const auto square = arithmetic::multiply(intervals[1], intervals[1], work);
+    CHECK(exact_bound(square.lower) == 0);
+    CHECK(work.used == 2 * intervals.size() * intervals.size() + 1);
+}
+
 TEST_CASE("Product Gauss brackets match independently isolated exact Sturm roots",
           "[UI-D02][N4-06][verification]") {
     std::ifstream input{UVLAS_P1_GAUSS_FIXTURE};
