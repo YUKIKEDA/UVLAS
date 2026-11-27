@@ -639,32 +639,36 @@ Result<void> inverse(detail::UpdatedData& data, std::span<const Complex> rhs,
     return {};
 }
 using Accumulator = uvlas::numerics::detail::CompensatedAccumulator;
-Result<void> product(Accumulator& real, Accumulator& imag, double a, double x) noexcept {
+using uvlas::numerics::detail::CheckedEft;
+Result<void> product(Accumulator& real, Accumulator& imag, double a, double x,
+                     const CheckedEft& eft) noexcept {
     (void)imag;
-    return real.product(a, x, -1);
+    return real.product(a, x, -1, eft);
 }
-Result<void> product(Accumulator& real, Accumulator& imag, Complex a, Complex x) noexcept {
-    auto rr = real.product(a.real(), x.real(), -1);
+Result<void> product(Accumulator& real, Accumulator& imag, Complex a, Complex x,
+                     const CheckedEft& eft) noexcept {
+    auto rr = real.product(a.real(), x.real(), -1, eft);
     if (!rr)
         return rr;
-    auto ii = real.product(a.imag(), x.imag(), 1);
+    auto ii = real.product(a.imag(), x.imag(), 1, eft);
     if (!ii)
         return ii;
-    auto ri = imag.product(a.real(), x.imag(), -1);
+    auto ri = imag.product(a.real(), x.imag(), -1, eft);
     if (!ri)
         return ri;
-    return imag.product(a.imag(), x.real(), -1);
+    return imag.product(a.imag(), x.real(), -1, eft);
 }
 template <StorageScalar Scalar>
-Result<void> add_rhs(Accumulator& real, Accumulator& imag, Scalar value) noexcept {
+Result<void> add_rhs(Accumulator& real, Accumulator& imag, Scalar value,
+                     const CheckedEft& eft) noexcept {
     if constexpr (std::same_as<Scalar, double>) {
         (void)imag;
-        return real.add(value);
+        return real.add(value, eft);
     } else {
-        auto r = real.add(value.real());
+        auto r = real.add(value.real(), eft);
         if (!r)
             return r;
-        return imag.add(value.imag());
+        return imag.add(value.imag(), eft);
     }
 }
 template <StorageScalar Scalar, class Data>
@@ -683,13 +687,20 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
             data.x_magnitude.values()[offset + static_cast<std::size_t>(j)] = *x;
         }
         const auto rows = [&](Index first_row, Index last_row) noexcept -> Result<void> {
+            if (first_row == last_row)
+                return {};
+            // Floating-point state is thread-local. Nothing in the row range
+            // invokes user code or changes that state.
+            const auto eft = CheckedEft::prepare();
+            if (!eft)
+                return std::unexpected(eft.error());
             for (Index i = first_row; i < last_row; ++i) {
                 const auto at = offset + static_cast<std::size_t>(i);
                 Accumulator real, imag;
-                auto first = add_rhs(real, imag, data.rhs_hi.values()[at]);
+                auto first = add_rhs(real, imag, data.rhs_hi.values()[at], *eft);
                 if (!first)
                     return std::unexpected(first.error());
-                auto second = add_rhs(real, imag, data.rhs_lo.values()[at]);
+                auto second = add_rhs(real, imag, data.rhs_lo.values()[at], *eft);
                 if (!second)
                     return std::unexpected(second.error());
                 auto bmag = detail::actual_magnitude_bounds(data.rhs_hi.values()[at],
@@ -701,11 +712,11 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
                     const Scalar a = coefficient(data, i, j);
                     if (!finite(a))
                         return fail(FailureCode::Nonfinite);
-                    auto term = product(real, imag, a, entry(hi, j, c));
+                    auto term = product(real, imag, a, entry(hi, j, c), *eft);
                     if (!term)
                         return std::unexpected(term.error());
                     if (lo) {
-                        auto trailing = product(real, imag, a, entry(*lo, j, c));
+                        auto trailing = product(real, imag, a, entry(*lo, j, c), *eft);
                         if (!trailing)
                             return std::unexpected(trailing.error());
                     }
@@ -721,16 +732,17 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
                     }
                     denominator = detail::add_magnitude_product_lower(
                         denominator, coefficient_lower,
-                        data.x_magnitude.values()[offset + static_cast<std::size_t>(j)].lower);
+                        data.x_magnitude.values()[offset + static_cast<std::size_t>(j)].lower,
+                        *eft);
                 }
-                auto r = real.result();
+                auto r = real.result(*eft);
                 if (!r)
                     return std::unexpected(r.error());
                 if constexpr (std::same_as<Scalar, double>) {
                     data.residual.values()[at] = r->value;
                     data.residual_error.values()[at] = r->error;
                 } else {
-                    auto im = imag.result();
+                    auto im = imag.result(*eft);
                     if (!im)
                         return std::unexpected(im.error());
                     data.residual.values()[at] = {r->value, im->value};

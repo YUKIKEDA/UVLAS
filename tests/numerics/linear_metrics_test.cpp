@@ -1,3 +1,4 @@
+#include "compensated.hpp"
 #include "linear_solve_detail.hpp"
 
 #include <boost/multiprecision/cpp_bin_float.hpp>
@@ -6,6 +7,7 @@
 
 #include <array>
 #include <bit>
+#include <cfenv>
 #include <cmath>
 #include <complex>
 #include <limits>
@@ -83,6 +85,8 @@ TEST_CASE("Actual two-word magnitude encloses cancellation and extreme exponents
 
 TEST_CASE("A lower-only backward denominator retains the directed product and sum",
           "[verification][N4-05][N4-06]") {
+    const auto eft = uvlas::numerics::detail::CheckedEft::prepare();
+    REQUIRE(eft);
     constexpr double maximum = std::numeric_limits<double>::max();
     constexpr double subnormal = std::numeric_limits<double>::denorm_min();
     const std::array inputs{std::array{0., 2., 0.},
@@ -92,13 +96,50 @@ TEST_CASE("A lower-only backward denominator retains the directed product and su
                             std::array{.1, std::nextafter(1., 2.), .2},
                             std::array{1., 2., 3.}};
     for (const auto& [base, a, b] : inputs) {
-        const double lower = metrics::add_magnitude_product_lower(base, a, b);
+        const double lower = metrics::add_magnitude_product_lower(base, a, b, *eft);
         const auto both =
             metrics::add_magnitudes({base, base}, metrics::multiply_magnitudes({a, a}, {b, b}));
         CHECK(std::bit_cast<std::uint64_t>(lower) == std::bit_cast<std::uint64_t>(both.lower));
         const Big exact = Big(base) + Big(a) * Big(b);
         CHECK(Big(lower) <= exact);
     }
+}
+
+TEST_CASE("Thread-local EFT qualification retains arithmetic words and failures",
+          "[verification][negative][N4-05][N4-06]") {
+    const auto eft = uvlas::numerics::detail::CheckedEft::prepare();
+    REQUIRE(eft);
+    const auto same = [](const auto& checked, const auto& full) {
+        REQUIRE(checked.has_value() == full.has_value());
+        if (!full) {
+            CHECK(checked.error().code == full.error().code);
+            return;
+        }
+        CHECK(std::bit_cast<std::uint64_t>(checked->hi) == std::bit_cast<std::uint64_t>(full->hi));
+        CHECK(std::bit_cast<std::uint64_t>(checked->lo) == std::bit_cast<std::uint64_t>(full->lo));
+    };
+    constexpr auto tiny = std::numeric_limits<double>::denorm_min();
+    constexpr auto maximum = std::numeric_limits<double>::max();
+    const std::array pairs{std::pair{1., 0x1p-53},
+                           std::pair{-12.25, 8.2},
+                           std::pair{-0., +0.},
+                           std::pair{tiny, .5},
+                           std::pair{maximum, 2.},
+                           std::pair{maximum, maximum},
+                           std::pair{std::numeric_limits<double>::infinity(), 1.}};
+    for (const auto& [a, b] : pairs) {
+        same(eft->sum(a, b), uvlas::numerics::two_sum(a, b));
+        same(eft->product(a, b), uvlas::numerics::two_product(a, b));
+    }
+
+    const auto previous = std::fegetround();
+    REQUIRE(previous == FE_TONEAREST);
+    REQUIRE(std::fesetround(FE_DOWNWARD) == 0);
+    const auto rejected = uvlas::numerics::detail::CheckedEft::prepare();
+    const auto restored = std::fesetround(previous);
+    REQUIRE(restored == 0);
+    REQUIRE_FALSE(rejected);
+    CHECK(rejected.error().code == core::FailureCode::PrecisionUnsupported);
 }
 
 TEST_CASE("Residual criteria use model scales and actual RHS rather than high word only",
