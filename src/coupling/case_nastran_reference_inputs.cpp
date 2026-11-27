@@ -4,6 +4,7 @@
 #include "structure/pg_reference_polynomials.hpp"
 
 #include <algorithm>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 
@@ -230,6 +231,7 @@ core::Result<CaseNastranReferenceInputs> CaseNastranReferenceInputs::prepare(
 namespace {
 
 namespace ref = structure::detail;
+using MassInput = CaseNastranReferenceInputs::Mass;
 
 template <class CaseMass>
 using MassEvidence = std::conditional_t<std::is_same_v<CaseMass, io::schema::MassRigid>,
@@ -239,7 +241,8 @@ template <class CaseMass>
 core::Result<MassEvidence<CaseMass>>
 certify_case_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepared,
                   CaseNastranMassId id, ref::ReferenceArithmetic& math, bool admitted,
-                  CaseNastranParticleDiagnostic* diagnostic) noexcept {
+                  CaseNastranParticleDiagnostic* diagnostic, const MassInput* selected = nullptr,
+                  std::optional<core::Index> case_ordinal = {}) noexcept {
     using ref::partition_take;
     using Reason = CaseNastranParticleFailure;
     using Result = core::Result<MassEvidence<CaseMass>>;
@@ -268,18 +271,20 @@ certify_case_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepar
             return reject(FailureCode::StaleGeneration);
 
         mark(Reason::Selection);
-        const CaseNastranReferenceInputs::Mass* selected = nullptr;
-        for (const auto& slot : prepared.masses()) {
-            math.visit(1);
-            if (!slot || slot->binding.target != id)
-                continue;
-            detail.element = slot->binding.element;
-            if (selected)
-                return reject(FailureCode::InvalidInput);
-            selected = &*slot;
+        if (!selected) {
+            for (const auto& slot : prepared.masses()) {
+                math.visit(1);
+                if (!slot || slot->binding.target != id)
+                    continue;
+                detail.element = slot->binding.element;
+                if (selected)
+                    return reject(FailureCode::InvalidInput);
+                selected = &*slot;
+            }
         }
         if (!selected)
             return reject(FailureCode::InvalidInput);
+        detail.element = selected->binding.element;
         const auto& original = selected->physical;
         if (!native::same_identity(identity, original.source.location.parent) ||
             original.source.location.source != deck.source ||
@@ -309,14 +314,19 @@ certify_case_mass(const io::SiCase& si, const CaseNastranReferenceInputs& prepar
 
         const auto model = partition_take(schema.root()).model.record();
         std::optional<CaseMass> case_mass;
-        for (std::size_t i = 0; i < model.masses.size(); ++i) {
+        const auto read_case_mass = [&](core::Index i) {
             math.visit(1);
-            const auto value = partition_take(model.masses.at(ref::partition_index(i))).record();
+            const auto value = partition_take(model.masses.at(i)).record();
             if (const auto* candidate = std::get_if<CaseMass>(&value);
-                candidate && candidate->id.unsigned_value() == id.value()) {
+                candidate && candidate->id.unsigned_value() == id.value())
                 case_mass = *candidate;
-                break;
-            }
+        };
+        if (case_ordinal) {
+            if (*case_ordinal >= 0)
+                read_case_mass(*case_ordinal);
+        } else {
+            for (std::size_t i = 0; i < model.masses.size() && !case_mass; ++i)
+                read_case_mass(ref::partition_index(i));
         }
         if (!case_mass)
             return reject(FailureCode::InvalidInput);
@@ -534,13 +544,70 @@ CaseNastranMassSet::certify(const io::SiCase& si, const CaseNastranReferenceInpu
             live_rationals = ref::partition_add(live_rationals, retained);
         }
         math.admit(live_rationals);
+        struct MassIndex {
+            std::uint64_t id{};
+            core::Index ordinal{};
+        };
+        const auto compares_id = [&](std::uint64_t left, std::uint64_t right) {
+            math.visit(1);
+            return left < right;
+        };
+        // Sort indices only. The owning evidence is built in sidecar declaration order.
+        {
+            auto bindings = ref::partition_take(
+                plan.allocate<MassIndex>(ref::partition_index(rows.size()), operation));
+            auto order = bindings.values();
+            for (std::size_t i = 0; i < rows.size(); ++i) {
+                math.visit(1);
+                order[i] = {rows[i]->binding.target.value(), ref::partition_index(i)};
+            }
+            std::ranges::sort(order, [&](const MassIndex& left, const MassIndex& right) {
+                math.visit(1);
+                return std::tie(left.id, left.ordinal) < std::tie(right.id, right.ordinal);
+            });
+            for (std::size_t i = 1; i < order.size(); ++i) {
+                math.visit(1);
+                if (order[i - 1].id != order[i].id)
+                    continue;
+                const auto ordinal = order[i].ordinal;
+                const auto& duplicate = rows[static_cast<std::size_t>(ordinal)]->binding;
+                if (diagnostic) {
+                    CaseNastranParticleDiagnostic detail;
+                    detail.reason = CaseNastranParticleFailure::Selection;
+                    detail.element = duplicate.element;
+                    *diagnostic = CaseNastranMassSetDiagnostic{{io::SchemaNamespace::Mass,
+                                                                duplicate.target.value(),
+                                                                duplicate.element, duplicate.node},
+                                                               detail};
+                }
+                ref::partition_fail(FailureCode::InvalidInput);
+            }
+        }
+        const auto model = ref::partition_take(schema.root()).model.record();
+        auto cases = ref::partition_take(
+            plan.allocate<MassIndex>(ref::partition_index(model.masses.size()), operation));
+        auto case_order = cases.values();
+        for (std::size_t i = 0; i < case_order.size(); ++i) {
+            math.visit(1);
+            const auto ordinal = ref::partition_index(i);
+            const auto value = ref::partition_take(model.masses.at(ordinal)).record();
+            const auto id =
+                std::visit([](const auto& item) { return item.id.unsigned_value(); }, value);
+            case_order[i] = {id, ordinal};
+        }
+        std::ranges::sort(case_order, compares_id, &MassIndex::id);
         auto owned = ref::partition_take(
             plan.allocate<std::optional<Mass>>(ref::partition_index(rows.size()), operation));
         const auto match = [&](const auto& row, auto tag) -> core::Result<Mass> {
             CaseNastranParticleDiagnostic detail;
             const auto& binding = row.binding;
+            const auto target = binding.target.value();
+            const auto found =
+                std::ranges::lower_bound(case_order, target, compares_id, &MassIndex::id);
+            const core::Index ordinal =
+                found != case_order.end() && found->id == target ? found->ordinal : -1;
             auto qualified = certify_case_mass<typename decltype(tag)::type>(
-                si, prepared, binding.target, math, true, &detail);
+                si, prepared, binding.target, math, true, &detail, &row, ordinal);
             if (!qualified && diagnostic) {
                 *diagnostic =
                     CaseNastranMassSetDiagnostic{{io::SchemaNamespace::Mass, binding.target.value(),

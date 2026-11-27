@@ -1519,6 +1519,7 @@ $EndElements
     enum class RigidMassCase : std::uint8_t { None, Matching, Absolute, Frame, Centre, Inertia };
     auto rigid_mass = RigidMassCase::None;
     bool mass_set = false;
+    bool duplicate_mass_target = false;
     bool case_millimetres = false;
     bool wrong_thickness_units = false;
     SECTION("Gmsh group expands and preserves the original rings") {
@@ -1817,6 +1818,14 @@ $EndElements
         rigid_mass = RigidMassCase::Centre;
         mass_set = true;
     }
+    SECTION("Two distinct CONM2 cards cannot certify the same Case mass") {
+        shell_set = true;
+        physical = true;
+        native_cards = true;
+        rigid_mass = RigidMassCase::Matching;
+        mass_set = true;
+        duplicate_mass_target = true;
+    }
     SECTION("The late native RBE2 error keeps its source field and Case declaration") {
         shell_set = true;
         physical = true;
@@ -1968,7 +1977,8 @@ $EndElements
         if (native_cards) {
             sidecar["beams"].push_back({{"element", "905"}, {"beam", "1"}});
             if (mass_set)
-                sidecar["masses"].push_back({{"element", "908"}, {"mass", "20"}});
+                sidecar["masses"].push_back(
+                    {{"element", "908"}, {"mass", duplicate_mass_target ? "1" : "20"}});
             sidecar["masses"].push_back({{"element", "906"}, {"mass", "1"}});
             sidecar["joints"].push_back({{"element", "907"}, {"joint", "1"}});
         }
@@ -2682,6 +2692,25 @@ $EndElements
                 using namespace uvlas::coupling::detail;
                 REQUIRE(native->masses().size() == 2);
                 std::optional<CaseNastranMassSetDiagnostic> mass_diagnostic;
+                if (duplicate_mass_target) {
+                    CaseNastranParticleDiagnostic single_diagnostic;
+                    const auto single = certify_case_nastran_rigid_mass(
+                        si, *native, CaseNastranMassId{1}, pg_limits, plan, &single_diagnostic);
+                    REQUIRE_FALSE(single);
+                    CHECK(single.error().code == core::FailureCode::InvalidInput);
+                    CHECK(single_diagnostic.reason == CaseNastranParticleFailure::Selection);
+                    CHECK(single_diagnostic.element == rd::NastranElementId{906});
+                    const auto set =
+                        CaseNastranMassSet::certify(si, *native, pg_limits, plan, &mass_diagnostic);
+                    REQUIRE_FALSE(set);
+                    CHECK(set.error().code == core::FailureCode::InvalidInput);
+                    REQUIRE(mass_diagnostic);
+                    CHECK(mass_diagnostic->declaration.case_id == 1);
+                    CHECK(mass_diagnostic->declaration.element == rd::NastranElementId{906});
+                    CHECK(mass_diagnostic->comparison.reason ==
+                          CaseNastranParticleFailure::Selection);
+                    return;
+                }
                 if (rigid_mass == RigidMassCase::Centre) {
                     const auto rejected =
                         CaseNastranMassSet::certify(si, *native, pg_limits, plan, &mass_diagnostic);
