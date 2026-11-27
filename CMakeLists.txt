@@ -61,7 +61,7 @@ uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
 
-# Exact reference algebra is a preparation component, separate from physical kernels.
+# Reference algebra, structural material and physical actions.
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
@@ -70,7 +70,8 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_full_trace.cpp src/structure/pg_global_constraints.cpp
     src/structure/pg_sparse_chart.cpp src/structure/pg_chart_candidate.cpp
     src/structure/pg_support_history.cpp src/structure/pg_rigid_support_rows.cpp
-    src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
+    src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp
+    src/structure/pg_shell_material.cpp)
 find_package(Threads REQUIRED)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)

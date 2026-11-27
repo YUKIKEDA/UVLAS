@@ -774,6 +774,11 @@ foreach(series IN ITEMS r4-reference r5-integrals r5-sides)
         LABELS "property;verification;V-PG" TIMEOUT ${pg_reference_timeout})
 endforeach()
 
+uvlas_add_test(structure.pg_shell_material
+    LABELS unit negative verification V-MAT
+    SOURCES structure/pg_shell_material_test.cpp
+    LIBS uvlas_structure)
+
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG
     TIMEOUT 180
