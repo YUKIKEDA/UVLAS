@@ -153,6 +153,20 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
     CHECK(bounded->second_pk_mandel_pascal[0].upper == q("-3630"));
     CHECK(bounded->energy_joules_per_cubic_metre.lower == q("43923", "800"));
     CHECK(bounded->energy_joules_per_cubic_metre.upper == q("49923", "800"));
+    // An undeformed point retains the stress from the Case's initial field.
+    std::array<pg::ExactRational, 9> cartesian;
+    pg::PgShellTensorEnclosure identity;
+    for (std::size_t i = 0; i < 3; ++i) {
+        cartesian[4 * i] = q("1");
+        identity[4 * i] = {q("1"), q("1")};
+    }
+    const auto material_point = pg::enclose_pg_shell_material_point(
+        shared, polynomial->enclosure(), pg::PgShellExplicitAxes{cartesian}, identity, limits,
+        memory);
+    REQUIRE(material_point);
+    CHECK(material_point->second_pk_world_pascal[0].lower == q("-3870"));
+    CHECK(material_point->first_pk_world_pascal[0].lower == q("-3870"));
+    CHECK(material_point->cauchy_world_pascal[0].upper == q("-3630"));
     const std::array chart_right{q("3", "4"), q("0"), q("3", "4")};
     const auto second =
         owned->sample_initial_green(si, 3, {chart_right, local, world, g}, limits, memory);

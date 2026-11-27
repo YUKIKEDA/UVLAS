@@ -253,6 +253,9 @@ struct MaterialBounds {
             left = {};
         return {std::move(left), std::move(right)};
     }
+    Bound divide_positive(const Bound& a, const Bound& b, const R& one) const {
+        return multiply(a, {math.div(one, b.upper), math.div(one, b.lower)});
+    }
     Bound root(const R& g) const {
         if (g.sign() <= 0)
             partition_fail(invalid);
@@ -283,9 +286,9 @@ struct MaterialBounds {
     }
 };
 
-void require_positive(const Bound& value) {
+void require_positive(const Bound& value, core::FailureCode nonpositive = invalid) {
     if (value.upper.sign() <= 0)
-        partition_fail(invalid);
+        partition_fail(nonpositive);
     if (value.lower.sign() <= 0)
         partition_fail(unresolved);
 }
@@ -307,6 +310,223 @@ void qualify_natural_metric(const std::array<Bound, order>& initial, const Bound
     const auto cross =
         bounds.add(bounds.multiply(a, bounds.square(yz)), bounds.multiply(b, bounds.square(xz)));
     require_positive(bounds.sub(bounds.add(bounds.multiply(leading, c), triple), cross));
+}
+PgShellMaterialEnclosure enclose_response(const PgShellElasticLaw& law,
+                                          const PgInitialGreenEnclosure& input,
+                                          const std::array<Bound, order>& green, const R& two,
+                                          const Bound& sqrt_two, const MaterialBounds& bounds) {
+    auto& math = bounds.math;
+    if (law.density_kg_m3().sign() <= 0 || input.radicand.sign() <= 0)
+        partition_fail(invalid);
+    const auto distinct_root =
+        input.radicand != two && std::ranges::any_of(input.mandel, [](const auto& value) {
+            return value.radical.sign() != 0;
+        });
+    const auto separate_root = distinct_root ? bounds.root(input.radicand) : Bound{};
+    const auto& field_root = distinct_root ? separate_root : sqrt_two;
+    std::array<Bound, order> initial, elastic, stress;
+    for (std::size_t i = 0; i < order; ++i) {
+        const auto& error = input.absolute_error[i];
+        if (error.sign() < 0 || math.compare(green[i].lower, green[i].upper) > 0)
+            partition_fail(invalid);
+        auto centre = bounds.radical(input.mandel[i], field_root);
+        initial[i] = {math.sub(centre.lower, error), math.add(centre.upper, error)};
+        elastic[i] = bounds.sub(green[i], initial[i]);
+    }
+    qualify_natural_metric(initial, sqrt_two, two, bounds);
+    Bound doubled_energy;
+    for (std::size_t i = 0; i < order; ++i) {
+        for (std::size_t j = 0; j < order; ++j) {
+            const auto stiffness = bounds.radical(law.stiffness()[i * order + j], sqrt_two);
+            const auto linear = bounds.multiply(stiffness, elastic[j]);
+            stress[i] = bounds.add(stress[i], linear);
+            if (i == j) {
+                doubled_energy = bounds.add(doubled_energy,
+                                            bounds.multiply(stiffness, bounds.square(elastic[i])));
+            } else if (i < j) {
+                const auto cross = bounds.multiply(elastic[i], linear);
+                doubled_energy = bounds.add(doubled_energy, bounds.scale(cross, two));
+            }
+        }
+    }
+    if (doubled_energy.lower.sign() < 0)
+        doubled_energy.lower = {}; // Positive definite law bounds the energy from below.
+    Bound energy{math.div(doubled_energy.lower, two), math.div(doubled_energy.upper, two)};
+    return PgShellMaterialEnclosure{std::move(energy), std::move(stress), math.info()};
+}
+
+using Tensor = PgShellTensorEnclosure;
+using Vector = std::array<Bound, 3>;
+
+Bound point(const R& value, ReferenceArithmetic& math) {
+    return {math.copy(value), math.copy(value)};
+}
+
+Vector column(const Tensor& a, std::size_t j, ReferenceArithmetic& math) {
+    return {Bound{math.copy(a[j].lower), math.copy(a[j].upper)},
+            Bound{math.copy(a[3 + j].lower), math.copy(a[3 + j].upper)},
+            Bound{math.copy(a[6 + j].lower), math.copy(a[6 + j].upper)}};
+}
+
+Bound dot(const Vector& a, const Vector& b, const MaterialBounds& bounds) {
+    Bound result;
+    for (std::size_t k = 0; k < a.size(); ++k)
+        result = bounds.add(result, bounds.multiply(a[k], b[k]));
+    return result;
+}
+
+Vector cross(const Vector& a, const Vector& b, const MaterialBounds& bounds) {
+    return {bounds.sub(bounds.multiply(a[1], b[2]), bounds.multiply(a[2], b[1])),
+            bounds.sub(bounds.multiply(a[2], b[0]), bounds.multiply(a[0], b[2])),
+            bounds.sub(bounds.multiply(a[0], b[1]), bounds.multiply(a[1], b[0]))};
+}
+
+Bound determinant(const Tensor& a, const MaterialBounds& bounds) {
+    const auto first = column(a, 0, bounds.math);
+    const auto second = column(a, 1, bounds.math);
+    const auto third = column(a, 2, bounds.math);
+    return dot(first, cross(second, third, bounds), bounds);
+}
+
+Vector normalize(Vector a, const R& one, const MaterialBounds& bounds) {
+    Bound norm_squared;
+    for (const auto& term : a)
+        norm_squared = bounds.add(norm_squared, bounds.square(term));
+    require_positive(norm_squared, core::FailureCode::GeometryInvalid);
+    const auto lower = bounds.root(norm_squared.lower);
+    auto upper = norm_squared.lower == norm_squared.upper ? bounds.math.copy(lower.upper)
+                                                          : bounds.root(norm_squared.upper).upper;
+    const Bound norm{bounds.math.copy(lower.lower), std::move(upper)};
+    require_positive(norm);
+    for (auto& value : a)
+        value = bounds.divide_positive(value, norm, one);
+    return a;
+}
+
+Tensor material_axes(const PgShellExplicitAxes& input, const R& one, const MaterialBounds& bounds) {
+    const R zero;
+    Tensor axes;
+    for (std::size_t j = 0; j < axes.size(); ++j)
+        axes[j] = point(input.columns[j], bounds.math);
+    for (std::size_t i = 0; i < 3; ++i) {
+        const auto a = column(axes, i, bounds.math);
+        for (std::size_t j = i; j < 3; ++j) {
+            const auto entry = dot(a, column(axes, j, bounds.math), bounds);
+            if (entry.lower != (i == j ? one : zero))
+                partition_fail(core::FailureCode::GeometryInvalid);
+        }
+    }
+    require_positive(determinant(axes, bounds), core::FailureCode::GeometryInvalid);
+    return axes;
+}
+
+Tensor material_axes(const PgShellProjectedAxes& input, const R& one,
+                     const MaterialBounds& bounds) {
+    auto& math = bounds.math;
+    if (math.add(math.square(input.cosine), math.square(input.sine)) != one)
+        partition_fail(core::FailureCode::GeometryInvalid);
+    const auto& ref = input.reference;
+    const auto root = bounds.root(ref.g);
+    ReferenceRadicals exact{math, ref.g};
+    const auto cross_exact = [&](const PgReferenceVector& a, const PgReferenceVector& b) {
+        PgReferenceVector result;
+        for (std::size_t i = 0; i < result.size(); ++i) {
+            const auto j = (i + 1) % 3, k = (i + 2) % 3;
+            result[i] = exact.sub(exact.mul(a[j], b[k]), exact.mul(a[k], b[j]));
+        }
+        return result;
+    };
+    PgReferenceVector fibre;
+    for (std::size_t i = 0; i < 3; ++i)
+        fibre[i].rational = math.copy(input.world_fibre[i]);
+    const auto area = cross_exact(ref.jacobian_columns_metres[0], ref.jacobian_columns_metres[1]);
+    PgReferenceScalar oriented_volume;
+    for (std::size_t i = 0; i < area.size(); ++i)
+        oriented_volume =
+            exact.add(oriented_volume, exact.mul(area[i], ref.jacobian_columns_metres[2][i]));
+    if (exact.sign(oriented_volume) <= 0)
+        partition_fail(core::FailureCode::GeometryInvalid);
+    // n x (w x n) is |n|^2 times the projected fibre. Form it before
+    // enclosing either direction so exact parallelism stays distinguishable.
+    const auto projected = cross_exact(area, cross_exact(fibre, area));
+    const auto enclose = [&](const PgReferenceVector& value) {
+        Vector result;
+        for (std::size_t i = 0; i < result.size(); ++i) {
+            if (exact.sign(value[i]) != 0)
+                result[i] = bounds.radical(value[i], root);
+        }
+        return result;
+    };
+    const auto normal = normalize(enclose(area), one, bounds);
+    const auto along = normalize(enclose(projected), one, bounds);
+    const auto across = cross(normal, along, bounds);
+    Tensor axes;
+    for (std::size_t i = 0; i < 3; ++i) {
+        axes[3 * i] =
+            bounds.add(bounds.scale(along[i], input.cosine), bounds.scale(across[i], input.sine));
+        axes[3 * i + 1] =
+            bounds.sub(bounds.scale(across[i], input.cosine), bounds.scale(along[i], input.sine));
+        axes[3 * i + 2] = {math.copy(normal[i].lower), math.copy(normal[i].upper)};
+    }
+    return axes;
+}
+
+enum class RightTensor { AsStored, Transposed };
+
+Tensor multiply(const Tensor& a, const Tensor& b, RightTensor right, const MaterialBounds& bounds) {
+    Tensor result;
+    for (std::size_t i = 0; i < 3; ++i) {
+        for (std::size_t j = 0; j < 3; ++j) {
+            auto& x = result[3 * i + j];
+            for (std::size_t k = 0; k < 3; ++k) {
+                const auto index = right == RightTensor::Transposed ? 3 * j + k : 3 * k + j;
+                x = bounds.add(x, bounds.multiply(a[3 * i + k], b[index]));
+            }
+        }
+    }
+    return result;
+}
+
+constexpr std::array mandel_axes{std::array{0U, 0U}, std::array{1U, 1U}, std::array{2U, 2U},
+                                 std::array{1U, 2U}, std::array{0U, 2U}, std::array{0U, 1U}};
+
+std::array<Bound, order> green_material(const Tensor& fa, const R& one, const R& half,
+                                        const Bound& sqrt_two, const MaterialBounds& bounds) {
+    const std::array axes{column(fa, 0, bounds.math), column(fa, 1, bounds.math),
+                          column(fa, 2, bounds.math)};
+    const auto unit = point(one, bounds.math);
+    const auto scale_shear = bounds.scale(sqrt_two, half);
+    std::array<Bound, order> green;
+    for (std::size_t k = 0; k < order; ++k) {
+        const auto [i, j] = mandel_axes[k];
+        if (i == j) {
+            Bound squared;
+            for (const auto& x : axes[i])
+                squared = bounds.add(squared, bounds.square(x));
+            green[k] = bounds.scale(bounds.sub(squared, unit), half);
+        } else {
+            green[k] = bounds.multiply(dot(axes[i], axes[j], bounds), scale_shear);
+        }
+    }
+    return green;
+}
+
+Tensor stress_tensor(const std::array<Bound, order>& stress, const Bound& sqrt_two, const R& half,
+                     const MaterialBounds& bounds) {
+    Tensor tensor;
+    const auto inverse_sqrt_two = bounds.scale(sqrt_two, half);
+    for (std::size_t k = 0; k < order; ++k) {
+        const auto [i, j] = mandel_axes[k];
+        if (i == j) {
+            tensor[3 * i + i] = {bounds.math.copy(stress[k].lower),
+                                 bounds.math.copy(stress[k].upper)};
+        } else {
+            auto shear = bounds.multiply(stress[k], inverse_sqrt_two);
+            tensor[3 * j + i] = {bounds.math.copy(shear.lower), bounds.math.copy(shear.upper)};
+            tensor[3 * i + j] = std::move(shear);
+        }
+    }
+    return tensor;
 }
 } // namespace
 
@@ -417,46 +637,47 @@ enclose_pg_shell_material(const PgShellElasticLaw& law, const PgInitialGreenEncl
     return evaluate([&]() -> core::Result<PgShellMaterialEnclosure> {
         ReferenceArithmetic math{limits, plan};
         math.admit();
-        if (law.density_kg_m3().sign() <= 0 || input.radicand.sign() <= 0)
-            partition_fail(invalid);
         const MaterialBounds bounds{math};
         const auto two = math.constant("2");
-        const auto sqrt_two = bounds.root(two);
-        const auto distinct_root =
-            input.radicand != two && std::ranges::any_of(input.mandel, [](const auto& value) {
-                return value.radical.sign() != 0;
-            });
-        const auto separate_root = distinct_root ? bounds.root(input.radicand) : Bound{};
-        const auto& field_root = distinct_root ? separate_root : sqrt_two;
-        std::array<Bound, order> initial, elastic, stress;
-        for (std::size_t i = 0; i < order; ++i) {
-            const auto& error = input.absolute_error[i];
-            if (error.sign() < 0 || math.compare(green[i].lower, green[i].upper) > 0)
+        return enclose_response(law, input, green, two, bounds.root(two), bounds);
+    });
+}
+
+core::Result<PgShellMaterialPointResponse>
+enclose_pg_shell_material_point(const PgShellElasticLaw& law, const PgInitialGreenEnclosure& input,
+                                const PgShellReferenceAxes& axes_source, const Tensor& f,
+                                const PgReferenceLimits& limits,
+                                core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellMaterialPointResponse> {
+        ReferenceArithmetic math{limits, plan};
+        math.admit(384);
+        const MaterialBounds bounds{math};
+        for (const auto& entry : f) {
+            if (math.compare(entry.lower, entry.upper) > 0)
                 partition_fail(invalid);
-            auto centre = bounds.radical(input.mandel[i], field_root);
-            initial[i] = {math.sub(centre.lower, error), math.add(centre.upper, error)};
-            elastic[i] = bounds.sub(green[i], initial[i]);
         }
-        qualify_natural_metric(initial, sqrt_two, two, bounds);
-        Bound doubled_energy;
-        for (std::size_t i = 0; i < order; ++i) {
-            for (std::size_t j = 0; j < order; ++j) {
-                const auto stiffness = bounds.radical(law.stiffness()[i * order + j], sqrt_two);
-                const auto linear = bounds.multiply(stiffness, elastic[j]);
-                stress[i] = bounds.add(stress[i], linear);
-                if (i == j) {
-                    doubled_energy = bounds.add(
-                        doubled_energy, bounds.multiply(stiffness, bounds.square(elastic[i])));
-                } else if (i < j) {
-                    const auto cross = bounds.multiply(elastic[i], linear);
-                    doubled_energy = bounds.add(doubled_energy, bounds.scale(cross, two));
-                }
-            }
-        }
-        if (doubled_energy.lower.sign() < 0)
-            doubled_energy.lower = {}; // Positive definite law bounds the energy from below.
-        Bound energy{math.div(doubled_energy.lower, two), math.div(doubled_energy.upper, two)};
-        return PgShellMaterialEnclosure{std::move(energy), std::move(stress), math.info()};
+        auto det = determinant(f, bounds);
+        require_positive(det, core::FailureCode::GeometryInvalid);
+        const auto one = math.constant("1"), two = math.constant("2");
+        const auto half = math.div(one, two);
+        const auto sqrt_two = bounds.root(two);
+        auto axes = std::visit(
+            [&](const auto& source) { return material_axes(source, one, bounds); }, axes_source);
+        const auto fa = multiply(f, axes, RightTensor::AsStored, bounds);
+        auto green = green_material(fa, one, half, sqrt_two, bounds);
+        auto local = enclose_response(law, input, green, two, sqrt_two, bounds);
+        const auto material_stress =
+            stress_tensor(local.second_pk_mandel_pascal, sqrt_two, half, bounds);
+        auto second = multiply(multiply(axes, material_stress, RightTensor::AsStored, bounds), axes,
+                               RightTensor::Transposed, bounds);
+        auto first = multiply(f, second, RightTensor::AsStored, bounds);
+        auto cauchy = multiply(first, f, RightTensor::Transposed, bounds);
+        for (auto& entry : cauchy)
+            entry = bounds.divide_positive(entry, det, one);
+        local.work = math.info();
+        return PgShellMaterialPointResponse{std::move(local), std::move(axes),   std::move(green),
+                                            std::move(det),   std::move(second), std::move(first),
+                                            std::move(cauchy)};
     });
 }
 } // namespace uvlas::structure

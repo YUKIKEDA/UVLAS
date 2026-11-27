@@ -28,6 +28,28 @@ struct Fixture {
             result[7 * i] = q("1");
         return result;
     }
+
+    PgShellTensorEnclosure tensor(const std::array<std::string_view, 9>& entries) {
+        PgShellTensorEnclosure result;
+        for (std::size_t i = 0; i < result.size(); ++i)
+            result[i] = {q(entries[i]), q(entries[i])};
+        return result;
+    }
+
+    void check_encloses(const PgMaterialEnclosure& actual, const ExactRational& expected) {
+        const auto low = actual.lower.compare(expected, limits.algebra, memory);
+        const auto high = actual.upper.compare(expected, limits.algebra, memory);
+        REQUIRE(low);
+        REQUIRE(high);
+        CHECK(*low <= 0);
+        CHECK(*high >= 0);
+        const auto width = actual.upper.subtract(actual.lower, limits.algebra, memory);
+        REQUIRE(width);
+        const auto bounded =
+            width->compare(q("1", "100000000000000000000000000"), limits.algebra, memory);
+        REQUIRE(bounded);
+        CHECK(*bounded < 0);
+    }
 };
 
 void rejected(const core::Result<PgShellMaterial>& result, core::FailureCode code) {
@@ -247,5 +269,107 @@ TEST_CASE("Shell material bounds retain independent radicals and initial field e
     const auto invalid = enclose_pg_shell_material(*law, input, green, f.limits, f.memory);
     REQUIRE_FALSE(invalid);
     CHECK(invalid.error().code == core::FailureCode::InvalidInput);
+}
+TEST_CASE("An anisotropic material point transforms stress measures through a finite shear",
+          "[MAT-D08][V-MAT][negative][verification]") {
+    Fixture f;
+    auto stiffness = f.identity();
+    stiffness[0] = f.q("2");
+    stiffness[7] = f.q("3");
+    stiffness[35] = f.q("4");
+    const auto one = f.q("1");
+    const auto law = PgShellElasticLaw::prepare(
+        PgEffectiveElasticity{stiffness, PgMaterialComponents::Mandel}, one, f.limits, f.memory);
+    REQUIRE(law);
+    const std::array<PgReferenceScalar, 6> zero;
+    const std::array<ExactRational, 6> uncertainty;
+    const PgInitialGreenEnclosure initial{one, zero, uncertainty};
+    const std::array<ExactRational, 9> axes{f.q("0"), f.q("-1"), f.q("0"), f.q("1"), f.q("0"),
+                                            f.q("0"), f.q("0"),  f.q("0"), f.q("1")};
+    auto deformation = f.tensor({"2", "1", "0", "0", "1", "0", "0", "0", "1"});
+    const PgShellExplicitAxes orientation{axes};
+    const auto evaluated = enclose_pg_shell_material_point(*law, initial, orientation, deformation,
+                                                           f.limits, f.memory);
+    REQUIRE(evaluated);
+    CHECK(evaluated->determinant.lower == f.q("2"));
+    CHECK(evaluated->determinant.upper == f.q("2"));
+    CHECK(evaluated->green_material_mandel[0].lower == f.q("1", "2"));
+    CHECK(evaluated->green_material_mandel[1].upper == f.q("3", "2"));
+    f.check_encloses(evaluated->material.energy_joules_per_cubic_metre, f.q("61", "8"));
+    // The local tensor has (S11,S22,S12)=(1,9/2,-4).
+    // A sends material e1 to world e2 and material e2 to -world e1.
+    const auto& second = evaluated->second_pk_world_pascal;
+    f.check_encloses(second[0], f.q("9", "2"));
+    f.check_encloses(second[1], f.q("4"));
+    f.check_encloses(second[3], f.q("4"));
+    f.check_encloses(second[4], f.q("1"));
+    const auto& first = evaluated->first_pk_world_pascal;
+    f.check_encloses(first[0], f.q("13"));
+    f.check_encloses(first[1], f.q("9"));
+    f.check_encloses(first[3], f.q("4"));
+    f.check_encloses(first[4], f.q("1"));
+    const auto& cauchy = evaluated->cauchy_world_pascal;
+    f.check_encloses(cauchy[0], f.q("35", "2"));
+    f.check_encloses(cauchy[1], f.q("9", "2"));
+    f.check_encloses(cauchy[3], f.q("9", "2"));
+    f.check_encloses(cauchy[4], f.q("1", "2"));
+
+    deformation[0] = {f.q("-2"), f.q("-2")};
+    const auto inverted = enclose_pg_shell_material_point(*law, initial, orientation, deformation,
+                                                          f.limits, f.memory);
+    REQUIRE_FALSE(inverted);
+    CHECK(inverted.error().code == core::FailureCode::GeometryInvalid);
+    deformation[0].upper = f.q("2");
+    const auto ambiguous = enclose_pg_shell_material_point(*law, initial, orientation, deformation,
+                                                           f.limits, f.memory);
+    REQUIRE_FALSE(ambiguous);
+    CHECK(ambiguous.error().code == core::FailureCode::PrecisionUnresolved);
+}
+
+TEST_CASE("Projected material axes use the physical layer tangents and in-plane angle",
+          "[MAT-D10][V-MAT][negative][verification]") {
+    Fixture f;
+    const auto one = f.q("1"), zero = f.q("0");
+    const auto law =
+        PgShellElasticLaw::prepare(PgIsotropicElasticity{one, zero}, one, f.limits, f.memory);
+    REQUIRE(law);
+    const auto deformation = f.tensor({"1", "0", "0", "0", "1", "0", "0", "0", "1"});
+    const std::array<PgReferenceScalar, 6> strain;
+    const std::array<ExactRational, 6> uncertainty;
+    const PgInitialGreenEnclosure initial{one, strain, uncertainty};
+    PgReferenceValue tilted{};
+    tilted.g = f.q("1");
+    tilted.normal[2].rational = f.q("1");
+    tilted.jacobian_columns_metres[0][0].rational = f.q("1");
+    tilted.jacobian_columns_metres[0][2].rational = f.q("3", "4");
+    tilted.jacobian_columns_metres[1][1].rational = f.q("2");
+    tilted.jacobian_columns_metres[2][2].rational = f.q("1");
+    const std::array fibre{f.q("1"), f.q("0"), f.q("0")};
+    const auto axes = enclose_pg_shell_material_point(
+        *law, initial, PgShellProjectedAxes{tilted, fibre, zero, one}, deformation, f.limits,
+        f.memory);
+    REQUIRE(axes);
+    // ds=(1,0,3/4) and dt=(0,2,0) give n=(-3/5,0,4/5).
+    // The projected fibre is along (4/5,0,3/5). The quarter turn sends
+    // a1 to world e2 and a2 to the negative of the projected fibre.
+    const std::array expected{f.q("0"), f.q("-4", "5"), f.q("-3", "5"), f.q("1"),     f.q("0"),
+                              f.q("0"), f.q("0"),       f.q("-3", "5"), f.q("4", "5")};
+    for (std::size_t i = 0; i < expected.size(); ++i)
+        f.check_encloses(axes->reference_axes[i], expected[i]);
+    for (const auto& stress : axes->cauchy_world_pascal)
+        f.check_encloses(stress, zero);
+
+    const std::array normal{f.q("-3"), f.q("0"), f.q("4")};
+    const auto parallel = enclose_pg_shell_material_point(
+        *law, initial, PgShellProjectedAxes{tilted, normal, one, zero}, deformation, f.limits,
+        f.memory);
+    REQUIRE_FALSE(parallel);
+    CHECK(parallel.error().code == core::FailureCode::GeometryInvalid);
+    tilted.jacobian_columns_metres[2][2].rational = f.q("-1");
+    const auto reversed = enclose_pg_shell_material_point(
+        *law, initial, PgShellProjectedAxes{tilted, fibre, one, zero}, deformation, f.limits,
+        f.memory);
+    REQUIRE_FALSE(reversed);
+    CHECK(reversed.error().code == core::FailureCode::GeometryInvalid);
 }
 } // namespace

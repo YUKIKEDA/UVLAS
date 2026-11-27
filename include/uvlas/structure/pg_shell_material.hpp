@@ -124,6 +124,41 @@ struct PgShellMaterialEnclosure {
     PgReferenceCallInfo work;
 };
 
+/// Row-major Cartesian tensor. Axis matrices store the basis as columns.
+using PgShellTensorEnclosure = std::array<PgMaterialEnclosure, 9>;
+
+struct PgShellExplicitAxes {
+    const std::array<ExactRational, 9>& columns;
+};
+
+struct PgShellProjectedAxes {
+    const PgReferenceValue& reference;
+    const std::array<ExactRational, 3>& world_fibre;
+    /// Exact unit pair for the right-handed in-plane rotation.
+    const ExactRational& cosine;
+    const ExactRational& sine;
+};
+
+using PgShellReferenceAxes = std::variant<PgShellExplicitAxes, PgShellProjectedAxes>;
+
+struct PgShellMaterialPointResponse {
+    PgShellMaterialEnclosure material;
+    PgShellTensorEnclosure reference_axes;
+    std::array<PgMaterialEnclosure, 6> green_material_mandel;
+    PgMaterialEnclosure determinant;
+    PgShellTensorEnclosure second_pk_world_pascal;
+    PgShellTensorEnclosure first_pk_world_pascal;
+    PgShellTensorEnclosure cauchy_world_pascal;
+};
+
+/// Evaluate all stress measures at one point with positive det(F).
+/// F maps reference world increments to current world increments.
+[[nodiscard]] core::Result<PgShellMaterialPointResponse>
+enclose_pg_shell_material_point(const PgShellElasticLaw&, const PgInitialGreenEnclosure&,
+                                const PgShellReferenceAxes&,
+                                const PgShellTensorEnclosure& deformation_gradient,
+                                const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
 /// Evaluate the whole input uncertainty in the fixed reference material frame.
 /// Require a positive natural metric throughout the initial strain enclosure.
 [[nodiscard]] core::Result<PgShellMaterialEnclosure>

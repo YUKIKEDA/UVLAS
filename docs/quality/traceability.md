@@ -124,9 +124,9 @@
 | MAT-D05 | [material-layer-adoption-contract.md:10](../specs/structure/material-layer-adoption-contract.md) | 1 | 4 | 0 |
 | MAT-D06 | [material-layer-adoption-contract.md:11](../specs/structure/material-layer-adoption-contract.md) | 1 | 0 | 0 |
 | MAT-D07 | [material-layer-adoption-contract.md:12](../specs/structure/material-layer-adoption-contract.md) | 0 | 0 | 0 |
-| MAT-D08 | [material-shell-adopted-specification.md:9](../specs/structure/material-shell-adopted-specification.md) | 6 | 0 | 0 |
+| MAT-D08 | [material-shell-adopted-specification.md:9](../specs/structure/material-shell-adopted-specification.md) | 7 | 0 | 0 |
 | MAT-D09 | [material-shell-adopted-specification.md:10](../specs/structure/material-shell-adopted-specification.md) | 4 | 0 | 0 |
-| MAT-D10 | [material-shell-adopted-specification.md:11](../specs/structure/material-shell-adopted-specification.md) | 1 | 0 | 0 |
+| MAT-D10 | [material-shell-adopted-specification.md:11](../specs/structure/material-shell-adopted-specification.md) | 2 | 0 | 0 |
 | MAT-D11 | [material-shell-adopted-specification.md:12](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D12 | [material-shell-adopted-specification.md:13](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
@@ -210,7 +210,7 @@
 | V-J1 | [practical-acceptance-plan.md:38](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-JOINT | [practical-acceptance-plan.md:33](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
-| V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 6 | 0 | 0 |
+| V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 8 | 0 | 0 |
 | V-MULTI | [practical-acceptance-plan.md:37](../requirements/practical-acceptance-plan.md) | 4 | 4 | 0 |
 | V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 17 | 12 | 0 |
 | V-RECOVER | [practical-acceptance-plan.md:35](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
