@@ -8,6 +8,7 @@
 #include "p1_quadrature_private.hpp"
 #include "p1_qualification_private.hpp"
 #include "p1_shared_kernel.hpp"
+#include "shared_p1_reuse_private.hpp"
 
 #include <bit>
 #include <cfenv>
@@ -456,7 +457,8 @@ private:
 public:
     static AeroResult<P1Basis> evaluate(const LocalGeometryPacket&, P1Accuracy, P1Limits,
                                         P1Workspace&, core::ResourcePlan&, const std::stop_token&,
-                                        const std::array<bool, 3>&, bool bound = false) noexcept;
+                                        const std::array<bool, 3>&, bool bound = false,
+                                        SharedP1ReuseSlot<P1Basis>* = nullptr) noexcept;
 };
 std::optional<core::FailureCode> P1Accuracy::validation_error() const noexcept {
     if (!std::isfinite(tau_basis) || !std::isfinite(tau_jacobian))
@@ -471,7 +473,8 @@ std::optional<core::FailureCode> P1Accuracy::validation_error() const noexcept {
 AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accuracy accuracy,
                                        P1Limits limits, P1Workspace& workspace,
                                        core::ResourcePlan& plan, const std::stop_token& stop,
-                                       const std::array<bool, 3>& boundary, bool bound) noexcept {
+                                       const std::array<bool, 3>& boundary, bool bound,
+                                       SharedP1ReuseSlot<P1Basis>* slot) noexcept {
     const auto context = packet.context();
     if (workspace.entered_.test_and_set())
         return std::unexpected(failed(core::FailureCode::InvalidInput, context));
@@ -500,7 +503,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             return std::unexpected(failed(core::FailureCode::ResourceExceeded, context));
         // The immutable expression plan belongs to this prepared workspace.
         const Shape shape = workspace.scratch_.values()[0].shape;
-        if (limits.max_steps < shape.work || plan.remaining_bytes() < sizeof(P1Storage))
+        const bool paid = slot != nullptr && slot->value_.has_value();
+        if (limits.max_steps < shape.work || (!paid && plan.remaining_bytes() < sizeof(P1Storage)))
             return std::unexpected(failed(core::FailureCode::ResourceExceeded, context));
         const auto& geometry = needed(packet.geometry()).get();
         if (geometry.context() != context ||
@@ -509,9 +513,23 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         const auto query = needed(packet.query());
         const auto ambient = needed(packet.ambient());
         const bool far = !bound && needed(packet.far()) == FarRelation::Far;
-        auto reserved = plan.allocate<P1Storage>(1, operation);
-        if (!reserved)
-            return std::unexpected(OwnedGeometryFailure{reserved.error(), {}, context});
+        core::PlannedBuffer<P1Storage> fresh;
+        if (!paid) {
+            auto allocated = plan.allocate<P1Storage>(1, operation);
+            if (!allocated)
+                return std::unexpected(OwnedGeometryFailure{allocated.error(), {}, context});
+            if (slot != nullptr)
+                slot->value_.emplace(P1Basis{std::move(*allocated), context});
+            else
+                fresh = std::move(*allocated);
+        }
+        auto* reserved = &fresh;
+        if (slot != nullptr) {
+            auto& current = slot->value_;
+            if (!current)
+                return std::unexpected(failed(core::FailureCode::InvalidInput, context));
+            reserved = &current->storage_;
+        }
         // User allocation hooks may change the thread environment during reservation.
         if (!supported_environment())
             return std::unexpected(failed(core::FailureCode::PrecisionUnsupported, context));
@@ -769,15 +787,18 @@ ScaledEnclosure enclose_p1_value(const p1::Interval& value, core::Precision prec
 AeroResult<P1Basis> evaluate_p1_partition(const LocalGeometryPacket& packet,
                                           const std::array<bool, 3>& boundary, P1Accuracy accuracy,
                                           P1Limits limits, P1Workspace& workspace,
-                                          core::ResourcePlan& plan,
-                                          const std::stop_token& stop) noexcept {
-    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary);
+                                          core::ResourcePlan& plan, const std::stop_token& stop,
+                                          SharedP1ReuseSlot<P1Basis>* slot) noexcept {
+    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary, false,
+                              slot);
 }
 AeroResult<P1Basis> evaluate_bound_partition(const LocalGeometryPacket& packet,
                                              const std::array<bool, 3>& boundary,
                                              P1Accuracy accuracy, P1Limits limits,
                                              P1Workspace& workspace, core::ResourcePlan& plan,
-                                             const std::stop_token& stop) noexcept {
-    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary, true);
+                                             const std::stop_token& stop,
+                                             SharedP1ReuseSlot<P1Basis>* slot) noexcept {
+    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary, true,
+                              slot);
 }
 } // namespace uvlas::aero::detail

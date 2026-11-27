@@ -24,5 +24,9 @@ class ExactPredicateAccess {
     [[nodiscard]] static core::Result<ExactTriangleResult>
     finish(PredicateWorkspace&, const PredicateLease&, core::PlannedBuffer<TriangleOutcome>,
            PredicateLimits, std::stop_token, core::FailureDetails, std::uint64_t) noexcept;
+    /// Write into a private outcome buffer whose lifetime is controlled by the caller.
+    [[nodiscard]] static core::Result<std::uint64_t>
+    finish_into(PredicateWorkspace&, const PredicateLease&, TriangleOutcome&, PredicateLimits,
+                std::stop_token, core::FailureDetails, std::uint64_t) noexcept;
 };
 } // namespace uvlas::aero::detail

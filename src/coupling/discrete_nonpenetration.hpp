@@ -225,13 +225,11 @@ private:
     friend struct NonpenetrationBuilder;
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
-                        std::optional<aero::detail::P1ActionValue>,
                         core::PlannedBuffer<NativeCirculationRows>,
                         aero::detail::PreparedTopologyOwner, std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
-    std::optional<aero::detail::P1ActionValue> geometry_owner_;
     core::PlannedBuffer<NativeCirculationRows> operator_rows_;
     aero::detail::PreparedTopologyOwner source_;
     std::uint64_t steps_;
