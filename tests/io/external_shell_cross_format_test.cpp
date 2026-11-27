@@ -985,10 +985,40 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
             si, bound, *prepared, rd::NastranSupportSetId{61}, rd::NastranGridId{10}, limits, plan,
             &diagnostic);
     };
+    const RectangleOracle oracle{arithmetic, plan};
+    const auto plane_weight = oracle.r("1", "6");
+    const auto depth_weight = oracle.r("1", "3");
+    std::array<ExactRational, 6> positions;
+    std::vector<PgLineQuadratureNode> plane;
+    plane.reserve(positions.size());
+    for (std::size_t i = 0; i < positions.size(); ++i) {
+        positions[i] = oracle.r(std::to_string(2 * i + 1), "12");
+        plane.push_back({positions[i], plane_weight});
+    }
+    const auto quarter = oracle.r("1", "4"), half = oracle.r("1", "2"), last = oracle.r("3", "4");
+    const std::array depth{PgLineQuadratureNode{quarter, depth_weight},
+                           PgLineQuadratureNode{half, depth_weight},
+                           PgLineQuadratureNode{last, depth_weight}};
+    const std::array rules{
+        coupling::CasePgRuleBinding{1, PgVolumeProductRule{plane, plane, depth}}};
+    const auto chart_limits = chart_preparation(preparation, 1, 1);
+    const coupling::CaseNastranPointPgChartLimits entry_limits{
+        {chart_limits, qualification, {1, 1, 1}}, {arithmetic, 2}, 1};
+    coupling::CaseNastranPointPgChartDiagnostic entry_diagnostic;
+    auto entry = coupling::prepare_case_nastran_pg_chart(si, bound, cards, rules, entry_limits,
+                                                         workspace, plan, {}, &entry_diagnostic);
     if (trial != Trial::Match) {
         const auto rejected = certify({arithmetic, 2});
         REQUIRE_FALSE(rejected);
         CHECK(rejected.error().code == Code::InvalidInput);
+        REQUIRE_FALSE(entry);
+        CHECK(entry.error().code == Code::InvalidInput);
+        REQUIRE(entry_diagnostic.support);
+        CHECK(entry_diagnostic.support.transform(
+                  [](const auto& problem) { return problem.grid; }) == rd::NastranGridId{10});
+        CHECK(entry_diagnostic.support.transform([](const auto& problem) {
+            return problem.reason;
+        }) == diagnostic.transform([](const auto& problem) { return problem.reason; }));
         if (const auto& problem = diagnostic) {
             CHECK(problem->set == rd::NastranSupportSetId{61});
             CHECK(problem->grid == rd::NastranGridId{10});
@@ -1015,6 +1045,64 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         CHECK(fixture::take(shell.reference().identity()) == patch);
         return;
     }
+    REQUIRE(entry);
+    CHECK_FALSE(entry_diagnostic.support);
+    REQUIRE(entry->supports.size() == 1);
+    REQUIRE(entry->shells.size() == 1);
+    REQUIRE(entry->structural.patch_count() == 1);
+    const auto& entry_support = required_evidence(entry->supports.values()[0]);
+    const auto* entry_patch = fixture::take(entry->structural.patch(0));
+    CHECK(entry_support.mapping.grid == rd::NastranGridId{10});
+    CHECK(entry_support.patch == fixture::take(entry_patch->info()).geometry);
+    CHECK(entry_support.world_components == 6U);
+    auto manual_input = config;
+    manual_input.field("model").field("geometry").elements.pop_back();
+    const auto manual_case = convert(fixture::checked(manual_input), arithmetic.algebra, plan);
+    const auto manual = fixture::take(coupling::prepare_case_component_pg_chart(
+        manual_case, rules, chart_limits, workspace, plan));
+    CHECK(fixture::take(manual.chart().identity()) ==
+          fixture::take(entry->structural.chart().identity()));
+    CHECK(std::ranges::equal(manual.chart().free_columns(),
+                             entry->structural.chart().free_columns()));
+    auto mixed_input = manual_input;
+    auto edge = fixture::fragment("Support.trace_constraint");
+    edge.set("id", fixture::json("\"2\""));
+    edge.field("region").set("boundary", fixture::json("1"));
+    mixed_input.field("model").field("supports").elements.push_back(std::move(edge));
+    auto mixed_limits = entry_limits;
+    mixed_limits.base.chart.constraints.maximum_sources = 2;
+    const auto mixed_manual = fixture::take(coupling::prepare_case_component_pg_chart(
+        convert(fixture::checked(mixed_input), arithmetic.algebra, plan), rules,
+        mixed_limits.base.chart, workspace, plan));
+    const auto mixed_graph = [&] {
+        const files::Tree tree;
+        write_external(mixed_input.field("model"), tree, false, 2, 1, native, mapping.dump());
+        return read_graph(tree, mixed_input, plan);
+    }();
+    const auto mixed_schema = fixture::checked(mixed_input);
+    const auto mixed_bound = fixture::take(rd::bind_external_mesh_sidecar(
+        mixed_schema, mixed_graph, rd::MeshGeometryId{2}, binding_limits, plan, {}));
+    const auto mixed_cards = quantities(mixed_graph, fixture::take(mixed_schema.identity()),
+                                        io::SourceId{1}, binding_limits, plan);
+    const auto mixed = fixture::take(coupling::prepare_case_nastran_pg_chart(
+        convert(mixed_schema, arithmetic.algebra, plan), mixed_bound, mixed_cards, rules,
+        mixed_limits, workspace, plan));
+    const auto& mixed_chart = mixed.structural.chart();
+    CHECK(fixture::take(mixed_chart.identity()) == fixture::take(mixed_manual.chart().identity()));
+    const auto mixed_sources = mixed_chart.original().sources();
+    REQUIRE(mixed_sources.size() == 2);
+    CHECK(mixed_sources[0].id == PgConstraintId{2});
+    CHECK(mixed_sources[0].world_components == 7U);
+    CHECK(mixed_sources[1].id == PgConstraintId{1});
+    CHECK(mixed_sources[1].world_components == 6U);
+    auto no_support_capacity = entry_limits;
+    no_support_capacity.maximum_support_mappings = 0;
+    core::ResourcePlan empty{0};
+    const auto denied = coupling::prepare_case_nastran_pg_chart(
+        si, bound, cards, rules, no_support_capacity, workspace, empty, {}, &entry_diagnostic);
+    REQUIRE_FALSE(denied);
+    CHECK(denied.error().code == Code::ResourceExceeded);
+    CHECK(empty.allocated_bytes() == 0);
     auto cancelled_limits = arithmetic;
     // MSVC implements request_stop() as a non-const member.
     // NOLINTNEXTLINE(misc-const-correctness)
@@ -1071,23 +1159,6 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         fixture::fragment("Support.trace_constraint");
     const auto reference_case =
         convert(fixture::checked(reference_input), arithmetic.algebra, plan);
-    const RectangleOracle oracle{arithmetic, plan};
-    const auto plane_weight = oracle.r("1", "6");
-    const auto depth_weight = oracle.r("1", "3");
-    std::array<ExactRational, 6> positions;
-    std::vector<PgLineQuadratureNode> plane;
-    plane.reserve(positions.size());
-    for (std::size_t i = 0; i < positions.size(); ++i) {
-        positions[i] = oracle.r(std::to_string(2 * i + 1), "12");
-        plane.push_back({positions[i], plane_weight});
-    }
-    const auto quarter = oracle.r("1", "4"), half = oracle.r("1", "2"), last = oracle.r("3", "4");
-    const std::array depth{PgLineQuadratureNode{quarter, depth_weight},
-                           PgLineQuadratureNode{half, depth_weight},
-                           PgLineQuadratureNode{last, depth_weight}};
-    const std::array rules{
-        coupling::CasePgRuleBinding{1, PgVolumeProductRule{plane, plane, depth}}};
-    const auto chart_limits = chart_preparation(preparation, 1, 1);
     const auto reference_chart = fixture::take(
         coupling::prepare_case_pg_chart(reference_case, rules, chart_limits, workspace, plan));
     const auto* conditioned = fixture::take(reference_chart.patch(0));
@@ -1143,11 +1214,11 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         fixture::take(original.transpose(dual, chart_limits.patch, workspace, plan));
     for (const auto& coefficient : reaction.values())
         CHECK(coefficient[0].sign() == 0);
-    for (const auto& entry : point_row.terms.values()) {
-        const auto& coefficient = reaction.values()[static_cast<std::size_t>(entry.column)];
-        CHECK(coefficient[1] == fixture::take(entry.coefficient.multiply(
+    for (const auto& term : point_row.terms.values()) {
+        const auto& coefficient = reaction.values()[static_cast<std::size_t>(term.column)];
+        CHECK(coefficient[1] == fixture::take(term.coefficient.multiply(
                                     dual[0][1], chart_limits.patch.algebra, plan)));
-        CHECK(coefficient[2] == fixture::take(entry.coefficient.multiply(
+        CHECK(coefficient[2] == fixture::take(term.coefficient.multiply(
                                     dual[0][2], chart_limits.patch.algebra, plan)));
     }
     const std::array duplicate{point_bindings[0], point_bindings[0]};
@@ -1159,9 +1230,12 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         PgSparseChart::prepare(std::move(original), chart_limits.chart, workspace, plan);
     REQUIRE_FALSE(unusable_legacy);
     CHECK(unusable_legacy.error().code == Code::Unsupported);
+    // NOLINTNEXTLINE(bugprone-use-after-move): rejected preparation preserves the original owner.
     REQUIRE(original.info());
-    const auto component_chart = fixture::take(
+    const auto direct_chart = fixture::take(
         PgComponentSparseChart::prepare(std::move(original), chart_limits.chart, workspace, plan));
+    const auto& component_chart = entry->structural.chart();
+    CHECK(fixture::take(direct_chart.identity()) == fixture::take(component_chart.identity()));
     const auto component_report = fixture::take(component_chart.preparation());
     CHECK(component_report.factors == 1);
     CHECK(component_report.scalar_rank == 2);
@@ -1181,15 +1255,18 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     }
     const auto lifted = fixture::take(
         component_chart.lift({chart_id, reference_free}, chart_limits.patch, workspace, plan));
+    const auto manual_lift = fixture::take(
+        manual.chart().lift({chart_id, reference_free}, chart_limits.patch, workspace, plan));
     const auto tangent = fixture::take(
         component_chart.tangent({chart_id, motion_free}, chart_limits.patch, workspace, plan));
     for (std::size_t j = 0; j < all_coordinates.size(); ++j) {
         CHECK(lifted.values()[j] == all_coordinates[j]);
+        CHECK(manual_lift.values()[j] == lifted.values()[j]);
         CHECK(tangent.values()[j] == horizontal_motion[j]);
     }
     std::vector<PgCartesianExactPosition> force(all_coordinates.size());
-    for (auto& entry : force)
-        entry = {coordinate("1"), coordinate("2"), coordinate("-3")};
+    for (auto& cartesian_force : force)
+        cartesian_force = {coordinate("1"), coordinate("2"), coordinate("-3")};
     const auto pulled = fixture::take(
         component_chart.transpose({chart_id, force}, chart_limits.patch, workspace, plan));
     REQUIRE(pulled.original_multipliers.size() == 1);
@@ -1234,6 +1311,7 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
                                                          chart_limits.chart, workspace, plan);
     REQUIRE_FALSE(refused);
     CHECK(refused.error().code == Code::InvalidInput);
+    // NOLINTNEXTLINE(bugprone-use-after-move): rejected preparation preserves the original owner.
     REQUIRE(overconstrained.info());
     auto limited_row = chart_limits.patch;
     limited_row.maximum_partition_visits = 0;

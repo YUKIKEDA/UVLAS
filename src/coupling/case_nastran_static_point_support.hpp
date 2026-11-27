@@ -53,21 +53,30 @@ struct CaseNastranPointSupport {
     std::optional<io::detail::NastranBulkPosition> cd_field{};
     std::uint8_t world_components{};
     core::PlannedBuffer<CaseNastranPointSupportTerm> terms;
+    structure::PgReferenceCallInfo call_info;
 };
 
 /// Exact dimensionless point evaluation coefficients in the same prepared basis.
-struct CaseNastranPointSupportRow {
+struct CaseStaticPgPointRow {
     structure::PgPreparedPatchIdentity basis;
     io::detail::MeshSupportId support;
     io::detail::MeshShellId shell;
     std::uint8_t world_components;
     core::PlannedBuffer<structure::PgTraceSparseEntry> terms;
     structure::PgCartesianExactPosition prescribed_metres;
+    structure::PgReferenceCallInfo call_info;
 };
 
-[[nodiscard]] core::Result<CaseNastranPointSupportRow> assemble_case_nastran_static_point_row(
+[[nodiscard]] core::Result<CaseStaticPgPointRow> assemble_case_nastran_static_point_row(
     const CaseNastranPointSupport&, const structure::PgPreparedPatch&,
     const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
+/// Same static centre-surface point row when the Case itself supplies its target.
+[[nodiscard]] core::Result<CaseStaticPgPointRow>
+assemble_case_static_pg_point_row(const io::SiCase&, const io::schema::SupportConstraint&,
+                                  io::detail::MeshShellId, const structure::PgPreparedPatch&,
+                                  const structure::PgReferenceLimits&,
+                                  core::ResourcePlan&) noexcept;
 
 // Compare a homogeneous translational SPC selection to a static Case point support
 // on an original node of its qualified planar Shell. The result owns the evidence.

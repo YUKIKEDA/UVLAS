@@ -36,6 +36,39 @@ namespace case_pg_chart_detail {
 struct Builder;
 }
 
+class CaseComponentPgChart {
+public:
+    CaseComponentPgChart(CaseComponentPgChart&&) noexcept = default;
+    CaseComponentPgChart& operator=(CaseComponentPgChart&&) noexcept = default;
+
+    [[nodiscard]] std::size_t patch_count() const noexcept {
+        return patches_.size();
+    }
+    [[nodiscard]] core::Result<const structure::PgPreparedPatch*>
+        patch(core::Index) const& noexcept;
+    [[nodiscard]] core::Result<const structure::PgPreparedPatch*>
+        patch(core::Index) const&& = delete;
+    [[nodiscard]] const structure::PgComponentSparseChart& chart() const& noexcept {
+        return chart_;
+    }
+    [[nodiscard]] const structure::PgComponentSparseChart& chart() const&& = delete;
+
+private:
+    friend struct case_pg_chart_detail::Builder;
+    CaseComponentPgChart(core::PlannedBuffer<std::optional<structure::PgPreparedPatch>>&& patches,
+                         structure::PgComponentSparseChart&& chart) noexcept
+        : patches_(std::move(patches)), chart_(std::move(chart)) {}
+    core::PlannedBuffer<std::optional<structure::PgPreparedPatch>> patches_;
+    structure::PgComponentSparseChart chart_;
+};
+
+/// Prepare a static Case with full-depth traces and selected world components
+/// of centre-surface point supports in the same PG bases.
+[[nodiscard]] core::Result<CaseComponentPgChart>
+prepare_case_component_pg_chart(const io::SiCase&, std::span<const CasePgRuleBinding>,
+                                const CasePgChartLimits&, core::Workspace&, core::ResourcePlan&,
+                                std::stop_token = {}) noexcept;
+
 /// Synchronous borrow from a CasePgChart. Keep its owner live and do not move it while borrowed.
 class CasePgShellReference {
 public:

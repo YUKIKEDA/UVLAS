@@ -32,6 +32,14 @@ D を 0.001 に変えた入力と、Case のチャート位置をずらした入
 
 元行と疎チャートを試験中に連結した。$Y,Z$ は同じ行集合なので1因子を共有し、スカラーrankは2だった。自由位置から基準座標を厳密に復元した。$X$ の並進は拘束されず、$X$ の支持反力は厳密に零だった。独立力と元行の転置から全Cartesian力を再構成し、元の力と同次接線の仕事が縮約後にも一致した。元支持IDの重複と、別の支持が同じ点に矛盾する固定値を指定した場合を拒否した。後者では失敗後も元拘束を保持した。
 
-GCC 14.2 Releaseの隔離ビルドで、SPCADDの実BDF試験は930アサーションが通った。CTestは `io.external_shell_cross_format`、`structure.pg_full_trace`、`structure.pg_chart_candidate` の3件が合格した。外部Caseの準備入口から成分別チャートと来歴を一度に返す処理は引き続きIM06-0で扱う。
+GCC 14.2 Releaseの隔離ビルドで、疎消去を直接検査する段階の実BDF試験は930アサーションが通った。CTestは `io.external_shell_cross_format`、`structure.pg_full_trace`、`structure.pg_chart_candidate` の3件が合格した。
+
+## Caseからの準備
+
+`prepare_case_nastran_pg_chart` の点支持を受け付ける入口は、同じ認証済みBDFとSI Caseから、Shellの対応、元SPCの来歴、構造基底と成分別の疎チャートを所有する結果を返す。外部入力の記述を外した同じSI Caseを `prepare_case_component_pg_chart` に渡すと、チャートの識別、自由列、復元した全位置が有理数で一致した。点支持と反対側の全厚固定支持を同時に与えた対照でも、両入口の識別が一致し、元行に支持IDと世界成分マスクが残った。
+
+外部入口では、元GRIDに対する方向、非零の規定変位、材料点または元面オフセットの不一致を、GRID 10と理由を示して拒否した。対応表の支持件数上限を0にした試験では、計画への確保課金なしで `ResourceExceeded` を返した。
+
+MSVC 19.52とGCC 14.2のReleaseで、SPCADDの実BDF試験は各1,083アサーションが通った。両環境で `io.external_shell_cross_format`、`io.external_case_chart`、`structure.pg_full_trace`、`structure.pg_chart_candidate`、`coupling.case_structural_pg_support`、`coupling.case_pg_chart_entry` の6件が合格した。Windowsの未変更のJSONパーサーには、同じソースで構築したMSVC 19.51のオブジェクトを使った。
 
 GCC の隔離複製で Case が選ばない方向の成分検査を外すと、世界 $X,Z$ の負対照が通り、回帰試験は失敗した。ソースを復元してハッシュを照合し、再構築した同じ試験で92アサーションが合格した。変更した翻訳単位の clang-tidy と clang-format 21.1.2 も通過した。
