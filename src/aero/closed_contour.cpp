@@ -213,6 +213,11 @@ struct ClosedContourData {
 };
 
 namespace {
+template <class Scalar>
+Scalar same_sign_integral(Scalar s, Scalar t, Scalar first_radius, Scalar second_radius) {
+    return (s + t) / (first_radius * second_radius * (s * second_radius + t * first_radius));
+}
+
 Vector edge_value(const Edge& edge, std::span<const ClosedContourEndpoint> endpoints,
                   Interval core2) {
     const auto& a = endpoints[edge.vertices[0]];
@@ -222,10 +227,53 @@ Vector edge_value(const Edge& edge, std::span<const ClosedContourEndpoint> endpo
     const auto c = cross(edge.delta, a.relative);
     const bool same = (s.lower > 0 && z.lower > 0) || (s.upper < 0 && z.upper < 0);
     const auto integral =
-        same ? (s + z) / (a.distance * b.distance * (s * b.distance + z * a.distance))
+        same ? same_sign_integral(s, z, a.distance, b.distance)
              : (s / a.distance - z / b.distance) / (norm2(c) + core2 * edge.length2);
     const auto factor = -integral / four_pi;
     return {c[0] * factor, c[1] * factor, c[2] * factor};
+}
+
+struct AgeDerivative {
+    Interval value, derivative;
+};
+AgeDerivative operator+(AgeDerivative a, AgeDerivative b) {
+    return {a.value + b.value, a.derivative + b.derivative};
+}
+AgeDerivative operator-(AgeDerivative a, AgeDerivative b) {
+    return {a.value - b.value, a.derivative - b.derivative};
+}
+AgeDerivative operator*(AgeDerivative a, AgeDerivative b) {
+    return {a.value * b.value, a.derivative * b.value + a.value * b.derivative};
+}
+AgeDerivative operator/(AgeDerivative a, AgeDerivative b) {
+    const auto quotient = a.value / b.value;
+    return {quotient, (a.derivative - quotient * b.derivative) / b.value};
+}
+
+Interval project_age_derivative(const Vector& delta, Interval length2, const Vector& velocity,
+                                Interval core2, const Vector& first, const Vector& second,
+                                const Vector& normal) {
+    const auto first_radius = root(norm2(first) + core2);
+    const auto second_radius = root(norm2(second) + core2);
+    const auto cross_span = cross(delta, first);
+    const auto cross_derivative = cross(delta, velocity);
+    // This is the query derivative of the forward span edge. It is also the
+    // translation derivative of the oppositely directed downstream edge.
+    const AgeDerivative s{dot(delta, first), dot(delta, velocity)};
+    const AgeDerivative t{s.value - length2, s.derivative};
+    const AgeDerivative a{first_radius, dot(first, velocity) / first_radius};
+    const AgeDerivative b{second_radius, dot(second, velocity) / second_radius};
+    const bool same =
+        (s.value.lower > 0 && t.value.lower > 0) || (s.value.upper < 0 && t.value.upper < 0);
+    const auto integral =
+        same ? same_sign_integral(s, t, a, b)
+             : (s / a - t / b) / AgeDerivative{norm2(cross_span) + core2 * length2,
+                                               Interval{2, 2} * dot(cross_span, cross_derivative)};
+    const AgeDerivative projected{dot(cross_span, normal), dot(cross_derivative, normal)};
+    const auto right =
+        dot(cross(velocity, second), normal) / (square(second_radius) * second_radius);
+    const auto left = dot(cross(velocity, first), normal) / (square(first_radius) * first_radius);
+    return -((projected * integral).derivative + right - left) / four_pi;
 }
 
 template <class Visit>
@@ -285,6 +333,55 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
     return work.used;
 }
 } // namespace
+
+AeroResult<StraightWakeColumnUpdate> project_straight_wake_column_update(
+    const GeometryContext& context, const ContourVector& first, const ContourVector& second,
+    const ContourVector& velocity, ContourInterval core_radius, const ContourVector& point,
+    const ContourVector& normal, std::span<const StraightWakeAgeSample> samples,
+    std::uint64_t maximum_samples, std::stop_token stop) noexcept {
+    return guard<StraightWakeColumnUpdate>(context, [&] {
+        Work work{maximum_samples, 0, stop};
+        work.step(0);
+        if (!p1_environment_supported())
+            reject(core::FailureCode::PrecisionUnsupported);
+        if (!valid(core_radius) || core_radius.lower <= 0 || samples.empty())
+            reject(invalid);
+        for (const auto* vector : {&first, &second, &velocity, &point, &normal})
+            if (!std::ranges::all_of(*vector, valid))
+                reject(invalid);
+        if (samples.size() > work.remaining())
+            reject(exhausted);
+        const auto delta = difference(second, first);
+        const auto area2 = norm2(cross(delta, velocity));
+        if (area2.upper == 0)
+            reject(invalid);
+        if (area2.lower <= 0)
+            reject(unresolved);
+        const auto length2 = norm2(delta);
+        const auto core2 = square(core_radius);
+        const auto first_offset = difference(point, first);
+        const auto second_offset = difference(point, second);
+        PairwiseSum real, imaginary;
+        for (const auto& sample : samples) {
+            work.step();
+            if (!valid(sample.age_seconds) || sample.age_seconds.lower < 0 ||
+                !valid(sample.real_weight_seconds) || !valid(sample.imaginary_weight_seconds))
+                reject(invalid);
+            if (zero(sample.real_weight_seconds) && zero(sample.imaginary_weight_seconds))
+                continue;
+            const Vector displacement{sample.age_seconds * velocity[0],
+                                      sample.age_seconds * velocity[1],
+                                      sample.age_seconds * velocity[2]};
+            const auto derivative = project_age_derivative(
+                delta, length2, velocity, core2, difference(first_offset, displacement),
+                difference(second_offset, displacement), normal);
+            real.append(derivative * sample.real_weight_seconds);
+            imaginary.append(derivative * sample.imaginary_weight_seconds);
+        }
+        work.step(0);
+        return StraightWakeColumnUpdate{real.sum(), imaginary.sum()};
+    });
+}
 
 ClosedContourWorkspace::ClosedContourWorkspace(
     core::PlannedBuffer<ClosedContourEndpoint>&& endpoints) noexcept

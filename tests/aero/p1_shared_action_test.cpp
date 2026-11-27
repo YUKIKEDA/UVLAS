@@ -1,8 +1,11 @@
+#include "aero/closed_contour.hpp"
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_action.hpp"
 #include "aero/p1_shared_kernel.hpp"
 #include "geometry_snapshot_fixture.hpp"
 
+#include <boost/math/constants/constants.hpp>
+#include <boost/math/quadrature/gauss.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <nlohmann/json.hpp>
@@ -309,6 +312,105 @@ TEST_CASE("Shared P1 quad action and all derivatives match independent area quad
             duality(value, transpose);
         }
     }
+}
+
+TEST_CASE("Straight wake age update agrees with the finite-core strip integral",
+          "[UW-D01][UW-D02][UW-D07][UI-D05][verification][negative]") {
+    const auto vector_words = [](const std::array<double, 3>& point) {
+        return p::ContourVector{{{point[0], point[0]}, {point[1], point[1]}, {point[2], point[2]}}};
+    };
+    const auto origin = vector_words({0, -.5, 0});
+    const auto tip = vector_words({.25, .5, .125});
+    const auto velocity = vector_words({2, 0, 0});
+    const auto normal = vector_words({.25, -.5, 1.});
+    constexpr p::ContourInterval radius{.125, .125};
+    const std::array<p::StraightWakeAgeSample, 3> samples{{
+        {{0, 0}, {-.125, -.125}, {-.25, -.25}},
+        {{.125, .125}, {-.5, -.5}, {.125, .125}},
+        {{.75, .75}, {-.25, -.25}, {-.125, -.125}},
+    }};
+    const auto context = test_geometry::context();
+    const auto projection = [&](const auto& first, const auto& second, const auto& flow, auto core,
+                                const auto& point, auto nodes, std::uint64_t work,
+                                std::stop_token stop = {}) {
+        return p::project_straight_wake_column_update(context, first, second, flow, core, point,
+                                                      normal, nodes, work, stop);
+    };
+
+    for (const std::array point : {std::array{-.125, 0., .125}, std::array{-.25, -.75, .0625},
+                                   std::array{8., 32., -16.}, std::array{0., -.5, 0.}}) {
+        CAPTURE(point);
+        const auto projected =
+            projection(origin, tip, velocity, radius, vector_words(point), samples, samples.size());
+        REQUIRE(projected);
+        const auto reversed =
+            projection(tip, origin, velocity, radius, vector_words(point), samples, samples.size());
+        REQUIRE(reversed);
+        std::array<Big, 2> reference{};
+        for (const auto& sample : samples) {
+            const Big age{sample.age_seconds.lower};
+            // Apply the Green-function Hessian over the infinitesimal strip.
+            // dX/ds cross dX/d(age) = (0, 1/4, -2) for this oriented band.
+            const auto density = [&](const Big& s) -> Big {
+                const Big x = Big(point[0]) - s / 4 - 2 * age;
+                const Big y = Big(point[1]) + Big(.5) - s;
+                const Big z = Big(point[2]) - s / 8;
+                const Big r2 = x * x + y * y + z * z;
+                const Big epsilon2 = Big(1) / 64;
+                const Big a2 = r2 + epsilon2;
+                const Big projected_normal = Big(-17) / 8;
+                const Big dot_r = x / 4 - y / 2 + z;
+                const Big area_dot_r = y / 4 - 2 * z;
+                return (projected_normal * (r2 - 2 * epsilon2) - 3 * dot_r * area_dot_r) /
+                       (4 * boost::math::constants::pi<Big>() * a2 * a2 * sqrt(a2));
+            };
+            const auto integrate = [&](unsigned count) {
+                Big total{};
+                for (unsigned i = 0; i < count; ++i)
+                    total += boost::math::quadrature::gauss<Big, 30>::integrate(
+                        density, Big(i) / count, Big(i + 1) / count);
+                return total;
+            };
+            const Big area = integrate(32);
+            REQUIRE(abs(area - integrate(64)) < Big("1e-35"));
+            reference[0] += area * sample.real_weight_seconds.lower;
+            reference[1] += area * sample.imaginary_weight_seconds.lower;
+        }
+        const auto encloses = [](p::ContourInterval interval, const Big& target) {
+            CHECK(Big(interval.lower) <= target);
+            CHECK(target <= Big(interval.upper));
+            CHECK(interval.upper - interval.lower < 1e-10);
+        };
+        encloses(projected->real, reference[0]);
+        encloses(projected->imaginary, reference[1]);
+        encloses(reversed->real, -reference[0]);
+        encloses(reversed->imaginary, -reference[1]);
+    }
+
+    const auto point = vector_words({0, 0, 0});
+    rejected(projection(origin, tip, velocity, radius, point, samples, samples.size() - 1),
+             core::FailureCode::ResourceExceeded);
+    rejected(projection(origin, origin, velocity, radius, point, samples, samples.size()),
+             core::FailureCode::InvalidInput);
+    rejected(
+        projection(origin, tip, velocity, p::ContourInterval{}, point, samples, samples.size()),
+        core::FailureCode::InvalidInput);
+    auto bad = samples;
+    bad[1].age_seconds = {-1, -.5};
+    rejected(projection(origin, tip, velocity, radius, point, bad, bad.size()),
+             core::FailureCode::InvalidInput);
+    const std::array<p::StraightWakeAgeSample, 1> zero{{{{.25, .25}, {}, {}}}};
+    const auto zero_update = projection(origin, tip, velocity, radius, point, zero, zero.size());
+    REQUIRE(zero_update);
+    CHECK(zero_update->real.lower == 0);
+    CHECK(zero_update->real.upper == 0);
+    CHECK(zero_update->imaginary.lower == 0);
+    CHECK(zero_update->imaginary.upper == 0);
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    rejected(
+        projection(origin, tip, velocity, radius, point, samples, samples.size(), stop.get_token()),
+        core::FailureCode::Cancelled);
 }
 
 TEST_CASE("P1 applies real and low-word strengths while retaining distinct equal-valued columns",
