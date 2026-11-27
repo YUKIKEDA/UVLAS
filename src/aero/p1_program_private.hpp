@@ -266,21 +266,34 @@ inline Output bound_program(Program& p, const Options& options) {
     const auto in = inputs(p);
     const auto zero = p.constant(0);
     const auto factor = p.constant(-1) / (p.pi() * 4);
+    const auto radius_squared = in.radius * in.radius;
+    std::array<Vector, 3> relative{};
+    std::array<Expression, 3> endpoint{};
+    for (std::size_t vertex = 0; vertex < 3; ++vertex) {
+        if (options.boundary[vertex] || options.boundary[(vertex + 2) % 3]) {
+            relative[vertex] = in.point - in.vertices[vertex];
+            endpoint[vertex] = sqrt(dot(relative[vertex], relative[vertex]) + radius_squared);
+        }
+    }
     Output out;
     for (std::size_t edge = 0; edge < 3; ++edge) {
         Vector velocity{zero, zero, zero};
         if (options.boundary[edge]) {
-            const auto delta = in.vertices[(edge + 1) % 3] - in.vertices[edge];
-            const auto length = norm(delta);
-            const auto tangent = delta / length;
-            const auto r = in.point - in.vertices[edge];
-            const auto s = dot(r, tangent), z = s - length;
-            const auto perpendicular = cross(tangent, r);
-            const auto k2 = dot(perpendicular, perpendicular) + in.radius * in.radius;
-            const auto ra = sqrt(s * s + k2), rb = sqrt(z * z + k2);
+            const auto next = (edge + 1) % 3;
+            const auto delta = in.vertices[next] - in.vertices[edge];
+            const auto length_squared = dot(delta, delta);
+            const auto from = dot(relative[edge], delta);
+            const auto to = from - length_squared;
+            const auto perpendicular = cross(delta, relative[edge]);
+            const auto ra = endpoint[edge], rb = endpoint[next];
             const bool same = options.start_sign[edge] * options.end_sign[edge] > 0;
-            const auto integral = contour_integral(length, s, z, ra, rb, k2, same);
-            velocity = perpendicular * (factor * integral);
+            const auto contour = [&] {
+                if (same)
+                    return (from + to) / (ra * rb * (from * rb + to * ra));
+                const auto cross_squared = dot(perpendicular, perpendicular);
+                return (from / ra - to / rb) / (cross_squared + radius_squared * length_squared);
+            }();
+            velocity = perpendicular * (factor * contour);
         }
         for (std::size_t axis = 0; axis < 3; ++axis)
             out.nodes[3 * edge + axis] = velocity[axis].index;

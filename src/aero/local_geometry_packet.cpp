@@ -316,8 +316,19 @@ public:
                                                 facet.incidence,
                                                 physical,
                                                 facet_scatter(facet)};
-            auto& packet = storage->values()[0].payload.emplace(
-                GeometryPacketAccess::retain(*input), layout, *expression, accuracy, limits);
+            auto& payload = storage->values()[0].payload;
+            std::optional<std::array<std::optional<ScaledEnclosure>, 7>> retained;
+            if (payload && payload->steps != 0 && payload->snapshot.data_.get() == &data &&
+                payload->ambient.facet == target &&
+                payload->requested.representation == accuracy.representation &&
+                payload->requested.tau == accuracy.tau) {
+                // These slots depend only on the three immutable facet vertices.
+                const auto constants = std::span{payload->values}.subspan<3, 7>();
+                auto& cached = retained.emplace();
+                std::ranges::copy(constants, cached.begin());
+            }
+            auto& packet = payload.emplace(GeometryPacketAccess::retain(*input), layout,
+                                           *expression, accuracy, limits);
             packet.qualification = *qualification;
             packet.closest = nearest(*input, *relation);
             packet.far = relation->far;
@@ -325,26 +336,34 @@ public:
             auto e = std::span{scratch.integers}.subspan<13, 3>();
             auto f = std::span{scratch.integers}.subspan<16, 3>();
             auto c = std::span{scratch.integers}.subspan<19, 3>();
-            for (std::size_t i = 0; i < 3; ++i) {
-                e[i] = points[1][i] - points[0][i];
-                f[i] = points[2][i] - points[0][i];
-            }
-            for (std::size_t i = 0; i < 3; ++i) {
-                const auto j = (i + 1) % 3, k = (i + 2) % 3;
-                c[i] = e[j] * f[k];
-                c[i] -= e[k] * f[j];
-            }
             auto& j2 = scratch.integers[22];
-            j2 = 0;
-            for (const auto& component : c) {
-                temp = component * component;
-                j2 += temp;
+            if (!retained) {
+                for (std::size_t i = 0; i < 3; ++i) {
+                    e[i] = points[1][i] - points[0][i];
+                    f[i] = points[2][i] - points[0][i];
+                }
+                for (std::size_t i = 0; i < 3; ++i) {
+                    const auto j = (i + 1) % 3, k = (i + 2) % 3;
+                    c[i] = e[j] * f[k];
+                    c[i] -= e[k] * f[j];
+                }
+                j2 = 0;
+                for (const auto& component : c) {
+                    temp = component * component;
+                    j2 += temp;
+                }
             }
             LocalWork work{alias_steps + input->preparation_steps, limits.max_steps, stop};
             {
                 const LocalClock enclosure_clock{accuracy.collect_timings ? &measured.enclosure
                                                                           : nullptr};
                 for (std::size_t i = 0; i < 12; ++i) {
+                    if (retained && i >= 3 && i < 10) {
+                        if (auto check = work.step(); !check)
+                            return std::unexpected(packet_failure(check.error(), context));
+                        packet.values[i] = (*retained)[i - 3];
+                        continue;
+                    }
                     core::Result<ScaledEnclosure> value = std::unexpected(
                         core::Failure{core::FailureCode::PrecisionUnresolved, operation});
                     if (i < 3)
