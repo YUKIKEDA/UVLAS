@@ -677,10 +677,11 @@ check_span_lines(const cf::DiscreteCirculationLoads& loads, std::span<const Poin
     return lift;
 }
 
-Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh& mesh,
-                     const a::GlobalContactState& contact, std::span<const Point> vertices,
-                     const Rat& density, std::size_t bound_count = columns,
-                     std::size_t strips = 4) {
+template <class Add>
+void visit_trefftz_midpoint_terms(const cf::DiscreteCirculation& solved, const FiniteWingMesh& mesh,
+                                  const a::GlobalContactState& contact,
+                                  std::span<const Point> vertices, std::size_t bound_count,
+                                  std::size_t strips, Add add_term) {
     std::vector<RationalPoint> edge(strips + 1);
     std::vector<Rat> trace(strips);
     for (std::size_t i = 0; i < strips; ++i) {
@@ -703,7 +704,6 @@ Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh
         jumps[i] -= trace[i];
         jumps[i + 1] += trace[i];
     }
-    Rat sum{};
     for (std::size_t i = 0; i < strips; ++i) {
         const Rat dy = edge[i + 1][1] - edge[i][1];
         const Rat dz = edge[i + 1][2] - edge[i][2];
@@ -714,9 +714,48 @@ Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh
             const Rat ry = y - edge[j][1], rz = z - edge[j][2];
             const Rat r2 = ry * ry + rz * rz;
             REQUIRE(r2 > 0);
-            sum += trace[i] * jumps[j] * (ry * dy + rz * dz) / r2;
+            add_term(Rat{trace[i] * jumps[j] * (ry * dy + rz * dz) / r2});
         }
     }
+}
+
+class DyadicEnclosureSum {
+public:
+    void add(const Rat& term) {
+        const Big scaled = numerator(term) * units_;
+        const Big divisor = denominator(term);
+        Big integral, remainder;
+        boost::multiprecision::divide_qr(scaled, divisor, integral, remainder);
+        integral_ += integral;
+        // Integer division truncates toward zero. Each discarded remainder has
+        // magnitude below one unit, irrespective of the sign of the term.
+        if (remainder != 0)
+            ++remainder_count_;
+    }
+
+    [[nodiscard]] Enclosure enclosure() const {
+        return {Rat{integral_} / units_, Rat{remainder_count_} / units_};
+    }
+
+private:
+    const Big units_ = Big{1} << 100;
+    Big integral_{};
+    std::size_t remainder_count_{};
+};
+
+Rat trefftz_midpoint(const cf::DiscreteCirculation& solved, const FiniteWingMesh& mesh,
+                     const a::GlobalContactState& contact, std::span<const Point> vertices,
+                     const Rat& density, std::size_t bound_count = columns,
+                     std::size_t strips = 4) {
+    Rat sum{};
+    DyadicEnclosureSum enclosed_sum;
+    visit_trefftz_midpoint_terms(solved, mesh, contact, vertices, bound_count, strips,
+                                 [&](const Rat& term) {
+                                     sum += term;
+                                     enclosed_sum.add(term);
+                                 });
+    const auto enclosure = enclosed_sum.enclosure();
+    CHECK(abs(sum - enclosure.center) <= enclosure.radius);
     return -density * sum / (4 * rational_word(std::numbers::pi));
 }
 
@@ -1426,9 +1465,11 @@ void check_formal_product(const cf::DiscreteCirculationLoads& loads, const CaseL
     const Rat sine_squared = sine * sine;
     const auto force = unpack_vector(loads.total_force());
     const auto axial = scale(force[0], Rat{1} / sine_squared);
-    const Rat trefftz =
-        trefftz_midpoint(loads.primal(), mesh, contact, grid.vertices, density, count, ny) /
-        sine_squared;
+    DyadicEnclosureSum trefftz_terms;
+    visit_trefftz_midpoint_terms(loads.primal(), mesh, contact, grid.vertices, count, ny,
+                                 [&](const Rat& term) { trefftz_terms.add(term); });
+    const auto trefftz = scale(trefftz_terms.enclosure(),
+                               -density / (4 * rational_word(std::numbers::pi) * sine_squared));
     // The streamwise ambient term is the odd part of Fz under incidence reversal.
     // Every closed bound ring has zero directed span displacement. With its trailing
     // edge omitted from the loads, the remaining displacement is minus that edge's.
@@ -1458,16 +1499,17 @@ void check_formal_product(const cf::DiscreteCirculationLoads& loads, const CaseL
     const Rat limit = rational_word(common_limit.at("reference_limit").get<double>());
     const Rat uncertainty =
         rational_word(common_limit.at("reference_relative_uncertainty").get<double>());
-    REQUIRE(trefftz > 0);
+    const Rat trefftz_lower = trefftz.center - trefftz.radius;
+    REQUIRE(trefftz_lower > 0);
     REQUIRE(limit > 0);
     REQUIRE(uncertainty >= 0);
-    const Rat gap = (abs(near - trefftz) + axial.radius) / trefftz;
+    const Rat gap = (abs(near - trefftz.center) + axial.radius + trefftz.radius) / trefftz_lower;
     const Rat indicator = (abs(near - limit) + axial.radius) / limit + uncertainty;
     const Rat threshold = Rat{1} / 100;
     CHECK(gap <= threshold);
     CHECK(indicator <= threshold);
     const Rat finite_trefftz = rational_word(common_limit.at("candidate_trefftz").get<double>());
-    CHECK(abs(trefftz - finite_trefftz) < Rat{1} / 10'000'000);
+    CHECK(abs(trefftz.center - finite_trefftz) + trefftz.radius < Rat{1} / 10'000'000);
 
     // Verify the assumed lower bound on |n_z| with the actual input tangents.
     const Rat minimum_normal = Rat{99} / 100;
@@ -1493,7 +1535,8 @@ void check_formal_product(const cf::DiscreteCirculationLoads& loads, const CaseL
     std::cout << std::setprecision(17)
               << "Formal midpoint drag N/rad^2, near=" << near.convert_to<double>()
               << ", radius=" << axial.radius.convert_to<double>()
-              << ", Trefftz=" << trefftz.convert_to<double>()
+              << ", Trefftz=" << trefftz.center.convert_to<double>()
+              << ", Trefftz radius=" << trefftz.radius.convert_to<double>()
               << ", near/far gap=" << gap.convert_to<double>()
               << ", ideal reference indicator=" << indicator.convert_to<double>()
               << ", relative L2 residual ceiling="
