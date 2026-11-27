@@ -105,7 +105,7 @@ private:
                 mismatch.reason = MeshSidecarFailure::CaseReference;
                 mismatch.source = snapshot.location;
                 mismatch.target_namespace = SchemaNamespace::Geometry;
-                mismatch.target = *snapshot.declaring_mesh_geometry;
+                mismatch.target = snapshot.declaring_mesh_geometry;
                 diagnostic_->sidecar = mismatch;
             }
             return reject({Code::InvalidInput, operation}, snapshot, LeafReferenceFailure::Sidecar);
