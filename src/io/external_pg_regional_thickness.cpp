@@ -213,10 +213,12 @@ compare_claim(ref::ReferenceArithmetic& math, CasePlanes& pg, const Face& face,
 }
 
 void admit_comparison(ref::ReferenceArithmetic& math,
-                      std::span<const ExternalPgThicknessClaim> claims) {
+                      std::span<const ExternalPgThicknessClaim> claims,
+                      std::uint64_t additional_live_rationals) {
     // The source values and each reported copy can be live together. Allow
     // one further rational per match for the accumulated chart area.
-    auto live = ref::partition_add(ref::reference_live_rationals, claims.size());
+    auto live = ref::partition_add(ref::partition_add(ref::reference_live_rationals, claims.size()),
+                                   additional_live_rationals);
     for (const auto& claim : claims) {
         math.visit(1);
         const auto values =
@@ -253,7 +255,7 @@ compare_regions(const Certified& certified, const structure::PgReferenceGeometry
                     partition_fail(Code::ResourceExceeded);
                 }
                 if (!claims.empty()) {
-                    admit_comparison(math, claims);
+                    admit_comparison(math, claims, limits.additional_live_rationals);
                 }
                 auto match = partition_take(plan.allocate<ExternalPgThicknessMatch>(
                     ref::partition_index(claims.size()), operation));
