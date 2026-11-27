@@ -160,6 +160,8 @@ struct P1Scratch {
     std::array<p1::Interval, 16> input;
     p1::FarComponents low_values, high_values;
     p1::Interval pi, ln2;
+    bool pi_prepared = false;
+    bool ln2_prepared = false;
 };
 namespace {
 std::uint64_t shape_payload(const Shape& shape) {
@@ -538,10 +540,17 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         load(geometry, query, ambient, scratch, work);
         auto [options, scale] = prepare_input(scratch, work);
         options.boundary = boundary;
-        scratch.pi = p1::pi_constant(work);
-        if (!bound)
+        // The workspace admits the full cold calculation. Report the actual
+        // operations once these input-independent intervals are available.
+        if (!scratch.pi_prepared) {
+            scratch.pi = p1::pi_constant(work);
+            scratch.pi_prepared = true;
+        }
+        if (!bound && !scratch.ln2_prepared) {
             scratch.ln2 =
                 p1::logarithm_series(p1::divide(p1::integer(1), p1::integer(3), work), work);
+            scratch.ln2_prepared = true;
+        }
         p1::Program program{scratch.program.values()};
         const auto output = bound ? p1::bound_program(program, options)
                             : far ? p1::far_program(program)
