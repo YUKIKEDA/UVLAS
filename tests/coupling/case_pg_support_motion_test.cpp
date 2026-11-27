@@ -8,6 +8,7 @@
 #include "coupling/case_material_reference.hpp"
 #include "coupling/case_material_rows.hpp"
 #include "coupling/case_material_surface_model.hpp"
+#include "coupling/case_pg_chart.hpp"
 #include "coupling/case_pg_reference.hpp"
 #include "coupling/case_pg_support_motion.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
@@ -698,43 +699,59 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
         wrong(core::FailureCode::GeometryInvalid);
     }
     SECTION("The conditioned original row carries position velocity and transpose work") {
+        const auto take_stage = [&](std::string_view stage, auto value) {
+            if (!value) {
+                CAPTURE(stage, plan.allocated_bytes(), static_cast<unsigned>(value.error().code));
+                REQUIRE(value.has_value());
+            }
+            return take(std::move(value));
+        };
         const auto si = checked_case(wire);
-        auto physical = take(c::prepare_case_pg_reference(si, 1, limits.support, workspace, plan));
-        INFO("Case PG physical reference prepared");
+        auto physical =
+            take_stage("Case PG reference",
+                       c::prepare_case_pg_reference(si, 1, limits.support, workspace, plan));
         const auto original = take(physical.source());
         const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
-        auto rank = take(PgRankPreparation::prepare(original.dictionary, original.partition,
-                                                    rank_limits, workspace, plan));
-        auto basis = take(PgReferenceBasis::prepare(std::move(physical), std::move(rank),
-                                                    rank_limits, workspace, plan));
-        auto gram = take(
-            PgFlatGram::prepare(std::move(basis), 256, {limits.chart, steps}, workspace, plan));
-        auto accepted = take(std::move(gram).generate_and_certify({320, 246}, {profile, steps, {}},
-                                                                  workspace, plan));
+        auto rank = take_stage("Local rank",
+                               PgRankPreparation::prepare(original.dictionary, original.partition,
+                                                          rank_limits, workspace, plan));
+        auto basis = take_stage("Reference basis",
+                                PgReferenceBasis::prepare(std::move(physical), std::move(rank),
+                                                          rank_limits, workspace, plan));
+        auto gram =
+            take_stage("Flat Gram", PgFlatGram::prepare(std::move(basis), 256,
+                                                        {limits.chart, steps}, workspace, plan));
+        auto accepted =
+            take_stage("Conditioning", std::move(gram).generate_and_certify(
+                                           {320, 246}, {profile, steps, {}}, workspace, plan));
         const auto prepared =
-            take(PgPreparedPatch::prepare(std::move(accepted), limits.chart, workspace, plan));
+            take_stage("Prepared patch", PgPreparedPatch::prepare(std::move(accepted), limits.chart,
+                                                                  workspace, plan));
         const auto patch_id = take(prepared.info()).identity;
         constexpr auto max_error = 1e-9;
         for (const auto precision : {core::Precision::Binary64, core::Precision::TwoWord}) {
             CAPTURE(static_cast<int>(precision));
             const PgPreparedReferenceProjection projection{precision, 1e-13, 1e-13,
                                                            1e-13,     1e-13, 1e-13};
-            const auto rows = take(c::CaseMaterialRows::prepare(
-                ready, thin, prepared, c::CaseMaterialCollocationSite{0, 1}, projection, 1e-13,
-                limits.chart, plan));
-            INFO("Collocation rows prepared");
+            const auto rows =
+                take_stage("Collocation rows",
+                           c::CaseMaterialRows::prepare(ready, thin, prepared,
+                                                        c::CaseMaterialCollocationSite{0, 1},
+                                                        projection, 1e-13, limits.chart, plan));
             namespace aero = uvlas::aero::detail;
             const c::CaseMaterialLoadKey original_key{aero::PhysicalFaceId{71}, aero::FacetId{81},
                                                       0, aero::PointId{91}};
             const c::CaseMaterialLoadKey other_key{original_key.face, original_key.facet, 1,
                                                    aero::PointId{92}};
-            const auto original_vertex = take(c::CaseMaterialRows::prepare(
-                ready, thin, prepared, c::CaseMaterialVertexSite{0, 1, 1}, projection, 1e-13,
-                limits.chart, plan, original_key));
-            const auto other_vertex = take(c::CaseMaterialRows::prepare(
-                ready, thin, prepared, c::CaseMaterialVertexSite{1, 1, 1}, projection, 1e-13,
-                limits.chart, plan, other_key));
-            INFO("Original vertex row prepared");
+            const auto original_vertex =
+                take_stage("Original vertex row",
+                           c::CaseMaterialRows::prepare(
+                               ready, thin, prepared, c::CaseMaterialVertexSite{0, 1, 1},
+                               projection, 1e-13, limits.chart, plan, original_key));
+            const auto other_vertex = take_stage(
+                "Other vertex row", c::CaseMaterialRows::prepare(
+                                        ready, thin, prepared, c::CaseMaterialVertexSite{1, 1, 1},
+                                        projection, 1e-13, limits.chart, plan, other_key));
             const bool paired = precision == core::Precision::TwoWord;
             const auto capacity =
                 static_cast<core::Index>(prepared.reference_coordinates().size() * 3);
@@ -764,7 +781,8 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
             const PgCartesianWords v_state{precision, v_high, v_low};
             const c::CaseMaterialActionLimits apply{steps, max_error, max_error, max_error, {}};
             const auto position =
-                take(rows.evaluate(patch_id, q_state, v_state, apply, action_workspace, plan));
+                take_stage("Position and velocity", rows.evaluate(patch_id, q_state, v_state, apply,
+                                                                  action_workspace, plan));
             const auto word = [](PgCartesianWords words, std::size_t index) {
                 return words.high[index] + (words.low.empty() ? 0.0 : words.low[index]);
             };
@@ -786,8 +804,9 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
             const PgCartesianWords loads{precision, force,
                                          paired ? std::span<const double>{zero}
                                                 : std::span<const double>{}};
-            const auto back = take(original_vertex.pullback(patch_id, loads, {steps, max_error, {}},
-                                                            action_workspace, plan));
+            const auto back = take_stage(
+                "Original force", original_vertex.pullback(patch_id, loads, {steps, max_error, {}},
+                                                           action_workspace, plan));
             CHECK(std::get<c::CaseMaterialVertexSite>(back.original_site).original_span_cell == 1);
             CHECK(back.surface.shell_id == 1);
             CHECK(back.patch == patch_id);
@@ -812,10 +831,13 @@ TEST_CASE("Case material chart owns the selected PG and preserves both sides at 
             };
             const auto first_load = contribution(original_key);
             const auto second_load = contribution(other_key);
-            const auto enclosed = take(original_vertex.pullback_enclosed(
-                patch_id, first_load, {steps, max_error, {}}, plan));
-            const auto second = take(other_vertex.pullback_enclosed(patch_id, second_load,
-                                                                    {steps, max_error, {}}, plan));
+            const auto enclosed =
+                take_stage("Original force enclosure",
+                           original_vertex.pullback_enclosed(patch_id, first_load,
+                                                             {steps, max_error, {}}, plan));
+            const auto second = take_stage(
+                "Other force enclosure", other_vertex.pullback_enclosed(
+                                             patch_id, second_load, {steps, max_error, {}}, plan));
             CHECK(second.original_site.chord_column == 1);
             const auto before_swap = plan.allocated_bytes();
             check_failure(original_vertex.pullback_enclosed(patch_id, second_load,
@@ -1079,6 +1101,119 @@ TEST_CASE("The frozen V-PG Case series prepares its physical PG references",
     }
     CHECK(prepared_shells == 36);
     CHECK(curved_points == 8);
+}
+
+TEST_CASE("Case chart entry points retain the original support rows",
+          "[V-PG][SH-D05][CN-D03][verification][case-pg-chart-entry]") {
+    auto input = a::root();
+    const auto verify = [](const c::CasePgChart& prepared) {
+        const auto selected = take(prepared.shell_reference(numerics::PatchId{1}, 1));
+        const auto& original = prepared.chart().original();
+        REQUIRE(original.sources().size() == 1);
+        const auto& support = original.sources().front();
+        CHECK(support.id == PgConstraintId{1});
+        CHECK(support.kind == PgTraceKind::Support);
+        CHECK(support.left == numerics::PatchId{1});
+        CHECK(support.first_row == 0);
+        REQUIRE(support.rows > 0);
+        REQUIRE(static_cast<std::size_t>(support.rows) == original.original_rows().size());
+        const auto coordinates = selected.patch().reference_coordinates();
+        bool nonzero = false;
+        for (core::Index row = 0; row < support.rows; ++row) {
+            const auto& metadata = original.original_rows()[static_cast<std::size_t>(row)];
+            CHECK(metadata.source == 0);
+            std::array<Q, 3> value{};
+            for (const auto& term : take(original.row(row))) {
+                const auto& point = coordinates[static_cast<std::size_t>(term.column)];
+                for (std::size_t axis = 0; axis < point.size(); ++axis)
+                    value[axis] += q(term.coefficient) * q(point[axis]);
+            }
+            for (std::size_t axis = 0; axis < value.size(); ++axis) {
+                CHECK(value[axis] == q(metadata.prescribed[axis]));
+                nonzero = nonzero || value[axis] != 0;
+            }
+        }
+        CHECK(nonzero);
+    };
+
+    Fixture f;
+    constexpr std::size_t plane_order = 7;
+    const auto plane_weight = f.r("1", "7"), depth_weight = f.r("1", "3");
+    std::array<ExactRational, plane_order> coordinates;
+    std::vector<PgLineQuadratureNode> line;
+    line.reserve(coordinates.size());
+    for (std::size_t i = 0; i < coordinates.size(); ++i) {
+        coordinates[i] = rat(f, I{2 * i + 1}, I{2 * plane_order});
+        line.push_back({coordinates[i], plane_weight});
+    }
+    const auto quarter = f.r("1", "4"), half = f.r("1", "2"), three_quarters = f.r("3", "4");
+    const std::array depth{PgLineQuadratureNode{quarter, depth_weight},
+                           PgLineQuadratureNode{half, depth_weight},
+                           PgLineQuadratureNode{three_quarters, depth_weight}};
+    const std::array rules{c::CasePgRuleBinding{1, PgVolumeProductRule{line, line, depth}}};
+    auto arithmetic = query_limits();
+    arithmetic.maximum_scalar_operations = 300'000'000;
+    arithmetic.maximum_partition_visits = 100'000'000;
+    auto exact = arithmetic;
+    exact.algebra.maximum_value_bits = 65536;
+    exact.algebra.maximum_work_bits = 262144;
+    const c::CasePgChartLimits limits{
+        case_pg_reference_limits(),
+        {profile, steps, 128, {}},
+        {768, 704},
+        {arithmetic, steps},
+        {768, 192},
+        {profile, steps, {}},
+        arithmetic,
+        {motion_exact_limits(), 10'000, c::case_motion_frame_interval_scratch_bytes},
+        {exact, 120'000},
+        {exact, 1, 1, 500, 120'000},
+        {exact, 300, 480, 70'000},
+        100'000};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    SECTION("Fixed support") {
+        const auto source = checked_case(input);
+        const auto prepared =
+            take(c::prepare_case_pg_chart(source, rules, limits, workspace, plan));
+        CHECK(prepared.motion() == nullptr);
+        verify(prepared);
+    }
+    SECTION("Time-dependent support") {
+        input.set(
+            "initial",
+            a::parse(R"({"kind":"equilibrium","branch":"1","perturbation":{"kind":"none"}})"));
+        auto& analysis = input.field("analysis");
+        analysis.set("kind", a::string("transient"));
+        analysis.erase("speed");
+        analysis.set("intervals",
+                     a::parse(R"([{"start":0,"end":1,"step":1,"restart":"initial"}])"));
+        input.field("numerics").field("scales").elements.push_back(a::scale("structural_velocity"));
+        input.field("model")
+            .field("supports")
+            .elements.at(0)
+            .field("motion")
+            .set(
+                "translation",
+                a::parse(
+                    R"({"kind":"polynomial","origin":0,"scale":1,"coefficients":[[0,0,0],[1,0,0]],"domain":[0,1]})"));
+        const c::CaseUniformFlowLimits uniform{motion_exact_limits(), motion_limits.curve, 100};
+        const c::CaseClockedPrescribedLimits clocks{
+            {{uniform, 8, 8}, {uniform, 2048, 50'000}},
+            {limits.support_frame, motion_limits, 2048, 50'000},
+            case_budget};
+        const c::CaseStructuralSupportLimits support_limits{
+            {clocks, 65'536, 2'000'000, 500}, {exact, exact, 500}, limits.trace, 1, 100'000, 1};
+        p::CurveWorkspace motion_workspace;
+        const auto source = checked_case(input);
+        const auto prepared = take(c::prepare_case_pg_motion_chart(
+            source, rules, limits, stamp, support_limits, workspace, motion_workspace, plan));
+        const auto* motion = prepared.motion();
+        REQUIRE(motion != nullptr);
+        CHECK(motion->support().group_count() == 1);
+        CHECK(&motion->support().chart() == &prepared.chart());
+        verify(prepared);
+    }
 }
 
 TEST_CASE("Clocked rigid PG supports preserve original rows and reaction power",
