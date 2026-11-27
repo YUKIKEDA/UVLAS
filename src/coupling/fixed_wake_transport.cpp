@@ -361,7 +361,7 @@ WakeBirthMatch WakeTransportResult::match_birth(a::MaterialReleaseKey key,
                                                 const WakeTransportClock& clock,
                                                 const a::OwnedGeometry& origin,
                                                 const a::OwnedGeometry& detached,
-                                                a::PointId detached_point) const noexcept {
+                                                a::PointId detached_point) const noexcept try {
     if (data_.size() == 0)
         return WakeBirthMatch::Missing;
     const auto& data = data_.values().front();
@@ -394,6 +394,8 @@ WakeBirthMatch WakeTransportResult::match_birth(a::MaterialReleaseKey key,
         birth->detached_geometry != *detached_identity)
         return WakeBirthMatch::Stale;
     return WakeBirthMatch::Verified;
+} catch (const std::bad_variant_access&) {
+    return WakeBirthMatch::Stale;
 }
 
 core::Result<WakeTransportPositionDual>
@@ -438,8 +440,10 @@ core::Result<a::ScaledEnclosure> WakeTransportResult::prescribed_time_dual() con
 
 core::Result<FirstFreeWakePoint> WakeMaterialTransition::row(std::size_t i) const noexcept {
     const auto rows = rows_.values();
-    if (i < rows.size() && rows[i])
-        return *rows[i];
+    if (i < rows.size()) {
+        if (const auto& row = rows[i])
+            return *row;
+    }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
 
@@ -450,8 +454,10 @@ core::Result<WakeMaterialPoint> WakeMaterialTransition::retired(std::size_t i) c
 core::Result<RetiredWakeMaterialPoint>
 WakeMaterialTransition::retired_sample(std::size_t i) const noexcept {
     const auto rows = retired_.values();
-    if (i < rows.size() && rows[i])
-        return *rows[i];
+    if (i < rows.size()) {
+        if (const auto& row = rows[i])
+            return *row;
+    }
     return std::unexpected(core::Failure{InvalidInput, operation});
 }
 
