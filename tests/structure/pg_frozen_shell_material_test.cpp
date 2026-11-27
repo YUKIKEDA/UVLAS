@@ -816,7 +816,8 @@ TEST_CASE("Frozen V-MAT elastic action at 3672 points", "[.high-elastic][V-MAT][
     }
     REQUIRE(layer_points == std::array<std::size_t, 3>{1'224, 1'224, 1'224});
     auto assembly_limits = limits;
-    assembly_limits.maximum_scalar_operations = 500'000'000'000ULL;
+    // The frozen rule's sampled per-point charges project to about 576 billion.
+    assembly_limits.maximum_scalar_operations = 1'000'000'000'000ULL;
     assembly_limits.maximum_partition_visits = 2'000'000'000;
     assembly_limits.algebra.maximum_value_bits = 16'384;
     assembly_limits.algebra.maximum_work_bits = 65'536;

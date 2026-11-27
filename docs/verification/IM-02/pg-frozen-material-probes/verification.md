@@ -82,6 +82,12 @@ uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.
 Ubuntu 24.04.5 の GCC 14.2.0 Release で、固定幅の有理数を外向きに丸める試験を実行した。分母が257 bitと9,001 bitの入力について、正負それぞれの上下端点と、作業幅を1 bit下げた場合の拒否を調べた。14アサーションが通過した。
 同じ構成の `structure.pg_shell_material`、`structure.pg_frozen_shell_material`、`structure.pg_discrete_gram`、`coupling.case_pg_shell_material` も通過した。凍結24点の比較と Case の材料作用への接続を含む。
 
+正式試験の初回は、スカラー演算の上限を5,000億に設定し、8,048.21秒で `ResourceExceeded` を返した。
+失敗時の累積所有確保は25,122,895,240 B、プロセスの最大常駐量は435,176 KiBだった。
+同じ点列の先頭・層境界・末尾から選んだ14点では、1点当たりのスカラー演算課金が145,742,116〜156,778,567だった。
+観測した最大課金で全3,672点と準備の分を見積もると約5,757億となるため、再試験のスカラー演算上限を1兆に設定した。
+点列、丸め精度、判定値、48 GiBの累積所有確保枠は維持する。
+
 ```bash
 uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/convergence.py out/pg-frozen-material-basis.txt --elastic-rule-output out/vmat-elastic-rule.json
 cmake --preset linux-release -DUVLAS_FORMAL_VMAT_ELASTIC_FIXTURE="$PWD/out/vmat-elastic-rule.json"
