@@ -3,6 +3,7 @@
 #include "aero/closed_contour.hpp"
 #include "case_known_flow.hpp"
 
+#include <complex>
 #include <uvlas/numerics/linear_solve.hpp>
 
 namespace uvlas::coupling::detail {
@@ -225,6 +226,34 @@ struct DiscreteCirculationRequest {
     /// Each parallel range receives its own share of the remaining step budget.
     std::size_t contour_workers{1};
 };
+
+struct HarmonicCirculationRhs {
+    aero::detail::PhysicalFaceId face{0};
+    aero::detail::ScalarWords real;
+    aero::detail::ScalarWords imaginary;
+};
+
+struct HarmonicCirculationResidual {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScaledEnclosure real;
+    aero::detail::ScaledEnclosure imaginary;
+};
+
+struct DiscreteHarmonicCirculation {
+    aero::detail::GeometryContext geometry;
+    numerics::linear::Solution<std::complex<double>> solution;
+    core::PlannedBuffer<std::optional<HarmonicCirculationResidual>> residual;
+    std::uint64_t used_steps;
+};
+
+/// Solve the finite straight-wake system A0 + W(omega) E^T with a real A0
+/// and a complex update. Right-hand sides are normal speeds in increasing
+/// physical bound face order. Reevaluate the original complex residual from
+/// the steady contour, the finite update enclosures and both solution words.
+[[nodiscard]] core::Result<DiscreteHarmonicCirculation> solve_discrete_harmonic_circulation(
+    const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+    std::span<const HarmonicCirculationRhs>, const DiscreteNonpenetrationLimits&,
+    const DiscreteCirculationRequest&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
 struct CirculationResidualRow {
     aero::detail::PhysicalFaceId face{0};

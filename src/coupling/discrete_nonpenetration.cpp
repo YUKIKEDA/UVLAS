@@ -341,13 +341,14 @@ void validate_circulation(const DiscreteCirculationRequest& request, std::size_t
     }
 }
 
-class NoDenseConsumerChecks final : public linear::ConsumerEvaluator<double> {
+template <class Scalar>
+class NoDenseConsumerChecks final : public linear::ConsumerEvaluator<Scalar> {
 public:
     [[nodiscard]] numerics::SupportedPrecision supported_precision() const noexcept override {
         return numerics::SupportedPrecision::Binary64AndTwoWord;
     }
     [[nodiscard]] core::Result<core::ErrorCertificate>
-    assess(const numerics::PrecisionBuffer<double>&, const numerics::PrecisionBuffer<double>&,
+    assess(const numerics::PrecisionBuffer<Scalar>&, const numerics::PrecisionBuffer<Scalar>&,
            const linear::Context&, const linear::ConsumerCheck& request,
            core::CertificateContext context) const override {
         return core::ErrorCertificate::unevaluated(context, request.budget);
@@ -379,7 +380,7 @@ linear::Solution<double> solve_projected(const numerics::DenseReal& matrix, nume
     auto factor =
         require(linear::DensePrepared::prepare(op, request.scales, request.solver_limits, memory));
     work.step();
-    const NoDenseConsumerChecks no_checks;
+    const NoDenseConsumerChecks<double> no_checks;
     const linear::Precision<double> precision{
         linear::RetainedPrecision{request.retained_generation}, {}, no_checks};
     return require(linear::solve_linear(op, right, request.scales, precision, request.algebraic,
@@ -1710,13 +1711,12 @@ struct NonpenetrationBuilder {
     static DiscreteHarmonicWakeUpdate harmonic_wake(const DiscreteNonpenetrationInput& input,
                                                     const StraightWakeHarmonicInput& phase,
                                                     const DiscreteNonpenetrationLimits& limits,
-                                                    core::ResourcePlan& memory,
-                                                    const std::stop_token& stop) {
+                                                    const Assembly& assembly,
+                                                    core::ResourcePlan& memory, p::Work& work) {
         if (input.wake.empty() ||
             !std::holds_alternative<SteadyWakeClosure>(input.wake.front().trailing))
             reject(core::FailureCode::InvalidInput);
-        p::Work work{0, limits.steps, stop};
-        const auto assembly = assemble(input, limits, memory, work, true);
+        const auto& stop = work.stop;
         const auto& geometry = require(input.contact.geometry()).get();
         const auto velocity = import(phase.convection_velocity, work);
         const auto component = std::ranges::find_if(velocity, [](const p::Interval& value) {
@@ -1890,6 +1890,205 @@ struct NonpenetrationBuilder {
         }
     }
 
+    static const a::ClosedContour& prepare_contour(const DiscreteNonpenetrationInput& input,
+                                                   NativeCirculationRows& owner,
+                                                   const DiscreteNonpenetrationLimits& limits,
+                                                   core::ResourcePlan& memory, p::Work& work) {
+        auto workspace =
+            require(a::GlobalWorkspace::create(memory, limits.induction.kernel.external_memory));
+        owner.contour.emplace(require(
+            a::ClosedContour::prepare(input.contact, owner.maps.values(), owner.ids.values(),
+                                      {remaining(work), limits.induction.kernel.external_memory},
+                                      *workspace, memory, work.stop)));
+        account(work, owner.contour->preparation_steps());
+        return *owner.contour;
+    }
+
+    static DiscreteHarmonicCirculation
+    solve_harmonic(const DiscreteNonpenetrationInput& input, const StraightWakeHarmonicInput& phase,
+                   std::span<const HarmonicCirculationRhs> velocities,
+                   const DiscreteNonpenetrationLimits& limits,
+                   const DiscreteCirculationRequest& request, core::ResourcePlan& memory,
+                   const std::stop_token& stop) {
+        using Complex = std::complex<double>;
+        using Code = core::FailureCode;
+        using Pair = std::array<p::Interval, 2>;
+        p::Work work{0, limits.steps, stop};
+        work.step();
+        const auto& geometry = require(input.contact.geometry()).get();
+        match_circulation_geometry(request, geometry.context());
+        const auto order = input.collocations.size();
+        if (order == 0 || order != velocities.size() || !request.certified_closed_contour ||
+            request.contour_workers == 0 || request.contour_workers > max_contour_workers ||
+            request.solver_limits.maximum_update_rank < 0 || input.wake.empty())
+            reject(Code::InvalidInput);
+        validate_circulation(request, order, work);
+        if (std::cmp_greater(input.wake.size(), request.solver_limits.maximum_update_rank))
+            reject(Code::ResourceExceeded);
+        const auto assembly = assemble(input, limits, memory, work, true);
+        const auto bound = std::span<const PanelRow>{assembly.bound.values()};
+        for (std::size_t i = 0; i < order; ++i) {
+            work.step();
+            if (velocities[i].face != bound[i].panel.face)
+                reject(Code::InvalidInput);
+        }
+        const auto update = harmonic_wake(input, phase, limits, assembly, memory, work);
+        const auto rank = update.columns.size();
+        const auto n = static_cast<core::Index>(order), k = static_cast<core::Index>(rank);
+        // The dense matrix factories check addressed products and allocation limits.
+        auto base =
+            require(numerics::DenseReal::zeroed({n, n, n}, memory, core::Operation::SolveLinear));
+        auto left = require(
+            numerics::DenseComplex::zeroed({n, k, n}, memory, core::Operation::SolveLinear));
+        auto right = require(
+            numerics::DenseComplex::zeroed({n, k, n}, memory, core::Operation::SolveLinear));
+        auto rhs = require(
+            numerics::DenseComplex::zeroed({n, 1, n}, memory, core::Operation::SolveLinear));
+        auto selected = allocate<std::size_t>(memory, rank);
+        for (std::size_t column = 0; column < rank; ++column) {
+            const auto& row = find(
+                bound, update.columns.values()[column].bound_face,
+                [](const PanelRow& item) { return item.panel.face; }, work);
+            selected.values()[column] = static_cast<std::size_t>(&row - bound.data());
+            right.values()[column * order + selected.values()[column]] = {1., 0.};
+            for (std::size_t i = 0; i < order; ++i) {
+                work.step();
+                const auto& value = update.coefficients.values()[column * order + i];
+                left.values()[column * order + i] = {
+                    project_contour(value.real, request.matrix_absolute),
+                    project_contour(value.imaginary, request.matrix_absolute)};
+            }
+        }
+        auto operator_rows = retain_operator(input, assembly, limits, memory, work);
+        auto& owner = operator_rows.values().front();
+        const auto& contour = prepare_contour(input, owner, limits, memory, work);
+        const auto workers = std::min(request.contour_workers, order);
+        std::array<std::optional<ContourSession>, max_contour_workers> sessions;
+        for (auto& slot : std::span{sessions}.first(workers))
+            slot.emplace(contour_session(contour, limits, memory));
+        auto native =
+            allocate<a::ContourInterval>(memory, multiply_budget(workers, owner.ids.size()));
+        auto projected = allocate<a::ContourInterval>(memory, multiply_budget(workers, order));
+        auto original_rhs = allocate<Pair>(memory, order);
+        contour_ranges(
+            order, workers, work,
+            [&](std::size_t worker, std::size_t first, std::size_t last, p::Work& local) {
+                const auto scratch =
+                    native.values().subspan(worker * owner.ids.size(), owner.ids.size());
+                const auto coefficients = projected.values().subspan(worker * order, order);
+                a::LocalRootScratch rounding;
+                for (std::size_t row = first; row < last; ++row) {
+                    const auto& item = bound[row];
+                    const auto& supplied = input.collocations[item.caller];
+                    auto& normal = owner.rows.values()[row].normal;
+                    normal = qualify_normal(geometry, item.panel, supplied, local);
+                    auto& value = original_rhs.values()[row];
+                    value = {import(velocities[row].real, local),
+                             import(velocities[row].imaginary, local)};
+                    rhs.values()[row] = {
+                        project_binary64(value[0], request.rhs_absolute, rounding, local),
+                        project_binary64(value[1], request.rhs_absolute, rounding, local)};
+                    project_contour_row(contour, *sessions[worker], supplied.query, normal, owner,
+                                        scratch, coefficients, limits, local);
+                    for (std::size_t column = 0; column < order; ++column) {
+                        local.step();
+                        base.values()[column * order + row] =
+                            project_contour(coefficients[column], request.matrix_absolute);
+                    }
+                }
+            });
+        const auto& context = request.scales.context;
+        const linear::ColumnUpdatedOperator op{base, left, right, context};
+        const auto rhs_buffer = require(numerics::PrecisionBuffer<Complex>::binary64(
+            std::move(rhs), core::NumericalGeneration{request.rhs_generation.value()}));
+        auto factor = require(
+            linear::UpdatedPrepared::prepare(op, request.scales, request.solver_limits, memory));
+        work.step();
+        const NoDenseConsumerChecks<Complex> no_checks;
+        const linear::Precision<Complex> precision{
+            linear::RetainedPrecision{request.retained_generation}, {}, no_checks};
+        auto solved = require(linear::solve_linear(
+            op, linear::Rhs<Complex>{rhs_buffer, context, request.rhs_generation}, request.scales,
+            precision, request.algebraic, request.solver_limits, factor, memory));
+        const auto* words = std::get_if<numerics::TwoWord<Complex>>(&solved.values().storage());
+        if (words == nullptr)
+            reject(Code::PrecisionUnsupported);
+        auto amplitudes = allocate<Pair>(memory, order);
+        for (std::size_t i = 0; i < order; ++i) {
+            const auto hi = words->hi.values()[i], lo = words->lo.values()[i];
+            amplitudes.values()[i] = {import(a::DoubleWord{hi.real(), lo.real()}, work),
+                                      import(a::DoubleWord{hi.imag(), lo.imag()}, work)};
+        }
+        auto real_strengths = allocate<a::ContourInterval>(memory, owner.transfer.size());
+        auto imag_strengths = allocate<a::ContourInterval>(memory, owner.transfer.size());
+        for (std::size_t i = 0; i < owner.transfer.size(); ++i) {
+            work.step();
+            const auto& transfer = owner.transfer.values()[i];
+            if (!transfer)
+                reject(Code::InvalidInput);
+            const auto& value = amplitudes.values()[transfer->column];
+            real_strengths.values()[i] =
+                contour_bounds(transfer->reverse ? p::negate(value[0], work) : value[0]);
+            imag_strengths.values()[i] =
+                contour_bounds(transfer->reverse ? p::negate(value[1], work) : value[1]);
+        }
+        auto original = allocate<Pair>(memory, order);
+        contour_ranges(
+            order, workers, work,
+            [&](std::size_t worker, std::size_t first, std::size_t last, p::Work& local) {
+                for (std::size_t row = first; row < last; ++row) {
+                    const auto& query = input.collocations[bound[row].caller].query;
+                    const auto& normal = owner.rows.values()[row].normal;
+                    const auto velocity = [&](std::span<const a::ContourInterval> strengths) {
+                        return dot(normal,
+                                   apply_contour(contour, *sessions[worker], query, {}, strengths,
+                                                 limits, local),
+                                   local);
+                    };
+                    auto& value = original.values()[row];
+                    value = {velocity(real_strengths.values()), velocity(imag_strengths.values())};
+                    for (std::size_t column = 0; column < rank; ++column) {
+                        const auto& source = update.coefficients.values()[column * order + row];
+                        const p::Interval real{checked_word(source.real.lower).lower,
+                                               checked_word(source.real.upper).upper};
+                        const p::Interval imag{checked_word(source.imaginary.lower).lower,
+                                               checked_word(source.imaginary.upper).upper};
+                        const auto& x = amplitudes.values()[selected.values()[column]];
+                        value[0] = p::add(value[0],
+                                          p::subtract(p::multiply(real, x[0], local),
+                                                      p::multiply(imag, x[1], local), local),
+                                          local);
+                        value[1] = p::add(value[1],
+                                          p::add(p::multiply(real, x[1], local),
+                                                 p::multiply(imag, x[0], local), local),
+                                          local);
+                    }
+                    for (std::size_t part = 0; part < value.size(); ++part)
+                        value[part] =
+                            p::subtract(value[part], original_rhs.values()[row][part], local);
+                }
+            });
+        auto residual = allocate<std::optional<HarmonicCirculationResidual>>(memory, order);
+        NativeResidualCheck check{request};
+        a::LocalRootScratch rounding;
+        const auto magnitude = [&](const Pair& value) {
+            const auto real = p::absolute(value[0]), imag = p::absolute(value[1]);
+            return p::square_root(
+                p::add(p::multiply(real, real, work), p::multiply(imag, imag, work), work), work);
+        };
+        for (std::size_t row = 0; row < order; ++row) {
+            const auto& value = original.values()[row];
+            check.add(magnitude(value), magnitude(original_rhs.values()[row]), row, work);
+            residual.values()[row].emplace(HarmonicCirculationResidual{
+                bound[row].panel.face,
+                a::enclose_p1_value(value[0], limits.induction_accuracy.representation, rounding),
+                a::enclose_p1_value(value[1], limits.induction_accuracy.representation, rounding)});
+        }
+        check.finish();
+        work.step();
+        return {geometry.context(), std::move(solved), std::move(residual), work.used};
+    }
+
     static PrimalCirculationData solve_contour(const DiscreteNonpenetrationInput& input,
                                                const ProjectedCaseUniformFlow& flow,
                                                const DiscreteNonpenetrationLimits& limits,
@@ -1904,18 +2103,7 @@ struct NonpenetrationBuilder {
         const auto workers = std::min(request.contour_workers, order);
         auto operator_rows = retain_operator(input, assembly, limits, memory, work);
         auto& owner = operator_rows.values().front();
-        {
-            auto workspace = require(
-                a::GlobalWorkspace::create(memory, limits.induction.kernel.external_memory));
-            owner.contour.emplace(require(a::ClosedContour::prepare(
-                input.contact, owner.maps.values(), owner.ids.values(),
-                {remaining(work), limits.induction.kernel.external_memory}, *workspace, memory,
-                work.stop)));
-        }
-        if (!owner.contour)
-            reject(core::FailureCode::InvalidInput);
-        auto& contour = *owner.contour;
-        account(work, contour.preparation_steps());
+        const auto& contour = prepare_contour(input, owner, limits, memory, work);
         std::array<std::optional<ContourSession>, max_contour_workers> sessions;
         for (auto& slot : std::span{sessions}.first(workers))
             slot.emplace(contour_session(contour, limits, memory));
@@ -4140,7 +4328,31 @@ assemble_discrete_harmonic_wake(const DiscreteNonpenetrationInput& input,
                                 const DiscreteNonpenetrationLimits& limits,
                                 core::ResourcePlan& memory, const std::stop_token& stop) noexcept {
     try {
-        return NonpenetrationBuilder::harmonic_wake(input, phase, limits, memory, stop);
+        if (input.wake.empty() ||
+            !std::holds_alternative<SteadyWakeClosure>(input.wake.front().trailing))
+            reject(core::FailureCode::InvalidInput);
+        p::Work work{0, limits.steps, stop};
+        const auto assembly = NonpenetrationBuilder::assemble(input, limits, memory, work, true);
+        return NonpenetrationBuilder::harmonic_wake(input, phase, limits, assembly, memory, work);
+    } catch (const p::ArithmeticFailure& error) {
+        return std::unexpected(core::Failure{error.code, evaluate});
+    } catch (const core::Failure& error) {
+        return std::unexpected(error);
+    } catch (const std::bad_alloc&) {
+        return std::unexpected(core::Failure{core::FailureCode::ResourceExceeded, evaluate});
+    } catch (...) {
+        return std::unexpected(core::Failure{core::FailureCode::PrecisionUnresolved, evaluate});
+    }
+}
+
+core::Result<DiscreteHarmonicCirculation> solve_discrete_harmonic_circulation(
+    const DiscreteNonpenetrationInput& input, const StraightWakeHarmonicInput& phase,
+    std::span<const HarmonicCirculationRhs> velocities, const DiscreteNonpenetrationLimits& limits,
+    const DiscreteCirculationRequest& request, core::ResourcePlan& memory,
+    const std::stop_token& stop) noexcept {
+    try {
+        return NonpenetrationBuilder::solve_harmonic(input, phase, velocities, limits, request,
+                                                     memory, stop);
     } catch (const p::ArithmeticFailure& error) {
         return std::unexpected(core::Failure{error.code, evaluate});
     } catch (const core::Failure& error) {

@@ -1891,6 +1891,50 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
             skewed.convection_velocity = coordinates(3., .125, 0.);
             reject(cf::assemble_discrete_harmonic_wake(view, skewed, solve_limits, memory),
                    core::FailureCode::GeometryInvalid);
+            auto harmonic_request = request;
+            harmonic_request.certified_closed_contour = true;
+            harmonic_request.solver_limits.maximum_update_rank = 1;
+            auto harmonic_limits = solve_limits;
+            harmonic_limits.action_steps = solve_limits.induction.steps;
+            const std::array forcing{cf::HarmonicCirculationRhs{
+                fixture.faces[0].id, a::SingleWord{.25}, a::SingleWord{-.125}}};
+            const auto solve_harmonic = [&](const cf::StraightWakeHarmonicInput& wake_phase,
+                                            const cf::DiscreteCirculationRequest& settings) {
+                return cf::solve_discrete_harmonic_circulation(view, wake_phase, forcing,
+                                                               harmonic_limits, settings, memory);
+            };
+            auto below_rank = harmonic_request;
+            below_rank.solver_limits.maximum_update_rank = 0;
+            reject(solve_harmonic(phase, below_rank), core::FailureCode::ResourceExceeded);
+            auto too_tight_projection = harmonic_request;
+            too_tight_projection.matrix_absolute = 0.;
+            reject(solve_harmonic(phase, too_tight_projection),
+                   core::FailureCode::PrecisionUnresolved);
+            const auto compare_harmonic = [&](const cf::StraightWakeHarmonicInput& wake_phase,
+                                              std::complex<double> expected) {
+                const auto response = take(solve_harmonic(wake_phase, harmonic_request));
+                CHECK(response.geometry == geometry.context());
+                CHECK(response.used_steps <= harmonic_limits.steps);
+                REQUIRE(response.residual.size() == 1);
+                REQUIRE(response.residual.values()[0]);
+                const auto& original = *response.residual.values()[0];
+                CHECK(original.face == fixture.faces[0].id);
+                residual_small(original.real, rational_word(1e-13));
+                residual_small(original.imaginary, rational_word(1e-13));
+                const auto& gamma = std::get<numerics::TwoWord<std::complex<double>>>(
+                    response.solution.values().storage());
+                CHECK(std::abs(gamma.hi.values()[0] + gamma.lo.values()[0] - expected) < 1e-12);
+            };
+            // Independent segment antiderivatives on the clockwise [0,2] x [0,1]
+            // contour, evaluated at (3/4,1/2,0) with core radius 1/8.
+            constexpr double steady_coefficient = -.6839370505734605;
+            constexpr std::complex<double> normal_speed{.25, -.125};
+            const std::complex<double> finite_update{.02372355017383860083, .07640431828473117643};
+            compare_harmonic(phase, normal_speed / (steady_coefficient + finite_update));
+            auto zero_phase = phase;
+            zero_phase.angular_frequency = 0.;
+            compare_harmonic(zero_phase, normal_speed / steady_coefficient);
+
             const auto closed = take(solve(steady_flow, request));
             residual_small(take(closed.row(0)).original_residual, rational_word(1e-13));
             const auto& words =
