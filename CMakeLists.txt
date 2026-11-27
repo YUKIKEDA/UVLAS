@@ -183,7 +183,7 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
 uvlas_configure_target(uvlas_coupling)
 target_include_directories(uvlas_coupling PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 target_link_libraries(uvlas_coupling PUBLIC uvlas_io uvlas_aero
-    PRIVATE uvlas_numerics Boost::multiprecision)
+    PRIVATE uvlas_numerics Boost::multiprecision Threads::Threads)
 
 add_library(uvlas_app_io STATIC src/app/validate_case.cpp src/app/inspect_result.cpp)
 uvlas_configure_target(uvlas_app_io)

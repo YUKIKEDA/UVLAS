@@ -13,6 +13,7 @@
 #include <nlohmann/json.hpp>
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -1642,6 +1643,62 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             CHECK(stale.error().code == core::FailureCode::StaleGeneration);
             CHECK(insufficient.allocated_bytes() == 0);
             if (selected.certified_closed_contour) {
+                auto parallel = selected;
+                parallel.contour_workers = 4;
+                const auto repeated = take(cf::solve_discrete_circulation_loads(
+                    input, write_loads, project_flow(), caps, parallel, *geometry_work, shared,
+                    *local, *kernel, memory));
+                const auto same_bits = [](double x, double y) {
+                    CHECK(std::bit_cast<std::uint64_t>(x) == std::bit_cast<std::uint64_t>(y));
+                };
+                const auto equal_words = [&](const a::ScalarWords& cx, const a::ScalarWords& cy) {
+                    REQUIRE(cx.index() == cy.index());
+                    if (const auto* single = std::get_if<a::SingleWord>(&cx)) {
+                        same_bits(single->value, std::get<a::SingleWord>(cy).value);
+                    } else {
+                        const auto x = std::get<a::DoubleWord>(cx);
+                        const auto y = std::get<a::DoubleWord>(cy);
+                        same_bits(x.high, y.high);
+                        same_bits(x.low, y.low);
+                    }
+                };
+                const auto equal_enclosure = [&](const a::ScaledEnclosure& x,
+                                                 const a::ScaledEnclosure& y) {
+                    CHECK(x.exponent() == y.exponent());
+                    same_bits(x.radius(), y.radius());
+                    equal_words(x.center(), y.center());
+                };
+                const auto equal_vector = [&](const cf::DiscreteLoadVector& x,
+                                              const cf::DiscreteLoadVector& y) {
+                    for (std::size_t axis = 0; axis < x.size(); ++axis)
+                        equal_enclosure(x[axis], y[axis]);
+                };
+                CHECK(repeated.used_steps() == loads.used_steps());
+                for (std::size_t i = 0; i < count; ++i) {
+                    equal_words(words(loads.primal().solution(), i),
+                                words(repeated.primal().solution(), i));
+                    const auto xx = take(loads.primal().row(i));
+                    const auto yy = take(repeated.primal().row(i));
+                    CHECK(xx.face == yy.face);
+                    equal_enclosure(xx.original_residual, yy.original_residual);
+                }
+                REQUIRE(repeated.edge_count() == loads.edge_count());
+                for (std::size_t i = 0; i < loads.edge_count(); ++i) {
+                    const auto x = take(loads.edge(i));
+                    const auto y = take(repeated.edge(i));
+                    CHECK(x.edge == y.edge);
+                    CHECK(x.excluded_bound_occurrences == y.excluded_bound_occurrences);
+                    equal_vector(x.force, y.force);
+                }
+                REQUIRE(repeated.point_count() == loads.point_count());
+                for (std::size_t i = 0; i < loads.point_count(); ++i) {
+                    const auto x = take(loads.point(i));
+                    const auto y = take(repeated.point(i));
+                    CHECK(x.point == y.point);
+                    equal_vector(x.force, y.force);
+                }
+                equal_vector(loads.total_force(), repeated.total_force());
+                equal_vector(loads.total_moment(), repeated.total_moment());
                 auto too_tight = selected;
                 too_tight.matrix_absolute = 0;
                 auto unconsumed = project_flow();

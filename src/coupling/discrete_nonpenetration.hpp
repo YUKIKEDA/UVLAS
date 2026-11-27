@@ -189,6 +189,9 @@ struct DiscreteCirculationRequest {
     double original_relative; ///< Multiplier of the unprojected affine RHS magnitude.
     /// Use outward Binary64 contour assembly for a primal fixed steady closure.
     bool certified_closed_contour{};
+    /// Admit one to four independent workspaces for the steady contour solve.
+    /// Each parallel range receives its own share of the remaining step budget.
+    std::size_t contour_workers{1};
 };
 
 struct CirculationResidualRow {
