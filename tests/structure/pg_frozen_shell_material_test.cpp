@@ -6,6 +6,7 @@
 #include <array>
 #include <cmath>
 #include <fstream>
+#include <iostream>
 #include <uvlas/structure/pg_shell_material.hpp>
 
 namespace {
@@ -159,6 +160,34 @@ void check(const PgMaterialEnclosure& actual, const Json& expected) {
     const auto budget = 1e-10 * std::max(1.0, std::abs(value));
     CHECK(q(actual.lower).convert_to<double>() >= value - budget);
     CHECK(q(actual.upper).convert_to<double>() <= value + budget);
+}
+
+TEST_CASE("Export selected PG coefficients for the frozen V-MAT transfer", "[.fixture][V-MAT]") {
+    std::ifstream input{UVLAS_PG_FROZEN_MATERIAL_PROBES};
+    REQUIRE(input);
+    const auto frozen = Json::parse(input);
+    const auto limits = query_limits();
+    core::ResourcePlan plan{profile};
+    Fixture fixture;
+    const auto patch = geometry(fixture, frozen.at("height_coefficients"),
+                                frozen.at("material_input"), limits, plan);
+    const auto source = take(patch.source());
+    const PgRankPreparationLimits rank_limits{profile, steps, 128, {}};
+    core::Workspace scratch{core::PlannedBuffer<std::byte>{}};
+    const auto rank = take(PgRankPreparation::prepare(source.dictionary, source.partition,
+                                                      rank_limits, scratch, plan));
+    const auto rows = take(rank.rows());
+    const auto count = static_cast<core::Index>(take(rank.preparation()).rank);
+    for (core::Index column = 0; column < count; ++column) {
+        for (const auto index : take(rank.basis_indices({column}))) {
+            const auto& row = rows[index];
+            const auto value = take(rank.basis({column}, index, limits.algebra, plan));
+            std::cout << "PG_COEFFICIENT " << column << ' ' << static_cast<int>(row.field) << ' '
+                      << row.cell.first << ' ' << row.cell.second << ' ' << row.powers.first << ' '
+                      << row.powers.second << ' ' << q(value) << '\n';
+        }
+    }
+    REQUIRE(std::cout.good());
 }
 
 TEST_CASE("Frozen V-MAT curved probes reproduce each full 3D material and stress measure",

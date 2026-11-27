@@ -8,6 +8,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from types import ModuleType
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -45,7 +46,7 @@ def tensor(components: np.ndarray) -> np.ndarray:
     return np.array([[xx, xy, xz], [xy, yy, yz], [xz, yz, zz]])
 
 
-def probes(archive: Path) -> dict:
+def verified_baseline(archive: Path) -> tuple[ModuleType, dict]:
     require_sha(ROOT / RECORD, RECORD_SHA256)
     require_sha(archive, ARCHIVE_SHA256)
     record = json.loads((ROOT / RECORD).read_text(encoding="utf-8"))
@@ -55,6 +56,11 @@ def probes(archive: Path) -> dict:
     sys.path.insert(0, str((ROOT / PARENT).parent))
     import check_material_shell_integration_v2 as baseline  # noqa: PLC0415
 
+    return baseline, record
+
+
+def probes(archive: Path) -> dict:
+    baseline, record = verified_baseline(archive)
     shell = baseline.shell
     model = shell.prepare(1, PARAMETERS, THICKNESS, True, "extended")
     material_input = record["material_input"]
@@ -137,7 +143,7 @@ def probes(archive: Path) -> dict:
         "schema": "uvlas.pg-frozen-material-probes/1",
         "record": {"path": RECORD, "sha256": RECORD_SHA256},
         "archive": {"path": ARCHIVE, "sha256": ARCHIVE_SHA256},
-        "sources": sources,
+        "sources": record["sources"],
         "replay_relative_errors": agreement,
         "integrated_energy_joules": reconstructed_energy,
         "material_input": material_input,

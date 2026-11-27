@@ -210,7 +210,7 @@
 | V-J1 | [practical-acceptance-plan.md:38](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-JOINT | [practical-acceptance-plan.md:33](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
-| V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 14 | 0 | 0 |
+| V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 15 | 0 | 0 |
 | V-MULTI | [practical-acceptance-plan.md:37](../requirements/practical-acceptance-plan.md) | 4 | 4 | 0 |
 | V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 17 | 12 | 0 |
 | V-RECOVER | [practical-acceptance-plan.md:35](../requirements/practical-acceptance-plan.md) | 1 | 0 | 0 |
