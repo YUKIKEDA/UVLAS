@@ -186,8 +186,37 @@ inline Interval subtract(const Interval& a, const Interval& b, Work& work) {
     return {sum_bound(a.lower, negated(b.upper), false),
             sum_bound(a.upper, negated(b.lower), true)};
 }
+inline bool exact_zero(const Interval& x) noexcept {
+    return x.lower.mantissa == 0 && x.upper.mantissa == 0;
+}
+inline bool ordinary_endpoint(const Bound& endpoint) {
+    // All four corner expressions fit the internal integer and exponent ranges.
+    return endpoint.power >= std::numeric_limits<int>::min() / 4 &&
+           endpoint.power <= std::numeric_limits<int>::max() / 4 && bits(endpoint.mantissa) <= 257;
+}
+inline bool ordinary_corners(const Interval& a, const Interval& b) {
+    return ordinary_endpoint(a.lower) && ordinary_endpoint(a.upper) && ordinary_endpoint(b.lower) &&
+           ordinary_endpoint(b.upper);
+}
 inline Interval multiply(const Interval& a, const Interval& b, Work& work) {
     work.step();
+    if (exact_zero(a) || exact_zero(b)) {
+        (void)exponent(static_cast<std::int64_t>(std::min(a.lower.power, a.upper.power)) +
+                       std::min(b.lower.power, b.upper.power));
+        (void)exponent(static_cast<std::int64_t>(std::max(a.lower.power, a.upper.power)) +
+                       std::max(b.lower.power, b.upper.power));
+        return {};
+    }
+    const bool a_nonnegative = a.lower.mantissa >= 0;
+    const bool b_nonnegative = b.lower.mantissa >= 0;
+    if ((a_nonnegative || a.upper.mantissa <= 0) && (b_nonnegative || b.upper.mantissa <= 0) &&
+        ordinary_corners(a, b)) {
+        const auto& a_low = b_nonnegative ? a.lower : a.upper;
+        const auto& a_high = b_nonnegative ? a.upper : a.lower;
+        const auto& b_low = a_nonnegative ? b.lower : b.upper;
+        const auto& b_high = a_nonnegative ? b.upper : b.lower;
+        return {product_enclosure(a_low, b_low).lower, product_enclosure(a_high, b_high).upper};
+    }
     auto result = corner_enclosure(a, b, product_enclosure);
     if (&a == &b && compare(a.lower, {}) <= 0 && compare(a.upper, {}) >= 0)
         result.lower = {};
@@ -195,8 +224,19 @@ inline Interval multiply(const Interval& a, const Interval& b, Work& work) {
 }
 inline Interval divide(const Interval& a, const Interval& b, Work& work) {
     work.step();
-    if (compare(b.lower, {}) <= 0 && compare(b.upper, {}) >= 0)
+    if (b.lower.mantissa <= 0 && b.upper.mantissa >= 0)
         throw ArithmeticFailure{core::FailureCode::PrecisionUnresolved};
+    if (exact_zero(a))
+        return {};
+    if (ordinary_corners(a, b)) {
+        const bool positive = b.lower.mantissa > 0;
+        const auto& low = positive ? a.lower : a.upper;
+        const auto& high = positive ? a.upper : a.lower;
+        const auto& low_divisor = low.mantissa >= 0 ? b.upper : b.lower;
+        const auto& high_divisor = high.mantissa >= 0 ? b.lower : b.upper;
+        return {quotient_enclosure(low, low_divisor).lower,
+                quotient_enclosure(high, high_divisor).upper};
+    }
     return corner_enclosure(a, b, quotient_enclosure);
 }
 inline Bound root_bound(const Bound& input, bool upper, Work& work) {

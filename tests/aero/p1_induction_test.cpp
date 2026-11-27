@@ -522,6 +522,31 @@ TEST_CASE("P1 interval operations include low dyadic terms and zero crossing squ
     const auto square = arithmetic::multiply(crossing, crossing, work);
     CHECK(square.lower.mantissa == 0);
     CHECK(square.upper.power < 0);
+    const std::array ranges{std::pair{-7, -2}, std::pair{-3, 0}, std::pair{-2, 5},
+                            std::pair{0, 0},   std::pair{0, 4},  std::pair{2, 19}};
+    for (const auto& [a_min, a_max] : ranges) {
+        const auto left = arithmetic::Interval{arithmetic::integer(a_min).lower,
+                                               arithmetic::integer(a_max).upper};
+        for (const auto& [b_min, b_max] : ranges) {
+            const auto right = arithmetic::Interval{arithmetic::integer(b_min).lower,
+                                                    arithmetic::integer(b_max).upper};
+            CAPTURE(a_min, a_max, b_min, b_max);
+            const auto product = arithmetic::multiply(left, right, work);
+            const auto all_products =
+                arithmetic::corner_enclosure(left, right, arithmetic::product_enclosure);
+            CHECK(rational(product.lower) == rational(all_products.lower));
+            CHECK(rational(product.upper) == rational(all_products.upper));
+            if (b_min <= 0 && b_max >= 0) {
+                CHECK_THROWS(arithmetic::divide(left, right, work));
+            } else {
+                const auto quotient = arithmetic::divide(left, right, work);
+                const auto all_quotients =
+                    arithmetic::corner_enclosure(left, right, arithmetic::quotient_enclosure);
+                CHECK(rational(quotient.lower) == rational(all_quotients.lower));
+                CHECK(rational(quotient.upper) == rational(all_quotients.upper));
+            }
+        }
+    }
     const auto high = arithmetic::integer(1),
                low = arithmetic::scale(arithmetic::integer(1), -9000);
     const auto sum = arithmetic::add(high, low, work);
