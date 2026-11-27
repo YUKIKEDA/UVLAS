@@ -209,13 +209,18 @@ inline Bound root_bound(const Bound& input, bool upper, Work& work) {
     const auto shift = static_cast<std::int64_t>(input.power) + 512 - 2 * t;
     const Integer a = input.mantissa << static_cast<unsigned>(shift);
     Integer root = 0;
+    Integer square = 0;
     for (int bit = 256; bit >= 0; --bit) {
         work.step();
-        const Integer candidate = root + (Integer{1} << static_cast<unsigned>(bit));
-        if (candidate * candidate <= a)
-            root = candidate;
+        const auto i = static_cast<unsigned>(bit);
+        // (root + 2^i)^2 = root^2 + 2^(i+1) root + 2^(2i).
+        auto candidate_square = square + (root << (i + 1U)) + (Integer{1} << (2U * i));
+        if (candidate_square <= a) {
+            root += Integer{1} << i;
+            square = std::move(candidate_square);
+        }
     }
-    if (upper && root * root != a)
+    if (upper && square != a)
         ++root;
     return rounded(root, exponent(t - 256), upper);
 }

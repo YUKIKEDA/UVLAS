@@ -127,6 +127,48 @@ TEST_CASE("P1 interval corners round products and quotients in both directions",
     CHECK(work.used == 2 * intervals.size() * intervals.size() + 1);
 }
 
+TEST_CASE("Binary root trials preserve adjacent endpoints and exact equality",
+          "[UI-D06][N4-06][verification]") {
+    using arithmetic::Bound;
+    using arithmetic::Integer;
+    using arithmetic::Interval;
+    const std::array inputs{Bound{1, 0}, Bound{2, 0}, Bound{3, -1074},
+                            Bound{(Integer{1} << 256U) - 1, -254}};
+    arithmetic::Work work{0, inputs.size() * 514, {}};
+    for (const auto& input : inputs) {
+        const auto result = arithmetic::square_root(Interval{input, input}, work);
+        const auto exact = exact_bound(input);
+        const auto lower = exact_bound(result.lower);
+        const auto upper = exact_bound(result.upper);
+        const boost::multiprecision::cpp_rational next =
+            lower + exact_bound(Bound{1, result.lower.power});
+        CHECK(lower * lower <= exact);
+        CHECK(upper * upper >= exact);
+        CHECK(next * next > exact);
+        if (lower * lower == exact)
+            CHECK(upper == lower);
+        else
+            CHECK(upper == next);
+    }
+    CHECK(work.used == inputs.size() * 514);
+
+    // A square integer quotient does not imply equality for the original ratio.
+    const ExactInteger denominator = ExactInteger{1} << 600U;
+    LocalRootScratch scratch;
+    LocalWork local{0, 514, {}};
+    const auto exact = LocalBounds::root(denominator, denominator, 0, false,
+                                         core::Precision::TwoWord, scratch, local);
+    REQUIRE(exact);
+    const auto remainder = LocalBounds::root(denominator + 1, denominator, 0, false,
+                                             core::Precision::TwoWord, scratch, local);
+    REQUIRE(remainder);
+    CHECK(center(*exact) == 1.);
+    CHECK(exact->radius() == 0.);
+    CHECK(center(*remainder) == 1.);
+    CHECK(remainder->radius() == 0x1p-256);
+    CHECK(local.used == 514);
+}
+
 TEST_CASE("Product Gauss brackets match independently isolated exact Sturm roots",
           "[UI-D02][N4-06][verification]") {
     std::ifstream input{UVLAS_P1_GAUSS_FIXTURE};
