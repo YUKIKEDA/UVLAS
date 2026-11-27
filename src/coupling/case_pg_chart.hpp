@@ -36,6 +36,30 @@ namespace case_pg_chart_detail {
 struct Builder;
 }
 
+/// Synchronous borrow of a conditioned Shell from its owning Case preparation.
+class CaseStaticPgPointPatch {
+public:
+    [[nodiscard]] numerics::PatchId shell() const noexcept {
+        return shell_;
+    }
+    [[nodiscard]] io::SchemaIdentity source() const noexcept {
+        return source_;
+    }
+    [[nodiscard]] const structure::PgPreparedPatch& patch() const noexcept {
+        return patch_;
+    }
+
+private:
+    friend class CaseComponentPgChart;
+    friend struct case_pg_chart_detail::Builder;
+    CaseStaticPgPointPatch(io::SchemaIdentity source, numerics::PatchId shell,
+                           const structure::PgPreparedPatch& patch) noexcept
+        : source_(source), shell_(shell), patch_(patch) {}
+    io::SchemaIdentity source_;
+    numerics::PatchId shell_;
+    const structure::PgPreparedPatch& patch_;
+};
+
 class CaseComponentPgChart {
 public:
     CaseComponentPgChart(CaseComponentPgChart&&) noexcept = default;
@@ -48,6 +72,8 @@ public:
         patch(core::Index) const& noexcept;
     [[nodiscard]] core::Result<const structure::PgPreparedPatch*>
         patch(core::Index) const&& = delete;
+    [[nodiscard]] core::Result<CaseStaticPgPointPatch> point_patch(core::Index) const& noexcept;
+    [[nodiscard]] core::Result<CaseStaticPgPointPatch> point_patch(core::Index) const&& = delete;
     [[nodiscard]] const structure::PgComponentSparseChart& chart() const& noexcept {
         return chart_;
     }
@@ -55,9 +81,11 @@ public:
 
 private:
     friend struct case_pg_chart_detail::Builder;
-    CaseComponentPgChart(core::PlannedBuffer<std::optional<structure::PgPreparedPatch>>&& patches,
+    CaseComponentPgChart(io::SchemaIdentity source,
+                         core::PlannedBuffer<std::optional<structure::PgPreparedPatch>>&& patches,
                          structure::PgComponentSparseChart&& chart) noexcept
-        : patches_(std::move(patches)), chart_(std::move(chart)) {}
+        : source_(source), patches_(std::move(patches)), chart_(std::move(chart)) {}
+    io::SchemaIdentity source_;
     core::PlannedBuffer<std::optional<structure::PgPreparedPatch>> patches_;
     structure::PgComponentSparseChart chart_;
 };

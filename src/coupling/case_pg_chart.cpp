@@ -581,6 +581,21 @@ CaseComponentPgChart::patch(core::Index i) const& noexcept {
     return std::unexpected(core::Failure{FailureCode::InvalidInput, operation});
 }
 
+core::Result<CaseStaticPgPointPatch>
+CaseComponentPgChart::point_patch(core::Index i) const& noexcept {
+    const auto selected = patch(i);
+    if (!selected)
+        return std::unexpected(selected.error());
+    const auto layout = chart_.original().layout();
+    const auto index = static_cast<std::size_t>(i);
+    const auto info = (*selected)->info();
+    if (!info)
+        return std::unexpected(info.error());
+    if (index >= layout.size() || layout[index].basis != info->identity)
+        return std::unexpected(core::Failure{FailureCode::StaleGeneration, operation});
+    return CaseStaticPgPointPatch{source_, layout[index].id, **selected};
+}
+
 core::Result<void> CasePgChart::prepare_numerical(const numerics::linear::Scales& forward,
                                                   const numerics::linear::Scales& transpose,
                                                   const pg::PgChartCandidatePreparation& request,
@@ -672,8 +687,8 @@ Builder::prepare(const io::SiCase& source, std::span<const CasePgRuleBinding> ru
 
                 Input input{source, {limits.trace.arithmetic, plan}, limits.maximum_input_work};
                 input.step();
-                const auto model = partition_take(partition_take(source.source_case()).get().root())
-                                       .model.record();
+                const auto& typed_case = partition_take(source.source_case()).get();
+                const auto model = partition_take(typed_case.root()).model.record();
                 const auto source_count = partition_add(model.joints.size(), model.supports.size());
                 if (rules.empty() || rules.size() != model.shells.size())
                     partition_fail(FailureCode::InvalidInput);
@@ -794,6 +809,7 @@ Builder::prepare(const io::SiCase& source, std::span<const CasePgRuleBinding> ru
                                       selected.patch, std::nullopt);
                 }
                 if constexpr (use_points) {
+                    const auto identity = partition_take(typed_case.identity());
                     auto point_rows =
                         input.allocate<std::optional<CaseStaticPgPointRow>>(point_count);
                     auto point_storage = input.views<pg::PgConstraintPointBinding>(point_count);
@@ -833,8 +849,11 @@ Builder::prepare(const io::SiCase& source, std::span<const CasePgRuleBinding> ru
                             evidence != nullptr
                                 ? assemble_case_nastran_static_point_row(*evidence, basis,
                                                                          row_limits, plan)
-                                : assemble_case_static_pg_point_row(source, *point, shell, basis,
-                                                                    row_limits, plan)));
+                                : assemble_case_static_pg_point_row(
+                                      source, *point,
+                                      CaseStaticPgPointPatch{identity, patch_bindings[patch].id,
+                                                             basis},
+                                      row_limits, plan)));
                         point_work.charge(row.call_info.scalar_operations);
                         point_work.visit(row.call_info.partition_visits);
                         live = partition_add(live, partition_add(row.terms.size(), 3));
@@ -857,7 +876,7 @@ Builder::prepare(const io::SiCase& source, std::span<const CasePgRuleBinding> ru
                     auto chart = partition_take(pg::PgComponentSparseChart::prepare(
                         std::move(original), chart_limits, workspace, plan));
                     input.step(0);
-                    return Chart{std::move(patches), std::move(chart)};
+                    return Chart{identity, std::move(patches), std::move(chart)};
                 } else {
                     auto original = partition_take(pg::PgGlobalConstraints::prepare(
                         {patch_bindings, rules.size()}, {trace_bindings, k}, limits.constraints,

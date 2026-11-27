@@ -1,6 +1,7 @@
 #include "case_nastran_static_point_support.hpp"
 
 #include "case_material_reference.hpp"
+#include "case_pg_chart.hpp"
 #include "io/nastran_support_selection.hpp"
 #include "io/si_case_detail.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
@@ -484,14 +485,15 @@ core::Result<CaseStaticPgPointRow> assemble_case_nastran_static_point_row(
                               patch, limits, plan);
 }
 
-core::Result<CaseStaticPgPointRow>
-assemble_case_static_pg_point_row(const io::SiCase& si, const s::SupportConstraint& support,
-                                  in::MeshShellId shell, const structure::PgPreparedPatch& patch,
-                                  const structure::PgReferenceLimits& limits,
-                                  core::ResourcePlan& plan) noexcept {
+core::Result<CaseStaticPgPointRow> assemble_case_static_pg_point_row(
+    const io::SiCase& si, const s::SupportConstraint& support, const CaseStaticPgPointPatch& bound,
+    const structure::PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
     return ref::partition_entry([&]() -> core::Result<CaseStaticPgPointRow> {
         Query query{{limits, plan}, nullptr, {}};
-        query.math.admit();
+        query.math.cancel();
+        const auto identity = partition_take(partition_take(si.source_case()).get().identity());
+        if (!in::same_identity(identity, bound.source()))
+            query.reject(Reason::Binding, Code::StaleGeneration);
         const auto target = support.target.record();
         const auto member = target.target.record();
         using Target = decltype(member.kind.selected());
@@ -499,8 +501,9 @@ assemble_case_static_pg_point_row(const io::SiCase& si, const s::SupportConstrai
         if (member.kind.selected() != Target::ItemShell ||
             target.side.selected() != Side::ItemInterior)
             query.reject(Reason::Position, Code::Unsupported);
-        if (member.id.unsigned_value() != shell.value())
+        if (member.id.unsigned_value() != bound.shell().value())
             query.reject(Reason::Position, Code::InvalidInput);
+        query.math.admit();
         require_static(query, si, support.motion.record());
         const auto coordinate = [&](core::Index i) {
             return query.exact(
@@ -516,8 +519,9 @@ assemble_case_static_pg_point_row(const io::SiCase& si, const s::SupportConstrai
         remaining.maximum_partition_visits -= query.math.partition_visits;
         query.math.reserve_nested_rationals(remaining.algebra, 2);
         auto row = partition_take(assemble_point_row(
-            {in::MeshSupportId{support.id.unsigned_value()}, shell, mask, chart, nullptr, nullptr},
-            patch, remaining, plan));
+            {in::MeshSupportId{support.id.unsigned_value()}, in::MeshShellId{bound.shell().value()},
+             mask, chart, nullptr, nullptr},
+            bound.patch(), remaining, plan));
         query.math.charge(row.call_info.scalar_operations);
         query.math.visit(row.call_info.partition_visits);
         row.call_info = query.math.info();

@@ -8,6 +8,8 @@
 
 namespace uvlas::coupling::detail {
 
+class CaseStaticPgPointPatch;
+
 struct CaseNastranPointSupportLimits {
     structure::PgReferenceLimits arithmetic;
     std::uint64_t maximum_terms{};
@@ -72,11 +74,9 @@ struct CaseStaticPgPointRow {
     const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
 
 /// Same static centre-surface point row when the Case itself supplies its target.
-[[nodiscard]] core::Result<CaseStaticPgPointRow>
-assemble_case_static_pg_point_row(const io::SiCase&, const io::schema::SupportConstraint&,
-                                  io::detail::MeshShellId, const structure::PgPreparedPatch&,
-                                  const structure::PgReferenceLimits&,
-                                  core::ResourcePlan&) noexcept;
+[[nodiscard]] core::Result<CaseStaticPgPointRow> assemble_case_static_pg_point_row(
+    const io::SiCase&, const io::schema::SupportConstraint&, const CaseStaticPgPointPatch&,
+    const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
 
 // Compare a homogeneous translational SPC selection to a static Case point support
 // on an original node of its qualified planar Shell. The result owns the evidence.

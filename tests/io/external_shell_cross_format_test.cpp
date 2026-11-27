@@ -1064,6 +1064,53 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
           fixture::take(entry->structural.chart().identity()));
     CHECK(std::ranges::equal(manual.chart().free_columns(),
                              entry->structural.chart().free_columns()));
+
+    auto pair_input = manual_input;
+    auto& pair_model = pair_input.field("model");
+    auto high_geometry = pair_model.field("geometry").elements.front();
+    high_geometry.set("id", fixture::string("6"));
+    high_geometry.field("frame").set("origin", fixture::json("[2,3,9]"));
+    pair_model.field("geometry").elements.push_back(std::move(high_geometry));
+    auto high_shell = pair_model.field("shells").elements.front();
+    high_shell.set("id", fixture::string("2"));
+    high_shell.set("geometry", fixture::string("6"));
+    high_shell.field("layers").elements.front().set("id", fixture::string("2"));
+    pair_model.field("shells").elements.push_back(std::move(high_shell));
+    auto high_support = pair_model.field("supports").elements.front();
+    high_support.set("id", fixture::string("2"));
+    high_support.field("target").field("target").set("id", fixture::string("2"));
+    pair_model.field("supports").elements.push_back(std::move(high_support));
+    const auto pair_case = convert(fixture::checked(pair_input), arithmetic.algebra, plan);
+    const std::array pair_rules{rules.front(),
+                                coupling::CasePgRuleBinding{2, rules.front().quadrature}};
+    const auto pair_limits = chart_preparation(preparation, 2, 2);
+    const auto pair_chart = fixture::take(coupling::prepare_case_component_pg_chart(
+        pair_case, pair_rules, pair_limits, workspace, plan));
+    const auto pair_source = fixture::take(pair_case.source_case());
+    const auto pair_model_record = fixture::take(pair_source.get().root()).model.record();
+    const auto condition = [&](core::Index index) {
+        return std::get<io::schema::SupportConstraint>(
+            fixture::take(pair_model_record.supports.at(index)).record());
+    };
+    const auto lower = condition(0), upper = condition(1);
+    const auto lower_patch = fixture::take(pair_chart.point_patch(0));
+    const auto upper_patch = fixture::take(pair_chart.point_patch(1));
+    const auto assemble = [&](const auto& point, const auto& bound_patch) {
+        return coupling::assemble_case_static_pg_point_row(pair_case, point, bound_patch,
+                                                           pair_limits.patch, plan);
+    };
+    CHECK(fixture::take(assemble(lower, lower_patch)).prescribed_metres[2] == oracle.r("5"));
+    CHECK(fixture::take(assemble(upper, upper_patch)).prescribed_metres[2] == oracle.r("9"));
+    const auto before_swap = plan.allocated_bytes();
+    const auto reject_swap = [&](const auto& point, const auto& wrong_patch) {
+        const auto swapped = assemble(point, wrong_patch);
+        REQUIRE_FALSE(swapped);
+        CHECK(swapped.error().code == Code::InvalidInput);
+    };
+    reject_swap(lower, upper_patch);
+    reject_swap(upper, lower_patch);
+    CHECK(plan.allocated_bytes() == before_swap);
+
     auto mixed_input = manual_input;
     auto edge = fixture::fragment("Support.trace_constraint");
     edge.set("id", fixture::json("\"2\""));

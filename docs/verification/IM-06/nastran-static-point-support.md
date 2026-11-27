@@ -43,3 +43,5 @@ GCC 14.2 Releaseの隔離ビルドで、疎消去を直接検査する段階の�
 MSVC 19.52とGCC 14.2のReleaseで、SPCADDの実BDF試験は各1,083アサーションが通った。両環境で `io.external_shell_cross_format`、`io.external_case_chart`、`structure.pg_full_trace`、`structure.pg_chart_candidate`、`coupling.case_structural_pg_support`、`coupling.case_pg_chart_entry` の6件が合格した。Windowsの未変更のJSONパーサーには、同じソースで構築したMSVC 19.51のオブジェクトを使った。
 
 GCC の隔離複製で Case が選ばない方向の成分検査を外すと、世界 $X,Z$ の負対照が通り、回帰試験は失敗した。ソースを復元してハッシュを照合し、再構築した同じ試験で92アサーションが合格した。変更した翻訳単位の clang-tidy と clang-format 21.1.2 も通過した。
+
+材料座標域をそろえた二つのShellを、高さ5 mと9 mに置いた。パッチ表からそれぞれを借りて点支持の行を評価すると、対応する高さが固定右辺に残った。借用するパッチを交換すると、どちらの向きでも新しい確保を行う前に `InvalidInput` を返した。
