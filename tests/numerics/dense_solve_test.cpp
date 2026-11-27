@@ -3,6 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <array>
+#include <bit>
 #include <cmath>
 #include <complex>
 #include <uvlas/numerics/dense_solve.hpp>
@@ -57,6 +58,40 @@ T low(const PrecisionBuffer<T>& values, std::size_t i) {
     if (auto* b = std::get_if<TwoWord<T>>(&values.storage()))
         return b->lo.values()[i];
     return {};
+}
+template <StorageScalar T>
+void check_worker_replay(const Solution<T>& serial, const Solution<T>& parallel) {
+    const auto same_bits = [](double left, double right) {
+        CHECK(std::bit_cast<std::uint64_t>(left) == std::bit_cast<std::uint64_t>(right));
+    };
+    const auto same_word = [&](T left, T right) {
+        if constexpr (std::same_as<T, double>) {
+            same_bits(left, right);
+        } else {
+            same_bits(left.real(), right.real());
+            same_bits(left.imag(), right.imag());
+        }
+    };
+    CHECK(serial.values().precision() == parallel.values().precision());
+    CHECK(serial.certificate().refinements() == parallel.certificate().refinements());
+    CHECK(serial.certificate().retention_path() == parallel.certificate().retention_path());
+    const auto first = high(serial.values()).values(), second = high(parallel.values()).values();
+    REQUIRE(first.size() == second.size());
+    for (std::size_t i = 0; i < first.size(); ++i) {
+        same_word(first[i], second[i]);
+        same_word(low(serial.values(), i), low(parallel.values(), i));
+    }
+    const auto first_metrics = serial.certificate().retained_columns();
+    const auto second_metrics = parallel.certificate().retained_columns();
+    REQUIRE(first_metrics.size() == second_metrics.size());
+    for (std::size_t i = 0; i < first_metrics.size(); ++i) {
+        same_bits(first_metrics[i].normalized_original_residual_upper,
+                  second_metrics[i].normalized_original_residual_upper);
+        same_bits(first_metrics[i].componentwise_backward_error_upper,
+                  second_metrics[i].componentwise_backward_error_upper);
+        same_bits(first_metrics[i].scaled_correction_upper,
+                  second_metrics[i].scaled_correction_upper);
+    }
 }
 struct Setup {
     core::ResourcePlan plan{1 << 24};
@@ -120,6 +155,20 @@ TEST_CASE("Dense pivoted LU agrees with an independent high precision original s
     auto solved = solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales, precision,
                                f.accuracy(), f.limits(3), *prepared, f.plan);
     REQUIRE(solved);
+    auto parallel_limits = f.limits(3);
+    parallel_limits.dense_residual_workers = 2;
+    auto parallel_prepared = DensePrepared::prepare(op, scales, parallel_limits, f.plan);
+    REQUIRE(parallel_prepared);
+    const auto parallel =
+        solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales, precision,
+                     f.accuracy(), parallel_limits, *parallel_prepared, f.plan);
+    REQUIRE(parallel);
+    check_worker_replay(*solved, *parallel);
+    parallel_limits.dense_residual_workers = 0;
+    const auto invalid = solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales,
+                                      precision, f.accuracy(), parallel_limits, *prepared, f.plan);
+    REQUIRE_FALSE(invalid);
+    CHECK(invalid.error().code == core::FailureCode::InvalidInput);
     auto expected = reference<Big>({{{0, 2, 1}, {1, -2, -3}, {3, -1, 2}}}, {-1, -4, 11});
     for (std::size_t i = 0; i < 3; ++i)
         CHECK(abs(Big(high(solved->values()).values()[i]) + Big(low(solved->values(), i)) -
@@ -218,6 +267,15 @@ TEST_CASE("Complex rank-two solve uses transpose without conjugation on both RHS
     auto solved = solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales, precision,
                                f.accuracy(), limits, *prepared, f.plan);
     REQUIRE(solved);
+    auto parallel_limits = limits;
+    parallel_limits.dense_residual_workers = 4;
+    auto parallel_prepared = UpdatedPrepared::prepare(op, scales, parallel_limits, f.plan);
+    REQUIRE(parallel_prepared);
+    const auto parallel =
+        solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales, precision,
+                     f.accuracy(), parallel_limits, *parallel_prepared, f.plan);
+    REQUIRE(parallel);
+    check_worker_replay(*solved, *parallel);
     const std::array expected{Complex{1, 1},  Complex{-2, 3}, Complex{2, -1},
                               Complex{-1, 2}, Complex{3, 0},  Complex{1, -4}};
     for (std::size_t i = 0; i < expected.size(); ++i)

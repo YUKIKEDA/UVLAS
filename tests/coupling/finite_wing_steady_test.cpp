@@ -1702,6 +1702,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             REQUIRE(rational_from_view(take(flow.source().jet.velocity(1))) == 0);
             selected.certified_closed_contour = true;
             selected.contour_workers = 4;
+            selected.solver_limits.dense_residual_workers = 4;
             selected.matrix_absolute = 6e-9;
             selected.original_absolute = .99 * std::abs(sin[sample].convert_to<double>()) *
                                          std::sqrt(static_cast<double>(count)) * 1e-11;
@@ -1764,6 +1765,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             if (selected.certified_closed_contour) {
                 auto parallel = selected;
                 parallel.contour_workers = 4;
+                parallel.solver_limits.dense_residual_workers = 4;
                 const auto repeated = take(cf::solve_discrete_circulation_loads(
                     input, write_loads, project_flow(), caps, parallel, *geometry_work, shared,
                     *local, *kernel, memory));

@@ -169,6 +169,7 @@ struct Limits {
     unsigned maximum_refinements;    ///< 0..5; promotion does not reset the count.
     BackendMemoryLimit
         backend_memory; ///< Explicit forecast/proven-bound request, readmitted per solve.
+    unsigned dense_residual_workers{1}; ///< 1..4 independent row ranges in a dense solve.
 };
 
 /// No condition estimate was evaluated for this operator.

@@ -8,9 +8,11 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <bit>
 #include <cmath>
 #include <limits>
+#include <thread>
 #include <type_traits>
 #include <uvlas/numerics/dense_solve.hpp>
 #include <variant>
@@ -26,9 +28,84 @@ using ComplexMatrix = Eigen::Matrix<Complex, Eigen::Dynamic, Eigen::Dynamic, Eig
 using RealLu = Eigen::PartialPivLU<RealMatrix, Index>;
 using ComplexLu = Eigen::PartialPivLU<ComplexMatrix, Index>;
 constexpr auto operation = core::Operation::SolveLinear;
+constexpr unsigned max_dense_residual_workers = 4;
 auto fail(FailureCode code) noexcept {
     return std::unexpected(core::Failure{code, operation});
 }
+
+// The same worker set serves all RHS columns, refinement rounds and projections.
+class DenseResidualTeam {
+public:
+    DenseResidualTeam() = default;
+    DenseResidualTeam(const DenseResidualTeam&) = delete;
+    DenseResidualTeam& operator=(const DenseResidualTeam&) = delete;
+    ~DenseResidualTeam() {
+        finished_.store(true, std::memory_order_relaxed);
+        generation_.fetch_add(1, std::memory_order_release);
+        generation_.notify_all();
+    }
+
+    Result<void> start(Index count) noexcept {
+        count_ = std::max(Index{1}, count);
+        try {
+            for (Index worker = 1; worker < count_; ++worker)
+                threads_[static_cast<std::size_t>(worker - 1)] =
+                    std::jthread([this, worker] { loop(worker); });
+        } catch (...) {
+            return fail(FailureCode::ResourceExceeded);
+        }
+        return {};
+    }
+
+    template <class F>
+    void run(const F& task) noexcept {
+        if (count_ == 1) {
+            task(0);
+            return;
+        }
+        task_ = &task;
+        invoke_ = [](const void* object, Index worker) noexcept {
+            (*static_cast<const F*>(object))(worker);
+        };
+        pending_.store(count_ - 1, std::memory_order_relaxed);
+        generation_.fetch_add(1, std::memory_order_release);
+        generation_.notify_all();
+        task(0);
+        // The completion counter carries the workers' writes back to this thread
+        // before it reduces the metrics or releases the borrowed task descriptor.
+        auto pending = pending_.load(std::memory_order_acquire);
+        while (pending != 0) {
+            pending_.wait(pending, std::memory_order_acquire);
+            pending = pending_.load(std::memory_order_acquire);
+        }
+    }
+
+    [[nodiscard]] Index count() const noexcept {
+        return count_;
+    }
+
+private:
+    void loop(Index worker) noexcept {
+        std::uint64_t seen = 0;
+        while (true) {
+            generation_.wait(seen, std::memory_order_acquire);
+            seen = generation_.load(std::memory_order_acquire);
+            if (finished_.load(std::memory_order_relaxed))
+                return;
+            invoke_(task_, worker);
+            if (pending_.fetch_sub(1, std::memory_order_acq_rel) == 1)
+                pending_.notify_one();
+        }
+    }
+
+    const void* task_{nullptr};
+    void (*invoke_)(const void*, Index) noexcept {nullptr};
+    Index count_{1};
+    std::atomic<Index> pending_{0};
+    std::atomic<std::uint64_t> generation_{0};
+    std::atomic<bool> finished_{false};
+    std::array<std::jthread, max_dense_residual_workers - 1> threads_;
+};
 template <class Value>
 Result<Value> with_context(Result<Value> result, const Context& context) noexcept {
     if (!result) {
@@ -593,7 +670,7 @@ Result<void> add_rhs(Accumulator& real, Accumulator& imag, Scalar value) noexcep
 template <StorageScalar Scalar, class Data>
 Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatrix<Scalar>* lo,
                       const Scales& scales, const Accuracy& accuracy,
-                      std::span<ColumnMetrics> metrics) noexcept {
+                      std::span<ColumnMetrics> metrics, DenseResidualTeam& team) noexcept {
     const Index n = hi.shape().rows, columns = hi.shape().columns;
     bool accepted = true;
     for (Index c = 0; c < columns; ++c) {
@@ -605,56 +682,80 @@ Result<bool> evaluate(Data& data, const DenseMatrix<Scalar>& hi, const DenseMatr
                 return std::unexpected(x.error());
             data.x_magnitude.values()[offset + static_cast<std::size_t>(j)] = *x;
         }
-        for (Index i = 0; i < n; ++i) {
-            const auto at = offset + static_cast<std::size_t>(i);
-            Accumulator real, imag;
-            auto first = add_rhs(real, imag, data.rhs_hi.values()[at]);
-            if (!first)
-                return std::unexpected(first.error());
-            auto second = add_rhs(real, imag, data.rhs_lo.values()[at]);
-            if (!second)
-                return std::unexpected(second.error());
-            auto bmag =
-                detail::actual_magnitude_bounds(data.rhs_hi.values()[at], data.rhs_lo.values()[at]);
-            if (!bmag)
-                return std::unexpected(bmag.error());
-            auto denominator = *bmag;
-            for (Index j = 0; j < n; ++j) {
-                const Scalar a = coefficient(data, i, j);
-                if (!finite(a))
-                    return fail(FailureCode::Nonfinite);
-                auto term = product(real, imag, a, entry(hi, j, c));
-                if (!term)
-                    return std::unexpected(term.error());
-                if (lo) {
-                    auto trailing = product(real, imag, a, entry(*lo, j, c));
-                    if (!trailing)
-                        return std::unexpected(trailing.error());
+        const auto rows = [&](Index first_row, Index last_row) noexcept -> Result<void> {
+            for (Index i = first_row; i < last_row; ++i) {
+                const auto at = offset + static_cast<std::size_t>(i);
+                Accumulator real, imag;
+                auto first = add_rhs(real, imag, data.rhs_hi.values()[at]);
+                if (!first)
+                    return std::unexpected(first.error());
+                auto second = add_rhs(real, imag, data.rhs_lo.values()[at]);
+                if (!second)
+                    return std::unexpected(second.error());
+                auto bmag = detail::actual_magnitude_bounds(data.rhs_hi.values()[at],
+                                                            data.rhs_lo.values()[at]);
+                if (!bmag)
+                    return std::unexpected(bmag.error());
+                auto denominator = *bmag;
+                for (Index j = 0; j < n; ++j) {
+                    const Scalar a = coefficient(data, i, j);
+                    if (!finite(a))
+                        return fail(FailureCode::Nonfinite);
+                    auto term = product(real, imag, a, entry(hi, j, c));
+                    if (!term)
+                        return std::unexpected(term.error());
+                    if (lo) {
+                        auto trailing = product(real, imag, a, entry(*lo, j, c));
+                        if (!trailing)
+                            return std::unexpected(trailing.error());
+                    }
+                    auto amag = detail::actual_magnitude_bounds(a, Scalar{});
+                    if (!amag)
+                        return std::unexpected(amag.error());
+                    denominator = detail::add_magnitudes(
+                        denominator,
+                        detail::multiply_magnitudes(
+                            *amag,
+                            data.x_magnitude.values()[offset + static_cast<std::size_t>(j)]));
                 }
-                auto amag = detail::actual_magnitude_bounds(a, Scalar{});
-                if (!amag)
-                    return std::unexpected(amag.error());
-                denominator = detail::add_magnitudes(
-                    denominator,
-                    detail::multiply_magnitudes(
-                        *amag, data.x_magnitude.values()[offset + static_cast<std::size_t>(j)]));
+                auto r = real.result();
+                if (!r)
+                    return std::unexpected(r.error());
+                if constexpr (std::same_as<Scalar, double>) {
+                    data.residual.values()[at] = r->value;
+                    data.residual_error.values()[at] = r->error;
+                } else {
+                    auto im = imag.result();
+                    if (!im)
+                        return std::unexpected(im.error());
+                    data.residual.values()[at] = {r->value, im->value};
+                    // L1 of component error enclosures is a sufficient complex-modulus bound.
+                    data.residual_error.values()[at] =
+                        detail::add_magnitudes({r->error, r->error}, {im->error, im->error}).upper;
+                }
+                data.denominator_lower.values()[at] = denominator.lower;
             }
-            auto r = real.result();
-            if (!r)
-                return std::unexpected(r.error());
-            if constexpr (std::same_as<Scalar, double>) {
-                data.residual.values()[at] = r->value;
-                data.residual_error.values()[at] = r->error;
-            } else {
-                auto im = imag.result();
-                if (!im)
-                    return std::unexpected(im.error());
-                data.residual.values()[at] = {r->value, im->value};
-                // L1 of component error enclosures is a sufficient complex-modulus bound.
-                data.residual_error.values()[at] =
-                    detail::add_magnitudes({r->error, r->error}, {im->error, im->error}).upper;
-            }
-            data.denominator_lower.values()[at] = denominator.lower;
+            return {};
+        };
+        const auto workers = team.count();
+        if (workers <= 1) {
+            const auto result = rows(0, n);
+            if (!result)
+                return std::unexpected(result.error());
+        } else {
+            // Each worker writes a disjoint slice. Each row consumes the same column
+            // order, and the final column metrics are reduced on the calling thread.
+            std::array<Result<void>, max_dense_residual_workers> results{};
+            const auto block = n / workers;
+            const auto rest = n % workers;
+            team.run([&](Index worker) noexcept {
+                const auto first = block * worker + std::min(worker, rest);
+                const auto last = first + block + static_cast<Index>(worker < rest);
+                results[static_cast<std::size_t>(worker)] = rows(first, last);
+            });
+            for (const auto& result : results)
+                if (!result)
+                    return std::unexpected(result.error());
         }
         auto candidate = detail::assess_candidate_column_metrics<Scalar>(
             n, data.residual.values().subspan(offset, size),
@@ -681,6 +782,9 @@ Result<Solution<Scalar>> solve(Data& data, const Rhs<Scalar>& rhs, const Scales&
                                const Precision<Scalar>& precision, const Accuracy& accuracy,
                                const Limits& limits, core::ResourcePlan& plan, Index rank,
                                ConditionDiagnostic condition) noexcept {
+    if (limits.dense_residual_workers == 0 ||
+        limits.dense_residual_workers > max_dense_residual_workers)
+        return fail(FailureCode::InvalidInput);
     const Index n = data.original.shape().rows, columns = rhs.values().shape().columns;
     auto valid =
         detail::check_solve_inputs(n, rank, data.context, rhs, scales, precision, accuracy, limits);
@@ -754,10 +858,14 @@ Result<Solution<Scalar>> solve(Data& data, const Rhs<Scalar>& rhs, const Scales&
             }
         }
     }
+    DenseResidualTeam team;
+    const auto started = team.start(std::min(static_cast<Index>(limits.dense_residual_workers), n));
+    if (!started)
+        return std::unexpected(started.error());
     unsigned refinements = 0;
     while (true) {
         auto assessed = evaluate(data, *hi, two ? &*lo : nullptr, scales, accuracy,
-                                 metadata->retained_columns.values());
+                                 metadata->retained_columns.values(), team);
         if (!assessed)
             return std::unexpected(assessed.error());
         if (*assessed)
@@ -860,7 +968,7 @@ Result<Solution<Scalar>> solve(Data& data, const Rhs<Scalar>& rhs, const Scales&
                     return fail(FailureCode::Nonfinite);
             }
         auto checked = evaluate(data, *projected, static_cast<const DenseMatrix<Scalar>*>(nullptr),
-                                scales, accuracy, metadata->returned_columns.values());
+                                scales, accuracy, metadata->returned_columns.values(), team);
         if (!checked)
             return std::unexpected(checked.error());
         if (!*checked)

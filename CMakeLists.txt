@@ -59,7 +59,7 @@ set(UVLAS_NUMERICS_SOURCES src/numerics/storage.cpp src/numerics/precision.cpp
 add_library(uvlas_numerics STATIC ${UVLAS_NUMERICS_SOURCES})
 uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
+target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2 Threads::Threads)
 
 # Exact reference algebra is a preparation component, separate from physical kernels.
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
@@ -247,7 +247,7 @@ if(BUILD_TESTING)
     uvlas_configure_target(uvlas_numerics_audit)
     uvlas_enable_allocation_audit(uvlas_numerics_audit)
     target_include_directories(uvlas_numerics_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2)
+    target_link_libraries(uvlas_numerics_audit PUBLIC uvlas_core_audit PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2 Threads::Threads)
     uvlas_require_audited_dependencies(uvlas_numerics_audit)
     add_library(uvlas_structure_audit STATIC ${UVLAS_STRUCTURE_SOURCES})
     uvlas_configure_target(uvlas_structure_audit)
