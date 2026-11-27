@@ -6,9 +6,9 @@
 #include "structure/pg_reference_arithmetic.hpp"
 
 #include <cmath>
+#include <memory>
 #include <memory_resource>
 #include <utility>
-#include <vector>
 
 namespace uvlas::coupling::detail {
 namespace {
@@ -66,27 +66,28 @@ void match_reference(const CaseMaterialChart& chart, const s::PgPreparedPatch& p
         if (std::holds_alternative<s::PgPartitionDomainSource>(edge.descriptor))
             ++domain_count;
     }
-    const auto bytes = partition_add(storage_bytes<s::PgPartitionLayer>(layers.size()),
-                                     storage_bytes<s::PgPartitionBoundary>(names.size()));
-    auto scratch = partition_take(
-        m.plan.allocate<std::byte>(partition_index(bytes), core::Operation::PrepareModel));
+    auto scratch = partition_take(m.plan.allocate<std::byte>(
+        partition_index(storage_bytes<s::PgPartitionLayer>(layers.size())),
+        core::Operation::PrepareModel));
     std::pmr::monotonic_buffer_resource resource{scratch.values().data(), scratch.size(),
                                                  std::pmr::null_memory_resource()};
-    std::pmr::vector<s::PgPartitionLayer> layer_view{&resource};
-    std::pmr::vector<s::PgPartitionBoundary> boundary_view{&resource};
-    layer_view.reserve(layers.size());
-    boundary_view.reserve(names.size());
-    for (const auto& layer : layers) {
+    auto* layer_view =
+        std::pmr::polymorphic_allocator<s::PgPartitionLayer>{&resource}.allocate(layers.size());
+    auto boundary_view = partition_take(m.plan.allocate<s::PgPartitionBoundary>(
+        partition_index(names.size()), core::Operation::PrepareModel));
+    for (std::size_t i = 0; i < layers.size(); ++i) {
         m.visit(1);
-        layer_view.emplace_back(layer.id, layer.lower, layer.upper);
+        const auto& layer = layers[i];
+        std::construct_at(layer_view + i, layer.id, layer.lower, layer.upper);
     }
-    for (const auto& name : names) {
+    for (std::size_t i = 0; i < names.size(); ++i) {
+        const auto& name = names[i];
         m.visit(partition_add(1, static_cast<std::uint64_t>(name.point_count)));
         const auto label = text.subspan(static_cast<std::size_t>(name.text_offset),
                                         static_cast<std::size_t>(name.text_count));
-        boundary_view.push_back({{label.data(), label.size()},
-                                 points.subspan(static_cast<std::size_t>(name.first_point),
-                                                static_cast<std::size_t>(name.point_count))});
+        boundary_view.values()[i] = {{label.data(), label.size()},
+                                     points.subspan(static_cast<std::size_t>(name.first_point),
+                                                    static_cast<std::size_t>(name.point_count))};
     }
     m.visit(partition_add(domain_count,
                           partition_add(thickness.vertices.size(), thickness.triangles.size())));
@@ -97,8 +98,8 @@ void match_reference(const CaseMaterialChart& chart, const s::PgPreparedPatch& p
         a.graph,
         points.first(domain_count),
         {thickness.vertices, thickness.triangles, thickness.values},
-        layer_view,
-        boundary_view,
+        {layer_view, layers.size()},
+        boundary_view.values(),
         {}};
     partition_take(b.partition.validate_for(expected));
     m.cancel();

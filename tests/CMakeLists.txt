@@ -1,11 +1,11 @@
 find_package(Catch2 3 CONFIG REQUIRED)
 
 # uvlas_add_test(<name> LABELS <label>... SOURCES <file>... [LIBS <target>...]
-#                [TIMEOUT <s>] [CONFIGURATIONS <configuration>...])
-# One executable is one CTest test. Labels: unit | property | integration |
+#                [TIMEOUT <s>] [TEST_SPEC <Catch2 filter>] [CONFIGURATIONS <configuration>...])
+# A test normally runs its entire executable. Labels: unit | property | integration |
 # verification | negative, plus the acceptance case it serves (for example V-PG).
 function(uvlas_add_test name)
-    cmake_parse_arguments(arg "" "TIMEOUT" "LABELS;SOURCES;LIBS;CONFIGURATIONS" ${ARGN})
+    cmake_parse_arguments(arg "" "TIMEOUT;TEST_SPEC" "LABELS;SOURCES;LIBS;CONFIGURATIONS" ${ARGN})
     if(NOT arg_LABELS OR NOT arg_SOURCES)
         message(FATAL_ERROR "uvlas_add_test(${name}) needs LABELS and SOURCES")
     endif()
@@ -23,7 +23,11 @@ function(uvlas_add_test name)
     endif()
     # Single-config CTest normally has no -C argument. CONFIGURATIONS there
     # would silently omit even the matching Release test; select at configure time.
-    add_test(NAME ${name} COMMAND ${target} ${configuration_args})
+    set(test_args)
+    if(DEFINED arg_TEST_SPEC)
+        list(APPEND test_args "${arg_TEST_SPEC}")
+    endif()
+    add_test(NAME ${name} COMMAND ${target} ${test_args} ${configuration_args})
     if(NOT arg_TIMEOUT)
         set(arg_TIMEOUT 60)
     endif()
@@ -728,16 +732,22 @@ uvlas_require_audited_dependencies(uvlas_test_structure_pg_rank_preparation_reso
 uvlas_add_test(structure.pg_reference_geometry
     LABELS unit property negative verification V-PG
     TIMEOUT 180
+    TEST_SPEC "~[pg-r4-reference]~[pg-r5-integrals]~[pg-r5-sides]"
     SOURCES structure/pg_reference_geometry_test.cpp
     LIBS uvlas_structure Boost::multiprecision)
 target_include_directories(uvlas_test_structure_pg_reference_geometry
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
-if(UVLAS_SANITIZERS AND NOT MSVC)
-    set_tests_properties(structure.pg_reference_geometry PROPERTIES TIMEOUT 600)
-else()
-    set_tests_properties(structure.pg_reference_geometry PROPERTIES
-        TIMEOUT "$<IF:$<CONFIG:Debug>,360,180>")
+set(pg_reference_timeout "$<IF:$<CONFIG:Debug>,360,180>")
+if(UVLAS_SANITIZERS)
+    set(pg_reference_timeout 600)
 endif()
+set_tests_properties(structure.pg_reference_geometry PROPERTIES TIMEOUT ${pg_reference_timeout})
+foreach(series IN ITEMS r4-reference r5-integrals r5-sides)
+    set(test_name structure.pg_reference_geometry.${series})
+    add_test(NAME ${test_name} COMMAND uvlas_test_structure_pg_reference_geometry "[pg-${series}]")
+    set_tests_properties(${test_name} PROPERTIES
+        LABELS "property;verification;V-PG" TIMEOUT ${pg_reference_timeout})
+endforeach()
 
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG
@@ -943,10 +953,12 @@ target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests" "${PROJECT_SOURCE_DIR}/src/structure")
 target_compile_definitions(uvlas_test_coupling_case_uniform_flow PRIVATE
     UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json")
+# Debug CI exhausted the previous 60 s and 120 s limits.
+set_tests_properties(coupling.case_uniform_flow PROPERTIES
+    TIMEOUT "$<IF:$<CONFIG:Debug>,300,60>")
 if(MSVC)
-    # The full MSVC Debug test including PG material preparation took 79 s locally.
-    set_tests_properties(coupling.case_uniform_flow PROPERTIES
-        TIMEOUT "$<IF:$<CONFIG:Debug>,120,60>")
+    # The nested exact interval load fixture exhausts the 1 MiB PE default in Debug.
+    target_link_options(uvlas_test_coupling_case_uniform_flow PRIVATE "$<$<CONFIG:Debug>:/STACK:8388608>")
 endif()
 
 uvlas_add_test(coupling.case_motion
