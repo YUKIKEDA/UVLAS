@@ -1134,28 +1134,88 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     CHECK(fixture::take(action.energy_joules.upper.compare(energy, arithmetic.algebra, plan)) >= 0);
     CHECK(action.tangent_action_newtons.size() == q0.size());
     const auto work_encloses = [&](std::span<const PgShellCartesianEnclosure> force,
+                                   std::span<const PgCartesianExactPosition> direction,
                                    const ExactRational& expected) {
         const auto& exact = arithmetic.algebra;
         ExactRational lo, hi;
-        REQUIRE(force.size() == stretch.size());
+        REQUIRE(force.size() == direction.size());
         for (std::size_t j = 0; j < force.size(); ++j) {
-            const auto& d = stretch[j][0];
-            const auto& bounds = force[j][0];
-            const bool negative = d.sign() < 0;
-            const auto a =
-                fixture::take(d.multiply(negative ? bounds.upper : bounds.lower, exact, plan));
-            const auto b =
-                fixture::take(d.multiply(negative ? bounds.lower : bounds.upper, exact, plan));
-            lo = fixture::take(lo.add(a, exact, plan));
-            hi = fixture::take(hi.add(b, exact, plan));
+            for (std::size_t i = 0; i < 3; ++i) {
+                const auto& d = direction[j][i];
+                const auto& bounds = force[j][i];
+                const bool negative = d.sign() < 0;
+                const auto a =
+                    fixture::take(d.multiply(negative ? bounds.upper : bounds.lower, exact, plan));
+                const auto b =
+                    fixture::take(d.multiply(negative ? bounds.lower : bounds.upper, exact, plan));
+                lo = fixture::take(lo.add(a, exact, plan));
+                hi = fixture::take(hi.add(b, exact, plan));
+            }
         }
         CHECK(fixture::take(lo.compare(expected, exact, plan)) <= 0);
         CHECK(fixture::take(hi.compare(expected, exact, plan)) >= 0);
     };
     // For one unit square with thickness 1/4, F11=2, E=1 and nu=0,
     // the directional work is (1/4)*P11 and (1/4)*dP11/dF11.
-    work_encloses(action.internal_force_newtons.values(), oracle.r("3", "4"));
-    work_encloses(action.tangent_action_newtons.values(), oracle.r("11", "8"));
+    work_encloses(action.internal_force_newtons.values(), stretch, oracle.r("3", "4"));
+    work_encloses(action.tangent_action_newtons.values(), stretch, oracle.r("11", "8"));
+
+    const auto& exact = arithmetic.algebra;
+    const auto one = oracle.r("1"), five = oracle.r("5");
+    // Augment the in-plane displacement by the through-thickness field Z-5.
+    for (std::size_t j = 0; j < q0.size(); ++j) {
+        const auto middle =
+            fixture::take(volume_patch.translation()[j].multiply(five, exact, plan));
+        stretch[j][2] = fixture::take(q0[j][2].subtract(middle, exact, plan));
+    }
+    constexpr std::string_view scale = "1000000000000000000000000000000000000000000";
+    const auto outer = oracle.r("69431844202973712388026755553595247452137", scale);
+    const auto inner = oracle.r("330009478207571867598667120448377656399712", scale);
+    using PointWeight = std::pair<ExactRational, ExactRational>;
+    // Four-point Gauss nodes and weights rounded at 42 decimal places.
+    const std::array<PointWeight, 4> gauss{
+        {{fixture::take(outer.clone(exact, plan)),
+          oracle.r("173927422568726928686531974610999703617674", scale)},
+         {fixture::take(inner.clone(exact, plan)),
+          oracle.r("326072577431273071313468025389000296382326", scale)},
+         {fixture::take(one.subtract(inner, exact, plan)),
+          oracle.r("326072577431273071313468025389000296382326", scale)},
+         {fixture::take(one.subtract(outer, exact, plan)),
+          oracle.r("173927422568726928686531974610999703617674", scale)}}};
+    const std::array<PointWeight, 7> seven{{{oracle.r("0"), oracle.r("41", "840")},
+                                            {oracle.r("1", "6"), oracle.r("216", "840")},
+                                            {oracle.r("1", "3"), oracle.r("27", "840")},
+                                            {oracle.r("1", "2"), oracle.r("272", "840")},
+                                            {oracle.r("2", "3"), oracle.r("27", "840")},
+                                            {oracle.r("5", "6"), oracle.r("216", "840")},
+                                            {oracle.r("1"), oracle.r("41", "840")}}};
+    const auto low = oracle.r("1", "6"), high = oracle.r("2", "3");
+    const std::array triangle{std::pair{&low, &low}, std::pair{&high, &low},
+                              std::pair{&low, &high}};
+    const auto mass_for_rule = [&](std::span<const PointWeight> depth_rule) {
+        std::vector<PgOwnedDiscreteVolumePoint> mass_rule;
+        for (std::size_t j = 0; j < volume_count; ++j) {
+            for (const auto& [u, v] : triangle) {
+                for (const auto& [z, w] : depth_rule) {
+                    mass_rule.push_back(
+                        {static_cast<core::Index>(j), fixture::take(u->clone(exact, plan)),
+                         fixture::take(v->clone(exact, plan)), fixture::take(z.clone(exact, plan)),
+                         fixture::take(w.multiply(low, exact, plan))});
+                }
+            }
+        }
+        const PgShellMassResolution mass_resolution{96, width, width};
+        const auto mass =
+            fixture::take(shell_volume.mass(lower_patch, mass_rule, {volume_id, stretch},
+                                            mass_resolution, pair_limits.patch, plan));
+        const auto quarter_mass = oracle.r("1", "4");
+        CHECK(fixture::take(mass.mass_kg.lower.compare(quarter_mass, exact, plan)) <= 0);
+        CHECK(fixture::take(mass.mass_kg.upper.compare(quarter_mass, exact, plan)) >= 0);
+        // Integral of X²+(Z-5)² over [2,3] × [3,4] × [5-1/8,5+1/8].
+        work_encloses(mass.action_kg_metres.values(), stretch, oracle.r("1217", "768"));
+    };
+    mass_for_rule(gauss);
+    mass_for_rule(seven);
     core::ResourcePlan no_allocation{0};
     const auto swapped_volume =
         shell_volume.elastic(upper_patch, {volume_id, stretched}, std::nullopt, resolution,

@@ -131,6 +131,12 @@ public:
             const structure::PgShellVolumeResolution&, const structure::PgReferenceLimits&,
             core::ResourcePlan&) const noexcept;
 
+    /// Use the Case's SI layer densities and the separately selected mass rule.
+    [[nodiscard]] core::Result<structure::PgShellMassVolumeAction>
+    mass(const CaseStaticPgPointPatch&, std::span<const structure::PgOwnedDiscreteVolumePoint>,
+         const structure::PgShellPatchDirection&, const structure::PgShellMassResolution&,
+         const structure::PgReferenceLimits&, core::ResourcePlan&) const noexcept;
+
 private:
     struct Sample {
         structure::PgOwnedDiscreteVolumePoint quadrature;
@@ -140,6 +146,9 @@ private:
     };
     CasePgShellVolume(io::SchemaIdentity, structure::PgPreparedPatchIdentity, std::uint64_t,
                       CasePgShellMaterials&&, core::PlannedBuffer<Sample>&&) noexcept;
+    [[nodiscard]] const structure::PgPreparedPatch&
+    checked_patch(const CaseStaticPgPointPatch&) const;
+    [[nodiscard]] std::uint64_t retained_slots() const;
 
     io::SchemaIdentity source_;
     structure::PgPreparedPatchIdentity patch_;

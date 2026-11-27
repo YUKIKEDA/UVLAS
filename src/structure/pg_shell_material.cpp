@@ -687,14 +687,24 @@ void require_full_rule(core::Index count, core::Index last) {
         partition_fail(invalid);
 }
 
-const PgShellVolumeSample& bound_sample(const PgShellVolumeSample& sample) noexcept {
-    return sample;
+template <class T>
+const T& bound_descriptor(const T& descriptor) noexcept {
+    return descriptor;
 }
 
-const PgShellVolumeSample& bound_sample(const std::optional<PgShellVolumeSample>& sample) {
-    if (!sample)
+template <class T>
+const T& bound_descriptor(const std::optional<T>& descriptor) {
+    if (!descriptor)
         partition_fail(invalid);
-    return *sample;
+    return *descriptor;
+}
+
+PgDiscreteVolumePoint quadrature_view(const PgDiscreteVolumePoint& p) noexcept {
+    return p;
+}
+
+PgDiscreteVolumePoint quadrature_view(const PgOwnedDiscreteVolumePoint& p) noexcept {
+    return {{p.volume, p.u, p.v, p.depth}, p.weight};
 }
 
 template <class Sample>
@@ -706,7 +716,7 @@ void validate_samples(const PgPreparedPatch& patch, std::span<const Sample> samp
     const auto count = detail::partition_index(volumes.size());
     core::Index previous = -1;
     for (const auto& slot : samples) {
-        const auto& sample = bound_sample(slot);
+        const auto& sample = bound_descriptor(slot);
         const auto volume = advance_volume(sample.quadrature, count, previous, math);
         const auto layer = static_cast<std::size_t>(volumes[volume].layer);
         if (sample.layer != layers[layer].id)
@@ -1078,7 +1088,7 @@ assemble_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& s
         const VolumeSum sum{bounds, resolution.fractional_bits};
         Bound energy;
         for (const auto& slot : samples) {
-            const auto& sample = bound_sample(slot);
+            const auto& sample = bound_descriptor(slot);
             math.visit(1);
             const auto keep_direction = direction ? detail::partition_mul(3, rank) : 0;
             auto point = partition_take(enclose_pg_shell_patch_point(
@@ -1141,11 +1151,12 @@ assemble_pg_shell_elastic_volume(const PgPreparedPatch& patch, const PgShellPatc
     return assemble_elastic_volume(patch, state, samples, direction, resolution, limits, plan);
 }
 
-core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
-    const PgPreparedPatch& patch, std::span<const PgDiscreteVolumePoint> samples,
-    std::span<const PgShellLayerDensity> densities, const PgShellPatchDirection& direction,
-    const PgShellMassResolution& resolution, const PgReferenceLimits& limits,
-    core::ResourcePlan& plan) noexcept {
+template <class Sample, class Density>
+static core::Result<PgShellMassVolumeAction>
+apply_consistent_mass(const PgPreparedPatch& patch, std::span<const Sample> samples,
+                      std::span<const Density> densities, const PgShellPatchDirection& direction,
+                      const PgShellMassResolution& resolution, const PgReferenceLimits& limits,
+                      core::ResourcePlan& plan) noexcept {
     return evaluate([&]() -> core::Result<PgShellMassVolumeAction> {
         using Code = core::FailureCode;
         ReferenceArithmetic math{limits, plan};
@@ -1166,14 +1177,14 @@ core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
             partition_fail(invalid);
         for (std::size_t i = 0; i < layers.size(); ++i) {
             math.visit(1);
-            if (densities[i].layer != layers[i].id ||
-                densities[i].kilograms_per_cubic_metre.sign() <= 0)
+            const auto& density = bound_descriptor(densities[i]);
+            if (density.layer != layers[i].id || density.kilograms_per_cubic_metre.sign() <= 0)
                 partition_fail(invalid);
         }
         const auto count = detail::partition_index(volumes.size());
         core::Index previous = -1;
         for (const auto& sample : samples)
-            static_cast<void>(advance_volume(sample, count, previous, math));
+            static_cast<void>(advance_volume(quadrature_view(sample), count, previous, math));
         require_full_rule(count, previous);
         math.admit(detail::partition_add(384, detail::partition_mul(17, rank)));
         auto action = partition_take(plan.allocate<PgShellCartesianEnclosure>(
@@ -1182,8 +1193,9 @@ core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
         const VolumeSum sum{bounds, resolution.fractional_bits};
         Bound mass;
         const auto kept = detail::partition_mul(9, rank); // Direction and action.
-        for (const auto& sample : samples) {
+        for (const auto& entry : samples) {
             math.visit(1);
+            const auto sample = quadrature_view(entry);
             const PgReferencePoint query{sample.point};
             auto row = partition_take(
                 patch.evaluate_reference(std::span{&query, 1}, remaining_limits(math, kept), plan));
@@ -1192,7 +1204,7 @@ core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
             const auto root = bounds.root(ref.g);
             const auto& volume = volumes[static_cast<std::size_t>(sample.point.volume)];
             const auto layer = static_cast<std::size_t>(volume.layer);
-            const auto& density = densities[layer].kilograms_per_cubic_metre;
+            const auto& density = bound_descriptor(densities[layer]).kilograms_per_cubic_metre;
             const auto weighted_density =
                 bounds.scale(volume_weight(ref, sample.weight, root, bounds), density);
             sum.add(mass, weighted_density);
@@ -1226,5 +1238,20 @@ core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
         return PgShellMassVolumeAction{info.identity, std::move(mass), std::move(action),
                                        math.info()};
     });
+}
+core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
+    const PgPreparedPatch& patch, std::span<const PgDiscreteVolumePoint> samples,
+    std::span<const PgShellLayerDensity> densities, const PgShellPatchDirection& direction,
+    const PgShellMassResolution& resolution, const PgReferenceLimits& limits,
+    core::ResourcePlan& plan) noexcept {
+    return apply_consistent_mass(patch, samples, densities, direction, resolution, limits, plan);
+}
+
+core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
+    const PgPreparedPatch& patch, std::span<const PgOwnedDiscreteVolumePoint> samples,
+    std::span<const std::optional<PgShellLayerDensity>> densities,
+    const PgShellPatchDirection& direction, const PgShellMassResolution& resolution,
+    const PgReferenceLimits& limits, core::ResourcePlan& plan) noexcept {
+    return apply_consistent_mass(patch, samples, densities, direction, resolution, limits, plan);
 }
 } // namespace uvlas::structure

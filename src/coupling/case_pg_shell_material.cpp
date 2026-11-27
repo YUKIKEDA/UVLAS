@@ -571,6 +571,23 @@ CasePgShellVolume::prepare(const io::SiCase& source, const CaseStaticPgPointPatc
     });
 }
 
+const pg::PgPreparedPatch&
+CasePgShellVolume::checked_patch(const CaseStaticPgPointPatch& bound) const {
+    const auto& patch = bound.patch();
+    if (bound.shell().value() != shell_ || !io::detail::same_identity(bound.source(), source_) ||
+        partition_take(patch.info()).identity != patch_)
+        partition_fail(FailureCode::StaleGeneration);
+    if (samples_.size() == 0)
+        partition_fail(FailureCode::InvalidInput);
+    return patch;
+}
+
+std::uint64_t CasePgShellVolume::retained_slots() const {
+    return pg::detail::partition_add(
+        material_slots(materials_),
+        pg::detail::partition_mul(samples_.size(), volume_sample_rationals));
+}
+
 core::Result<pg::PgShellElasticVolumeAction>
 CasePgShellVolume::elastic(const CaseStaticPgPointPatch& bound, const pg::PgShellPatchState& state,
                            const std::optional<pg::PgShellPatchDirection>& direction,
@@ -580,17 +597,10 @@ CasePgShellVolume::elastic(const CaseStaticPgPointPatch& bound, const pg::PgShel
     auto out = partition_entry([&]() -> core::Result<pg::PgShellElasticVolumeAction> {
         ReferenceArithmetic math{limits, memory};
         math.cancel();
-        const auto& patch = bound.patch();
-        if (bound.shell().value() != shell_ ||
-            !io::detail::same_identity(bound.source(), source_) ||
-            partition_take(patch.info()).identity != patch_ || state.patch != patch_ ||
-            (direction && direction->patch != patch_))
+        const auto& patch = checked_patch(bound);
+        if (state.patch != patch_ || (direction && direction->patch != patch_))
             partition_fail(FailureCode::StaleGeneration);
-        if (samples_.size() == 0)
-            partition_fail(FailureCode::InvalidInput);
-        const auto retained = pg::detail::partition_add(
-            material_slots(materials_),
-            pg::detail::partition_mul(samples_.size(), volume_sample_rationals));
+        const auto retained = retained_slots();
         auto rows = partition_take(memory.allocate<std::optional<pg::PgShellVolumeSample>>(
             partition_index(samples_.size()), core::Operation::EvaluateStructure));
         for (std::size_t i = 0; i < samples_.size(); ++i) {
@@ -607,6 +617,40 @@ CasePgShellVolume::elastic(const CaseStaticPgPointPatch& bound, const pg::PgShel
         }
         auto action = partition_take(pg::assemble_pg_shell_elastic_volume(
             patch, state, rows.values(), direction, resolution, remaining(math, retained), memory));
+        record_work(math, action.work);
+        action.work = math.info();
+        return action;
+    });
+    if (!out)
+        out.error().operation = core::Operation::EvaluateStructure;
+    return out;
+}
+core::Result<pg::PgShellMassVolumeAction> CasePgShellVolume::mass(
+    const CaseStaticPgPointPatch& bound, std::span<const pg::PgOwnedDiscreteVolumePoint> rule,
+    const pg::PgShellPatchDirection& direction, const pg::PgShellMassResolution& resolution,
+    const pg::PgReferenceLimits& limits, core::ResourcePlan& memory) const noexcept {
+    auto out = partition_entry([&]() -> core::Result<pg::PgShellMassVolumeAction> {
+        ReferenceArithmetic math{limits, memory};
+        math.cancel();
+        const auto& patch = checked_patch(bound);
+        if (direction.patch != patch_)
+            partition_fail(FailureCode::StaleGeneration);
+        if (direction.coefficients_metres.size() != partition_take(patch.info()).basis.rank)
+            partition_fail(FailureCode::InvalidInput);
+        const auto layers = materials_.layers();
+        const auto retained =
+            pg::detail::partition_add(retained_slots(), pg::detail::partition_mul(rule.size(), 4));
+        auto densities = partition_take(memory.allocate<std::optional<pg::PgShellLayerDensity>>(
+            partition_index(layers.size()), core::Operation::EvaluateStructure));
+        for (std::size_t i = 0; i < layers.size(); ++i) {
+            math.visit(1);
+            const auto& law = partition_take(materials_.law_for(partition_index(i))).get();
+            densities.values()[i].emplace(
+                pg::PgShellLayerDensity{layers[i].id, law.density_kg_m3()});
+        }
+        auto action = partition_take(
+            pg::apply_pg_shell_consistent_mass(patch, rule, densities.values(), direction,
+                                               resolution, remaining(math, retained), memory));
         record_work(math, action.work);
         action.work = math.info();
         return action;

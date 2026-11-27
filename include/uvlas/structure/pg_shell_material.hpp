@@ -298,6 +298,12 @@ apply_pg_shell_consistent_mass(const PgPreparedPatch&, std::span<const PgDiscret
                                const PgShellMassResolution&, const PgReferenceLimits&,
                                core::ResourcePlan&) noexcept;
 
+[[nodiscard]] core::Result<PgShellMassVolumeAction>
+apply_pg_shell_consistent_mass(const PgPreparedPatch&, std::span<const PgOwnedDiscreteVolumePoint>,
+                               std::span<const std::optional<PgShellLayerDensity>>,
+                               const PgShellPatchDirection&, const PgShellMassResolution&,
+                               const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
 /// Evaluate the whole input uncertainty in the fixed reference material frame.
 /// Require a positive natural metric throughout the initial strain enclosure.
 [[nodiscard]] core::Result<PgShellMaterialEnclosure>
