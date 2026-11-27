@@ -630,10 +630,11 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
         p::P1FaceStrengths{geometry.faces[0].id, std::array{wake_ids[2], wake_ids[2]}},
         bound_wake[1]};
     const auto prepare_mixed = [&](const p::P1ActionSource& source, auto maps, auto keys,
-                                   core::ResourcePlan& memory) {
+                                   core::ResourcePlan& memory,
+                                   const p::P1AssemblyLimits& caps = limits()) {
         return p::prepare_bound_wake_induction(
             source, maps, keys, {core::Precision::TwoWord, 1e-10},
-            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            {core::Precision::TwoWord, 1e-10, 1e-10}, caps, prepared.shared_workspace,
             *prepared.local_workspace, *prepared.kernel_workspace, memory);
     };
     for (const double z : {.75, 12.}) {
@@ -647,16 +648,19 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
         REQUIRE(kernel_steps > 0);
         REQUIRE(kernel_steps < tight.kernel.max_steps);
         tight.kernel.max_steps = kernel_steps;
+        tight.geometry.max_steps = UINT64_C(500000000);
         tight.steps = forecast.reserved_steps;
         const auto at_limit =
             test_geometry::take(p::forecast_bound_wake_induction(source, bound_wake, ids, tight));
         CHECK(at_limit.reserved_steps == forecast.reserved_steps);
+        core::ResourcePlan memory{forecast.payload_bytes};
+        const auto mixed =
+            test_geometry::take(prepare_mixed(source, bound_wake, ids, memory, tight));
+        const auto report = test_geometry::take(mixed.report());
+        CHECK(report.used_steps <= forecast.reserved_steps);
         --tight.kernel.max_steps;
         rejected(p::forecast_bound_wake_induction(source, bound_wake, ids, tight),
                  core::FailureCode::ResourceExceeded);
-        core::ResourcePlan memory{forecast.payload_bytes};
-        const auto mixed = test_geometry::take(prepare_mixed(source, bound_wake, ids, memory));
-        const auto report = test_geometry::take(mixed.report());
         CHECK(memory.allocated_bytes() == forecast.payload_bytes);
         CHECK(report.far_facets == (z > 1 ? 1 : 0));
         CHECK(report.cancelled_analytic_pairs == 1);

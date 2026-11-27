@@ -112,7 +112,7 @@ $$
 x=\sum_i\beta_i x_i,\quad dS=J(1-u)\,du\,dv
 $$
 
-でGauss–Legendre12×12と8×8、計208点を評価する。順はu外側/v内側/基底/xyz。各点でnormal/Jを含む13jetを作り、12次を返す。未解決時に黙って解析枝へ切り替えない。
+でGauss–Legendre12×12と8×8、計208点を評価する。順はu外側/v内側/基底/xyz。各点でnormal/Jを含む13jetを作り、12次を返す。求積座標と重みに依存しないnormal、J、半径と定数のjetは同じfacetと照会の中で一度だけ評価し、両次数で共用する。未解決時に黙って解析枝へ切り替えない。
 
 節点・重みは256bit dyadic区間の固定表。実装時に有理Sturm列で各Legendre根区間の一意性・全根被覆・順序を独立確認し、 $$ w_i=2/((1-z_i^2)P'_n(z_i)^2) $$ を囲む。[0,1]へ移した重みの和1と0〜2n−1次モーメント1/(k+1)の包含も検査する。binary64表を高精度へ拡張しただけの表を使わない。
 
@@ -128,10 +128,10 @@ $$
 
 ## 6. 全callのpayload・work・失敗保証
 
-容量は式の静的命令列から計算する。近接の全枝を持つP_near、farの1点を持つP_sample、定数/元位置/認定のP_setupを作る。共通の辺長・端点距離・normal/Jは全基底で共有し、各命令は既存結果のindexだけを読む。1命令1Jet13 slotを割り当て、使用済みslotの削減で容量を楽観化しない。各命令列の節点数をNとすると
+容量は式の静的命令列から計算する。近接の全枝を持つP_near、遠方の共通jetを持つP_far,setup、farの1点を持つP_sample、定数/元位置/認定のP_setupを作る。共通の辺長・端点距離・normal/Jは全基底で共有し、各命令は既存結果のindexだけを読む。1命令1Jet13 slotを割り当て、使用済みslotの削減で容量を楽観化しない。各命令列の節点数をNとすると
 
 $$
-S=\max(N(P_{\rm near}),N(P_{\rm sample})+18)+N(P_{\rm setup})
+S=\max(N(P_{\rm near}),N(P_{\rm far,setup})+N(P_{\rm sample})+18)+N(P_{\rm setup})
 $$
 
 がjetの同時slot上限である。18はGauss8/12各9累積jet。sampleは208点に再利用し、全点のjetを保持しない。Jet13は14区間、区間は2端点、端点は仮数/指数である。固定scalar scratchは各primitiveの命令列から同じ方法で求める最大slot R、元exact scratchも同時生存する元式命令から求めるEとする。全byteは
@@ -160,7 +160,7 @@ workの単位を区間基本演算1回、sqrtのbit候補1回、区間演算の�
 
 $$
 W(P_{\rm setup})+
-\max\{W(P_{\rm near}),208W(P_{\rm sample})+W(P_{\rm accumulation/check})\}
+\max\{W(P_{\rm near}),W(P_{\rm far,setup})+208W(P_{\rm sample})+W(P_{\rm accumulation/check})\}
 $$
 
 である。nearの各分岐は選ぶ一方のcostの最大を取り、未評価の枝を実課金しない。固定208点の各基底/xyzの加算もaccumulationに展開する。計画のsum/product/byte/indexを全てcheckedに計算する。

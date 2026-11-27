@@ -71,8 +71,7 @@ Shape build_maximum_shape() {
         maximum.work = std::max(maximum.work, contour.work);
     }
     p1::Program far{{}};
-    const auto output = p1::far_program(far);
-    (void)output;
+    const auto far_program = p1::far_program(far);
     const auto far_nodes = p1::checked_sum(far.count, 18);
     if (far_nodes > static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max()))
         throw p1::ArithmeticFailure{core::FailureCode::ResourceExceeded};
@@ -84,9 +83,10 @@ Shape build_maximum_shape() {
     // and one relative-budget multiplication. ell and ell^2 are prepared once.
     constexpr std::uint64_t comparison =
         42 * (UINT64_C(3) * 7 + 2 * scalar_root + 1) + scalar_root + 1;
-    maximum.work =
-        std::max(maximum.work, p1::checked_sum(p1::checked_product(208, far.work),
-                                               p1::checked_sum(accumulation, comparison)));
+    const auto quadrature_work = p1::checked_sum(
+        far_program.setup_work, p1::checked_product(208, far.work - far_program.setup_work));
+    maximum.work = std::max(
+        maximum.work, p1::checked_sum(quadrature_work, p1::checked_sum(accumulation, comparison)));
     maximum.work =
         p1::checked_sum(maximum.work, input_work + table_work + constant_work + result_work);
     return maximum;
@@ -556,13 +556,20 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             scratch.ln2_prepared = true;
         }
         p1::Program program{scratch.program.values()};
-        const auto output = bound ? p1::bound_program(program, options)
-                            : far ? p1::far_program(program)
-                                  : p1::near_program(program, options);
+        std::size_t sample_begin = 0;
+        const auto output = [&] {
+            if (!far) {
+                return bound ? p1::bound_program(program, options)
+                             : p1::near_program(program, options);
+            }
+            const auto far_output = p1::far_program(program);
+            sample_begin = far_output.sample_begin;
+            return far_output.output;
+        }();
         if (program.count > scratch.jets.size())
             return std::unexpected(failed(core::FailureCode::ResourceExceeded, context));
-        const auto evaluate = [&]() {
-            for (std::size_t i = 0; i < program.count; ++i)
+        const auto evaluate = [&](std::size_t begin, std::size_t end) {
+            for (std::size_t i = begin; i < end; ++i)
                 p1::evaluate_node(scratch.program.values()[i], scratch.jets.values(), i,
                                   scratch.input, -scale, scratch.pi, scratch.ln2, work);
         };
@@ -571,6 +578,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         if (far) {
             p1::build_rule(p1::gauss_8, scratch.low, work);
             p1::build_rule(p1::gauss_12, scratch.high, work);
+            evaluate(0, sample_begin);
             for (std::size_t i = 0; i < 18; ++i)
                 scratch.jets.values()[base + i].components.fill(p1::integer(0));
             for (std::size_t order = 0; order < 2; ++order) {
@@ -581,7 +589,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
                         scratch.input[14] = quadrature.nodes[j];
                         scratch.input[15] =
                             p1::multiply(quadrature.weights[i], quadrature.weights[j], work);
-                        evaluate();
+                        evaluate(sample_begin, program.count);
                         for (std::size_t component = 0; component < 9; ++component)
                             for (std::size_t jet = 0; jet < 14; ++jet) {
                                 auto& accumulator =
@@ -604,7 +612,7 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
             const auto ell = p1::square_root(p1::exact(scratch.temporary[4], -4296), work);
             diagnostic = p1::qualify_far(scratch.low_values, scratch.high_values, ell, scale, work);
         } else
-            evaluate();
+            evaluate(0, program.count);
         auto selected = P1Branch::Analytic;
         if (bound)
             selected = P1Branch::BoundContour;

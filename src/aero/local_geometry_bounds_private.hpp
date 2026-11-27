@@ -147,9 +147,8 @@ public:
         auto& a = scratch.integers[2];
         auto& b = scratch.integers[3];
         auto& root = scratch.integers[4];
-        auto& candidate = scratch.integers[5];
         auto& square = scratch.integers[6];
-        auto& product = scratch.integers[7];
+        auto& candidate_square = scratch.integers[7];
         n = numerator;
         d = denominator;
         if (n < 0 || d <= 0)
@@ -176,21 +175,27 @@ public:
         const auto common = std::min(boost::multiprecision::lsb(a), boost::multiprecision::lsb(b));
         a >>= common;
         b >>= common;
+        if (auto check = work.step(); !check)
+            return std::unexpected(check.error());
+        // Compare against floor(a/b). The remainder distinguishes exact roots.
+        auto& quotient = n;
+        auto& remainder = d;
+        boost::multiprecision::divide_qr(a, b, quotient, remainder);
         root = 0;
+        square = 0;
         for (int bit = 256; bit >= 0; --bit) {
-            if (auto check = work.step(); !check)
-                return std::unexpected(check.error());
-            candidate = 1;
-            candidate <<= static_cast<unsigned>(bit);
-            candidate += root;
-            square = candidate * candidate;
-            product = square * b;
-            if (product <= a)
-                root = candidate;
+            const auto i = static_cast<unsigned>(bit);
+            candidate_square = square + (root << (i + 1U)) + (ExactInteger{1} << (2U * i));
+            if (candidate_square <= quotient) {
+                root += ExactInteger{1} << i;
+                square = candidate_square;
+            }
+            if (bit != 0) {
+                if (auto check = work.step(); !check)
+                    return std::unexpected(check.error());
+            }
         }
-        square = root * root;
-        product = square * b;
-        const bool uncertain = product != a;
+        const bool uncertain = square != quotient || remainder != 0;
         if (negative)
             root = -root;
         return dyadic(root, exponent + t - 256, precision, scratch, uncertain);

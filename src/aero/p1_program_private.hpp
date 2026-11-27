@@ -287,26 +287,39 @@ inline Output bound_program(Program& p, const Options& options) {
     }
     return out;
 }
-inline Output far_program(Program& p) {
+struct FarOutput {
+    Output output;
+    std::size_t sample_begin{};
+    std::uint64_t setup_work{};
+};
+
+inline FarOutput far_program(Program& p) {
     const auto in = inputs(p);
-    const auto u = p.input(13), v = p.input(14), weight = p.input(15);
     const auto one = p.constant(1);
-    const std::array<Expression, 3> bary{(one - u) * (one - v), u, (one - u) * v};
+    const auto three = p.constant(3);
     const auto cross_product =
         cross(in.vertices[1] - in.vertices[0], in.vertices[2] - in.vertices[0]);
     const auto jac = norm(cross_product);
     const auto n = cross_product * (one / jac);
+    const auto radius_squared = in.radius * in.radius;
+    const auto twice_radius_squared = radius_squared * 2;
+    const auto four_pi = p.pi() * 4;
+    // These jets depend only on the facet and query, not on the Gauss point.
+    const auto sample_begin = p.count;
+    const auto setup_work = p.work;
+    const auto u = p.input(13), v = p.input(14), weight = p.input(15);
+    const std::array<Expression, 3> bary{(one - u) * (one - v), u, (one - u) * v};
     const auto point =
         in.vertices[0] * bary[0] + in.vertices[1] * bary[1] + in.vertices[2] * bary[2];
     const auto r = in.point - point;
-    const auto r2 = dot(r, r), den = r2 + in.radius * in.radius, rn = dot(r, n);
-    const auto kernel = (n * (r2 - in.radius * in.radius * 2) - r * (rn * 3)) *
-                        (jac * weight * (one - u) / (den * den * sqrt(den))) / (p.pi() * 4);
+    const auto r2 = dot(r, r), den = r2 + radius_squared, rn = dot(r, n);
+    const auto kernel = (n * (r2 - twice_radius_squared) - r * (rn * three)) *
+                        (jac * weight * (one - u) / (den * den * sqrt(den))) / four_pi;
     Output out;
     for (std::size_t k = 0; k < 3; ++k)
         for (std::size_t axis = 0; axis < 3; ++axis)
             out.nodes[3 * k + axis] = (kernel[axis] * bary[k]).index;
-    return out;
+    return {out, sample_begin, setup_work};
 }
 struct Jet {
     std::array<Interval, 14> components;
