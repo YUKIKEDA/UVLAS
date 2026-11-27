@@ -56,7 +56,7 @@ cmake --preset linux-release && cmake --build --preset linux-release && ctest --
 cmake --preset linux-sanitize && cmake --build --preset linux-sanitize && ctest --preset linux-sanitize
 ```
 
-`linux-sanitize` はAddressSanitizerとUndefinedBehaviorSanitizerを付けたDebug。コンパイラの指定など手元だけの設定は、追跡対象外の `CMakeUserPresets.json` に置く。共有Presetに開発機の絶対パスを書かない。
+`linux-sanitize` は、AddressSanitizerとUndefinedBehaviorSanitizerを付けたDebug。有限翼の全比較を試験時間内に実行するため、GCCの `-O1 -g1` を使う。コンパイラの指定など手元だけの設定は、追跡対象外の `CMakeUserPresets.json` に置く。共有Presetに開発機の絶対パスを書かない。
 
 ## ビルドの方針
 

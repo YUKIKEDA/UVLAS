@@ -43,7 +43,11 @@
       "name": "linux-sanitize",
       "inherits": "linux-base",
       "displayName": "Linux Debug with AddressSanitizer and UndefinedBehaviorSanitizer",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug", "UVLAS_SANITIZERS": "address,undefined" }
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS_DEBUG": "-O1 -g1",
+        "UVLAS_SANITIZERS": "address,undefined"
+      }
     }
   ],
   "buildPresets": [
