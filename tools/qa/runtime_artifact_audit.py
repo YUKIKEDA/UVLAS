@@ -86,8 +86,17 @@ if os.name == "nt":
     python_license = Path(sys.base_prefix) / "LICENSE.txt"
     notice_path = "base_python/LICENSE.txt"
 else:
-    python_license = Path("/usr/share/doc/python3.12/copyright")
-    notice_path = str(python_license)
+    base = Path(sys.base_prefix).resolve()
+    stdlib = Path(sysconfig.get_path("stdlib")).resolve()
+    if not stdlib.is_relative_to(base):
+        raise RuntimeError("CPython stdlib notice is outside the base interpreter")
+    packaged_notice = Path("/usr/share/doc/python3.12/copyright")
+    if base == Path("/usr") and packaged_notice.is_file():
+        python_license = packaged_notice
+        notice_path = str(python_license)
+    else:
+        python_license = stdlib / "LICENSE.txt"
+        notice_path = "stdlib/LICENSE.txt"
 try:
     notice_bytes = python_license.read_bytes()
 except OSError as error:
@@ -145,6 +154,29 @@ if os.name == "nt":
 
 print(json.dumps(result, sort_keys=True))
 """
+
+
+PYTHON_EXCEPTION_PROBE = """
+import importlib
+from pathlib import Path
+import sys
+
+module, source = map(Path, sys.argv[1:])
+sys.path.insert(0, str(module.parent))
+uvlas = importlib.import_module("_uvlas")
+if Path(uvlas.__file__).resolve() != module:
+    raise RuntimeError("Resolved a different extension")
+loaded = uvlas.load_case(source)
+if loaded.ok or loaded.failure.code != uvlas.FailureCode.InvalidInput:
+    raise RuntimeError("Malformed JSON did not return InvalidInput")
+print("Malformed JSON rejected.")
+"""
+
+# GLIBC's binding report distinguishes the caller from the selected provider.
+GNU_EXCEPTION_BINDING = re.compile(
+    r"^\s*\d+:\s*binding file (.+?) \[[0-9]+\] to (.+?) \[[0-9]+\]: "
+    r"normal symbol `_ZNSt13runtime_errorC1EPKc' \[GLIBCXX_3\.4\.21\]\s*$"
+)
 
 
 def require(condition: bool, message: str) -> None:
@@ -394,6 +426,62 @@ def verify_python(
     return tested
 
 
+def exception_provider(trace: Path, caller: Path) -> Path:
+    providers: set[Path] = set()
+    with trace.open(encoding="utf-8", errors="replace") as lines:
+        for line in lines:
+            binding = GNU_EXCEPTION_BINDING.match(line)
+            if binding is None or Path(binding[1]) != caller:
+                continue
+            provider = Path(binding[2])
+            require(provider.is_absolute(), f"Non-absolute exception provider for {caller.name}")
+            providers.add(provider.resolve(strict=True))
+    if len(providers) != 1:
+        raise RuntimeError(f"Expected one observed exception provider for {caller.name}")
+    return providers.pop()
+
+
+def audit_linux_exception_provider(
+    python: Path, cli: Path, extension: Path, stage: Path, env: dict[str, str], *, expected: str
+) -> dict[str, object]:
+    # The byte offset in the normal CLI diagnostic establishes parser entry.
+    source = stage / "invalid.json"
+    source.write_bytes(b'{"schema":x}')
+    runs = (
+        ("cli", cli, [str(cli), "validate", str(source)], 2, "validate: JSON document at byte 10"),
+        (
+            "extension",
+            extension,
+            [str(python), "-I", "-B", "-c", PYTHON_EXCEPTION_PROBE, str(extension), str(source)],
+            0,
+            "Malformed JSON rejected.",
+        ),
+    )
+    observations: dict[str, object] = {}
+    for name, caller, command, status, message in runs:
+        prefix = stage / f"binding-{name}"
+        result = run(
+            command, stage, {**env, "LD_DEBUG": "bindings", "LD_DEBUG_OUTPUT": str(prefix)}
+        )
+        report = result.stderr if name == "cli" else result.stdout
+        require(
+            result.returncode == status and report.strip() == message,
+            f"{name} did not reach the malformed JSON path: {result.stderr.strip()}",
+        )
+        traces = list(stage.glob(f"{prefix.name}.*"))
+        if len(traces) != 1:
+            raise RuntimeError(f"Expected one glibc loader binding trace for {name}")
+        provider = exception_provider(traces[0], caller)
+        observed = digest(provider)
+        require(
+            observed == expected,
+            f"{name} exception provider {provider.name} SHA-256 {observed} "
+            f"does not match {expected}",
+        )
+        observations[name] = {"file": provider.name, "sha256": observed}
+    return {"symbol": "std::runtime_error(char const*)@GLIBCXX_3.4.21", **observations}
+
+
 def audit(
     cli: Path,
     extension: Path,
@@ -403,7 +491,14 @@ def audit(
     commit: str,
     producer_manifest: Path,
     dumpbin: str,
+    linux_exception_provider_sha256: str | None = None,
 ) -> dict[str, object]:
+    if linux_exception_provider_sha256 is not None:
+        require(sys.platform == "linux", "The exception provider audit requires Linux/glibc")
+        require(
+            re.fullmatch(r"[0-9a-f]{64}", linux_exception_provider_sha256) is not None,
+            "Invalid expected exception provider SHA-256",
+        )
     # The audit interpreter is outside the build; never resolve a venv's python symlink.
     require(python.is_absolute(), "Use an absolute path to the fresh venv interpreter")
     producer = read_producer_manifest(producer_manifest, commit)
@@ -462,7 +557,7 @@ def audit(
             stage=stage,
             env=env,
         )
-        return {
+        report: dict[str, object] = {
             "platform": platform.system(),
             "producer_manifest_sha256": producer.sha256,
             "kernel_release": platform.release(),
@@ -474,6 +569,16 @@ def audit(
             "relocated_cli": {"build_info": banner, "invalid_option_status": negative.returncode},
             "relocated_python": python_info,
         }
+        if linux_exception_provider_sha256 is not None:
+            report["linux_parser_exception_runtime"] = audit_linux_exception_provider(
+                python,
+                staged_cli,
+                staged_extension,
+                stage,
+                env,
+                expected=linux_exception_provider_sha256,
+            )
+        return report
 
 
 def main() -> None:
@@ -483,6 +588,10 @@ def main() -> None:
     parser.add_argument("--commit", required=True)
     parser.add_argument("--producer-manifest", required=True, type=Path)
     parser.add_argument("--dumpbin", default="dumpbin")
+    parser.add_argument(
+        "--linux-exception-provider-sha256",
+        help="SHA-256 required for the libstdc++ provider of the JSON exception constructor",
+    )
     args = parser.parse_args()
     result = audit(
         args.cli,
@@ -492,6 +601,7 @@ def main() -> None:
         commit=args.commit,
         producer_manifest=args.producer_manifest,
         dumpbin=args.dumpbin,
+        linux_exception_provider_sha256=args.linux_exception_provider_sha256,
     )
     result["vcpkg_notice_sha256"] = notice_hashes(args.notices, args.vcpkg_share)
     print(json.dumps(result, indent=2, sort_keys=True))
