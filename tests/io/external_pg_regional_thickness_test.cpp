@@ -453,7 +453,7 @@ TEST_CASE("Whole-face thickness comparison charges inputs and reported copies to
 
     // With two original PSHELL baselines, 18 slots for the claim data and result
     // plus just one baseline slot must reject the pair before any allocation.
-    const auto both = required_estimate(arithmetic.algebra, 2 * (4 + 4 + 1 + 1));
+    const auto both = required_estimate(arithmetic.algebra, 2ULL * (4 + 4 + 1 + 1));
     limited.algebra.external_memory =
         ExactEstimateAdmission{required_estimate(arithmetic.algebra, 19)};
     REQUIRE(compare_external_pg_regional_thickness(evidence, reference, first, {limited, 2, 4, 1},
