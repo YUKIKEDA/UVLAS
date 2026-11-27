@@ -64,3 +64,16 @@ cmake -S . -B <build> -DUVLAS_FORMAL_HARMONIC_FIXTURE=<absolute-path-to-input>
 cmake --build <build> --target uvlas_test_coupling_finite_wing_drag_refinement_fw_v01_m2n4
 ctest --test-dir <build> --output-on-failure -R '^coupling[.]finite_wing_harmonic[.]k(005|020|080)$'
 ```
+
+## Ubuntu Release の正式格子結果
+
+Ubuntu 24.04.5、AMD Ryzen 7 8845HS、GCC 14.2.0 Release、空力コード `ed298b90` で検証した。
+正式入力は独立した2回の生成でバイト一致し、SHA-256は `5db7b5c9281c0554d2a207ff142900cae5313936e0116c48e94b9227f92b4430` だった。
+係数の組立と元残差の再評価に4ワーカーを指定した。下表の各行では、その格子の元の全行を評価した。
+
+| $k$ | 格子 | 運動 | 相対 L2 残差上限 | $F_z$ 合計相対誤差上限 | $M_y$ 合計相対誤差上限 |
+| ---: | --- | --- | ---: | ---: | ---: |
+| 0.05 | M128/N192 | 上下動 | `5.48599e-12` | 0.389861402% | 0.576421999% |
+| 0.05 | M128/N192 | ピッチ | `5.468895724281204e-12` | 0.400990141% | 0.586193279% |
+| 0.2 | M128/N192 | 上下動 | `4.91821e-12` | 0.514916073% | 0.749304905% |
+| 0.2 | M128/N192 | ピッチ | `4.785011012056122e-12` | 0.593372753% | 0.797811145% |
