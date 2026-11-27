@@ -44,9 +44,13 @@ private:
 
 /// One independent circulation column, keyed by its physical face identifier.
 struct P0BoundColumn {};
+/// A wake quadrilateral with one common strength throughout both children.
+struct ConstantWakeColumn {
+    P1StrengthId id;
+};
 /// Wake triangles hold three columns and wake quads hold their ordered L/R.
-using P1FaceColumns =
-    std::variant<std::array<P1StrengthId, 3>, std::array<P1StrengthId, 2>, P0BoundColumn>;
+using P1FaceColumns = std::variant<std::array<P1StrengthId, 3>, std::array<P1StrengthId, 2>,
+                                   P0BoundColumn, ConstantWakeColumn>;
 struct P1FaceStrengths {
     P1FaceStrengths() noexcept = default; ///< Empty staging slot filled before qualification.
     P1FaceStrengths(PhysicalFaceId physical, const P1FaceColumns& basis) noexcept
@@ -207,7 +211,7 @@ prepare_shared_p1(const P1ActionSource&, std::span<const P1FaceStrengths>,
                   const std::stop_token& = {}) noexcept;
 
 /// Forecast or prepare the UW-D01 mixed action. Bound quadrilaterals require
-/// P0BoundColumn, while wake faces retain their existing P1 scatter.
+/// P0BoundColumn. Wake faces declare their constant column or retain their P1 scatter.
 [[nodiscard]] AeroResult<P1AssemblyPlan>
 forecast_bound_wake_induction(const P1ActionSource&, std::span<const P1FaceStrengths>,
                               std::span<const P1StrengthId>, const P1AssemblyLimits&,

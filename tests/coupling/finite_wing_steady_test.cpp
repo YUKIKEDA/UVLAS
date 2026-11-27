@@ -1426,11 +1426,22 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                                  [edge](const auto& row) { return row.edge == edge; }))
             midpoint.emplace_back(edge, xyz({}));
     REQUIRE(midpoint.size() == nx * (2 * ny + 1));
-    std::vector<cf::DiscreteWakePanel> wake;
+    std::vector<cf::DiscreteWakePanel> wake, frozen_wake;
+    std::vector<a::TrailingEdgeRow> transfers;
     wake.reserve(ny);
-    for (std::size_t i = 0; i < ny; ++i)
-        wake.emplace_back(mesh.quads[count + i].facets[0], cf::AttachedWakeFront{},
-                          a::P1StrengthId{700 + i});
+    frozen_wake.reserve(ny);
+    transfers.reserve(ny);
+    for (std::size_t i = 0; i < ny; ++i) {
+        const auto facet = mesh.quads[count + i].facets[0];
+        wake.emplace_back(facet, cf::AttachedWakeFront{}, cf::SteadyWakeClosure{});
+        frozen_wake.emplace_back(facet, cf::AttachedWakeFront{}, a::P1StrengthId{700 + i});
+        const auto panel = take_global(contact.uvlm_quad(facet, 1'000'000));
+        const auto& attachment = panel.attachment;
+        if (!attachment)
+            FAIL("The fixed steady strip requires a trailing-edge transfer");
+        CHECK(attachment->bound_face == mesh.faces[count - ny + i].id);
+        transfers.push_back(*attachment);
+    }
 
     const std::vector<double> scales(count, 20.);
     const std::vector<ls::UnitDimensions> gamma_units(count, {2, 0, -1, 0, 0, 0, 0});
@@ -1478,19 +1489,10 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
         sin[sample] = rational_from_view(take(flow.source().jet.velocity(2))) / 20;
         cos[sample] = rational_from_view(take(flow.source().jet.velocity(0))) / 20;
 
-        // The independent fixed point supplies the downstream trace to the native
-        // conditional solve. Verify closure below with the retained native values.
-        std::vector<cf::FrozenWakeTrace> traces;
-        traces.reserve(ny);
-        for (std::size_t k = 0; k < ny; ++k) {
-            const Rat value =
-                sin[sample] * rational_word(gamma_prime.at(count - ny + k).get<double>());
-            traces.push_back({a::P1StrengthId{700 + k}, a::SingleWord{value.convert_to<double>()}});
-        }
         const cf::DiscreteNonpenetrationInput input{contact,
                                                     rows,
                                                     wake,
-                                                    {core::AcceptedStateId{2}, traces},
+                                                    {core::AcceptedStateId{2}, {}},
                                                     trial,
                                                     stamp,
                                                     p::RequestedSide::Automatic};
@@ -1540,11 +1542,36 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
             CHECK(abs(exact_word(held) - expected) <= tolerance);
             check_within(unpack(take(loads.primal().row(k)).original_residual), 0, tolerance);
             rows[k].circulation = held;
-            if (k >= count - ny)
-                traces[k - (count - ny)].strength = held;
         }
+        // Recheck the original sheet with independent, explicitly supplied
+        // downstream traces and the same retained two-word circulation.
+        std::vector<cf::FrozenWakeTrace> traces;
+        traces.reserve(ny);
+        for (std::size_t k = 0; k < ny; ++k) {
+            const auto& gamma = rows[count - ny + k].circulation;
+            const auto value =
+                transfers[k].coefficient == 1
+                    ? gamma
+                    : std::visit(
+                          [](const auto& word) -> a::ScalarWords {
+                              if constexpr (std::is_same_v<std::decay_t<decltype(word)>,
+                                                           a::SingleWord>)
+                                  return a::SingleWord{-word.value};
+                              else
+                                  return a::DoubleWord{-word.high, -word.low};
+                          },
+                          gamma);
+            traces.push_back({a::P1StrengthId{700 + k}, value});
+        }
+        const cf::DiscreteNonpenetrationInput check_input{contact,
+                                                          rows,
+                                                          frozen_wake,
+                                                          {core::AcceptedStateId{2}, traces},
+                                                          trial,
+                                                          stamp,
+                                                          p::RequestedSide::Automatic};
         const auto closure = take(cf::evaluate_discrete_nonpenetration(
-            input, project_flow(), caps, shared, *local, *kernel, memory));
+            check_input, project_flow(), caps, shared, *local, *kernel, memory));
         for (std::size_t k = 0; k < count; ++k)
             check_within(unpack(take(closure.row(k)).residual), 0, tolerance);
 

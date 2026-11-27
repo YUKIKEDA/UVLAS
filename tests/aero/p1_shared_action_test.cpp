@@ -731,6 +731,71 @@ TEST_CASE("Mixed induction follows the bound circulation contour and the wake sc
     }
 }
 
+TEST_CASE("A constant wake quad uses an analytic contour at near and far queries",
+          "[UW-D01][UW-D02][UW-D07][UI-D05][N4-06][verification]") {
+    GeometryFixture geometry;
+    geometry.share_by_alias();
+    Prepared prepared{geometry};
+    const std::array maps{
+        p::P1FaceStrengths{geometry.faces[0].id, p::ConstantWakeColumn{strength[2]}},
+        p::P1FaceStrengths{geometry.faces[1].id,
+                           std::array{strength[0], strength[1], strength[0]}}};
+    auto values = mu, deltas = direction_mu;
+    values[0] = values[1] = deltas[0] = deltas[1] = scalar(0);
+    const p::P1ActionDirection direction{direction_points, deltas, direction_query, word(.015625)};
+    for (const double z : {.75, 12.}) {
+        CAPTURE(z);
+        const auto query = prepared.query(geometry.query(z));
+        const p::P1ActionSource source{prepared.contact, query, {3, 5}};
+        const auto prepare = [&](const auto& columns) {
+            return test_geometry::take(p::prepare_bound_wake_induction(
+                source, columns, strength, {core::Precision::TwoWord, 1e-10},
+                {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+                *prepared.local_workspace, *prepared.kernel_workspace, prepared.memory));
+        };
+        const auto closed = prepare(maps);
+        const auto result = test_geometry::take(p::apply_shared_p1(
+            closed, source, values, direction, apply_steps, prepared.shared_workspace));
+        const auto transpose = test_geometry::take(p::adjoint_shared_p1(
+            closed, source, values, dual, apply_steps, prepared.shared_workspace, prepared.memory));
+        auto variable = maps;
+        variable[0].columns = std::array{strength[2], strength[2]};
+        if (z < 1) {
+            const auto baseline = prepare(variable);
+            const auto original = test_geometry::take(p::apply_shared_p1(
+                baseline, source, values, direction, apply_steps, prepared.shared_workspace));
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                const auto a = decode(result.velocity()[axis].real);
+                const auto b = decode(original.velocity()[axis].real);
+                CHECK(abs(a.center - b.center) <= a.radius + b.radius);
+            }
+        }
+        const auto value = ring(geometry, z, Big{0});
+        const Big h{"1e-25"};
+        const auto above = ring(geometry, z, h), below = ring(geometry, z, -h);
+        const auto& tangent = result.jvp();
+        const auto* tangent_values = tangent ? &*tangent : nullptr;
+        if (tangent_values == nullptr)
+            FAIL("Missing constant contour derivative");
+        for (std::size_t axis = 0; axis < 3; ++axis) {
+            const auto actual = decode(result.velocity()[axis].real);
+            const auto derivative = decode((*tangent_values)[axis].real);
+            const Big expected = value[axis] * high(values[2].real);
+            const Big expected_derivative =
+                (above[axis] - below[axis]) * high(values[2].real) / (2 * h) +
+                value[axis] * high(deltas[2].real);
+            CHECK(abs(actual.center - expected) <= actual.radius + Big{"1e-45"});
+            CHECK(abs(derivative.center - expected_derivative) <= derivative.radius + Big{"1e-45"});
+        }
+        const auto bound = test_geometry::take(transpose.strength(2));
+        const auto d = decode(bound.real);
+        Big expected = 0;
+        for (std::size_t axis = 0; axis < 3; ++axis)
+            expected += value[axis] * high(dual[axis].real);
+        CHECK(abs(d.center - expected) <= d.radius + Big{"1e-45"});
+    }
+}
+
 TEST_CASE("Mixed induction reuses unowned facet packets and bases",
           "[UW-D01][UW-D07][N4-06][verification]") {
     GeometryFixture geometry;

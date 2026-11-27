@@ -1087,9 +1087,10 @@ struct NonpenetrationBuilder {
                     leading = a::P1StrengthId::bound(entry.bound_face);
                 }
             }
-            const auto trailing = downstream != nullptr ? history(*downstream) : leading;
-            maps.values()[bound_count + i] =
-                a::P1FaceStrengths{panel.face, std::array{leading, trailing}};
+            const a::P1FaceColumns columns =
+                downstream != nullptr ? a::P1FaceColumns{std::array{leading, history(*downstream)}}
+                                      : a::P1FaceColumns{a::ConstantWakeColumn{leading}};
+            maps.values()[bound_count + i] = a::P1FaceStrengths{panel.face, columns};
         }
         if (attached != attachments.size())
             reject(core::FailureCode::InvalidInput);
