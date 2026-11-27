@@ -84,11 +84,14 @@ TEST_CASE("PG prepared patch reconstructs fixed physical position and translatio
     // This affine field deliberately mixes world x and y, with a separate
     // constant translation represented by the protected constant mode.
     std::vector<PgCartesianExactPosition> current(patch.reference_coordinates().size());
+    std::vector<PgCartesianExactPosition> stretch(current.size()), rigid_shift(current.size());
     for (std::size_t j = 0; j < current.size(); ++j) {
         const auto& xyz = patch.reference_coordinates()[j];
         const auto shift = q(patch.translation()[j]);
         current[j] = {as_rational(2 * q(xyz[0]) + q(xyz[1]) + 3 * shift),
                       as_rational(q(xyz[1]) - 4 * shift), as_rational(q(xyz[2]) + 5 * shift)};
+        stretch[j][0] = as_rational(q(xyz[0]));
+        rigid_shift[j][0] = as_rational(shift);
     }
     const PgShellPatchState affine_state{recorded.identity, current};
     const PgShellPatchState reference_state{recorded.identity, patch.reference_coordinates()};
@@ -170,6 +173,25 @@ TEST_CASE("PG prepared patch reconstructs fixed physical position and translatio
         encloses(material.second_pk_world_pascal[0], Q("15"));
         encloses(material.first_pk_world_pascal[0], Q("40"));
         encloses(material.cauchy_world_pascal[0], Q("105/2"));
+        // Vary F11 at fixed F12=1. Analytic differentiation of P for
+        // E_Y=10 and nu=0 gives dP11=60, dP12=20, dP21=5, dP22=0.
+        const auto action = take(linearize_pg_shell_material_point(
+            law, strain, axes, state, {recorded.identity, stretch}, caps, assembly));
+        encloses(action.first_pk_direction_pascal[0], Q("60"));
+        encloses(action.first_pk_direction_pascal[1], Q("20"));
+        encloses(action.first_pk_direction_pascal[3], Q("5"));
+        encloses(action.first_pk_direction_pascal[4], Q("0"));
+        const auto translation_action = take(linearize_pg_shell_material_point(
+            law, strain, axes, state, {recorded.identity, rigid_shift}, caps, assembly));
+        for (const auto& component : translation_action.first_pk_direction_pascal) {
+            CHECK(component.lower.sign() == 0);
+            CHECK(component.upper.sign() == 0);
+        }
+        auto wrong_direction = PgShellPatchDirection{recorded.identity, stretch};
+        wrong_direction.patch.bytes[0] ^= std::byte{1};
+        check_failure(linearize_pg_shell_material_point(law, strain, axes, state, wrong_direction,
+                                                        caps, none),
+                      core::FailureCode::StaleGeneration);
 
         auto rest =
             take(enclose_pg_shell_patch_point(patch, reference_state, queries[p], caps, assembly));

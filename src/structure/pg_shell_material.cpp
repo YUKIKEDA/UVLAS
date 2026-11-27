@@ -516,6 +516,55 @@ Tensor stress_tensor(const std::array<Bound, order>& stress, const Bound& sqrt_t
     }
     return tensor;
 }
+
+void add_gradient_column(std::array<PgReferenceScalar, 9>& gradient, std::size_t row,
+                         const PgReferenceVector& shape, const R& coefficient,
+                         ReferenceRadicals& exact) {
+    for (std::size_t column = 0; column < shape.size(); ++column) {
+        auto& entry = gradient[3 * row + column];
+        entry = exact.add(entry, exact.scale(shape[column], coefficient));
+    }
+}
+
+Tensor first_pk_derivative(const PgShellElasticLaw& law, const PgShellMaterialPointResponse& value,
+                           const Tensor& f, const Tensor& df, const MaterialBounds& bounds) {
+    auto& math = bounds.math;
+    const auto one = math.constant("1"), two = math.constant("2");
+    const auto half = math.div(one, two);
+    const auto sqrt_two = bounds.root(two);
+    const auto& axes = value.reference_axes;
+    const auto fa = multiply(f, axes, RightTensor::AsStored, bounds);
+    const auto dfa = multiply(df, axes, RightTensor::AsStored, bounds);
+    const std::array base_columns{column(fa, 0, math), column(fa, 1, math), column(fa, 2, math)};
+    const std::array delta_columns{column(dfa, 0, math), column(dfa, 1, math),
+                                   column(dfa, 2, math)};
+    const auto mandel_shear = bounds.scale(sqrt_two, half);
+    std::array<Bound, order> green, stress;
+    for (std::size_t k = 0; k < order; ++k) {
+        const auto [i, j] = mandel_axes[k];
+        auto derivative = dot(base_columns[i], delta_columns[j], bounds);
+        if (i != j)
+            derivative = bounds.multiply(
+                bounds.add(derivative, dot(delta_columns[i], base_columns[j], bounds)),
+                mandel_shear);
+        green[k] = std::move(derivative);
+    }
+    for (std::size_t i = 0; i < order; ++i) {
+        for (std::size_t j = 0; j < order; ++j) {
+            const auto stiffness = bounds.radical(law.stiffness()[i * order + j], sqrt_two);
+            stress[i] = bounds.add(stress[i], bounds.multiply(stiffness, green[j]));
+        }
+    }
+    const auto local_stress = stress_tensor(stress, sqrt_two, half, bounds);
+    const auto world_stress = multiply(multiply(axes, local_stress, RightTensor::AsStored, bounds),
+                                       axes, RightTensor::Transposed, bounds);
+    auto derivative = multiply(f, world_stress, RightTensor::AsStored, bounds);
+    const auto geometric =
+        multiply(df, value.second_pk_world_pascal, RightTensor::AsStored, bounds);
+    for (std::size_t k = 0; k < derivative.size(); ++k)
+        derivative[k] = bounds.add(derivative[k], geometric[k]);
+    return derivative;
+}
 } // namespace
 
 PgShellElasticLaw::PgShellElasticLaw(std::array<PgReferenceScalar, 36>&& stiffness, R&& density,
@@ -715,11 +764,7 @@ core::Result<PgShellPatchPoint> enclose_pg_shell_patch_point(const PgPreparedPat
                     continue;
                 const auto delta = math.sub(q[j][a], q0[j][a]);
                 position[a] = exact.add(position[a], exact.scale(shape.value, delta));
-                for (std::size_t b = 0; b < 3; ++b) {
-                    auto& entry = gradient[3 * a + b];
-                    entry =
-                        exact.add(entry, exact.scale(shape.physical_gradient_per_metre[b], delta));
-                }
+                add_gradient_column(gradient, a, shape.physical_gradient_per_metre, delta, exact);
             }
         }
         const MaterialBounds bounds{math};
@@ -758,6 +803,50 @@ enclose_pg_shell_material_point(const PgShellElasticLaw& law, const PgInitialGre
             axes);
         return enclose_pg_shell_material_point(law, input, source, point.deformation_gradient,
                                                point_limits, plan);
+    });
+}
+
+core::Result<PgShellMaterialPointLinearization> linearize_pg_shell_material_point(
+    const PgShellElasticLaw& law, const PgInitialGreenEnclosure& input,
+    const PgShellPointAxes& axes, const PgShellPatchPoint& point,
+    const PgShellPatchDirection& direction, const PgReferenceLimits& limits,
+    core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellMaterialPointLinearization> {
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        if (direction.patch != point.patch)
+            partition_fail(core::FailureCode::StaleGeneration);
+        const auto shapes = point.shapes.values();
+        if (direction.coefficients_metres.size() != shapes.size())
+            partition_fail(invalid);
+        auto value_limits = limits;
+        math.reserve_nested_rationals(value_limits.algebra,
+                                      detail::partition_mul(3, shapes.size()));
+        auto value = partition_take(
+            enclose_pg_shell_material_point(law, input, axes, point, value_limits, plan));
+        math.charge(value.material.work.scalar_operations);
+        math.visit(value.material.work.partition_visits);
+        math.admit(detail::partition_add(512, detail::partition_mul(11, shapes.size())));
+        std::array<PgReferenceScalar, 9> gradient;
+        const auto& g = point.reference.g;
+        ReferenceRadicals exact{math, g};
+        for (std::size_t j = 0; j < shapes.size(); ++j) {
+            math.visit(1);
+            for (std::size_t a = 0; a < 3; ++a) {
+                const auto& coefficient = direction.coefficients_metres[j][a];
+                if (coefficient.sign() != 0)
+                    add_gradient_column(gradient, a, shapes[j].physical_gradient_per_metre,
+                                        coefficient, exact);
+            }
+        }
+        const MaterialBounds bounds{math};
+        const auto root = bounds.root(g);
+        Tensor df;
+        for (std::size_t j = 0; j < df.size(); ++j)
+            df[j] = bounds.radical(gradient[j], root);
+        auto derivative = first_pk_derivative(law, value, point.deformation_gradient, df, bounds);
+        value.material.work = math.info();
+        return PgShellMaterialPointLinearization{std::move(value), std::move(derivative)};
     });
 }
 } // namespace uvlas::structure

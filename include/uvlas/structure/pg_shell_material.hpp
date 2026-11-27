@@ -177,6 +177,16 @@ struct PgShellMaterialPointResponse {
     PgShellTensorEnclosure cauchy_world_pascal;
 };
 
+struct PgShellPatchDirection {
+    PgPreparedPatchIdentity patch;
+    std::span<const PgCartesianExactPosition> coefficients_metres;
+};
+
+struct PgShellMaterialPointLinearization {
+    PgShellMaterialPointResponse value;
+    PgShellTensorEnclosure first_pk_direction_pascal;
+};
+
 /// Evaluate all stress measures at one point with positive det(F).
 /// F maps reference world increments to current world increments.
 [[nodiscard]] core::Result<PgShellMaterialPointResponse>
@@ -190,6 +200,14 @@ enclose_pg_shell_material_point(const PgShellElasticLaw&, const PgInitialGreenEn
 enclose_pg_shell_material_point(const PgShellElasticLaw&, const PgInitialGreenEnclosure&,
                                 const PgShellPointAxes&, const PgShellPatchPoint&,
                                 const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
+/// Differentiate P=F S along one coefficient direction at the same fixed
+/// material point, including both geometric and constitutive terms.
+[[nodiscard]] core::Result<PgShellMaterialPointLinearization>
+linearize_pg_shell_material_point(const PgShellElasticLaw&, const PgInitialGreenEnclosure&,
+                                  const PgShellPointAxes&, const PgShellPatchPoint&,
+                                  const PgShellPatchDirection&, const PgReferenceLimits&,
+                                  core::ResourcePlan&) noexcept;
 
 /// Evaluate the whole input uncertainty in the fixed reference material frame.
 /// Require a positive natural metric throughout the initial strain enclosure.
