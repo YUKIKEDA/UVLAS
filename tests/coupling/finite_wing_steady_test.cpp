@@ -34,6 +34,11 @@ namespace p = a::pchip;
 namespace cf = coupling::detail;
 
 constexpr std::uint64_t budget = std::uint64_t{1} << 48U;
+#ifdef UVLAS_FINITE_WING_FORMAL_PRODUCT
+constexpr bool formal_product = true;
+#else
+constexpr bool formal_product = false;
+#endif
 const p::PchipInputStamp stamp{p::PchipIssuerId{71}, p::PchipInputGeneration{8}};
 
 structure::ExactLimits exact_limits() noexcept {
@@ -1409,6 +1414,93 @@ void verify_prepared_contour(const FiniteWingMesh& mesh, const a::OwnedGeometry&
         check_bounds(candidate.first[axis], reference.velocity()[axis].real);
 }
 
+#ifdef UVLAS_FINITE_WING_FORMAL_PRODUCT
+void check_formal_product(const cf::DiscreteCirculationLoads& loads, const CaseLattice& grid,
+                          const FiniteWingMesh& mesh, const a::OwnedGeometry& geometry,
+                          const a::GlobalContactState& contact,
+                          std::span<const a::TrailingEdgeRow> transfers, const Rat& sine,
+                          const nlohmann::json& common_limit) {
+    const auto count = grid.collocation.size();
+    const auto ny = transfers.size();
+    const Rat density = rational_word(1.2);
+    const Rat sine_squared = sine * sine;
+    const auto force = unpack_vector(loads.total_force());
+    const auto axial = scale(force[0], Rat{1} / sine_squared);
+    const Rat trefftz =
+        trefftz_midpoint(loads.primal(), mesh, contact, grid.vertices, density, count, ny) /
+        sine_squared;
+    // The streamwise ambient term is the odd part of Fz under incidence reversal.
+    // Every closed bound ring has zero directed span displacement. With its trailing
+    // edge omitted from the loads, the remaining displacement is minus that edge's.
+    Rat trailing = 0;
+    for (std::size_t k = 0; k < ny; ++k) {
+        const auto panel = count - ny + k;
+        const auto te = transfers[k].edge;
+        const auto gamma = exact_word(words(loads.primal().solution(), panel));
+        std::size_t sides = 0;
+        for (const auto facet : mesh.quads[panel].facets) {
+            const auto edges = test_geometry::take(geometry.facet_edges(facet));
+            const auto turns = test_geometry::take(geometry.incidence(facet));
+            for (std::size_t side = 0; side < edges.size(); ++side) {
+                const auto edge = take_global(contact.uvlm_load_edge(edges[side], 1'000'000));
+                if (edge.edge != te)
+                    continue;
+                const auto y0 = grid.vertices.at(edge.endpoints[0].value() - 1)[1];
+                const auto y1 = grid.vertices.at(edge.endpoints[1].value() - 1)[1];
+                trailing +=
+                    gamma * static_cast<int>(turns[side]) * (rational_word(y1) - rational_word(y0));
+                ++sides;
+            }
+        }
+        REQUIRE(sides == 1);
+    }
+    const Rat near = axial.center + trailing * density * 20 / sine;
+    const Rat limit = rational_word(common_limit.at("reference_limit").get<double>());
+    const Rat uncertainty =
+        rational_word(common_limit.at("reference_relative_uncertainty").get<double>());
+    REQUIRE(trefftz > 0);
+    REQUIRE(limit > 0);
+    REQUIRE(uncertainty >= 0);
+    const Rat gap = (abs(near - trefftz) + axial.radius) / trefftz;
+    const Rat indicator = (abs(near - limit) + axial.radius) / limit + uncertainty;
+    const Rat threshold = Rat{1} / 100;
+    CHECK(gap <= threshold);
+    CHECK(indicator <= threshold);
+    const Rat finite_trefftz = rational_word(common_limit.at("candidate_trefftz").get<double>());
+    CHECK(abs(trefftz - finite_trefftz) < Rat{1} / 10'000'000);
+
+    // Verify the assumed lower bound on |n_z| with the actual input tangents.
+    const Rat minimum_normal = Rat{99} / 100;
+    const Rat normal_squared = minimum_normal * minimum_normal;
+    Rat residual_squared = 0;
+    for (std::size_t i = 0; i < count; ++i) {
+        const auto& tangents = grid.tangents[i];
+        CHECK(exact_word(tangents[0][1]) == 0);
+        CHECK(exact_word(tangents[0][2]) == 0);
+        const auto transverse = exact_word(tangents[1][1]);
+        const auto height = exact_word(tangents[1][2]);
+        REQUIRE(transverse != 0);
+        CHECK(normal_squared * (transverse * transverse + height * height) <=
+              transverse * transverse);
+        const auto row = unpack(take(loads.primal().row(i)).original_residual);
+        const Rat bound = abs(row.center) + row.radius;
+        residual_squared += bound * bound;
+    }
+    const Rat rhs_squared_lower = 400 * count * normal_squared * sine_squared;
+    const Rat residual_ratio_squared = residual_squared / rhs_squared_lower;
+    const Rat residual_budget = Rat{1} / UINT64_C(100000000000);
+    CHECK(residual_ratio_squared <= residual_budget * residual_budget);
+    std::cout << std::setprecision(17)
+              << "Formal midpoint drag N/rad^2, near=" << near.convert_to<double>()
+              << ", radius=" << axial.radius.convert_to<double>()
+              << ", Trefftz=" << trefftz.convert_to<double>()
+              << ", near/far gap=" << gap.convert_to<double>()
+              << ", ideal reference indicator=" << indicator.convert_to<double>()
+              << ", relative L2 residual ceiling="
+              << std::sqrt(residual_ratio_squared.convert_to<double>()) << '\n';
+}
+#endif
+
 void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                       const nlohmann::json& oracle, double length, double radius) {
     const auto m = oracle.at("chord_panels").get<core::Index>();
@@ -1479,7 +1571,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
     REQUIRE(topology.trailing_edges().size() == ny);
 
 #ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
-    if (m == 128) {
+    if (m == 128 && !formal_product) {
         verify_formal_wing_forecast(grid, mesh, geometry, contact, geometry_caps, ny,
                                     *geometry_work, memory);
         verify_formal_wing_contacts(grid, mesh, geometry, contact, geometry_caps, contact_caps,
@@ -1545,8 +1637,10 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
     const std::vector<ls::UnitDimensions> speed_units(count, {1, 0, -1, 0, 0, 0, 0});
     const cf::DiscreteCirculationRequest request{
         {scales, scales, gamma_units, speed_units, context(geometry.context())},
-        {order, 1, 0, 5, ls::EstimateAdmission{1U << 20U}},
-        {ls::Norm::Infinity, 1e-25, 0., 1e-23, core::ObservationId{20}, core::ObservationId{21}},
+        {order, 1, 0, 5,
+         ls::EstimateAdmission{formal_product ? UINT64_C(14) * (UINT64_C(1) << 30U) : 1U << 20U}},
+        {formal_product ? ls::Norm::L2 : ls::Norm::Infinity, formal_product ? 1e-12 : 1e-25, 0.,
+         formal_product ? 1e-12 : 1e-23, core::ObservationId{20}, core::ObservationId{21}},
         core::RhsGeneration{3},
         core::NumericalGeneration{4},
         1e-13,
@@ -1567,8 +1661,11 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                                 caps, contact_caps, *geometry_work, *global, shared, *local,
                                 *kernel, contour_test);
     }
-    const auto& gamma_prime = oracle.at("gamma_derivative_m2_s_per_rad");
-    REQUIRE(gamma_prime.size() == count);
+    const auto gamma_prime = oracle.find("gamma_derivative_m2_s_per_rad");
+    if (!formal_product) {
+        REQUIRE(gamma_prime != oracle.end());
+        REQUIRE(gamma_prime->size() == count);
+    }
     std::array<Enclosure, 2> near{};
     std::array<Rat, 2> far{}, sin{}, cos{};
     for (std::size_t sample = 0; sample < 2; ++sample) {
@@ -1601,9 +1698,31 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                                                     p::RequestedSide::Automatic};
         auto selected = request;
         selected.certified_closed_contour = count == 8 && sample == 0;
+        if (formal_product) {
+            REQUIRE(rational_from_view(take(flow.source().jet.velocity(1))) == 0);
+            selected.certified_closed_contour = true;
+            selected.contour_workers = 4;
+            selected.matrix_absolute = 6e-9;
+            selected.original_absolute = .99 * std::abs(sin[sample].convert_to<double>()) *
+                                         std::sqrt(static_cast<double>(count)) * 1e-11;
+        }
         const auto loads = take(cf::solve_discrete_circulation_loads(
             input, write_loads, std::move(flow), caps, selected, *geometry_work, shared, *local,
             *kernel, memory));
+        if (formal_product) {
+#ifdef UVLAS_FINITE_WING_FORMAL_PRODUCT
+            std::ifstream archive(UVLAS_FINITE_WING_COMMON_LIMIT);
+            REQUIRE(archive);
+            const auto frozen_limit = nlohmann::json::parse(archive);
+            const auto& record = frozen_limit.at("records").at(UVLAS_FINITE_WING_INDEX);
+            REQUIRE(record.at("dihedral") == wing.at("dihedral_degrees"));
+            CHECK(loads.edge_count() == midpoint.size());
+            check_formal_product(loads, grid, mesh, geometry, contact, transfers, sin[sample],
+                                 record);
+            std::cout << "Cumulative planned payload bytes " << memory.allocated_bytes() << '\n';
+#endif
+            return;
+        }
         if (count == 8) {
             core::ResourcePlan replay_memory{UINT64_C(2000000000)};
             const auto retained_contact = take_global(contact.retain_checked(replay_memory));
@@ -1713,7 +1832,7 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
         const auto tolerance = rational_word(2e-10);
         for (std::size_t k = 0; k < count; ++k) {
             const auto held = words(loads.primal().solution(), k);
-            const Rat expected = sin[sample] * rational_word(gamma_prime.at(k).get<double>());
+            const Rat expected = sin[sample] * rational_word(gamma_prime->at(k).get<double>());
             CHECK(abs(exact_word(held) - expected) <= tolerance);
             check_within(unpack(take(loads.primal().row(k)).original_residual), 0, tolerance);
             rows[k].circulation = held;
@@ -1881,7 +2000,12 @@ void verify_selected_wing() {
 }
 } // namespace
 
-#ifdef UVLAS_FINITE_WING_FORMAL_GEOMETRY
+#ifdef UVLAS_FINITE_WING_FORMAL_PRODUCT
+TEST_CASE("A formal finite-wing grid qualifies steady circulation and induced drag",
+          "[V-AERO][AE-02][UW-D03][UW-D05][N4-06][verification]") {
+    verify_selected_wing();
+}
+#elif defined(UVLAS_FINITE_WING_FORMAL_GEOMETRY)
 TEST_CASE("A formal finite-wing grid qualifies geometry and single-query forecasts",
           "[V-AERO][AE-02][UW-D03][UW-D05][N4-06][verification]") {
     verify_selected_wing();
