@@ -3,6 +3,7 @@
 #include "pg_reference_arithmetic.hpp"
 
 #include <algorithm>
+#include <thread>
 #include <uvlas/structure/pg_discrete_gram.hpp>
 
 using namespace uvlas;
@@ -284,6 +285,47 @@ TEST_CASE("PG product rules preserve the triangle Jacobian on cut curved volumes
     CHECK(abs(fine[1] - reference) + tail < tolerance);
     const auto coarse = volume_bounds(low_gram);
     CHECK((coarse[1] < reference - tail - tolerance || coarse[0] > reference + tail + tolerance));
+
+    // Keep each depth pair together and exercise a rule above the parallel threshold.
+    const auto midpoint_weight = fixture.r("1", "9");
+    std::array<ExactRational, 9> midpoints;
+    std::vector<PgLineQuadratureNode> midpoint_rule;
+    midpoint_rule.reserve(midpoints.size());
+    for (std::size_t i = 0; i < midpoints.size(); ++i) {
+        midpoints[i] = rat(fixture, I{2 * i + 1}, I{18});
+        midpoint_rule.push_back({midpoints[i], midpoint_weight});
+    }
+    const PgVolumeProductRule many_points{midpoint_rule, midpoint_rule, depth_pair};
+    auto parallel_limits = limits;
+    parallel_limits.arithmetic.maximum_scalar_operations = 1'000'000'000;
+    parallel_limits.arithmetic.maximum_partition_visits = 1'000'000'000;
+    auto serial_limits = parallel_limits;
+    constexpr auto power_slots = detail::PgRankMonomialPowers::retained_rationals +
+                                 detail::PgRankMonomialPowers::retained_mixed +
+                                 detail::PgRankMonomialPowers::retained_common;
+    const auto points = volumes * midpoint_rule.size() * midpoint_rule.size() * depth_pair.size();
+    const auto shared_slots = 4 * points + 2 * product_entries.size();
+    const auto serial_slots =
+        shared_slots + detail::basis_live_rationals + 16 + 3 * size + power_slots + 32;
+    serial_limits.arithmetic.algebra.external_memory =
+        ExactEstimateAdmission{(2 * serial_slots + 1) * bytes_per_integer};
+    auto parallel_basis = make_curve_basis(), serial_basis = make_curve_basis();
+    core::ResourcePlan parallel_plan{profile}, serial_plan{profile};
+    const auto parallel_gram = take(PgDiscreteGram::prepare_product(
+        std::move(parallel_basis), many_points, grid, parallel_limits, scratch, parallel_plan));
+    const auto serial_gram = take(PgDiscreteGram::prepare_product(
+        std::move(serial_basis), many_points, grid, serial_limits, scratch, serial_plan));
+    REQUIRE(parallel_gram.rule().size() == points);
+    if (std::thread::hardware_concurrency() > 1) {
+        CHECK(parallel_plan.allocated_bytes() > serial_plan.allocated_bytes());
+    }
+    const auto parallel_entries = take(parallel_gram.enclosure()).upper_triangle;
+    const auto serial_entries = take(serial_gram.enclosure()).upper_triangle;
+    REQUIRE(parallel_entries.size() == serial_entries.size());
+    for (std::size_t i = 0; i < serial_entries.size(); ++i) {
+        CHECK(parallel_entries[i].lower == serial_entries[i].lower);
+        CHECK(parallel_entries[i].upper == serial_entries[i].upper);
+    }
 }
 
 TEST_CASE("PG common denominator Horner preserves sparse signed polynomial values",

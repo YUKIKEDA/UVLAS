@@ -1,6 +1,11 @@
+#include "../core/resource_plan_worker.hpp"
 #include "pg_conditioning_factor.hpp"
+#include "pg_gram_worker_plan.hpp"
 #include "pg_reference_arithmetic.hpp"
 
+#include <new>
+#include <stop_token>
+#include <thread>
 #include <uvlas/structure/pg_discrete_gram.hpp>
 
 namespace uvlas::structure {
@@ -395,61 +400,196 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                     }
                 }
             }
-            std::size_t depth_slot = 0;
             IntegerWork work{math, limits.maximum_integer_steps};
             const auto& length = basis.length_metres();
             const auto length_cube = math.mul(math.square(length), length);
             const auto two = math.constant("2");
             const auto two_length = math.mul(two, length);
-            for (const auto& p : rule.values()) {
-                math.visit(1);
-                const auto located =
-                    basis.locate(math, PgReferenceVolumePoint{p.volume, p.u, p.v, p.depth});
-                const auto& geometry = located.reference;
-                const auto& jacobian =
-                    std::get<PgReferenceVolumeMeasure>(geometry.measure).jacobian;
-                const auto root = root_bounds(work, geometry.g, bits);
-                check_slot(root);
-                ReferenceRadicals field{math, geometry.g};
-                const auto scale = math.div(p.weight, length_cube);
-                auto measure = radical_bounds(work, field.scale(jacobian, scale), root, bits);
-                // The certified Jacobian and the supplied scalar weight are positive.
-                measure.lower = std::max(RankWide{}, measure.lower);
-                const auto z =
-                    math.div(math.mul(geometry.zeta, geometry.full_thickness_metres), two_length);
-                const auto half_z_squared = math.div(math.square(z), two);
-                const auto director_radical = math.div(z, math.square(geometry.g));
-                const auto evaluate = [&](const Numerators& terms) {
-                    auto a = math.add(terms[0], math.mul(half_z_squared, terms[2]));
-                    auto b = math.mul(director_radical, terms[1]);
-                    return radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
-                };
-                std::optional<PgRankMonomialPowers> monomials;
-                if (depth_slot == 0 && power_reuse &&
-                    PgRankMonomialPowers::fits(located.u, located.v, math.leaf_limits))
-                    monomials.emplace(located.u, located.v, *power_reuse);
-                auto values = samples.values();
-                for (std::size_t i = 0; i < values.size(); ++i) {
-                    math.visit(1);
-                    const auto numerator_values = [&]() -> Numerators {
-                        auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
-                                                       /*derivatives=*/false,
-                                                       monomials ? &*monomials : nullptr);
-                        return {std::move(jet[0][0]), std::move(jet[1][0]), std::move(jet[2][0])};
+            const auto evaluate_range = [&](std::span<const PgOwnedDiscreteVolumePoint> range,
+                                            ReferenceArithmetic& point_math,
+                                            IntegerWork& point_work,
+                                            std::span<Interval> point_samples,
+                                            std::span<Numerators> point_cache,
+                                            std::span<Interval> output) {
+                std::size_t depth_slot = 0;
+                for (const auto& p : range) {
+                    point_math.visit(1);
+                    const auto located = basis.locate(
+                        point_math, PgReferenceVolumePoint{p.volume, p.u, p.v, p.depth});
+                    const auto& geometry = located.reference;
+                    const auto& jacobian =
+                        std::get<PgReferenceVolumeMeasure>(geometry.measure).jacobian;
+                    const auto root = root_bounds(point_work, geometry.g, bits);
+                    check_slot(root);
+                    ReferenceRadicals field{point_math, geometry.g};
+                    const auto scale = point_math.div(p.weight, length_cube);
+                    auto measure =
+                        radical_bounds(point_work, field.scale(jacobian, scale), root, bits);
+                    // The certified Jacobian and the supplied scalar weight are positive.
+                    measure.lower = std::max(RankWide{}, measure.lower);
+                    const auto z = point_math.div(
+                        point_math.mul(geometry.zeta, geometry.full_thickness_metres), two_length);
+                    const auto half_z_squared = point_math.div(point_math.square(z), two);
+                    const auto director_radical = point_math.div(z, point_math.square(geometry.g));
+                    const auto evaluate = [&](const Numerators& terms) {
+                        auto a = point_math.add(terms[0], point_math.mul(half_z_squared, terms[2]));
+                        auto b = point_math.mul(director_radical, terms[1]);
+                        return radical_bounds(point_work, {std::move(a), std::move(b)}, root, bits);
                     };
-                    if (cached.size() == 0) {
-                        values[i] = evaluate(numerator_values());
-                        continue;
+                    std::optional<PgRankMonomialPowers> monomials;
+                    if (depth_slot == 0 && power_reuse &&
+                        PgRankMonomialPowers::fits(located.u, located.v, point_math.leaf_limits))
+                        monomials.emplace(located.u, located.v, *power_reuse);
+                    auto values = point_samples;
+                    for (std::size_t i = 0; i < values.size(); ++i) {
+                        point_math.visit(1);
+                        const auto numerator_values = [&]() -> Numerators {
+                            auto jet = basis.numerator_jet(
+                                point_math, {partition_index(i)}, located,
+                                /*derivatives=*/false, monomials ? &*monomials : nullptr);
+                            return {std::move(jet[0][0]), std::move(jet[1][0]),
+                                    std::move(jet[2][0])};
+                        };
+                        if (point_cache.size() == 0) {
+                            values[i] = evaluate(numerator_values());
+                            continue;
+                        }
+                        auto& terms = point_cache[i];
+                        if (depth_slot == 0)
+                            terms = numerator_values();
+                        values[i] = evaluate(terms);
                     }
-                    auto& terms = cached.values()[i];
-                    if (depth_slot == 0)
-                        terms = numerator_values();
-                    values[i] = evaluate(terms);
+                    accumulate_sample(point_work, output, values, measure);
+                    // fill_product emits all depths consecutively for one volume and (u, v).
+                    if (++depth_slot == depth_group)
+                        depth_slot = 0;
                 }
-                accumulate_sample(work, sums.values(), values, measure);
-                // fill_product emits all depths consecutively for one volume and (u, v).
-                if (++depth_slot == depth_group)
-                    depth_slot = 0;
+            };
+            using namespace detail::parallel_gram;
+            constexpr std::size_t count = 4;
+            const auto concurrency =
+                std::min<std::size_t>(count, std::thread::hardware_concurrency());
+            bool merged = false;
+            // The recorded crossover control contains 192 points per fixed task.
+            constexpr std::size_t minimum_points_per_task = 192;
+            if (concurrency > 1 && depth_group > 1 &&
+                rule.values().size() >= count * minimum_points_per_task &&
+                rule.values().size() / depth_group >= count &&
+                rule.values().size() % depth_group == 0) {
+                const auto suggest = [&]() -> std::optional<Forecast> {
+                    try {
+                        return forecast<count, Interval, Numerators>(
+                            basis, source.partition, rule.values(), depth_group, entries, rank,
+                            held_rationals, math, limits, work);
+                    } catch (const PartitionAbort& failure) {
+                        if (failure.failure.code != core::FailureCode::ResourceExceeded)
+                            throw;
+                        return std::nullopt;
+                    }
+                };
+                const auto admitted_jobs = suggest();
+                if (admitted_jobs) {
+                    core::detail::WorkerPayloadReservation reservation{plan};
+                    if (!reservation.begin(admitted_jobs->sum.bytes))
+                        partition_fail(core::FailureCode::ResourceExceeded);
+                    struct WorkerResult {
+                        core::PlannedBuffer<Interval> sums;
+                        Budget used;
+                        std::optional<core::Failure> failure;
+                    };
+                    std::array<WorkerResult, count> children;
+                    std::stop_source stop_source;
+                    const std::stop_callback caller_stop{limits.arithmetic.cancellation,
+                                                         [&] { stop_source.request_stop(); }};
+                    const auto worker = [&](std::size_t i) {
+                        const auto& job = admitted_jobs->jobs[i];
+                        auto& child = children[i];
+                        core::ResourcePlan local_plan{job.cap.bytes};
+                        core::Workspace local_workspace{core::PlannedBuffer<std::byte>{}};
+                        auto local_limits = limits.arithmetic;
+                        local_limits.maximum_scalar_operations = job.cap.scalar;
+                        local_limits.maximum_partition_visits = job.cap.visits;
+                        local_limits.algebra.external_memory =
+                            ExactEstimateAdmission{admitted_jobs->external_per_worker};
+                        local_limits.cancellation = stop_source.get_token();
+                        ReferenceArithmetic local_math{local_limits, local_plan};
+                        IntegerWork local_work{local_math, job.cap.integer};
+                        try {
+                            local_math.cancel();
+                            const auto local_lease = partition_take(local_workspace.acquire());
+                            local_math.admit(admitted_jobs->worker_live);
+                            auto child_sums = partition_take(local_plan.allocate<Interval>(
+                                partition_index(entries), partition_operation));
+                            auto child_samples = partition_take(local_plan.allocate<Interval>(
+                                partition_index(rank), partition_operation));
+                            auto child_cache = partition_take(local_plan.allocate<Numerators>(
+                                partition_index(rank), partition_operation));
+                            evaluate_range(rule.values().subspan(job.first, job.points), local_math,
+                                           local_work, child_samples.values(), child_cache.values(),
+                                           child_sums.values());
+                            local_math.cancel();
+                            child.sums = std::move(child_sums);
+                        } catch (const PartitionAbort& failure) {
+                            child.failure = failure.failure;
+                        } catch (const std::overflow_error&) {
+                            child.failure = core::Failure{core::FailureCode::ResourceExceeded,
+                                                          partition_operation};
+                        } catch (const std::bad_alloc&) {
+                            child.failure = core::Failure{core::FailureCode::ResourceExceeded,
+                                                          partition_operation};
+                        } catch (...) {
+                            child.failure =
+                                core::Failure{core::FailureCode::InvalidInput, partition_operation};
+                        }
+                        child.used = {local_plan.allocated_bytes(), local_math.scalar_operations,
+                                      local_math.partition_visits, local_work.steps};
+                    };
+                    std::optional<core::Failure> launch_failure;
+                    {
+                        std::array<std::jthread, count> threads;
+                        try {
+                            for (std::size_t i = 0; i < concurrency; ++i) {
+                                threads[i] = std::jthread([&, i] {
+                                    for (std::size_t id = i; id < count; id += concurrency)
+                                        worker(id);
+                                });
+                            }
+                        } catch (...) {
+                            stop_source.request_stop();
+                            launch_failure = core::Failure{core::FailureCode::ResourceExceeded,
+                                                           partition_operation};
+                        }
+                    }
+                    Budget receipt{};
+                    for (const auto& child : children)
+                        receipt.add(child.used);
+                    if (!reservation.settle(receipt.bytes))
+                        partition_fail(core::FailureCode::ResourceExceeded);
+                    math.scalar_operations = partition_add(math.scalar_operations, receipt.scalar);
+                    math.partition_visits = partition_add(math.partition_visits, receipt.visits);
+                    work.steps = partition_add(work.steps, receipt.integer);
+                    if (launch_failure)
+                        throw PartitionAbort{*launch_failure};
+                    math.cancel();
+                    for (const auto& child : children)
+                        if (child.failure)
+                            throw PartitionAbort{*child.failure};
+                    for (const auto& child : children)
+                        for (std::size_t i = 0; i < entries; ++i) {
+                            auto& dst = sums.values()[i];
+                            const auto& src = child.sums.values()[i];
+                            work.charge(
+                                std::max(dst.lower.backend().size(), src.lower.backend().size()) +
+                                std::max(dst.upper.backend().size(), src.upper.backend().size()));
+                            dst.lower += src.lower;
+                            dst.upper += src.upper;
+                        }
+                    merged = true;
+                }
+            }
+            if (!merged) {
+                evaluate_range(rule.values(), math, work, samples.values(), cached.values(),
+                               sums.values());
             }
             const auto drop = 3 * bits - grid.output_fractional_bits;
             for (std::size_t i = 0; i < entries; ++i) {
