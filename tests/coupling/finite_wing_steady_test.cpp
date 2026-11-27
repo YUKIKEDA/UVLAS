@@ -1701,6 +1701,131 @@ void verify_harmonic_grid(const CaseLattice& grid, const FiniteWingMesh& mesh,
     }
 }
 
+void verify_harmonic_thin_panel() {
+    struct Example {
+        std::array<Point, 4> vertices;
+        Point query;
+        double circulation;
+    };
+    // Swept panels and exact Binary64 collocations from formal M256/N192 rows
+    // (0, 162) and (255, 175), using zero frequency to isolate the closed contour.
+    // Reference circulation is the reciprocal of the directed six-edge contour
+    // influence, evaluated from exact binary inputs with a 100-digit antiderivative.
+    const std::array examples{
+        Example{{Point{2.1784515365038395, 3.1111404660392044, 0.},
+                 Point{2.216133040577926, 3.164955393735604, 0.},
+                 Point{2.178496713893399, 3.1111404660392044, 0.},
+                 Point{2.2161775341817913, 3.164955393735604, 0.}},
+                {2.1973072340815776, 3.138047929887404, 0.},
+                -7.740080467966106e-5},
+        Example{{Point{3.2574907744621195, 3.698404363053158, 0.},
+                 Point{3.2734800322953057, 3.732050807568877, 0.},
+                 Point{3.2575096326705406, 3.698404363053158, 0.},
+                 Point{3.2734986767383654, 3.732050807568877, 0.}},
+                {3.26549790426254, 3.7152275853110175, 0.},
+                -7.145052610271387e-5},
+    };
+    for (const auto& example : examples) {
+        CAPTURE(example.query);
+        auto tail_left = example.vertices[2];
+        auto tail_right = example.vertices[3];
+        tail_left[0] += 128.;
+        tail_right[0] += 128.;
+        const std::array vertices{example.vertices[0], example.vertices[1], example.vertices[2],
+                                  example.vertices[3], tail_left,           tail_right};
+        const FiniteWingMesh mesh{vertices, 1, 1};
+        std::array<double, 18> low{};
+        low[12] = vertices[2][0] - (tail_left[0] - 128.);
+        low[15] = vertices[3][0] - (tail_right[0] - 128.);
+        const a::DoublePositions positions{mesh.xyz, low};
+        const std::array bands{a::BandId{50}};
+        const auto geometry_caps = test_geometry::limits();
+        const a::GlobalLimits contact_caps{std::numeric_limits<std::uint64_t>::max() / 4,
+                                           ls::EstimateAdmission{65536}};
+        core::ResourcePlan plan{UINT64_C(2000000000)};
+        auto workspace = test_geometry::workspace(plan);
+        const Number instant{5, 4};
+        const auto geometry =
+            test_geometry::take(a::prepare_owned_geometry({mesh.ids,
+                                                           mesh.bindings,
+                                                           positions,
+                                                           positions,
+                                                           mesh.edges,
+                                                           mesh.faces,
+                                                           bands,
+                                                           {},
+                                                           mesh.quads,
+                                                           a::SingleWord{1e-6},
+                                                           test_geometry::context(),
+                                                           instant.view()},
+                                                          geometry_caps, *workspace, plan));
+        auto global = take(a::GlobalWorkspace::create(plan, contact_caps.metadata));
+        const auto topology = take_global(a::build_global_topology(
+            geometry, {mesh.roles, mesh.owners, mesh.trailing}, contact_caps, *global, plan));
+        const auto contact =
+            take_global(a::check_global_geometry(topology, geometry, contact_caps, *global, plan));
+        const auto query = test_geometry::take(
+            a::resolve_query(geometry, {a::QueryId{1}, a::FreePoint{a::FreeSingle{example.query}}},
+                             geometry.context(), geometry_caps, *workspace, plan));
+        const std::array rows{cf::DiscreteCollocation{
+            mesh.quads[0].facets[0], query,
+            cf::ExplicitCollocationTangents{xyz({1., 0., 0.}), xyz({0., 1., 0.})}, xyz({}),
+            a::SingleWord{0.}, a::SingleWord{0.}}};
+        const std::array wake{cf::DiscreteWakePanel{
+            mesh.quads[1].facets[0], cf::AttachedWakeFront{}, cf::SteadyWakeClosure{}}};
+        const cf::DiscreteNonpenetrationInput input{contact,
+                                                    rows,
+                                                    wake,
+                                                    {core::AcceptedStateId{2}, {}},
+                                                    a::P1ActionStamp{815, 6},
+                                                    stamp,
+                                                    p::RequestedSide::Automatic};
+        const std::array rhs{
+            cf::HarmonicCirculationRhs{mesh.faces[0].id, a::SingleWord{1.}, a::SingleWord{0.}}};
+        const std::array starts{0.};
+        const cf::StraightWakeHarmonicInput phase{xyz({20., 0., 0.}), starts, 0., 16};
+        const std::array scales{20.};
+        const std::array<ls::UnitDimensions, 1> gamma_units{{{2, 0, -1, 0, 0, 0, 0}}};
+        const std::array<ls::UnitDimensions, 1> velocity_units{{{1, 0, -1, 0, 0, 0, 0}}};
+        cf::DiscreteCirculationRequest request{
+            {scales, scales, gamma_units, velocity_units, context(geometry.context())},
+            {1, 1, 1, 5, ls::EstimateAdmission{1U << 20U}},
+            {ls::Norm::L2, 1e-12, 0., 1e-12, core::ObservationId{20}, core::ObservationId{21}},
+            core::RhsGeneration{3},
+            core::NumericalGeneration{4},
+            6e-9,
+            1e-13,
+            4.9e-13,
+            0.};
+        request.certified_closed_contour = true;
+        const cf::DiscreteNonpenetrationLimits action_limits{
+            {core::Precision::TwoWord, 1e-12},
+            {core::Precision::TwoWord, 1e-12, 1e-12},
+            {geometry_caps, {ls::EstimateAdmission{65536}, 1000000000}, UINT64_C(150000000000)},
+            UINT64_C(150000000000),
+            UINT64_C(70000000000000)};
+        const auto solve = [&] {
+            return cf::solve_discrete_harmonic_circulation(input, phase, rhs, action_limits,
+                                                           request, plan);
+        };
+        auto initial = solve();
+        INFO("Operation " << (initial ? -1 : static_cast<int>(initial.error().operation)));
+        const auto qualified = take(std::move(initial));
+        REQUIRE(qualified.residual.size() == 1);
+        REQUIRE(qualified.residual.values().front());
+        const auto& words = std::get<numerics::TwoWord<std::complex<double>>>(
+            qualified.physical_values().storage());
+        const auto gamma = words.hi.values().front() + words.lo.values().front();
+        CHECK(std::abs(gamma - example.circulation) <= 2e-12 * std::abs(example.circulation));
+        const auto original = unpack(qualified.residual.values().front()->real);
+        CHECK(abs(original.center) + original.radius < rational_word(1e-11));
+        request.matrix_absolute = 1e-16;
+        const auto too_tight = solve();
+        REQUIRE_FALSE(too_tight);
+        CHECK(too_tight.error().code == core::FailureCode::PrecisionUnresolved);
+    }
+}
+
 void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                       const nlohmann::json& oracle, double length, double radius) {
     const auto m = oracle.at("chord_panels").get<core::Index>();
@@ -1848,9 +1973,11 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
         1e-11,
         0.};
     constexpr a::P1ActionStamp trial{815, 6};
-    if (count == 8 && wing.at("dihedral_degrees").get<int>() == 0)
+    if (count == 8 && wing.at("dihedral_degrees").get<int>() == 0) {
         verify_harmonic_grid(grid, mesh, input_geometry, geometry_caps, contact_caps, caps,
                              request);
+        verify_harmonic_thin_panel();
+    }
     const cf::DiscreteVectorLoadInput write_loads{
         trial, request.retained_generation, midpoint,
         rates, a::SingleWord{1.2},          xyz({.375, 0., 0.})};

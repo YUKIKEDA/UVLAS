@@ -3,6 +3,7 @@
 #include "p1_shared_action.hpp"
 
 #include <atomic>
+#include <cstdint>
 
 namespace uvlas::aero::detail {
 
@@ -65,6 +66,9 @@ private:
     std::atomic_flag entered_ = ATOMIC_FLAG_INIT;
 };
 
+/// Different interval evaluations of the same finite-edge cross product.
+enum class ContourCrossProduct : std::uint8_t { EndpointRelative, MidpointRelative };
+
 /// Fixed, complete constant-strength contour on an owned current snapshot.
 /// Use a separate workspace and output row for each concurrent caller.
 class ClosedContour {
@@ -86,14 +90,16 @@ public:
     [[nodiscard]] AeroResult<std::uint64_t>
     project(const ResolvedQuery&, const ContourVector& normal, std::span<ContourInterval> row,
             const GeometryLimits&, GlobalLimits, GeometryWorkspace&, GlobalWorkspace&,
-            ClosedContourWorkspace&, std::stop_token = {}) const noexcept;
+            ClosedContourWorkspace&, std::stop_token = {},
+            ContourCrossProduct = ContourCrossProduct::EndpointRelative) const noexcept;
 
     /// Enclose the induced velocity at a free point or a physical load-edge midpoint.
     /// Strengths are in native column order; midpoint evaluation omits its own bound edge.
     [[nodiscard]] AeroResult<std::pair<ContourVector, std::uint64_t>>
     apply(const ResolvedQuery&, std::optional<EdgeId> self, std::span<const ContourInterval>,
           const GeometryLimits&, GlobalLimits, GeometryWorkspace&, GlobalWorkspace&,
-          ClosedContourWorkspace&, std::stop_token = {}) const noexcept;
+          ClosedContourWorkspace&, std::stop_token = {},
+          ContourCrossProduct = ContourCrossProduct::EndpointRelative) const noexcept;
 
 private:
     ClosedContour(core::PlannedBuffer<ClosedContourData>&&, GeometryContext) noexcept;

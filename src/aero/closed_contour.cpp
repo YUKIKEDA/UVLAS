@@ -95,6 +95,34 @@ Interval outward(double lower, double upper) {
 Interval operator-(Interval a) {
     return {-a.upper, -a.lower};
 }
+// TwoSum gives the exact rounding error with the qualified Binary64 environment.
+template <bool Up>
+double sum_endpoint(double a, double b) {
+    const auto sum = a + b;
+    if (!std::isfinite(sum))
+        reject(unresolved);
+    const auto b_part = sum - a;
+    const auto error = (a - (sum - b_part)) + (b - b_part);
+    if (!std::isfinite(error))
+        return adjacent<Up>(sum);
+    return (Up ? error > 0. : error < 0.) ? adjacent<Up>(sum) : sum;
+}
+
+Interval tight_difference(Interval a, Interval b) {
+    const Interval result{sum_endpoint<false>(a.lower, -b.upper),
+                          sum_endpoint<true>(a.upper, -b.lower)};
+    if (!valid(result))
+        reject(unresolved);
+    return result;
+}
+
+template <bool Up>
+double half_endpoint(double x) {
+    const auto half = x * .5;
+    const auto restored = half * 2.;
+    return (Up ? restored < x : restored > x) ? adjacent<Up>(half) : half;
+}
+
 Interval operator+(Interval a, Interval b) {
     if (zero(a))
         return b;
@@ -154,6 +182,19 @@ Interval norm2(const Vector& a) {
 Vector cross(const Vector& a, const Vector& b) {
     return {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
 }
+Vector midpoint_cross(const Vector& first, const Vector& second, const Vector& query) {
+    Vector delta{}, relative{};
+    for (std::size_t axis = 0; axis < delta.size(); ++axis) {
+        delta[axis] = tight_difference(second[axis], first[axis]);
+        const Interval half{half_endpoint<false>(delta[axis].lower),
+                            half_endpoint<true>(delta[axis].upper)};
+        relative[axis] = tight_difference(tight_difference(query[axis], first[axis]), half);
+    }
+    // delta × (q − first − delta/2) equals delta × (q − first).
+    // Moving the origin near the projected midpoint avoids subtracting large products.
+    return cross(delta, relative);
+}
+
 Interval from_words(ScalarWords words) {
     if (const auto* single = std::get_if<SingleWord>(&words))
         return {single->value, single->value};
@@ -221,12 +262,11 @@ Scalar same_sign_integral(Scalar s, Scalar t, Scalar first_radius, Scalar second
 }
 
 Vector edge_value(const Edge& edge, std::span<const ClosedContourEndpoint> endpoints,
-                  Interval core2) {
+                  Interval core2, const Vector& c) {
     const auto& a = endpoints[edge.vertices[0]];
     const auto& b = endpoints[edge.vertices[1]];
     const auto s = dot(edge.delta, a.relative);
     const auto z = s - edge.length2;
-    const auto c = cross(edge.delta, a.relative);
     const bool same = (s.lower > 0 && z.lower > 0) || (s.upper < 0 && z.upper < 0);
     const auto integral =
         same ? same_sign_integral(s, z, a.distance, b.distance)
@@ -283,7 +323,7 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
                        std::optional<EdgeId> self, const GeometryLimits& query_limits,
                        GlobalLimits limits, GeometryWorkspace& geometry_work,
                        GlobalWorkspace& contact_work, std::span<ClosedContourEndpoint> endpoints,
-                       const std::stop_token& stop, Visit visit) {
+                       const std::stop_token& stop, ContourCrossProduct coordinates, Visit visit) {
     Work work{limits.max_steps, 0, stop};
     work.step(0);
     if (!data.contacts || endpoints.size() != data.vertices.size())
@@ -326,7 +366,19 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
         work.step();
         if (edge.first == edge.last || self == edge.id)
             continue;
-        const auto velocity = edge_value(edge, endpoints, data.core2);
+        auto c = cross(edge.delta, endpoints[edge.vertices[0]].relative);
+        if (coordinates == ContourCrossProduct::MidpointRelative) {
+            work.step();
+            const auto midpoint =
+                midpoint_cross(vertices[edge.vertices[0]], vertices[edge.vertices[1]], location);
+            for (std::size_t axis = 0; axis < c.size(); ++axis) {
+                c[axis] = {std::max(c[axis].lower, midpoint[axis].lower),
+                           std::min(c[axis].upper, midpoint[axis].upper)};
+                if (!valid(c[axis]))
+                    reject(unresolved, edge.id);
+            }
+        }
+        const auto velocity = edge_value(edge, endpoints, data.core2, c);
         const auto terms = data.terms.values().subspan(edge.first, edge.last - edge.first);
         work.step(terms.size());
         visit(velocity, terms);
@@ -648,7 +700,7 @@ ClosedContour::project(const ResolvedQuery& query, const ContourVector& normal,
                        std::span<ContourInterval> row, const GeometryLimits& query_limits,
                        GlobalLimits limits, GeometryWorkspace& geometry_work,
                        GlobalWorkspace& contact_work, ClosedContourWorkspace& work,
-                       std::stop_token stop) const noexcept {
+                       std::stop_token stop, ContourCrossProduct coordinates) const noexcept {
     return guard<std::uint64_t>(query.context(), [&] {
         const Lease lease{work.entered_};
         if (data_.size() == 0 || data_.values().front().columns != row.size() ||
@@ -660,14 +712,15 @@ ClosedContour::project(const ResolvedQuery& query, const ContourVector& normal,
             reject(core::FailureCode::Cancelled);
         std::ranges::fill(row, Interval{});
         limits.max_steps -= row.size();
-        const auto used = evaluate(data_.values().front(), query, {}, query_limits, limits,
-                                   geometry_work, contact_work, work.endpoints_.values(), stop,
-                                   [&](const Vector& velocity, std::span<const Term> terms) {
-                                       const auto value = dot(normal, velocity);
-                                       for (const auto& term : terms)
-                                           row[term.column] =
-                                               row[term.column] + (term.sign == 1 ? value : -value);
-                                   });
+        const auto used =
+            evaluate(data_.values().front(), query, {}, query_limits, limits, geometry_work,
+                     contact_work, work.endpoints_.values(), stop, coordinates,
+                     [&](const Vector& velocity, std::span<const Term> terms) {
+                         const auto value = dot(normal, velocity);
+                         for (const auto& term : terms)
+                             row[term.column] =
+                                 row[term.column] + (term.sign == 1 ? value : -value);
+                     });
         return used + row.size();
     });
 }
@@ -677,7 +730,7 @@ ClosedContour::apply(const ResolvedQuery& query, std::optional<EdgeId> self,
                      std::span<const ContourInterval> strengths, const GeometryLimits& query_limits,
                      GlobalLimits limits, GeometryWorkspace& geometry_work,
                      GlobalWorkspace& contact_work, ClosedContourWorkspace& work,
-                     std::stop_token stop) const noexcept {
+                     std::stop_token stop, ContourCrossProduct coordinates) const noexcept {
     return guard<std::pair<ContourVector, std::uint64_t>>(query.context(), [&] {
         const Lease lease{work.entered_};
         if (data_.size() == 0 || data_.values().front().columns != strengths.size())
@@ -690,17 +743,18 @@ ClosedContour::apply(const ResolvedQuery& query, std::optional<EdgeId> self,
         }
         limits.max_steps = input_work.remaining();
         std::array<PairwiseSum, 3> sum{};
-        const auto used = evaluate(data_.values().front(), query, self, query_limits, limits,
-                                   geometry_work, contact_work, work.endpoints_.values(), stop,
-                                   [&](const Vector& velocity, std::span<const Term> terms) {
-                                       Interval weight{};
-                                       for (const auto& term : terms) {
-                                           const auto value = strengths[term.column];
-                                           weight = weight + (term.sign == 1 ? value : -value);
-                                       }
-                                       for (std::size_t axis = 0; axis < sum.size(); ++axis)
-                                           sum[axis].append(weight * velocity[axis]);
-                                   });
+        const auto used =
+            evaluate(data_.values().front(), query, self, query_limits, limits, geometry_work,
+                     contact_work, work.endpoints_.values(), stop, coordinates,
+                     [&](const Vector& velocity, std::span<const Term> terms) {
+                         Interval weight{};
+                         for (const auto& term : terms) {
+                             const auto value = strengths[term.column];
+                             weight = weight + (term.sign == 1 ? value : -value);
+                         }
+                         for (std::size_t axis = 0; axis < sum.size(); ++axis)
+                             sum[axis].append(weight * velocity[axis]);
+                     });
         return std::pair{Vector{sum[0].sum(), sum[1].sum(), sum[2].sum()}, used + input_work.used};
     });
 }
