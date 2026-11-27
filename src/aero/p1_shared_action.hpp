@@ -246,6 +246,12 @@ forecast_bound_wake_serial_induction(const P1ActionSource&, std::span<const P1Fa
     LocalAccuracy, P1Accuracy, const P1AssemblyLimits&, SharedP1Workspace&, LocalPacketWorkspace&,
     P1Workspace&, BoundWakeFacetStorage&, const std::stop_token& = {}) noexcept;
 
+/// Matrix assembly may apply values and transpose strengths. Coordinate derivatives are excluded.
+[[nodiscard]] AeroResult<SharedP1Action> prepare_bound_wake_values(
+    const P1ActionSource&, std::span<const P1FaceStrengths>, std::span<const P1StrengthId>,
+    LocalAccuracy, P1Accuracy, const P1AssemblyLimits&, SharedP1Workspace&, LocalPacketWorkspace&,
+    P1Workspace&, core::ResourcePlan&, BoundWakeFacetStorage*, const std::stop_token&) noexcept;
+
 /// Prepare mixed induction at exactly the midpoint of a non-TE canonical bound edge.
 /// Exclude all occurrences of that bound contour only. Retain the full wake sheet.
 [[nodiscard]] AeroResult<SharedP1Action> prepare_bound_wake_midpoint_induction(

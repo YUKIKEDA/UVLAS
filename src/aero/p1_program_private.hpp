@@ -337,14 +337,51 @@ inline FarOutput far_program(Program& p) {
 struct Jet {
     std::array<Interval, 14> components;
 };
+inline Interval evaluate_value_node(const Node& node, std::span<const Jet> values,
+                                    const std::array<Interval, 16>& inputs, const Interval& pi,
+                                    const Interval& ln2, Work& work) {
+    switch (node.op) {
+    case Opcode::Input:
+        return inputs[node.left];
+    case Opcode::IntegerConstant:
+        return integer(node.value);
+    case Opcode::Pi:
+        return pi;
+    default:
+        break;
+    }
+    const auto& a = values[node.left].components[0];
+    const auto& b = values[node.right].components[0];
+    switch (node.op) {
+    case Opcode::Add:
+        return add(a, b, work);
+    case Opcode::Subtract:
+        return subtract(a, b, work);
+    case Opcode::Negate:
+        return negate(a, work);
+    case Opcode::Multiply:
+        return multiply(a, b, work);
+    case Opcode::Divide:
+        return divide(a, b, work);
+    case Opcode::Sqrt:
+        return square_root(a, work);
+    case Opcode::Log1p:
+        return log_one_plus(a, ln2, work);
+    case Opcode::Atan2:
+        return atan_two(a, b, pi, work);
+    case Opcode::ValueWithDerivative:
+        return a;
+    default:
+        throw ArithmeticFailure{core::FailureCode::InvalidInput};
+    }
+}
 inline void evaluate_node(const Node& node, const std::span<Jet> values, std::size_t index,
                           const std::array<Interval, 16>& inputs, int seed_power,
                           const Interval& pi, const Interval& ln2, Work& work) {
     auto& out = values[index].components;
+    out[0] = evaluate_value_node(node, values, inputs, pi, ln2, work);
     if (node.op == Opcode::Input || node.op == Opcode::IntegerConstant || node.op == Opcode::Pi) {
-        out.fill(integer(0));
-        out[0] = node.op == Opcode::Input ? inputs[node.left]
-                                          : (node.op == Opcode::Pi ? pi : integer(node.value));
+        std::fill(out.begin() + 1, out.end(), integer(0));
         if (node.op == Opcode::Input && node.left < 13)
             out[node.left + 1] = scale(integer(1), seed_power);
         return;
@@ -355,43 +392,37 @@ inline void evaluate_node(const Node& node, const std::span<Jet> values, std::si
     case Opcode::Add:
     case Opcode::Subtract:
     case Opcode::Negate:
-        for (std::size_t j = 0; j < 14; ++j)
+        for (std::size_t j = 1; j < 14; ++j)
             out[j] = node.op == Opcode::Add
                          ? add(a[j], b[j], work)
                          : (node.op == Opcode::Subtract ? subtract(a[j], b[j], work)
                                                         : negate(a[j], work));
         break;
     case Opcode::Multiply:
-        out[0] = multiply(a[0], b[0], work);
         for (std::size_t j = 1; j < 14; ++j)
             out[j] = add(multiply(a[j], b[0], work), multiply(a[0], b[j], work), work);
         break;
     case Opcode::Divide:
-        out[0] = divide(a[0], b[0], work);
         for (std::size_t j = 1; j < 14; ++j)
             out[j] = divide(subtract(a[j], multiply(out[0], b[j], work), work), b[0], work);
         break;
     case Opcode::Sqrt: {
-        out[0] = square_root(a[0], work);
         const auto twice = multiply(integer(2), out[0], work);
         for (std::size_t j = 1; j < 14; ++j)
             out[j] = divide(a[j], twice, work);
         break;
     }
     case Opcode::Log1p: {
-        out[0] = log_one_plus(a[0], ln2, work);
         const auto denominator = add(integer(1), a[0], work);
         for (std::size_t j = 1; j < 14; ++j)
             out[j] = divide(a[j], denominator, work);
         break;
     }
     case Opcode::ValueWithDerivative:
-        out = a;
         for (std::size_t j = 1; j < 14; ++j)
             out[j] = b[j];
         break;
     case Opcode::Atan2: {
-        out[0] = atan_two(a[0], b[0], pi, work);
         const auto denominator = add(multiply(a[0], a[0], work), multiply(b[0], b[0], work), work);
         for (std::size_t j = 1; j < 14; ++j)
             out[j] = divide(subtract(multiply(b[0], a[j], work), multiply(a[0], b[j], work), work),

@@ -781,6 +781,54 @@ TEST_CASE("Mixed induction reuses unowned facet packets and bases",
         same(a.imaginary, b.imaginary);
     };
 
+    for (const auto* source : {&near_source, &far_source}) {
+        const auto budget =
+            source == &near_source ? near_plan.payload_bytes : far_plan.payload_bytes;
+        core::ResourcePlan coefficient_memory{3 * budget};
+        const auto full = test_geometry::take(p::prepare_bound_wake_induction(
+            *source, maps, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+            *prepared.local_workspace, *prepared.kernel_workspace, coefficient_memory));
+        p::BoundWakeFacetStorage coefficient_storage{coefficient_memory};
+        {
+            const auto values = test_geometry::take(p::prepare_bound_wake_values(
+                *source, maps, ids, {core::Precision::TwoWord, 1e-10},
+                {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
+                *prepared.local_workspace, *prepared.kernel_workspace, coefficient_memory,
+                &coefficient_storage, {}));
+            const auto full_report = test_geometry::take(full.report());
+            const auto value_report = test_geometry::take(values.report());
+            CHECK(value_report.used_steps < full_report.used_steps);
+            CHECK(value_report.far_facets == full_report.far_facets);
+            const auto ordinary = test_geometry::take(p::apply_shared_p1(
+                full, *source, mu, std::nullopt, apply_steps, prepared.shared_workspace));
+            const auto coefficient_velocity = test_geometry::take(p::apply_shared_p1(
+                values, *source, mu, std::nullopt, apply_steps, prepared.shared_workspace));
+            for (std::size_t axis = 0; axis < ordinary.velocity().size(); ++axis)
+                same_complex(ordinary.velocity()[axis], coefficient_velocity.velocity()[axis]);
+            std::array<p::p1::Interval, 9> ordinary_coefficients{}, value_coefficients{};
+            REQUIRE(p::project_real_strength_transpose(full, *source, ordinary_coefficients,
+                                                       apply_steps, prepared.shared_workspace, {}));
+            REQUIRE(p::project_real_strength_transpose(values, *source, value_coefficients,
+                                                       apply_steps, prepared.shared_workspace, {}));
+            for (std::size_t i = 0; i < ordinary_coefficients.size(); ++i) {
+                CHECK(p::p1::compare(ordinary_coefficients[i].lower, value_coefficients[i].lower) ==
+                      0);
+                CHECK(p::p1::compare(ordinary_coefficients[i].upper, value_coefficients[i].upper) ==
+                      0);
+            }
+            rejected(p::apply_shared_p1(values, *source, mu, direction, apply_steps,
+                                        prepared.shared_workspace),
+                     core::FailureCode::InvalidInput);
+            rejected(p::adjoint_shared_p1(values, *source, mu, dual, apply_steps,
+                                          prepared.shared_workspace, coefficient_memory),
+                     core::FailureCode::InvalidInput);
+        }
+        const auto restored = test_geometry::take(recycled(*source, coefficient_storage, limits()));
+        REQUIRE(p::apply_shared_p1(restored, *source, mu, direction, apply_steps,
+                                   prepared.shared_workspace));
+    }
+
     core::ResourcePlan memory{2 * (near_plan.payload_bytes + far_plan.payload_bytes)};
     p::BoundWakeFacetStorage storage{memory};
     {

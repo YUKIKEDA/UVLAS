@@ -34,4 +34,9 @@ evaluate_p1_partition(const LocalGeometryPacket&, const std::array<bool, 3>& bou
 evaluate_bound_partition(const LocalGeometryPacket&, const std::array<bool, 3>& boundary,
                          P1Accuracy, P1Limits, P1Workspace&, core::ResourcePlan&,
                          const std::stop_token&, SharedP1ReuseSlot<P1Basis>* = nullptr) noexcept;
+/// Near/bound payloads contain values; far payloads retain the fixed-rule qualification.
+[[nodiscard]] AeroResult<P1Basis>
+evaluate_partition_values(const LocalGeometryPacket&, const std::array<bool, 3>& boundary,
+                          bool bound, P1Accuracy, P1Limits, P1Workspace&, core::ResourcePlan&,
+                          const std::stop_token&, SharedP1ReuseSlot<P1Basis>*) noexcept;
 } // namespace uvlas::aero::detail

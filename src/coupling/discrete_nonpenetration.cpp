@@ -1141,24 +1141,30 @@ struct NonpenetrationBuilder {
             reject(core::FailureCode::ResourceExceeded);
     }
 
-    static a::SharedP1Action prepare_action(const Assembly& assembly,
-                                            const a::P1ActionSource& source,
-                                            const DiscreteNonpenetrationLimits& limits,
-                                            a::SharedP1Workspace& shared,
-                                            a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
-                                            core::ResourcePlan& memory, p::Work& work,
-                                            a::BoundWakeFacetStorage* storage = nullptr) {
+    static a::SharedP1Action
+    prepare_action(const Assembly& assembly, const a::P1ActionSource& source,
+                   const DiscreteNonpenetrationLimits& limits, a::SharedP1Workspace& shared,
+                   a::LocalPacketWorkspace& local, a::P1Workspace& kernel,
+                   core::ResourcePlan& memory, p::Work& work,
+                   a::BoundWakeFacetStorage* storage = nullptr, bool values_only = false) {
         auto induction_limits = limits.induction;
         induction_limits.steps = std::min(induction_limits.steps, remaining(work));
-        auto action = require(
-            storage != nullptr ? a::prepare_bound_wake_induction_reusing_facets(
-                                     source, assembly.maps.values(), assembly.ids.values(),
-                                     limits.geometry_accuracy, limits.induction_accuracy,
-                                     induction_limits, shared, local, kernel, *storage, work.stop)
-                               : a::prepare_bound_wake_induction(
-                                     source, assembly.maps.values(), assembly.ids.values(),
-                                     limits.geometry_accuracy, limits.induction_accuracy,
-                                     induction_limits, shared, local, kernel, memory, work.stop));
+        auto action = require([&] {
+            if (values_only)
+                return a::prepare_bound_wake_values(
+                    source, assembly.maps.values(), assembly.ids.values(), limits.geometry_accuracy,
+                    limits.induction_accuracy, induction_limits, shared, local, kernel, memory,
+                    storage, work.stop);
+            if (storage != nullptr)
+                return a::prepare_bound_wake_induction_reusing_facets(
+                    source, assembly.maps.values(), assembly.ids.values(), limits.geometry_accuracy,
+                    limits.induction_accuracy, induction_limits, shared, local, kernel, *storage,
+                    work.stop);
+            return a::prepare_bound_wake_induction(source, assembly.maps.values(),
+                                                   assembly.ids.values(), limits.geometry_accuracy,
+                                                   limits.induction_accuracy, induction_limits,
+                                                   shared, local, kernel, memory, work.stop);
+        }());
         account(work, require(action.report()).used_steps);
         return action;
     }
@@ -1649,9 +1655,9 @@ struct NonpenetrationBuilder {
                 return sample.velocity;
             }();
             record.relative = difference(known_velocity, import(row.velocity, work), work);
-            const auto action =
-                prepare_action(assembly, source, limits, shared, local, kernel, memory, work,
-                               reuse_actions ? &action_storage : nullptr);
+            const auto action = prepare_action(
+                assembly, source, limits, shared, local, kernel, memory, work,
+                reuse_actions ? &action_storage : nullptr, !strength_work.values().empty());
             if (direction != nullptr && i == 0) {
                 if (action.point_count() != direction->points.size())
                     reject(core::FailureCode::InvalidInput);

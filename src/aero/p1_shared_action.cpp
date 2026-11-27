@@ -367,6 +367,7 @@ struct SharedP1Data {
     P1AssemblyReport report;
     std::size_t canonical_points = 0;
     core::Precision precision = core::Precision::Binary64;
+    bool values_only{};
 };
 
 namespace shared_p1 {
@@ -768,7 +769,7 @@ public:
             P1Accuracy accuracy, const P1AssemblyLimits& limits, SharedP1Workspace& workspace,
             LocalPacketWorkspace& local, P1Workspace& kernel, core::ResourcePlan& memory,
             const std::stop_token& stop, bool mixed = false, std::optional<EdgeId> self = {},
-            BoundWakeFacetStorage* reuse = nullptr) noexcept {
+            BoundWakeFacetStorage* reuse = nullptr, bool values_only = false) noexcept {
         const auto context = source.query.context();
         if (workspace.entered_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(invalid, context));
@@ -953,6 +954,7 @@ public:
             data.topology = verified.topology;
             data.geometry.emplace(OwnedGeometry{verified.geometry->data_, context});
             data.precision = accuracy.representation;
+            data.values_only = values_only;
             data.report.plan = plan;
             data.report.facets = facet_count;
             data.canonical_points = populate_points(data, geometry, point_columns.values(), work);
@@ -1027,12 +1029,18 @@ public:
                     throw ArithmeticFailure{invalid};
                 SharedP1ReuseSlot<P1Basis> slot{entry.basis};
                 auto* storage_slot = use_storage ? &slot : nullptr;
-                auto basis = needed(
-                    entry.bound
-                        ? evaluate_bound_partition(*packet, entry.boundary, accuracy, limits.kernel,
-                                                   kernel, memory, stop, storage_slot)
-                        : evaluate_p1_partition(*packet, entry.boundary, accuracy, limits.kernel,
-                                                kernel, memory, stop, storage_slot));
+                auto basis = needed([&] {
+                    if (values_only)
+                        return evaluate_partition_values(*packet, entry.boundary, entry.bound,
+                                                         accuracy, limits.kernel, kernel, memory,
+                                                         stop, storage_slot);
+                    if (entry.bound)
+                        return evaluate_bound_partition(*packet, entry.boundary, accuracy,
+                                                        limits.kernel, kernel, memory, stop,
+                                                        storage_slot);
+                    return evaluate_p1_partition(*packet, entry.boundary, accuracy, limits.kernel,
+                                                 kernel, memory, stop, storage_slot);
+                }());
                 const auto steps = needed(basis.steps());
                 entry.basis.emplace(std::move(basis));
                 charge(work, steps);
@@ -1044,18 +1052,17 @@ public:
         });
     }
 
-    static AeroResult<SharedP1Action>
-    prepare_reusing_facets(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
-                           std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
-                           P1Accuracy accuracy, const P1AssemblyLimits& limits,
-                           SharedP1Workspace& workspace, LocalPacketWorkspace& local,
-                           P1Workspace& kernel, BoundWakeFacetStorage& reuse,
-                           const std::stop_token& stop, std::optional<EdgeId> self = {}) noexcept {
+    static AeroResult<SharedP1Action> prepare_reusing_facets(
+        const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+        std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy, P1Accuracy accuracy,
+        const P1AssemblyLimits& limits, SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+        P1Workspace& kernel, BoundWakeFacetStorage& reuse, const std::stop_token& stop,
+        std::optional<EdgeId> self = {}, bool values_only = false) noexcept {
         if (reuse.preparing_.test_and_set(std::memory_order_acquire))
             return std::unexpected(failure(invalid, source.query.context()));
         const Lease lease{reuse.preparing_};
         return prepare(source, faces, strengths, local_accuracy, accuracy, limits, workspace, local,
-                       kernel, reuse.memory_, stop, true, self, &reuse);
+                       kernel, reuse.memory_, stop, true, self, &reuse, values_only);
     }
 
     static AeroResult<P1ActionValue> apply(const SharedP1Action& action,
@@ -1071,6 +1078,8 @@ public:
         return guarded<P1ActionValue>(context, [&] {
             operator_environment();
             const auto& data = matches(action, source);
+            if (data.values_only && direction)
+                throw ArithmeticFailure{invalid};
             verify_shapes(data, strengths, direction);
             (void)checked_limit(
                 apply_work(data.facets.size(), data.canonical_points, data.strengths.size(), false),
@@ -1173,6 +1182,8 @@ public:
         return guarded<P1ActionAdjoint>(context, [&] {
             operator_environment();
             const auto& data = matches(action, source);
+            if (data.values_only)
+                throw ArithmeticFailure{invalid};
             verify_shapes(data, strengths, std::nullopt);
             const auto p = data.canonical_points;
             const auto s = data.strengths.size();
@@ -1473,6 +1484,21 @@ AeroResult<P1SerialAssemblyPlan> forecast_bound_wake_serial_induction(
     std::span<const P1StrengthId> strengths, const P1AssemblyLimits& limits,
     const std::stop_token& stop) noexcept {
     return SharedP1Engine::forecast_serial(source, faces, strengths, limits, stop);
+}
+
+AeroResult<SharedP1Action>
+prepare_bound_wake_values(const P1ActionSource& source, std::span<const P1FaceStrengths> faces,
+                          std::span<const P1StrengthId> strengths, LocalAccuracy local_accuracy,
+                          P1Accuracy accuracy, const P1AssemblyLimits& limits,
+                          SharedP1Workspace& workspace, LocalPacketWorkspace& local,
+                          P1Workspace& kernel, core::ResourcePlan& memory,
+                          BoundWakeFacetStorage* reuse, const std::stop_token& stop) noexcept {
+    if (reuse != nullptr)
+        return SharedP1Engine::prepare_reusing_facets(source, faces, strengths, local_accuracy,
+                                                      accuracy, limits, workspace, local, kernel,
+                                                      *reuse, stop, {}, true);
+    return SharedP1Engine::prepare(source, faces, strengths, local_accuracy, accuracy, limits,
+                                   workspace, local, kernel, memory, stop, true, {}, nullptr, true);
 }
 
 AeroResult<std::uint64_t> project_real_strength_transpose(
