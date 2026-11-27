@@ -829,6 +829,7 @@ TEST_CASE("Mixed induction reuses unowned facet packets and bases",
             far_source, maps, ids, {core::Precision::TwoWord, 1e-10},
             {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), prepared.shared_workspace,
             *prepared.local_workspace, *prepared.kernel_workspace, fresh_memory));
+        CHECK(report.used_steps < test_geometry::take(fresh.report()).used_steps);
         CAPTURE(fresh_memory.allocated_bytes());
         CHECK(fresh_memory.allocated_bytes() == far_plan.payload_bytes);
         const auto evaluate = [&](const p::SharedP1Action& action) {
@@ -933,6 +934,32 @@ TEST_CASE("Mixed induction reuses unowned facet packets and bases",
     const auto retried = test_geometry::take(recycled(far_source, retry_storage, limits()));
     CHECK(test_geometry::take(retried.report()).far_facets == 1);
     CHECK(retry_memory.allocated_bytes() - before_retry == reuse_charge);
+
+    // Keep the same IDs and diagnostic revisions but change an actual vertex.
+    auto updated = geometry;
+    updated.coordinates[8] = .5;
+    Prepared updated_geometry{updated};
+    const auto updated_query = updated_geometry.query(updated.query(12.));
+    const p::P1ActionSource updated_source{updated_geometry.contact, updated_query, {3, 5}};
+    const auto same_size_fresh = [&](p::BoundWakeFacetStorage& arena) {
+        return p::prepare_bound_wake_induction_reusing_facets(
+            updated_source, maps, ids, {core::Precision::TwoWord, 1e-10},
+            {core::Precision::TwoWord, 1e-10, 1e-10}, limits(), updated_geometry.shared_workspace,
+            *updated_geometry.local_workspace, *updated_geometry.kernel_workspace, arena);
+    };
+    core::ResourcePlan changed_memory{2 * (near_plan.payload_bytes + far_plan.payload_bytes)};
+    p::BoundWakeFacetStorage changed_storage{changed_memory}, last_storage{changed_memory};
+    {
+        const auto first = test_geometry::take(recycled(near_source, changed_storage, limits()));
+        CHECK(first.active());
+    }
+    const auto changed = test_geometry::take(same_size_fresh(changed_storage));
+    const auto cold = test_geometry::take(same_size_fresh(last_storage));
+    const auto warm_report = test_geometry::take(changed.report());
+    const auto cold_report = test_geometry::take(cold.report());
+    // Storage reuse has its own initialization visits. The new snapshot must
+    // pay the same numerical preparation costs as the empty storage.
+    CHECK(warm_report.used_steps >= cold_report.used_steps);
 }
 
 TEST_CASE("Serial bound midpoints exclude each new self edge and retain its wake alias",

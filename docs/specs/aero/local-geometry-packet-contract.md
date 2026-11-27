@@ -57,6 +57,8 @@ LocalPacketWorkspaceは既存GeometryWorkspaceと同じlease境界を使い、�
 
 共有作用を組み立てる前には、三角形と照会位置の読取り18 step、A0の17 stepと述語subcapの小さい方、包絡の3108 stepを合算する。中点の別名経路は、入口2 step、元facet索引の二分探索、三辺の照合3 stepで覆う。共有作用はこの上限と呼出し側のgeometry予算の小さい方を局所準備の予約と上限に使い、実行したstepを計上する。
 
+共有作用で直列に使う局所パケット領域には、照会を変えても同じ三角形に属する法線3成分、面積3成分、最長辺長の包絡が残る。前の準備が成功し、幾何の所有元、facet ID、要求表現、幅の上限tauが同じ場合に限り、この7量を再利用して1量につき1 stepを計上する。位置、距離、接触と最近実体は新しい照会について認定する。事前予約は再利用できない場合の上限を保つ。
+
 32768bit/et_offの積と整数除算は逐次実行し、既存の固定Boost外部scratch forecast `7L limb = 28672byte` を再利用する。平方根は上記bit試行と比較で評価する。新しい同時積・動的精度型・再帰階層を重ねない。allocator overhead/RSSのhard capとは呼ばず、proven boundなしのstrict要求は既存と同じUnsupportedとする。結果確保と外部scratchのbad_allocは既存cause/detailsを保ち、leaseを解放する。
 
 任意の計測要求は数学のaccuracyと分離したmetadataである。disabledを既定とし、時計読みを行わない。enabledでは既存StageTimingで分類、接触資格、包絡、および包絡内のroot/幅認定を記録する。root/幅は包絡時間へ内包されるため合計へ重複加算しない。計測の有無で中心/半径/資格/実stepを変えない。準備段階の観測を物理kernelや実務全体の性能へ一般化しない。

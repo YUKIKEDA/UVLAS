@@ -61,8 +61,8 @@ Shape build_maximum_shape() {
             maximum.work = std::max(maximum.work, count.work);
         }
     }
-    // The contour has three independent edge expressions. Taking all three
-    // branches alike covers the maximal node and work sums.
+    // All three edges activate the maximum number of shared endpoint roots.
+    // After those roots, each edge contributes its own branch cost.
     for (const std::int8_t sign : {std::int8_t{0}, std::int8_t{1}}) {
         p1::Options options;
         options.start_sign.fill(sign);
