@@ -710,6 +710,27 @@ TEST_CASE(
     CHECK(n_difference.property == rd::NastranPropertyId{90});
     CHECK(required_evidence(n_difference.field).byte == millimetre_deck(young).find("2.54"));
 
+    auto unknown_face_case = config;
+    auto unknown_face_map = nlohmann::json::parse(nastran_map("3"));
+    unknown_face_map["shells"].at(0)["element"] = "999";
+    const auto map_bytes = unknown_face_map.dump();
+    auto& map_ref =
+        unknown_face_case.field("model").field("geometry").elements.at(2).field("sidecar");
+    files::declare_path(map_ref, "unknown-face.json", hex_digest(map_bytes));
+    files::write_file(tree.root / "unknown-face.json", map_bytes);
+    const auto unknown_face_graph = read_graph(tree, unknown_face_case, plan);
+    const auto unknown_face_schema = fixture::checked(unknown_face_case);
+    const auto unknown_face = bind(unknown_face_schema, unknown_face_graph, 3);
+    REQUIRE_FALSE(unknown_face);
+    CHECK(unknown_face.error().code == core::FailureCode::InvalidInput);
+    CHECK(unknown_face.error().operation == core::Operation::PrepareModel);
+    const auto& unknown_face_diagnostic = required_evidence(binding_diag);
+    CHECK(unknown_face_diagnostic.reason == rd::MeshSidecarFailure::Selection);
+    CHECK(unknown_face_diagnostic.element == 999);
+    CHECK(required_evidence(unknown_face_diagnostic.source).source == io::SourceId{4});
+    CHECK(unknown_face_diagnostic.node);
+    CHECK_FALSE(unknown_face_diagnostic.byte);
+
     const auto g_again = fixture::take(prepare_gmsh(si, gmsh, gmsh_diag));
     const auto n_again = fixture::take(prepare_nastran(si, nastran, cards, nastran_diag));
     CHECK(fixture::take(fixture::take(g_again.at(0)).get().reference().identity()) == identity);
