@@ -25,6 +25,19 @@ struct StraightWakeColumnUpdate {
     ContourInterval imaginary;
 };
 
+struct StraightWakeAgeQuadrature {
+    core::PlannedBuffer<StraightWakeAgeSample> samples;
+    std::uint64_t interval_steps{};
+};
+
+/// Own the finite Gauss16 rule on explicitly supplied, increasing age
+/// boundaries in seconds, starting at zero. Frequency is in rad/s. Included
+/// error covers nodes, weights and phase arithmetic, for the supplied partition.
+[[nodiscard]] AeroResult<StraightWakeAgeQuadrature> prepare_straight_wake_age_quadrature(
+    const GeometryContext&, std::span<const double> age_boundaries_seconds,
+    double angular_frequency, std::uint64_t maximum_samples, std::uint64_t maximum_interval_steps,
+    core::ResourcePlan&, std::stop_token = {}) noexcept;
+
 /// Project the age derivative of a directed, constant-strength wake contour at the
 /// supplied samples. The contour goes from first to second, downstream, then back
 /// to first. Core radius is strictly positive. The caller qualifies the geometry

@@ -1,6 +1,8 @@
 #include "closed_contour.hpp"
 
+#include "certified_trigonometry_private.hpp"
 #include "global_geometry_private.hpp"
+#include "p1_quadrature_private.hpp"
 #include "p1_shared_kernel.hpp"
 
 #include <cmath>
@@ -333,6 +335,76 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
     return work.used;
 }
 } // namespace
+
+AeroResult<StraightWakeAgeQuadrature>
+prepare_straight_wake_age_quadrature(const GeometryContext& context,
+                                     std::span<const double> boundaries, double frequency,
+                                     std::uint64_t maximum_samples, std::uint64_t maximum_steps,
+                                     core::ResourcePlan& plan, std::stop_token stop) noexcept {
+    return guard<StraightWakeAgeQuadrature>(context, [&] {
+        if (stop.stop_requested())
+            reject(core::FailureCode::Cancelled);
+        if (!p1_environment_supported())
+            reject(core::FailureCode::PrecisionUnsupported);
+        if (boundaries.size() < 2 || boundaries.front() != 0 || !std::isfinite(frequency))
+            reject(invalid);
+        constexpr auto order = p1::gauss_16.size();
+        const auto count = times(boundaries.size() - 1, order);
+        if (count > maximum_samples)
+            reject(exhausted);
+        p1::Work work{0, maximum_steps, stop};
+        try {
+            for (std::size_t i = 1; i < boundaries.size(); ++i) {
+                work.step();
+                if (!std::isfinite(boundaries[i]) || boundaries[i] <= boundaries[i - 1])
+                    reject(invalid);
+            }
+            std::array<p1::Interval, order> nodes, weights;
+            p1::build_rule(p1::gauss_16, std::span{nodes}, std::span{weights}, work);
+            const auto half_frequency = p1::scale(decode_p1_word(frequency), -1);
+            const auto pi = p1::pi_constant(work);
+            const auto rounded = [](const p1::Bound& value, bool upper) {
+                if (value.mantissa == 0)
+                    return 0.;
+                const auto top = static_cast<std::int64_t>(value.power) + p1::bits(value.mantissa);
+                const auto quantum = p1::exponent(std::max<std::int64_t>(-1074, top - 53));
+                const auto head = p1::at_power(value, quantum, upper);
+                const auto result = std::scalbn(head.convert_to<double>(), quantum);
+                if (!std::isfinite(result))
+                    reject(unresolved);
+                return result;
+            };
+            const auto enclosure = [&](const p1::Interval& value) {
+                return Interval{rounded(value.lower, false), rounded(value.upper, true)};
+            };
+            core::PlannedBuffer<StraightWakeAgeSample> samples;
+            allocate(samples, count, plan, context);
+            std::size_t out = 0;
+            auto left = decode_p1_word(boundaries.front());
+            for (const auto hi : boundaries.subspan(1)) {
+                const auto right = decode_p1_word(hi);
+                const auto width = p1::subtract(right, left, work);
+                for (std::size_t i = 0; i < order; ++i) {
+                    const auto age = p1::add(left, p1::multiply(width, nodes[i], work), work);
+                    const auto q = p1::multiply(width, weights[i], work);
+                    const auto half_phase = p1::multiply(age, half_frequency, work);
+                    const auto phase =
+                        p1::sine_cosine(half_phase, p1::PhaseUnits::Radians, pi, work);
+                    const auto weighted =
+                        p1::negate(p1::scale(p1::multiply(q, phase.sine, work), 1), work);
+                    samples.values()[out++] = {
+                        enclosure(age), enclosure(p1::multiply(weighted, phase.sine, work)),
+                        enclosure(p1::multiply(weighted, phase.cosine, work))};
+                }
+                left = right;
+            }
+            work.step();
+            return StraightWakeAgeQuadrature{std::move(samples), work.used};
+        } catch (const p1::ArithmeticFailure& failure) {
+            reject(failure.code);
+        }
+    });
+}
 
 AeroResult<StraightWakeColumnUpdate> project_straight_wake_column_update(
     const GeometryContext& context, const ContourVector& first, const ContourVector& second,

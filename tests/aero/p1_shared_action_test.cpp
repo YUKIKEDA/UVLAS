@@ -314,6 +314,78 @@ TEST_CASE("Shared P1 quad action and all derivatives match independent area quad
     }
 }
 
+TEST_CASE("Gauss16 wake samples enclose the fixed age rule and complex phase",
+          "[UW-D01][UW-D02][verification][negative]") {
+    const auto context = test_geometry::context();
+    const std::array boundaries{0., .125, .5};
+    const auto make = [&](double frequency, std::uint64_t sample_limit, std::uint64_t work,
+                          core::ResourcePlan& plan) {
+        return p::prepare_straight_wake_age_quadrature(context, boundaries, frequency, sample_limit,
+                                                       work, plan);
+    };
+    using Gauss = boost::math::quadrature::gauss<Big, 16>;
+    const auto& nodes = Gauss::abscissa();
+    const auto& weights = Gauss::weights();
+    constexpr std::uint64_t sample_count = 32;
+    constexpr auto bytes = sample_count * sizeof(p::StraightWakeAgeSample);
+    const auto encloses = [](p::ContourInterval interval, const Big& target) {
+        CHECK(Big(interval.lower) <= target);
+        CHECK(target <= Big(interval.upper));
+        CHECK(interval.upper - interval.lower < 1e-14);
+    };
+    for (const double frequency : {32., -32., 0., 1e-20}) {
+        CAPTURE(frequency);
+        core::ResourcePlan plan{bytes};
+        const auto result = make(frequency, sample_count, 1'000'000, plan);
+        REQUIRE(result);
+        CHECK(plan.allocated_bytes() == bytes);
+        REQUIRE(result->samples.size() == sample_count);
+        for (std::size_t panel = 0; panel < boundaries.size() - 1; ++panel) {
+            const Big left{boundaries[panel]}, right{boundaries[panel + 1]};
+            const Big scale = (right - left) / 2;
+            const Big midpoint = (left + right) / 2;
+            for (std::size_t i = 0; i < sample_count / 2; ++i) {
+                const auto positive = i >= nodes.size();
+                const auto j = positive ? i - nodes.size() : nodes.size() - 1 - i;
+                const Big age = midpoint + (positive ? nodes[j] : -nodes[j]) * scale;
+                const Big quadrature = scale * weights[j];
+                const Big phase = age * frequency;
+                const auto& sample = result->samples.values()[panel * 16 + i];
+                encloses(sample.age_seconds, age);
+                encloses(sample.real_weight_seconds, quadrature * (cos(phase) - 1));
+                encloses(sample.imaginary_weight_seconds, -quadrature * sin(phase));
+                if (frequency == 0.) {
+                    CHECK(sample.real_weight_seconds.lower == 0);
+                    CHECK(sample.real_weight_seconds.upper == 0);
+                    CHECK(sample.imaginary_weight_seconds.lower == 0);
+                    CHECK(sample.imaginary_weight_seconds.upper == 0);
+                }
+            }
+        }
+        core::ResourcePlan exact{bytes};
+        const auto replay = make(frequency, sample_count, result->interval_steps, exact);
+        REQUIRE(replay);
+        CHECK(replay->interval_steps == result->interval_steps);
+        core::ResourcePlan short_steps{bytes};
+        rejected(make(frequency, sample_count, result->interval_steps - 1, short_steps),
+                 core::FailureCode::ResourceExceeded);
+    }
+    core::ResourcePlan short_samples{bytes};
+    rejected(make(32., sample_count - 1, 1'000'000, short_samples),
+             core::FailureCode::ResourceExceeded);
+    CHECK(short_samples.allocated_bytes() == 0);
+    core::ResourcePlan short_storage{bytes - 1};
+    rejected(make(32., sample_count, 1'000'000, short_storage),
+             core::FailureCode::ResourceExceeded);
+    CHECK(short_storage.allocated_bytes() == 0);
+    const std::array invalid_ages{0., .125, .125};
+    core::ResourcePlan invalid{bytes};
+    rejected(p::prepare_straight_wake_age_quadrature(context, invalid_ages, 32., sample_count,
+                                                     1'000'000, invalid),
+             core::FailureCode::InvalidInput);
+    CHECK(invalid.allocated_bytes() == 0);
+}
+
 TEST_CASE("Straight wake age update agrees with the finite-core strip integral",
           "[UW-D01][UW-D02][UW-D07][UI-D05][verification][negative]") {
     const auto vector_words = [](const std::array<double, 3>& point) {
