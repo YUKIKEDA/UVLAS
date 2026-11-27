@@ -221,6 +221,11 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
         LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
     target_include_directories(uvlas_test_io_external_shell_cross_format PRIVATE
         "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+    add_test(NAME io.external_case_chart
+        COMMAND uvlas_test_io_external_shell_cross_format "[.external-case-chart]")
+    set_tests_properties(io.external_case_chart PROPERTIES
+        LABELS "V-USE;V-PG;integration;negative;verification"
+        TIMEOUT "$<IF:$<CONFIG:Debug>,300,120>")
 endif()
 
 if(WIN32)

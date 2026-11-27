@@ -1,5 +1,6 @@
 #include "../structure/pg_partition_test_support.hpp"
 #include "coupling/case_external_pg.hpp"
+#include "coupling/case_external_pg_chart.hpp"
 #include "coupling/case_nastran_static_point_support.hpp"
 #include "reference_file_test_fixture.hpp"
 #include "reference_resolution.hpp"
@@ -8,6 +9,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include <source_location>
+#include <stdexcept>
 
 namespace {
 namespace io = uvlas::io;
@@ -17,6 +19,16 @@ namespace coupling = uvlas::coupling::detail;
 namespace fixture = uvlas::test::declaration_fixture;
 namespace files = uvlas::test::reference_file_fixture;
 using namespace uvlas::structure;
+
+template <class T>
+[[nodiscard]] const T&
+required_evidence(const std::optional<T>& value,
+                  std::source_location location = std::source_location::current()) {
+    if (!value)
+        throw std::runtime_error("Missing external chart evidence at line " +
+                                 std::to_string(location.line()));
+    return *value;
+}
 
 constexpr std::string_view mesh = R"MSH($MeshFormat
 4.1 0 8
@@ -191,6 +203,30 @@ rd::NastranLaminateCards quantities(const rd::ReferencedCase& graph,
         rd::NastranIsotropicShellCards::prepare(std::move(shells), {32, 32'000}, plan, {}));
     return fixture::take(
         rd::NastranLaminateCards::prepare(std::move(mats), {32, 32'000}, plan, {}));
+}
+
+coupling::CasePgChartLimits chart_preparation(const coupling::CasePgReferenceLimits& reference,
+                                              std::uint64_t patches, std::uint64_t sources) {
+    auto exact = reference.geometry;
+    exact.algebra.maximum_value_bits = 65536;
+    exact.algebra.maximum_work_bits = 262144;
+    exact.maximum_scalar_operations = 300'000'000;
+    exact.maximum_partition_visits = 100'000'000;
+    constexpr auto steps = std::uint64_t{10'000'000'000'000};
+    constexpr auto profile = std::uint64_t{48} << 30U;
+    return {
+        reference,
+        {profile, steps, 128, {}},
+        {768, 704},
+        {exact, steps},
+        {768, 192},
+        {profile, steps, {}},
+        exact,
+        {reference.geometry.algebra, 10'000, coupling::case_motion_frame_interval_scratch_bytes},
+        {exact, 120'000},
+        {exact, patches, sources, 500, 120'000},
+        {exact, 512, 960, 140'000},
+        100'000};
 }
 
 class RectangleOracle {
@@ -496,6 +532,376 @@ TEST_CASE("One planar Case has the same measured Shell through Nastran and Gmsh"
     const auto n_again = fixture::take(prepare_nastran(nastran, native, &nastran_diag));
     CHECK(fixture::take(fixture::take(g_again.at(0)).get().reference().identity()) == identity);
     CHECK(fixture::take(fixture::take(n_again.at(0)).get().reference().identity()) == identity);
+}
+
+TEST_CASE(
+    "Authenticated external reference owners enter the same full-depth Case chart",
+    "[.external-case-chart][FD-03][IO4-03][IO4-04][R-05][V-USE][V-PG][integration][negative]") {
+    using Code = core::FailureCode;
+    core::ResourcePlan plan{fixture::budget};
+    auto config = fixture::root("coupled_transient");
+    auto& model = config.field("model");
+    model.field("supports").elements[0] = fixture::fragment("Support.trace_constraint");
+    auto& pg = model.field("geometry").elements.front();
+    pg.field("frame").set("origin", fixture::json("[1,2,3]"));
+    pg.field("frame").set("rotation", fixture::json("[[0,0,1],[1,0,0],[0,1,0]]"));
+    pg.set("reference_length", fixture::json("2"));
+    pg.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    model.field("shells")
+        .elements.front()
+        .field("layers")
+        .elements.front()
+        .field("axis")
+        .field("direction")
+        .set("value", fixture::json("[0,1,0]"));
+    const auto with_line = [](std::string_view line) {
+        std::string msh{mesh};
+        const auto entities = msh.find("0 0 1 0\n");
+        REQUIRE(entities != std::string::npos);
+        msh.replace(entities, std::string_view{"0 0 1 0\n"}.size(),
+                    "0 1 1 0\n11 1000 2000 3000 1000 4000 5000 1 7 0\n");
+        constexpr std::string_view old = "1 1 701 701\n";
+        const auto elements = msh.find(old);
+        REQUIRE(elements != std::string::npos);
+        msh.replace(elements, old.size(), "2 2 501 701\n1 11 1 1\n501 " + std::string{line} + "\n");
+        return msh;
+    };
+    const auto map = [](unsigned id) {
+        auto sidecar = native_sidecar(true, false, std::to_string(id));
+        sidecar["supports"].push_back(
+            {{"physical", {{"dimension", 1}, {"tag", 7}}}, {"support", "1"}});
+        return sidecar.dump();
+    };
+    const auto graph = [&] {
+        const files::Tree tree;
+        write_external(model, tree, true, 2, 1, with_line("99 10"), map(2));
+        add_external(model, tree, false, false, 3, 3);
+        write_external(model, tree, true, 4, 5, with_line("20 40"), map(4));
+        add_external(model, tree, false, true, 5, 7);
+        return read_graph(tree, config, plan);
+    }();
+    const auto schema = fixture::checked(config);
+    const auto parent = fixture::take(schema.identity());
+    const auto binding_limits = make_binding_limits();
+    const auto bind = [&](unsigned id) {
+        return fixture::take(rd::bind_external_mesh_sidecar(schema, graph, rd::MeshGeometryId{id},
+                                                            binding_limits, plan, {}, nullptr));
+    };
+    const auto g = bind(2), n = bind(3), wrong_edge = bind(4), wrong_thickness = bind(5);
+    const auto cards = quantities(graph, parent, io::SourceId{3}, binding_limits, plan);
+    const auto bad_cards = quantities(graph, parent, io::SourceId{7}, binding_limits, plan);
+
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const auto si = convert(schema, arithmetic.algebra, plan);
+    const coupling::CasePgReferenceLimits preparation{
+        {arithmetic.algebra, 4, {}},
+        {arithmetic.algebra, 2000, 20'000'000, 100'000, {}},
+        partition_test::limits(),
+        arithmetic,
+        100'000,
+        {}};
+    const rd::ExternalSidecarPgLimits correspondence{
+        {arithmetic, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
+    const auto chart_limits = chart_preparation(preparation, 1, 1);
+    const coupling::CaseGmshPgChartLimits g_limits{
+        chart_limits, correspondence, {1, 1, 200'000}, {arithmetic, 1}, 1};
+    const coupling::CaseNastranPgChartLimits n_limits{chart_limits, correspondence, {1, 1, 1}};
+    const RectangleOracle oracle{arithmetic, plan};
+    const auto plane_weight = oracle.r("1", "6");
+    const auto depth_weight = oracle.r("1", "3");
+    std::array<ExactRational, 6> positions;
+    std::vector<PgLineQuadratureNode> plane;
+    plane.reserve(positions.size());
+    for (std::size_t i = 0; i < positions.size(); ++i) {
+        positions[i] = oracle.r(std::to_string(2 * i + 1), "12");
+        plane.push_back({positions[i], plane_weight});
+    }
+    const auto quarter = oracle.r("1", "4"), half = oracle.r("1", "2"), last = oracle.r("3", "4");
+    const std::array depth{PgLineQuadratureNode{quarter, depth_weight},
+                           PgLineQuadratureNode{half, depth_weight},
+                           PgLineQuadratureNode{last, depth_weight}};
+    const std::array rules{
+        coupling::CasePgRuleBinding{1, PgVolumeProductRule{plane, plane, depth}}};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    coupling::CaseGmshPgChartDiagnostic g_problem;
+    coupling::CaseNastranPgSetDiagnostic n_problem;
+    core::ResourcePlan none{0};
+    const auto stopped = coupling::prepare_case_gmsh_pg_chart(
+        si, g, rules, g_limits, workspace, none, partition_test::requested_stop_token());
+    REQUIRE_FALSE(stopped);
+    CHECK(stopped.error().code == Code::Cancelled);
+    auto short_limits = g_limits;
+    short_limits.maximum_support_mappings = 0;
+    const auto denied =
+        coupling::prepare_case_gmsh_pg_chart(si, g, rules, short_limits, workspace, none);
+    REQUIRE_FALSE(denied);
+    CHECK(denied.error().code == Code::ResourceExceeded);
+    CHECK(none.allocated_bytes() == 0);
+
+    const auto rejected_edge = coupling::prepare_case_gmsh_pg_chart(
+        si, wrong_edge, rules, g_limits, workspace, plan, {}, &g_problem);
+    REQUIRE_FALSE(rejected_edge);
+    const auto& edge_problem = required_evidence(g_problem.support);
+    CHECK(rejected_edge.error().code == Code::InvalidInput);
+    CHECK(edge_problem.reason == coupling::CaseGmshSupportBoundaryFailure::OutsideBoundary);
+    CHECK(edge_problem.line == 501);
+    const auto rejected_thickness = coupling::prepare_case_nastran_pg_chart(
+        si, wrong_thickness, bad_cards, rules, n_limits, workspace, plan, {}, &n_problem);
+    REQUIRE_FALSE(rejected_thickness);
+    CHECK(rejected_thickness.error().code == Code::InvalidInput);
+    CHECK(required_evidence(n_problem.member.planar.regional_thickness).element == 701);
+
+    core::ResourcePlan g_plan{fixture::budget}, n_plan{fixture::budget},
+        direct_plan{fixture::budget};
+    const auto g_chart = fixture::take(coupling::prepare_case_gmsh_pg_chart(
+        si, g, rules, g_limits, workspace, g_plan, {}, &g_problem));
+    const auto n_chart = fixture::take(coupling::prepare_case_nastran_pg_chart(
+        si, n, cards, rules, n_limits, workspace, n_plan, {}, &n_problem));
+    const auto reference = fixture::take(
+        coupling::prepare_case_pg_chart(si, rules, chart_limits, workspace, direct_plan));
+    core::ResourcePlan g_separate{fixture::budget}, n_separate{fixture::budget};
+    const auto g_set = fixture::take(coupling::CaseGmshPgSet::prepare(
+        si, g, preparation, correspondence, g_limits.shells, workspace, g_separate));
+    REQUIRE(coupling::certify_case_gmsh_support_boundary(
+        si, g, g_set, rd::MeshSupportId{1}, rd::GmshKey{1, 7}, g_limits.support, g_separate));
+    REQUIRE(coupling::CaseNastranPlanarPgSet::prepare(si, n, cards, preparation, correspondence,
+                                                      n_limits.shells, workspace, n_separate));
+    CHECK(g_plan.allocated_bytes() < g_separate.allocated_bytes() + direct_plan.allocated_bytes());
+    CHECK(n_plan.allocated_bytes() < n_separate.allocated_bytes() + direct_plan.allocated_bytes());
+    const auto expected = fixture::take(reference.shell_reference(uvlas::numerics::PatchId{1}, 1));
+    const auto g_shell =
+        fixture::take(g_chart.chart.shell_reference(uvlas::numerics::PatchId{1}, 1));
+    const auto n_shell =
+        fixture::take(n_chart.chart.shell_reference(uvlas::numerics::PatchId{1}, 1));
+    REQUIRE(g_chart.shells.size() == 1);
+    const auto& g_evidence = required_evidence(g_chart.shells.values().front());
+    REQUIRE(n_chart.shells.size() == 1);
+    const auto& n_evidence = required_evidence(n_chart.shells.values().front());
+    REQUIRE(g_chart.supports.size() == 1);
+    const auto& support = required_evidence(g_chart.supports.values().front());
+    REQUIRE(support.lines.size() == 1);
+    CHECK(support.lines.values().front().nodes == std::array<std::uint64_t, 2>{99, 10});
+    CHECK(support.lines.values().front().incident_face == 701);
+    const auto identity = fixture::take(
+        fixture::take(expected.patch().conditioning().reference_basis())->reference_identity());
+    CHECK(support.patch == identity);
+    CHECK(required_evidence(g_evidence.thickness).pg == identity);
+    CHECK(required_evidence(n_evidence.planar.thickness_regions).pg == identity);
+    for (const auto* observed : {&g_shell, &n_shell}) {
+        CHECK(observed->chart_identity() == expected.chart_identity());
+        CHECK(observed->columns().basis == expected.columns().basis);
+        CHECK(observed->fixed_rule().size() == expected.fixed_rule().size());
+        const auto& original = observed->chart().original();
+        REQUIRE(original.sources().size() == 1);
+        CHECK(original.sources()[0].kind == PgTraceKind::Support);
+        REQUIRE_FALSE(original.original_rows().empty());
+        const auto x0 = observed->patch().reference_coordinates();
+        const auto residual = fixture::take(original.residual(
+            {original.layout(), x0}, chart_limits.chart.arithmetic, workspace, plan));
+        REQUIRE(residual.values().size() == original.original_rows().size());
+        for (const auto& value : residual.values())
+            for (const auto& component : value)
+                CHECK(component.sign() == 0);
+    }
+}
+
+TEST_CASE("Both Gmsh joint sides retain provenance in the assembled Case connection",
+          "[.external-case-chart][FD-03][FD-05][IO4-04][R-05][V-PG][integration][negative]") {
+    constexpr std::string_view joined_mesh = R"msh($MeshFormat
+4.1 0 8
+$EndMeshFormat
+$Entities
+0 2 2 0
+11 1000 0 0 1000 1000 0 1 11 0
+12 1000 0 0 1000 1000 0 1 12 0
+17 0 0 0 1000 1000 0 1 7 0
+18 1000 0 0 2000 1000 0 1 7 0
+$EndEntities
+$Nodes
+2 8 10 80
+2 17 0 4
+10 20 30 40
+0 0 0
+1000 0 0
+1000 1000 0
+0 1000 0
+2 18 0 4
+50 60 70 80
+1000 0 0
+2000 0 0
+2000 1000 0
+1000 1000 0
+$EndNodes
+$Elements
+4 4 501 702
+1 11 1 1
+501 20 30
+1 12 1 1
+502 80 50
+2 17 3 1
+701 10 20 30 40
+2 18 3 1
+702 50 60 70 80
+$EndElements
+)msh";
+    constexpr std::string_view adhesive = R"json(
+{"kind":"adhesive","id":"1",
+ "first":{"target":{"kind":"shell","id":"1"},"kind":"edge","geometry":"1","boundary":1,"side":"interior"},
+ "second":{"target":{"kind":"shell","id":"2"},"kind":"edge","geometry":"6","boundary":0,"side":"interior"},
+ "mapping":[
+   {"first_cell":[1,0],"second_cell":[0,0],
+    "domain":[[{"numerator":"0","denominator":"1"},{"numerator":"-1","denominator":"1"}],
+              [{"numerator":"1","denominator":"2"},{"numerator":"-1","denominator":"1"}],
+              [{"numerator":"1","denominator":"2"},{"numerator":"1","denominator":"1"}],
+              [{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}]],
+    "first":[[{"powers":[0,0],"coefficient":{"numerator":"1","denominator":"1"}}],
+             [{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"1"}}],
+             [{"powers":[0,1],"coefficient":{"numerator":"1","denominator":"1"}}]],
+    "second":[[],[{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"1"}}],
+                 [{"powers":[0,1],"coefficient":{"numerator":"1","denominator":"1"}}]],
+    "orientation":"same"},
+   {"first_cell":[1,1],"second_cell":[0,1],
+    "domain":[[{"numerator":"1","denominator":"2"},{"numerator":"-1","denominator":"1"}],
+              [{"numerator":"1","denominator":"1"},{"numerator":"-1","denominator":"1"}],
+              [{"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}],
+              [{"numerator":"1","denominator":"2"},{"numerator":"1","denominator":"1"}]],
+    "first":[[{"powers":[0,0],"coefficient":{"numerator":"1","denominator":"1"}}],
+             [{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"1"}}],
+             [{"powers":[0,1],"coefficient":{"numerator":"1","denominator":"1"}}]],
+    "second":[[],[{"powers":[1,0],"coefficient":{"numerator":"1","denominator":"1"}}],
+                 [{"powers":[0,1],"coefficient":{"numerator":"1","denominator":"1"}}]],
+    "orientation":"same"}],"split_at_attachment":false}
+)json";
+    core::ResourcePlan plan{fixture::budget};
+    auto config = fixture::root("coupled_transient");
+    auto& model = config.field("model");
+    model.field("supports").elements[0] = fixture::fragment("Support.trace_constraint");
+    model.field("joints").elements.push_back(fixture::json(adhesive));
+    auto& pg = model.field("geometry").elements.front();
+    pg.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    auto other_geometry = pg;
+    other_geometry.set("id", fixture::string("6"));
+    other_geometry.field("frame").set("origin", fixture::json("[1,0,0]"));
+    model.field("geometry").elements.push_back(std::move(other_geometry));
+    auto other_shell = model.field("shells").elements.front();
+    other_shell.set("id", fixture::string("2"));
+    other_shell.set("geometry", fixture::string("6"));
+    other_shell.field("layers").elements.front().set("id", fixture::string("2"));
+    model.field("shells").elements.push_back(std::move(other_shell));
+
+    const auto mapping = [](unsigned geometry, bool swapped) {
+        auto result = native_sidecar(true, false, std::to_string(geometry));
+        auto right = result["shells"][0];
+        right["shell"] = "2";
+        right["faces"][0]["element"] = "702";
+        right["material_layers"][0]["layer"] = "2";
+        result["shells"].push_back(std::move(right));
+        result["joints"].push_back({{"first", {{"dimension", 1}, {"tag", swapped ? 12 : 11}}},
+                                    {"second", {{"dimension", 1}, {"tag", swapped ? 11 : 12}}},
+                                    {"joint", "1"}});
+        return result.dump();
+    };
+    const auto graph = [&] {
+        const files::Tree tree;
+        write_external(model, tree, true, 2, 1, joined_mesh, mapping(2, false));
+        write_external(model, tree, true, 3, 3, joined_mesh, mapping(3, true));
+        return read_graph(tree, config, plan);
+    }();
+    const auto schema = fixture::checked(config);
+    const auto bind = [&](unsigned id) {
+        return fixture::take(rd::bind_external_mesh_sidecar(
+            schema, graph, rd::MeshGeometryId{id}, make_binding_limits(), plan, {}, nullptr));
+    };
+    const auto bound = bind(2), swapped = bind(3);
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const auto si = convert(schema, arithmetic.algebra, plan);
+    const coupling::CasePgReferenceLimits pg_limits{
+        {arithmetic.algebra, 4, {}},
+        {arithmetic.algebra, 2000, 20'000'000, 100'000, {}},
+        partition_test::limits(),
+        arithmetic,
+        100'000,
+        {}};
+    const auto chart_limits = chart_preparation(pg_limits, 2, 2);
+    const coupling::CaseGmshPgChartLimits limits{
+        chart_limits,
+        {{arithmetic, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000},
+        {2, 8, 200'000},
+        {arithmetic, 1},
+        0,
+        1};
+    const RectangleOracle oracle{arithmetic, plan};
+    const auto weight = oracle.r("1", "6"), third = oracle.r("1", "3");
+    std::array<ExactRational, 6> positions;
+    std::vector<PgLineQuadratureNode> plane;
+    plane.reserve(positions.size());
+    for (std::size_t i = 0; i < positions.size(); ++i) {
+        positions[i] = oracle.r(std::to_string(2 * i + 1), "12");
+        plane.push_back({positions[i], weight});
+    }
+    const auto low = oracle.r("1", "4"), half = oracle.r("1", "2"), high = oracle.r("3", "4");
+    const std::array depth{PgLineQuadratureNode{low, third}, PgLineQuadratureNode{half, third},
+                           PgLineQuadratureNode{high, third}};
+    const PgVolumeProductRule product{plane, plane, depth};
+    const std::array rules{coupling::CasePgRuleBinding{1, product},
+                           coupling::CasePgRuleBinding{2, product}};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    coupling::CaseGmshPgChartDiagnostic diagnostic;
+    const auto rejected = coupling::prepare_case_gmsh_pg_chart(si, swapped, rules, limits,
+                                                               workspace, plan, {}, &diagnostic);
+    REQUIRE_FALSE(rejected);
+    CHECK(rejected.error().code == core::FailureCode::InvalidInput);
+    const auto& joint_problem = required_evidence(diagnostic.joint);
+    CHECK(joint_problem.joint == rd::MeshJointId{1});
+    CHECK(joint_problem.endpoint == 0);
+    CHECK(joint_problem.edge.reason == coupling::CaseGmshSupportBoundaryFailure::Incidence);
+    CHECK(joint_problem.edge.line == 502);
+
+    const auto prepared = fixture::take(coupling::prepare_case_gmsh_pg_chart(
+        si, bound, rules, limits, workspace, plan, {}, &diagnostic));
+    CHECK_FALSE(diagnostic.joint);
+    REQUIRE(prepared.joints.size() == 1);
+    const auto& joint = required_evidence(prepared.joints.values().front());
+    CHECK(joint.joint == rd::MeshJointId{1});
+    for (std::size_t i = 0; i < joint.endpoints.size(); ++i) {
+        const auto& edge = joint.endpoints[i];
+        CHECK(edge.shell == rd::MeshShellId{i + 1});
+        REQUIRE(edge.lines.size() == 1);
+        CHECK(edge.lines.values()[0].element == 501 + i);
+        CHECK(edge.lines.values()[0].incident_face == 701 + i);
+        const auto shell =
+            fixture::take(prepared.chart.shell_reference(uvlas::numerics::PatchId{i + 1}, 2));
+        const auto* basis = fixture::take(shell.patch().conditioning().reference_basis());
+        CHECK(fixture::take(basis->reference_identity()) == edge.patch);
+    }
+    const auto& original = prepared.chart.chart().original();
+    REQUIRE(original.sources().size() == 2);
+    CHECK(std::ranges::count_if(original.sources(), [](const auto& entry) {
+              return entry.kind == PgTraceKind::Connection;
+          }) == 1);
+    REQUIRE_FALSE(original.original_rows().empty());
+    CHECK_FALSE(prepared.chart.chart().pivots().empty());
+
+    std::vector<PgCartesianExactPosition> coordinates;
+    REQUIRE(original.layout().size() == 2);
+    for (const auto& entry : original.layout()) {
+        REQUIRE(static_cast<std::size_t>(entry.first) == coordinates.size());
+        const auto shell = fixture::take(prepared.chart.shell_reference(entry.id, 2));
+        const auto reference = shell.patch().reference_coordinates();
+        REQUIRE(static_cast<std::size_t>(entry.count) == reference.size());
+        for (const auto& point : reference) {
+            PgCartesianExactPosition copy;
+            for (std::size_t d = 0; d < copy.size(); ++d)
+                copy[d] = fixture::take(point[d].clone(arithmetic.algebra, plan));
+            coordinates.push_back(std::move(copy));
+        }
+    }
+    const auto residual = fixture::take(original.residual(
+        {original.layout(), coordinates}, chart_limits.chart.arithmetic, workspace, plan));
+    REQUIRE(residual.values().size() == original.original_rows().size());
+    for (const auto& value : residual.values())
+        for (const auto& component : value)
+            CHECK(component.sign() == 0);
 }
 
 TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
