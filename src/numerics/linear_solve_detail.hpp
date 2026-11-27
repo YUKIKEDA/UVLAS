@@ -2,6 +2,10 @@
 #include <span>
 #include <uvlas/numerics/linear_solve.hpp>
 
+namespace uvlas::numerics::detail {
+class CheckedEft;
+}
+
 namespace uvlas::numerics::linear::detail {
 [[nodiscard]] core::Result<void> check_accuracy_inputs(const Accuracy& accuracy) noexcept;
 [[nodiscard]] core::Result<void>
@@ -26,6 +30,11 @@ struct MagnitudeBounds {
 // A finite overflow is represented by max-double lower / infinity upper.
 [[nodiscard]] MagnitudeBounds add_magnitudes(MagnitudeBounds a, MagnitudeBounds b) noexcept;
 [[nodiscard]] MagnitudeBounds multiply_magnitudes(MagnitudeBounds a, MagnitudeBounds b) noexcept;
+/// Accumulate one product of nonnegative lower bounds with the same downward
+/// rounding as the lower component of multiply_magnitudes and add_magnitudes.
+[[nodiscard]] double
+add_magnitude_product_lower(double sum, double a, double b,
+                            const uvlas::numerics::detail::CheckedEft&) noexcept;
 
 // Enclose abs(high+low), not abs(high)+abs(low). Nonfinite words return Nonfinite.
 // A finite exact magnitude outside binary64 can have an infinite upper bound.

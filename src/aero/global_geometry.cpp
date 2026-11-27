@@ -1,4 +1,5 @@
 #include "global_geometry_private.hpp"
+#include "query_coordinates_private.hpp"
 
 #include <utility>
 
@@ -745,6 +746,113 @@ GlobalResult<GlobalWorkPlan> GlobalContactState::work_plan() const noexcept {
         return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
     return data_.values()[0].plan;
 }
+
+ContourContactIndex::ContourContactIndex(GlobalContactState&& contact,
+                                         core::PlannedBuffer<Node>&& nodes,
+                                         std::uint64_t steps) noexcept
+    : contact_(std::move(contact)), nodes_(std::move(nodes)), preparation_steps_(steps) {}
+ContourContactIndex::ContourContactIndex(ContourContactIndex&&) noexcept = default;
+ContourContactIndex& ContourContactIndex::operator=(ContourContactIndex&&) noexcept = default;
+ContourContactIndex::~ContourContactIndex() = default;
+
+GlobalResult<ContourContactIndex> ContourContactIndex::prepare(const GlobalContactState& contact,
+                                                               GlobalLimits limits,
+                                                               GlobalWorkspace& workspace,
+                                                               core::ResourcePlan& plan,
+                                                               std::stop_token stop) noexcept {
+    return GlobalEngine::prepare_contour(contact, limits, workspace, plan, std::move(stop));
+}
+
+std::uint64_t ContourContactIndex::preparation_steps() const noexcept {
+    return contact_.active() ? preparation_steps_ : 0;
+}
+
+GlobalResult<ContourContactWork>
+ContourContactIndex::qualify(const ResolvedQuery& query, std::optional<EdgeId> self,
+                             const GeometryLimits& query_limits, GlobalLimits limits,
+                             GeometryWorkspace& query_workspace, GlobalWorkspace& workspace,
+                             std::stop_token stop) const noexcept {
+    return GlobalEngine::qualify_contour(*this, query, self, query_limits, limits, query_workspace,
+                                         workspace, std::move(stop));
+}
+
+GlobalResult<ContourContactIndex> GlobalEngine::prepare_contour(const GlobalContactState& contact,
+                                                                GlobalLimits limits,
+                                                                GlobalWorkspace& workspace,
+                                                                core::ResourcePlan& plan,
+                                                                std::stop_token stop) noexcept {
+    const auto context = contact.context_;
+    return guarded(context, [&]() -> GlobalResult<ContourContactIndex> {
+        const Lease lease{workspace.busy_};
+        const auto geometry = contact.geometry();
+        if (!geometry)
+            return std::unexpected(geometry.error());
+        const auto& data = *source(geometry->get());
+        const auto& reference_nodes = contact.data_.values().front().topology->nodes;
+        const auto count = reference_nodes.size();
+        Run run{limits, context, workspace.scratch_.values().front(), stop};
+        const auto refit_cost = plus(times(64, decode_cost), times(32, simple_cost));
+        run.admit(plus(times(plus(count, 1), refit_cost), times(2, decode_cost)));
+        if (scalar(data.radius, 0, run) <= 0)
+            reject(core::FailureCode::Unsupported);
+        byte_admit(plus(bytes<GlobalContactData>(1), bytes<Node>(count)), plan, context);
+        auto retained = contact.retain_checked(plan, stop);
+        if (!retained)
+            return std::unexpected(retained.error());
+        core::PlannedBuffer<Node> nodes;
+        allocate(nodes, count, plan, context);
+        run.step(count);
+        std::ranges::copy(reference_nodes.values(), nodes.values().begin());
+        refit_tree(data, nodes.values(), run);
+        run.step(0);
+        return ContourContactIndex{std::move(*retained), std::move(nodes), run.used};
+    });
+}
+
+GlobalResult<ContourContactWork>
+GlobalEngine::qualify_contour(const ContourContactIndex& index, const ResolvedQuery& query,
+                              std::optional<EdgeId> self, const GeometryLimits& query_limits,
+                              GlobalLimits limits, GeometryWorkspace& query_workspace,
+                              GlobalWorkspace& workspace, std::stop_token stop) noexcept {
+    const auto& contact = index.contact_;
+    const auto context = contact.context_;
+    return guarded(context, [&]() -> GlobalResult<ContourContactWork> {
+        const Lease lease{workspace.busy_};
+        const auto geometry = contact.geometry();
+        if (!geometry)
+            return std::unexpected(geometry.error());
+        const auto& data = *source(geometry->get());
+        const auto& topology = *contact.data_.values().front().topology;
+        Run run{limits, context, workspace.scratch_.values().front(), stop};
+        run.admit(limits.max_steps);
+        const auto expression = query.definition();
+        if (!expression)
+            return std::unexpected(GlobalGeometryFailure{expression.error(), {}});
+        auto capped = query_limits;
+        capped.max_steps = std::min(capped.max_steps, run.reserved - run.used);
+        const auto coordinates =
+            exact_query_coordinates(geometry->get(), query, capped, query_workspace, stop);
+        if (!coordinates)
+            return std::unexpected(GlobalGeometryFailure{coordinates.error(), {}});
+        run.step(coordinates->used_steps);
+        if (self) {
+            const auto* edge = std::get_if<SourceEdgePoint>(&expression->definition);
+            if (edge == nullptr || scalar(edge->t, 0, run) != word(0.5, 0, run))
+                reject(core::FailureCode::InvalidInput, expression->id);
+            const auto owner = contact.uvlm_load_edge(edge->edge, run.reserved - run.used, stop);
+            if (!owner)
+                return std::unexpected(owner.error());
+            run.step(owner->used_steps);
+            if (owner->edge != *self || owner->trailing)
+                reject(core::FailureCode::InvalidInput, expression->id);
+        } else if (!std::holds_alternative<FreePoint>(expression->definition)) {
+            reject(core::FailureCode::Unsupported, expression->id);
+        }
+        return qualify_contour_point(data, topology, index.nodes_.values(), coordinates->numerator,
+                                     expression->id, self, run);
+    });
+}
+
 GlobalWorkspace::GlobalWorkspace(core::PlannedBuffer<GlobalScratch> s) noexcept
     : scratch_(std::move(s)) {}
 GlobalWorkspace::~GlobalWorkspace() = default;

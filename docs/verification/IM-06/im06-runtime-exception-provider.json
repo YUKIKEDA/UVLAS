@@ -1,0 +1,107 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-runtime-exception-provider",
+  "ids": [
+    "IO4-07",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-28",
+  "source_commit": "77dc9bd8b9e70cd21f179d9897610e1ec9b7ce9a",
+  "claimed_state": "移設CLIとPython拡張の実例外バインド先を、指定した候補環境のライブラリーSHA-256に両方照合する。",
+  "checks": {
+    "known_linux_runtime_profiles_passed": 2,
+    "rejected_other_library_sha256": 1,
+    "rejected_parser_not_reached": 1,
+    "windows_audit_preserved": true,
+    "windows_rejected_linux_only_option": true
+  },
+  "runs": {
+    "alma": {
+      "source_commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+      "compiler": "GNU 14.2.1",
+      "artifact_hashes": {
+        "cli": "bb9c2ccb8c2b42bcf15770334ce1b58d69932a55b726baf2b731cfc0c4be6944",
+        "extension": "8488cc1f93ded36d819091544dbefdb25e036371768aa7159fc5fa310f702ffc"
+      },
+      "libc": [
+        "glibc",
+        "2.28"
+      ],
+      "cpython": "3.12.16",
+      "python_notice": {
+        "file": "LICENSE.txt",
+        "path": "stdlib/LICENSE.txt",
+        "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+      },
+      "ownership_cases": 10,
+      "observed_exception_runtime": {
+        "cli": {
+          "file": "libstdc++.so.6.0.25",
+          "sha256": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134"
+        },
+        "extension": {
+          "file": "libstdc++.so.6.0.25",
+          "sha256": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134"
+        },
+        "symbol": "std::runtime_error(char const*)@GLIBCXX_3.4.21"
+      },
+      "raw_report_sha256": "818309ec11c0b6d9d356ef949f01cc611ce03bdbdc0941cafe12b66f4e239110"
+    },
+    "noble": {
+      "source_commit": "3a140d7bfbffef797a3fb7b29187dc458e50f53a",
+      "compiler": "GNU 14.2.0",
+      "artifact_hashes": {
+        "cli": "31790b9949b5135a18579e1cff602e00c65f1e8a10d90cc08cafb334b3fe6268",
+        "extension": "be08f7239ed663cb3ca67f915250d600afb895698078d271f734bb07193a3e34"
+      },
+      "libc": [
+        "glibc",
+        "2.39"
+      ],
+      "cpython": "3.12.3",
+      "python_notice": {
+        "file": "copyright",
+        "path": "/usr/share/doc/python3.12/copyright",
+        "sha256": "f1cbf908e1daa8789b389fdcf17811ed36b675d736b39a103591399861350382"
+      },
+      "ownership_cases": 10,
+      "observed_exception_runtime": {
+        "cli": {
+          "file": "libstdc++.so.6.0.33",
+          "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+        },
+        "extension": {
+          "file": "libstdc++.so.6.0.33",
+          "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+        },
+        "symbol": "std::runtime_error(char const*)@GLIBCXX_3.4.21"
+      },
+      "raw_report_sha256": "23337e64703c2d4beaad74fdf74cbbbf00c9550f019f8ab717768ae31b28ba0e"
+    },
+    "windows": {
+      "source_commit": "63df6cc00d7180725370201dca3454ad35073cfd",
+      "compiler": "MSVC 19.51.36260.0",
+      "artifact_hashes": {
+        "cli": "09ab9ff3597fb0680087710eec0451af8ea6c816e6388ecaefc1c624cdd7813f",
+        "extension": "392bca0bde5480625ce6bf9a5fe2ec990b966d103ecfeb6d7b7dece65039541e"
+      },
+      "libc": null,
+      "cpython": "3.12.8",
+      "python_notice": {
+        "file": "LICENSE.txt",
+        "path": "base_python/LICENSE.txt",
+        "sha256": "886a0ead2d89030ee62dbff52b04e47ab91998341295bb9c56fb952b4e081c7a"
+      },
+      "ownership_cases": 10,
+      "observed_exception_runtime": null,
+      "raw_report_sha256": "bf9f1b2857f728344e2568de77cf186841acd26a66d9769b44f8798d11cc8774"
+    }
+  },
+  "artifacts": {
+    "tools/qa/runtime_artifact_audit.py": "d86247d2982992eae75b8b8d6b8aafb71af6280842a2adcce4f47ac04b3dcd9e",
+    "docs/build.md": "10863ef056c6e3d0faf09edfcb454731f3f9dcf09d84d237b6eaa7693c0400b2",
+    "docs/verification/IM-06/runtime-exception-provider.md": "27140866b5aaa1f0307685763fe3c6c56f9caad615898d982a4102b028e378c6"
+  }
+}

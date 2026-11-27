@@ -52,6 +52,24 @@ int lowest_bit(double value) noexcept {
     const auto significand = (bits & 0xfffffffffffffULL) | (exponent == 0 ? 0ULL : (1ULL << 52));
     return (exponent == 0 ? -1074 : exponent - 1075) + std::countr_zero(significand);
 }
+Result<TwoWordValue> sum_finite(double a, double b) noexcept {
+    const double sum = a + b;
+    if (!finite(sum))
+        return fail(FailureCode::Nonfinite);
+    const double part_b = sum - a;
+    const double error = (a - (sum - part_b)) + (b - part_b);
+    if (!finite(error))
+        return fail(FailureCode::Nonfinite);
+    return TwoWordValue{sum, error};
+}
+Result<TwoWordValue> product_finite(double a, double b) noexcept {
+    const double product = a * b;
+    if (!finite(product))
+        return fail(FailureCode::Nonfinite);
+    if (a != 0 && b != 0 && lowest_bit(a) + lowest_bit(b) < -1074)
+        return fail(FailureCode::PrecisionUnresolved);
+    return TwoWordValue{product, std::fma(a, b, -product)};
+}
 using detail::outward_add;
 using CompensatedSum = detail::CompensatedAccumulator;
 // Compare with a downward enclosure of tolerance*scale without forming its extreme exponent.
@@ -119,16 +137,7 @@ Result<TwoWordValue> two_sum(double a, double b) noexcept {
     if (!supported_environment()) {
         return fail(FailureCode::PrecisionUnsupported);
     }
-    const double sum = a + b;
-    if (!finite(sum)) {
-        return fail(FailureCode::Nonfinite);
-    }
-    const double part_b = sum - a;
-    const double error = (a - (sum - part_b)) + (b - part_b);
-    if (!finite(error)) {
-        return fail(FailureCode::Nonfinite);
-    }
-    return TwoWordValue{sum, error};
+    return sum_finite(a, b);
 }
 Result<TwoWordValue> two_product(double a, double b) noexcept {
     if (!finite(a) || !finite(b)) {
@@ -137,14 +146,23 @@ Result<TwoWordValue> two_product(double a, double b) noexcept {
     if (!supported_environment()) {
         return fail(FailureCode::PrecisionUnsupported);
     }
-    const double product = a * b;
-    if (!finite(product)) {
+    return product_finite(a, b);
+}
+
+Result<detail::CheckedEft> detail::CheckedEft::prepare() noexcept {
+    if (!supported_environment())
+        return fail(FailureCode::PrecisionUnsupported);
+    return CheckedEft{};
+}
+Result<TwoWordValue> detail::CheckedEft::sum(double a, double b) const noexcept {
+    if (!finite(a) || !finite(b))
         return fail(FailureCode::Nonfinite);
-    }
-    if (a != 0 && b != 0 && lowest_bit(a) + lowest_bit(b) < -1074) {
-        return fail(FailureCode::PrecisionUnresolved);
-    }
-    return TwoWordValue{product, std::fma(a, b, -product)};
+    return sum_finite(a, b);
+}
+Result<TwoWordValue> detail::CheckedEft::product(double a, double b) const noexcept {
+    if (!finite(a) || !finite(b))
+        return fail(FailureCode::Nonfinite);
+    return product_finite(a, b);
 }
 
 template <StorageScalar Scalar>

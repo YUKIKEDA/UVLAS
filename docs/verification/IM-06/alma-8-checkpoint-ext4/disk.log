@@ -1,0 +1,4 @@
+offline checkpoint-12/first: bytes=8, values=(42,), sha256=ed049108bc18f2c64369e8d0ea42850bdd1a7d1dd340cfde716315579702a76c
+offline checkpoint-13/first: bytes=8, values=(42,), sha256=ed049108bc18f2c64369e8d0ea42850bdd1a7d1dd340cfde716315579702a76c
+offline checkpoint-13/second: bytes=16, values=(100, 200), sha256=68800b8a9ce409c137edc325250eead52dcde482665288efcd0a31e362e19f8b
+offline staging: chunks=8/12 bytes, actual bytes match prefix, no manifest

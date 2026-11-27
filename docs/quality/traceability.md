@@ -51,7 +51,7 @@
 | ID | 定義 | 試験 | 記録 | コード |
 |---|---|---:|---:|---:|
 | AE-01 | [uvlm-integrated-specification.md:1](../specs/aero/uvlm-integrated-specification.md) | 0 | 0 | 0 |
-| AE-02 | [design-decisions.md:55](../specs/design-decisions.md) | 12 | 12 | 0 |
+| AE-02 | [design-decisions.md:55](../specs/design-decisions.md) | 13 | 12 | 0 |
 | AE-03 | [design-decisions.md:56](../specs/design-decisions.md) | 0 | 0 | 0 |
 | AE-04 | [design-decisions.md:57](../specs/design-decisions.md) | 0 | 0 | 0 |
 | AE-05 | [design-decisions.md:58](../specs/design-decisions.md) | 0 | 0 | 0 |
@@ -101,13 +101,13 @@
 | FD-10 | [case-schema-fields.md:231](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-11 | [case-schema-fields.md:319](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-12 | [case-schema-fields.md:333](../specs/foundation/case-schema-fields.md) | 2 | 0 | 0 |
-| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 188 | 52 | 0 |
+| IO4-01 | [case-schema-contract.md:93](../specs/foundation/case-schema-contract.md) | 188 | 55 | 0 |
 | IO4-02 | [io-execution-adoption-specification.md:27](../specs/foundation/io-execution-adoption-specification.md) | 0 | 14 | 0 |
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 79 | 34 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 38 | 20 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 17 | 7 | 0 |
-| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 21 | 5 | 0 |
-| IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 0 | 2 | 0 |
+| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 22 | 7 | 0 |
+| IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 1 | 8 | 0 |
 | J1-D01 | [j1-discrete-equilibrium-and-chart-contract.md:5](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 2 | 3 | 0 |
 | J1-D02 | [j1-discrete-equilibrium-and-chart-contract.md:10](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
 | J1-D03 | [j1-discrete-equilibrium-and-chart-contract.md:11](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
@@ -132,10 +132,10 @@
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | N4-01 | [numerical-foundation-adoption-specification.md:6](../specs/foundation/numerical-foundation-adoption-specification.md) | 14 | 4 | 0 |
 | N4-02 | [numerical-foundation-adoption-specification.md:19](../specs/foundation/numerical-foundation-adoption-specification.md) | 290 | 120 | 4 |
-| N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 155 | 69 | 2 |
+| N4-03 | [numerical-foundation-adoption-specification.md:37](../specs/foundation/numerical-foundation-adoption-specification.md) | 156 | 69 | 2 |
 | N4-04 | [numerical-foundation-adoption-specification.md:47](../specs/foundation/numerical-foundation-adoption-specification.md) | 8 | 14 | 0 |
-| N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 108 | 27 | 0 |
-| N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 216 | 94 | 0 |
+| N4-05 | [numerical-foundation-adoption-specification.md:57](../specs/foundation/numerical-foundation-adoption-specification.md) | 110 | 27 | 0 |
+| N4-06 | [numerical-foundation-adoption-specification.md:75](../specs/foundation/numerical-foundation-adoption-specification.md) | 220 | 94 | 0 |
 | N4-07 | [numerical-foundation-adoption-specification.md:85](../specs/foundation/numerical-foundation-adoption-specification.md) | 98 | 7 | 1 |
 | N4-08 | [numerical-foundation-adoption-specification.md:100](../specs/foundation/numerical-foundation-adoption-specification.md) | 199 | 88 | 1 |
 | N4-09 | [numerical-foundation-adoption-specification.md:120](../specs/foundation/numerical-foundation-adoption-specification.md) | 89 | 49 | 1 |
@@ -179,17 +179,17 @@
 | ST-10 | [design-decisions.md:48](../specs/design-decisions.md) | 0 | 0 | 0 |
 | UI-D01 | [uvlm-induction-adopted-specification.md:9](../specs/aero/uvlm-induction-adopted-specification.md) | 20 | 9 | 0 |
 | UI-D02 | [uvlm-induction-adopted-specification.md:10](../specs/aero/uvlm-induction-adopted-specification.md) | 11 | 3 | 0 |
-| UI-D03 | [uvlm-induction-adopted-specification.md:11](../specs/aero/uvlm-induction-adopted-specification.md) | 28 | 10 | 0 |
+| UI-D03 | [uvlm-induction-adopted-specification.md:11](../specs/aero/uvlm-induction-adopted-specification.md) | 29 | 10 | 0 |
 | UI-D04 | [uvlm-induction-adopted-specification.md:12](../specs/aero/uvlm-induction-adopted-specification.md) | 22 | 4 | 0 |
-| UI-D05 | [uvlm-induction-adopted-specification.md:13](../specs/aero/uvlm-induction-adopted-specification.md) | 32 | 12 | 0 |
+| UI-D05 | [uvlm-induction-adopted-specification.md:13](../specs/aero/uvlm-induction-adopted-specification.md) | 34 | 12 | 0 |
 | UI-D06 | [uvlm-induction-adopted-specification.md:14](../specs/aero/uvlm-induction-adopted-specification.md) | 57 | 11 | 0 |
-| UW-D01 | [uvlm-wake-adopted-specification.md:9](../specs/aero/uvlm-wake-adopted-specification.md) | 12 | 18 | 1 |
-| UW-D02 | [uvlm-wake-adopted-specification.md:10](../specs/aero/uvlm-wake-adopted-specification.md) | 8 | 8 | 0 |
-| UW-D03 | [uvlm-wake-adopted-specification.md:11](../specs/aero/uvlm-wake-adopted-specification.md) | 9 | 19 | 0 |
+| UW-D01 | [uvlm-wake-adopted-specification.md:9](../specs/aero/uvlm-wake-adopted-specification.md) | 13 | 18 | 1 |
+| UW-D02 | [uvlm-wake-adopted-specification.md:10](../specs/aero/uvlm-wake-adopted-specification.md) | 9 | 8 | 0 |
+| UW-D03 | [uvlm-wake-adopted-specification.md:11](../specs/aero/uvlm-wake-adopted-specification.md) | 10 | 19 | 0 |
 | UW-D04 | [uvlm-wake-adopted-specification.md:12](../specs/aero/uvlm-wake-adopted-specification.md) | 4 | 4 | 0 |
-| UW-D05 | [uvlm-wake-adopted-specification.md:13](../specs/aero/uvlm-wake-adopted-specification.md) | 5 | 12 | 0 |
+| UW-D05 | [uvlm-wake-adopted-specification.md:13](../specs/aero/uvlm-wake-adopted-specification.md) | 6 | 12 | 0 |
 | UW-D06 | [uvlm-wake-adopted-specification.md:14](../specs/aero/uvlm-wake-adopted-specification.md) | 8 | 20 | 0 |
-| UW-D07 | [uvlm-wake-adopted-specification.md:15](../specs/aero/uvlm-wake-adopted-specification.md) | 26 | 13 | 0 |
+| UW-D07 | [uvlm-wake-adopted-specification.md:15](../specs/aero/uvlm-wake-adopted-specification.md) | 28 | 13 | 0 |
 | UW-D08 | [uvlm-wake-adopted-specification.md:16](../specs/aero/uvlm-wake-adopted-specification.md) | 4 | 3 | 0 |
 
 ## 受入計画とケース
@@ -205,7 +205,7 @@
 | A5-07 | [practical-acceptance-plan.md:111](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | P-CURVED-BOX | [practical-acceptance-plan.md:65](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | PERF-FL-01 | [case-status.md:29](../quality/case-status.md) | 0 | 0 | 0 |
-| V-AERO | [practical-acceptance-plan.md:36](../requirements/practical-acceptance-plan.md) | 12 | 10 | 0 |
+| V-AERO | [practical-acceptance-plan.md:36](../requirements/practical-acceptance-plan.md) | 13 | 10 | 0 |
 | V-BEAM | [practical-acceptance-plan.md:32](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-J1 | [practical-acceptance-plan.md:38](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-JOINT | [practical-acceptance-plan.md:33](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
@@ -246,5 +246,5 @@
 | R-03 | [implementation-start-review.md:71](../plans/implementation-start-review.md) | 0 | 1 | 0 |
 | R-04 | [implementation-start-review.md:72](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | R-05 | [implementation-start-review.md:73](../plans/implementation-start-review.md) | 16 | 23 | 0 |
-| R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 9 | 0 |
+| R-06 | [implementation-start-review.md:74](../plans/implementation-start-review.md) | 0 | 14 | 0 |
 | R-07 | [implementation-start-review.md:75](../plans/implementation-start-review.md) | 0 | 0 | 0 |

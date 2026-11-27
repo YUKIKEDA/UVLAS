@@ -468,7 +468,8 @@ public:
     static AeroResult<P1Basis> evaluate(const LocalGeometryPacket&, P1Accuracy, P1Limits,
                                         P1Workspace&, core::ResourcePlan&, const std::stop_token&,
                                         const std::array<bool, 3>&, bool bound = false,
-                                        SharedP1ReuseSlot<P1Basis>* = nullptr) noexcept;
+                                        SharedP1ReuseSlot<P1Basis>* = nullptr,
+                                        bool values_only = false) noexcept;
 };
 std::optional<core::FailureCode> P1Accuracy::validation_error() const noexcept {
     if (!std::isfinite(tau_basis) || !std::isfinite(tau_jacobian))
@@ -484,7 +485,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
                                        P1Limits limits, P1Workspace& workspace,
                                        core::ResourcePlan& plan, const std::stop_token& stop,
                                        const std::array<bool, 3>& boundary, bool bound,
-                                       SharedP1ReuseSlot<P1Basis>* slot) noexcept {
+                                       SharedP1ReuseSlot<P1Basis>* slot,
+                                       bool values_only) noexcept {
     const auto context = packet.context();
     if (workspace.entered_.test_and_set())
         return std::unexpected(failed(core::FailureCode::InvalidInput, context));
@@ -525,6 +527,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         const auto query = needed(packet.query());
         const auto ambient = needed(packet.ambient());
         const bool far = !bound && needed(packet.far()) == FarRelation::Far;
+        // The fixed-rule qualification records the full difference, including derivatives.
+        const bool evaluate_values = values_only && !far;
         core::PlannedBuffer<P1Storage> fresh;
         if (!paid) {
             auto allocated = plan.allocate<P1Storage>(1, operation);
@@ -617,6 +621,12 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
                 }
             const auto ell = p1::square_root(p1::exact(scratch.temporary[4], -4296), work);
             diagnostic = p1::qualify_far(scratch.low_values, scratch.high_values, ell, scale, work);
+        } else if (evaluate_values) {
+            const auto nodes = scratch.program.values().first(program.count);
+            auto jets = scratch.jets.values();
+            for (std::size_t i = 0; i < nodes.size(); ++i)
+                jets[i].components[0] = p1::evaluate_value_node(nodes[i], jets, scratch.input,
+                                                                scratch.pi, scratch.ln2, work);
         } else
             evaluate(0, program.count);
         auto selected = P1Branch::Analytic;
@@ -634,7 +644,8 @@ AeroResult<P1Basis> P1Engine::evaluate(const LocalGeometryPacket& packet, P1Accu
         for (std::size_t component = 0; component < 9; ++component) {
             const auto& evaluated =
                 scratch.jets.values()[far ? base + 9 + component : output.nodes[component]];
-            for (std::size_t jet = 0; jet < 14; ++jet) {
+            const std::size_t components = evaluate_values ? 1 : evaluated.components.size();
+            for (std::size_t jet = 0; jet < components; ++jet) {
                 work.step();
                 auto value = enclosure(p1::scale(evaluated.components[jet], -scale),
                                        accuracy.representation, scratch.output);
@@ -841,5 +852,14 @@ AeroResult<P1Basis> evaluate_bound_partition(const LocalGeometryPacket& packet,
                                              SharedP1ReuseSlot<P1Basis>* slot) noexcept {
     return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary, true,
                               slot);
+}
+AeroResult<P1Basis> evaluate_partition_values(const LocalGeometryPacket& packet,
+                                              const std::array<bool, 3>& boundary, bool bound,
+                                              P1Accuracy accuracy, P1Limits limits,
+                                              P1Workspace& workspace, core::ResourcePlan& plan,
+                                              const std::stop_token& stop,
+                                              SharedP1ReuseSlot<P1Basis>* slot) noexcept {
+    return P1Engine::evaluate(packet, accuracy, limits, workspace, plan, stop, boundary, bound,
+                              slot, true);
 }
 } // namespace uvlas::aero::detail

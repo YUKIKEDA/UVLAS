@@ -1,0 +1,9 @@
+/mnt/kernel-core.rpm:
+    Header V4 RSA/SHA256 Signature, key ID ced7258b: OK
+    Header SHA256 digest: OK
+    Header SHA1 digest: OK
+    Payload SHA256 digest: OK
+    V4 RSA/SHA256 Signature, key ID ced7258b: OK
+    MD5 digest: OK
+./lib/modules/4.18.0-553.189.1.el8_10.x86_64/vmlinuz
+6c68c16ecb83e4884b10e3cb5b9f9814cdff9127264a1ec32e7edfc910565a69  ./lib/modules/4.18.0-553.189.1.el8_10.x86_64/vmlinuz

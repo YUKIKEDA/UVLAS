@@ -190,15 +190,18 @@ Section describe(const WakeStrengthEndpoint& endpoint, core::ResourcePlan& memor
         const auto quad = panel(source.contact, row.facet, work);
         if (quad.role != a::AeroFaceRole::Wake)
             reject(InvalidInput);
+        const auto* trailing = std::get_if<a::P1StrengthId>(&row.trailing);
+        if (trailing == nullptr)
+            reject(InvalidInput);
         unique_faces.values()[bound.size() + i] = quad.face.value();
         const auto back = key(quad.corners[3], quad.corners[2]);
-        const auto at = find(history, row.trailing, &FrozenWakeTrace::id, work);
-        if (at == history.end() || at->id != row.trailing)
+        const auto at = find(history, *trailing, &FrozenWakeTrace::id, work);
+        if (at == history.end() || at->id != *trailing)
             reject(InvalidInput);
         auto& trace = traces.values()[i];
         (void)words(at->strength);
-        trace = {back, row.trailing, at->strength, {}, {}, {}};
-        identifiers.values()[i] = row.trailing;
+        trace = {back, *trailing, at->strength, {}, {}, {}};
+        identifiers.values()[i] = *trailing;
         if (quad.attachment) {
             if (!std::holds_alternative<AttachedWakeFront>(row.leading) || front >= attached.size())
                 reject(InvalidInput);

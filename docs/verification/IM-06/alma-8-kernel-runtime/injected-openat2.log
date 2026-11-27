@@ -1,0 +1,20 @@
+validate: manifest acquisition
+cli_root_exit=2
+2008  openat2(AT_FDCWD, "/case", {flags=O_RDONLY|O_CLOEXEC|O_PATH|O_DIRECTORY, resolve=RESOLVE_NO_SYMLINKS}, 24) = -1 ENOSYS (Function not implemented) (INJECTED)
+validate: reference acquisition at /model/geometry/1/mesh
+cli_child-enosys_exit=2
+2014  openat2(AT_FDCWD, "/case", {flags=O_RDONLY|O_CLOEXEC|O_PATH|O_DIRECTORY, resolve=RESOLVE_NO_SYMLINKS}, 24) = 3
+2014  openat2(3, "external case.json", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 4
+2014  openat2(3, "wing.msh", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = -1 ENOSYS (Function not implemented) (INJECTED)
+validate: reference acquisition at /model/geometry/1/mesh
+cli_child-einval_exit=2
+2020  openat2(AT_FDCWD, "/case", {flags=O_RDONLY|O_CLOEXEC|O_PATH|O_DIRECTORY, resolve=RESOLVE_NO_SYMLINKS}, 24) = 3
+2020  openat2(3, "external case.json", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 4
+2020  openat2(3, "wing.msh", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = -1 EINVAL (Invalid argument) (INJECTED)
+file FailureCode.Unsupported
+2026  openat2(AT_FDCWD, "/case", {flags=O_RDONLY|O_CLOEXEC|O_PATH|O_DIRECTORY, resolve=RESOLVE_NO_SYMLINKS}, 24) = 3
+2026  openat2(3, "external case.json", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = 4
+2026  openat2(3, "wing.msh", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = -1 ENOSYS (Function not implemented) (INJECTED)
+dict FailureCode.Unsupported
+2032  openat2(AT_FDCWD, "/case", {flags=O_RDONLY|O_CLOEXEC|O_PATH|O_DIRECTORY, resolve=RESOLVE_NO_SYMLINKS}, 24) = 3
+2032  openat2(3, "wing.msh", {flags=O_RDONLY|O_NOCTTY|O_NONBLOCK|O_CLOEXEC, resolve=RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH}, 24) = -1 ENOSYS (Function not implemented) (INJECTED)
