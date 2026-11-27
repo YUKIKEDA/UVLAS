@@ -1,3 +1,4 @@
+#include "pg_conditioning_factor.hpp"
 #include "pg_reference_projection.hpp"
 
 #include <algorithm>
@@ -565,6 +566,124 @@ Tensor first_pk_derivative(const PgShellElasticLaw& law, const PgShellMaterialPo
         derivative[k] = bounds.add(derivative[k], geometric[k]);
     return derivative;
 }
+enum class Endpoint { Lower, Upper };
+
+R outward_grid(const R& value, std::uint32_t bits, Endpoint endpoint, ReferenceArithmetic& math) {
+    if (value.sign() == 0)
+        return {};
+    constexpr std::uint64_t max_bits = 8192;
+    constexpr auto limb_bits = std::numeric_limits<detail::RankWord>::digits;
+    const auto numerator_bits = detail::partition_add(value.numerator_bits(), bits);
+    const auto denominator_bits = value.denominator_bits();
+    if (std::max(numerator_bits, denominator_bits) > max_bits)
+        partition_fail(core::FailureCode::ResourceExceeded);
+    math.charge(2 + numerator_bits / limb_bits + denominator_bits / limb_bits);
+    const auto fraction = detail::rank_fraction<detail::RankWide>(value);
+    const detail::RankWide scaled = detail::rank_abs(fraction.numerator) << bits;
+    auto units = detail::conditioning_divide(math, scaled, fraction.denominator);
+    const bool negative = value.sign() < 0;
+    const bool away_from_zero =
+        negative ? endpoint == Endpoint::Lower : endpoint == Endpoint::Upper;
+    if (away_from_zero && detail::rank_product(math, units, fraction.denominator) != scaled)
+        ++units;
+    if (negative)
+        units = -units;
+    math.charge();
+    return detail::rank_materialize_dyadic(units, bits, math.leaf_limits, math.plan);
+}
+
+struct VolumeSum {
+    const MaterialBounds& bounds;
+    std::uint32_t bits;
+
+    void add(Bound& result, const Bound& term) const {
+        const Bound enclosed{outward_grid(term.lower, bits, Endpoint::Lower, bounds.math),
+                             outward_grid(term.upper, bits, Endpoint::Upper, bounds.math)};
+        result = bounds.add(result, enclosed);
+    }
+
+    void check_width(const Bound& value, const R& maximum_width) const {
+        auto& math = bounds.math;
+        if (math.compare(math.sub(value.upper, value.lower), maximum_width) > 0)
+            partition_fail(unresolved);
+    }
+};
+
+PgReferenceSource patch_reference(const PgPreparedPatch& patch) {
+    const auto* basis = partition_take(patch.conditioning().reference_basis());
+    return partition_take(basis->source());
+}
+
+std::size_t advance_volume(const PgDiscreteVolumePoint& sample, core::Index count,
+                           core::Index& previous, ReferenceArithmetic& math) {
+    math.visit(1);
+    const auto volume = sample.point.volume;
+    if (volume < 0 || volume >= count || volume < previous || volume - previous > 1 ||
+        sample.weight.sign() <= 0)
+        partition_fail(invalid);
+    previous = volume;
+    return static_cast<std::size_t>(volume);
+}
+
+void require_full_rule(core::Index count, core::Index last) {
+    if (count == 0 || last != count - 1)
+        partition_fail(invalid);
+}
+
+void validate_samples(const PgPreparedPatch& patch, std::span<const PgShellVolumeSample> samples,
+                      ReferenceArithmetic& math) {
+    const auto reference = patch_reference(patch);
+    const auto volumes = partition_take(reference.partition.volumes());
+    const auto layers = partition_take(reference.partition.layers());
+    const auto count = detail::partition_index(volumes.size());
+    core::Index previous = -1;
+    for (const auto& sample : samples) {
+        const auto volume = advance_volume(sample.quadrature, count, previous, math);
+        const auto layer = static_cast<std::size_t>(volumes[volume].layer);
+        if (sample.layer != layers[layer].id)
+            partition_fail(invalid);
+    }
+    require_full_rule(count, previous);
+}
+
+void add_weighted_stress(std::span<PgShellCartesianEnclosure> coefficients, const Tensor& stress,
+                         std::span<const PgConditionedReferenceColumn> shapes, const Bound& weight,
+                         const Bound& root, const VolumeSum& sum) {
+    const auto& bounds = sum.bounds;
+    for (std::size_t j = 0; j < coefficients.size(); ++j) {
+        bounds.math.visit(1);
+        Vector gradient;
+        for (std::size_t b = 0; b < gradient.size(); ++b)
+            gradient[b] = bounds.radical(shapes[j].physical_gradient_per_metre[b], root);
+        for (std::size_t a = 0; a < gradient.size(); ++a) {
+            Bound force;
+            for (std::size_t b = 0; b < gradient.size(); ++b)
+                force = bounds.add(force, bounds.multiply(stress[3 * a + b], gradient[b]));
+            sum.add(coefficients[j][a], bounds.multiply(force, weight));
+        }
+    }
+}
+
+PgReferenceLimits remaining_limits(ReferenceArithmetic& math, std::uint64_t kept) {
+    auto limits = math.limits;
+    limits.maximum_scalar_operations -= math.scalar_operations;
+    limits.maximum_partition_visits -= math.partition_visits;
+    math.reserve_nested_rationals(limits.algebra, kept);
+    return limits;
+}
+
+void record_work(ReferenceArithmetic& math, PgReferenceCallInfo taken) {
+    math.charge(taken.scalar_operations);
+    math.visit(taken.partition_visits);
+}
+
+Bound volume_weight(const PgReferenceValue& reference, const R& rule_weight, const Bound& root,
+                    const MaterialBounds& bounds) {
+    const auto& measure = std::get<PgReferenceVolumeMeasure>(reference.measure);
+    const auto jacobian = bounds.radical(measure.jacobian, root);
+    require_positive(jacobian, core::FailureCode::GeometryInvalid);
+    return bounds.scale(jacobian, rule_weight);
+}
 } // namespace
 
 PgShellElasticLaw::PgShellElasticLaw(std::array<PgReferenceScalar, 36>&& stiffness, R&& density,
@@ -847,6 +966,173 @@ core::Result<PgShellMaterialPointLinearization> linearize_pg_shell_material_poin
         auto derivative = first_pk_derivative(law, value, point.deformation_gradient, df, bounds);
         value.material.work = math.info();
         return PgShellMaterialPointLinearization{std::move(value), std::move(derivative)};
+    });
+}
+core::Result<PgShellElasticVolumeAction>
+assemble_pg_shell_elastic_volume(const PgPreparedPatch& patch, const PgShellPatchState& state,
+                                 std::span<const PgShellVolumeSample> samples,
+                                 const std::optional<PgShellPatchDirection>& direction,
+                                 const PgShellVolumeResolution& resolution,
+                                 const PgReferenceLimits& limits,
+                                 core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellElasticVolumeAction> {
+        using Code = core::FailureCode;
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto info = partition_take(patch.info());
+        if (state.patch != info.identity || (direction && direction->patch != info.identity))
+            partition_fail(Code::StaleGeneration);
+        const auto rank = info.basis.rank;
+        if (state.coordinates_metres.size() != rank ||
+            (direction && direction->coefficients_metres.size() != rank) ||
+            resolution.energy_width_joules.sign() < 0 ||
+            resolution.force_width_newtons.sign() < 0 ||
+            resolution.tangent_width_newtons.sign() < 0)
+            partition_fail(invalid);
+        if (resolution.fractional_bits > 1024)
+            partition_fail(Code::PrecisionUnsupported);
+        validate_samples(patch, samples, math);
+
+        const auto live_results = detail::partition_mul(direction ? 12 : 6, rank);
+        // Keep the state, reference, direction and the current shape row
+        // in the budget alongside the accumulators.
+        const auto live_rows = detail::partition_mul(direction ? 17 : 14, rank);
+        math.admit(detail::partition_add(640, detail::partition_add(live_results, live_rows)));
+        const auto rank_index = detail::partition_index(rank);
+        auto force = partition_take(plan.allocate<PgShellCartesianEnclosure>(
+            rank_index, core::Operation::EvaluateStructure));
+        auto tangent = partition_take(plan.allocate<PgShellCartesianEnclosure>(
+            direction ? rank_index : 0, core::Operation::EvaluateStructure));
+        const MaterialBounds bounds{math};
+        const VolumeSum sum{bounds, resolution.fractional_bits};
+        Bound energy;
+        for (const auto& sample : samples) {
+            math.visit(1);
+            const auto keep_direction = direction ? detail::partition_mul(3, rank) : 0;
+            auto point = partition_take(enclose_pg_shell_patch_point(
+                patch, state, PgReferencePoint{sample.quadrature.point},
+                remaining_limits(math, detail::partition_add(live_results, keep_direction)), plan));
+            record_work(math, point.work);
+            const auto& ref = point.reference;
+            const auto root = bounds.root(ref.g);
+            const auto weight = volume_weight(ref, sample.quadrature.weight, root, bounds);
+            const auto response_limits = remaining_limits(
+                math, detail::partition_add(live_results, detail::partition_mul(6, rank)));
+            const auto add_elastic = [&](const PgShellMaterialPointResponse& value) {
+                record_work(math, value.material.work);
+                sum.add(energy,
+                        bounds.multiply(value.material.energy_joules_per_cubic_metre, weight));
+                add_weighted_stress(force.values(), value.first_pk_world_pascal,
+                                    point.shapes.values(), weight, root, sum);
+            };
+            if (direction) {
+                const auto action = partition_take(
+                    linearize_pg_shell_material_point(sample.law, sample.initial, sample.axes,
+                                                      point, *direction, response_limits, plan));
+                add_elastic(action.value);
+                add_weighted_stress(tangent.values(), action.first_pk_direction_pascal,
+                                    point.shapes.values(), weight, root, sum);
+            } else {
+                const auto value = partition_take(enclose_pg_shell_material_point(
+                    sample.law, sample.initial, sample.axes, point, response_limits, plan));
+                add_elastic(value);
+            }
+        }
+        sum.check_width(energy, resolution.energy_width_joules);
+        for (const auto& column : force.values())
+            for (const auto& x : column)
+                sum.check_width(x, resolution.force_width_newtons);
+        for (const auto& column : tangent.values())
+            for (const auto& x : column)
+                sum.check_width(x, resolution.tangent_width_newtons);
+        return PgShellElasticVolumeAction{info.identity, std::move(energy), std::move(force),
+                                          std::move(tangent), math.info()};
+    });
+}
+core::Result<PgShellMassVolumeAction> apply_pg_shell_consistent_mass(
+    const PgPreparedPatch& patch, std::span<const PgDiscreteVolumePoint> samples,
+    std::span<const PgShellLayerDensity> densities, const PgShellPatchDirection& direction,
+    const PgShellMassResolution& resolution, const PgReferenceLimits& limits,
+    core::ResourcePlan& plan) noexcept {
+    return evaluate([&]() -> core::Result<PgShellMassVolumeAction> {
+        using Code = core::FailureCode;
+        ReferenceArithmetic math{limits, plan};
+        math.cancel();
+        const auto info = partition_take(patch.info());
+        if (direction.patch != info.identity)
+            partition_fail(Code::StaleGeneration);
+        const auto rank = info.basis.rank;
+        if (direction.coefficients_metres.size() != rank || resolution.mass_width_kg.sign() < 0 ||
+            resolution.action_width_kg_metres.sign() < 0)
+            partition_fail(invalid);
+        if (resolution.fractional_bits > 1024)
+            partition_fail(Code::PrecisionUnsupported);
+        const auto source = patch_reference(patch);
+        const auto volumes = partition_take(source.partition.volumes());
+        const auto layers = partition_take(source.partition.layers());
+        if (densities.size() != layers.size())
+            partition_fail(invalid);
+        for (std::size_t i = 0; i < layers.size(); ++i) {
+            math.visit(1);
+            if (densities[i].layer != layers[i].id ||
+                densities[i].kilograms_per_cubic_metre.sign() <= 0)
+                partition_fail(invalid);
+        }
+        const auto count = detail::partition_index(volumes.size());
+        core::Index previous = -1;
+        for (const auto& sample : samples)
+            static_cast<void>(advance_volume(sample, count, previous, math));
+        require_full_rule(count, previous);
+        math.admit(detail::partition_add(384, detail::partition_mul(17, rank)));
+        auto action = partition_take(plan.allocate<PgShellCartesianEnclosure>(
+            detail::partition_index(rank), core::Operation::EvaluateStructure));
+        const MaterialBounds bounds{math};
+        const VolumeSum sum{bounds, resolution.fractional_bits};
+        Bound mass;
+        const auto kept = detail::partition_mul(9, rank); // Direction and action.
+        for (const auto& sample : samples) {
+            math.visit(1);
+            const PgReferencePoint query{sample.point};
+            auto row = partition_take(
+                patch.evaluate_reference(std::span{&query, 1}, remaining_limits(math, kept), plan));
+            record_work(math, row.call_info);
+            const auto& ref = row.points.values().front();
+            const auto root = bounds.root(ref.g);
+            const auto& volume = volumes[static_cast<std::size_t>(sample.point.volume)];
+            const auto layer = static_cast<std::size_t>(volume.layer);
+            const auto& density = densities[layer].kilograms_per_cubic_metre;
+            const auto weighted_density =
+                bounds.scale(volume_weight(ref, sample.weight, root, bounds), density);
+            sum.add(mass, weighted_density);
+            ReferenceRadicals exact{math, ref.g};
+            PgReferenceVector displacement;
+            const auto shapes = row.columns.values();
+            for (std::size_t j = 0; j < shapes.size(); ++j) {
+                math.visit(1);
+                for (std::size_t a = 0; a < displacement.size(); ++a) {
+                    const auto& coefficient = direction.coefficients_metres[j][a];
+                    if (coefficient.sign() != 0)
+                        displacement[a] =
+                            exact.add(displacement[a], exact.scale(shapes[j].value, coefficient));
+                }
+            }
+            Vector weighted_displacement;
+            for (std::size_t a = 0; a < displacement.size(); ++a)
+                weighted_displacement[a] =
+                    bounds.multiply(weighted_density, bounds.radical(displacement[a], root));
+            for (std::size_t j = 0; j < shapes.size(); ++j) {
+                math.visit(1);
+                const auto n = bounds.radical(shapes[j].value, root);
+                for (std::size_t a = 0; a < displacement.size(); ++a)
+                    sum.add(action.values()[j][a], bounds.multiply(n, weighted_displacement[a]));
+            }
+        }
+        sum.check_width(mass, resolution.mass_width_kg);
+        for (const auto& column : action.values())
+            for (const auto& x : column)
+                sum.check_width(x, resolution.action_width_kg_metres);
+        return PgShellMassVolumeAction{info.identity, std::move(mass), std::move(action),
+                                       math.info()};
     });
 }
 } // namespace uvlas::structure

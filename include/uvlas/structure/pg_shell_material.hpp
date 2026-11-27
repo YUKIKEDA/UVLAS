@@ -209,6 +209,67 @@ linearize_pg_shell_material_point(const PgShellElasticLaw&, const PgInitialGreen
                                   const PgShellPatchDirection&, const PgReferenceLimits&,
                                   core::ResourcePlan&) noexcept;
 
+struct PgShellVolumeSample {
+    PgDiscreteVolumePoint quadrature;
+    core::LayerId layer;
+    const PgShellElasticLaw& law;
+    PgInitialGreenEnclosure initial;
+    PgShellPointAxes axes;
+};
+
+struct PgShellVolumeResolution {
+    std::uint32_t fractional_bits; ///< Outward dyadic rounding of each SI contribution.
+    const ExactRational& energy_width_joules;
+    const ExactRational& force_width_newtons;
+    const ExactRational& tangent_width_newtons;
+};
+
+using PgShellCartesianEnclosure = std::array<PgMaterialEnclosure, 3>;
+
+struct PgShellElasticVolumeAction {
+    PgPreparedPatchIdentity patch;
+    PgMaterialEnclosure energy_joules;
+    core::PlannedBuffer<PgShellCartesianEnclosure> internal_force_newtons;
+    core::PlannedBuffer<PgShellCartesianEnclosure> tangent_action_newtons;
+    PgReferenceCallInfo work;
+};
+
+/// Assemble the energy, its gradient and an optional tangent action for one
+/// finite rule. Positive samples must cover each partition volume in order,
+/// and each layer sample belongs to its volume. Width limits refer to the
+/// finite-rule result, including field and arithmetic errors.
+[[nodiscard]] core::Result<PgShellElasticVolumeAction> assemble_pg_shell_elastic_volume(
+    const PgPreparedPatch&, const PgShellPatchState&, std::span<const PgShellVolumeSample>,
+    const std::optional<PgShellPatchDirection>&, const PgShellVolumeResolution&,
+    const PgReferenceLimits&, core::ResourcePlan&) noexcept;
+
+struct PgShellLayerDensity {
+    core::LayerId layer;
+    const ExactRational& kilograms_per_cubic_metre;
+};
+
+struct PgShellMassResolution {
+    std::uint32_t fractional_bits;
+    const ExactRational& mass_width_kg;
+    const ExactRational& action_width_kg_metres;
+};
+
+struct PgShellMassVolumeAction {
+    PgPreparedPatchIdentity patch;
+    PgMaterialEnclosure mass_kg;
+    core::PlannedBuffer<PgShellCartesianEnclosure> action_kg_metres;
+    PgReferenceCallInfo work;
+};
+
+/// Apply the consistent reference-volume mass on a separately supplied rule.
+/// Densities are in the partition's physical layer order. The trial positions
+/// and elastic fields do not enter the action.
+[[nodiscard]] core::Result<PgShellMassVolumeAction>
+apply_pg_shell_consistent_mass(const PgPreparedPatch&, std::span<const PgDiscreteVolumePoint>,
+                               std::span<const PgShellLayerDensity>, const PgShellPatchDirection&,
+                               const PgShellMassResolution&, const PgReferenceLimits&,
+                               core::ResourcePlan&) noexcept;
+
 /// Evaluate the whole input uncertainty in the fixed reference material frame.
 /// Require a positive natural metric throughout the initial strain enclosure.
 [[nodiscard]] core::Result<PgShellMaterialEnclosure>

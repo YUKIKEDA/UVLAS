@@ -126,7 +126,7 @@
 | MAT-D07 | [material-layer-adoption-contract.md:12](../specs/structure/material-layer-adoption-contract.md) | 0 | 0 | 0 |
 | MAT-D08 | [material-shell-adopted-specification.md:9](../specs/structure/material-shell-adopted-specification.md) | 8 | 0 | 0 |
 | MAT-D09 | [material-shell-adopted-specification.md:10](../specs/structure/material-shell-adopted-specification.md) | 4 | 0 | 0 |
-| MAT-D10 | [material-shell-adopted-specification.md:11](../specs/structure/material-shell-adopted-specification.md) | 2 | 0 | 0 |
+| MAT-D10 | [material-shell-adopted-specification.md:11](../specs/structure/material-shell-adopted-specification.md) | 3 | 0 | 0 |
 | MAT-D11 | [material-shell-adopted-specification.md:12](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D12 | [material-shell-adopted-specification.md:13](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
 | MAT-D13 | [material-shell-adopted-specification.md:14](../specs/structure/material-shell-adopted-specification.md) | 0 | 0 | 0 |
