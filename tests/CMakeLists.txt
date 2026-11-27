@@ -440,7 +440,6 @@ add_test(NAME core.audit_configuration COMMAND "${CMAKE_COMMAND}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/core/check_audit_configuration.cmake")
 set_tests_properties(core.audit_configuration PROPERTIES TIMEOUT 100 LABELS "negative")
 
-find_package(Threads REQUIRED)
 uvlas_add_test(core.state
     LABELS unit negative
     SOURCES core/state_test.cpp

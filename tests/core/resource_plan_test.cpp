@@ -1,3 +1,5 @@
+#include "../../src/core/resource_plan_worker.hpp"
+
 #include <catch2/catch_test_macros.hpp>
 
 #include <cstddef>
@@ -277,4 +279,35 @@ TEST_CASE("Outer construction failure rolls back only its own reservation", "[ne
             CHECK(plan.remaining_bytes() == 0);
         }
     }
+}
+
+TEST_CASE("ResourcePlan accounts for worker receipts within the parent budget",
+          "[negative][N4-02]") {
+    ResourcePlan parent{107};
+    REQUIRE(parent.allocate<std::byte>(7, operation));
+    detail::WorkerPayloadReservation reservation{parent};
+    CHECK_FALSE(reservation.begin(101));
+    REQUIRE(reservation.begin(100));
+    CHECK(parent.remaining_bytes() == 0);
+    CHECK_FALSE(parent.allocate<std::byte>(1, operation));
+    CHECK_FALSE(reservation.begin(0));
+
+    ResourcePlan first{57};
+    ResourcePlan second{43};
+    REQUIRE(first.allocate<std::byte>(57, operation));
+    REQUIRE(second.allocate<std::byte>(39, operation));
+    CHECK_FALSE(second.allocate<std::byte>(5, operation));
+    CHECK_FALSE(reservation.settle(101));
+    REQUIRE(reservation.settle(first.allocated_bytes() + second.allocated_bytes()));
+    CHECK(parent.allocated_bytes() == 103);
+    CHECK(parent.remaining_bytes() == 4);
+    CHECK_FALSE(reservation.begin(5));
+
+    {
+        detail::WorkerPayloadReservation abandoned{parent};
+        REQUIRE(abandoned.begin(4));
+        CHECK(parent.remaining_bytes() == 0);
+    }
+    REQUIRE(parent.allocate<std::byte>(4, operation));
+    CHECK(parent.allocated_bytes() == 107);
 }

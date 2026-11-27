@@ -71,10 +71,11 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_sparse_chart.cpp src/structure/pg_chart_candidate.cpp
     src/structure/pg_support_history.cpp src/structure/pg_rigid_support_rows.cpp
     src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
+find_package(Threads REQUIRED)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
 target_include_directories(uvlas_structure PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(uvlas_structure PUBLIC uvlas_core uvlas_numerics PRIVATE Boost::headers Boost::hash2)
+target_link_libraries(uvlas_structure PUBLIC uvlas_core uvlas_numerics PRIVATE Boost::headers Boost::hash2 Threads::Threads)
 
 if(UVLAS_BUILD_PYTHON)
     if(NOT CMAKE_CROSSCOMPILING)
@@ -251,7 +252,7 @@ if(BUILD_TESTING)
     uvlas_configure_target(uvlas_structure_audit)
     uvlas_enable_allocation_audit(uvlas_structure_audit)
     target_include_directories(uvlas_structure_audit PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-    target_link_libraries(uvlas_structure_audit PUBLIC uvlas_core_audit uvlas_numerics_audit PRIVATE Boost::headers Boost::hash2)
+    target_link_libraries(uvlas_structure_audit PUBLIC uvlas_core_audit uvlas_numerics_audit PRIVATE Boost::headers Boost::hash2 Threads::Threads)
     uvlas_require_audited_dependencies(uvlas_structure_audit)
     uvlas_require_audited_dependencies(uvlas_core_audit)
     add_library(uvlas_io_audit STATIC ${UVLAS_IO_SOURCES})
