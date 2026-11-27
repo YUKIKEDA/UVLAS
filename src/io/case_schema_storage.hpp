@@ -8,7 +8,7 @@ struct SchemaData {
     core::PlannedBuffer<InputDocumentData> snapshot;
     core::PlannedBuffer<SchemaNode> nodes;
     core::PlannedBuffer<std::uint64_t> array_elements;
-    std::array<std::uint64_t, 191> record_counts{};
+    std::array<std::uint64_t, 194> record_counts{};
     core::PlannedBuffer<std::optional<schema::Case>> records_Case;
     core::PlannedBuffer<std::optional<schema::Units>> records_Units;
     core::PlannedBuffer<std::optional<schema::Model>> records_Model;
@@ -223,6 +223,9 @@ struct SchemaData {
     core::PlannedBuffer<std::optional<schema::InitialPointRigid>> records_InitialPointRigid;
     core::PlannedBuffer<std::optional<schema::Rational>> records_Rational;
     core::PlannedBuffer<std::optional<schema::FileReference>> records_FileReference;
+    core::PlannedBuffer<std::optional<schema::MaterialMap>> records_MaterialMap;
+    core::PlannedBuffer<std::optional<schema::MaterialMapPiece>> records_MaterialMapPiece;
+    core::PlannedBuffer<std::optional<schema::MaterialMapTerm>> records_MaterialMapTerm;
 
     core::PlannedBuffer<char> digits;
     core::PlannedBuffer<SchemaIdentifier> identifiers;

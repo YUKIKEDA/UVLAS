@@ -1,0 +1,53 @@
+{
+  "id": "finite-wing-drag-refinement-v1",
+  "sources": {
+    "docs/verification/IM-03/finite-wing-case-v1/reference.py": "18d84c7def0ee7a40426a4dcab71e6537b686e9f2addec5c5e972d81a3835950",
+    "docs/verification/IM-03/finite-wing-span-lines-v1/reference.py": "6cdc1161e8e6a011fdf3a642e5bdc5f019730c6c3c5083937c01dadf8869c3a8",
+    "rd/aero/finite-wing/records/drag-common-limit-result.json": "c875d9a995b4129b61e50a7d0fb1184108a3387f17fda4fd28eeebaaddfc9aa5",
+    "rd/aero/finite-wing/records/drag-common-limit-assessment-policy.md": "f573ce4f677f175161aca26c1e26ad678b9e88e58f798cdff9c0dbb517a38ea0"
+  },
+  "closure_m": 1024.0,
+  "core_m": 1.114285714285714e-05,
+  "cases": [
+    {
+      "dihedral_degrees": 0,
+      "chord_panels": 4,
+      "span_panels": 12,
+      "near_drag_N_per_rad2": 1493.7120322516485,
+      "trefftz_drag_N_per_rad2": 1469.216157531009,
+      "relative_near_far_gap": 0.016672750701165945,
+      "relative_near_to_limit_plus_uncertainty": 0.026472230120144987,
+      "relative_original_residual": 9.5e-74
+    },
+    {
+      "dihedral_degrees": 5,
+      "chord_panels": 4,
+      "span_panels": 12,
+      "near_drag_N_per_rad2": 1487.4130365023257,
+      "trefftz_drag_N_per_rad2": 1462.5782889301147,
+      "relative_near_far_gap": 0.016980115020289087,
+      "relative_near_to_limit_plus_uncertainty": 0.02631159184159925,
+      "relative_original_residual": 1.6e-73
+    },
+    {
+      "dihedral_degrees": 0,
+      "chord_panels": 8,
+      "span_panels": 24,
+      "near_drag_N_per_rad2": 1544.3181741140208,
+      "trefftz_drag_N_per_rad2": 1502.8212840507456,
+      "relative_near_far_gap": 0.02761265794121799,
+      "relative_near_to_limit_plus_uncertainty": 0.008829938489527062,
+      "relative_original_residual": 1.385e-72
+    },
+    {
+      "dihedral_degrees": 5,
+      "chord_panels": 8,
+      "span_panels": 24,
+      "near_drag_N_per_rad2": 1537.773715016131,
+      "trefftz_drag_N_per_rad2": 1496.1591749321801,
+      "relative_near_far_gap": 0.027814246492748662,
+      "relative_near_to_limit_plus_uncertainty": 0.008985344973321702,
+      "relative_original_residual": 2.09e-72
+    }
+  ]
+}

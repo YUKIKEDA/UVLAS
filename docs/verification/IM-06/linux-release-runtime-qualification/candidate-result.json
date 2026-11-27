@@ -1,0 +1,85 @@
+{
+  "build_info": {
+    "commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+    "compiler": "GNU 14.2.1",
+    "configuration": "Release",
+    "dependencies": {
+      "boost": "1.92.0",
+      "eigen": "5.0.1",
+      "nlohmann_json": "3.12.0",
+      "spectra": "1.2.0"
+    },
+    "dependency_repairs": {
+      "nlohmann_json_sax_allocation": 1
+    },
+    "floating_point": "-ffp-contract=off -fno-fast-math",
+    "instruction_set": "sse2",
+    "platform": "Linux x86_64",
+    "platform_key": "linux-x64-gnu14.2-sse2",
+    "schema": "uvlas.build-info/1",
+    "uncommitted_changes": false,
+    "version": "0.1.0-dev"
+  },
+  "manifest_sha256": "2ddd32581a917c8b64a165228be930759648d044b6e7b2a5cbf3b477426fa0c8",
+  "artifact_hashes": {
+    "cli": "bb9c2ccb8c2b42bcf15770334ce1b58d69932a55b726baf2b731cfc0c4be6944",
+    "extension": "8488cc1f93ded36d819091544dbefdb25e036371768aa7159fc5fa310f702ffc"
+  },
+  "python": "3.12.16 (main, Nov 21 2026, 04:53:13) [GCC 14.2.1 20250110 (Red Hat 14.2.1-11)]",
+  "soabi": "cpython-312-x86_64-linux-gnu",
+  "machine": "x86_64",
+  "numpy": "2.3.5",
+  "wheel_license_count": 38,
+  "python_notice_sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+  "provider_hashes": {
+    "libstdc++.so.6.0.25": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134"
+  },
+  "ordinary_cli": {
+    "exit": 0,
+    "stdout": "Case validation succeeded."
+  },
+  "ordinary_owned_case": {
+    "sha256": "677503399e07e07f0e012c830dbc8711d75ebab1a87d27ad8e31699dc09f4c62",
+    "bytes": 19823
+  },
+  "ordinary_manifest_remove": "while_owned",
+  "external_references": {
+    "case_sha256": "741e954d7cdbf8882f9f8876efbeed287e304403d284de5a0e3e2bbef90c298b",
+    "sources": {
+      "wing.msh": "9543d355442833d70f8a49fd512a114dfa1d279b1f70e0923c74ff30a165a037",
+      "gmsh.json": "c0c7ba785b4a304f7f2d2c2c34b37ea97d6985c19e820eac00108a654a18c02e",
+      "wing.bdf": "a02d07c9e93ce20900ae3bfe42475348f4d7eea178e9e1ea69017a2ea50c9ffa",
+      "nastran.json": "97056a41d580a5e44465c322234a8d024730476c8e772671d84c5b86f83eb2d9"
+    },
+    "accepted": {
+      "cli": 0,
+      "python_file": true,
+      "python_dict": true
+    },
+    "changed_deck": "validate: reference SHA-256 mismatch at /model/geometry/2/deck",
+    "different_gmsh_sidecar_geometry": "validate: Gmsh sidecar format at /model/geometry/1/sidecar",
+    "restored_cli": 0
+  },
+  "ownership": [
+    "..........",
+    "----------------------------------------------------------------------",
+    "Ran 10 tests in 0.829s",
+    "",
+    "OK"
+  ],
+  "wheel_name": "uvlas_private_rehearsal-0.1.0.dev0+ga13bce0b1622-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+  "wheel_sha256": "dcd3e889e0a451c7cca723658325db3b01d31f0228f2f2a406115dedb8d80977",
+  "numpy_wheel_sha256": "0d8163f43acde9a73c2a33605353a4f1bc4798745a8b1d73183b28e5b435ae28",
+  "developer_tools": {
+    "cl": null,
+    "gcc": null,
+    "g++": null,
+    "cmake": null,
+    "ninja": null,
+    "git": null,
+    "vcpkg": null,
+    "dumpbin": null
+  },
+  "pip_install": "Successfully installed numpy-2.3.5 uvlas-private-rehearsal-0.1.0.dev0+ga13bce0b1622",
+  "pip_check": "No broken requirements found."
+}

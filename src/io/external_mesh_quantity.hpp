@@ -42,6 +42,14 @@ using ImportedCaseMaterial =
     std::uint64_t maximum_vertices, const structure::ExactLimits&, core::ResourcePlan&,
     const std::stop_token&, std::optional<ImportedQuantityMismatch>* = nullptr) noexcept;
 
+/// Compare an already parsed exact external full thickness after the same region is admitted.
+[[nodiscard]] core::Result<void>
+check_imported_uniform_thickness(const structure::ExactRational&, SiLengthUnit external_length,
+                                 const schema::Thickness&, SiLengthUnit case_length,
+                                 std::uint64_t maximum_vertices, const structure::ExactLimits&,
+                                 core::ResourcePlan&, const std::stop_token&,
+                                 std::optional<ImportedQuantityMismatch>* = nullptr) noexcept;
+
 /// Compare the uniform PSHELL thickness for an element without explicit corner overrides.
 /// Element and property belong to the same authenticated deck. The admitting caller
 /// has established the physical correspondence with the case thickness region.

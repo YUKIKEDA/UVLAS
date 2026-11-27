@@ -120,4 +120,6 @@ GOOD  独立した実装を別ブランチで進め、先行の実装を使う�
 
 ## pushの前に、PRの状態
 
-PRのあるブランチへpushする前に `gh pr view N --json state` を読む。mergeされたPRのブランチへのpushは、消えたブランチをリモートに作り直すだけで、どこにも届かない。
+PRのあるブランチへpushする前に `gh pr view N --json state,headRefName,headRefOid` を読む。返った `headRefName` からpush先の `refs/heads/…` を作り、そのリモートのSHAが `headRefOid` と一致することを確かめる。積んだ複数のPRを同時に更新するときも、各PRの出力からそれぞれのpush先を作る。merge済みのPRにはpushしない。
+
+2026-11-25、PR #353 の確認済みSHAを、手入力で親PR #352 のブランチにpushした。GitHubが #353 をマージ済みにして #354 の比較先を `main` へ変更した。ブランチ名をPRの表から転記せず、照合したPRのヘッドから取得する。

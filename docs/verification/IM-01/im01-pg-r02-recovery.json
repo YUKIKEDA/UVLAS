@@ -1,0 +1,134 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-r02-recovery",
+  "package": "IM-01",
+  "issue": 17,
+  "ids": [
+    "R-02",
+    "SH-D05",
+    "SH-D07",
+    "N4-04"
+  ],
+  "date": "2026-11-25",
+  "source_commit": "2f70cff11ca9b7b55a6e1e1919a5cef9e03ecac0",
+  "claimed_state": "凍結非整合実PG閉路で、失敗後の同じ元拘束と同じ準備済みチャートを両OSで再利用した。",
+  "checks": {
+    "assertions_per_os": 8195,
+    "profile_bytes": 51539607552,
+    "exact_positions": 1653,
+    "exact_dual_force": 909,
+    "exact_original_multipliers": 2016,
+    "exact_original_rhs": 2016,
+    "matched_original_nonzeros": 28116,
+    "zero_allocation_on_reuse_rejections": true,
+    "compiled_source_sha256": "fc975d7d695e26e41ed4b0a831839a6924a81775d79d955cc36a90ff9f75a4a3",
+    "clang_tidy_inherited_findings": 9,
+    "clang_tidy_baseline_findings": 13,
+    "historical_link_integrity_count": 35
+  },
+  "results": {
+    "msvc": {
+      "patches": 4,
+      "connections": 4,
+      "rows": 672,
+      "columns": 551,
+      "nonzeros": 28116,
+      "rank": 248,
+      "lower_terms": 4330,
+      "upper_terms": 19173,
+      "short_factor_capacity": 23502,
+      "retry_factor_capacity": 23503,
+      "failed_prepare_bytes": 68801368,
+      "final_plan_bytes": 2026577616,
+      "end_peak_bytes": 937066496,
+      "initial_resident_bytes": 6385664,
+      "geometry": {
+        "nanoseconds": 2766063300,
+        "charged_bytes": 1647148952,
+        "resident_bytes": 745017344,
+        "lifetime_peak_resident_bytes": 937066496
+      },
+      "traces": {
+        "nanoseconds": 554883100,
+        "charged_bytes": 69094968,
+        "resident_bytes": 774361088,
+        "lifetime_peak_resident_bytes": 937066496
+      },
+      "aggregate": {
+        "nanoseconds": 31567900,
+        "charged_bytes": 4315952,
+        "resident_bytes": 782307328,
+        "lifetime_peak_resident_bytes": 937066496
+      },
+      "chart": {
+        "nanoseconds": 31046806600,
+        "charged_bytes": 72322328,
+        "resident_bytes": 818876416,
+        "lifetime_peak_resident_bytes": 937066496
+      },
+      "retry": {
+        "nanoseconds": 30386246500,
+        "charged_bytes": 69002568,
+        "resident_bytes": 863678464,
+        "lifetime_peak_resident_bytes": 937066496
+      }
+    },
+    "gcc14": {
+      "patches": 4,
+      "connections": 4,
+      "rows": 672,
+      "columns": 551,
+      "nonzeros": 28116,
+      "rank": 248,
+      "lower_terms": 4330,
+      "upper_terms": 19173,
+      "short_factor_capacity": 23502,
+      "retry_factor_capacity": 23503,
+      "failed_prepare_bytes": 68801368,
+      "final_plan_bytes": 2044563520,
+      "end_peak_bytes": 944881664,
+      "initial_resident_bytes": 4861952,
+      "geometry": {
+        "nanoseconds": 2208001995,
+        "charged_bytes": 1665134856,
+        "resident_bytes": 762568704,
+        "lifetime_peak_resident_bytes": 944881664
+      },
+      "traces": {
+        "nanoseconds": 303747786,
+        "charged_bytes": 69094968,
+        "resident_bytes": 779890688,
+        "lifetime_peak_resident_bytes": 944881664
+      },
+      "aggregate": {
+        "nanoseconds": 24386036,
+        "charged_bytes": 4315952,
+        "resident_bytes": 788058112,
+        "lifetime_peak_resident_bytes": 944881664
+      },
+      "chart": {
+        "nanoseconds": 14451314284,
+        "charged_bytes": 72322328,
+        "resident_bytes": 814796800,
+        "lifetime_peak_resident_bytes": 944881664
+      },
+      "retry": {
+        "nanoseconds": 14663674310,
+        "charged_bytes": 69002568,
+        "resident_bytes": 855355392,
+        "lifetime_peak_resident_bytes": 944881664
+      }
+    },
+    "msvc_log_sha256": "46a574c726c9b7fce6da37e39b345d4d9721e674c56ce70a1b9ea081a6a79e56",
+    "gcc14_log_sha256": "a1cec7887bafc8ea6793881cc5f4c4428ab9caf1a539f033847f3bfd451cac6e"
+  },
+  "immutable": {
+    "docs/verification/IM-01/pg-sparse-chart-series/run-series.cpp.txt": "78ef8a8e65259b473d0201efe94b7b22fa3d0c2b953a033434310aea34f3f384"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-sparse-chart-series/run-recovery.patch": "5dbbfdb4f511db3b31d31458347ef4c5bf46f17aa74b13502939e21e1725a6a2"
+  },
+  "evidence": [
+    "docs/verification/IM-01/exit-review.md"
+  ]
+}

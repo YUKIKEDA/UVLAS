@@ -101,6 +101,7 @@ struct DeclaredReferenceView {
     std::string_view digest_spelling;     ///< Original lowercase hexadecimal digest.
     std::uint64_t declaration_node;       ///< Original FileRef object node ordinal.
     std::string_view declaration_pointer; ///< Original-document JSON Pointer to that object.
+    std::optional<std::uint64_t> declaring_mesh_geometry{};
 };
 struct DeclarationMemoryReport {
     std::uint64_t owned_bytes, scratch_bytes, cumulative_bytes, work;

@@ -1,6 +1,8 @@
+#include "../structure/pg_partition_test_support.hpp"
 #include "case_schema_test_adapter.hpp"
 #include "external_mesh_quantity.hpp"
 #include "nastran_laminate_cards.hpp"
+#include "nastran_pcomp_physical.hpp"
 #include "source_digest.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -547,4 +549,218 @@ TEST_CASE("A declared constant whole-region full thickness compares with every c
     CHECK_FALSE(diagnostic);
 }
 
+[[nodiscard]] structure::PgReferenceGeometry
+pcomp_pg(partition_test::Fixture& input, std::span<const std::string_view> endpoints,
+         std::string_view full_numerator, std::string_view full_denominator, bool varying,
+         bool cropped, core::ResourcePlan& plan) {
+    auto number = [&](std::string_view value) {
+        const auto slash = value.find('/');
+        if (slash != std::string_view::npos) {
+            return input.r(value.substr(0, slash), value.substr(slash + 1));
+        }
+        return input.r(value);
+    };
+    std::vector<structure::ExactRational> zeta;
+    zeta.reserve(endpoints.size());
+    for (const auto value : endpoints) {
+        zeta.push_back(number(value));
+    }
+    input.layers.clear();
+    for (std::size_t i = 0; i + 1 < zeta.size(); ++i) {
+        input.layers.emplace_back(core::LayerId{11U + i}, zeta[i], zeta[i + 1]);
+    }
+    for (auto& height : input.heights) {
+        height = input.r(full_numerator, full_denominator);
+    }
+    if (varying) {
+        input.heights[3] = input.r("41", "100");
+    }
+    if (cropped) {
+        input.domain.resize(3);
+    }
+    const auto exact = partition_test::exact_limits();
+    const structure::PgReferenceLimits reference{exact, 20'000'000, 10'000'000, {}};
+    const auto one = input.r("1");
+    const std::array origin{input.r("0"), input.r("0"), input.r("0")};
+    const std::array rotation{input.r("1"), input.r("0"), input.r("0"), input.r("0"), input.r("1"),
+                              input.r("0"), input.r("0"), input.r("0"), input.r("1")};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto dictionary = take(structure::PgCoefficientDictionary::prepare(
+        input.chart_graph(), {exact, 2000, 20'000'000, 100'000, {}}, workspace, plan));
+    auto partition = take(structure::PgIntegrationPartition::prepare(
+        input.request(), partition_test::limits(), workspace, plan));
+    input.layers.clear();
+    structure::PgReferenceInputs assembled{std::move(input.chart_graph()), std::move(dictionary),
+                                           std::move(partition)};
+    return take(structure::PgReferenceGeometry::prepare(std::move(assembled),
+                                                        {rotation, origin, one}, reference, plan));
+}
+
+TEST_CASE("PCOMP layers retain exact thickness and reverse the physical ply order",
+          "[IO4-03][FD-03][R-05][N4-02][integration][verification][negative]") {
+    constexpr auto forward = MeshSidecarOrientation::Same;
+    constexpr auto reverse = MeshSidecarOrientation::Reversed;
+    constexpr std::array<std::string_view, 3> forward_intervals{"-1", "-1/2", "1"};
+    constexpr std::array<std::string_view, 3> reverse_intervals{"-1", "1/2", "1"};
+    constexpr std::array<std::string_view, 5> split_intervals{"-1", "-3/4", "0", "3/4", "1"};
+    constexpr std::array<std::string_view, 4> joined_intervals{"-1", "-3/4", "3/4", "1"};
+    constexpr std::array<std::string_view, 3> same_thickness{"-1", "0", "1"};
+    auto endpoints = std::span<const std::string_view>{forward_intervals};
+    std::string_view z0 = "-200.", mode, first = "100.", second = "300.";
+    MeshSidecarOrientation direction = forward;
+    bool variable_case = false;
+    bool cropped = false;
+    bool inherited = false;
+    using Failure = NastranPcompGeometryFailure;
+    std::optional<Failure> failure;
+    SECTION("Explicit centered offset with asymmetric plies") {}
+    SECTION("Reversed face uses the original top ply first") {
+        direction = reverse;
+        endpoints = reverse_intervals;
+        z0 = {};
+    }
+    SECTION("An unchanged Case ply order cannot match a reversed asymmetric stack") {
+        direction = reverse;
+        failure = Failure::Interface;
+    }
+    SECTION("The exact layer interface catches a changed split with the same total") {
+        first = "101.";
+        second = "299.";
+        failure = Failure::Interface;
+    }
+    SECTION("A sub-ulp deck thickness difference fails") {
+        first = "100.00000000000000000001";
+        z0 = {};
+        failure = Failure::FullThickness;
+    }
+    SECTION("The actual positive-area PG thickness is compared") {
+        variable_case = true;
+        failure = Failure::FullThickness;
+    }
+    SECTION("A difference in a wholly inactive thickness triangle does not change the comparison") {
+        variable_case = true;
+        cropped = true;
+    }
+    SECTION("The later layer can inherit the earlier explicit thickness field") {
+        endpoints = same_thickness;
+        second = {};
+        z0 = {};
+        inherited = true;
+    }
+    SECTION("An explicit bottom shift cannot match the prepared reference plane") {
+        z0 = "-199.";
+        failure = Failure::ReferencePlane;
+    }
+    SECTION("Both halves of SYM can occupy independently declared Case layers") {
+        mode = "SYM";
+        endpoints = split_intervals;
+        z0 = "-400.";
+    }
+    SECTION("SYM matches one declared center layer spanning the center plane") {
+        mode = "SYM";
+        endpoints = joined_intervals;
+        z0 = {};
+    }
+    SECTION("A smeared stiffness option does not certify a physical stack") {
+        mode = "SMEAR";
+        z0 = {};
+        failure = Failure::Mode;
+    }
+    SECTION("A PCOMP stack does not merge unmatched Case layers") {
+        endpoints = joined_intervals;
+        failure = Failure::LayerCount;
+    }
+    const auto head =
+        std::string{"PCOMP,30,"} + std::string{z0} + ",,,,,," + std::string{mode} + "\n";
+    const auto bulk = head + ",81," + std::string{first} + ",,,52," + std::string{second} +
+                      ",17.5\nMAT8,81,130.0,9.0,.28\nMAT1,52,1.0\n";
+    core::ResourcePlan plan{partition_test::cap};
+    const auto cards =
+        take(NastranLaminateCards::prepare(material_cards(bulk), laminate_limits, plan, {}));
+    const auto deck = take(cards.view());
+    const auto expected_hash = source_digest(std::as_bytes(std::span{bulk}));
+    const auto property = deck.pcomp.front().property_ordinal;
+    partition_test::Fixture input;
+    const bool symmetric = mode == "SYM";
+    const auto full_numerator = symmetric ? "4" : inherited ? "1" : "2";
+    const auto pg = pcomp_pg(input, endpoints, full_numerator, "5", variable_case, cropped, plan);
+    const auto vertex_count = cropped ? std::uint64_t{3} : std::uint64_t{4};
+    const NastranPcompGeometryLimits bounds{comparison_limits(), vertex_count, 128};
+    std::optional<NastranPcompGeometryDiagnostic> diagnostic;
+    const auto compare = [&](const NastranPcompGeometryLimits& quota,
+                             const std::stop_token& stop = {}) {
+        return compare_nastran_pcomp_geometry(cards, property, SiLengthUnit::Millimetre, direction,
+                                              pg, quota, plan, stop, &diagnostic);
+    };
+    const auto result = compare(bounds);
+    if (failure) {
+        REQUIRE_FALSE(result);
+        CHECK(result.error().operation == core::Operation::PrepareModel);
+        CHECK(result.error().code == (failure == Failure::Mode ? Unsupported : InvalidInput));
+        const auto invalid = take(diagnostic);
+        CHECK(invalid.reason == *failure);
+        CHECK(invalid.field);
+        if (failure == Failure::Interface) {
+            CHECK(invalid.case_layer == core::LayerId{11});
+        }
+        if (variable_case) {
+            CHECK(invalid.thickness_vertex == 3);
+        }
+        return;
+    }
+    REQUIRE(result);
+    CHECK_FALSE(diagnostic);
+    CHECK(result->source.source == SourceId{99});
+    CHECK(result->digest == expected_hash);
+    CHECK(result->property == NastranPropertyId{30});
+    CHECK(result->bottom_offset_field.has_value() == !z0.empty());
+    CHECK(result->pg == take(pg.identity()));
+    CHECK(result->winding == direction);
+    CHECK(result->full_thickness_metres == input.r(full_numerator, "5"));
+    const auto match = result->layers.values();
+    REQUIRE(match.size() == endpoints.size() - 1);
+    for (std::size_t i = 0; i < match.size(); ++i) {
+        CHECK(match[i].layer == core::LayerId{11U + i});
+        CHECK(match[i].case_ordinal == i);
+        const auto declared = match[i].declared_ply;
+        REQUIRE(declared < 2);
+        const auto ply = deck.layers(deck.pcomp.front());
+        CHECK(match[i].material.id == take(ply[declared].material).id);
+        if (const auto& angle = match[i].source_angle) {
+            CHECK(declared == 1);
+            CHECK(angle->value.decimal() == "17.5");
+        } else {
+            CHECK(declared == 0);
+        }
+        CHECK(match[i].thickness ==
+              take(ply[ply[declared].thickness_source_ply].thickness).field.position);
+    }
+    if (symmetric) {
+        CHECK(match.front().material.id == NastranMaterialId{81});
+        CHECK(match.back().material.id == NastranMaterialId{81});
+        CHECK(match[1].ply_thickness_metres == input.r(match.size() == 3 ? "6" : "3", "10"));
+    } else {
+        CHECK(match.front().material.id == NastranMaterialId{direction == forward ? 81U : 52U});
+        CHECK(match.front().ply_thickness_metres ==
+              input.r(direction == forward ? "1" : "3", "10"));
+    }
+
+    auto exact = bounds;
+    exact.work = result->work;
+    REQUIRE(compare(exact));
+    --exact.work;
+    const auto exhausted = compare(exact);
+    REQUIRE_FALSE(exhausted);
+    CHECK(exhausted.error().code == ResourceExceeded);
+    exact = bounds;
+    exact.thickness_vertices = vertex_count - 1;
+    const auto vertices = compare(exact);
+    REQUIRE_FALSE(vertices);
+    CHECK(vertices.error().code == ResourceExceeded);
+    const auto cancelled = compare(bounds, partition_test::requested_stop_token());
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == Cancelled);
+    CHECK_FALSE(diagnostic);
+    CHECK(compare(bounds));
+}
 } // namespace

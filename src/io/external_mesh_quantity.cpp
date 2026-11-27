@@ -18,20 +18,27 @@ constexpr SchemaDimension thickness_dimension{{1, 0, 0, 0}};
     return std::unexpected(core::Failure{code, operation});
 }
 
-[[nodiscard]] core::Result<Rational> imported_si(std::string_view value, const SiUnits& units,
+[[nodiscard]] core::Result<Rational> imported_si(const Rational& input, const SiUnits& units,
                                                  SchemaDimension dimensions,
                                                  const structure::ExactLimits& limits,
                                                  core::ResourcePlan& plan) noexcept {
-    auto input = Rational::from_decimal(value, limits, plan);
-    if (!input) {
-        return std::unexpected(input.error());
-    }
     const SiRecipeView multiplier{SiDecimalView{1, "1", 0}, {}, units, dimensions, 0};
     const auto unit = materialize_rational(multiplier, limits, plan);
     if (!unit) {
         return std::unexpected(unit.error());
     }
-    return input->multiply(*unit, limits, plan);
+    return input.multiply(*unit, limits, plan);
+}
+
+[[nodiscard]] core::Result<Rational> imported_si(std::string_view value, const SiUnits& units,
+                                                 SchemaDimension dimensions,
+                                                 const structure::ExactLimits& limits,
+                                                 core::ResourcePlan& plan) noexcept {
+    const auto input = Rational::from_decimal(value, limits, plan);
+    if (!input) {
+        return std::unexpected(input.error());
+    }
+    return imported_si(*input, units, dimensions, limits, plan);
 }
 
 [[nodiscard]] core::Result<Rational> case_si(SchemaNumberView value, const SiUnits& units,
@@ -124,27 +131,13 @@ struct MaterialCheck {
     return {length, SiMassUnit::Kilogram, SiTimeUnit::Second, SiAngleUnit::Radian};
 }
 
-} // namespace
-
-core::Result<void> check_imported_uniform_thickness(
-    ImportedUniformThickness external, const schema::Thickness& field, SiLengthUnit case_length,
-    std::uint64_t maximum_vertices, const structure::ExactLimits& limits, core::ResourcePlan& plan,
-    const std::stop_token& stop, std::optional<ImportedQuantityMismatch>* diagnostic) noexcept {
-    if (diagnostic) {
-        diagnostic->reset();
-    }
-    if (stop.stop_requested()) {
-        return fail(Code::Cancelled);
-    }
-    if (field.values.size() > maximum_vertices) {
-        return fail(Code::ResourceExceeded);
-    }
-    const auto actual = imported_si(external.decimal, length_units(external.length),
-                                    thickness_dimension, limits, plan);
-    if (!actual) {
-        return std::unexpected(actual.error());
-    }
-    if (actual->sign() <= 0) {
+[[nodiscard]] core::Result<void>
+check_thickness_vertices(const Rational& actual, const schema::Thickness& field,
+                         SiLengthUnit case_length, std::optional<NastranBulkPosition> position,
+                         const structure::ExactLimits& limits, core::ResourcePlan& plan,
+                         const std::stop_token& stop,
+                         std::optional<ImportedQuantityMismatch>* diagnostic) noexcept {
+    if (actual.sign() <= 0) {
         return fail(Code::InvalidInput);
     }
     for (core::Index i = 0; std::cmp_less(i, field.values.size()); ++i) {
@@ -159,14 +152,58 @@ core::Result<void> check_imported_uniform_thickness(
         if (!expected) {
             return std::unexpected(expected.error());
         }
-        if (*expected != *actual) {
+        if (*expected != actual) {
             if (diagnostic) {
-                *diagnostic = ImportedQuantityMismatch{Field::FullThickness, external.position, i};
+                *diagnostic = ImportedQuantityMismatch{Field::FullThickness, position, i};
             }
             return fail(Code::InvalidInput);
         }
     }
     return stop.stop_requested() ? core::Result<void>{fail(Code::Cancelled)} : core::Result<void>{};
+}
+
+template <class Number>
+[[nodiscard]] core::Result<void>
+check_uniform(Number&& external, SiLengthUnit external_length, const schema::Thickness& field,
+              SiLengthUnit case_length, std::uint64_t maximum_vertices,
+              std::optional<NastranBulkPosition> position, const structure::ExactLimits& limits,
+              core::ResourcePlan& plan, const std::stop_token& stop,
+              std::optional<ImportedQuantityMismatch>* diagnostic) noexcept {
+    if (diagnostic) {
+        diagnostic->reset();
+    }
+    if (stop.stop_requested()) {
+        return fail(Code::Cancelled);
+    }
+    if (field.values.size() > maximum_vertices) {
+        return fail(Code::ResourceExceeded);
+    }
+    const auto actual =
+        imported_si(external, length_units(external_length), thickness_dimension, limits, plan);
+    if (!actual) {
+        return std::unexpected(actual.error());
+    }
+    return check_thickness_vertices(*actual, field, case_length, position, limits, plan, stop,
+                                    diagnostic);
+}
+
+} // namespace
+
+core::Result<void> check_imported_uniform_thickness(
+    ImportedUniformThickness external, const schema::Thickness& field, SiLengthUnit case_length,
+    std::uint64_t maximum_vertices, const structure::ExactLimits& limits, core::ResourcePlan& plan,
+    const std::stop_token& stop, std::optional<ImportedQuantityMismatch>* diagnostic) noexcept {
+    return check_uniform(external.decimal, external.length, field, case_length, maximum_vertices,
+                         external.position, limits, plan, stop, diagnostic);
+}
+
+core::Result<void> check_imported_uniform_thickness(
+    const Rational& external, SiLengthUnit external_length, const schema::Thickness& field,
+    SiLengthUnit case_length, std::uint64_t maximum_vertices, const structure::ExactLimits& limits,
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<ImportedQuantityMismatch>* diagnostic) noexcept {
+    return check_uniform(external, external_length, field, case_length, maximum_vertices, {},
+                         limits, plan, stop, diagnostic);
 }
 
 core::Result<void> check_imported_pshell_thickness(

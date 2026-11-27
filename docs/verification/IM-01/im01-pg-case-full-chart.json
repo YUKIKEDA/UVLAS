@@ -1,0 +1,124 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-case-full-chart",
+  "ids": [
+    "SH-D02",
+    "SH-D03",
+    "SH-D05",
+    "SH-D07",
+    "CN-D01",
+    "N4-04",
+    "V-PG"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-25",
+  "source_commit": "cda37b4aec046b70725d83c2c927cd83d5894566",
+  "scope": "凍結R4の2曲面Caseを、同じ所有参照、有限則の合同認定、全厚位置拘束、固定疎チャートへ通した。",
+  "case_manifest_sha256": "a3464f54edfc40b1e2752f13bafa648c29a898faef877de7593b67db725e1fb4",
+  "frozen_cases": {
+    "r4-interface-00/case.json": "81f37f427ffe8bfe08db9335fb3c9147331e018cb93f5655c6231f0ead310ae7",
+    "r4-interface-01/case.json": "a593c8ffa2a724ffca3da535ccce296dbb38fa2ab0529fc30a32cebffe4368be"
+  },
+  "profile_bytes": 51539607552,
+  "matching_layout_source": "3f0d89514ba4f7e366934756d243a5a8073b07cb",
+  "results": {
+    "msvc_release": {
+      "matching": {
+        "right_n": 1,
+        "columns": 344,
+        "original_rows": 192,
+        "rank": 116,
+        "cumulative_bytes": 4538406718
+      },
+      "nonmatching": {
+        "right_n": 2,
+        "columns": 521,
+        "original_rows": 288,
+        "rank": 171,
+        "cumulative_bytes": 9670047942,
+        "original_nonzeros": 70428,
+        "lower_terms": 11106,
+        "upper_terms": 34860,
+        "factor_capacity": 100000
+      },
+      "passing_nonmatching_assertions": 212354,
+      "smaller_profile_nonmatching": "ResourceExceeded",
+      "passed_assertions_in_run_with_smaller_profile": 420573,
+      "regression_ctests": 4
+    },
+    "gcc14_release": {
+      "matching": {
+        "right_n": 1,
+        "columns": 344,
+        "original_rows": 192,
+        "rank": 116,
+        "cumulative_bytes": 4559331326
+      },
+      "nonmatching": {
+        "right_n": 2,
+        "columns": 521,
+        "original_rows": 288,
+        "rank": 171,
+        "cumulative_bytes": 9724812822,
+        "original_nonzeros": 70428,
+        "lower_terms": 11106,
+        "upper_terms": 34860,
+        "factor_capacity": 100000
+      },
+      "passing_nonmatching_assertions": 212354,
+      "smaller_profile_nonmatching": "ResourceExceeded",
+      "passed_assertions_in_run_with_smaller_profile": 420573,
+      "regression_ctests": 4
+    }
+  },
+  "raw_log_sha256": {
+    "msvc_release": {
+      "msvc-final.log": "1cdd9005ac3726bb86e4a3aac4c2158f4a2c64dfdd5048d3100db52bf408ce25",
+      "msvc-r4-n2-frozen-width.log": "e7bf32e6c6a48cddba5f7b0cabef9e2846f740286fb393a13642453fc6e3eef1",
+      "msvc-targeted-ctest.log": "58311c3f4ce3ea6c3f541dfecaafb19b4ada5468732edd5d3c45ae91bc707d1d"
+    },
+    "gcc14_release": {
+      "gcc-release.log": "0984575bab3ebf8483cbff62fc611db8a6a66024c55d1b1fba01e33551fe167a",
+      "gcc-r4-n2-frozen-width.log": "708f56972d3ee35e29717486bd3c72180605bb79c96126a8f69717325bc4ede9",
+      "gcc-targeted-ctest.log": "694a1cae0c48f1b2e484d624fc239299e09b4366acbf138e85d97908cd0894c0"
+    }
+  },
+  "finite_sample_source": {
+    "commit": "3c82bef6c98f775f01ce9d8ce01c8364ae73ef38",
+    "path": "docs/verification/IM-01/pg-vpg-finite-conditioning/run-series.cpp.txt",
+    "sha256": "50ef3f768f97d7ceb8d808e12f5563fda2965e126553f50875e42e2de27054b2"
+  },
+  "sources": {
+    "CMakeLists.txt": "0dd56de3e698390812bba502ec99d97c8a8877e713ee750374fad64cf1618fb6",
+    "src/coupling/case_pg_chart.cpp": "c8783148f1b580e1cac4d7c54cf6398f78bff83fb441a6c1e0d9f2dac6776f08",
+    "src/coupling/case_pg_chart.hpp": "2032ba5e61a60a358019c167abddd8970da85bbb6734b2960705d756cdfc7b11",
+    "src/coupling/case_pg_reference.cpp": "7e5d9f5a7e8edc07fa509ff7a0578f36baf8cb5ab46867d18f3b6ae384652044",
+    "src/coupling/case_pg_support_motion.cpp": "b0b71d39e5067154202d2ebaa5eff883b116ccd46aebb6d6d773c3a266c12f55",
+    "src/structure/pg_global_constraints.cpp": "98be6b7b0362c6443027a70c5bc387ea8ee9ce08c3dd5128093d2e285806a8e8",
+    "src/structure/pg_rigid_support_rows.cpp": "502470331a4d35894b079f8182c4cff8caedb698324bbb3c9f738db8c0d6dea6",
+    "src/structure/pg_support_history.cpp": "5b565fd3920c8752ff9ea7c397478b1c1f2d7affba21f2f973ad0446e90d0f6f",
+    "src/structure/pg_sparse_chart.cpp": "24c2c81f22eacd91e96d72d91b6e762b408905b3ea37879db52310a25060ee6d",
+    "tests/coupling/case_pg_support_motion_test.cpp": "32cc85227a56ec1b1f38a5fd2962b932436fdeeef8c0b458d9825e20b0f8ab0e",
+    "tests/structure/pg_full_trace_test.cpp": "84fbb9fd69f3f68ea543d84c1658ec0cebc14080dd35bc012ceeae6fc1423c79",
+    "tools/qa/vpg_case_reference.py": "29fb7a9908bfd1143bb14ccfed2d21fc9fb6f84acd7b02272caf39842785f322",
+    "docs/specs/structure/pg-case-chart-contract.md": "c285b246ebbd71cdcbdc90ce8ebbb1c140bdb52667c97cdcbdfcf8287570c088",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-case-full-chart/run-case-chart.cpp.txt": "ed6ba5790dc0796cc5f11b4774c3841ab83b249a2e95c962ab9cb4beab9425a6",
+    "docs/verification/IM-01/pg-case-full-chart/verification.md": "0fdb6a5496a3c17cbec7a7d3f48f8510f4123999475e0e4229236a0c7f81d3e5"
+  },
+  "nonmatching_alternative_patch_width": {
+    "source_commit": "3fa5c5385f58e81a4f008f8c2a0e5aaad5bf5873",
+    "maximum_value_and_work_bits": [
+      8192,
+      32768
+    ],
+    "same_counts_and_cumulative_bytes": true,
+    "raw_log_sha256": {
+      "msvc_release": "6a8c0c44466e7a3a32965746fd6635a324349ccdb33c885c6f6a352868e7c2e1",
+      "gcc14_release": "a40c5aae8b7d423a0cd8dd9f15bb95550d8d0e848d9464b00468fa0d0120a266"
+    }
+  }
+}

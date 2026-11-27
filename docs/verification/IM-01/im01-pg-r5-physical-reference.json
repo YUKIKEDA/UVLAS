@@ -1,0 +1,178 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-r5-physical-reference",
+  "ids": [
+    "SH-D03",
+    "SH-D05",
+    "SH-D07",
+    "V-PG"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-25",
+  "source_commit": "0a37532e7328d1d29c3b678714c6e9e95521a5f7",
+  "product_source_commit": "5d30aa930b2c61075dbcc90bf4e76b92c11decb6",
+  "frozen_case_manifest_sha256": "a3464f54edfc40b1e2752f13bafa648c29a898faef877de7593b67db725e1fb4",
+  "driver_sha256": "5c50ef71df132608356403196ca431bf770f8da960585b61de867ebfc22a781d",
+  "msvc_full_series_driver": {
+    "source_commit": "72116b1f86a8700009174d361be1cb9c20eac19c",
+    "sha256": "aa31de164908556833666966f99b029a33cd1f355ba60ae95e9df7793600c30c",
+    "difference": "The rational dual probe was initialized at program startup rather than within the test call."
+  },
+  "checks": {
+    "configurations": 4,
+    "total_points": 480,
+    "volume_points": 140,
+    "horizontal_points": 280,
+    "lateral_points": 60,
+    "required_mode_ordinals": [
+      19,
+      20
+    ],
+    "physical_components_per_representation": 3840,
+    "normalized_reproduction_tolerance": "1e-8",
+    "decimal_oracle_comparison_tolerance": "1e-65",
+    "profile_bytes": 51539607552
+  },
+  "results": {
+    "msvc_release": {
+      "assertions": 441702,
+      "rows": [
+        {
+          "case_ordinal": 0,
+          "prepared_bytes": 2139412561,
+          "work_j": "0.0990269",
+          "work_error_j": "9.58385e-114",
+          "volume": 19,
+          "horizontal": 38,
+          "lateral": 11,
+          "exact_position_error_m": "4.71294e-117",
+          "exact_gradient_error": "4.83124e-113",
+          "rounded_position_error_m": "9.13956e-34",
+          "rounded_gradient_error": "2.17259e-32",
+          "cumulative_product_bytes": 4189693009
+        },
+        {
+          "case_ordinal": 1,
+          "prepared_bytes": 2139412561,
+          "work_j": "0.0991864",
+          "work_error_j": "9.59684e-114",
+          "volume": 19,
+          "horizontal": 38,
+          "lateral": 11,
+          "exact_position_error_m": "4.74075e-119",
+          "exact_gradient_error": "4.8205e-113",
+          "rounded_position_error_m": "8.54638e-34",
+          "rounded_gradient_error": "1.97418e-32",
+          "cumulative_product_bytes": 4189693009
+        },
+        {
+          "case_ordinal": 2,
+          "prepared_bytes": 6474765449,
+          "work_j": "0.0425961",
+          "work_error_j": "4.93142e-114",
+          "volume": 51,
+          "horizontal": 102,
+          "lateral": 19,
+          "exact_position_error_m": "4.71294e-117",
+          "exact_gradient_error": "4.80952e-113",
+          "rounded_position_error_m": "1.35291e-33",
+          "rounded_gradient_error": "1.63194e-32",
+          "cumulative_product_bytes": 17976868649
+        },
+        {
+          "case_ordinal": 3,
+          "prepared_bytes": 6474765449,
+          "work_j": "0.042654",
+          "work_error_j": "4.9372e-114",
+          "volume": 51,
+          "horizontal": 102,
+          "lateral": 19,
+          "exact_position_error_m": "4.74075e-119",
+          "exact_gradient_error": "4.82028e-113",
+          "rounded_position_error_m": "8.27128e-34",
+          "rounded_gradient_error": "2.60652e-32",
+          "cumulative_product_bytes": 17976868649
+        }
+      ],
+      "log_sha256": "4385aed645e1861f6a435c3407ad4c7c3098cdda073dc3f1a4fe1c8851439fdd"
+    },
+    "gcc14_release": {
+      "assertions": 441702,
+      "rows": [
+        {
+          "case_ordinal": 0,
+          "prepared_bytes": 2148426593,
+          "work_j": "0.0990269",
+          "work_error_j": "9.58385e-114",
+          "volume": 19,
+          "horizontal": 38,
+          "lateral": 11,
+          "exact_position_error_m": "4.71294e-117",
+          "exact_gradient_error": "4.83124e-113",
+          "rounded_position_error_m": "9.13956e-34",
+          "rounded_gradient_error": "2.17259e-32",
+          "cumulative_product_bytes": 4198707041
+        },
+        {
+          "case_ordinal": 1,
+          "prepared_bytes": 2148426593,
+          "work_j": "0.0991864",
+          "work_error_j": "9.59684e-114",
+          "volume": 19,
+          "horizontal": 38,
+          "lateral": 11,
+          "exact_position_error_m": "4.74075e-119",
+          "exact_gradient_error": "4.8205e-113",
+          "rounded_position_error_m": "8.54638e-34",
+          "rounded_gradient_error": "1.97418e-32",
+          "cumulative_product_bytes": 4198707041
+        },
+        {
+          "case_ordinal": 2,
+          "prepared_bytes": 6513044745,
+          "work_j": "0.0425961",
+          "work_error_j": "4.93142e-114",
+          "volume": 51,
+          "horizontal": 102,
+          "lateral": 19,
+          "exact_position_error_m": "4.71294e-117",
+          "exact_gradient_error": "4.80952e-113",
+          "rounded_position_error_m": "1.35291e-33",
+          "rounded_gradient_error": "1.63194e-32",
+          "cumulative_product_bytes": 18015147945
+        },
+        {
+          "case_ordinal": 3,
+          "prepared_bytes": 6513044745,
+          "work_j": "0.042654",
+          "work_error_j": "4.9372e-114",
+          "volume": 51,
+          "horizontal": 102,
+          "lateral": 19,
+          "exact_position_error_m": "4.74075e-119",
+          "exact_gradient_error": "4.82028e-113",
+          "rounded_position_error_m": "8.27128e-34",
+          "rounded_gradient_error": "2.60652e-32",
+          "cumulative_product_bytes": 18015147945
+        }
+      ],
+      "log_sha256": "cb63d70d970cef074894e23f7fd10df453b72ee2159caebe98427486d5c72119"
+    }
+  },
+  "msvc_final_driver_thin_control": {
+    "assertions": 180519,
+    "case_ordinal": 3,
+    "log_sha256": "f30968926f3af1571c3319a5991a99a98a2b5bf7dc4140a585822f4c4426c9f8"
+  },
+  "negative_gradient_misread": {
+    "case_ordinal": 0,
+    "first_failed_assertion": 39104,
+    "normalized_gradient_error": "0.93772",
+    "source_sha256": "2780a1c699319bd66f08daa416b517cedb411feee2ce501b8a33eb13726d8bda",
+    "log_sha256": "aad704e13c9658dfb166f06f69e1e1c541f6b63a89ff7a2fb23c01686a5daced"
+  },
+  "evidence": [
+    "docs/verification/IM-01/pg-case-reference-handoff/physical-reference.md"
+  ]
+}

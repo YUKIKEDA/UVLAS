@@ -513,7 +513,8 @@ PgRankPreparation::translation_axis(PgRankRequiredColumn target) const noexcept 
 std::array<std::array<ExactRational, 3>, 3>
 PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn column,
                                   PgCellIndex cell, const ExactRational& u, const ExactRational& v,
-                                  const ExactRational& axis_scale, bool derivatives) const {
+                                  const ExactRational& axis_scale, bool derivatives,
+                                  PgRankMonomialPowers* powers) const {
     const auto& state = rank_state(state_);
     math.visit(1);
     const auto k = rank_index(column.value, state.info.rank);
@@ -533,12 +534,30 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
         const auto target = std::tuple{fields[field], cell.first, cell.second};
         const auto first = std::partition_point(indices.begin(), indices.end(),
                                                 [&](auto i) { return key(i) < target; });
-        for (auto term = first; term != indices.end() && key(*term) == target; ++term) {
+        auto last = first;
+        while (last != indices.end() && key(*last) == target)
+            ++last;
+        if (powers != nullptr) {
+            const auto count = static_cast<std::size_t>(last - first);
+            const auto offset = begin + static_cast<std::size_t>(first - indices.begin());
+            auto exact = powers->common_sum(math, state.rows.values(), {first, last},
+                                            state.basis_values.values().subspan(offset, count));
+            if (exact) {
+                jet[field][0] = std::move(*exact);
+                continue;
+            }
+        }
+        for (auto term = first; term != last; ++term) {
             const auto& row = state.rows.values()[*term];
             const auto offset = begin + static_cast<std::size_t>(term - indices.begin());
             math.charge();
             const auto coefficient =
                 rank_exact(state.basis_values.values()[offset], math.leaf_limits, math.plan);
+            if (powers != nullptr) {
+                jet[field][0] =
+                    math.add(jet[field][0], powers->term(math, coefficient, row.powers));
+                continue;
+            }
             for (std::size_t i = 0; i < orders.size(); ++i) {
                 const auto order = orders[i];
                 if (order.first > row.powers.first || order.second > row.powers.second)
@@ -553,6 +572,169 @@ PgRankPreparation::basis_cell_jet(ReferenceArithmetic& math, PgRankBasisColumn c
             jet[field][i] = math.mul(jet[field][i], axis_scale);
     }
     return jet;
+}
+
+bool PgRankMonomialPowers::fits(const ExactRational& u, const ExactRational& v,
+                                const ExactLimits& limits) {
+    // The validated rank dictionaries bound the total degree and store the
+    // coefficients in RankCell. Bound the products before any cancellation.
+    const auto width =
+        partition_add(std::numeric_limits<RankCell>::digits,
+                      partition_mul(degree, std::max(partition_bits(u), partition_bits(v))));
+    return width <= std::min(limits.maximum_value_bits, limits.maximum_work_bits);
+}
+
+const ExactRational& PgRankMonomialPowers::Axis::power(ReferenceArithmetic& math,
+                                                       std::size_t exponent) {
+    if (exponent == 1)
+        return coordinate;
+    while (last_power < exponent) {
+        auto& next = values[last_power - 1];
+        next = math.mul(last_power == 1 ? coordinate : values[last_power - 2], coordinate);
+        ++last_power;
+    }
+    return values[exponent - 2];
+}
+
+ExactRational PgRankMonomialPowers::term(ReferenceArithmetic& math,
+                                         const ExactRational& coefficient, ExactPowers exponents) {
+    const auto a = static_cast<std::size_t>(exponents.first);
+    const auto b = static_cast<std::size_t>(exponents.second);
+    if (a == 0)
+        return b == 0 ? math.copy(coefficient) : math.mul(coefficient, v_.power(math, b));
+    if (b != 0 && reuse_ != Reuse::Axis) {
+        // Positive mixed powers occupy consecutive diagonals of the degree bound.
+        const auto order = a + b;
+        auto& mixed = mixed_[(order - 2) * (order - 1) / 2 + a - 1];
+        if (const auto& ready = mixed)
+            return math.mul(coefficient, *ready);
+        const auto& stored = mixed.emplace(math.mul(u_.power(math, a), v_.power(math, b)));
+        return math.mul(coefficient, stored);
+    }
+    auto value = math.mul(coefficient, u_.power(math, a));
+    if (b != 0)
+        value = math.mul(value, v_.power(math, b));
+    return value;
+}
+
+const Integer& PgRankMonomialPowers::IntegerPowers::power(const IntegerBackend& base,
+                                                          std::size_t exponent) {
+    values[0] = 1;
+    while (initialized < exponent) {
+        values[initialized + 1] = values[initialized] * Integer{base};
+        ++initialized;
+    }
+    return values[exponent];
+}
+
+std::optional<ExactRational>
+PgRankMonomialPowers::common_sum(ReferenceArithmetic& math, std::span<const PgRankRow> rows,
+                                 std::span<const std::uint32_t> indices,
+                                 std::span<const RankFraction<RankCell>> coefficients) {
+    if (reuse_ != Reuse::CommonDenominator || coefficients.size() <= 1)
+        return std::nullopt;
+    // Charge the same scalar work as the mixed-power path: load, scale and
+    // accumulate one coefficient. The width check also bounds the integer work.
+    const auto steps = partition_mul(3, coefficients.size());
+    if (steps > math.limits.maximum_scalar_operations - math.scalar_operations)
+        return std::nullopt;
+
+    ExactPowers previous{-1, -1};
+    std::size_t max_u = 0, max_v = 0;
+    std::uint64_t numerator_bits = 0, coefficient_denominator_bits = 1;
+    for (std::size_t i = 0; i < indices.size(); ++i) {
+        math.cancel();
+        const auto powers = rows[indices[i]].powers;
+        if (std::tie(powers.first, powers.second) <= std::tie(previous.first, previous.second))
+            return std::nullopt;
+        previous = powers;
+        max_u = std::max(max_u, static_cast<std::size_t>(powers.first));
+        max_v = std::max(max_v, static_cast<std::size_t>(powers.second));
+        numerator_bits = std::max(numerator_bits, rank_bits(coefficients[i].numerator));
+        const auto bits = rank_bits(coefficients[i].denominator);
+        if (bits > 1)
+            coefficient_denominator_bits = partition_add(coefficient_denominator_bits, bits);
+    }
+    const auto coordinate_bits = partition_add(partition_mul(max_u, partition_bits(u_.coordinate)),
+                                               partition_mul(max_v, partition_bits(v_.coordinate)));
+    const auto numerator_bound = partition_add(numerator_bits, partition_log(indices.size()));
+    const auto denominator_bound = partition_add(coordinate_bits, coefficient_denominator_bits);
+    const auto width = partition_add(denominator_bound, numerator_bound);
+    if (width > math.leaf_limits.maximum_value_bits)
+        return std::nullopt;
+    const auto admitted = exact_rational_admission(math.leaf_limits, width, 0);
+    if (!admitted) {
+        if (admitted.error().code == core::FailureCode::ResourceExceeded)
+            return std::nullopt;
+        throw PartitionAbort{admitted.error()};
+    }
+
+    // The product bounds the coefficient LCM before any arbitrary-precision
+    // arithmetic. Reduce the completed sum just once.
+    math.charge(steps);
+    Integer coefficient_denominator = 1;
+    for (const auto& coefficient : coefficients) {
+        math.cancel();
+        const Integer denominator{coefficient.denominator};
+        if (coefficient_denominator % denominator != 0) {
+            const Integer divisor =
+                boost::multiprecision::gcd(coefficient_denominator, denominator);
+            coefficient_denominator *= denominator / divisor;
+        }
+    }
+    const auto& u = ExactFactory::value(u_.coordinate).backend();
+    const auto& v = ExactFactory::value(v_.coordinate).backend();
+    // Consume the canonical rows in descending (a,b), grouping by outer degree.
+    // Each Horner accumulator homogenizes just the consumed suffix, so the old
+    // common-denominator width bound also covers all partial accumulators.
+    Integer sum = 0;
+    auto i = indices.size();
+    std::size_t outer_degree = max_u;
+    while (i != 0) {
+        math.cancel();
+        const auto outer = rows[indices[i - 1]].powers.first;
+        const auto a = static_cast<std::size_t>(outer);
+        const auto max_inner = static_cast<std::size_t>(rows[indices[i - 1]].powers.second);
+        auto inner_degree = max_inner;
+        Integer inner = 0;
+        do {
+            --i;
+            math.cancel();
+            const auto b = static_cast<std::size_t>(rows[indices[i]].powers.second);
+            if (b < inner_degree)
+                inner *= v_num_.power(v.num(), inner_degree - b);
+            Integer coefficient{coefficients[i].numerator};
+            if (coefficients[i].denominator != 1)
+                coefficient *= coefficient_denominator / Integer{coefficients[i].denominator};
+            else if (coefficient_denominator != 1)
+                coefficient *= coefficient_denominator;
+            if (b < max_inner)
+                coefficient *= v_den_.power(v.denom(), max_inner - b);
+            inner += coefficient;
+            inner_degree = b;
+        } while (i != 0 && rows[indices[i - 1]].powers.first == outer);
+        if (inner_degree != 0)
+            inner *= v_num_.power(v.num(), inner_degree);
+        if (max_inner < max_v)
+            inner *= v_den_.power(v.denom(), max_v - max_inner);
+        if (a < outer_degree)
+            sum *= u_num_.power(u.num(), outer_degree - a);
+        if (a < max_u)
+            inner *= u_den_.power(u.denom(), max_u - a);
+        sum += inner;
+        outer_degree = a;
+    }
+    if (outer_degree != 0)
+        sum *= u_num_.power(u.num(), outer_degree);
+    if (sum == 0)
+        return ExactRational{};
+    Integer den = coefficient_denominator * u_den_.power(u.denom(), max_u);
+    den *= v_den_.power(v.denom(), max_v);
+    const Integer divisor = boost::multiprecision::gcd(rank_abs(sum), den);
+    sum /= divisor;
+    den /= divisor;
+    return rank_exact(RankFraction<Integer>{std::move(sum), std::move(den)}, math.leaf_limits,
+                      math.plan);
 }
 
 core::Result<std::span<const std::uint32_t>>

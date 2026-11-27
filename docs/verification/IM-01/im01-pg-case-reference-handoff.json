@@ -1,0 +1,190 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-case-reference-handoff",
+  "ids": [
+    "SH-D02",
+    "SH-D03",
+    "SH-D05",
+    "SH-D07",
+    "N4-02",
+    "N4-06",
+    "N4-04",
+    "V-PG"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-25",
+  "source_commit": "bf0b873ecc7ff141f0ad8068bcbadeaf30e4e52f",
+  "product_source_commit": "b379d8732a2fff47a1bf648064390db0f201bbc0",
+  "scope": "凍結R5全4配置で、同じCase所有の有限則・参照・全厚元拘束の受渡しを確認した。",
+  "case_manifest_sha256": "a3464f54edfc40b1e2752f13bafa648c29a898faef877de7593b67db725e1fb4",
+  "compiled_driver_sha256": "c72ba446e72796336fd8bfc7ce770e15ed14bdbd0fd886e67e23e14113035aaf",
+  "archive_driver_sha256": "31774fa38a1035d8bcc3a90ef5e9d2a7c27bfef00d544b992278e9f1907c460f",
+  "profile_bytes": 51539607552,
+  "checks": {
+    "r5_configurations": 4,
+    "r5_assertions_per_platform": 421260,
+    "r4_paired_shell_assertions_per_platform": 4599,
+    "targeted_ctests_per_platform": 4,
+    "exact_reference_sample_points_per_configuration": 5,
+    "finite_volume_projection_points_per_configuration": 2,
+    "independent_geometry_tolerance": "1e-70",
+    "volume_projection_tolerance": "2^-60",
+    "strict_gradient_projection_rejection": {
+      "case": "r5-taper-00",
+      "point_ordinal": 281,
+      "column": 157,
+      "derivative": "Cartesian x",
+      "g_per_metre": 9.95894E+24,
+      "independent_two_word_error_per_metre": 5.8842E-08
+    }
+  },
+  "cases": [
+    {
+      "name": "r5-taper-00",
+      "n": 1,
+      "thickness_metres": "1/100",
+      "sha256": "80044242b860ef7f299bdf56373248b7009cac865a42b311ecd2176a47eeda95",
+      "original_rows": 192,
+      "rank": 45,
+      "cumulative_bytes": {
+        "msvc": 2380097769,
+        "gcc14": 2389111801
+      }
+    },
+    {
+      "name": "r5-taper-01",
+      "n": 1,
+      "thickness_metres": "1/10000",
+      "sha256": "d2bbdc7fe8cfd3179d1dccfcd5710c787ee5d8eb133f600ecab9d124b9070fe1",
+      "original_rows": 192,
+      "rank": 45,
+      "cumulative_bytes": {
+        "msvc": 2350259249,
+        "gcc14": 2359273281
+      }
+    },
+    {
+      "name": "r5-taper-02",
+      "n": 2,
+      "thickness_metres": "1/100",
+      "sha256": "54108ffbaaadc6298092a71683903b1035ce2e7eb410a7dc0633d119c99f91c8",
+      "original_rows": 288,
+      "rank": 86,
+      "cumulative_bytes": {
+        "msvc": 6884487185,
+        "gcc14": 6922766481
+      }
+    },
+    {
+      "name": "r5-taper-03",
+      "n": 2,
+      "thickness_metres": "1/10000",
+      "sha256": "5fc304b6aaa954e770fb5343abe7f49e3bbebd0db559a94cc584c02eea718ad5",
+      "original_rows": 288,
+      "rank": 86,
+      "cumulative_bytes": {
+        "msvc": 6884494737,
+        "gcc14": 6922774033
+      }
+    }
+  ],
+  "raw_log_sha256": {
+    "msvc-r5-exact.log": "7190b77e0824ed1685f42e5d9ff931923e915066a8234deb080a4b17a5c29937",
+    "msvc-r5-exact-ctest.log": "5853a36f99945100f51c10a50812368ca20d7b5808588c6dc40247d2f6f7596b",
+    "msvc-r5-handoff-diagnose.log": "c76a64e1835b7fa9c313565468e49a8e0a838c7f83dcccae433156fb6045157f",
+    "gcc-r5-exact.log": "6602b975bdf803cd8db0c9762abad36c15902383cfafcb687553136a85de042c",
+    "gcc-r4-paired-handoff.log": "382a36a0cfd6704ee414fb6501fcc9633e7b5e9547f5db536f3956a8450a9b67",
+    "gcc-r5-exact-ctest.log": "438806151ebc15bd7cfd8963af4408ae1faf15151e287ea3bfd25c6771e17c8b"
+  },
+  "evidence": [
+    "docs/verification/IM-01/pg-case-reference-handoff/verification.md"
+  ],
+  "gradient_diagnostics": {
+    "rounded_required_fields": {
+      "case": "r5-taper-00",
+      "points": [
+        280,
+        281
+      ],
+      "maximum_translation_derivative_error_per_metre": 7.87339E-32,
+      "maximum_reference_position_derivative_error": 2.9412E-33,
+      "assertions": 36042,
+      "compiled_driver_sha256": "ae1c0e841e1d0a4e40ea9dc3111c885102f0d8c9ed1780561ae8750f9e8e01f2",
+      "archive_driver_sha256": "95cbe2444ce3294698f6b9c855659419fe2d423766e44c73c0ff4052d8396f46",
+      "log_sha256": "785f6460cb3bd1bcbf7c0a8cde7bdf4976114418b6f6b2a8e44c5bfa54558189"
+    },
+    "gradient_component_cycle": {
+      "first_failed_assertion": 36657,
+      "log_sha256": "5adfdad32af0e97bb3df5c5f14c46fa6fb236738b510800e8a11d86dc12cdb39"
+    },
+    "product_rule_r5_msvc": {
+      "case": "r5-taper-00",
+      "source_commit": "b379d8732a2fff47a1bf648064390db0f201bbc0",
+      "order": [
+        17,
+        17,
+        3
+      ],
+      "exact_rule_denominator": "10^48",
+      "volumes": 19,
+      "point_count": 16473,
+      "resource_profile_bytes": 51539607552,
+      "narrow": {
+        "value_work_bits": [
+          8192,
+          32768
+        ],
+        "outcome": "ResourceExceeded",
+        "cumulative_bytes": 541239401,
+        "log_sha256": "18b01935a5d892240b3046e5d99762ad47bd4ca2fce2def32c832ec6ef60a42f"
+      },
+      "wide": {
+        "value_work_bits": [
+          65536,
+          262144
+        ],
+        "outcome": "externally stopped during Gram",
+        "wall_seconds": 662.88,
+        "cpu_seconds": 650.25,
+        "peak_working_set_bytes": 356036608,
+        "log_sha256": "54e5b21b4b617b335f6bce75fd16e7c2e90a80426a68a2db66c244e41d2b1ba4",
+        "process_sample_sha256": "72010e587e8433eec9fa8eeabac9d76aba5f9c61bba4a7a7eed2e7f602c65953"
+      },
+      "compiled_wide_driver_sha256": "5efdeff07a8fbe1027489c89f1eed0afdd898689d64ac02185f349d0d142b115",
+      "archive_driver_sha256": "f32210092c122da06b6e00c73a7a62b7c931d25b5fc4359747747ebdd014355a"
+    }
+  },
+  "case_product_dispatch": {
+    "source_commit": "c1a8898003f4c4bdfbc774937b46b298905c9b9a",
+    "driver_sha256": "b4c56400ba743be98ab30789e2443a85232a8ff4d6bc71ad28d0f7f3d19df68c",
+    "based_on_case": "r5-taper-00, height polynomial set to zero",
+    "order": [
+      7,
+      7,
+      3
+    ],
+    "volume_count": 19,
+    "points": 2793,
+    "original_rows": 192,
+    "rank": 37,
+    "assertions_per_platform": 14574,
+    "support_ctests_per_platform": 2,
+    "resource_plan_bytes": {
+      "msvc": {
+        "product_through_residual": 720430793,
+        "explicit_through_chart": 720213705
+      },
+      "gcc14": {
+        "product_through_residual": 723087977,
+        "explicit_through_chart": 722870889
+      }
+    },
+    "logs_sha256": {
+      "msvc-case-product.log": "7de6add66a9c7b8d6ca59b908d98511b9b8216b92c942827bd6abe44c802b69a",
+      "msvc-case-product-ctest.log": "aae0636fedf04e598e6a366bc599e1eb34611328e0a8ef413edfbcf9da1dbe3a",
+      "gcc-case-product.log": "2cd5660bde3c8197a3f53428cfd40b207244c52e4e19e5553efde0d08757d541",
+      "gcc-case-product-ctest.log": "8ed40a5b1eda6459b94f3d0249ce77b202c05642e9707dae738c111f231fd71d"
+    }
+  }
+}

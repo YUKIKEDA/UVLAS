@@ -1,0 +1,95 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-r4-domain-geometry",
+  "ids": [
+    "GEO-01",
+    "SH-D02",
+    "SH-D07",
+    "V-PG"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "60a356c7031e9ba5895527c4349209f92902a825",
+  "claimed_state": "凍結R4の28配置で全体積片および選択した層面と外周の参照位置、法線、厚さ、物理測度を独立な有理式と複素ステップで照合した。",
+  "checks": {
+    "frozen_shapes": 7,
+    "frozen_configurations": 28,
+    "subdivision_counts": [
+      1,
+      2,
+      4
+    ],
+    "full_thickness_metres": [
+      "1/100",
+      "1/10000"
+    ],
+    "diagnostic_layers": [
+      "-1",
+      "-1/3",
+      "1"
+    ],
+    "horizontal_queries_per_configuration": 4,
+    "lateral_queries_per_configuration": 8,
+    "chart_area_per_layer": "1",
+    "r4_assertions_per_platform": 81964,
+    "ctest": "structure.pg_reference_geometry",
+    "ctest_cases_per_platform": 12,
+    "ctest_assertions_per_platform": 85114,
+    "ctest_release_timeout_seconds": 180,
+    "seconds": {
+      "msvc_release": 67,
+      "gcc14_release": 50.36
+    },
+    "clang_tidy_translation_units": 1,
+    "mutation": {
+      "operation": "reverse only the returned reference normal",
+      "source_sha256": "93b6e726235b186ebcf82f67a8408eaa9ee019e57fec972417ad33ed0f06400f",
+      "failed_assertions": 1,
+      "first_failed_assertion": 9,
+      "expected_radical": "-7950/25309",
+      "observed_radical": "7950/25309"
+    }
+  },
+  "frozen_references": [
+    {
+      "id": "paired-reference-r4-audit",
+      "sha256": "2af9e42f35928cb0d213f126fd481d03703ce6995b3c52e75ea1c8045cd9f0c9",
+      "hint": "rd/structure/main-shell/paired-geometry/records/paired-reference-r4-audit.json"
+    },
+    {
+      "id": "check_mass_paired_quality",
+      "sha256": "2c34de18e55eba8d6aab71bd196ef31999d9d27cade7531ca5a480487c309c4b",
+      "hint": "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_quality.py"
+    },
+    {
+      "id": "check_mass_paired_coefficient_input",
+      "sha256": "68fe1c38ba8380a3bd72c9e12c3cba9bcaafd766cf2e1e4c24f7f652c7693ba2",
+      "hint": "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_coefficient_input.py"
+    },
+    {
+      "id": "mass-paired-quality-result",
+      "sha256": "f0345e55e920f4bb87d3b9abd4c6e1507b201f8ea4eb929a86417997cc224c9a",
+      "hint": "rd/structure/main-shell/paired-geometry/records/mass-paired-quality-result.json"
+    },
+    {
+      "id": "mass-paired-coefficient-input-result",
+      "sha256": "46d1111dc403182244d54091d2ef85051533d822468050b6d01e48615af204e8",
+      "hint": "rd/structure/main-shell/paired-geometry/records/mass-paired-coefficient-input-result.json"
+    }
+  ],
+  "sources": {
+    "src/structure/pg_reference_geometry.cpp": "0e2887e722f0fbd8542a39b6c5000c1a44987a05fd0c6fddff2e879c0d543521",
+    "src/structure/pg_reference_domain.hpp": "73b04ad4e1536ce010aab0969f6ae2ba56b63d0424e600c85ad6c94869be9836",
+    "src/structure/pg_integration_partition.cpp": "f5ac8cda2ebadf4f39972891965baab41aaa8df73328e5a0789ebb7ccb7f8ddf",
+    "src/structure/pg_reference_arithmetic.hpp": "d2e68a13e22f9ceeaf85a29ee4b0f0e65304618f3c69c25cc4fadd8c68008057",
+    "include/uvlas/structure/pg_reference_geometry.hpp": "927fd55f0578b888facbb21869811c814e3e8165e8e525a4474ebdc8ff0a08ea",
+    "tests/structure/pg_partition_test_support.hpp": "33246f600d8b6d95492b35b9cf3b4ee2431296cc2aa73c03e3c538f84e2ba79b",
+    "docs/specs/structure/pg-reference-geometry-contract.md": "2cf03ea466b44914018ff6f391cb49c85ef46fde29f393e3ff72ec37b7550439",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-r4-domain-geometry.md": "60c2dbe08c8075de10efa0d624fcaf0fe058c7719ec8681011872977be468e10",
+    "tests/structure/pg_reference_geometry_test.cpp": "1bd02f2725100fd85a473899114fdb4c0bd001de088a0f985f871917525f21e2"
+  }
+}

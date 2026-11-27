@@ -1,0 +1,317 @@
+#include "external_pg_regional_thickness.hpp"
+
+#include "../structure/pg_reference_domain.hpp"
+#include "external_pg_chart_clip.hpp"
+
+#include <algorithm>
+
+namespace uvlas::io::detail {
+namespace {
+namespace ref = structure::detail;
+namespace chart = external_pg_chart;
+using ref::partition_fail;
+using ref::partition_take;
+using Code = core::FailureCode;
+using Reason = ExternalPgThicknessFailure;
+constexpr auto operation = core::Operation::PrepareModel;
+
+struct Diagnosis {
+    std::optional<ExternalPgThicknessDiagnostic>* output{};
+    ExternalPgThicknessDiagnostic value{};
+
+    void select(const ExternalPgThicknessClaim& claim) noexcept {
+        value = {Reason::Selection, claim.element, claim.sidecar_node, claim.field, {}, {}, {}, {},
+                 claim.property};
+    }
+
+    [[noreturn]] void fail(Reason reason, Code code) const {
+        if (output) {
+            auto location = value;
+            location.reason = reason;
+            *output = location;
+        }
+        partition_fail(code);
+    }
+};
+
+template <class View>
+[[nodiscard]] const auto&
+resolve_face(ref::ReferenceArithmetic& math, const View& source, std::uint64_t id,
+             std::span<ExternalPgThicknessMatch> previous, const Diagnosis& diagnosis) {
+    const auto selected = std::ranges::find_if(source.faces, [&](const auto& face) {
+        math.visit(1);
+        return face.element == id;
+    });
+    const bool duplicate = std::ranges::any_of(previous, [&](const auto& match) {
+        math.visit(1);
+        return match.element == id;
+    });
+    if (selected == source.faces.end() || duplicate) {
+        diagnosis.fail(Reason::Selection, Code::InvalidInput);
+    }
+    return *selected;
+}
+
+template <class Face>
+[[nodiscard]] std::array<const chart::Point*, 4> positive_ring(const Face& face) noexcept {
+    const auto count = face.ring().size();
+    std::array<const chart::Point*, 4> ring{};
+    for (std::size_t i = 0; i < count; ++i) {
+        const auto native = face.winding == ExternalPgWinding::Forward ? i : (count - i) % count;
+        ring[i] = &face.corners[native].chart;
+    }
+    return ring;
+}
+
+struct CasePlanes {
+    explicit CasePlanes(const structure::PgIntegrationPartition& partition,
+                        core::ResourcePlan& plan, std::uint64_t maximum)
+        : triangles(partition_take(partition.triangles())),
+          vertices(partition_take(partition.vertices())),
+          pieces(partition_take(partition.pieces())),
+          thickness(partition_take(partition.thickness())),
+          visited(partition_take(
+              plan.allocate<bool>(ref::partition_index(thickness.values.size()), operation))),
+          vertex_limit(maximum) {}
+
+    void admit(ref::ReferenceArithmetic& math, core::Index original) {
+        for (const auto vertex : ref::reference_at(thickness.triangles, original)) {
+            math.visit(1);
+            const auto ordinal = static_cast<std::size_t>(vertex);
+            if (!visited.values()[ordinal]) {
+                if (used == vertex_limit) {
+                    partition_fail(Code::ResourceExceeded);
+                }
+                ++used;
+                visited.values()[ordinal] = true;
+            }
+        }
+    }
+
+    std::span<const structure::PgPartitionTriangle> triangles;
+    std::span<const chart::Point> vertices;
+    std::span<const structure::PgPartitionPiece> pieces;
+    structure::PgPartitionThicknessView thickness;
+    core::PlannedBuffer<bool> visited;
+    std::uint64_t vertex_limit;
+    std::uint64_t used{};
+};
+
+template <class Face>
+void validate_claim(const Face& face, const ExternalPgThicknessClaim& claim, Diagnosis& diagnosis) {
+    if (claim.value_metres && claim.corners.empty() && claim.value_metres->sign() > 0) {
+        return;
+    }
+    const auto ring = face.ring();
+    if (claim.value_metres || claim.corners.size() != ring.size()) {
+        diagnosis.fail(Reason::Selection, Code::InvalidInput);
+    }
+    bool positive = false;
+    for (std::size_t i = 0; i < ring.size(); ++i) {
+        const auto& corner = claim.corners[i];
+        if (corner.node != ring[i].node || !corner.value_metres ||
+            corner.value_metres->sign() < 0) {
+            diagnosis.value.field = corner.field;
+            diagnosis.value.scale_field = corner.scale_field;
+            diagnosis.value.node = corner.node;
+            diagnosis.fail(Reason::Selection, Code::InvalidInput);
+        }
+        positive = positive || corner.value_metres->sign() > 0;
+    }
+    if (!positive) {
+        diagnosis.fail(Reason::Selection, Code::InvalidInput);
+    }
+}
+
+void compare_constant(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& plane,
+                      std::span<const chart::Point> vertices, const chart::Rational& expected,
+                      core::Index original, Diagnosis& diagnosis) {
+    // The difference is affine on this common piece.
+    for (std::size_t i = 0; i < vertices.size(); ++i) {
+        math.visit(1);
+        const auto h = plane.evaluate(math, vertices[i].s, vertices[i].t);
+        if (math.compare(h, expected) != 0) {
+            diagnosis.value.case_triangle = original;
+            diagnosis.value.overlap_vertex = i;
+            diagnosis.fail(Reason::Difference, Code::InvalidInput);
+        }
+    }
+}
+
+template <class Face>
+void compare_nodal(ref::ReferenceArithmetic& math, const ref::ThicknessPlane& plane,
+                   const Face& face, std::span<const ExternalPgCornerThicknessClaim> claims,
+                   core::Index original, Diagnosis& diagnosis) {
+    // A Case thickness plane composed with this triangle's affine chart map or
+    // this quadrilateral's bilinear chart map has the same shape functions as the
+    // source thickness. Equality on a positive-area open subset requires all
+    // coefficients to agree. Evaluate the polynomial at the source interpolation
+    // nodes, even when a node is outside the current clipped polygon.
+    const auto ring = face.ring();
+    for (std::size_t i = 0; i < ring.size(); ++i) {
+        math.visit(1);
+        const auto& corner = ring[i];
+        const auto h = plane.evaluate(math, corner.chart.s, corner.chart.t);
+        if (math.compare(h, *claims[i].value_metres) != 0) {
+            diagnosis.value.case_triangle = original;
+            diagnosis.value.node = corner.node;
+            diagnosis.value.field = claims[i].field;
+            diagnosis.value.scale_field = claims[i].scale_field;
+            diagnosis.fail(Reason::Difference, Code::InvalidInput);
+        }
+    }
+}
+
+template <class Face>
+[[nodiscard]] ExternalPgThicknessMatch
+compare_claim(ref::ReferenceArithmetic& math, CasePlanes& pg, const Face& face,
+              const ExternalPgThicknessClaim& claim, Diagnosis& diagnosis) {
+    validate_claim(face, claim, diagnosis);
+    const auto outward = positive_ring(face);
+    const auto domain = std::span{outward}.first(face.ring().size());
+    ExternalPgThicknessMatch match{face.element, face.winding,  {}, {}, 0, 0, claim.sidecar_node,
+                                   claim.field,  claim.property};
+    for (const auto& triangle : pg.triangles) {
+        math.visit(1);
+        const chart::Triangle basis{&ref::reference_at(pg.vertices, triangle.vertices[0]),
+                                    &ref::reference_at(pg.vertices, triangle.vertices[1]),
+                                    &ref::reference_at(pg.vertices, triangle.vertices[2])};
+        const auto overlap = chart::clip(math, basis, domain);
+        const auto area = chart::area2(math, overlap);
+        if (area.sign() <= 0) {
+            continue;
+        }
+        const auto original = ref::reference_at(pg.pieces, triangle.piece).thickness_triangle;
+        pg.admit(math, original);
+        const auto plane = ref::thickness_plane(math, pg.thickness, original);
+        const auto vertices = overlap.vertices();
+        if (const auto* value = claim.value_metres) {
+            compare_constant(math, plane, vertices, *value, original, diagnosis);
+        } else {
+            compare_nodal(math, plane, face, claim.corners, original, diagnosis);
+        }
+        match.twice_chart_area = math.add(match.twice_chart_area, area);
+        match.pieces = ref::partition_add(match.pieces, 1);
+        match.vertices = ref::partition_add(match.vertices, vertices.size());
+    }
+    if (match.pieces == 0) {
+        diagnosis.fail(Reason::Source, Code::GeometryInvalid);
+    }
+    if (const auto* value = claim.value_metres) {
+        match.value_metres = math.copy(*value);
+    } else {
+        ExternalPgNodalThickness result;
+        result.count = claim.corners.size();
+        for (std::size_t i = 0; i < result.count; ++i) {
+            const auto& native = claim.corners[i];
+            result.values[i] = {native.node, math.copy(*native.value_metres), native.field,
+                                native.scale_field};
+        }
+        match.value_metres = std::move(result);
+    }
+    return match;
+}
+
+void admit_comparison(ref::ReferenceArithmetic& math,
+                      std::span<const ExternalPgThicknessClaim> claims,
+                      std::uint64_t additional_live_rationals) {
+    // The source values and each reported copy can be live together. Allow
+    // one further rational per match for the accumulated chart area.
+    auto live = ref::partition_add(ref::partition_add(ref::reference_live_rationals, claims.size()),
+                                   additional_live_rationals);
+    for (const auto& claim : claims) {
+        math.visit(1);
+        const auto values =
+            claim.value_metres ? std::size_t{1} : std::min(claim.corners.size(), std::size_t{4});
+        live = ref::partition_add(live, ref::partition_mul(2, values));
+    }
+    math.admit(live);
+}
+
+template <class Certified>
+core::Result<ExternalPgThicknessReport>
+compare_regions(const Certified& certified, const structure::PgReferenceGeometry& reference,
+                std::span<const ExternalPgThicknessClaim> claims,
+                const ExternalPgThicknessLimits& limits, core::ResourcePlan& plan,
+                std::optional<ExternalPgThicknessDiagnostic>* output) noexcept {
+    if (output) {
+        output->reset();
+    }
+    return core::guard_entry(
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<ExternalPgThicknessReport> {
+            try {
+                ref::ReferenceArithmetic math{limits.arithmetic, plan};
+                math.cancel();
+                Diagnosis diagnosis{output};
+                const auto source = certified.view();
+                if (!source) {
+                    diagnosis.fail(Reason::Source, Code::InvalidInput);
+                }
+                const auto identity = partition_take(reference.identity());
+                if (identity != source->patch) {
+                    diagnosis.fail(Reason::Source, Code::StaleGeneration);
+                }
+                if (claims.size() > limits.maximum_claims) {
+                    partition_fail(Code::ResourceExceeded);
+                }
+                if (!claims.empty()) {
+                    admit_comparison(math, claims, limits.additional_live_rationals);
+                }
+                auto match = partition_take(plan.allocate<ExternalPgThicknessMatch>(
+                    ref::partition_index(claims.size()), operation));
+                if (!claims.empty()) {
+                    const auto input = partition_take(reference.source());
+                    CasePlanes pg{input.partition, plan, limits.case_vertices};
+                    for (std::size_t i = 0; i < claims.size(); ++i) {
+                        math.visit(1);
+                        const auto& claim = claims[i];
+                        diagnosis.select(claim);
+                        const auto& face = resolve_face(math, *source, claim.element,
+                                                        match.values().first(i), diagnosis);
+                        match.values()[i] = compare_claim(math, pg, face, claim, diagnosis);
+                    }
+                }
+                math.cancel();
+                return ExternalPgThicknessReport{source->source, source->digest, identity,
+                                                 std::move(match), math.info()};
+            } catch (const ref::PartitionAbort& error) {
+                return std::unexpected(error.failure);
+            }
+        });
+}
+
+} // namespace
+
+core::Result<structure::ExactLimits>
+admit_external_pg_thickness_inputs(const structure::PgReferenceLimits& limits,
+                                   std::uint64_t uniform_values, std::uint64_t nodal_faces,
+                                   core::ResourcePlan& plan) noexcept {
+    return core::guard_entry(
+        operation, Code::InvalidInput, {}, [&]() -> core::Result<structure::ExactLimits> {
+            try {
+                ref::ReferenceArithmetic math{limits, plan};
+                const auto uniform =
+                    ref::partition_add(ref::reference_live_rationals, uniform_values);
+                math.admit(ref::partition_add(uniform, ref::partition_mul(4, nodal_faces)));
+                return math.leaf_limits;
+            } catch (const ref::PartitionAbort& error) {
+                return std::unexpected(error.failure);
+            }
+        });
+}
+
+core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
+    const ExternalPlanarPg& certified, const structure::PgReferenceGeometry& reference,
+    std::span<const ExternalPgThicknessClaim> claims, const ExternalPgThicknessLimits& limits,
+    core::ResourcePlan& plan, std::optional<ExternalPgThicknessDiagnostic>* output) noexcept {
+    return compare_regions(certified, reference, claims, limits, plan, output);
+}
+
+core::Result<ExternalPgThicknessReport> compare_external_pg_regional_thickness(
+    const GmshPgBounds& certified, const structure::PgReferenceGeometry& reference,
+    std::span<const ExternalPgThicknessClaim> claims, const ExternalPgThicknessLimits& limits,
+    core::ResourcePlan& plan, std::optional<ExternalPgThicknessDiagnostic>* output) noexcept {
+    return compare_regions(certified, reference, claims, limits, plan, output);
+}
+
+} // namespace uvlas::io::detail

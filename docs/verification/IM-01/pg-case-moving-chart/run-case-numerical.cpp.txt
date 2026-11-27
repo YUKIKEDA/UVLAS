@@ -1,0 +1,385 @@
+#include "numerics/sparse_test_support.hpp"
+#include "run-case-motion.cpp.txt"
+
+namespace {
+namespace lin = numerics::linear;
+using NumericBuffer = numerics::PrecisionBuffer<double>;
+constexpr double original_tolerance = 1e-5;
+constexpr double work_tolerance = 1e-6;
+constexpr double coordinate_tolerance = 1e-6;
+
+core::Result<cc::CasePgChart> prepare_product_fixture(const Json& wire,
+                                                      p::CurveWorkspace* motion_workspace,
+                                                      core::Workspace& ws,
+                                                      core::ResourcePlan& plan) {
+    const auto source = checked_case_wire(wire.dump());
+    auto limits = chart_limits(1);
+    limits.constraints.maximum_sources = 3;
+    Fixture f;
+    constexpr std::size_t order = 7;
+    const auto weight = owned(f, Q{1, order});
+    const auto depth_weight = owned(f, Q{1, 3});
+    std::array<ExactRational, order> coordinates;
+    std::vector<PgLineQuadratureNode> plane;
+    for (std::size_t i = 0; i < order; ++i) {
+        coordinates[i] = owned(f, Q{2 * i + 1, 2 * order});
+        plane.push_back({coordinates[i], weight});
+    }
+    const std::array depths{owned(f, Q{1, 4}), owned(f, Q{1, 2}), owned(f, Q{3, 4})};
+    const std::array depth{PgLineQuadratureNode{depths[0], depth_weight},
+                           PgLineQuadratureNode{depths[1], depth_weight},
+                           PgLineQuadratureNode{depths[2], depth_weight}};
+    const PgVolumeProductRule product{plane, plane, depth};
+    const std::array rules{cc::CasePgRuleBinding{1, product}, cc::CasePgRuleBinding{2, product}};
+    if (motion_workspace == nullptr)
+        return cc::prepare_case_pg_chart(source, rules, limits, ws, plan);
+    return cc::prepare_case_pg_motion_chart(source, rules, limits, stamp, motion_chart_limits(), ws,
+                                            *motion_workspace, plan);
+}
+
+NumericBuffer retained(std::span<const PgCartesianExactPosition> values, core::ResourcePlan& plan) {
+    const auto size = values.size();
+    std::vector<double> a_(3 * size), b_(3 * size);
+    for (std::size_t i = 0; i < size; ++i)
+        for (std::size_t d = 0; d < 3; ++d) {
+            const auto exact = q(values[i][d]);
+            const auto j = d * size + i;
+            a_[j] = exact.convert_to<double>();
+            b_[j] = (exact - Q{a_[j]}).convert_to<double>();
+        }
+    const auto rows = static_cast<core::Index>(size);
+    const auto op = core::Operation::EvaluateStructure;
+    auto high = take(numerics::DenseReal::copy({rows, 3, rows}, a_, plan, op));
+    auto low = take(numerics::DenseReal::copy({rows, 3, rows}, b_, plan, op));
+    return take(
+        NumericBuffer::two_word(std::move(high), std::move(low), core::NumericalGeneration{104}));
+}
+
+Q retained_component(const NumericBuffer& buffer, std::size_t row, std::size_t axis) {
+    const auto shape = buffer.shape();
+    const auto i = axis * static_cast<std::size_t>(shape.leading_dimension) + row;
+    if (const auto* words = std::get_if<numerics::TwoWord<double>>(&buffer.storage()))
+        return Q{words->hi.values()[i]} + Q{words->lo.values()[i]};
+    return Q{std::get<numerics::Binary64<double>>(buffer.storage()).values.values()[i]};
+}
+
+void check_numerical_actions(cc::CasePgChart& ready, const cc::CaseStructuralSupportSample* sample,
+                             core::Workspace& ws, core::ResourcePlan& plan) {
+    const auto math = chart_limits(2).chart.arithmetic;
+    const auto id = take(ready.chart().identity());
+    const auto* original_rows = ready.chart().original().original_rows().data();
+    const auto* original_pivots = ready.chart().pivots().data();
+    const auto* patch_before = take(ready.patch(0));
+    const auto* motion_before = ready.motion();
+    REQUIRE(ready.numerical() == nullptr);
+    const auto rank = static_cast<core::Index>(ready.chart().pivots().size());
+    REQUIRE(rank > 1);
+    sparse_test::Fixture forward_fixture{rank}, transpose_fixture{rank};
+    auto backward = sparse_test::context();
+    backward.unknown_layout = core::ScopeId{501};
+    backward.residual_layout = core::ScopeId{502};
+    // Normalize the inner solver's equation residuals by the magnitudes of the original
+    // pivot rows and columns. Check the actual original defects separately in their own units.
+    const auto row_pivots = ready.chart().pivots();
+    const auto& original_rows_for_scale = ready.chart().original();
+    for (std::size_t i = 0; i < row_pivots.size(); ++i)
+        for (const auto& term : take(original_rows_for_scale.row(row_pivots[i].original_row))) {
+            const auto column = std::ranges::find_if(
+                row_pivots, [&](const auto& p) { return p.dependent_column == term.column; });
+            if (column == row_pivots.end())
+                continue;
+            const double scale = std::abs(q(term.coefficient).convert_to<double>());
+            const auto j = static_cast<std::size_t>(column - row_pivots.begin());
+            forward_fixture.residual[i] = (std::max)(forward_fixture.residual[i], scale);
+            transpose_fixture.residual[j] = (std::max)(transpose_fixture.residual[j], scale);
+        }
+    const auto forward = forward_fixture.scales(), transpose = transpose_fixture.scales(backward);
+    const auto solver = sparse_test::limits(rank, 3);
+    // The largest original coefficient lies in the [2^29,2^30) bin.
+    // Half a Binary64 ulp in that bin is 2^-24.
+    constexpr double coefficient_budget = 0x1p-24;
+    constexpr double short_coefficient_budget = 0x1p-30;
+    const auto& source_rows = ready.chart().original();
+    double maximum_value = 0, projection_error = 0;
+    std::size_t zeros = 0;
+    for (std::size_t i = 0; i < source_rows.original_rows().size(); ++i) {
+        for (const auto& term : take(source_rows.row(static_cast<core::Index>(i)))) {
+            const Q coefficient = q(term.coefficient);
+            const double rounded = coefficient.convert_to<double>();
+            if (!std::isfinite(rounded))
+                continue;
+            maximum_value = (std::max)(maximum_value, std::abs(rounded));
+            const Q error = abs(coefficient - Q{rounded});
+            projection_error = (std::max)(projection_error, error.convert_to<double>());
+            if (rounded == 0)
+                ++zeros;
+        }
+    }
+    std::clog << "CASE_PROJECTION," << rank << ',' << maximum_value << ',' << projection_error
+              << ',' << zeros << '\n';
+    CHECK(maximum_value >= 0x1p29);
+    CHECK(maximum_value < 0x1p30);
+    CHECK(projection_error > short_coefficient_budget);
+    CHECK(projection_error <= coefficient_budget);
+    CHECK(zeros == 0);
+    const PgChartCandidatePreparation preparation{math, coefficient_budget, solver};
+    const auto request = [&](const lin::Scales& scales) {
+        return PgChartCandidateSolve{scales,
+                                     forward_fixture.precision(),
+                                     sparse_test::accuracy(),
+                                     solver,
+                                     core::RhsGeneration{91},
+                                     core::NumericalGeneration{92},
+                                     core::NumericalGeneration{93},
+                                     original_tolerance,
+                                     2'000'000,
+                                     {}};
+    };
+    const auto primal = request(forward);
+    const auto adjoint = request(transpose);
+
+    const auto check_owner = [&] {
+        CHECK(take(ready.chart().identity()) == id);
+        CHECK(ready.chart().original().original_rows().data() == original_rows);
+        CHECK(ready.chart().pivots().data() == original_pivots);
+        CHECK(take(ready.patch(0)) == patch_before);
+        CHECK(ready.motion() == motion_before);
+        CHECK(take(ready.shell_reference(numerics::PatchId{1}, 1)).chart_identity() == id);
+    };
+    Fixture fixture;
+    std::vector<PgCartesianExactPosition> free(ready.chart().free_columns().size());
+    REQUIRE_FALSE(free.empty());
+    free.front()[0] = fixture.r("1", "16");
+    const auto exact_lift = [&] {
+        if (sample != nullptr) {
+            REQUIRE(motion_before != nullptr);
+            return take(cc::lift_case_structural_pg_support_exact(
+                *motion_before, *sample, Value, free, motion_chart_limits().exact, ws, plan));
+        }
+        const auto& original = ready.chart().original();
+        auto values = take(plan.allocate<PgCartesianExactPosition>(
+            static_cast<core::Index>(original.original_rows().size()),
+            core::Operation::EvaluateStructure));
+        for (std::size_t i = 0; i < values.size(); ++i)
+            for (std::size_t d = 0; d < 3; ++d)
+                values.values()[i][d] =
+                    owned(fixture, q(original.original_rows()[i].prescribed[d]));
+        auto lifted = take(ready.chart().lift({id, free}, math, ws, plan));
+        return cc::CaseStructuralExactLift{std::move(values), std::move(lifted), {}};
+    };
+    const auto exact_before = exact_lift();
+    auto pre_cancel = preparation;
+    pre_cancel.projection.cancellation = requested_stop_token();
+    core::ResourcePlan none{0};
+    check_failure(ready.prepare_numerical(forward, transpose, pre_cancel, none),
+                  core::FailureCode::Cancelled);
+    check_failure(ready.prepare_numerical(forward, transpose, preparation, none),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(none.allocated_bytes() == 0);
+    auto short_solver = preparation;
+    short_solver.solver.maximum_order = rank - 1;
+    const auto before_failure = plan.allocated_bytes();
+    check_failure(ready.prepare_numerical(forward, transpose, short_solver, plan),
+                  core::FailureCode::ResourceExceeded);
+    CHECK(plan.allocated_bytes() > before_failure);
+    auto short_projection = preparation;
+    short_projection.maximum_absolute_coefficient_error = short_coefficient_budget;
+    check_failure(ready.prepare_numerical(forward, transpose, short_projection, plan),
+                  core::FailureCode::PrecisionUnresolved);
+    CHECK(ready.numerical() == nullptr);
+    check_owner();
+    const auto after_failure = exact_lift();
+    CHECK(
+        std::ranges::equal(after_failure.coordinates.values(), exact_before.coordinates.values()));
+
+    const auto before_attach = plan.allocated_bytes();
+    const auto attachment = ready.prepare_numerical(forward, transpose, preparation, plan);
+    if (!attachment)
+        FAIL("Numerical preparation failed at rank "
+             << rank << " with code " << static_cast<unsigned>(attachment.error().code)
+             << " in operation " << static_cast<unsigned>(attachment.error().operation));
+    const auto charged = plan.allocated_bytes() - before_attach;
+    check_owner();
+    const auto* prepared = ready.numerical();
+    REQUIRE(prepared != nullptr);
+    REQUIRE(&prepared->exact() == &ready.chart());
+    if (motion_before != nullptr)
+        CHECK(&motion_before->support().chart() == &prepared->exact());
+    check_failure(ready.prepare_numerical(forward, transpose, pre_cancel, none),
+                  core::FailureCode::Cancelled);
+    check_failure(ready.prepare_numerical(forward, transpose, short_solver, plan),
+                  core::FailureCode::ResourceExceeded);
+    REQUIRE(ready.numerical() == prepared);
+    check_owner();
+
+    INFO("Retain the free and prescribed coordinates");
+    const auto r = retained(free, plan);
+    const auto c = retained(exact_before.original_rhs.values(), plan);
+    std::vector<PgCartesianExactPosition> forces(exact_before.coordinates.size());
+    const auto reference = take(ready.chart().lift({id, free}, math, ws, plan));
+    const auto first_loaded = std::ranges::find_if(
+        reference.values(), [](const auto& row) { return row[0].sign() != 0; });
+    REQUIRE(first_loaded != reference.values().end());
+    const auto loaded = static_cast<std::size_t>(first_loaded - reference.values().begin());
+    forces[loaded][0] = fixture.r("1");
+    const auto f = retained(forces, plan);
+    const auto transposed = prepared->transpose({id, f}, adjoint, ws, plan);
+    if (!transposed)
+        FAIL("Transpose failed with code " << static_cast<unsigned>(transposed.error().code));
+    const auto& dual = *transposed;
+    std::optional<cc::CaseStructuralRetainedRhs> motion_rhs;
+    if (sample != nullptr)
+        motion_rhs.emplace(take(cc::retain_case_structural_pg_rhs(
+            *sample, Value, core::NumericalGeneration{109}, 120'000, plan)));
+    const auto* rhs = motion_rhs ? &*motion_rhs : nullptr;
+    const auto lift_result =
+        rhs != nullptr
+            ? cc::lift_case_structural_pg_support(*prepared, {id, r}, *rhs, primal, ws, plan)
+            : prepared->lift({id, r}, {id, c}, primal, ws, plan);
+    if (!lift_result)
+        FAIL("Lift failed with code " << static_cast<unsigned>(lift_result.error().code)
+                                      << " in operation "
+                                      << static_cast<unsigned>(lift_result.error().operation));
+    const auto& lifted = *lift_result;
+    CHECK(std::holds_alternative<numerics::TwoWord<double>>(lifted.coordinates.storage()));
+    CHECK(std::holds_alternative<numerics::TwoWord<double>>(dual.original_multipliers.storage()));
+    const auto bound =
+        rhs != nullptr
+            ? take(cc::work_case_structural_pg_support(*prepared, {id, f}, {id, r}, *rhs, lifted,
+                                                       dual, work_tolerance, 2'000'000))
+            : take(prepared->work_defect({id, f}, {id, r}, {id, c}, lifted, dual, work_tolerance,
+                                         2'000'000, {}));
+    const auto& original = ready.chart().original();
+    const auto& passed_rhs = rhs != nullptr ? rhs->centre() : c;
+    Q direct = 0, reduced = 0, reaction = 0;
+    Q physical_work = 0;
+    Q max_residual = 0;
+    Q max_balance = 0;
+    for (std::size_t d = 0; d < 3; ++d) {
+        std::vector<Q> balance(forces.size());
+        for (std::size_t j = 0; j < forces.size(); ++j) {
+            const auto position = retained_component(lifted.coordinates, j, d);
+            CHECK(abs(position - q(exact_before.coordinates.values()[j][d])) <=
+                  Q{coordinate_tolerance});
+            balance[j] = retained_component(f, j, d);
+            direct += position * balance[j];
+        }
+        for (std::size_t j = 0; j < free.size(); ++j) {
+            const auto h = retained_component(dual.independent_force, j, d);
+            balance[static_cast<std::size_t>(ready.chart().free_columns()[j])] -= h;
+            reduced += q(free[j][d]) * h;
+        }
+        for (std::size_t i = 0; i < exact_before.original_rhs.size(); ++i) {
+            const auto centre = retained_component(passed_rhs, i, d);
+            const auto physical = q(exact_before.original_rhs.values()[i][d]);
+            const auto multiplier = retained_component(dual.original_multipliers, i, d);
+            reaction += centre * multiplier;
+            physical_work += physical * multiplier;
+            Q assembled = 0;
+            for (const auto& term : take(original.row(static_cast<core::Index>(i)))) {
+                assembled += q(term.coefficient) *
+                             retained_component(lifted.coordinates,
+                                                static_cast<std::size_t>(term.column), d);
+                balance[static_cast<std::size_t>(term.column)] -= q(term.coefficient) * multiplier;
+            }
+            const Q residual = abs(assembled - (rhs != nullptr ? physical : centre));
+            CHECK(residual <= Q{lifted.original_residual_upper});
+            if (residual > max_residual)
+                max_residual = residual;
+        }
+        for (const auto& value : balance) {
+            const Q component = abs(value);
+            CHECK(component <= Q{dual.original_balance_upper});
+            max_balance = (std::max)(max_balance, component);
+        }
+    }
+    CHECK(direct != 0);
+    CHECK(abs(direct - reduced - reaction) <= Q{bound});
+    if (rhs != nullptr)
+        CHECK(abs(direct - reduced - physical_work) <= Q{bound});
+    CHECK(bound <= work_tolerance);
+    CHECK(lifted.original_residual_upper <= original_tolerance);
+    std::clog << "CASE_NUMERICAL_OWNER," << (sample != nullptr ? "moving" : "fixed") << ',' << rank
+              << ',' << charged << ',' << plan.allocated_bytes() << ','
+              << max_residual.convert_to<double>() << ',' << max_balance.convert_to<double>() << ','
+              << bound << '\n';
+}
+
+void check_single_support_jets(const cc::CasePgChart& ready,
+                               const cc::CaseStructuralSupportSample& sample) {
+    const auto& original = ready.chart().original();
+    REQUIRE(original.sources().size() == 2);
+    REQUIRE(sample.chart() == take(ready.chart().identity()));
+    REQUIRE(sample.orders() == 3);
+    REQUIRE(sample.rows() == original.original_rows().size());
+    const auto* left = take(ready.patch(0));
+    const std::array changes{0, 2, 0};
+    const std::array derivatives{1, 2, 2};
+    for (std::size_t row = 0; row < sample.rows(); ++row) {
+        const auto& entry = original.original_rows()[row];
+        const bool moves =
+            original.sources()[static_cast<std::size_t>(entry.source)].kind == PgTraceKind::Support;
+        CHECK(sample.row_groups()[row].has_value() == moves);
+        Q translation = 0;
+        if (moves)
+            for (const auto& term : take(original.row(static_cast<core::Index>(row))))
+                translation += q(term.coefficient) *
+                               q(left->translation()[static_cast<std::size_t>(term.column)]);
+        for (std::size_t order = 0; order < derivatives.size(); ++order)
+            for (std::size_t d = 0; d < changes.size(); ++d) {
+                const Q initial = order == 0 ? q(entry.prescribed[d]) : Q{};
+                const Q expected = initial + derivatives[order] * changes[d] * translation;
+                verify_outward_jet(sample.original_rhs()[3 * (order * sample.rows() + row) + d],
+                                   expected);
+            }
+    }
+}
+cc::CaseStructuralSupportSample case_sample(const cc::CaseStructuralSupport& motion,
+                                            p::CurveWorkspace& motion_workspace,
+                                            core::ResourcePlan& plan) {
+    const std::array<std::uint32_t, 1> word{1};
+    const std::array<std::uint32_t, 2> denominator{0, 1U << 12U};
+    const p::RationalView unit{1, word, word}, null{0, {}, word};
+    const cc::CaseFlowComponentBudget tolerance{unit, {1, word, denominator}, null};
+    std::array<cc::CaseFlowComponentBudget, 36> pose{};
+    std::array<cc::CaseFlowComponentBudget, 9> rhs{};
+    pose.fill(tolerance);
+    rhs.fill(tolerance);
+    const cc::CasePgSupportProjection projection{core::Precision::TwoWord, pose, rhs, rhs};
+    return take(cc::evaluate_case_structural_pg_support(motion, motion, {stamp, 1, 0, Right},
+                                                        Second, projection, motion_workspace,
+                                                        motion_chart_limits().evaluation, plan));
+}
+} // namespace
+
+TEST_CASE("The typed Case keeps its fixed chart while preparing numerical lift and work",
+          "[.case-numerical-owner][V-PG][SH-D05][N4-04][verification][negative]") {
+    auto wire = nlohmann::json::parse(frozen_interface(0));
+    for (auto& geometry : wire.at("model").at("geometry")) {
+        geometry.at("coefficients") = Json::array();
+        geometry.at("degree") = {0, 0};
+    }
+    core::Workspace ws{core::PlannedBuffer<std::byte>{}};
+    core::ResourcePlan plan{profile};
+    auto fixed = take(prepare_product_fixture(wire, nullptr, ws, plan));
+    REQUIRE(fixed.motion() == nullptr);
+    check_numerical_actions(fixed, nullptr, ws, plan);
+}
+
+TEST_CASE("The typed Case uses the same moving chart for retained motion lift and work",
+          "[.case-numerical-owner][V-PG][CN-D03][SH-D05][N4-04][verification][negative]") {
+    core::Workspace ws{core::PlannedBuffer<std::byte>{}};
+    p::CurveWorkspace motion_workspace;
+    core::ResourcePlan plan{profile};
+    auto wire = moving_case(false, Geometry::Flat);
+    wire.at("model").at("supports").erase(1);
+    wire.at("model").at("supports").at(0).at("motion").at("translation").at("coefficients") =
+        Json::parse(R"([[0,0,0],[0,0,0],[0,2,0]])");
+    wire.at("model").at("geometry").at(1).at("boundaries").erase(1);
+    auto moving = take(prepare_product_fixture(wire, &motion_workspace, ws, plan));
+    const auto* motion = moving.motion();
+    REQUIRE(motion != nullptr);
+    const auto sample = case_sample(*motion, motion_workspace, plan);
+    check_single_support_jets(moving, sample);
+    check_numerical_actions(moving, &sample, ws, plan);
+}

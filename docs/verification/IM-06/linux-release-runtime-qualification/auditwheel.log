@@ -1,0 +1,20 @@
+
+uvlas_private_rehearsal-0.1.0.dev0+ga13bce0b1622-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
+is consistent with the following platform tag:
+"manylinux_2_27_x86_64".
+
+The wheel references external versioned symbols in these
+system-provided shared libraries: libgcc_s.so.1 with versions
+{'GCC_3.0', 'GCC_4.3.0'}, libm.so.6 with versions {'GLIBC_2.2.5'},
+libc.so.6 with versions {'GLIBC_2.2.5', 'GLIBC_2.26', 'GLIBC_2.4',
+'GLIBC_2.14'}, libpthread.so.0 with versions {'GLIBC_2.2.5'},
+libstdc++.so.6 with versions {'CXXABI_1.3.3', 'CXXABI_1.3.2',
+'GLIBCXX_3.4.19', 'CXXABI_1.3.9', 'GLIBCXX_3.4.18', 'GLIBCXX_3.4.20',
+'GLIBCXX_3.4.14', 'GLIBCXX_3.4.11', 'GLIBCXX_3.4.9', 'GLIBCXX_3.4.15',
+'CXXABI_1.3', 'CXXABI_1.3.11', 'GLIBCXX_3.4', 'CXXABI_1.3.8',
+'CXXABI_1.3.5', 'GLIBCXX_3.4.21'}
+
+This constrains the platform tag to "manylinux_2_27_x86_64". In order
+to achieve a more compatible tag, you would need to recompile a new
+wheel from source on a system with earlier versions of these
+libraries, such as a recent manylinux image.

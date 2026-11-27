@@ -386,6 +386,17 @@ TEST_CASE("PG global constraints retain original rows, right-hand sides and exac
     check_failure(prepare(patches, bad_support, limits, plan), core::FailureCode::InvalidInput);
     const std::array repeated_id{bindings[1], bindings[1]};
     check_failure(prepare(patches, repeated_id, limits, plan), core::FailureCode::InvalidInput);
+    const std::array repeated_support{bindings[0], bindings[0]};
+    check_failure(prepare(patches, repeated_support, limits, plan),
+                  core::FailureCode::InvalidInput);
+    const std::array distinct_namespaces{
+        PgConstraintTraceBinding{PgConstraintId{1}, ab, 2, core::Index{0}},
+        PgConstraintTraceBinding{PgConstraintId{1}, fixed, 1, {}}};
+    const auto shared_id = take(prepare(patches, distinct_namespaces, limits, plan));
+    REQUIRE(shared_id.sources().size() == 2);
+    CHECK(shared_id.sources()[0].id == shared_id.sources()[1].id);
+    CHECK(shared_id.sources()[0].kind == PgTraceKind::Connection);
+    CHECK(shared_id.sources()[1].kind == PgTraceKind::Support);
 
     auto global = take(prepare(patches, bindings, limits, plan));
     const auto layout = global.layout();

@@ -267,6 +267,34 @@ void check_curved_area_projection(Fixture& f, const PgPreparedPatch& patch,
     CHECK(measure + budget >= area(upper_root));
 }
 
+void check_retained_reference_projection(const PgPreparedPatch& patch,
+                                         const PgReferenceLimits& limits,
+                                         core::ResourcePlan& plan) {
+    const auto rule = patch.fixed_rule();
+    REQUIRE(rule);
+    REQUIRE(rule->size() > 2);
+    const auto query = [](const PgOwnedDiscreteVolumePoint& p) -> PgReferencePoint {
+        return PgReferenceVolumePoint{p.volume, p.u, p.v, p.depth};
+    };
+    const std::array points{query((*rule)[1]), query((*rule)[2])};
+    constexpr PgPreparedReferenceProjection accuracy{
+        core::Precision::TwoWord, 0x1p-60, 0x1p-60, 0x1p-42, 0x1p-60, 0x1p-60};
+    const auto direct = take(patch.project_reference(points, accuracy, limits, plan));
+    const auto retained =
+        take(patch.project_fixed_reference(1, points.size(), accuracy, limits, plan));
+    CHECK_FALSE(direct.first_rule_ordinal().has_value());
+    CHECK(retained.first_rule_ordinal() == 1);
+    CHECK(retained.source() == direct.source());
+    CHECK(retained.column_count() == direct.column_count());
+    REQUIRE(retained.points().size() == points.size());
+    for (std::size_t row = 0; row < points.size(); ++row) {
+        CHECK(retained.points()[row].domain == PgProjectedReferenceDomain::Volume);
+        CHECK(retained.points()[row].partition_record == (*rule)[row + 1].volume);
+        CHECK(retained.points()[row].layer == direct.points()[row].layer);
+    }
+    CHECK(std::ranges::equal(retained.high_words(), direct.high_words()));
+    CHECK(std::ranges::equal(retained.low_words(), direct.low_words()));
+}
 void check_fixed_projection(const PgPreparedPatch& patch, std::span<const CurvedRulePoint> rule,
                             const PgReferenceLimits& limits, core::ResourcePlan& plan) {
     REQUIRE(rule.size() > 2);
@@ -575,6 +603,7 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
         PgPreparedPatch::prepare(std::move(adjacent_certificate), caps.arithmetic, scratch, plan));
     check_curved_trace(f, patch, adjacent_patch, caps.arithmetic, scratch, plan);
     check_fixed_projection(patch, rule, caps.arithmetic, plan);
+    check_retained_reference_projection(patch, caps.arithmetic, plan);
     check_projected_weight_admission(patch, caps.arithmetic, plan);
     check_curved_area_projection(f, patch, caps.arithmetic, plan);
 }

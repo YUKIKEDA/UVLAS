@@ -121,7 +121,13 @@ set(UVLAS_IO_SOURCES src/io/input_scalar.cpp src/io/input_document.cpp
     src/io/nastran_bulk.cpp src/io/nastran_coordinate_cards.cpp src/io/nastran_beam_cards.cpp
     src/io/nastran_pbeam_cards.cpp src/io/nastran_position_enclosures.cpp
     src/io/nastran_shell_cards.cpp src/io/nastran_isotropic_shell_cards.cpp
-    src/io/nastran_laminate_cards.cpp src/io/external_mesh_quantity.cpp src/io/external_planar_pg.cpp
+    src/io/nastran_laminate_cards.cpp
+    src/io/nastran_pcomp_physical.cpp src/io/external_mesh_quantity.cpp src/io/external_planar_pg.cpp
+    src/io/nastran_pg_material_axes.cpp
+    src/io/external_pg_regional_thickness.cpp
+    src/io/external_mesh_sidecar.cpp
+    src/io/external_mesh_sidecar_binding.cpp
+    src/io/external_mesh_sidecar_pg.cpp src/io/case_pg_reference.cpp
     src/io/nastran_support_cards.cpp src/io/nastran_lumped_mass_cards.cpp
     src/io/nastran_lumped_mass_geometry.cpp src/io/nastran_beam_si.cpp
     src/io/nastran_rigid_link_cards.cpp src/io/nastran_rigid_attachment.cpp
@@ -150,11 +156,24 @@ endif()
 
 add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
                          src/coupling/pg_aero_attachment.cpp
+                         src/coupling/case_reference_graph.cpp
+                         src/coupling/case_material_chart.cpp
+                         src/coupling/case_material_reference.cpp
+                         src/coupling/case_material_rows.cpp
+                         src/coupling/case_material_original_layout.cpp
+                         src/coupling/case_material_alias.cpp
+                         src/coupling/case_material_surface_model.cpp
     src/coupling/fixed_bdf2_circulation.cpp
     src/coupling/fixed_wake_transport.cpp
+    src/coupling/wake_strength_transition.cpp
     src/coupling/case_known_flow.cpp
     src/coupling/case_aero_attachment.cpp
     src/coupling/case_motion.cpp src/coupling/case_pg_support_motion.cpp
+    src/coupling/case_external_pg.cpp
+    src/coupling/case_pg_chart.cpp
+    src/coupling/case_gmsh_support_boundary.cpp
+    src/coupling/case_nastran_static_point_support.cpp
+    src/coupling/case_nastran_reference_inputs.cpp
     src/coupling/case_motion_frame.cpp
     src/coupling/case_motion_time_series.cpp
     src/coupling/case_uniform_flow.cpp

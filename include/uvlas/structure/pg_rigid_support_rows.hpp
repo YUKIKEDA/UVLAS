@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include <optional>
-#include <uvlas/structure/pg_sparse_chart.hpp>
+#include <uvlas/structure/pg_chart_candidate.hpp>
 
 namespace uvlas::structure {
 
@@ -51,13 +51,23 @@ public:
     }
     [[nodiscard]] const PgSparseChart& chart() const& noexcept;
     [[nodiscard]] const PgSparseChart& chart() const&& = delete;
+    [[nodiscard]] const PgChartCandidate* numerical() const& noexcept {
+        return chart_.numerical();
+    }
+    [[nodiscard]] const PgChartCandidate* numerical() const&& = delete;
+    [[nodiscard]] core::Result<void> prepare_numerical(const numerics::linear::Scales& forward,
+                                                       const numerics::linear::Scales& transpose,
+                                                       const PgChartCandidatePreparation& request,
+                                                       core::ResourcePlan& plan) & noexcept {
+        return chart_.prepare_numerical(forward, transpose, request, plan);
+    }
     [[nodiscard]] std::span<const PgRigidSupportRow> rows() const& noexcept;
     [[nodiscard]] std::span<const PgRigidSupportRow> rows() const&& = delete;
 
 private:
     PgRigidSupportRows(PgSparseChart&&, core::PlannedBuffer<PgRigidSupportRow>,
                        std::size_t group_count) noexcept;
-    PgSparseChart chart_;
+    PgChartOwner chart_;
     core::PlannedBuffer<PgRigidSupportRow> rows_;
     std::size_t group_count_;
 };

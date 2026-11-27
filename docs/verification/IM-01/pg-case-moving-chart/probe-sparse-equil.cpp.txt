@@ -1,0 +1,131 @@
+#include "numerics/sparse_test_support.hpp"
+
+#include <charconv>
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+
+using namespace sparse_test;
+using namespace uvlas;
+using namespace uvlas::numerics;
+using namespace uvlas::numerics::linear;
+
+template <class T>
+T checked(core::Result<T> value) {
+    if (!value) {
+        std::cerr << static_cast<unsigned>(value.error().code) << '\n';
+        throw std::runtime_error("unexpected failure");
+    }
+    return std::move(*value);
+}
+
+std::vector<std::string> fields(const std::string& input) {
+    std::istringstream source(input);
+    std::vector<std::string> result;
+    std::string field;
+    while (std::getline(source, field, ','))
+        result.push_back(field);
+    return result;
+}
+
+int main(int argc, char** argv) {
+    if (argc != 2)
+        return 2;
+    constexpr core::Index n = 74;
+    constexpr auto op = core::Operation::SolveLinear;
+    std::vector<Triplet> entries;
+    std::vector<double> hi(3 * n), lo(3 * n);
+    std::ifstream file(argv[1]);
+    std::string line;
+    while (std::getline(file, line)) {
+        const auto v = fields(line);
+        if (v.empty())
+            continue;
+        if (v[0] == "BMAT")
+            entries.emplace_back(std::stoll(v[1]), std::stoll(v[2]), std::stod(v[3]));
+        else if (v[0] == "WORDS") {
+            const auto i = std::stoul(v[1]) * n + std::stoul(v[2]);
+            hi[i] = std::stod(v[5]);
+            lo[i] = std::stod(v[6]);
+        }
+    }
+    if (entries.empty())
+        return 3;
+    for (int mode = 0; mode < 4; ++mode) {
+        std::vector<double> rows(n), cols(n), original_scale(n, 1);
+        for (const auto& item : entries) {
+            auto& size = rows[static_cast<std::size_t>(item.row)];
+            size = (std::max)(size, std::abs(item.value));
+            auto& scale = original_scale[static_cast<std::size_t>(item.row)];
+            scale = (std::max)(scale, std::abs(item.value));
+        }
+        std::vector<int> dr(n), dc(n);
+        if ((mode & 1) != 0)
+            for (std::size_t i = 0; i < dr.size(); ++i)
+                dr[i] = -std::ilogb(rows[i]);
+        for (const auto& item : entries) {
+            auto& size = cols[static_cast<std::size_t>(item.column)];
+            const double v = std::scalbn(item.value, dr[static_cast<std::size_t>(item.row)]);
+            size = (std::max)(size, std::abs(v));
+        }
+        if ((mode & 2) != 0)
+            for (std::size_t i = 0; i < dc.size(); ++i)
+                dc[i] = -std::ilogb(cols[i]);
+        auto scaled = entries;
+        for (auto& item : scaled) {
+            const int e =
+                dr[static_cast<std::size_t>(item.row)] + dc[static_cast<std::size_t>(item.column)];
+            const double old = item.value;
+            item.value = std::scalbn(old, e);
+            if (std::scalbn(item.value, -e) != old)
+                return 4;
+        }
+        auto b_hi = hi, b_lo = lo;
+        for (std::size_t i = 0; i < hi.size(); ++i) {
+            b_hi[i] = std::scalbn(hi[i], dr[i % n]);
+            b_lo[i] = std::scalbn(lo[i], dr[i % n]);
+            if (std::scalbn(b_hi[i], -dr[i % n]) != hi[i] ||
+                std::scalbn(b_lo[i], -dr[i % n]) != lo[i])
+                return 5;
+        }
+        auto fixture = Fixture{n};
+        for (std::size_t i = 0; i < dr.size(); ++i) {
+            fixture.residual[i] = std::scalbn(original_scale[i], dr[i]);
+            fixture.unknown[i] = std::scalbn(1., -dc[i]);
+        }
+        const auto scale = fixture.scales();
+        core::ResourcePlan plan{std::uint64_t{512} << 20};
+        auto matrix = checked(SparseReal::from_triplets(n, n, scaled, plan, op));
+        const SparseOperator a{matrix, scale.context};
+        auto lim = sparse_test::limits(n, 3);
+        auto owner = checked(SparsePrepared::prepare(a, scale, SparseMethod::GeneralLu, lim, plan));
+        auto b = checked(PrecisionBuffer<double>::two_word(
+            checked(DenseReal::copy({n, 3, n}, b_hi, plan, op)),
+            checked(DenseReal::copy({n, 3, n}, b_lo, plan, op)), core::NumericalGeneration{90}));
+        const Rhs<double> rhs{b, scale.context, core::RhsGeneration{91}};
+        auto solution = solve_linear(a, rhs, scale, fixture.precision(), sparse_test::accuracy(),
+                                     lim, owner, plan);
+        if (!solution) {
+            std::cout << "EQUIL," << mode << ",failure,"
+                      << static_cast<unsigned>(solution.error().code) << '\n';
+            continue;
+        }
+        const auto* kept = std::get_if<TwoWord<double>>(&solution->values().storage());
+        if (!kept)
+            return 6;
+        std::cout << "EQUIL," << mode << ",success\n";
+        for (std::size_t row = 0; row < hi.size(); ++row) {
+            const auto h = std::scalbn(kept->hi.values()[row], dc[row % n]);
+            const auto l = std::scalbn(kept->lo.values()[row], dc[row % n]);
+            if (std::scalbn(h, -dc[row % n]) != kept->hi.values()[row] ||
+                std::scalbn(l, -dc[row % n]) != kept->lo.values()[row])
+                return 7;
+            std::cout << "EQUIL_WORDS," << mode << ',' << row / n << ',' << row % n << ','
+                      << std::hexfloat << h << ',' << l << '\n';
+        }
+    }
+}

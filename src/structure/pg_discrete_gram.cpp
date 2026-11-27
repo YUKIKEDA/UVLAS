@@ -76,22 +76,66 @@ struct Interval {
     return {root, root + (same ? 0 : 1)};
 }
 
+[[nodiscard]] RankWide multiply_endpoint(IntegerWork& work, const RankWide& left,
+                                         const RankWide& right) {
+    using DoubleWord = boost::multiprecision::double_limb_type;
+    constexpr auto limb_bits = std::numeric_limits<RankWord>::digits;
+    static_assert(std::numeric_limits<DoubleWord>::digits == 2 * limb_bits);
+    const auto& a = left.backend();
+    const auto& b = right.backend();
+    work.charge(partition_mul(a.size(), b.size()));
+    const auto size = a.size() + b.size();
+    if (size > 8192 / limb_bits)
+        partition_fail(core::FailureCode::ResourceExceeded);
+
+    RankWide product;
+    auto& target = product.backend();
+    target.resize(size, size);
+    const std::span<RankWord> output{target.limbs(), size};
+    const std::span<const RankWord> lhs{a.limbs(), a.size()}, rhs{b.limbs(), b.size()};
+    std::ranges::fill(output, RankWord{0});
+    for (std::size_t i = 0; i < lhs.size(); ++i) {
+        DoubleWord carry = 0;
+        for (std::size_t j = 0; j < rhs.size(); ++j) {
+            // A limb product plus an existing limb and carry fits in two limbs.
+            const DoubleWord word =
+                static_cast<DoubleWord>(lhs[i]) * rhs[j] + output[i + j] + carry;
+            output[i + j] = static_cast<RankWord>(word);
+            carry = word >> limb_bits;
+        }
+        output[i + rhs.size()] = static_cast<RankWord>(carry);
+    }
+    target.normalize();
+    target.sign(a.sign() != b.sign());
+    return product;
+}
+
 /// Multiply an arbitrary interval by a nonnegative interval on the same grids.
 [[nodiscard]] Interval with_positive(IntegerWork& work, const Interval& value,
                                      const Interval& positive) {
-    return {rank_product(work, value.lower, value.lower < 0 ? positive.upper : positive.lower),
-            rank_product(work, value.upper, value.upper < 0 ? positive.lower : positive.upper)};
+    return {
+        multiply_endpoint(work, value.lower, value.lower < 0 ? positive.upper : positive.lower),
+        multiply_endpoint(work, value.upper, value.upper < 0 ? positive.lower : positive.upper)};
 }
 
 [[nodiscard]] Interval interval_product(IntegerWork& work, const Interval& left,
                                         const Interval& right) {
-    if (left.lower == 0 && left.upper == 0)
-        return {};
-    if (right.lower == 0 && right.upper == 0)
-        return {};
-    const std::array endpoints{
-        rank_product(work, left.lower, right.lower), rank_product(work, left.lower, right.upper),
-        rank_product(work, left.upper, right.lower), rank_product(work, left.upper, right.upper)};
+    if (right.lower >= 0)
+        return with_positive(work, left, right);
+    if (left.lower >= 0)
+        return with_positive(work, right, left);
+    if (left.upper <= 0) {
+        const auto& minimum = right.upper <= 0 ? left.upper : left.lower;
+        return {multiply_endpoint(work, minimum, right.upper),
+                multiply_endpoint(work, left.lower, right.lower)};
+    }
+    if (right.upper <= 0)
+        return {multiply_endpoint(work, left.upper, right.lower),
+                multiply_endpoint(work, left.lower, right.lower)};
+    const std::array endpoints{multiply_endpoint(work, left.lower, right.lower),
+                               multiply_endpoint(work, left.lower, right.upper),
+                               multiply_endpoint(work, left.upper, right.lower),
+                               multiply_endpoint(work, left.upper, right.upper)};
     const auto bounds = std::ranges::minmax_element(endpoints);
     return {*bounds.min, *bounds.max};
 }
@@ -192,15 +236,19 @@ void fill_product(ReferenceArithmetic& math, PgVolumeProductRule input, core::In
 
 void accumulate_sample(IntegerWork& work, std::span<Interval> entries,
                        std::span<const Interval> values, const Interval& weight) {
-    for (std::size_t j = 0; j < values.size(); ++j)
+    for (std::size_t j = 0; j < values.size(); ++j) {
+        const auto& right = values[j];
+        // No rounding occurs on these integer grids. Interval multiplication
+        // is associative, so the weighted column can be shared by the row.
+        const auto weighted =
+            right.lower == 0 && right.upper == 0 ? Interval{} : with_positive(work, right, weight);
         for (std::size_t i = 0; i <= j; ++i) {
             work.charge();
             const auto& left = values[i];
-            const auto& right = values[j];
-            if ((left.lower == 0 && left.upper == 0) || (right.lower == 0 && right.upper == 0))
+            if ((left.lower == 0 && left.upper == 0) ||
+                (weighted.lower == 0 && weighted.upper == 0))
                 continue;
-            const auto contribution =
-                with_positive(work, interval_product(work, left, right), weight);
+            const auto contribution = interval_product(work, left, weighted);
             auto& entry = entries[packed(i, j)];
             work.charge(
                 std::max(entry.lower.backend().size(), contribution.lower.backend().size()) +
@@ -208,6 +256,7 @@ void accumulate_sample(IntegerWork& work, std::span<Interval> entries,
             entry.lower += contribution.lower;
             entry.upper += contribution.upper;
         }
+    }
 }
 
 } // namespace
@@ -261,10 +310,9 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             const auto source = partition_take(basis.source());
             const auto volumes = partition_take(source.partition.volumes());
             const auto* points = std::get_if<std::span<const PgDiscreteVolumePoint>>(&input);
+            const auto* product = std::get_if<PgVolumeProductRule>(&input);
             const auto size =
-                points != nullptr
-                    ? points->size()
-                    : product_count(std::get<PgVolumeProductRule>(input), volumes.size());
+                points != nullptr ? points->size() : product_count(*product, volumes.size());
             const auto point_count = partition_index(size);
             if (points != nullptr)
                 validate_rule(math, *points, volumes.size());
@@ -278,8 +326,9 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
             // The exact rule and both endpoints of every result entry can coexist.
             const auto held_rationals =
                 partition_add(partition_mul(4, size), partition_mul(2, entries));
-            math.admit(partition_add(basis_live_rationals + 16, held_rationals));
-            if (const auto* product = std::get_if<PgVolumeProductRule>(&input)) {
+            const auto live_rationals = partition_add(basis_live_rationals + 16, held_rationals);
+            math.admit(live_rationals);
+            if (product != nullptr) {
                 const auto one = math.constant("1");
                 validate_factor(math, product->radial, one, true);
                 validate_factor(math, product->transverse, one, false);
@@ -295,8 +344,7 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                                         math.copy(p.point.depth), math.copy(p.weight)};
                 }
             } else {
-                fill_product(math, std::get<PgVolumeProductRule>(input),
-                             partition_index(volumes.size()), rule.values());
+                fill_product(math, *product, partition_index(volumes.size()), rule.values());
             }
             auto samples =
                 partition_take(plan.allocate<Interval>(partition_index(rank), partition_operation));
@@ -304,6 +352,50 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                 plan.allocate<Interval>(partition_index(entries), partition_operation));
             auto result = partition_take(
                 plan.allocate<PgGramEntry>(partition_index(entries), partition_operation));
+            using Numerators = std::array<ExactRational, 3>;
+            core::PlannedBuffer<Numerators> cached;
+            std::size_t depth_group = 1;
+            using PowerReuse = PgRankMonomialPowers::Reuse;
+            std::optional<PowerReuse> power_reuse;
+            if (product != nullptr && product->depth.size() > 1) {
+                auto cache_arithmetic = ReferenceArithmetic{limits.arithmetic, plan};
+                const auto cache_rationals = partition_add(live_rationals, partition_mul(rank, 3));
+                try {
+                    cache_arithmetic.admit(cache_rationals);
+                    cached = partition_take(
+                        plan.allocate<Numerators>(partition_index(rank), partition_operation));
+                    math.leaf_limits = cache_arithmetic.leaf_limits;
+                    depth_group = product->depth.size();
+                } catch (const PartitionAbort& unavailable) {
+                    if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
+                        throw;
+                }
+                if (depth_group > 1) {
+                    const auto axis_slots =
+                        partition_add(cache_rationals, PgRankMonomialPowers::retained_rationals);
+                    const auto mixed_slots =
+                        partition_add(axis_slots, PgRankMonomialPowers::retained_mixed);
+                    const std::array preferences{
+                        std::pair{
+                            PowerReuse::CommonDenominator,
+                            partition_add(mixed_slots, PgRankMonomialPowers::retained_common)},
+                        std::pair{PowerReuse::Mixed, mixed_slots},
+                        std::pair{PowerReuse::Axis, axis_slots}};
+                    for (const auto& [reuse, slots] : preferences) {
+                        cache_arithmetic.leaf_limits = limits.arithmetic.algebra;
+                        try {
+                            cache_arithmetic.admit(slots);
+                            math.leaf_limits = cache_arithmetic.leaf_limits;
+                            power_reuse = reuse;
+                            break;
+                        } catch (const PartitionAbort& unavailable) {
+                            if (unavailable.failure.code != core::FailureCode::ResourceExceeded)
+                                throw;
+                        }
+                    }
+                }
+            }
+            std::size_t depth_slot = 0;
             IntegerWork work{math, limits.maximum_integer_steps};
             const auto& length = basis.length_metres();
             const auto length_cube = math.mul(math.square(length), length);
@@ -327,16 +419,37 @@ core::Result<PgDiscreteGram> PgDiscreteGram::prepare_rule(PgReferenceBasis&& bas
                     math.div(math.mul(geometry.zeta, geometry.full_thickness_metres), two_length);
                 const auto half_z_squared = math.div(math.square(z), two);
                 const auto director_radical = math.div(z, math.square(geometry.g));
+                const auto evaluate = [&](const Numerators& terms) {
+                    auto a = math.add(terms[0], math.mul(half_z_squared, terms[2]));
+                    auto b = math.mul(director_radical, terms[1]);
+                    return radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
+                };
+                std::optional<PgRankMonomialPowers> monomials;
+                if (depth_slot == 0 && power_reuse &&
+                    PgRankMonomialPowers::fits(located.u, located.v, math.leaf_limits))
+                    monomials.emplace(located.u, located.v, *power_reuse);
                 auto values = samples.values();
                 for (std::size_t i = 0; i < values.size(); ++i) {
                     math.visit(1);
-                    const auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
-                                                         /*derivatives=*/false);
-                    auto a = math.add(jet[0][0], math.mul(half_z_squared, jet[2][0]));
-                    auto b = math.mul(director_radical, jet[1][0]);
-                    values[i] = radical_bounds(work, {std::move(a), std::move(b)}, root, bits);
+                    const auto numerator_values = [&]() -> Numerators {
+                        auto jet = basis.numerator_jet(math, {partition_index(i)}, located,
+                                                       /*derivatives=*/false,
+                                                       monomials ? &*monomials : nullptr);
+                        return {std::move(jet[0][0]), std::move(jet[1][0]), std::move(jet[2][0])};
+                    };
+                    if (cached.size() == 0) {
+                        values[i] = evaluate(numerator_values());
+                        continue;
+                    }
+                    auto& terms = cached.values()[i];
+                    if (depth_slot == 0)
+                        terms = numerator_values();
+                    values[i] = evaluate(terms);
                 }
                 accumulate_sample(work, sums.values(), values, measure);
+                // fill_product emits all depths consecutively for one volume and (u, v).
+                if (++depth_slot == depth_group)
+                    depth_slot = 0;
             }
             const auto drop = 3 * bits - grid.output_fractional_bits;
             for (std::size_t i = 0; i < entries; ++i) {

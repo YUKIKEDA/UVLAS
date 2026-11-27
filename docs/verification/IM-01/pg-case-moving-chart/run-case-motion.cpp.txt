@@ -1,0 +1,244 @@
+#include "run-case-chart.cpp.txt"
+
+namespace {
+using Json = nlohmann::json;
+enum class Geometry : std::uint8_t { Flat, FrozenCurve };
+
+Json moving_case(bool coincident, Geometry shape) {
+    auto document = Json::parse(frozen_interface(0));
+    auto& model = document.at("model");
+    if (shape == Geometry::Flat)
+        for (auto& geometry : model.at("geometry")) {
+            geometry.at("coefficients") = Json::array();
+            geometry.at("degree") = {0, 0};
+        }
+    auto& right = model.at("geometry").at(1);
+    const auto& domain = right.at("domain");
+    right.at("boundaries")
+        .push_back({{"name", "fixed_outer"}, {"vertices", {domain.at(1), domain.at(2)}}});
+    auto& supports = model.at("supports");
+    auto stationary = supports.at(0);
+    stationary.at("id") = "2";
+    if (!coincident) {
+        auto& region = stationary.at("region");
+        region.at("target").at("id") = "2";
+        region.at("geometry") = "2";
+        region.at("boundary") = 1;
+    }
+    supports.push_back(std::move(stationary));
+    supports.at(0).at("motion").at("translation") = Json::parse(
+        R"({"kind":"polynomial","origin":0,"scale":1,"coefficients":[[0,0,0],[0,0,0],[1,2,-1]],"domain":[0,2]})");
+    document["initial"] =
+        Json::parse(R"({"kind":"equilibrium","branch":"1","perturbation":{"kind":"none"}})");
+    auto& analysis = document.at("analysis");
+    analysis["kind"] = "transient";
+    analysis["physics"] = "structural";
+    analysis.erase("speed");
+    analysis["intervals"] = Json::parse(
+        R"([{"start":0,"end":1,"step":1,"restart":"initial"},{"start":1,"end":2,"step":1,"restart":"event"}])");
+    analysis["wake"] = {{"kind", "none"}};
+    analysis["loads"] = Json::array();
+    document["flow"] = {{"kind", "none"}};
+    model["aero_surfaces"] = Json::array();
+    document.at("numerics")
+        .at("scales")
+        .push_back(Json::parse(a::scale("structural_velocity").wire()));
+    return document;
+}
+
+cc::CaseStructuralSupportLimits motion_chart_limits() {
+    const cc::CaseUniformFlowLimits uniform{motion_exact_limits(), motion_limits.curve, 100};
+    const cc::CaseClockedPrescribedLimits clocks{
+        {{uniform, 8, 8}, {uniform, 2048, 50'000}},
+        {{motion_exact_limits(), 10'000, cc::case_motion_frame_interval_scratch_bytes},
+         motion_limits,
+         2048,
+         50'000},
+        case_budget};
+    const auto math = chart_limits(1).chart.arithmetic;
+    return {{clocks, 65'536, 2'000'000, 500}, {math, math, 500}, {math, 120'000}, 2, 100'000, 1};
+}
+
+core::Result<cc::CasePgChart> prepare_moving(bool coincident, Geometry shape,
+                                             core::Workspace& workspace,
+                                             p::CurveWorkspace& motion_workspace,
+                                             core::ResourcePlan& plan) {
+    const auto wire = moving_case(coincident, shape).dump();
+    const auto source = checked_case_wire(wire);
+    auto limits = chart_limits(shape == Geometry::FrozenCurve ? 2 : 1);
+    limits.constraints.maximum_sources = 3;
+    Fixture fixture;
+    core::ResourcePlan selection{profile};
+    const auto nodes = finite_rule(fixture);
+    std::array<std::vector<ExactRational>, 2> weights;
+    std::array<std::vector<PgDiscreteVolumePoint>, 2> points;
+    for (std::size_t i = 0; i < points.size(); ++i) {
+        auto geometry = take(
+            cc::prepare_case_pg_reference(source, i + 1, limits.reference, workspace, selection));
+        const auto owners = take(geometry.source());
+        auto rank = take(PgRankPreparation::prepare(owners.dictionary, owners.partition,
+                                                    limits.rank, workspace, selection));
+        auto basis = take(PgReferenceBasis::prepare(std::move(geometry), std::move(rank),
+                                                    limits.rank, workspace, selection));
+        points[i] = select_rule(fixture, basis, 1, nodes, weights[i], selection);
+    }
+    const std::array rules{cc::CasePgRuleBinding{1, points[0]},
+                           cc::CasePgRuleBinding{2, points[1]}};
+    const auto motion_caps = motion_chart_limits();
+    core::ResourcePlan empty{0};
+    check_failure(cc::prepare_case_pg_motion_chart(source, rules, limits, stamp, motion_caps,
+                                                   workspace, motion_workspace, empty,
+                                                   requested_stop_token()),
+                  core::FailureCode::Cancelled);
+    auto nested_cancel = motion_caps;
+    nested_cancel.exact.arithmetic.cancellation = requested_stop_token();
+    check_failure(cc::prepare_case_pg_motion_chart(source, rules, limits, stamp, nested_cancel,
+                                                   workspace, motion_workspace, empty),
+                  core::FailureCode::Cancelled);
+    CHECK(empty.allocated_bytes() == 0);
+    return cc::prepare_case_pg_motion_chart(source, rules, limits, stamp, motion_caps, workspace,
+                                            motion_workspace, plan);
+}
+
+void verify_outward_jet(const io::SiEnclosure& enclosure, const Q& expected) {
+    const auto* value = std::get_if<io::ScaledTwoWord>(&enclosure);
+    REQUIRE(value != nullptr);
+    REQUIRE(std::isfinite(value->high));
+    REQUIRE(std::isfinite(value->low));
+    REQUIRE((std::isfinite(value->radius) && value->radius >= 0));
+    constexpr std::int64_t exponent_bound = 4096;
+    const auto exponent = value->exponent2;
+    REQUIRE((exponent >= -exponent_bound && exponent <= exponent_bound));
+    I power = 1;
+    power <<= static_cast<unsigned>(exponent < 0 ? -exponent : exponent);
+    const Q scale = exponent < 0 ? Q{1, power} : Q{power};
+    const Q centre = (Q{value->high} + Q{value->low}) * scale;
+    const Q radius = Q{value->radius} * scale;
+    CHECK(abs(expected - centre) <= radius);
+    CHECK(radius <= Q{1, I{1} << 44U});
+}
+
+void compare_position_jets(const cc::CasePgChart& ready, const cc::CaseStructuralSupportSample& jet,
+                           core::Workspace& workspace, core::ResourcePlan& plan) {
+    const auto* motion = ready.motion();
+    REQUIRE(motion != nullptr);
+    const auto& chart = ready.chart();
+    const auto id = take(chart.identity());
+    const auto& original = chart.original();
+    REQUIRE(ready.patch_count() == 2);
+    REQUIRE(&chart == &motion->support().chart());
+    CHECK(jet.chart() == id);
+    REQUIRE(jet.rows() == original.original_rows().size());
+    REQUIRE(jet.orders() == 3);
+    REQUIRE(jet.original_rhs().size() == 9 * jet.rows());
+    const auto source_count = original.sources().size();
+    REQUIRE(source_count == 3);
+    CHECK(original.sources()[0].id == PgConstraintId{1});
+    CHECK(original.sources()[1].id == PgConstraintId{1});
+    CHECK(original.sources()[2].id == PgConstraintId{2});
+    CHECK(original.sources()[0].kind == PgTraceKind::Connection);
+    CHECK(original.sources()[1].kind == PgTraceKind::Support);
+    CHECK(original.sources()[2].kind == PgTraceKind::Support);
+    const auto left = take(ready.patch(0));
+    const auto right = take(ready.patch(1));
+    CHECK(original.layout()[0].basis == take(left->info()).identity);
+    CHECK(original.layout()[1].basis == take(right->info()).identity);
+
+    const auto caps = motion_chart_limits();
+    const std::array order_list{Value, First, Second};
+    const std::array<Q, 3> changes{Q{1}, Q{2}, Q{-1}};
+    const std::array<Q, 3> derivatives{Q{1}, Q{2}, Q{2}};
+    const std::vector<PgCartesianExactPosition> free(chart.free_columns().size());
+    Fixture fixture;
+    const auto column_count = static_cast<std::size_t>(take(original.info()).columns);
+    std::vector<PgCartesianExactPosition> load(column_count);
+    for (std::size_t i = 0; i < load.size(); ++i)
+        load[i][i % 3] = owned(fixture, Q{static_cast<unsigned>(i % 5 + 1), 13});
+    const auto dual = take(chart.transpose({id, load}, caps.exact.arithmetic, workspace, plan));
+
+    for (std::size_t order = 0; order < order_list.size(); ++order) {
+        const auto lift = take(cc::lift_case_structural_pg_support_exact(
+            *motion, jet, order_list[order], free, caps.exact, workspace, plan));
+        const auto c_times_q = take(original.apply({original.layout(), lift.coordinates.values()},
+                                                   caps.exact.arithmetic, workspace, plan));
+        for (std::size_t i = 0; i < jet.rows(); ++i) {
+            const auto& declared = original.original_rows()[i];
+            const auto moving = declared.source == 1;
+            CHECK(jet.row_groups()[i].has_value() == moving);
+            Q translation{};
+            if (moving)
+                for (const auto& term : take(original.row(static_cast<core::Index>(i)))) {
+                    const auto col = static_cast<std::size_t>(term.column);
+                    REQUIRE(col < left->translation().size());
+                    translation += q(term.coefficient) * q(left->translation()[col]);
+                }
+            for (std::size_t axis = 0; axis < 3; ++axis) {
+                const Q reference = order == 0 ? q(declared.prescribed[axis]) : Q{};
+                const Q expected = reference + derivatives[order] * changes[axis] * translation;
+                verify_outward_jet(jet.original_rhs()[3 * (order * jet.rows() + i) + axis],
+                                   expected);
+                CHECK(q(lift.original_rhs.values()[i][axis]) == expected);
+                CHECK(q(c_times_q.values()[i][axis]) == expected);
+            }
+        }
+        CHECK(work(lift.coordinates.values(), load) ==
+              work(lift.original_rhs.values(), dual.original_multipliers.values()));
+    }
+}
+} // namespace
+
+namespace {
+void verify_motion_chart(Geometry shape, std::string_view result_tag) {
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    p::CurveWorkspace motion_workspace;
+    core::ResourcePlan plan{profile};
+    const auto candidate = prepare_moving(false, shape, workspace, motion_workspace, plan);
+    if (!candidate)
+        UNSCOPED_INFO(
+            "Moving chart preparation: " << static_cast<unsigned>(candidate.error().code));
+    REQUIRE(candidate);
+    const auto* motion = candidate->motion();
+    REQUIRE(motion != nullptr);
+    REQUIRE(motion->support().group_count() == 1);
+    const auto caps = motion_chart_limits();
+    const std::array<std::uint32_t, 1> word{1};
+    const std::array<std::uint32_t, 2> denom{0, 1U << 12U};
+    const p::RationalView unit{1, word, word}, null{0, {}, word};
+    const cc::CaseFlowComponentBudget tolerance{unit, {1, word, denom}, null};
+    std::array<cc::CaseFlowComponentBudget, 36> pose{};
+    std::array<cc::CaseFlowComponentBudget, 9> rhs{};
+    pose.fill(tolerance);
+    rhs.fill(tolerance);
+    const cc::CasePgSupportProjection projection{core::Precision::TwoWord, pose, rhs, rhs};
+    for (const auto query :
+         {cc::CaseFlowClockQuery{stamp, 0, 1, Left}, cc::CaseFlowClockQuery{stamp, 1, 0, Right}}) {
+        const auto sample = take(cc::evaluate_case_structural_pg_support(
+            *motion, *motion, query, Second, projection, motion_workspace, caps.evaluation, plan));
+        CHECK(q(sample.node().seconds) == 1);
+        compare_position_jets(*candidate, sample, workspace, plan);
+    }
+    std::clog << result_tag << ',' << candidate->chart().original().original_rows().size() << ','
+              << candidate->chart().pivots().size() << ',' << plan.allocated_bytes() << '\n'
+              << std::flush;
+}
+
+} // namespace
+
+TEST_CASE("The Case chart retains stationary and moving full-thickness support together",
+          "[.case-pg-moving-chart][V-PG][CN-D01][CN-D03][SH-D05][N4-04][verification]") {
+    verify_motion_chart(Geometry::Flat, "CASE_PG_MOTION_ACCEPT");
+}
+
+TEST_CASE("The frozen R4 curved Case keeps one chart for the support jets",
+          "[.case-pg-moving-curve][V-PG][CN-D01][CN-D03][SH-D05][N4-04][verification]") {
+    verify_motion_chart(Geometry::FrozenCurve, "CASE_PG_CURVED_MOTION_ACCEPT");
+}
+
+TEST_CASE("A moving Case support cannot share all rows with a stationary support",
+          "[.case-pg-moving-chart][V-PG][CN-D03][verification][negative]") {
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    p::CurveWorkspace motion_workspace;
+    core::ResourcePlan plan{profile};
+    check_failure(prepare_moving(true, Geometry::Flat, workspace, motion_workspace, plan),
+                  core::FailureCode::InvalidInput);
+}

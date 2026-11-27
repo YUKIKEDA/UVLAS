@@ -148,6 +148,12 @@ uvlas_add_test(io.external_planar_pg
     LIBS uvlas_io Boost::hash2)
 target_include_directories(uvlas_test_io_external_planar_pg PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 
+uvlas_add_test(io.external_pg_regional_thickness
+    LABELS integration
+    SOURCES io/external_pg_regional_thickness_test.cpp
+    LIBS uvlas_io Boost::hash2)
+target_include_directories(uvlas_test_io_external_pg_regional_thickness PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
 uvlas_add_test(io.gmsh_mesh
     LABELS unit property negative verification
     SOURCES io/gmsh_mesh_test.cpp support/allocation_audit.cpp
@@ -191,8 +197,30 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     uvlas_add_test(io.reference_input
         LABELS integration property negative verification
         SOURCES io/reference_input_test.cpp
-        LIBS uvlas_io nlohmann_json::nlohmann_json)
-    target_include_directories(uvlas_test_io_reference_input PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+        LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+    target_include_directories(uvlas_test_io_reference_input PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+
+    uvlas_add_test(io.gmsh_shell_reference_set
+        LABELS integration negative verification
+        SOURCES io/gmsh_shell_reference_set_test.cpp
+        LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
+    target_include_directories(uvlas_test_io_gmsh_shell_reference_set PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+
+    uvlas_add_test(io.gmsh_case_support_boundary
+        LABELS integration negative verification
+        SOURCES io/gmsh_case_support_boundary_test.cpp
+        LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
+    target_include_directories(uvlas_test_io_gmsh_case_support_boundary PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+
+    uvlas_add_test(io.external_shell_cross_format
+        LABELS integration negative verification V-USE
+        SOURCES io/external_shell_cross_format_test.cpp
+        LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
+    target_include_directories(uvlas_test_io_external_shell_cross_format PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 endif()
 
 if(WIN32)
@@ -725,7 +753,7 @@ uvlas_require_audited_dependencies(uvlas_test_structure_pg_rank_preparation_reso
 uvlas_add_test(structure.pg_reference_geometry
     LABELS unit property negative verification V-PG
     TIMEOUT 180
-    TEST_SPEC "~[pg-r4-reference]~[pg-r5-integrals]"
+    TEST_SPEC "~[pg-r4-reference]~[pg-r5-integrals]~[pg-r5-sides]"
     SOURCES structure/pg_reference_geometry_test.cpp
     LIBS uvlas_structure Boost::multiprecision)
 target_include_directories(uvlas_test_structure_pg_reference_geometry
@@ -735,7 +763,7 @@ if(UVLAS_SANITIZERS)
     set(pg_reference_timeout 600)
 endif()
 set_tests_properties(structure.pg_reference_geometry PROPERTIES TIMEOUT ${pg_reference_timeout})
-foreach(series IN ITEMS r4-reference r5-integrals)
+foreach(series IN ITEMS r4-reference r5-integrals r5-sides)
     set(test_name structure.pg_reference_geometry.${series})
     add_test(NAME ${test_name} COMMAND uvlas_test_structure_pg_reference_geometry "[pg-${series}]")
     set_tests_properties(${test_name} PROPERTIES
@@ -773,6 +801,10 @@ target_include_directories(uvlas_test_structure_pg_product_quadrature
     PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
 if(UVLAS_SANITIZERS AND NOT MSVC)
     set_tests_properties(structure.pg_product_quadrature PROPERTIES TIMEOUT 420)
+elseif(MSVC)
+    # Debug evaluates the powered, explicit and narrow-limit curved Gram paths.
+    set_tests_properties(structure.pg_product_quadrature PROPERTIES
+        TIMEOUT "$<IF:$<CONFIG:Debug>,600,300>")
 endif()
 
 uvlas_add_test(structure.pg_prepared_patch
@@ -946,10 +978,98 @@ target_include_directories(uvlas_test_coupling_case_uniform_flow PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests" "${PROJECT_SOURCE_DIR}/src/structure")
 target_compile_definitions(uvlas_test_coupling_case_uniform_flow PRIVATE
     UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json")
-# The deployed Debug jobs exhausted both their 60 s and 120 s limits.
+# Debug CI exhausted the previous 60 s and 120 s limits.
 set_tests_properties(coupling.case_uniform_flow PROPERTIES
     TIMEOUT "$<IF:$<CONFIG:Debug>,300,60>")
+if(MSVC)
+    # The nested exact interval load fixture exhausts the 1 MiB PE default in Debug.
+    target_link_options(uvlas_test_coupling_case_uniform_flow PRIVATE
+        "$<$<CONFIG:Debug>:/STACK:8388608>")
+endif()
 
+set(finite_wing_shapes fw_v01 fw_v02)
+set(finite_wing_series steady wake_length core_radius)
+foreach(wing_index RANGE 0 1)
+    list(GET finite_wing_shapes ${wing_index} wing_shape)
+    foreach(series_index RANGE 0 2)
+        list(GET finite_wing_series ${series_index} series)
+        set(test_name coupling.finite_wing_${series}.${wing_shape})
+        set(target uvlas_test_coupling_finite_wing_${series}_${wing_shape})
+        uvlas_add_test(${test_name}
+            LABELS V-AERO verification
+            SOURCES coupling/finite_wing_steady_test.cpp
+            LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+        target_include_directories(${target} PRIVATE
+            "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+        target_compile_definitions(${target} PRIVATE
+            UVLAS_FINITE_WING_INDEX=${wing_index}
+            UVLAS_FINITE_WING_SERIES=${series_index}
+            UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json"
+            UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json"
+            UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json"
+            UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json"
+            UVLAS_FINITE_WING_SPAN_LINES_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-span-lines-v1.json")
+        # Each shape keeps the paired angles or the members of a sensitivity series together.
+        set_tests_properties(${test_name} PROPERTIES
+            TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
+    endforeach()
+endforeach()
+set(finite_wing_drag_grids m2n4 m4n8)
+foreach(wing_index RANGE 0 1)
+    list(GET finite_wing_shapes ${wing_index} wing_shape)
+    foreach(level RANGE 0 1)
+        list(GET finite_wing_drag_grids ${level} grid)
+        set(test_name coupling.finite_wing_drag_refinement.${wing_shape}.${grid})
+        set(target uvlas_test_coupling_finite_wing_drag_refinement_${wing_shape}_${grid})
+        uvlas_add_test(${test_name}
+            LABELS V-AERO verification
+            SOURCES coupling/finite_wing_steady_test.cpp
+            LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
+        target_include_directories(${target} PRIVATE
+            "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+        target_compile_definitions(${target} PRIVATE
+            UVLAS_FINITE_WING_INDEX=${wing_index}
+            UVLAS_FINITE_WING_SERIES=3
+            UVLAS_FINITE_WING_REFINEMENT_LEVEL=${level}
+            UVLAS_FINITE_WING_CASE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-case-v1.json"
+            UVLAS_FINITE_WING_STEADY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-steady-v1.json"
+            UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json"
+            UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json"
+            UVLAS_FINITE_WING_SPAN_LINES_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-span-lines-v1.json"
+            UVLAS_FINITE_WING_REFINEMENT_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-drag-refinement-v1.json")
+        set(drag_timeout 1200)
+        if(grid STREQUAL "m4n8")
+            # FW-V02 took 1321 seconds with MSVC Debug. Keep the Release limit fixed.
+            set(drag_timeout "$<IF:$<CONFIG:Debug>,1800,1200>")
+        endif()
+        set_tests_properties(${test_name} PROPERTIES TIMEOUT ${drag_timeout})
+    endforeach()
+endforeach()
+set(multiple_surface_cases steady loads)
+foreach(native_loads RANGE 0 1)
+    list(GET multiple_surface_cases ${native_loads} mode)
+    set(test_name coupling.multiple_surface_${mode})
+    set(target uvlas_test_coupling_multiple_surface_${mode})
+    set(mode_options TIMEOUT "$<IF:$<CONFIG:Debug>,720,150>")
+    if(native_loads)
+        # The full frozen load observation repeats the qualified action at every
+        # load point. The matrix and work regression still runs in every build.
+        set(mode_options TIMEOUT 420 CONFIGURATIONS Release)
+    endif()
+    uvlas_add_test(${test_name}
+        LABELS V-MULTI verification
+        SOURCES coupling/multiple_surface_steady_test.cpp
+        LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json
+        ${mode_options})
+    target_include_directories(${target} PRIVATE
+        "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+    target_compile_definitions(${target} PRIVATE
+        UVLAS_MULTIPLE_SURFACE_NATIVE_LOADS=${native_loads}
+        UVLAS_MULTIPLE_SURFACE_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/multiple-surface-steady-v1.json")
+    if(native_loads AND TEST "${test_name}")
+        set_tests_properties(${test_name} PROPERTIES RUN_SERIAL TRUE)
+    endif()
+endforeach()
 uvlas_add_test(coupling.case_motion
     LABELS V-AERO property negative verification
     SOURCES coupling/case_motion_test.cpp
@@ -975,10 +1095,31 @@ target_include_directories(uvlas_test_coupling_case_structural_pg_support PRIVAT
 uvlas_add_test(coupling.case_pg_support_motion
     LABELS V-PG V-AERO property negative verification
     TIMEOUT 180
+    TEST_SPEC "~[case-pg-chart-entry]"
     SOURCES coupling/case_pg_support_motion_test.cpp
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_pg_support_motion PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/structure" "${PROJECT_SOURCE_DIR}/tests")
+add_test(NAME coupling.case_pg_chart_entry
+    COMMAND uvlas_test_coupling_case_pg_support_motion "[case-pg-chart-entry]")
+set_tests_properties(coupling.case_pg_chart_entry PROPERTIES
+    LABELS "integration;verification;V-PG" TIMEOUT "$<IF:$<CONFIG:Debug>,300,180>")
+# Run all exact PG preparations in Release. The same executable runs the
+# two-layer Case preparation and its negative checks in every configuration.
+if(CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(frozen_pg_configs)
+    if(CMAKE_CONFIGURATION_TYPES)
+        set(frozen_pg_configs CONFIGURATIONS Release)
+    endif()
+    add_test(NAME coupling.frozen_case_pg_reference
+        COMMAND "${Python3_EXECUTABLE}" -m tools.qa.vpg_product_reference
+            "$<TARGET_FILE:uvlas_test_coupling_case_pg_support_motion>"
+        ${frozen_pg_configs})
+    set_tests_properties(coupling.frozen_case_pg_reference PROPERTIES
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+        LABELS "integration;verification;V-PG"
+        TIMEOUT 600)
+endif()
 
 uvlas_add_test(coupling.case_motion_frame
     LABELS V-AERO property negative verification

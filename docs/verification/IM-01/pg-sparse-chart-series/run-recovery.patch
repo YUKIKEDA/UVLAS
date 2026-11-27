@@ -1,0 +1,215 @@
+--- run-series.cpp.txt
++++ run-series.cpp.txt
+@@ -5,0 +6,2 @@
++
++#include <catch2/catch_session.hpp>
+@@ -117 +118,0 @@
+-#ifdef UVLAS_R02_MEASURE_REUSE
+@@ -134,0 +136 @@
++#ifdef UVLAS_R02_MEASURE_REUSE
+@@ -248 +249,0 @@
+-    std::array<std::array<std::size_t, 3>, 4> edge_counts{};
+@@ -258,2 +258,0 @@
+-        const auto t = take(traces[i]->info());
+-        edge_counts[i] = {a.size(), b.size(), t.overlaps};
+@@ -289,34 +288,34 @@
+-    PgSparseChartPreparation measured;
+-    PgSparseChartIdentity identity;
+-    Phase chart_phase;
+-    {
+-        const auto chart = take(prepare(original));
+-        chart_phase = finish(begin, plan, bytes_before);
+-        measured = take(chart.preparation());
+-        identity = take(chart.identity());
+-        REQUIRE(measured.timing.has_value());
+-        REQUIRE(measured.original_nonzeros == static_cast<std::uint64_t>(original_info.nonzeros));
+-        REQUIRE(measured.rank > 0);
+-        REQUIRE(measured.upper_terms >= measured.rank);
+-        REQUIRE(measured.lower_terms + measured.upper_terms <= measured.factor_term_capacity);
+-#ifdef UVLAS_R02_MEASURE_REUSE
+-        measure_reuse(patch_count, contact_count, chart, measured, original_info, chart_phase,
+-                      fixtures[0], chart_limits.arithmetic, workspace, plan);
+-        return;
+-#endif
+-    }
+-
+-    const auto exact_capacity = measured.lower_terms + measured.upper_terms;
+-    chart_limits.maximum_factor_terms = exact_capacity;
+-    {
+-        auto exact_original = aggregate();
+-        const auto exact = take(prepare(exact_original));
+-        REQUIRE(take(exact.identity()) == identity);
+-        const auto info = take(exact.preparation());
+-        REQUIRE(info.rank == measured.rank);
+-        REQUIRE(info.lower_terms == measured.lower_terms);
+-        REQUIRE(info.upper_terms == measured.upper_terms);
+-        REQUIRE(info.factor_term_capacity == exact_capacity);
+-    }
+-    chart_limits.maximum_factor_terms = exact_capacity - 1;
+-    auto short_original = aggregate();
++
++    const auto chart = take(prepare(original));
++    const auto chart_phase = finish(begin, plan, bytes_before);
++    const auto measured = take(chart.preparation());
++    const auto identity = take(chart.identity());
++    REQUIRE(measured.timing.has_value());
++    REQUIRE(measured.original_nonzeros == static_cast<std::uint64_t>(original_info.nonzeros));
++    REQUIRE(measured.rank == 248);
++    REQUIRE(measured.lower_terms == 4330);
++    REQUIRE(measured.upper_terms == 19173);
++    REQUIRE(original_info.columns == 551);
++    REQUIRE(original_info.rows == 672);
++    REQUIRE(original_info.nonzeros == 28116);
++    REQUIRE(nonconforming == 2);
++
++    const auto columns = static_cast<std::size_t>(original_info.columns);
++    const auto independent = sample(fixtures[0], chart.free_columns().size(), 1);
++    const auto force = sample(fixtures[0], columns, 3);
++    const auto use = [&](const PgSparseChart& owner) {
++        auto q =
++            take(owner.lift({identity, independent}, chart_limits.arithmetic, workspace, plan));
++        auto dual =
++            take(owner.transpose({identity, force}, chart_limits.arithmetic, workspace, plan));
++        return std::pair{std::move(q), std::move(dual)};
++    };
++    const auto [baseline_q, baseline_dual] = use(chart);
++    const Q expected_work = work(baseline_q.values(), force);
++    REQUIRE(expected_work != 0);
++    REQUIRE(expected_work == work(independent, baseline_dual.independent_force.values()));
++    const auto adopted_capacity = measured.lower_terms + measured.upper_terms;
++
++    // Trigger the factor cap during elimination on the historical original CSR.
++    auto rejected = aggregate();
++    chart_limits.maximum_factor_terms = adopted_capacity - 1;
+@@ -324,2 +323 @@
+-    check_failure(prepare(short_original), core::FailureCode::ResourceExceeded);
+-    REQUIRE(take(short_original.info()).nonzeros == original_info.nonzeros);
++    check_failure(prepare(rejected), core::FailureCode::ResourceExceeded);
+@@ -327,10 +325,88 @@
+-
+-    std::cout << "R02 {\"patches\":" << patch_count << ",\"connections\":" << contact_count
+-              << ",\"cycle\":" << (contact_count == 4 ? "true" : "false")
+-              << ",\"nonconforming_contacts\":" << nonconforming << ",\"edge_counts\":[";
+-    for (std::size_t i = 0; i < contact_count; ++i) {
+-        const auto [a, b, common] = edge_counts[i];
+-        std::cout << (i == 0 ? "" : ",") << '[' << a << ',' << b << ',' << common << ']';
+-    }
+-    std::cout << "],\"rows\":" << original_info.rows << ",\"columns\":" << original_info.columns
+-              << ",\"nonzeros\":" << measured.original_nonzeros << ",\"rank\":" << measured.rank
++    REQUIRE(short_bytes > 0);
++    const auto retained_info = take(rejected.info());
++    CHECK(retained_info.columns == original_info.columns);
++    CHECK(retained_info.rows == original_info.rows);
++    CHECK(retained_info.nonzeros == original_info.nonzeros);
++    REQUIRE(std::ranges::equal(rejected.layout(), chart.original().layout()));
++    REQUIRE(rejected.sources().size() == chart.original().sources().size());
++    for (std::size_t i = 0; i < rejected.sources().size(); ++i) {
++        const auto& before = chart.original().sources()[i];
++        const auto& after = rejected.sources()[i];
++        CHECK(before.id == after.id);
++        CHECK(before.kind == after.kind);
++        CHECK(before.left == after.left);
++        CHECK(before.right == after.right);
++        CHECK(before.first_row == after.first_row);
++        CHECK(before.rows == after.rows);
++        CHECK(before.first_overlap == after.first_overlap);
++        CHECK(before.overlaps == after.overlaps);
++    }
++    CHECK(rejected.overlaps().size() == chart.original().overlaps().size());
++    REQUIRE(rejected.original_rows().size() == chart.original().original_rows().size());
++    std::size_t matched_entries = 0;
++    for (core::Index row = 0; row < original_info.rows; ++row) {
++        const auto i = static_cast<std::size_t>(row);
++        const auto& before = chart.original().original_rows()[i];
++        const auto& after = rejected.original_rows()[i];
++        CHECK(before.source == after.source);
++        CHECK(before.source_row == after.source_row);
++        CHECK(before.source_overlap == after.source_overlap);
++        CHECK(before.field == after.field);
++        CHECK(before.power == after.power);
++        CHECK(before.local_representative == after.local_representative);
++        CHECK(before.local_scale == after.local_scale);
++        CHECK(before.prescribed == after.prescribed);
++        const auto lhs = take(chart.original().row(row));
++        const auto rhs = take(rejected.row(row));
++        REQUIRE(std::ranges::equal(lhs, rhs, [](const auto& a, const auto& b) {
++            return a.column == b.column && a.coefficient == b.coefficient;
++        }));
++        matched_entries += rhs.size();
++    }
++    REQUIRE(matched_entries == measured.original_nonzeros);
++
++    // Retry exactly that object. Do not reconstruct or replace the rejected input.
++    chart_limits.maximum_factor_terms = adopted_capacity;
++    const auto retry_begin = Clock::now();
++    const auto retry_bytes_before = plan.allocated_bytes();
++    const auto recovered = take(prepare(rejected));
++    const auto retry_phase = finish(retry_begin, plan, retry_bytes_before);
++    const auto recovered_info = take(recovered.preparation());
++    CHECK(take(recovered.identity()) == identity);
++    CHECK(recovered_info.rank == measured.rank);
++    CHECK(recovered_info.lower_terms == measured.lower_terms);
++    CHECK(recovered_info.upper_terms == measured.upper_terms);
++    CHECK(recovered_info.factor_term_capacity == adopted_capacity);
++
++    // Fail operations on the already-prepared original chart before reusing it.
++    core::ResourcePlan none{0};
++    check_failure(chart.lift({identity, independent}, chart_limits.arithmetic, workspace, none),
++                  core::FailureCode::ResourceExceeded);
++    auto cancelled = chart_limits.arithmetic;
++    cancelled.cancellation = requested_stop_token();
++    check_failure(chart.transpose({identity, force}, cancelled, workspace, none),
++                  core::FailureCode::Cancelled);
++    REQUIRE(none.allocated_bytes() == 0);
++    REQUIRE(take(chart.identity()) == identity);
++    const auto [post_q, post_dual] = use(chart);
++    const auto [retry_q, retry_dual] = use(recovered);
++    for (const auto& result : {std::pair{&post_q, &post_dual}, std::pair{&retry_q, &retry_dual}}) {
++        CHECK(std::ranges::equal(result.first->values(), baseline_q.values()));
++        CHECK(std::ranges::equal(result.second->independent_force.values(),
++                                 baseline_dual.independent_force.values()));
++        CHECK(std::ranges::equal(result.second->original_multipliers.values(),
++                                 baseline_dual.original_multipliers.values()));
++        CHECK(work(result.first->values(), force) == expected_work);
++        CHECK(work(independent, result.second->independent_force.values()) == expected_work);
++    }
++    const auto residual =
++        take(recovered.original().residual({recovered.original().layout(), retry_q.values()},
++                                           chart_limits.arithmetic, workspace, plan));
++    for (const auto& value : residual.values())
++        for (const auto& component : value)
++            CHECK(component.sign() == 0);
++
++    const auto end_memory = take(core::sample_process_memory(core::Operation::PrepareModel));
++    std::cout << "R02-RECOVERY {\"patches\":" << patch_count << ",\"connections\":" << contact_count
++              << ",\"rows\":" << original_info.rows << ",\"columns\":" << columns
++              << ",\"nonzeros\":" << matched_entries << ",\"rank\":" << measured.rank
+@@ -339,7 +415,5 @@
+-              << ",\"pivot_capacity\":" << measured.pivot_capacity
+-              << ",\"work_row_capacity\":" << measured.work_row_capacity
+-              << ",\"factor_term_capacity\":" << measured.factor_term_capacity
+-              << ",\"internal_chart_nanoseconds\":" << measured.timing->elapsed_nanoseconds
+-              << ",\"exact_factor_capacity_accepted\":" << exact_capacity
+-              << ",\"one_less_factor_capacity_rejected\":" << exact_capacity - 1
+-              << ",\"one_less_charged_bytes\":" << short_bytes
++              << ",\"short_factor_capacity\":" << adopted_capacity - 1
++              << ",\"retry_factor_capacity\":" << adopted_capacity
++              << ",\"failed_prepare_bytes\":" << short_bytes
++              << ",\"final_plan_bytes\":" << plan.allocated_bytes()
++              << ",\"end_peak_bytes\":" << end_memory.peak_resident_bytes
+@@ -350,0 +425 @@
++    write_phase("retry", retry_phase);
+@@ -355,7 +430 @@
+-TEST_CASE("R02 two patches") {
+-    run(2, 1);
+-}
+-TEST_CASE("R02 three patches") {
+-    run(3, 2);
+-}
+-TEST_CASE("R02 four patch loop") {
++TEST_CASE("R02 real closed loop retries the retained owner and chart") {
+@@ -363,0 +433,4 @@
++
++int main(int argc, char* argv[]) {
++    return Catch::Session().run(argc, argv);
++}

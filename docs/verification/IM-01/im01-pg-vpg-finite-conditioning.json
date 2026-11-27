@@ -1,0 +1,97 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im01-pg-vpg-finite-conditioning",
+  "ids": [
+    "SH-D03",
+    "SH-D07",
+    "N4-02",
+    "N4-08",
+    "V-PG"
+  ],
+  "package": "IM-01",
+  "issue": 17,
+  "date": "2026-11-24",
+  "source_commit": "60a356c7031e9ba5895527c4349209f92902a825",
+  "scope": "凍結R4・R5の各形状に用意した固定有限則に対する合同誤差、必須場、資源の確認。",
+  "checks": {
+    "frozen_configurations": 32,
+    "mandatory_exact_comparisons": 385968,
+    "maximum_congruence_bound": "67228454952851012729700381706022692862771588222466804032907623629109303393831158069826207776293651711520513606615918836486951027580911842470708269174182586519595894668239590738211936605396349893067642271728909619690288607262100925066836241428213640043/1218164251424999885044172798484398538859528357199375940858488307151618586345803262808201883235251282403163114528926083522932396233150386755822248412039081677441409712494559128733848706936256706044099949184902297359210699740674359368218295451933620701603467350388034693385228573748989263872",
+    "maximum_cumulative_plan_bytes": 11428331040,
+    "maximum_peak_resident_bytes": 6522732544,
+    "maximum_gram_steps": 57162288959,
+    "maximum_certificate_steps": 28024748098,
+    "maximum_whole_preparation_ms": 406112,
+    "cross_platform_repeat_cases": 1,
+    "mutated_records_rejected": [
+      "wrong case key",
+      "missing Gram stage",
+      "mandatory comparison count zero",
+      "one byte above plan cap"
+    ]
+  },
+  "frozen_references": [
+    {
+      "id": "paired-reference-r4-audit",
+      "sha256": "2af9e42f35928cb0d213f126fd481d03703ce6995b3c52e75ea1c8045cd9f0c9",
+      "hint": "rd/structure/main-shell/paired-geometry/records/paired-reference-r4-audit.json"
+    },
+    {
+      "id": "paired-shell-r5-audit",
+      "sha256": "48e4a9ecbcb3ea0ee6cff0269f71c0567032d9b0ddf6040421aba51f8e222167",
+      "hint": "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-audit.json"
+    },
+    {
+      "id": "mass-paired-quality-result",
+      "sha256": "f0345e55e920f4bb87d3b9abd4c6e1507b201f8ea4eb929a86417997cc224c9a",
+      "hint": "rd/structure/main-shell/paired-geometry/records/mass-paired-quality-result.json"
+    },
+    {
+      "id": "mass-paired-coefficient-input-result",
+      "sha256": "46d1111dc403182244d54091d2ef85051533d822468050b6d01e48615af204e8",
+      "hint": "rd/structure/main-shell/paired-geometry/records/mass-paired-coefficient-input-result.json"
+    },
+    {
+      "id": "paired-shell-r5-domain-v2-result",
+      "sha256": "7552eb6b9cb4f9cebb07b31eeeb61abd3c392620ed9f5e897f1ba5ffe2ce7e43",
+      "hint": "rd/structure/main-shell/paired-geometry/records/paired-shell-r5-domain-v2-result.json"
+    },
+    {
+      "id": "check_mass_paired_quality",
+      "sha256": "2c34de18e55eba8d6aab71bd196ef31999d9d27cade7531ca5a480487c309c4b",
+      "hint": "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_quality.py"
+    },
+    {
+      "id": "check_mass_paired_coefficient_input",
+      "sha256": "68fe1c38ba8380a3bd72c9e12c3cba9bcaafd766cf2e1e4c24f7f652c7693ba2",
+      "hint": "rd/structure/main-shell/paired-geometry/experiments/check_mass_paired_coefficient_input.py"
+    },
+    {
+      "id": "swept_taper_domain",
+      "sha256": "e29bcfa5e20b638e5ee0e344627fb4b73763358c5b511d5a385832bb0321f2fc",
+      "hint": "rd/structure/main-shell/paired-geometry/experiments/swept_taper_domain.py"
+    },
+    {
+      "id": "check_paired_shell_r5_domain_v2",
+      "sha256": "1e926f1d7bd0e0e34b4d8c8a8e52485ed5664f874e8b74eb38afab94c3e75e5a",
+      "hint": "rd/structure/main-shell/paired-geometry/experiments/check_paired_shell_r5_domain_v2.py"
+    }
+  ],
+  "sources": {
+    "src/structure/pg_discrete_gram.cpp": "957d14724351f9e1f46574153518c5bd70b678dbd850e272f5da5054b56f6044",
+    "src/structure/pg_conditioning.cpp": "3e4d992d6acd9159dc29b1716cc1f9f714828ee9468e4de9b37fb40cb6a5e78d",
+    "src/structure/pg_conditioning_factor.hpp": "245b9272c6e80f51cbfa7b62525459c0febd78ddd2595bed7025b859049693d3",
+    "src/structure/pg_rank_preparation.cpp": "71e0caf42e0de407ee1f9eaba7ad709232bbe1e4d773440c3800c0926bc8b026",
+    "src/structure/pg_reference_geometry.cpp": "0e2887e722f0fbd8542a39b6c5000c1a44987a05fd0c6fddff2e879c0d543521",
+    "tests/structure/pg_conditioning_test_support.hpp": "6518becda7ae6db712a005924de2f88cc02f5ee95c5742ae63e36bf7e88737d4",
+    "docs/specs/structure/pg-discrete-gram-contract.md": "189b6e40c4ce326337d0cc2c52f0da0ae42f858e3d7dd4770f91a9d93f4fd029",
+    "docs/specs/structure/pg-discrete-conditioning-certificate-contract.md": "c30169bc6103ce1e0a5be7e56f5db82b1c4ad0dea64c47c0b9d98ab4e41b10d1",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be"
+  },
+  "artifacts": {
+    "docs/verification/IM-01/pg-vpg-finite-conditioning/run-series.cpp.txt": "50ef3f768f97d7ceb8d808e12f5563fda2965e126553f50875e42e2de27054b2",
+    "docs/verification/IM-01/pg-vpg-finite-conditioning/run-series.py.txt": "d273d4c0d5553dd979b955870732b37a990cf93670735b147646f3eae6094271",
+    "docs/verification/IM-01/pg-vpg-finite-conditioning/verification.md": "ed41ffe62a7899c4ba9bed84d8fd44312240722cf66cd25dfa1228862d787bc9",
+    "docs/verification/IM-01/pg-vpg-finite-conditioning/result.json": "b21abff82e92157f8c8e58747f5505783f73c1ef4985536fdfeeecff2f37bc02"
+  }
+}

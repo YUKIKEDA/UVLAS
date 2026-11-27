@@ -1,0 +1,41 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-case-material-map-reference-v1",
+  "ids": [
+    "IM-03",
+    "IM-06",
+    "AE-02",
+    "FD-06",
+    "GEO-01",
+    "IO4-01"
+  ],
+  "package": "IM-03",
+  "source_commit": "3b2f7776b7e33140be43720b2b6d2a72a7a0597f",
+  "claimed_state": "Typed fixed material-map input and exact independent Cartesian point and tangents for a Case surface graph.",
+  "verification": {
+    "windows": "MSVC 19.51 Release, io.case_schema, io.case_schema_resources, coupling.case_uniform_flow 3/3. Focused material map 50 assertions and thin surface 18 assertions with seed 23.",
+    "linux": "GCC 14.2 Release, same 3/3, focused 50 and 18 assertions.",
+    "dictionary": "194 records and 815 field names, exact types and required status, independently regenerated header matched byte-for-byte after the pinned clang-format pass.",
+    "mutation": "Drop the thin surface span tangent's height derivative on an isolated GCC source copy. One exact check fails (-7/16 expected), restoring source returns all 18 assertions.",
+    "static": "clang-format 21.1.2; GCC compile-database clang-tidy for the changed arithmetic, schema semantic and cross-test TUs; Ruff; Japanese prose lint; recorded source/artifact hashes."
+  },
+  "sources": {
+    "CMakeLists.txt": "a566300714a8c35a7658de3d138d1b9c35883337e2d27f53cee85142b3cc90d8",
+    "docs/specs/foundation/case-schema-fields.md": "4325a13a77499aa9ab4a9d300f55320839d301c0e916d03378ad7bd27d47cfa9",
+    "include/uvlas/io/case_schema_records.hpp": "69d45dd954f82cc0318f03356714d1b29176c6c411b09c7201edc3614a10f263",
+    "src/coupling/case_reference_graph.cpp": "bd5391de4c6f9aa6339123f6908b77a7a674b2552954395b171a49f3272bc1c8",
+    "src/coupling/case_reference_graph.hpp": "92b170aa73a90e56e434b9618fce2d8bc58959e0786d81ad530664ba3c150945",
+    "src/io/case_schema_dictionary.cpp": "6c9068a76207e3505ec14efa898432cbc8057fbd302009116a1ba70c163e85a3",
+    "src/io/case_schema_exact.cpp": "1316a9d42306f77eea1342101ee2e3f8afda704e36c3d45a4b9706e52b1a1da3",
+    "src/io/case_schema_storage.hpp": "9305c8980587e426b43c0aee79f3b1c92ea76d64b3dcdd0b83023b9f47f45512",
+    "tests/coupling/case_uniform_flow_test.cpp": "028ee8524f4d85916a550c7d133347bf524636d214f7b3692005d1e0bb4c31fd",
+    "tests/io/case_schema_cross_test.cpp": "08a554cb0fe21daa441bb508e4703407efbe608e61dfd341e18ed805e591afb8",
+    "tests/io/case_schema_expected_fields.hpp": "67681781ba5e3258f1e2b98239c194d28d2af66fdfaebe09df3d1f47b5cf0490",
+    "tests/io/case_schema_fragments_test.cpp": "fd2f87e8cc6302c30112493b25f251f238f22e5bd22e3c831048f1ff4b2aa3a1",
+    "tests/io/case_schema_inventory_test.cpp": "5223cbe8fbd7dee2af3c9ff8b9375d87ef388bd60e1a9c79dd7e58e160f9c3b2"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/case-material-map-reference.md": "e5139dcdf84731ee9a3914326a7957352ddc64705353b8b1959938cdb73bbaf7",
+    "docs/verification/IM-06/schema-field-inventory-generator.py": "6a5f84c2fad7088f12cb44a1b8ddd10ab0cc96d0b71f9f1a2522ec3fac71423d"
+  }
+}

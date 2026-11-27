@@ -8,6 +8,7 @@
 #include <fstream>
 #include <future>
 #include <limits>
+#include <tuple>
 
 namespace {
 using namespace uvlas;
@@ -165,6 +166,55 @@ TEST_CASE("Global geometry rejects zero area but admits a proper half-turn witho
     CHECK(collapsed.error().cause.code == core::FailureCode::GeometryInvalid);
     CHECK(collapsed.error().problem == s::GeometryProblem{s::FacetId{70}});
 }
+TEST_CASE("A retained contact keeps the same checked current geometry and reference topology",
+          "[UW-D07][UW-D03][N4-03]") {
+    const auto [retained, geometry_id] = [] {
+        test_geometry::TriangleFixture fixture;
+        core::ResourcePlan plan{budget};
+        auto geometry_work = test_geometry::workspace(plan);
+        auto work = workspace(plan);
+        const auto geometry = test_geometry::take(s::prepare_owned_geometry(
+            fixture.input(), test_geometry::limits(), *geometry_work, plan));
+        const std::array roles{s::FaceRoleInput{fixture.faces[0].id, s::AeroFaceRole::Bound}};
+        const std::array edges{s::EdgeBindingInput{fixture.edges[0].id, s::CanonicalEdge{}},
+                               s::EdgeBindingInput{fixture.edges[1].id, s::CanonicalEdge{}},
+                               s::EdgeBindingInput{fixture.edges[2].id, s::CanonicalEdge{}}};
+        const auto topology =
+            take(s::build_global_topology(geometry, {roles, edges, {}}, limits(), *work, plan));
+        const auto qualified =
+            take(s::check_global_geometry(topology, geometry, limits(), *work, plan));
+        const auto check = take(qualified.work_plan());
+        const auto recorded = qualified.reference_topology();
+        REQUIRE(recorded);
+        const auto fingerprint = test_geometry::take(geometry.identity());
+
+        core::ResourcePlan measured{budget};
+        auto copy = take(qualified.retain_checked(measured));
+        const auto copy_topology = copy.reference_topology();
+        REQUIRE(copy_topology);
+        CHECK(copy_topology->same_owner(*recorded));
+        CHECK(take(copy.work_plan()).payload_bytes == check.payload_bytes);
+        CHECK(measured.allocated_bytes() > 0);
+        CHECK(measured.allocated_bytes() < check.payload_bytes);
+        core::ResourcePlan exact{measured.allocated_bytes()};
+        CHECK(qualified.retain_checked(exact));
+        core::ResourcePlan short_plan{measured.allocated_bytes() - 1};
+        const auto denied = qualified.retain_checked(short_plan);
+        if (denied)
+            FAIL("The retained contact owner must fit its payload");
+        CHECK(denied.error().origin.cause.code == core::FailureCode::ResourceExceeded);
+        CHECK(short_plan.allocated_bytes() == 0);
+        return std::tuple{std::move(copy), fingerprint};
+    }();
+    // Source geometry, topology, qualification, workspaces and resource plan are gone.
+    const auto current = take(retained.geometry());
+    CHECK(test_geometry::take(current.get().identity()) == geometry_id);
+    const auto owner = retained.reference_topology();
+    REQUIRE(owner);
+    CHECK(owner->trailing_point_count() == 0);
+    CHECK(take(retained.face_role(0)).role == s::AeroFaceRole::Bound);
+}
+
 TEST_CASE("Sparse alias rows reject duplicate unsorted unknown and explicit-zero columns",
           "[UW-D07][UI-D03][N4-02]") {
     test_global_geometry::KinematicsFixture fixture;

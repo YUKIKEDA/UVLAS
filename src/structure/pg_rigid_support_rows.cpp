@@ -56,9 +56,9 @@ void bind_supports(ReferenceArithmetic& math, std::span<const PgConstraintSource
             partition_fail(core::FailureCode::InvalidInput);
         const auto match = std::ranges::find_if(sources, [&](const auto& x) {
             math.visit(1);
-            return x.id == entry.support;
+            return x.kind == PgTraceKind::Support && x.id == entry.support;
         });
-        if (match == sources.end() || match->kind != PgTraceKind::Support)
+        if (match == sources.end())
             partition_fail(core::FailureCode::InvalidInput);
         auto& selected = output[static_cast<std::size_t>(match - sources.begin())];
         if (selected)
@@ -220,7 +220,7 @@ PgRigidSupportRows::prepare_groups(PgSparseChart&& chart,
 }
 
 const PgSparseChart& PgRigidSupportRows::chart() const& noexcept {
-    return chart_;
+    return chart_.exact();
 }
 std::span<const PgRigidSupportRow> PgRigidSupportRows::rows() const& noexcept {
     return rows_.values();

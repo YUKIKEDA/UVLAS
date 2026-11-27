@@ -6,6 +6,7 @@
 #include <array>
 #include <bit>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <stdexcept>
 #include <uvlas/structure/pg_rank_preparation.hpp>
@@ -32,6 +33,52 @@ constexpr std::array<std::uint32_t, 4> rank_trace_slots{0, 14, 36, 39};
 constexpr std::uint32_t rank_key_count = rank_field_slots.back() * rank_max_cells;
 constexpr std::uint32_t rank_trace_count = rank_trace_slots.back() * 8;
 constexpr std::uint32_t rank_missing = UINT32_MAX;
+
+template <class I>
+struct RankFraction;
+
+/// Lazy powers shared by all value-only columns at one chart point.
+class PgRankMonomialPowers {
+    static constexpr std::size_t degree = *std::ranges::max_element(rank_degree);
+
+public:
+    enum class Reuse : std::uint8_t { Axis, Mixed, CommonDenominator };
+
+    static constexpr std::uint64_t retained_rationals = 2 * (degree - 1);
+    static constexpr std::uint64_t retained_mixed = degree * (degree - 1) / 2;
+    // Four integer power arrays and scratch for products, the LCM and reduction.
+    static constexpr std::uint64_t retained_common = 2 * (degree + 1) + 10;
+
+    PgRankMonomialPowers(const ExactRational& u, const ExactRational& v, Reuse reuse) noexcept
+        : u_(u), v_(v), reuse_(reuse) {}
+
+    [[nodiscard]] static bool fits(const ExactRational&, const ExactRational&, const ExactLimits&);
+    [[nodiscard]] ExactRational term(ReferenceArithmetic&, const ExactRational&, ExactPowers);
+    [[nodiscard]] std::optional<ExactRational> common_sum(ReferenceArithmetic&,
+                                                          std::span<const PgRankRow>,
+                                                          std::span<const std::uint32_t>,
+                                                          std::span<const RankFraction<RankCell>>);
+
+private:
+    struct Axis {
+        const ExactRational& coordinate;
+        std::array<ExactRational, degree - 1> values{};
+        std::size_t last_power = 1;
+
+        [[nodiscard]] const ExactRational& power(ReferenceArithmetic&, std::size_t);
+    };
+
+    struct IntegerPowers {
+        std::array<Integer, degree + 1> values{};
+        std::size_t initialized = 0;
+        [[nodiscard]] const Integer& power(const IntegerBackend&, std::size_t);
+    };
+
+    Axis u_, v_;
+    Reuse reuse_;
+    std::array<std::optional<ExactRational>, retained_mixed> mixed_{};
+    IntegerPowers u_num_, u_den_, v_num_, v_den_;
+};
 
 template <class I>
 struct RankFraction {

@@ -1,0 +1,44 @@
+diff --git a/src/io/input_document.cpp b/src/io/input_document.cpp
+index 6429d4dc..5f7862c8 100644
+--- a/src/io/input_document.cpp
++++ b/src/io/input_document.cpp
+@@ -135,7 +135,8 @@ ParserEnvironment environment(Context& context) {
+     context.reject(core::FailureCode::Unsupported, InputDiagnosticReason::UnsupportedMemoryModel);
+ #endif
+     // Add another revision only after inspecting its source/model correspondence.
+-    if constexpr (_GLIBCXX_RELEASE != 14 || (__GLIBCXX__ != 20240801 && __GLIBCXX__ != 20240908) ||
++    if constexpr (_GLIBCXX_RELEASE != 14 || (__GLIBCXX__ != 20240801 && __GLIBCXX__ != 20240908 &&
++                   __GLIBCXX__ != 20250110) ||
+                   _GLIBCXX_USE_CXX11_ABI != 1 || sizeof(unsigned long) != 8)
+         context.reject(core::FailureCode::Unsupported,
+                        InputDiagnosticReason::UnsupportedMemoryModel);
+@@ -206,6 +207,21 @@ ParserMemoryPlan memory_plan(std::uint64_t n, std::uint64_t depth, Context& cont
+         evidence(ParserSourceRole::IteratorStorage,
+                  fixed_digest("0409c9668d5bae4abeeceeef3ee29353c1f4039dc5a78565acfe1cb34d442f38"));
+     } else {
++#if defined(__GLIBCXX__) && __GLIBCXX__ == 20250110
++        evidence(ParserSourceRole::Vector,
++                 fixed_digest("466fdab9756343b1fca4c36cb5105db50654fbf9f32166ce0cde5e369901fe26"));
++        evidence(ParserSourceRole::VectorGrowth,
++                 fixed_digest("852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68"));
++        evidence(ParserSourceRole::BitVector,
++                 fixed_digest("d17336c83d5b5f17fcfab5712e091446995ccfb65351bd0798baccdd41e00b8d"));
++        evidence(ParserSourceRole::String,
++                 fixed_digest("7c8e15840577ec46af320cb89ee5898efdb08301ce05d3739f414797c31c417f"));
++        evidence(ParserSourceRole::CowString,
++                 fixed_digest("93e635f984e8f79f47f2cce4c7ea817667714779066a2702a7df923aef637755"));
++        // The AlmaLinux 8 image resolves runtime_error to its system libstdc++ 8.
++        evidence(ParserSourceRole::ExceptionRuntime,
++                 fixed_digest("293bb4c062db39e1a44b367dc93646bb372b281b46f294ed9e05f18811f75555"));
++#else
+         evidence(ParserSourceRole::Vector,
+                  fixed_digest("b896547442cc7fa6e6eea35f94a64e0b32431e1e3d8abee301bd5aa1f5ff8c0f"));
+         evidence(ParserSourceRole::VectorGrowth,
+@@ -222,6 +238,7 @@ ParserMemoryPlan memory_plan(std::uint64_t n, std::uint64_t depth, Context& cont
+                  fixed_digest("0cb671deeb0d99a38b6171290d056034ef6c2c804078a4fca30b4541f16f4d5b"));
+         evidence(ParserSourceRole::ExceptionRuntime,
+                  fixed_digest("c40ec114b10ec3a67067d2e5f206cb31d4441afb713bb4d8789d7ec85e107f65"));
++#endif
+     }
+     return InputDocumentFactory::plan(platform, breakdown, estimate, sources, used);
+ }

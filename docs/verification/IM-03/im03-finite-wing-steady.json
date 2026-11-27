@@ -1,0 +1,35 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-steady-v1",
+  "ids": [
+    "IM-03",
+    "A5-02",
+    "V-AERO",
+    "AE-02",
+    "UW-D03",
+    "UW-D05",
+    "N4-06"
+  ],
+  "package": "IM-03",
+  "source_commit": "5663966374bead51e48cb4d2956988cf37dff6ff",
+  "claimed_state": "The two frozen finite-core wing geometries at +1 degree, the 8×8 steady circulation systems assembled from the product action, their retained solutions and original residuals, and vector force and moment from the product load entry match an independent finite-kernel oracle.",
+  "verification": {
+    "windows": "MSVC 19.51 Release, coupling.finite_wing_steady 1/1 with 1314 assertions in 32.56 seconds.",
+    "linux": "GCC 14.2 Release, coupling.finite_wing_steady 1/1 with 1314 assertions in 22.18 seconds.",
+    "mutation": "Rotate the retained downstream trace by one span band. Independent comparison fails at dihedral 0, source column 4 and receiving row 0 (zero-based). Exact restoration passed all 1314 assertions with seed 23.",
+    "static": "Pinned clang-format and clang-tidy on the changed test TU, document lint and trace check.",
+    "fixture": "Recreated in a separate output directory with identical SHA-256 e4c0246d5ef9ddd978294d753e03ddc8831f44d0aac62824f04ca3707da9d667.",
+    "debug": "MSVC 19.51 Debug, coupling.finite_wing_steady 1/1, 279.75 s under the 480 s limit."
+  },
+  "sources": {
+    "tests/coupling/finite_wing_steady_test.cpp": "a9a1b09a351c0f2b63a1b4956c7df0cdd52678b517246f6bd719ba37899eecc9",
+    "docs/verification/IM-03/finite-wing-steady-v1/reference.py": "7cd47141282ee114900b939405185feacb61fc782a269ca7c8b7d172aa7ead43",
+    "docs/verification/IM-03/finite-wing-case-v1/reference.py": "18d84c7def0ee7a40426a4dcab71e6537b686e9f2addec5c5e972d81a3835950",
+    "rd/aero/finite-wing/records/finite-wing-specialization-result.json": "56da441111e16b149f6030916cb3decd3c091ba1744fa9073c22077188dca719",
+    "tests/aero/fixtures/finite-wing-case-v1.json": "0fa3597ffecbddba915652af463b5475a98e32a625d0cba2c3ab5b56093c6e01"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/finite-wing-steady-v1/verification.md": "dc214be8ce52c8d150a07687486351f3609c6b186c2140900087f10c979c41df",
+    "tests/aero/fixtures/finite-wing-steady-v1.json": "e4c0246d5ef9ddd978294d753e03ddc8831f44d0aac62824f04ca3707da9d667"
+  }
+}

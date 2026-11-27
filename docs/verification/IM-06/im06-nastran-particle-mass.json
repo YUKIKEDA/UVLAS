@@ -1,0 +1,30 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-nastran-particle-mass",
+  "ids": [
+    "FD-03",
+    "FD-05",
+    "IO4-03",
+    "R-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "fc95c71ce49d8a0dce5c7196e9f8aec6fe2d4e17",
+  "equivalent_source_commit": "b74bd8928b743dcc911299ba8bc24d59c95090fa",
+  "claimed_state": "認証されたCONM2について同じ平面シェルの元GRID、SI粒子質量、零偏心と零慣性を照合する。",
+  "checks": {
+    "windows_msvc_release_ctests": 2,
+    "linux_gcc14_release_ctests": 2,
+    "linux_clang_tidy_translation_units": 2,
+    "positive_decks": 2,
+    "same_schema_physical_mismatch_cases": 3,
+    "zero_partition_budget_rejects_before_allocation": true
+  },
+  "artifacts": {
+    "src/coupling/case_nastran_reference_inputs.cpp": "a206e79869935e5499a993616ae1ec9c6aeb1daa6c3a8e5c4c200dd0d0486bc1",
+    "src/coupling/case_nastran_reference_inputs.hpp": "b1ae64bb5f4299c8debc74eafe4c13ef515c95fd922484fa55bd49bb81238ba9",
+    "tests/io/reference_input_test.cpp": "e53e41957ac6de4d9400b58fc9c43f9b8887d47c7b7901a8e50167ac82b1c7be",
+    "docs/verification/IM-06/nastran-particle-mass.md": "125941d4dedf37990dea03cb38f7b0c56b991ed2f7d16a1091113ba8fc667561"
+  }
+}

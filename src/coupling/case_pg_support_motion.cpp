@@ -1,6 +1,7 @@
 #include "case_pg_support_motion.hpp"
 
 #include "case_component_precision_private.hpp"
+#include "case_pg_support_input.hpp"
 #include "io/si_case_detail.hpp"
 #include "structure/pg_reference_arithmetic.hpp"
 
@@ -329,7 +330,8 @@ void require_whole_edge(const s::SupportTraceConstraint& support, const s::Model
 core::Result<void> validate_region(const PgGlobalConstraints& original,
                                    const PgConstraintSource& source, const PgPreparedPatch& patch,
                                    std::uint64_t boundary, const PgTraceLimits& trace_limits,
-                                   core::Workspace& workspace, core::ResourcePlan& plan) noexcept {
+                                   core::Workspace& workspace, core::ResourcePlan& plan,
+                                   bool stationary = false) noexcept {
     using namespace structure::detail;
     return partition_entry([&]() -> core::Result<void> {
         ReferenceArithmetic math{trace_limits.arithmetic, plan};
@@ -412,6 +414,10 @@ core::Result<void> validate_region(const PgGlobalConstraints& original,
                 if (recorded.field != row.field || recorded.power != row.power ||
                     recorded.source_overlap != partition_index(i))
                     partition_fail(StaleGeneration);
+                if (stationary)
+                    for (std::size_t axis = 0; axis < axes; ++axis)
+                        if (math.compare(recorded.prescribed[axis], row.prescribed[axis]) != 0)
+                            partition_fail(StaleGeneration);
                 if (row.unique_row < 0) {
                     if (!actual.empty())
                         partition_fail(StaleGeneration);
@@ -440,15 +446,20 @@ core::Result<void> validate_region(const PgGlobalConstraints& original,
 struct Builder {
     static CaseStructuralSupport
     prepare(const io::SiCase& si, PgSparseChart&& chart,
-            std::span<const PgConstraintPatchBinding> patches, std::span<const PgConstraintId> ids,
+            std::span<const PgConstraintPatchBinding> patches, CasePgSupportSelection selection,
             p::PchipInputStamp stamp, core::Workspace& pg_workspace,
             p::CurveWorkspace& motion_workspace, const CaseStructuralSupportLimits& limits,
             core::ResourcePlan& plan, const std::stop_token& stop, core::FailureDetails details) {
         m::Work work{0, limits.maximum_group_work, stop};
         work.step();
+        const auto ids = selection.moving;
+        const auto stationary = selection.stationary;
         if (ids.empty())
             case_components::reject(InvalidInput);
-        if (ids.size() > limits.maximum_group_supports || !std::in_range<core::Index>(ids.size()))
+        if (ids.size() > limits.maximum_group_supports ||
+            stationary.size() > limits.maximum_group_supports - ids.size() ||
+            !std::in_range<core::Index>(ids.size()) ||
+            !std::in_range<core::Index>(stationary.size()))
             case_components::reject(ResourceExceeded);
         const auto& timing = limits.evaluation.clock;
         auto grid = take(prepare_case_reference_clock(
@@ -486,9 +497,16 @@ struct Builder {
                 return a < b;
             });
         };
+        const auto is_stationary = [&](std::uint64_t id) {
+            return std::ranges::any_of(stationary, [&](auto entry) {
+                work.step();
+                return entry.value() == id;
+            });
+        };
         for (const auto& source : sources) {
             work.step();
-            if (source.kind == PgTraceKind::Support && !in_group(source.id.value()))
+            if (source.kind == PgTraceKind::Support && !in_group(source.id.value()) &&
+                !is_stationary(source.id.value()))
                 case_components::reject(Unsupported);
         }
         for (std::uint64_t i = 0; i < model.supports.size(); ++i) {
@@ -503,23 +521,20 @@ struct Builder {
                     work.step();
                     return patch.id.value() == shell;
                 });
-                if (in_layout && !in_group(support->id.unsigned_value()))
+                if (in_layout && !in_group(support->id.unsigned_value()) &&
+                    !is_stationary(support->id.unsigned_value()))
                     case_components::reject(Unsupported);
             }
         }
         auto trace_limits = limits.region_trace;
         trace_limits.arithmetic.cancellation = stop;
-        for (std::size_t i = 0; i < ids.size(); ++i) {
-            work.step();
-            const auto id = PgConstraintId{order.values()[i]};
-            if (i != 0 && id.value() == order.values()[i - 1])
-                case_components::reject(InvalidInput);
+        const auto validate_support = [&](PgConstraintId id, bool fixed) {
             const auto declaration = from_case(model, id, work);
             const auto source = std::ranges::find_if(sources, [&](const auto& x) {
                 work.step();
-                return x.id == id;
+                return x.kind == PgTraceKind::Support && x.id == id;
             });
-            if (source == sources.end() || source->kind != PgTraceKind::Support)
+            if (source == sources.end())
                 case_components::reject(StaleGeneration);
             require_whole_edge(declaration, model, *source, work);
             const auto patch = std::ranges::find_if(patches, [&](const auto& x) {
@@ -531,9 +546,36 @@ struct Builder {
             const auto checked =
                 validate_region(original, *source, patch->patch,
                                 declaration.region.record().boundary.unsigned_value(), trace_limits,
-                                pg_workspace, plan);
+                                pg_workspace, plan, fixed);
             if (!checked)
                 throw checked.error();
+            return declaration;
+        };
+        for (std::size_t i = 0; i < stationary.size(); ++i) {
+            work.step();
+            const auto id = stationary[i];
+            if (in_group(id.value()) ||
+                std::ranges::any_of(stationary.first(i), [&](auto previous) {
+                    work.step();
+                    return previous == id;
+                }))
+                case_components::reject(InvalidInput);
+            const auto declaration = validate_support(id, true);
+            // The event count and at most six component lookups.
+            for (std::size_t lookup = 0; lookup < 7; ++lookup)
+                work.step();
+            if (!take(stationary_case_pg_motion(si, declaration.motion.record())))
+                case_components::reject(Unsupported);
+            const auto stationary_frame = take(CaseMotionFrame::prepare(
+                si, declaration.motion, timing.motion.frame, plan, stop, details));
+            static_cast<void>(stationary_frame);
+        }
+        for (std::size_t i = 0; i < ids.size(); ++i) {
+            work.step();
+            const auto id = PgConstraintId{order.values()[i]};
+            if (i != 0 && id.value() == order.values()[i - 1])
+                case_components::reject(InvalidInput);
+            const auto declaration = validate_support(id, false);
             auto selected = take(prepare_case_motion(
                 si, declaration.motion, {intervals.front().begin, intervals.back().end}, stamp,
                 motion_workspace, timing.motion, plan, stop, details));
@@ -644,10 +686,21 @@ core::Result<CaseStructuralSupport> prepare_case_structural_pg_support(
     core::Workspace& pg_workspace, p::CurveWorkspace& motion_workspace,
     const CaseStructuralSupportLimits& limits, core::ResourcePlan& plan,
     const std::stop_token& stop, core::FailureDetails details) noexcept {
+    return prepare_case_structural_pg_support(si, std::move(chart), patches,
+                                              CasePgSupportSelection{ids, {}}, stamp, pg_workspace,
+                                              motion_workspace, limits, plan, stop, details);
+}
+
+core::Result<CaseStructuralSupport> prepare_case_structural_pg_support(
+    const io::SiCase& si, structure::PgSparseChart&& chart,
+    std::span<const structure::PgConstraintPatchBinding> patches, CasePgSupportSelection selection,
+    p::PchipInputStamp stamp, core::Workspace& pg_workspace, p::CurveWorkspace& motion_workspace,
+    const CaseStructuralSupportLimits& limits, core::ResourcePlan& plan,
+    const std::stop_token& stop, core::FailureDetails details) noexcept {
     using structural_support_detail::Builder;
     return structural_support_detail::guarded<CaseStructuralSupport>(
         core::Operation::PrepareModel, details, [&] {
-            return Builder::prepare(si, std::move(chart), patches, ids, stamp, pg_workspace,
+            return Builder::prepare(si, std::move(chart), patches, selection, stamp, pg_workspace,
                                     motion_workspace, limits, plan, stop, details);
         });
 }
@@ -789,7 +842,7 @@ retain_case_structural_pg_rhs(const CaseStructuralSupportSample& sample, p::JetO
 }
 
 core::Result<structure::PgChartCandidateLift> lift_case_structural_pg_support(
-    structure::PgChartCandidate& chart, structure::PgChartCandidateInput independent,
+    const structure::PgChartCandidate& chart, structure::PgChartCandidateInput independent,
     const CaseStructuralRetainedRhs& rhs, const structure::PgChartCandidateSolve& request,
     core::Workspace& workspace, core::ResourcePlan& plan, core::FailureDetails details) noexcept {
     return structural_support_detail::guarded<structure::PgChartCandidateLift>(

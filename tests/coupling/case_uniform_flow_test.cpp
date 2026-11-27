@@ -3,12 +3,14 @@
 #include "coupling/case_aero_attachment.hpp"
 #include "coupling/case_flow_clock.hpp"
 #include "coupling/case_known_flow.hpp"
+#include "coupling/case_reference_graph.hpp"
 #include "coupling/case_uniform_flow.hpp"
 #include "coupling/case_uniform_flow_projection.hpp"
 #include "coupling/discrete_nonpenetration.hpp"
 #include "coupling/fixed_bdf2_circulation.hpp"
 #include "coupling/fixed_wake_transport.hpp"
 #include "coupling/pg_aero_attachment.hpp"
+#include "coupling/wake_strength_transition.hpp"
 #include "io/case_schema_test_adapter.hpp"
 #include "io/si_rational_projection.hpp"
 #include "structure/pg_conditioning_test_support.hpp"
@@ -25,6 +27,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <source_location>
 #include <uvlas/core/instrumentation.hpp>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <vector>
@@ -56,9 +59,18 @@ const cf::CaseUniformFlowLimits limits{
     100};
 
 template <class T>
-T take(core::Result<T> value) {
-    if (!value)
+T take(core::Result<T> value, const std::source_location at = std::source_location::current()) {
+    if (!value) {
+        INFO(at.file_name() << ':' << at.line());
+        const auto& resources = value.error().details.resources;
+        if (resources) {
+            const auto& usage = *resources;
+            INFO("Resource kind " << static_cast<int>(usage.kind) << ", required " << usage.required
+                                  << ", observed " << usage.observed);
+            FAIL("Unexpected case-flow failure " << static_cast<int>(value.error().code));
+        }
         FAIL("Unexpected case-flow failure " << static_cast<int>(value.error().code));
+    }
     return std::move(*value);
 }
 
@@ -195,6 +207,89 @@ void jet(const a::ExactUniformFlowJet& result, const std::array<Number, 3>& velo
     }
 }
 } // namespace
+
+TEST_CASE("Typed thin surface reference owns exact Cartesian position and tangents",
+          "[verification][negative][AE-02][GEO-01][FD-06]") {
+    auto make = [] {
+        auto value = root("aerodynamic_steady");
+        value.field("units").set("length", string("mm"));
+        auto& geometries = value.field("model").field("geometry").elements;
+        geometries.at(0) = parse(R"({
+            "kind":"surface_graph","id":"1",
+            "frame":{"origin":[4000,-2000,3000],"rotation":[[0,-1,0],[1,0,0],[0,0,1]]},
+            "reference_length":2000,
+            "x0":{"numerator":"1","denominator":"3"},
+            "width":{"numerator":"3","denominator":"2"},
+            "skew":{"numerator":"-1","denominator":"4"},
+            "degree":[2,3],
+            "coefficients":[
+                {"powers":[2,1],"coefficient":{"numerator":"1","denominator":"2"}},
+                {"powers":[0,3],"coefficient":{"numerator":"-1","denominator":"3"}}],
+            "domain":[
+                [{"numerator":"0","denominator":"1"},{"numerator":"0","denominator":"1"}],
+                [{"numerator":"1","denominator":"1"},{"numerator":"0","denominator":"1"}],
+                [{"numerator":"1","denominator":"1"},{"numerator":"1","denominator":"1"}],
+                [{"numerator":"1","denominator":"2"},{"numerator":"1","denominator":"2"}],
+                [{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}]],
+            "boundaries":[],"continuity":[]
+        })");
+        return value;
+    };
+    auto input = make();
+    auto& graph = input.field("model").field("geometry").elements.at(0);
+    // The aerodynamic surface references leading/trailing rows of its own graph.
+    auto& boundaries = graph.field("boundaries").elements;
+    const auto example = root("aerodynamic_steady");
+    boundaries =
+        example.field("model").field("geometry").elements.at(0).field("boundaries").elements;
+    constexpr io::SourceId source_id{166};
+    const structure::PgReferenceLimits bounds{exact_limits(), 10000, 1000, {}};
+    core::ResourcePlan memory{budget};
+    const auto ready = [&] {
+        const auto si = materialize(input, source_id);
+        reject(cf::CaseReferenceSurface::prepare(si, 90, bounds, memory),
+               core::FailureCode::InvalidInput);
+        return take(cf::CaseReferenceSurface::prepare(si, 1, bounds, memory));
+    }();
+    const auto identity = take(ready.identity());
+    CHECK(identity.geometry_id == 1);
+    CHECK(identity.source.source.source == source_id);
+    const auto scalar = [&](std::string_view n, std::string_view d = "1") {
+        return take(structure::ExactRational::from_integer_pair(n, d, bounds.algebra, memory));
+    };
+    const auto chord = scalar("1", "4");
+    const auto span = scalar("1", "2");
+    const auto result = take(ready.evaluate(chord, span, bounds, memory));
+    // Independent substitution into X=(4-2η, -2+2(1/3+3ξ/2-η/4),
+    // 3+ξ²η-2η³/3), with both analytic derivatives in the same coordinates.
+    CHECK(result.position[0] == scalar("3"));
+    CHECK(result.position[1] == scalar("-5", "6"));
+    CHECK(result.position[2] == scalar("283", "96"));
+    CHECK(result.chord_tangent[0] == scalar("0"));
+    CHECK(result.chord_tangent[1] == scalar("3"));
+    CHECK(result.chord_tangent[2] == scalar("1", "4"));
+    CHECK(result.span_tangent[0] == scalar("-2"));
+    CHECK(result.span_tangent[1] == scalar("-1", "2"));
+    CHECK(result.span_tangent[2] == scalar("-7", "16"));
+
+    const auto upper = scalar("3", "4");
+    const auto edge = take(ready.evaluate(chord, upper, bounds, memory));
+    CHECK(edge.position[0] == scalar("5", "2"));
+    reject(ready.evaluate(span, upper, bounds, memory), core::FailureCode::GeometryInvalid);
+    const structure::PgReferenceLimits no_visits{exact_limits(), 10000, 0, {}};
+    reject(ready.evaluate(chord, span, no_visits, memory), core::FailureCode::ResourceExceeded);
+    // NOLINTNEXTLINE(misc-const-correctness): MSVC 14.51 request_stop() requires a mutable source.
+    std::stop_source stop;
+    static_cast<void>(stop.request_stop());
+    const structure::PgReferenceLimits cancelled{exact_limits(), 10000, 1000, stop.get_token()};
+    reject(ready.evaluate(chord, span, cancelled, memory), core::FailureCode::Cancelled);
+
+    graph.field("frame").set("rotation", parse("[[0,1,0],[1,0,0],[0,0,1]]"));
+    const auto mirrored = materialize(input, source_id);
+    reject(cf::CaseReferenceSurface::prepare(mirrored, 1, bounds, memory),
+           core::FailureCode::GeometryInvalid);
+    CHECK(take(ready.evaluate(chord, span, bounds, memory)).position[2] == scalar("283", "96"));
+}
 
 TEST_CASE("Typed SI constant flow owns full-width signed magnitudes and restores exact velocity",
           "[AE-07][IO4-01][N4-02][N4-03][property]") {
@@ -1790,7 +1885,8 @@ TEST_CASE("Discrete nonpenetration joins the original residual and implicit circ
         reject(solved.row(1), core::FailureCode::InvalidInput);
         const std::array tangent_rhs{cf::CirculationLinearRhs{row.face, a::SingleWord{.125}}};
         const auto tangent = take(cf::solve_discrete_circulation_linearization(
-            solved, cf::CirculationSense::Tangent, tangent_rhs, request, 100000, memory));
+            solved, cf::CirculationSense::Tangent, tangent_rhs, request, solve_limits.steps,
+            memory));
         const Rat expected_tangent{Big{"167540106538491744036640792288003354"},
                                    Big{"1000000000000000000000000000000000000"}};
         CHECK(abs(solution_word(tangent.solution(), 0) - expected_tangent) <= rational_word(1e-15));
@@ -2138,7 +2234,7 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             cf::EdgeMidpointVelocity{a::EdgeId{17}, coordinates(.125, .25, -.125)}};
         const std::array wake_force_edges{midpoint_velocities[0], midpoint_velocities[1],
                                           midpoint_velocities[3]};
-        const cf::DiscreteVectorLoadInput load_input{
+        cf::DiscreteVectorLoadInput load_input{
             input.trial_stamp,
             request.retained_generation,
             has_wake ? std::span<const cf::EdgeMidpointVelocity>{wake_force_edges}
@@ -2146,6 +2242,8 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             std::span{rates}.first(count),
             a::SingleWord{1.25},
             moment_origin};
+        if (mode == LoadCase::AliasedShared)
+            load_input.retention = cf::DiscreteLoadRetention::OriginalRows;
         a::SharedP1Workspace shared;
         auto local = take(a::LocalPacketWorkspace::create(memory));
         auto kernel = take(a::P1Workspace::create(memory));
@@ -2256,6 +2354,44 @@ TEST_CASE("Discrete circulation loads keep midpoint and triangle force and momen
             CHECK(abs(nodal_force[axis] - unpack(force[axis])) <= rational_word(1e-24));
             CHECK(abs(nodal_moment[axis] - unpack(moment[axis])) <= rational_word(1e-24));
         }
+        if (mode == LoadCase::AliasedShared) {
+            REQUIRE(result.original_count() == 28);
+            std::array<Rat, 3> original_sum{};
+            std::array<std::array<Rat, 3>, 2> shared_edge_face{};
+            std::array<std::size_t, 2> shared_edge_ends{};
+            for (std::size_t i = 0; i < result.original_count(); ++i) {
+                const auto contribution = take(result.original(i));
+                REQUIRE(contribution.local_vertex < 3);
+                const auto points = test_geometry::take(geometry.facet_points(contribution.facet));
+                CHECK(test_geometry::take(geometry.owner(points[contribution.local_vertex])) ==
+                      contribution.canonical);
+                const auto panel =
+                    contribution.face == fixture.faces[0].id ? std::size_t{0} : std::size_t{1};
+                CHECK(contribution.face == fixture.faces[panel].id);
+                if (contribution.edge == a::EdgeId{12})
+                    ++shared_edge_ends[panel];
+                for (std::size_t axis = 0; axis < original_sum.size(); ++axis) {
+                    const auto actual = unpack(contribution.force[axis]);
+                    original_sum[axis] += actual;
+                    if (contribution.edge == a::EdgeId{12})
+                        shared_edge_face[panel][axis] += actual;
+                }
+                if (!contribution.edge && contribution.facet == a::FacetId{200})
+                    residual_expected(contribution.force[2], exact_force / Rat{3});
+            }
+            CHECK(shared_edge_ends == std::array<std::size_t, 2>{2, 2});
+            // Each side has its own signed contribution before cancellation. The
+            // sum is the independently frozen force on the physical shared edge.
+            CHECK(shared_edge_face[0][0] * shared_edge_face[1][0] < 0);
+            const auto shared_edge = take(result.edge(2)).force;
+            for (std::size_t axis = 0; axis < original_sum.size(); ++axis) {
+                CHECK(abs(original_sum[axis] - unpack(force[axis])) <= rational_word(1e-24));
+                CHECK(abs(shared_edge_face[0][axis] + shared_edge_face[1][axis] -
+                          unpack(shared_edge[axis])) <= rational_word(1e-24));
+            }
+        } else
+            CHECK(result.original_count() == 0);
+        reject(result.original(result.original_count()), core::FailureCode::InvalidInput);
         reject(result.edge(result.edge_count()), core::FailureCode::InvalidInput);
         reject(result.point(result.point_count()), core::FailureCode::InvalidInput);
         reject(result.facet(result.facet_count()), core::FailureCode::InvalidInput);
@@ -2947,13 +3083,14 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     };
     const auto first = collocate(a::QueryId{1}, {.75, .5, 0.});
     const auto second = collocate(a::QueryId{2}, {.625, 2.375, 0.});
-    const auto rows = [&](const a::ResolvedQuery& second_query) {
+    const auto rows = [&](const a::ResolvedQuery& first_query,
+                          const a::ResolvedQuery& second_query) {
         const std::array frame{coordinates(1, 0, 0), coordinates(0, 1, 0)};
         // The input may arrive in a different order than the qualified physical face order.
         return std::array{
             cf::DiscreteCollocation{a::FacetId{202}, second_query, frame, coordinates(0, 0, .75),
                                     a::SingleWord{9}, a::SingleWord{0}},
-            cf::DiscreteCollocation{a::FacetId{200}, first, frame, coordinates(0, 0, .5),
+            cf::DiscreteCollocation{a::FacetId{200}, first_query, frame, coordinates(0, 0, .5),
                                     a::SingleWord{7}, a::SingleWord{0}}};
     };
     a::SharedP1Workspace shared;
@@ -2976,8 +3113,16 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
                             circulation_context(geometry.context())};
     const auto request = circulation_request(scales, 2, ls::Norm::L2);
     const auto solve = [&](const a::ResolvedQuery& query) {
-        const auto collocations = rows(query);
-        const cf::DiscreteNonpenetrationInput input{contact,
+        const auto qualified = take_global(contact.retain_checked(memory));
+        const auto fresh_query = [&](const a::ResolvedQuery& original) {
+            return test_geometry::take(a::resolve_query(
+                geometry, test_geometry::take(original.definition()), geometry.context(),
+                test_geometry::limits(), *geometry_work, memory));
+        };
+        const auto owned_first = fresh_query(first);
+        const auto owned_second = fresh_query(query);
+        const auto collocations = rows(owned_first, owned_second);
+        const cf::DiscreteNonpenetrationInput input{qualified,
                                                     collocations,
                                                     {},
                                                     {core::AcceptedStateId{2}, {}},
@@ -3001,7 +3146,7 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
         residual_small(original.original_residual, rational_word(1e-13) * residual_scales[i]);
     }
 
-    constexpr std::uint64_t linearization_steps = 100000;
+    const auto linearization_steps = solve_limits.steps;
     std::array forcing{
         cf::CirculationLinearRhs{fixture.faces[0].id, a::DoubleWord{-.125, 0x1p-57}},
         cf::CirculationLinearRhs{fixture.faces[1].id, a::DoubleWord{.1875, -0x1p-58}}};
@@ -3110,6 +3255,11 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
                solved, tangent_sense, forcing, tangent_request, linearization_steps, no_space),
            core::FailureCode::ResourceExceeded);
 
+    // There are no live input row/query objects from solve() here. The old
+    // algebra-only cap does not admit exact row replay from the owned input.
+    reject(cf::solve_discrete_circulation_linearization(solved, tangent_sense, forcing,
+                                                        tangent_request, 100000, memory),
+           core::FailureCode::ResourceExceeded);
     const auto tangent = take(linearize(tangent_sense, forcing, tangent_request));
     const auto transpose = take(linearize(transpose_sense, seed, transpose_request));
     CHECK(tangent.sense() == tangent_sense);
@@ -3160,7 +3310,7 @@ TEST_CASE("Discrete circulation and its linearization solve nonsymmetric mutual 
     }
 
     // A uniform-velocity direction is shared across these two nonsymmetric rows.
-    const auto two_collocations = rows(second);
+    const auto two_collocations = rows(first, second);
     const cf::DiscreteNonpenetrationInput pullback_input{
         contact, two_collocations,           {}, {core::AcceptedStateId{2}, {}}, {7, 11},
         stamp,   p::RequestedSide::Automatic};
@@ -3610,7 +3760,8 @@ TEST_CASE("Known flow drives discrete midpoint loads and their implicit actions"
 }
 
 TEST_CASE("Free wake motion uses all sources at attached and inherited material points",
-          "[AE-07][UW-D01][UW-D02][UW-D04][UW-D07][N4-06][J1-D01][FD-07][verification][negative]") {
+          "[AE-07][UW-D01][UW-D02][UW-D03][UW-D04][UW-D07][N4-06][J1-D01][FD-07][verification]["
+          "negative]") {
     auto source_case = gust_case("deg", R"({"kind":"constant","value":[1]})");
     const auto schedule = parse(R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");
     source_case.field("analysis").set("intervals", schedule);
@@ -3835,12 +3986,15 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     const cf::WakeTransportClock transport_clock{wake_grid, wake_grid, destination};
     const cf::WakeTransportLimits transport_limits{transport_clock_limits, 1, 10000, 4096,
                                                    core::Precision::TwoWord};
-    const auto history_contact = [&](const Number& stamp_time, double seconds, double downstream) {
+    const auto history_contact = [&](const Number& stamp_time, double seconds, double downstream,
+                                     std::optional<core::GeometryGeneration> generation = {}) {
         auto shape = xyz;
         shape[12] = downstream;
         auto history_geometry = input_geometry;
         history_geometry.current = a::SinglePositions{shape};
         history_geometry.context.time = seconds;
+        if (generation)
+            history_geometry.context.current = *generation;
         history_geometry.exact_time = stamp_time.view();
         const auto snapshot = test_geometry::take(a::prepare_owned_geometry(
             history_geometry, test_geometry::limits(), *geometry_work, memory));
@@ -3911,6 +4065,819 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
     right.add(field_dual.core_radius, d.core_radius);
     near(left.value, .118145889468151347);
     CHECK(abs(left.value - right.value) <= left.radius + right.radius + rational_word(1e-15));
+
+    const Number previous_time{9, 8}, start_time{1};
+    const auto& previous_geometry = take_global(previous.geometry()).get();
+    const auto& start_geometry = take_global(older.geometry()).get();
+    const auto earlier_collocation = [&](const auto& shape) {
+        return test_geometry::take(
+            a::resolve_query(shape, {a::QueryId{1}, a::FreePoint{a::FreeSingle{{.75, .5, 0}}}},
+                             shape.context(), test_geometry::limits(), *geometry_work, memory));
+    };
+    const auto earlier_query = earlier_collocation(previous_geometry);
+    const auto start_query = earlier_collocation(start_geometry);
+    const std::array previous_bound{cf::DiscreteCollocation{
+        a::FacetId{200}, earlier_query, frame, zero, a::SingleWord{.5}, a::SingleWord{.125}}};
+    const std::array start_bound{cf::DiscreteCollocation{a::FacetId{200}, start_query, frame, zero,
+                                                         a::SingleWord{.5}, a::SingleWord{.125}}};
+    const cf::DiscreteNonpenetrationInput previous_source{
+        previous, previous_bound, wake, input.history, {7, 10}, stamp, p::RequestedSide::Automatic};
+    const cf::DiscreteNonpenetrationInput start_source{
+        older, start_bound, wake, input.history, {7, 9}, stamp, p::RequestedSide::Right};
+    const cf::DiscreteKnownFlowInput previous_flow{
+        provider,        current,          {stamp, previous_time.view()},
+        flow.projection, flow.flow_limits, flow.coordinate_limits,
+        *geometry_work,  flow_workspace};
+    const cf::DiscreteKnownFlowInput start_flow{
+        provider,        current,          {stamp, start_time.view(), p::RequestedSide::Right},
+        flow.projection, flow.flow_limits, flow.coordinate_limits,
+        *geometry_work,  flow_workspace};
+    const std::array trailing_point{id[2]};
+    const cf::FirstFreeWakeEndpoint newest{input, flow, selected, &d};
+    const cf::FirstFreeWakeEndpoint at_trailing_edge{previous_source, previous_flow, trailing_point,
+                                                     &d};
+    const cf::FirstFreeWakeEndpoint retained_previous{previous_source, previous_flow, selected, &d};
+    const cf::FirstFreeWakeEndpoint retained_start{start_source, start_flow, selected, &d};
+    const std::array born{cf::FirstFreeWakePoint{material[0], std::nullopt}};
+    const std::array restarted{cf::FirstFreeWakePoint{material[0], material[0]}};
+    const auto first = [&](const auto& clock, const auto& trial, const auto& parent, auto epoch,
+                           const auto& material_points) {
+        return cf::evaluate_first_free_wake_transport(
+            clock, trial, parent, epoch, material_points, transport_seeds, transport_limits,
+            cap_velocity, shared, *local, *kernel, memory);
+    };
+    reject(first(transport_clock, newest, at_trailing_edge, a::ReleaseEpoch{9}, born),
+           core::FailureCode::StaleGeneration);
+    reject(first(transport_clock, newest, retained_previous, release.epoch, born),
+           core::FailureCode::StaleGeneration);
+    reject(first(transport_clock, newest, retained_previous, std::nullopt, restarted),
+           core::FailureCode::InvalidInput);
+    reject(first(transport_clock, newest, newest, release.epoch, born),
+           core::FailureCode::StaleGeneration);
+    const auto birth = take(first(transport_clock, newest, at_trailing_edge, release.epoch, born));
+    const auto birth_row = take(birth.row(0));
+    if (!birth_row.direction)
+        FAIL("The birth row must retain its direction");
+    CHECK(birth_row.release == release);
+    residual_expected(birth_row.residual[0], Rat{8});
+    residual_expected(birth_row.residual[1], Rat{0});
+    residual_expected((*birth_row.direction)[0], Rat{-1, 8});
+    const auto& parent_velocity = take(birth.parent_free_velocity()).get();
+    const auto& trial_velocity = take(birth.free_velocity()).get();
+    const auto parent_row = take(parent_velocity.row(0));
+    const auto trial_row = take(trial_velocity.row(0));
+    CHECK(parent_row.owner == release.point);
+    near(center(parent_row.velocity[2]), 1.024661130622405660);
+    if (!parent_row.direction)
+        FAIL("The parent row must retain its direction");
+    near(center((*parent_row.direction)[2]), -.064175653096249599);
+    near(center(birth_row.residual[2]), -1.559233165679606171);
+    near(center((*birth_row.direction)[2]), -.000440026076076997);
+    CHECK(trial_row.owner == material[0].point);
+    exact(take(take(parent_velocity.ambient(0)).get().time()), previous_time);
+    CHECK(abs(center(birth_row.residual[2]) +
+              (center(parent_row.velocity[2]) + center(trial_row.velocity[2])) / 2) <
+          rational_word(1e-15));
+    const auto birth_dual = take(birth.position_dual(0));
+    residual_expected(birth_dual.stencil[0][0], Rat{-1});
+    residual_expected(birth_dual.stencil[1][0], Rat{1});
+    residual_expected(birth_dual.stencil[2][0], Rat{0});
+    WorkEnclosure birth_left, birth_right;
+    birth_left.add(*birth_row.direction, transport_seeds[0]);
+    birth_right.add(birth_dual.stencil[0], dx);
+    birth_right.add(birth_dual.stencil[1], dx);
+    for (const auto* endpoint : {&trial_velocity, &parent_velocity}) {
+        REQUIRE(endpoint->point_count() == points.size());
+        for (std::size_t i = 0; i < points.size(); ++i)
+            birth_right.add(take(endpoint->point_dual(i)).position, displacements[i]);
+        birth_right.add(take(endpoint->strength_dual(0)).value, dhistory[0].strength);
+        birth_right.add(take(endpoint->strength_dual(1)).value, bound[0].circulation_direction);
+        const auto dual_field = take(endpoint->field_dual());
+        birth_right.add(dual_field.uniform_flow, dambient);
+        birth_right.add(dual_field.flow_time, d.flow_time);
+        birth_right.add(dual_field.core_radius, d.core_radius);
+    }
+    CHECK(abs(birth_left.value - birth_right.value) <=
+          birth_left.radius + birth_right.radius + rational_word(1e-15));
+
+    const cf::WakeTransportClock first_interval{
+        wake_grid, wake_grid, {stamp, 0, 1, p::RequestedSide::Automatic}};
+    const auto restarted_result =
+        take(first(first_interval, retained_previous, retained_start, std::nullopt, restarted));
+    const auto restarted_row = take(restarted_result.row(0));
+    residual_expected(restarted_row.residual[0], Rat{2});
+    const auto& restart_parent = take(restarted_result.parent_free_velocity()).get();
+    CHECK(take(restart_parent.row(0)).owner == material[0].point);
+    exact(take(take(restart_parent.ambient(0)).get().time()), start_time);
+    reject(first(first_interval, retained_previous, retained_start, release.epoch, restarted),
+           core::FailureCode::StaleGeneration);
+
+    const cf::FirstFreeWakeEndpoint trailing_start{start_source, start_flow, trailing_point, &d};
+    const auto interval_birth =
+        take(first(first_interval, retained_previous, trailing_start, release.epoch, born));
+    const auto second_release = take_global(topology.release_key(id[3], release.epoch));
+    const std::array growth_points{material[0],
+                                   cf::WakeMaterialPoint{second_release, id[5], a::FacetId{202}}};
+    const cf::WakeMaterialSnapshot growth_parent{older, {}};
+    const cf::WakeMaterialSnapshot growth_trial{previous, growth_points};
+    auto growth_limits = transport_limits;
+    growth_limits.maximum_particles = 2;
+    const auto growth = [&](const auto& parent_sample, const auto& trial_sample, auto epoch) {
+        return cf::prepare_wake_material_transition(wake_si, first_interval, parent_sample,
+                                                    trial_sample, epoch, growth_limits, memory);
+    };
+    const auto transition = take(growth(growth_parent, growth_trial, release.epoch));
+    REQUIRE(transition.size() == 2);
+    const std::array classified{take(transition.row(0)), take(transition.row(1))};
+    CHECK(classified[0].current.release == release);
+    CHECK(classified[1].current.release == second_release);
+    CHECK_FALSE(classified[0].parent);
+    CHECK_FALSE(classified[1].parent);
+    const std::array departing{id[4], id[5]};
+    const std::array origins{id[2], id[3]};
+    const cf::FirstFreeWakeEndpoint growing_trial{previous_source, previous_flow, departing, {}};
+    const cf::FirstFreeWakeEndpoint growing_parent{start_source, start_flow, origins, {}};
+    const auto growth_residual = take(cf::evaluate_first_free_wake_transport(
+        first_interval, growing_trial, growing_parent, release.epoch, classified, {}, growth_limits,
+        cap_velocity, shared, *local, *kernel, memory));
+    residual_expected(take(growth_residual.row(0)).residual[0], Rat{7});
+    residual_expected(take(growth_residual.row(1)).residual[0], Rat{8});
+    const cf::WakeMaterialSnapshot missing_release{previous, material};
+    reject(growth(growth_parent, missing_release, release.epoch),
+           core::FailureCode::StaleGeneration);
+    auto aliased = growth_points;
+    aliased[1].point = id[4];
+    const cf::WakeMaterialSnapshot repeated_owner{previous, aliased};
+    reject(growth(growth_parent, repeated_owner, release.epoch),
+           core::FailureCode::StaleGeneration);
+    auto crossed = growth_points;
+    std::swap(crossed[0].point, crossed[1].point);
+    const cf::WakeMaterialSnapshot crossed_releases{previous, crossed};
+    reject(growth(growth_parent, crossed_releases, release.epoch),
+           core::FailureCode::StaleGeneration);
+    const std::array crossed_birth{cf::FirstFreeWakePoint{crossed[0], std::nullopt}};
+    const std::array swapped_departure{id[5]};
+    const cf::FirstFreeWakeEndpoint wrong_span{
+        previous_source, previous_flow, swapped_departure, {}};
+    reject(first(first_interval, wrong_span, trailing_start, release.epoch, crossed_birth),
+           core::FailureCode::StaleGeneration);
+    const cf::WakeMaterialSnapshot already_released{older, material};
+    reject(growth(already_released, growth_trial, release.epoch),
+           core::FailureCode::StaleGeneration);
+    reject(growth(growth_parent, growth_trial, a::ReleaseEpoch{9}),
+           core::FailureCode::StaleGeneration);
+    reject(cf::prepare_wake_material_transition(wake_si, first_interval, growth_parent,
+                                                growth_trial, release.epoch, transport_limits,
+                                                memory),
+           core::FailureCode::ResourceExceeded);
+
+    const a::PointId far_up{9}, far_down{10};
+    const a::EdgeId far_upper{21}, far_end{22}, far_lower{23}, far_diagonal{24};
+    const std::array extended_ids{id[0], id[1], id[2],      id[3],  id[4],
+                                  id[5], alias, coincident, far_up, far_down};
+    const std::array extended_bindings{bindings[0],
+                                       bindings[1],
+                                       bindings[2],
+                                       bindings[3],
+                                       bindings[4],
+                                       bindings[5],
+                                       bindings[6],
+                                       bindings[7],
+                                       test_geometry::binding(),
+                                       test_geometry::binding()};
+    const std::array<double, 30> extended_xyz{0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 2, 1, 0,
+                                              2, 0, 0, 1, 0, 0, 1, 0, 0, 3, 1, 0, 3, 0, 0};
+    const std::array extended_edges{edges[0],
+                                    edges[1],
+                                    edges[2],
+                                    edges[3],
+                                    edges[4],
+                                    edges[5],
+                                    edges[6],
+                                    edges[7],
+                                    edges[8],
+                                    edges[9],
+                                    a::EdgeInput{far_upper, {id[4], far_up}},
+                                    a::EdgeInput{far_end, {far_up, far_down}},
+                                    a::EdgeInput{far_lower, {far_down, id[5]}},
+                                    a::EdgeInput{far_diagonal, {id[5], far_up}}};
+    const a::PhysicalFaceId far_face{102};
+    const a::BandId far_band{52};
+    const a::FacetId far_facet{204};
+    const std::array extended_bands{fixture.bands[0], fixture.bands[1], far_band};
+    const std::array extended_faces{fixture.faces[0], fixture.faces[1],
+                                    a::FaceInput{far_face, far_band}};
+    const std::array extended_roles{fixture.roles[0], fixture.roles[1],
+                                    a::FaceRoleInput{far_face, a::AeroFaceRole::Wake}};
+    const std::array extended_quads{fixture.quads[0], fixture.quads[1],
+                                    a::QuadInput{far_face,
+                                                 {id[5], id[4], far_up, far_down},
+                                                 {edges[6].id, far_upper, far_end, far_lower},
+                                                 far_diagonal,
+                                                 {far_facet, a::FacetId{205}}}};
+    const std::array extended_ownership{ownership[0],
+                                        ownership[1],
+                                        ownership[2],
+                                        ownership[3],
+                                        ownership[4],
+                                        ownership[5],
+                                        ownership[6],
+                                        ownership[7],
+                                        ownership[8],
+                                        ownership[9],
+                                        a::EdgeBindingInput{far_upper, a::CanonicalEdge{}},
+                                        a::EdgeBindingInput{far_end, a::CanonicalEdge{}},
+                                        a::EdgeBindingInput{far_lower, a::CanonicalEdge{}},
+                                        a::EdgeBindingInput{far_diagonal, a::CanonicalEdge{}}};
+    auto extended_input = input_geometry;
+    extended_input.points = extended_ids;
+    extended_input.bindings = extended_bindings;
+    extended_input.reference = a::SinglePositions{extended_xyz};
+    extended_input.current = a::SinglePositions{extended_xyz};
+    extended_input.edges = extended_edges;
+    extended_input.faces = extended_faces;
+    extended_input.bands = extended_bands;
+    extended_input.quads = extended_quads;
+    const auto extended_geometry = test_geometry::take(
+        a::prepare_owned_geometry(extended_input, test_geometry::limits(), *geometry_work, memory));
+    const auto extended_topology = take_global(a::build_global_topology(
+        extended_geometry, {extended_roles, extended_ownership, trailing}, cap, *global, memory));
+    const auto extended_contact = take_global(
+        a::check_global_geometry(extended_topology, extended_geometry, cap, *global, memory));
+    const a::ReleaseEpoch next_epoch{9};
+    const std::array extended_points{
+        cf::WakeMaterialPoint{release, far_up, far_facet},
+        cf::WakeMaterialPoint{{release.point, next_epoch}, id[4], a::FacetId{202}},
+        cf::WakeMaterialPoint{second_release, far_down, far_facet},
+        cf::WakeMaterialPoint{{second_release.point, next_epoch}, id[5], a::FacetId{202}}};
+    const cf::WakeMaterialSnapshot extended_trial{extended_contact, extended_points};
+    auto extended_limits = growth_limits;
+    extended_limits.maximum_particles = 4;
+    const auto extended = take(
+        cf::prepare_wake_material_transition(wake_si, transport_clock, growth_trial, extended_trial,
+                                             next_epoch, extended_limits, memory));
+    REQUIRE(extended.size() == 4);
+    CHECK_FALSE(extended.window());
+    CHECK_FALSE(extended.retirement_source());
+    const auto inherited = take(extended.row(0));
+    if (!inherited.parent) {
+        FAIL("A retained row must keep its parent material point");
+        return;
+    }
+    CHECK(inherited.parent->point == id[4]);
+    CHECK(inherited.current.point == far_up);
+    CHECK_FALSE(take(extended.row(1)).parent);
+    CHECK(take(extended.row(2)).current.point == far_down);
+
+    const auto low_word = std::ldexp(1., -90);
+    auto parent_gamma = previous_bound;
+    parent_gamma[0].circulation = a::DoubleWord{.5, low_word};
+    const std::array parent_trace{cf::FrozenWakeTrace{old_id, a::DoubleWord{-.25, -low_word}}};
+    const cf::DiscreteNonpenetrationInput parent_strength{previous,
+                                                          parent_gamma,
+                                                          wake,
+                                                          {input.history.parent, parent_trace},
+                                                          previous_source.trial_stamp,
+                                                          stamp,
+                                                          p::RequestedSide::Automatic};
+    const auto extended_query = earlier_collocation(extended_geometry);
+    const std::array trial_gamma{cf::DiscreteCollocation{
+        a::FacetId{200}, extended_query, frame, zero, a::SingleWord{.75}, a::SingleWord{0}}};
+    const a::P1StrengthId newest_id{56}, mapped_old_id{57};
+    const std::array extended_panels{
+        cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, newest_id},
+        cf::DiscreteWakePanel{far_facet, newest_id, mapped_old_id}};
+    const std::array extended_trace{
+        cf::FrozenWakeTrace{newest_id, a::DoubleWord{.5, low_word}},
+        cf::FrozenWakeTrace{mapped_old_id, a::DoubleWord{-.25, -low_word}}};
+    const auto strengths = [&](const auto& columns, const auto& panels) {
+        const cf::DiscreteNonpenetrationInput next_source{extended_contact,
+                                                          trial_gamma,
+                                                          panels,
+                                                          {input.history.parent, columns},
+                                                          input.trial_stamp,
+                                                          stamp,
+                                                          p::RequestedSide::Automatic};
+        return cf::prepare_wake_strength_transition(
+            wake_si, transport_clock, {parent_strength, growth_points},
+            {next_source, extended_points}, next_epoch, extended_limits, memory);
+    };
+    auto mutated_trace = extended_trace;
+    const auto qualified_strengths = take(strengths(mutated_trace, extended_panels));
+    REQUIRE(qualified_strengths.history().size() == 2);
+    CHECK(qualified_strengths.material().size() == extended.size());
+    CHECK(qualified_strengths.history()[1].id == mapped_old_id);
+    REQUIRE(qualified_strengths.history_material().size() == 2);
+    CHECK(qualified_strengths.history_material()[1].from == second_release.point);
+    CHECK(qualified_strengths.history_material()[1].to == release.point);
+    CHECK(qualified_strengths.history_material()[1].epoch == release.epoch);
+    CHECK(qualified_strengths.history_material()[0].epoch == next_epoch);
+    CHECK(qualified_strengths.retired_history().empty());
+
+    const auto held = std::get<a::DoubleWord>(qualified_strengths.history()[1].strength);
+    CHECK(held.high == -.25);
+    CHECK(held.low == -low_word);
+    mutated_trace[0].strength = a::SingleWord{.75};
+    reject(strengths(mutated_trace, extended_panels), core::FailureCode::StaleGeneration);
+    mutated_trace = extended_trace;
+    mutated_trace[0].strength = a::SingleWord{.5};
+    reject(strengths(mutated_trace, extended_panels), core::FailureCode::StaleGeneration);
+    mutated_trace = extended_trace;
+    mutated_trace[1].strength = a::DoubleWord{-.25, low_word};
+    reject(strengths(mutated_trace, extended_panels), core::FailureCode::StaleGeneration);
+    CHECK(std::get<a::DoubleWord>(qualified_strengths.history()[1].strength).low == -low_word);
+    const cf::DiscreteNonpenetrationInput with_owned_history{
+        extended_contact,
+        trial_gamma,
+        extended_panels,
+        {input.history.parent, qualified_strengths.history()},
+        input.trial_stamp,
+        stamp,
+        p::RequestedSide::Automatic};
+    const std::array historical_probe{far_up};
+    auto extended_velocity_limits = cap_velocity;
+    extended_velocity_limits.action.induction.steps *= 3;
+    extended_velocity_limits.action.steps *= 3;
+    extended_velocity_limits.action.action_steps *= 2;
+    core::ResourcePlan extended_velocity_memory{512ULL * 1024 * 1024};
+    auto evaluated_velocity = cf::evaluate_discrete_free_wake_velocity(
+        with_owned_history, flow, historical_probe, nullptr, {}, extended_velocity_limits, shared,
+        *local, *kernel, extended_velocity_memory);
+    if (!evaluated_velocity) {
+        const auto& resources = evaluated_velocity.error().details.resources;
+        if (resources) {
+            const auto& observed = *resources;
+            INFO("Resource demand " << observed.required << ", usage " << observed.observed);
+            REQUIRE(evaluated_velocity);
+        }
+    }
+    const auto growing_velocity = take(std::move(evaluated_velocity));
+    CHECK(take(growing_velocity.row(0)).owner == far_up);
+
+    const std::array birth_origins{cf::WakeMaterialPoint{release, release.point, {}},
+                                   cf::WakeMaterialPoint{second_release, second_release.point, {}}};
+    const cf::WakeMaterialSnapshot preceding{older, birth_origins, &growth_residual};
+    const std::array extended_direction_points{id[0], id[1],      id[2],  id[3],   id[4],
+                                               id[5], coincident, far_up, far_down};
+    const std::array extended_displacements{dx, dx, dx, dx, dx, dx, dx, dx, dx};
+    const cf::DiscreteFreeWakeDirection trial_direction{extended_direction_points,
+                                                        extended_displacements,
+                                                        {},
+                                                        dambient,
+                                                        d.flow_time,
+                                                        d.core_radius};
+    const cf::FreeWakeTrialEndpoint parent_trial{
+        {parent_strength, growth_points}, previous_flow, &d};
+    const cf::FreeWakeTrialEndpoint current_trial{
+        {with_owned_history, extended_points}, flow, &trial_direction};
+    const std::array retained_previous_direction{dprevious[0], dolder[0]};
+    const std::array retained_older_direction{dolder[0], dprevious[0]};
+    const cf::FreeWakeTrialLimits trial_limits{extended_limits, extended_limits,
+                                               extended_velocity_limits};
+    const std::array trial_seeds{coordinates(1, 0, .125), coordinates(2, 0, -.25),
+                                 coordinates(3, 0, .5), coordinates(4, 0, -.125)};
+    core::ResourcePlan trial_memory{1024ULL * 1024 * 1024};
+    const auto step = take(cf::evaluate_free_wake_trial(
+        wake_si, transport_clock, parent_trial, current_trial,
+        {&preceding, {retained_previous_direction, retained_older_direction}}, next_epoch,
+        trial_seeds, trial_limits, shared, *local, *kernel, trial_memory));
+    if (!step.trapezoid || !step.bdf2) {
+        FAIL("An interior trial must include both the released and retained rows");
+        return;
+    }
+    REQUIRE(step.trapezoid->size() == 2);
+    REQUIRE(step.bdf2->size() == 2);
+    CHECK(step.strength.history_material()[0].epoch == next_epoch);
+    CHECK(take(step.trapezoid->row(0)).release == extended_points[1].release);
+    CHECK(take(step.trapezoid->row(1)).release == extended_points[3].release);
+    CHECK(take(step.bdf2->row(0)).release == release);
+    CHECK(take(step.bdf2->row(1)).release == second_release);
+    residual_expected(take(step.trapezoid->row(0)).residual[0], Rat{8});
+    residual_expected(take(step.trapezoid->row(1)).residual[0], Rat{8});
+    residual_expected(take(step.bdf2->row(0)).residual[0], Rat{10});
+    residual_expected(take(step.bdf2->row(1)).residual[0], Rat{8});
+    residual_expected(take(step.trapezoid->position_dual(0)).stencil[0][0], Rat{16});
+    residual_expected(take(step.trapezoid->position_dual(1)).stencil[0][0], Rat{32});
+    residual_expected(take(step.bdf2->position_dual(0)).stencil[0][0], Rat{12});
+    residual_expected(take(step.bdf2->position_dual(1)).stencil[0][0], Rat{36});
+
+    const auto detached = take(step.trapezoid->row(0));
+    const auto retained_top = take(step.bdf2->row(0));
+    const auto retained_bottom = take(step.bdf2->row(1));
+    if (!detached.direction || !retained_top.direction || !retained_bottom.direction) {
+        FAIL("Expected directions for the released and retained rows");
+        return;
+    }
+    residual_expected((*detached.direction)[0], Rat{-1, 8});
+    residual_expected((*retained_top.direction)[0], Rat{-5, 8});
+    residual_expected((*retained_bottom.direction)[0], Rat{-45, 8});
+
+    const auto parent_bound = a::P1StrengthId::bound(fixture.faces[0].id);
+    const std::array parent_directions{
+        dhistory[0], cf::FrozenWakeTrace{parent_bound, parent_gamma[0].circulation_direction}};
+    const auto transferred = take(cf::apply_wake_strength_transfer(
+        step.strength, parent_directions, extended_limits.maximum_steps, trial_memory));
+    REQUIRE(transferred.size() == 2);
+    CHECK(transferred.values()[0].id == newest_id);
+    CHECK(sum_words(transferred.values()[0].strength) == Rat{1, 8});
+    CHECK(transferred.values()[1].id == mapped_old_id);
+    CHECK(sum_words(transferred.values()[1].strength) == Rat{5, 16});
+    for (const auto* transport : std::array{&*step.trapezoid, &*step.bdf2}) {
+        const auto& velocity = take(transport->free_velocity()).get();
+        auto covectors =
+            std::array{take(velocity.strength_dual(0)), take(velocity.strength_dual(1))};
+        const auto reversed = take(
+            cf::pullback_wake_strength_transfer(step.strength, covectors, core::Precision::TwoWord,
+                                                extended_limits.maximum_steps, trial_memory));
+        REQUIRE(reversed.size() == 2);
+        WorkEnclosure trial_work, parent_work;
+        for (std::size_t i = 0; i < covectors.size(); ++i) {
+            const auto seed = take(reversed.row(i));
+            CHECK(seed.id == parent_directions[i].id);
+            trial_work.add(covectors[i].value, transferred.values()[i].strength);
+            parent_work.add(seed.value, parent_directions[i].strength);
+        }
+        CHECK(trial_work.value != 0);
+        CHECK(abs(trial_work.value - parent_work.value) <= trial_work.radius + parent_work.radius);
+        std::swap(covectors[0], covectors[1]);
+        reject(cf::pullback_wake_strength_transfer(step.strength, covectors,
+                                                   core::Precision::TwoWord,
+                                                   extended_limits.maximum_steps, trial_memory),
+               core::FailureCode::StaleGeneration);
+    }
+
+    reject(cf::evaluate_free_wake_trial(wake_si, transport_clock, parent_trial, current_trial, {},
+                                        next_epoch, trial_seeds, trial_limits, shared, *local,
+                                        *kernel, trial_memory),
+           core::FailureCode::InvalidInput);
+
+    auto wrong_link = extended_panels;
+    wrong_link[1].leading = mapped_old_id;
+    reject(strengths(extended_trace, wrong_link), core::FailureCode::StaleGeneration);
+
+    auto limited_case = source_case;
+    limited_case.field("numerics")
+        .set("wake_rows", parse(R"({"kind":"limited","maximum_rows":1})"));
+    const auto limited_si = materialize(limited_case, io::SourceId{486});
+    const auto limited_grid = take(cf::prepare_case_reference_clock(
+        limited_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock limited_first{limited_grid, limited_grid,
+                                               first_interval.destination};
+    const cf::WakeTransportClock limited_second{limited_grid, limited_grid, destination};
+    CHECK(take(cf::prepare_wake_material_transition(limited_si, limited_first, growth_parent,
+                                                    growth_trial, release.epoch, extended_limits,
+                                                    memory))
+              .size() == 2);
+    reject(cf::prepare_wake_material_transition(limited_si, limited_second, growth_trial,
+                                                extended_trial, next_epoch, extended_limits,
+                                                memory),
+           core::FailureCode::ResourceExceeded);
+
+    auto window_case = limited_case;
+    window_case.field("analysis")
+        .field("wake")
+        .set(
+            "retention",
+            parse(R"({"kind":"closed_window","duration":0.125,"distance":1,"error_budget":0.01})"));
+    const auto window_si = materialize(window_case, io::SourceId{487});
+    const auto window_grid = take(cf::prepare_case_reference_clock(
+        window_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock window_first{window_grid, window_grid, first_interval.destination};
+    const cf::WakeTransportClock window_second{window_grid, window_grid, destination};
+    const auto first_window = take(
+        cf::prepare_wake_material_transition(window_si, window_first, growth_parent, growth_trial,
+                                             release.epoch, extended_limits, memory));
+    CHECK(first_window.retired_count() == 0);
+    CHECK(first_window.window().has_value());
+    CHECK_FALSE(first_window.retirement_source());
+    const std::array window_points{extended_points[1], extended_points[3]};
+    const cf::WakeMaterialSnapshot window_trial{contact, window_points};
+    const auto window = take(cf::prepare_wake_material_transition(
+        window_si, window_second, growth_trial, window_trial, next_epoch, extended_limits, memory));
+    CHECK(window.size() == 2);
+    REQUIRE(window.retired_count() == 2);
+    CHECK(take(window.retired(0)).release == release);
+    CHECK(take(window.retired(1)).release == second_release);
+    CHECK(take(window.retired(0)).point == id[4]);
+    CHECK(take(window.row(0)).current.release.epoch == next_epoch);
+    const auto& requirements = window.window();
+    const auto& retirement_source = window.retirement_source();
+    if (!requirements || !retirement_source) {
+        FAIL("The finite window must keep its Case limits and retirement source");
+        return;
+    }
+    CHECK(requirements->rows == 1);
+    CHECK(pg_conditioning_test::q(requirements->duration_seconds) ==
+          pg_conditioning_test::Q{"1/8"});
+    CHECK(pg_conditioning_test::q(requirements->distance_metres) == pg_conditioning_test::Q{1});
+    CHECK(pg_conditioning_test::q(requirements->error_budget) == pg_conditioning_test::Q{"1/100"});
+    CHECK(retirement_source->geometry == test_geometry::take(previous_geometry.identity()));
+    const auto retired_at = retirement_source->time_seconds.view();
+    exact({retired_at.sign, retired_at.numerator, retired_at.denominator}, previous_time);
+    const auto upper_retired = take(window.retired_sample(0));
+    const auto lower_retired = take(window.retired_sample(1));
+    CHECK(upper_retired.material.release == release);
+    CHECK(sum_words(upper_retired.parent_position_metres[0]) == Rat{15, 8});
+    CHECK(sum_words(upper_retired.parent_position_metres[1]) == 1);
+    CHECK(sum_words(lower_retired.parent_position_metres[0]) == 2);
+    CHECK(sum_words(lower_retired.parent_position_metres[1]) == 0);
+    reject(window.retired_sample(2), core::FailureCode::InvalidInput);
+    const std::array window_panels{
+        cf::DiscreteWakePanel{a::FacetId{202}, cf::AttachedWakeFront{}, newest_id}};
+    const std::array window_history{extended_trace.front()};
+    const cf::DiscreteNonpenetrationInput next_window_source{contact,
+                                                             bound,
+                                                             window_panels,
+                                                             {input.history.parent, window_history},
+                                                             input.trial_stamp,
+                                                             stamp,
+                                                             p::RequestedSide::Automatic};
+    const auto window_strengths = take(cf::prepare_wake_strength_transition(
+        window_si, window_second, {parent_strength, growth_points},
+        {next_window_source, window_points}, next_epoch, extended_limits, memory));
+    CHECK(window_strengths.material().retired_count() == 2);
+    REQUIRE(window_strengths.history().size() == 1);
+    CHECK(window_strengths.history().front().id == newest_id);
+    REQUIRE(window_strengths.retired_history().size() == 1);
+    const auto& retired_strength = window_strengths.retired_history().front();
+    CHECK(retired_strength.material.epoch == release.epoch);
+    CHECK(retired_strength.material.from == second_release.point);
+    CHECK(retired_strength.trace.id == old_id);
+    CHECK(std::get<a::DoubleWord>(retired_strength.trace.strength).low == -low_word);
+
+    ResidualFixture reversed_fixture;
+    reversed_fixture.reverse_wake();
+    auto reversed_geometry_input = reversed_fixture.input();
+    reversed_geometry_input.context.time = 1.25;
+    reversed_geometry_input.exact_time = time.view();
+    const auto reverse_now = test_geometry::take(a::prepare_owned_geometry(
+        reversed_geometry_input, test_geometry::limits(), *geometry_work, memory));
+    const auto reverse_topology = take_global(
+        a::build_global_topology(reverse_now, reversed_fixture.topology(), cap, *global, memory));
+    REQUIRE(reverse_topology.trailing_edges().size() == 1);
+    REQUIRE(reverse_topology.trailing_edges().front().coefficient == -1);
+    const auto reverse_trial =
+        take_global(a::check_global_geometry(reverse_topology, reverse_now, cap, *global, memory));
+    reversed_geometry_input.context.time = 1.125;
+    reversed_geometry_input.exact_time = previous_time.view();
+    const auto reverse_previous = test_geometry::take(a::prepare_owned_geometry(
+        reversed_geometry_input, test_geometry::limits(), *geometry_work, memory));
+    const auto reverse_parent = take_global(
+        a::check_global_geometry(reverse_topology, reverse_previous, cap, *global, memory));
+    const auto reverse_query = earlier_collocation(reverse_now);
+    const auto reverse_previous_query = earlier_collocation(reverse_previous);
+    const std::array reverse_parent_gamma{
+        cf::DiscreteCollocation{a::FacetId{200}, reverse_previous_query, frame, zero,
+                                a::DoubleWord{.5, low_word}, a::SingleWord{0}}};
+    const std::array reverse_trial_gamma{cf::DiscreteCollocation{
+        a::FacetId{200}, reverse_query, frame, zero, a::SingleWord{.75}, a::SingleWord{0}}};
+    const cf::DiscreteNonpenetrationInput reverse_parent_source{
+        reverse_parent,
+        reverse_parent_gamma,
+        wake,
+        {input.history.parent, parent_trace},
+        previous_source.trial_stamp,
+        stamp,
+        p::RequestedSide::Automatic};
+    const auto reverse_strengths = [&](const auto& columns) {
+        const cf::DiscreteNonpenetrationInput reverse_trial_source{reverse_trial,
+                                                                   reverse_trial_gamma,
+                                                                   window_panels,
+                                                                   {input.history.parent, columns},
+                                                                   input.trial_stamp,
+                                                                   stamp,
+                                                                   p::RequestedSide::Automatic};
+        return cf::prepare_wake_strength_transition(
+            window_si, window_second, {reverse_parent_source, growth_points},
+            {reverse_trial_source, window_points}, next_epoch, extended_limits, memory);
+    };
+    const std::array reversed_trace{cf::FrozenWakeTrace{newest_id, a::DoubleWord{-.5, -low_word}}};
+    const auto signed_strengths = take(reverse_strengths(reversed_trace));
+    CHECK(std::get<a::DoubleWord>(signed_strengths.history().front().strength).low == -low_word);
+    const std::array bound_direction{
+        cf::FrozenWakeTrace{parent_bound, a::DoubleWord{.5, low_word}}};
+    const auto signed_direction = take(cf::apply_wake_strength_transfer(
+        signed_strengths, bound_direction, extended_limits.maximum_steps, trial_memory));
+    REQUIRE(signed_direction.size() == 1);
+    const auto signed_value = std::get<a::DoubleWord>(signed_direction.values()[0].strength);
+    CHECK(signed_value.high == -.5);
+    CHECK(signed_value.low == -low_word);
+    const auto& newest_velocity = take(step.trapezoid->free_velocity()).get();
+    const std::array newest_covector{take(newest_velocity.strength_dual(0))};
+    const auto signed_dual = take(cf::pullback_wake_strength_transfer(
+        signed_strengths, newest_covector, core::Precision::TwoWord, extended_limits.maximum_steps,
+        trial_memory));
+    REQUIRE(signed_dual.size() == 1);
+    const auto parent_covector = take(signed_dual.row(0));
+    CHECK(parent_covector.id == parent_bound);
+    WorkEnclosure newest_work, signed_parent_work;
+    newest_work.add(newest_covector[0].value, signed_direction.values()[0].strength);
+    signed_parent_work.add(parent_covector.value, bound_direction[0].strength);
+    CHECK(newest_work.value != 0);
+    CHECK(abs(newest_work.value - signed_parent_work.value) <=
+          newest_work.radius + signed_parent_work.radius);
+    reject(reverse_strengths(window_history), core::FailureCode::StaleGeneration);
+
+    const cf::WakeMaterialSnapshot omitted_window{previous, {}};
+    reject(cf::prepare_wake_material_transition(window_si, window_second, omitted_window,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
+    reject(cf::prepare_wake_material_transition(wake_si, transport_clock, omitted_window,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
+
+    auto alias_bindings = bindings;
+    alias_bindings[7].ownership = a::AliasOf{id[4]};
+    auto alias_reference = xyz;
+    std::ranges::copy(std::span{xyz}.subspan(12, 3), alias_reference.begin() + 21);
+    auto alias_current = alias_reference;
+    alias_current[12] = alias_current[21] = 1.875;
+    auto alias_input = input_geometry;
+    alias_input.bindings = alias_bindings;
+    alias_input.reference = a::SinglePositions{alias_reference};
+    alias_input.current = a::SinglePositions{alias_current};
+    alias_input.context.time = 1.125;
+    alias_input.exact_time = previous_time.view();
+    const auto alias_geometry = test_geometry::take(
+        a::prepare_owned_geometry(alias_input, test_geometry::limits(), *geometry_work, memory));
+    const auto alias_topology = take_global(a::build_global_topology(
+        alias_geometry, {fixture.roles, ownership, trailing}, cap, *global, memory));
+    const auto alias_contact =
+        take_global(a::check_global_geometry(alias_topology, alias_geometry, cap, *global, memory));
+    auto alias_parent_points = growth_points;
+    alias_parent_points[0].point = coincident;
+    const cf::WakeMaterialSnapshot alias_window_parent{alias_contact, alias_parent_points};
+    const auto alias_window = take(
+        cf::prepare_wake_material_transition(window_si, window_second, alias_window_parent,
+                                             window_trial, next_epoch, extended_limits, memory));
+    REQUIRE(alias_window.retired_count() == 2);
+    CHECK(take(alias_window.retired(0)).point == id[4]);
+
+    const cf::WakeMaterialSnapshot partial_window{previous, material};
+    reject(cf::prepare_wake_material_transition(window_si, window_second, partial_window,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
+
+    auto fractional_case = window_case;
+    fractional_case.field("analysis")
+        .field("wake")
+        .field("retention")
+        .set("duration", parse("0.1875"));
+    const auto fractional_si = materialize(fractional_case, io::SourceId{488});
+    const auto fractional_grid = take(cf::prepare_case_reference_clock(
+        fractional_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock fractional_clock{fractional_grid, fractional_grid, destination};
+    reject(cf::prepare_wake_material_transition(fractional_si, fractional_clock, growth_trial,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::InvalidInput);
+
+    reject(cf::prepare_wake_material_transition(window_si, window_second, growth_trial,
+                                                extended_trial, next_epoch, extended_limits,
+                                                memory),
+           core::FailureCode::StaleGeneration);
+    reject(cf::prepare_wake_material_transition(limited_si, limited_second, growth_trial,
+                                                window_trial, next_epoch, extended_limits, memory),
+           core::FailureCode::ResourceExceeded);
+
+    auto two_rows_case = window_case;
+    two_rows_case.field("analysis").field("wake").field("retention").set("duration", parse("0.25"));
+    two_rows_case.field("numerics").field("wake_rows").set("maximum_rows", parse("2"));
+    const auto two_rows_si = materialize(two_rows_case, io::SourceId{490});
+    const auto two_rows_grid = take(cf::prepare_case_reference_clock(
+        two_rows_si, stamp, transport_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock two_rows_clock{
+        two_rows_grid, two_rows_grid, {stamp, 0, 3, p::RequestedSide::Automatic}};
+    const Number third_time{11, 8};
+    auto later_input = extended_input;
+    later_input.context.time = 1.375;
+    later_input.exact_time = third_time.view();
+    const auto later_geometry = test_geometry::take(
+        a::prepare_owned_geometry(later_input, test_geometry::limits(), *geometry_work, memory));
+    const auto later_contact = take_global(
+        a::check_global_geometry(extended_topology, later_geometry, cap, *global, memory));
+    const a::ReleaseEpoch latest_epoch{10};
+    auto shifted_points = extended_points;
+    for (const auto i : {std::size_t{0}, std::size_t{2}}) {
+        shifted_points[i].release.epoch = next_epoch;
+        shifted_points[i + 1].release.epoch = latest_epoch;
+    }
+    const cf::WakeMaterialSnapshot shifted_trial{later_contact, shifted_points};
+    const auto shifted = take(
+        cf::prepare_wake_material_transition(two_rows_si, two_rows_clock, extended_trial,
+                                             shifted_trial, latest_epoch, extended_limits, memory));
+    REQUIRE(shifted.retired_count() == 2);
+    CHECK(take(shifted.retired(0)).release == release);
+    CHECK(take(shifted.retired(1)).release == second_release);
+    const auto retained = take(shifted.row(0));
+    if (!retained.parent) {
+        FAIL("A retained window row must keep its parent material point");
+        return;
+    }
+    CHECK(retained.parent->release.epoch == next_epoch);
+    CHECK(retained.parent->point == id[4]);
+    CHECK(retained.current.point == far_up);
+    auto retired_wrong_row = shifted_points;
+    retired_wrong_row[0].release = release;
+    const cf::WakeMaterialSnapshot wrong_tail{later_contact, retired_wrong_row};
+    reject(cf::prepare_wake_material_transition(two_rows_si, two_rows_clock, extended_trial,
+                                                wrong_tail, latest_epoch, extended_limits, memory),
+           core::FailureCode::StaleGeneration);
+
+    const std::array birth_origin{cf::WakeMaterialPoint{release, release.point, std::nullopt}};
+    auto from_origin = stages;
+    from_origin[2].points = birth_origin;
+    reject(run_material(from_origin), core::FailureCode::InvalidInput);
+    from_origin[2].preceding_births = &birth;
+    reject(run_material(from_origin), core::FailureCode::StaleGeneration);
+    from_origin[2].preceding_births = &interval_birth;
+    const auto after_birth = take(run_material(from_origin));
+    const auto after_birth_row = take(after_birth.row(0));
+    // Xn=2, Xn-1=15/8, and the only Xn-2 is the authenticated TE origin at x=1.
+    residual_expected(after_birth_row.residual[0], Rat{-2});
+    near(center(after_birth_row.residual[2]), -vz[1]);
+    CHECK(take(after_birth.position_dual(0)).release == release);
+    const std::array different_detached{cf::WakeMaterialPoint{release, id[5], a::FacetId{202}}};
+    auto wrong_detached = from_origin;
+    wrong_detached[1].points = different_detached;
+    reject(run_material(wrong_detached), core::FailureCode::StaleGeneration);
+    auto replaced_origin = from_origin;
+    replaced_origin[2].points = stages[2].points;
+    reject(run_material(replaced_origin), core::FailureCode::StaleGeneration);
+    const std::array origin_as_current{from_origin[2], from_origin[1], from_origin[2]};
+    reject(run_material(origin_as_current), core::FailureCode::InvalidInput);
+
+    const auto stale_origin = history_contact(start_time, 1., 1.625, core::GeometryGeneration{7});
+    const std::array wrong_origin_context{
+        from_origin[0], from_origin[1],
+        cf::WakeMaterialSnapshot{stale_origin, birth_origin, &interval_birth}};
+    reject(run_material(wrong_origin_context), core::FailureCode::StaleGeneration);
+
+    auto other_case = source_case;
+    other_case.field("flow").set("uniform", parse(R"({"kind":"constant","value":[0,0,2]})"));
+    const auto other_si = materialize(other_case, io::SourceId{485});
+    const auto other_grid = take(
+        cf::prepare_case_reference_clock(other_si, stamp, transport_clock_limits, 1000000, memory));
+    const auto other_provider = prepare_gust(other_case, io::SourceId{485}, flow_workspace, memory);
+    const cf::DiscreteKnownFlowInput other_flow{
+        other_provider,   other_provider,         flow.time,      flow.projection,
+        flow.flow_limits, flow.coordinate_limits, *geometry_work, flow_workspace};
+    const cf::WakeTransportClock other_clock{other_grid, other_grid, destination};
+    reject(cf::evaluate_fixed_free_wake_transport(
+               other_clock, from_origin, input, other_flow, selected, &d, history_direction,
+               transport_seeds, transport_limits, cap_velocity, shared, *local, *kernel, memory),
+           core::FailureCode::StaleGeneration);
+
+    auto event_case = source_case;
+    event_case.field("analysis")
+        .set(
+            "intervals",
+            parse(
+                R"([{"start":0.875,"end":1.125,"step":0.25,"restart":"initial"},{"start":1.125,"end":1.375,"step":0.125,"restart":"event"}])"));
+    const auto event_si = materialize(event_case, io::SourceId{484});
+    const cf::CaseFlowClockLimits event_clock_limits{limits, 2, 4};
+    const auto event_grid = take(
+        cf::prepare_case_reference_clock(event_si, stamp, event_clock_limits, 1000000, memory));
+    const auto event_provider = prepare_gust(event_case, io::SourceId{484}, flow_workspace, memory);
+    const cf::WakeTransportClock event_clock{
+        event_grid, event_grid, {stamp, 1, 1, p::RequestedSide::Automatic}};
+    auto event_limits = transport_limits;
+    event_limits.clock = event_clock_limits;
+    const cf::DiscreteKnownFlowInput event_trial_flow{
+        event_provider,   event_provider,         flow.time,      flow.projection,
+        flow.flow_limits, flow.coordinate_limits, *geometry_work, flow_workspace};
+    const cf::FirstFreeWakeEndpoint event_trial{input, event_trial_flow, selected, &d};
+    const auto after_event = [&](p::RequestedSide side) {
+        const cf::DiscreteNonpenetrationInput parent_source{
+            previous, previous_bound, wake, input.history, {7, 10}, stamp, side};
+        const cf::DiscreteKnownFlowInput parent_flow{
+            event_provider,  event_provider,   {stamp, previous_time.view(), side},
+            flow.projection, flow.flow_limits, flow.coordinate_limits,
+            *geometry_work,  flow_workspace};
+        const cf::FirstFreeWakeEndpoint parent{parent_source, parent_flow, selected, &d};
+        return cf::evaluate_first_free_wake_transport(
+            event_clock, event_trial, parent, std::nullopt, restarted, transport_seeds,
+            event_limits, cap_velocity, shared, *local, *kernel, memory);
+    };
+    reject(after_event(p::RequestedSide::Left), core::FailureCode::StaleGeneration);
+    const auto post_event = take(after_event(p::RequestedSide::Right));
+    residual_expected(take(post_event.row(0)).residual[0], Rat{1});
+    const auto& event_parent = take(post_event.parent_free_velocity()).get();
+    exact(take(take(event_parent.ambient(0)).get().time()), previous_time);
+    event_case.field("analysis")
+        .field("wake")
+        .set("retention",
+             parse(R"({"kind":"closed_window","duration":0.25,"distance":1,"error_budget":0.01})"));
+    const auto event_window_si = materialize(event_case, io::SourceId{489});
+    const auto event_window_grid = take(cf::prepare_case_reference_clock(
+        event_window_si, stamp, event_clock_limits, 1000000, memory));
+    const cf::WakeTransportClock event_window_clock{event_window_grid, event_window_grid,
+                                                    event_clock.destination};
+    auto event_window_limits = event_limits;
+    event_window_limits.maximum_particles = 2;
+    reject(cf::prepare_wake_material_transition(event_window_si, event_window_clock, growth_trial,
+                                                window_trial, next_epoch, event_window_limits,
+                                                memory),
+           core::FailureCode::Unsupported);
 
     auto prescribed_case = source(R"({"kind":"constant","value":[0,0,9]})",
                                   R"([{"start":1,"end":1.5,"step":0.125,"restart":"initial"}])");

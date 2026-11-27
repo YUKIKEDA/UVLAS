@@ -1,0 +1,35 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-case-nastran-planar-pg-set",
+  "ids": [
+    "FD-03",
+    "IO4-03",
+    "MAT-D05",
+    "R-05",
+    "N4-02"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-25",
+  "source_commit": "7996cbdab8ca98b1673bf7b6426969e387b403dd",
+  "claimed_state": "同じCaseと認証済みNastran対応表の全Shellについて、平面・厚さ・積層・材料軸の証拠を一括で所有する。",
+  "checks": {
+    "windows_release_targets_passed": 4,
+    "windows_debug_targets_passed": 4,
+    "gcc_asan_ubsan_targets_passed": 4,
+    "real_file_assertions": 1634
+  },
+  "artifacts": {
+    "CMakeLists.txt": "765b3a369b9d032120440b1f58611be07c2e8b13144e5716a3cc99d7edf261d1",
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/case-nastran-planar-pg-set.md": "f7d58161b1ecd22ed46735f0ff358a01dd16e8be37ee96da6c83add9a624308a",
+    "src/coupling/case_external_pg.cpp": "a053deeadb5e07e841997d02e7141995a79c45ea9a57582b707192ab4a7d0782",
+    "src/coupling/case_external_pg.hpp": "82c68295a287cac54495074387a969b599b8fd10b1ef31c89ddc41d86c8efee1",
+    "src/coupling/case_pg_reference.cpp": "7e5d9f5a7e8edc07fa509ff7a0578f36baf8cb5ab46867d18f3b6ae384652044",
+    "src/io/external_mesh_sidecar_binding.hpp": "ef6db162fc70d439347f79f8d9669da71548f02c15957b5fd6f4fe949422ac73",
+    "src/io/external_mesh_sidecar_pg.cpp": "0d11744a47d16756f254fb3cce4fc043d8667aa9e9225f319c7e49e0fdd5d726",
+    "src/io/nastran_pg_material_axes.cpp": "9ce084494abd4903f3d53a87f1c2e43b04126c2546c9546a2acc3911360e2459",
+    "tests/CMakeLists.txt": "aa31f34f1aacbe78124da1bfdc7ac43d148c8ef62036a77d3fdfcf243b8782c2",
+    "tests/io/reference_input_test.cpp": "a6a7c09e888d919ae97322e223eaf2e3d611164e5ef8343e14741fe07a7ec91a"
+  }
+}

@@ -5,10 +5,6 @@
 
 #include <uvlas/numerics/linear_solve.hpp>
 
-namespace uvlas::aero::detail::p1 {
-struct Interval;
-}
-
 namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
 using ExplicitCollocationTangents = std::array<NonpenetrationVector, 2>;
@@ -63,7 +59,7 @@ struct DiscreteWakePanel {
 
 struct FrozenWakeTrace {
     aero::detail::P1StrengthId id;
-    aero::detail::ScalarWords strength;
+    aero::detail::ScalarWords strength{aero::detail::SingleWord{0}};
 };
 struct FrozenWakeTraces {
     FrozenWakeTraces(core::AcceptedStateId accepted,
@@ -197,6 +193,8 @@ struct CirculationResidualRow {
     bool includes_wake_quadrature{};
 };
 
+struct NativeCirculationRows;
+
 /// Own both the LU-qualified retained words and the independent native residual
 /// check. No physical mapping or continuous wake-integral accuracy is inferred.
 class DiscreteCirculation {
@@ -228,16 +226,29 @@ private:
     DiscreteCirculation(numerics::linear::Solution<double>, ProjectedCaseUniformFlow&&,
                         core::PlannedBuffer<std::optional<CirculationResidualRow>>,
                         std::optional<aero::detail::P1ActionValue>,
-                        core::PlannedBuffer<aero::detail::p1::Interval>,
+                        core::PlannedBuffer<NativeCirculationRows>,
                         aero::detail::PreparedTopologyOwner, std::uint64_t) noexcept;
     numerics::linear::Solution<double> solution_;
     ProjectedCaseUniformFlow flow_;
     core::PlannedBuffer<std::optional<CirculationResidualRow>> rows_;
     std::optional<aero::detail::P1ActionValue> geometry_owner_;
-    core::PlannedBuffer<aero::detail::p1::Interval> influence_;
+    core::PlannedBuffer<NativeCirculationRows> operator_rows_;
     aero::detail::PreparedTopologyOwner source_;
     std::uint64_t steps_;
 };
+
+/// Synchronous witness for replay of one exact qualified real operator. The legacy
+/// solution and its dense native coefficients are only the witness's comparison data.
+struct CirculationRowReplay {
+    std::size_t rows, coefficients;
+    std::uint64_t replay_row_bytes, reference_dense_bytes, allocated_bytes, used_steps;
+};
+
+[[nodiscard]] core::Result<CirculationRowReplay> verify_discrete_circulation_row_replay(
+    const DiscreteNonpenetrationInput&, const DiscreteCirculation&,
+    const DiscreteNonpenetrationLimits&, const DiscreteCirculationRequest&,
+    aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
+    aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
 
 /// Assemble and solve all bound rows, then check the actual returned circulation
 /// with the native original residual. Trial input circulation/direction is not
@@ -302,6 +313,7 @@ private:
 /// transpose has distinct matrix and scale generations and its own dual layout IDs.
 /// Reusing the primal scale generation requires its certified scale values and units.
 /// rhs_absolute uses the RHS's units and matrix_absolute uses 1/m in both senses.
+/// max_steps covers native row preparation, projection, solve and original residual.
 [[nodiscard]] core::Result<DiscreteCirculationLinearization>
 solve_discrete_circulation_linearization(const DiscreteCirculation&, CirculationSense,
                                          std::span<const CirculationLinearRhs>,
@@ -473,6 +485,8 @@ struct BoundCirculationRate {
 
 class FixedBdf2Circulation;
 
+enum class DiscreteLoadRetention : std::uint8_t { Aggregates, OriginalRows };
+
 struct DiscreteVectorLoadInput {
     DiscreteVectorLoadInput(aero::detail::P1ActionStamp trial,
                             core::NumericalGeneration circulation_generation,
@@ -493,6 +507,7 @@ struct DiscreteVectorLoadInput {
     aero::detail::ScalarWords density;           ///< kg/m³, finite and strictly positive.
     NonpenetrationVector moment_origin;          ///< Reference point in the geometry's SI frame.
     const FixedBdf2Circulation* fixed_bdf2 = nullptr; ///< Alternative to independent rates.
+    DiscreteLoadRetention retention = DiscreteLoadRetention::Aggregates;
 };
 
 struct DiscreteCirculatoryLoad {
@@ -512,6 +527,17 @@ struct DiscreteNoncirculatoryLoad {
 
 struct DiscreteNodalLoad {
     aero::detail::PointId point;
+    DiscreteLoadVector force;
+};
+
+/// One already weighted contribution to an original facet vertex. The canonical
+/// point is for global work checks; face, facet and local vertex select the original row.
+struct DiscreteOriginalLoadContribution {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::FacetId facet;
+    std::uint8_t local_vertex{};
+    aero::detail::PointId canonical;
+    std::optional<aero::detail::EdgeId> edge; ///< Empty for triangle area loads.
     DiscreteLoadVector force;
 };
 
@@ -559,6 +585,9 @@ public:
     [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t original_count() const noexcept;
+    [[nodiscard]] core::Result<DiscreteOriginalLoadContribution>
+    original(std::size_t) const noexcept;
     [[nodiscard]] std::size_t bdf2_rate_count() const noexcept {
         return bdf2_rates_.size();
     }
@@ -579,13 +608,17 @@ private:
                              const DiscreteLoadVector& force, const DiscreteLoadVector& moment,
                              const DiscreteLoadVector& origin,
                              core::PlannedBuffer<std::optional<RetainedBdf2Rate>>,
-                             DiscreteLoadSource, std::uint64_t) noexcept;
+                             core::PlannedBuffer<std::optional<DiscreteOriginalLoadContribution>>,
+                             std::size_t original_count, DiscreteLoadSource,
+                             std::uint64_t) noexcept;
     DiscreteCirculation primal_;
     core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges_;
     core::PlannedBuffer<std::optional<DiscreteNoncirculatoryLoad>> facets_;
     core::PlannedBuffer<std::optional<DiscreteNodalLoad>> points_;
     DiscreteLoadVector force_, moment_, origin_;
     core::PlannedBuffer<std::optional<RetainedBdf2Rate>> bdf2_rates_;
+    core::PlannedBuffer<std::optional<DiscreteOriginalLoadContribution>> original_;
+    std::size_t original_count_{};
     DiscreteLoadSource source_;
     std::uint64_t steps_;
 };
@@ -1001,6 +1034,9 @@ public:
     [[nodiscard]] core::Result<DiscreteCirculatoryLoad> edge(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNoncirculatoryLoad> facet(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteNodalLoad> point(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t original_count() const noexcept;
+    [[nodiscard]] core::Result<DiscreteOriginalLoadContribution>
+    original(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_force() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_moment() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> moment_origin() const noexcept;
@@ -1106,7 +1142,7 @@ private:
 };
 
 /// Compose the velocity pullback directly into a signed residual.
-enum class FreeWakeSeedSign : std::uint8_t { Positive, Negative };
+enum class FreeWakeSeedScale : std::uint8_t { Positive, Negative, NegativeHalf };
 
 /// Use a fixed contact-qualified source state and its positive common SI radius.
 /// Each selected particle belongs to a retained wake face. The listed IDs can be
@@ -1121,6 +1157,6 @@ enum class FreeWakeSeedSign : std::uint8_t { Positive, Negative };
     std::span<const NonpenetrationVector> seeds, const DiscreteFreeWakeLimits&,
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {},
-    FreeWakeSeedSign = FreeWakeSeedSign::Positive) noexcept;
+    FreeWakeSeedScale = FreeWakeSeedScale::Positive) noexcept;
 
 } // namespace uvlas::coupling::detail

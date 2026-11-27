@@ -1,0 +1,36 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-finite-wing-native-row-replay-v1",
+  "ids": [
+    "IM-03",
+    "N4-05",
+    "N4-06",
+    "UW-D03"
+  ],
+  "package": "IM-03",
+  "source_commit": "0a858f55d351c6275e49de179905d451247c587d",
+  "claimed_state": "A separate synchronous row-replay witness reproduces each source interval endpoint, retained dense-LU words and original residual enclosure of two fixed M2/N4 native circulation systems. The coefficient work buffer is one row.",
+  "verification": {
+    "scope": "Proof with borrowed fixed input and legacy dense native comparison data still live. Neither default retention changes nor full-grid capacity or timing are claimed.",
+    "windows": "MSVC Release 2/2; 573 checks each; 13.80 and 17.76 seconds",
+    "linux": "GCC 14 Release 2/2; 573 checks each; 9.05 and 10.89 seconds",
+    "mutation": "Unchanged test passes at seed 23. A detached modified tangent under the same identities is rejected as StaleGeneration.",
+    "bytes": "MSVC old interval matrix 18432, replay row 2304, cumulative replay 9057200; GCC old interval matrix 20480, replay row 2560, cumulative replay 9147184.",
+    "commands": [
+      "ctest --test-dir out/issue166-build -C Release -V -R '^coupling\\.finite_wing_drag_refinement\\.fw_v0[12]\\.m2n4$' -j 2",
+      "ctest --test-dir build -V -R '^coupling\\.finite_wing_drag_refinement\\.fw_v0[12]\\.m2n4$' -j 2",
+      "clang-tidy on the native source and one refinement test command",
+      "just trace-check"
+    ]
+  },
+  "sources": {
+    "src/coupling/discrete_nonpenetration.cpp": "99635605b70d829edc17f9ce28a0e60558c69cea11d9c6e3a1495520be026eea",
+    "src/coupling/discrete_nonpenetration.hpp": "6246fb21705dd2cf1faafbd209a55e7fac375227d745addacbb4afe248107c79",
+    "src/aero/p1_interval_private.hpp": "aa2d6ed189ae13710d07e033f824876c53de4bc13455324f9f341736491c3e57",
+    "tests/coupling/finite_wing_steady_test.cpp": "c3c9c29ae2abaf09aec57459ff34d2a5665c34c8c6525c44ab44aa69fdc2ce08"
+  },
+  "artifacts": {
+    "docs/verification/IM-03/finite-wing-native-row-replay-v1/verification.md": "f46cc80152dc2280cb55730f577fe31a3346bce866bbd25ddec5a3e8c80a7844",
+    "tests/aero/fixtures/finite-wing-drag-refinement-v1.json": "29b7cf5fd5301a0b4ebfc684e81b9cf70a90fa7305f34451a88e9da5cbd15878"
+  }
+}

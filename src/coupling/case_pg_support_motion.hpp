@@ -40,6 +40,11 @@ struct CasePgSupportSample {
     const CasePgSupportLimits&, core::ResourcePlan&, const std::stop_token& = {},
     core::FailureDetails = {}) noexcept;
 
+struct CasePgSupportSelection {
+    std::span<const structure::PgConstraintId> moving;
+    std::span<const structure::PgConstraintId> stationary;
+};
+
 struct CaseStructuralSupportLimits {
     CasePgSupportLimits evaluation;
     structure::PgRigidSupportLimits exact;
@@ -69,6 +74,7 @@ public:
 
 private:
     friend struct structural_support_detail::Builder;
+    friend class CasePgChart;
     CaseStructuralSupport(case_clock_detail::Grid&& clock,
                           core::PlannedBuffer<std::optional<CaseMotionReady>>&& motions,
                           structure::PgRigidSupportRows&& support) noexcept
@@ -153,6 +159,15 @@ private:
     core::Workspace&, aero::detail::pchip::CurveWorkspace&, const CaseStructuralSupportLimits&,
     core::ResourcePlan&, const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
 
+/// Leave verified stationary supports in the same chart's constant RHS.
+[[nodiscard]] core::Result<CaseStructuralSupport>
+prepare_case_structural_pg_support(const io::SiCase&, structure::PgSparseChart&&,
+                                   std::span<const structure::PgConstraintPatchBinding>,
+                                   CasePgSupportSelection, aero::detail::pchip::PchipInputStamp,
+                                   core::Workspace&, aero::detail::pchip::CurveWorkspace&,
+                                   const CaseStructuralSupportLimits&, core::ResourcePlan&,
+                                   const std::stop_token& = {}, core::FailureDetails = {}) noexcept;
+
 [[nodiscard]] core::Result<CaseStructuralSupportSample> evaluate_case_structural_pg_support(
     const CaseStructuralSupport&, const CaseStructuralSupport& current, CaseFlowClockQuery,
     aero::detail::pchip::JetOrder, const CasePgSupportProjection&,
@@ -209,7 +224,7 @@ retain_case_structural_pg_rhs(const CaseStructuralSupportSample&, aero::detail::
 
 /// Add the true RHS radius to the numerical chart's original-CSR certificate.
 [[nodiscard]] core::Result<structure::PgChartCandidateLift> lift_case_structural_pg_support(
-    structure::PgChartCandidate&, structure::PgChartCandidateInput independent,
+    const structure::PgChartCandidate&, structure::PgChartCandidateInput independent,
     const CaseStructuralRetainedRhs&, const structure::PgChartCandidateSolve&, core::Workspace&,
     core::ResourcePlan&, core::FailureDetails = {}) noexcept;
 

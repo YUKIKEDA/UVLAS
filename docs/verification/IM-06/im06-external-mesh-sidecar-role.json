@@ -1,0 +1,39 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-external-mesh-sidecar-role",
+  "ids": [
+    "FD-03",
+    "IO4-01",
+    "IO4-03",
+    "IO4-04",
+    "R-05"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-24",
+  "source_commit": "62f7727108c0ed895fe9d27daa05b0b7f9de005d",
+  "claimed_state": "認証済みの Gmsh・Nastran 対応表を既存 Case に結び付け、平面全域と明示された一様厚さ・材料を照合する。",
+  "checks": {
+    "windows_release_targets_passed": 2,
+    "gcc_asan_ubsan_targets_passed": 2,
+    "sidecar_assertions_per_platform": 300,
+    "existing_nastran_quantity_assertions": 441,
+    "exact_comparison_mutation_failures": 2,
+    "restored_exact_comparison_assertions": 300
+  },
+  "artifacts": {
+    "CMakeLists.txt": "b8e0d7c56d1aa2bb07c24c5be952e5f2516665afb02f35ef4d1a2c0c25369202",
+    "docs/verification/IM-06/external-mesh-sidecar-role.md": "f9e2eae17827eaaae26147376e27c1ac9170eead258cd893f1041e77c89b3176",
+    "src/io/external_mesh_quantity.cpp": "792e2708500aaf1c9bc5e94b716b2ecf99e2c4c8167db1bd665a84e05021e312",
+    "src/io/external_mesh_quantity.hpp": "873ea8dce8d0e3591e4e3c15e9fc8b5326019b2954a9c62c5aeff5ba5728c208",
+    "src/io/external_mesh_sidecar.cpp": "17a838090a6c5d09d2303cf94c4d9d54ef2de9ca3b31cdd5666a154bafc06454",
+    "src/io/external_mesh_sidecar.hpp": "6d6d3ec80747e0e8ddbe6b077d4883305ab4e7ff82bf43afb3c93f40280c9754",
+    "src/io/external_mesh_sidecar_binding.cpp": "1a0511d4f8391ee843426969c9d8aec84b91cccc699c6b87a12cb98fcaf8f4c9",
+    "src/io/external_mesh_sidecar_binding.hpp": "ef6db162fc70d439347f79f8d9669da71548f02c15957b5fd6f4fe949422ac73",
+    "src/io/external_mesh_sidecar_pg.cpp": "f0ad95b5dd6b7d0cf2166cd03f1e06f97b08b3997fa0378628a2f12a8f465b57",
+    "src/io/external_mesh_sidecar_pg.hpp": "67c5dfba070d0f360e4c78a3ec89abfc6e9c3b2c40509855374a36b09fb78185",
+    "src/io/reference_resolution.cpp": "79a75866a53348ca977379d61f71795422ee42138e9e4db2b3fe7a647c8f92b2",
+    "src/io/reference_resolution.hpp": "4332c18d27233c31fefa5471090e6a8037d4a8473be2fda2f950bd5a97c3269a",
+    "tests/io/reference_input_test.cpp": "00d0ec010bd03cbae498b93e44d4284d19532b8afca093f78adf6f1e0d59822c"
+  }
+}

@@ -108,6 +108,49 @@ class CaseFileOperations(unittest.TestCase):
                 uvlas.FailureCode.Unsupported,
             )
 
+    def test_sidecar_roles_are_read_at_the_shared_case_entry(self):
+        case = copy.deepcopy(EXAMPLES["schema_examples"]["coupled_transient"])
+        geometry = copy.deepcopy(EXAMPLES["fragments"]["Geometry.nastran"])
+        deck = b"BEGIN BULK\nGRID,1,,3.0,4.0,5.0\nENDDATA\n"
+        geometry["deck"].update(
+            source_id="300", path="skin.bdf", sha256=hashlib.sha256(deck).hexdigest()
+        )
+        geometry["sidecar"].update(source_id="301", path="skin.json")
+        case["model"]["geometry"].append(geometry)
+        sidecar = {
+            "schema": "uvlas.nastran-sidecar/1",
+            "geometry": geometry["id"],
+            "generator": "MSC Nastran 2022.1",
+            "units": {"length": "m", "mass": "kg", "time": "s", "angle": "deg"},
+            **{key: [] for key in ("shells", "materials", "beams", "masses", "supports", "joints")},
+        }
+        with tempfile.TemporaryDirectory() as workspace:
+            root = Path(workspace)
+            path = root / "case.json"
+            (root / "skin.bdf").write_bytes(deck)
+            cases = {
+                "matching geometry": json_bytes(sidecar),
+                "malformed sidecar": b"{}",
+                "different geometry": json_bytes({**sidecar, "geometry": "999"}),
+            }
+            for scenario, data in cases.items():
+                with self.subTest(scenario=scenario):
+                    geometry["sidecar"]["sha256"] = hashlib.sha256(data).hexdigest()
+                    (root / "skin.json").write_bytes(data)
+                    path.write_bytes(json_bytes(case))
+                    result = uvlas.load_case(path)
+                    other = uvlas.case_from_dict(case, reference_root=root)
+                    output = cli("validate", path)
+                    if scenario == "matching geometry":
+                        self.assertTrue(result.ok)
+                        self.assertTrue(other.ok)
+                        self.assertEqual(output.returncode, 0, output.stderr)
+                    else:
+                        self.assert_failure(result, uvlas.FailureCode.InvalidInput)
+                        self.assert_failure(other, uvlas.FailureCode.InvalidInput)
+                        self.assertEqual(output.returncode, 2, output.stderr)
+                        self.assertIn(b"Nastran sidecar format", output.stderr)
+
     def test_dictionary_checks_schema_and_owns_the_copied_input(self):
         case = copy.deepcopy(EXAMPLES["schema_examples"]["structural_static"])
         result = uvlas.case_from_dict(case)

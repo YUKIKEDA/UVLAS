@@ -1,0 +1,35 @@
+AlmaLinux: glibc 2.28
+ldd (GNU libc) 2.28
+VERSION="8.10 (Cerulean Leopard)"
+2f30a0614edfb344f880fccba87b71d8cdf8354d9d99874032cc1595f588eb88  provider-proof
+header_revision=20250110 estimate_bytes=11883
+metadata_vector_growth=852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68
+metadata_exception_runtime=293bb4c062db39e1a44b367dc93646bb372b281b46f294ed9e05f18811f75555
+actual_exception_provider=/lib64/libstdc++.so.6
+      1000:	binding file ./provider-proof [0] to /lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+      1000:	binding file ./provider-proof [0] to /lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134  /usr/lib64/libstdc++.so.6.0.25
+libstdc++-8.5.0-31.el8_10.alma.1.x86_64
+........ alternate-header/bits/vector.tcc
+#define __GLIBCXX__ 20250110
+#define _GLIBCXX_RELEASE 14
+#define _GLIBCXX_USE_CXX11_ABI 1
+dc5dad860d9f9add7ccbbea1e67f315c6f0f74d6398ccdd6459391a976cd0dc2  alternate-header/bits/vector.tcc
+852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68  /opt/rh/gcc-toolset-14/root/usr/include/c++/14/bits/vector.tcc
+header_revision=20250110 estimate_bytes=11883
+metadata_vector_growth=852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68
+metadata_exception_runtime=293bb4c062db39e1a44b367dc93646bb372b281b46f294ed9e05f18811f75555
+actual_exception_provider=/lib64/libstdc++.so.6
+      1022:	binding file ./alternate-provider-proof [0] to /lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+      1022:	binding file ./alternate-provider-proof [0] to /lib64/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+Same qualified diagnostic on the Jammy WSL host
+glibc 2.35
+2f30a0614edfb344f880fccba87b71d8cdf8354d9d99874032cc1595f588eb88  provider-proof
+header_revision=20250110 estimate_bytes=11883
+metadata_vector_growth=852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68
+metadata_exception_runtime=293bb4c062db39e1a44b367dc93646bb372b281b46f294ed9e05f18811f75555
+actual_exception_provider=/lib/x86_64-linux-gnu/libstdc++.so.6
+      1026:	binding file ./provider-proof [0] to /lib/x86_64-linux-gnu/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+      1026:	binding file ./provider-proof [0] to /lib/x86_64-linux-gnu/libstdc++.so.6 [0]: normal symbol `_ZNSt13runtime_errorC1EPKc' [GLIBCXX_3.4.21]
+ff0825e113603c3866680d5d52216bc6d8eedf3a59f52a0aef67ff01994db128  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30
+libstdc++6:amd64	12.3.0-1ubuntu1~22.04.3

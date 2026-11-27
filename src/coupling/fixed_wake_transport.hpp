@@ -1,6 +1,7 @@
 #pragma once
 
 #include "case_flow_clock.hpp"
+#include "io/si_exact_words.hpp"
 
 namespace uvlas::coupling::detail {
 
@@ -9,12 +10,17 @@ namespace uvlas::coupling::detail {
 struct WakeMaterialPoint {
     aero::detail::MaterialReleaseKey release;
     aero::detail::PointId point;
-    aero::detail::FacetId wake_facet;
+    // The empty facet is reserved for the true trailing-edge origin stored at birth.
+    std::optional<aero::detail::FacetId> wake_facet;
 };
+
+class WakeTransportResult;
 
 struct WakeMaterialSnapshot {
     const aero::detail::GlobalContactState& contact;
     std::span<const WakeMaterialPoint> points; ///< Strictly ascending release keys.
+    // Only the older sample may use the preceding first-step result for birth origins.
+    const WakeTransportResult* preceding_births{};
 };
 
 struct WakeTransportClock {
@@ -35,8 +41,19 @@ struct WakeTransportLimits {
 };
 
 struct WakeTransportRow {
+    WakeTransportRow(aero::detail::MaterialReleaseKey key, DiscreteLoadVector rate,
+                     std::optional<DiscreteLoadVector> tangent,
+                     std::optional<DiscreteLoadVector> position,
+                     std::optional<DiscreteLoadVector> position_tangent) noexcept
+        : release(key),
+          residual(rate),
+          direction(tangent),
+          prescribed_position(position),
+          prescribed_position_direction(position_tangent) {}
+
     aero::detail::MaterialReleaseKey release;
-    DiscreteLoadVector residual; ///< m/s, physical BDF2 minus the flow velocity.
+    DiscreteLoadVector
+        residual; ///< m/s, discrete transport rate minus the corresponding fluid velocity.
     std::optional<DiscreteLoadVector> direction;
     std::optional<DiscreteLoadVector> prescribed_position; ///< Explicit fixed-step candidate, m.
     std::optional<DiscreteLoadVector> prescribed_position_direction;
@@ -47,11 +64,17 @@ struct WakeTransportHistoryDirection {
 };
 
 struct WakeTransportPositionDual {
+    WakeTransportPositionDual(aero::detail::MaterialReleaseKey key,
+                              std::array<DiscreteLoadVector, 3> weights) noexcept
+        : release(key), stencil(weights) {}
+
     aero::detail::MaterialReleaseKey release;
     // Current, previous, older terms of the time stencil. The free velocity
     // transpose on current source geometry belongs to the same returned action.
     std::array<DiscreteLoadVector, 3> stencil;
 };
+
+enum class WakeBirthMatch : std::uint8_t { Missing, Stale, Verified };
 
 struct WakeTransportData;
 
@@ -65,7 +88,16 @@ public:
 
     [[nodiscard]] std::size_t size() const noexcept;
     [[nodiscard]] core::Result<WakeTransportRow> row(std::size_t) const noexcept;
+    [[nodiscard]] WakeBirthMatch match_birth(aero::detail::MaterialReleaseKey,
+                                             const WakeTransportClock&,
+                                             const aero::detail::OwnedGeometry& origin,
+                                             const aero::detail::OwnedGeometry& detached,
+                                             aero::detail::PointId detached_point) const noexcept;
     [[nodiscard]] core::Result<WakeTransportPositionDual> position_dual(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
+    parent_free_velocity() const& noexcept;
+    [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
+    parent_free_velocity() const&& = delete;
     [[nodiscard]] core::Result<aero::detail::ScaledEnclosure> prescribed_time_dual() const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteFreeWakeVelocity>>
     free_velocity() const& noexcept;
@@ -85,6 +117,102 @@ private:
     const DiscreteNonpenetrationInput&, const DiscreteKnownFlowInput&,
     std::span<const aero::detail::PointId> particles, const DiscreteFreeWakeDirection*,
     const WakeTransportHistoryDirection&, std::span<const NonpenetrationVector> seeds,
+    const WakeTransportLimits&, const DiscreteFreeWakeLimits&, aero::detail::SharedP1Workspace&,
+    aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
+    const std::stop_token& = {}) noexcept;
+
+struct FirstFreeWakeEndpoint {
+    const DiscreteNonpenetrationInput& source;
+    const DiscreteKnownFlowInput& flow;
+    std::span<const aero::detail::PointId> particles; ///< In material row order.
+    const DiscreteFreeWakeDirection* direction{};
+};
+
+struct FirstFreeWakePoint {
+    WakeMaterialPoint current;
+    /// Empty at birth: the parent endpoint is the canonical trailing-edge point.
+    std::optional<WakeMaterialPoint> parent;
+};
+
+/// Exact Case inputs retained for later closed-window qualification.
+struct WakeWindowRequirements {
+    structure::ExactRational duration_seconds;
+    structure::ExactRational distance_metres;
+    structure::ExactRational error_budget;
+    std::uint64_t rows{};
+};
+
+struct RetiredWakeMaterialPoint {
+    WakeMaterialPoint material;
+    NonpenetrationVector parent_position_metres;
+};
+
+struct WakeRetirementSource {
+    std::array<std::byte, 32> geometry{};
+    io::detail::SiRationalWords time_seconds;
+};
+
+/// Complete material correspondence between a parent and its wake trial.
+/// Each row pairs a retained owner with its parent, or identifies a new trailing-edge release.
+class WakeMaterialTransition {
+public:
+    WakeMaterialTransition(WakeMaterialTransition&&) noexcept = default;
+    WakeMaterialTransition& operator=(WakeMaterialTransition&&) noexcept = default;
+
+    [[nodiscard]] std::size_t size() const noexcept {
+        return rows_.size();
+    }
+    [[nodiscard]] core::Result<FirstFreeWakePoint> row(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t retired_count() const noexcept {
+        return retired_.size();
+    }
+    [[nodiscard]] core::Result<WakeMaterialPoint> retired(std::size_t) const noexcept;
+    [[nodiscard]] core::Result<RetiredWakeMaterialPoint> retired_sample(std::size_t) const noexcept;
+    [[nodiscard]] const std::optional<WakeWindowRequirements>& window() const& noexcept {
+        return window_;
+    }
+    [[nodiscard]] const std::optional<WakeWindowRequirements>& window() const&& = delete;
+    [[nodiscard]] const std::optional<WakeRetirementSource>& retirement_source() const& noexcept {
+        return retirement_source_;
+    }
+    [[nodiscard]] const std::optional<WakeRetirementSource>& retirement_source() const&& = delete;
+    [[nodiscard]] std::uint64_t used_steps() const noexcept {
+        return used_steps_;
+    }
+
+private:
+    friend struct WakeTransportBuilder;
+    WakeMaterialTransition(core::PlannedBuffer<std::optional<FirstFreeWakePoint>>&& rows,
+                           core::PlannedBuffer<std::optional<RetiredWakeMaterialPoint>>&& retired,
+                           std::optional<WakeWindowRequirements>&& window,
+                           std::optional<WakeRetirementSource>&& retirement_source,
+                           std::uint64_t used_steps) noexcept
+        : rows_(std::move(rows)),
+          retired_(std::move(retired)),
+          window_(std::move(window)),
+          retirement_source_(std::move(retirement_source)),
+          used_steps_(used_steps) {}
+    core::PlannedBuffer<std::optional<FirstFreeWakePoint>> rows_;
+    core::PlannedBuffer<std::optional<RetiredWakeMaterialPoint>> retired_;
+    std::optional<WakeWindowRequirements> window_;
+    std::optional<WakeRetirementSource> retirement_source_;
+    std::uint64_t used_steps_;
+};
+
+/// Check complete material-key coverage at the next Case clock node. This identifies
+/// the rows to transport; the resulting positions and solver state are still a trial.
+[[nodiscard]] core::Result<WakeMaterialTransition> prepare_wake_material_transition(
+    const io::SiCase&, const WakeTransportClock&, const WakeMaterialSnapshot& parent,
+    const WakeMaterialSnapshot& trial, aero::detail::ReleaseEpoch, const WakeTransportLimits&,
+    core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
+/// Trapezoidal transport for newly released points, and for retained free
+/// points on the first accepted interval step. Each fluid action and its
+/// tangent/pullback are evaluated at that endpoint's own geometry and clock.
+[[nodiscard]] core::Result<WakeTransportResult> evaluate_first_free_wake_transport(
+    const WakeTransportClock&, const FirstFreeWakeEndpoint& current,
+    const FirstFreeWakeEndpoint& parent, std::optional<aero::detail::ReleaseEpoch> birth_epoch,
+    std::span<const FirstFreeWakePoint>, std::span<const NonpenetrationVector> seeds,
     const WakeTransportLimits&, const DiscreteFreeWakeLimits&, aero::detail::SharedP1Workspace&,
     aero::detail::LocalPacketWorkspace&, aero::detail::P1Workspace&, core::ResourcePlan&,
     const std::stop_token& = {}) noexcept;

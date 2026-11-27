@@ -47,6 +47,13 @@ public:
             return inspect_gmsh(snapshot);
         case ReferenceRole::NastranDeck:
             return inspect_nastran(snapshot);
+        case ReferenceRole::NastranSidecar:
+        case ReferenceRole::GmshSidecar:
+            if (auto& limit = limits_.sidecar) {
+                return inspect_sidecar(snapshot, *limit);
+            }
+            return reject({Code::Unsupported, operation}, snapshot,
+                          LeafReferenceFailure::UnsupportedRole);
         default:
             return reject({Code::Unsupported, operation}, snapshot,
                           LeafReferenceFailure::UnsupportedRole);
@@ -77,6 +84,32 @@ private:
                                  }));
         }
         limits_.nastran.work -= *work;
+        return ExtractedReferenceDependencies{};
+    }
+
+    [[nodiscard]] core::Result<ExtractedReferenceDependencies>
+    inspect_sidecar(const AcquiredRootSnapshot& snapshot, MeshSidecarLimits& limit) noexcept {
+        std::optional<MeshSidecarDiagnostic> detail;
+        const auto parsed = read_mesh_sidecar(snapshot, limit, plan_, stop_, &detail);
+        if (!parsed) {
+            if (diagnostic_) {
+                diagnostic_->sidecar = detail;
+            }
+            return reject(parsed.error(), snapshot, LeafReferenceFailure::Sidecar);
+        }
+        limit.maximum_work -= parsed->work();
+        if (snapshot.declaring_mesh_geometry &&
+            parsed->geometry() != MeshGeometryId{*snapshot.declaring_mesh_geometry}) {
+            if (diagnostic_) {
+                MeshSidecarDiagnostic mismatch{};
+                mismatch.reason = MeshSidecarFailure::CaseReference;
+                mismatch.source = snapshot.location;
+                mismatch.target_namespace = SchemaNamespace::Geometry;
+                mismatch.target = snapshot.declaring_mesh_geometry;
+                diagnostic_->sidecar = mismatch;
+            }
+            return reject({Code::InvalidInput, operation}, snapshot, LeafReferenceFailure::Sidecar);
+        }
         return ExtractedReferenceDependencies{};
     }
 
@@ -188,6 +221,11 @@ public:
             const DependencyEdge edge{std::nullopt, declaration->source_ordinal,
                                       parent_.source.source, original.role,
                                       original.declaration_node};
+            const auto& vertex = vertices_.values()[static_cast<std::size_t>(edge.dependency)];
+            if (vertex.declaring_mesh_geometry != original.declaring_mesh_geometry) {
+                return reject({Code::InvalidInput, operation}, edge, original.source_id,
+                              original.declaration_pointer);
+            }
             if (const auto visited = follow(edge, i, original.declaration_pointer, {}); !visited) {
                 return visited;
             }
@@ -353,6 +391,7 @@ ReferenceGraphBuilder::configure_roots(const RootReferenceReport& report) noexce
         entry.id = original.source_id;
         entry.role = original.role;
         entry.digest = original.declared_digest;
+        entry.declaring_mesh_geometry = original.declaring_mesh_geometry;
     }
     root_count_ = static_cast<core::Index>(count);
     vertex_count_ = root_count_;
@@ -528,6 +567,7 @@ core::Result<void> ReferenceGraphBuilder::authenticate(Vertex& vertex, const Dep
     }
     limits_.inventory.charge(*file, acquired_ + origin_.manifest_identity.has_value());
     identities_.values()[acquired_++] = file->file_info.identity;
+    snapshot->declaring_mesh_geometry = vertex.declaring_mesh_geometry;
     vertex.snapshot.emplace(std::move(*snapshot));
     return {};
 }
@@ -668,6 +708,7 @@ void LeafReferenceDiagnostic::reset() noexcept {
     format_offset.reset();
     declaring_source.reset();
     path.reset();
+    sidecar.reset();
     walk.reset();
     declaration_pointer = {};
 }

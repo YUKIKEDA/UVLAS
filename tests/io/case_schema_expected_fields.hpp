@@ -6,7 +6,7 @@ struct Field {
     std::string_view record, name, spelling;
     bool optional;
 };
-inline constexpr std::array<Field, 806> fields{{
+inline constexpr std::array<Field, 815> fields{{
     {"Case", "schema", "Tag{uvlas.case/1}", false},
     {"Case", "units", "Units", false},
     {"Case", "model", "Model", false},
@@ -317,6 +317,15 @@ inline constexpr std::array<Field, 806> fields{{
     {"AeroAttachmentPrescribed", "motion", "Motion", false},
     {"AeroAttachmentStructural", "kind", "Tag{structural}", false},
     {"AeroAttachmentStructural", "host", "Ref<Shell>", false},
+    {"AeroAttachmentStructural", "material_map", "MaterialMap", true},
+    {"MaterialMap", "pieces", "List<MaterialMapPiece>", false},
+    {"MaterialMapPiece", "chord_cells", "Vec<Index,2>", false},
+    {"MaterialMapPiece", "span_cells", "Vec<Index,2>", false},
+    {"MaterialMapPiece", "layer", "Ref<Layer>", false},
+    {"MaterialMapPiece", "side", "Tag{interior,lower,upper}", false},
+    {"MaterialMapPiece", "terms", "List<MaterialMapTerm>", false},
+    {"MaterialMapTerm", "powers", "Vec<Count,2>", false},
+    {"MaterialMapTerm", "coefficient", "Vec<Rational,3>", false},
     {"AeroSharing", "other", "Ref<AeroSurface>", false},
     {"AeroSharing", "own_boundary", "Index", false},
     {"AeroSharing", "other_boundary", "Index", false},

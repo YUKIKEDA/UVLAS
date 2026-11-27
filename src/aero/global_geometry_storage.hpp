@@ -75,7 +75,6 @@ struct GlobalTopologyOwner {
 struct GlobalContactData {
     std::optional<OwnedGeometry> geometry;
     std::shared_ptr<const GlobalTopologyData> topology;
-    core::PlannedBuffer<global_detail::Node> nodes;
     GlobalWorkPlan plan;
 };
 struct AliasKinematicsData {

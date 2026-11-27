@@ -112,7 +112,10 @@ Nastran/Gmshのsidecar内容は本caseと同じ型辞書の幾何・材料・所
 | AeroSurface | id:Id<AeroSurface>, geometry:Ref<Geometry>, attachment:AeroAttachment, chord:List<Number>, span:List<Number>, leading:Index, trailing:Index, orientation:Tag{positive,reversed}, sharing:List<AeroSharing> | chord/span各2以上で厳密増加、後縁の物理index範囲検査。quarter/three-quarterを別入力で変更不可 |
 | AeroAttachment fixed | kind:Tag{fixed_reference} | geometryの不変参照位置を使う。架空シェル不要 |
 | AeroAttachment prescribed | kind:Tag{prescribed_motion}, motion:Motion | 参照geometryに同じSE(3)運動を作用。別の構造支持速度を加算しない |
-| AeroAttachment structural | kind:Tag{structural}, host:Ref<Shell> | 同じ固定物質写像のq/vから位置/面速度。motionの重畳keyは禁止 |
+| AeroAttachment structural | kind:Tag{structural}, host:Ref<Shell>, material_map?:MaterialMap | 同じ固定材料座標対応のq/vから位置と面速度を求める。省略形式も読めるが、物理準備には必須。motionの重畳keyは禁止。[材料座標対応](../aero/structural-attachment-material-map-contract.md) |
+| MaterialMap | pieces:List<MaterialMapPiece> | 一つ以上。空力面の物理セル格子を隙間・重複なしに覆う |
+| MaterialMapPiece | chord_cells:Vec<Index,2>, span_cells:Vec<Index,2>, layer:Ref<Layer>, side:Tag{interior,lower,upper}, terms:List<MaterialMapTerm> | 各セル軸の0始まり半開区間と、支持先Shellが所有する層を指定 |
+| MaterialMapTerm | powers:Vec<Count,2>, coefficient:Vec<Rational,3> | 総次数4以下。べきの組を一意にし、係数は材料座標の順に格納 |
 | AeroSharing | other:Ref<AeroSurface>, own_boundary:Index, other_boundary:Index, orientation:Tag{same,reversed} | ID共有と近接を区別。incident適格性はprepare |
 | Flow none | kind:Tag{none} | aero_surfacesが空の場合だけ。架空ρ/Uを必須にしない |
 | Flow known | kind:Tag{known}, density:Q<M/L³>, uniform:TimeSeries<3>, gust:Gust, reference:FlowReference, events:List<Q<T>> | density>0、uniformはL/T。events厳密増加、空可 |
