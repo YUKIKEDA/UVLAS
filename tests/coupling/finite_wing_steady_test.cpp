@@ -2249,16 +2249,18 @@ std::vector<double> formal_harmonic_ages(std::span<const Point> collocation,
     }
     REQUIRE(nearest > 0.);
     auto step = std::min(.0005, std::sqrt(nearest) / (2 * speed));
-    const auto final_age = length / speed;
+    // The quadrature derives its final endpoint from the retained wake geometry.
+    // Keep every supplied start strictly below the outward lower bound on that endpoint.
+    const auto end_age_lower = std::nextafter(length / speed, 0.);
     const auto phase_limit = std::numbers::pi / omega;
-    std::vector<double> ages{0.};
-    while (ages.back() < final_age) {
-        const auto next = std::min(final_age, ages.back() + std::min(step, phase_limit));
-        REQUIRE(next > ages.back());
-        ages.push_back(next);
+    std::vector<double> starts{0.};
+    for (auto next = std::min(step, phase_limit); next < end_age_lower;
+         next = starts.back() + std::min(step, phase_limit)) {
+        REQUIRE(next > starts.back());
+        starts.push_back(next);
         step *= 1.5;
     }
-    return ages;
+    return starts;
 }
 
 void verify_formal_harmonic(double k, bool heave) {
