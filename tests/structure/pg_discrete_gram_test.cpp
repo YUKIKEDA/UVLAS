@@ -6,6 +6,7 @@
 #include <uvlas/structure/pg_full_trace.hpp>
 #include <uvlas/structure/pg_prepared_patch.hpp>
 #include <uvlas/structure/pg_prepared_volume.hpp>
+#include <uvlas/structure/pg_shell_material.hpp>
 
 using namespace uvlas;
 using namespace uvlas::structure;
@@ -21,6 +22,24 @@ constexpr auto curved_rule_points_per_volume = static_cast<std::size_t>(curved_r
                                                static_cast<std::size_t>(curved_rule_depth_count);
 constexpr int curved_rule_weight_denominator =
     2 * curved_rule_planar_count * curved_rule_depth_count;
+
+using Matrix3 = std::array<Q, 9>;
+
+Matrix3 product(const Matrix3& a, const Matrix3& b, bool transpose_left = false) {
+    Matrix3 result{};
+    for (std::size_t i = 0; i < 3; ++i)
+        for (std::size_t j = 0; j < 3; ++j)
+            for (std::size_t k = 0; k < 3; ++k)
+                result[3 * i + j] += a[transpose_left ? 3 * k + i : 3 * i + k] * b[3 * k + j];
+    return result;
+}
+
+Q contract(const Matrix3& a, const Matrix3& b) {
+    Q sum{};
+    for (std::size_t i = 0; i < a.size(); ++i)
+        sum += a[i] * b[i];
+    return sum;
+}
 
 PgReferenceBasis parabolic_basis(Fixture& f, core::Workspace& scratch, core::ResourcePlan& plan,
                                  bool adjacent = false) {
@@ -44,6 +63,119 @@ struct CurvedRulePoint {
     ExactRational u, v, depth;
     Q s, t, zeta, root, measure;
 };
+
+void check_curved_shell_actions(Fixture& f, const PgPreparedPatch& patch,
+                                std::span<const CurvedRulePoint> rule,
+                                const PgReferenceLimits& limits, core::Workspace& workspace) {
+    core::ResourcePlan plan{profile};
+    const auto info = take(patch.info());
+    const auto reference = patch.reference_coordinates();
+    const auto field =
+        take(patch.conditioning().required_coordinates({2}, limits, workspace, plan));
+    const auto convert = [&](const Q& value) {
+        return rat(f, numerator(value), denominator(value));
+    };
+    std::vector<PgCartesianExactPosition> trial(reference.size()), direction(reference.size());
+    const Q amplitude{"1/16"};
+    for (std::size_t j = 0; j < reference.size(); ++j) {
+        // Required field 2 represents the reference midsurface height s²/16.
+        // The test direction is therefore s² e_x metres at every depth.
+        const Q coefficient = 16 * q(field.values()[j]);
+        direction[j][0] = convert(coefficient);
+        trial[j][0] = convert(q(reference[j][0]) + amplitude * coefficient);
+        trial[j][1] = convert(q(reference[j][1]));
+        trial[j][2] = convert(q(reference[j][2]));
+    }
+    const auto half = f.r("1", "2"), zero = f.r("0"), one = f.r("1");
+    const auto e_lower = f.r("10"), e_upper = f.r("20"), rho_upper = f.r("3");
+    const auto lower =
+        take(PgShellElasticLaw::prepare(PgIsotropicElasticity{e_lower, zero}, one, limits, plan));
+    const auto upper = take(
+        PgShellElasticLaw::prepare(PgIsotropicElasticity{e_upper, zero}, rho_upper, limits, plan));
+    const auto& partition = take(take(patch.conditioning().reference_basis())->source()).partition;
+    const auto volumes = take(partition.volumes());
+    const auto layers = take(partition.layers());
+    REQUIRE(layers.size() == 2);
+    const std::array<PgShellLayerDensity, 2> densities{
+        {{layers[0].id, one}, {layers[1].id, rho_upper}}};
+    const std::array<PgReferenceScalar, 6> initial_green;
+    const std::array<ExactRational, 6> initial_error;
+    const PgInitialGreenEnclosure initial{one, initial_green, initial_error};
+    const std::array fibre{f.r("1"), f.r("0"), f.r("0")};
+    const PgShellPointAxes axes = PgShellProjectedFibre{fibre, one, zero};
+    std::vector<PgShellVolumeSample> samples;
+    std::vector<PgDiscreteVolumePoint> mass_rule;
+    Q energy{}, force_work{}, tangent_work{}, mass{}, inertia{};
+    // Use the same explicit finite rule in both paths. The oracle works in
+    // physical 3x3 tensors and differentiates the analytic parabola.
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        const auto& p = rule[i * curved_rule_points_per_volume + curved_rule_points_per_volume / 2];
+        const auto layer = static_cast<std::size_t>(volumes[i].layer);
+        const PgDiscreteVolumePoint sample{{p.volume, p.u, p.v, p.depth}, half};
+        samples.push_back({sample, layers[layer].id, layer == 0 ? lower : upper, initial, axes});
+        mass_rule.push_back(sample);
+        const auto s = p.s, zeta = p.zeta, r = p.root;
+        const Q x_s = 2 - zeta / (16 * r * r * r);
+        const Q z_s = s / 4 - zeta * s / (128 * r * r * r);
+        const Q x_zeta = -s / (16 * r), z_zeta = Q{"1/2"} / r;
+        const Q determinant = x_s * z_zeta - x_zeta * z_s;
+        Matrix3 delta{};
+        delta[0] = 2 * s * z_zeta / determinant;
+        delta[2] = -2 * s * x_zeta / determinant;
+        Matrix3 deformation{};
+        for (std::size_t j = 0; j < 9; ++j)
+            deformation[j] = (j % 4 == 0 ? Q{1} : Q{}) + amplitude * delta[j];
+        const auto gram = product(deformation, deformation, true);
+        const auto mixed = product(deformation, delta, true);
+        Matrix3 green{}, stress{}, stress_direction{};
+        const Q young = layer == 0 ? 10 : 20;
+        for (std::size_t j = 0; j < 9; ++j) {
+            green[j] = (gram[j] - (j % 4 == 0 ? Q{1} : Q{})) / 2;
+            stress[j] = young * green[j];
+            const auto transpose = 3 * (j % 3) + j / 3;
+            stress_direction[j] = young * (mixed[j] + mixed[transpose]) / 2;
+        }
+        // The oracle's Gram measure is nondimensional and uses 1/(2*63).
+        // The shell action uses length 2 m and integration weight 1/2.
+        const Q measure = p.measure * (8 * curved_rule_points_per_volume);
+        energy += measure * contract(green, stress) / 2;
+        force_work += measure * contract(product(deformation, stress), delta);
+        tangent_work += measure * (contract(product(delta, stress), delta) +
+                                   contract(product(deformation, stress_direction), delta));
+        const Q weighed_mass = measure * (layer == 0 ? 1 : 3);
+        mass += weighed_mass;
+        inertia += weighed_mass * s * s * s * s;
+    }
+    const auto width = f.r("1", "1000000000000000000000");
+    const PgShellVolumeResolution elastic_resolution{112, width, width, width};
+    const PgShellPatchDirection delta{info.identity, direction};
+    const auto elastic = take(assemble_pg_shell_elastic_volume(
+        patch, {info.identity, trial}, samples, delta, elastic_resolution, limits, plan));
+    const auto contained = [](const Q& lo, const Q& hi, const Q& expected) {
+        CHECK(lo <= expected);
+        CHECK(hi >= expected);
+        CHECK(hi - lo < Q{"1/10000000000000000000"});
+    };
+    const auto verify_work = [&](std::span<const PgShellCartesianEnclosure> action,
+                                 const Q& expected) {
+        Q lo{}, hi{};
+        REQUIRE(action.size() == direction.size());
+        for (std::size_t j = 0; j < action.size(); ++j) {
+            const Q a = q(direction[j][0]) * q(action[j][0].lower);
+            const Q b = q(direction[j][0]) * q(action[j][0].upper);
+            lo += std::min(a, b);
+            hi += std::max(a, b);
+        }
+        contained(lo, hi, expected);
+    };
+    contained(q(elastic.energy_joules.lower), q(elastic.energy_joules.upper), energy);
+    verify_work(elastic.internal_force_newtons.values(), force_work);
+    verify_work(elastic.tangent_action_newtons.values(), tangent_work);
+    const auto consistent = take(apply_pg_shell_consistent_mass(patch, mass_rule, densities, delta,
+                                                                {112, width, width}, limits, plan));
+    contained(q(consistent.mass_kg.lower), q(consistent.mass_kg.upper), mass);
+    verify_work(consistent.action_kg_metres.values(), inertia);
+}
 
 // Sample the parabola z=s²/16. Rational Pythagorean slopes let this
 // finite-rule oracle use only exact rational arithmetic.
@@ -433,7 +565,7 @@ void check_projected_weight_admission(const PgPreparedPatch& patch, const PgRefe
 } // namespace
 
 TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its transform",
-          "[SH-D03][SH-D07][N4-02][N4-03][N4-08][verification]") {
+          "[SH-D03][SH-D04][SH-D07][MAT-D08][MAT-D10][V-MAT][N4-02][N4-03][N4-08][verification]") {
     Fixture f;
     core::Workspace scratch{core::PlannedBuffer<std::byte>{}};
     core::ResourcePlan setup{profile};
@@ -598,6 +730,7 @@ TEST_CASE("PG curved discrete Gram encloses the selected rule and certifies its 
     }
     CHECK(rebuilt == expected);
     CHECK(translated == 1);
+    check_curved_shell_actions(f, patch, rule, caps.arithmetic, scratch);
     const auto adjacent_patch = take(
         PgPreparedPatch::prepare(std::move(adjacent_certificate), caps.arithmetic, scratch, plan));
     check_curved_trace(f, patch, adjacent_patch, caps.arithmetic, scratch, plan);

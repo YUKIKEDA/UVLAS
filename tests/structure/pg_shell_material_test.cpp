@@ -1,3 +1,5 @@
+#include "pg_partition_test_support.hpp"
+
 #include <catch2/catch_test_macros.hpp>
 
 #include <uvlas/structure/pg_shell_material.hpp>
@@ -371,5 +373,76 @@ TEST_CASE("Projected material axes use the physical layer tangents and in-plane 
         f.memory);
     REQUIRE_FALSE(reversed);
     CHECK(reversed.error().code == core::FailureCode::GeometryInvalid);
+}
+TEST_CASE("A variable-thickness curved layer tilts the material axes used in stress recovery",
+          "[MAT-D05][MAT-D10][V-MAT][verification]") {
+    Fixture f;
+    partition_test::Fixture chart;
+    const auto zero = f.q("0"), one = f.q("1"), two = f.q("2");
+    const auto curvature = f.q("1", "16");
+    const std::array<ExactInputTerm, 1> terms{{{{2, 0}, curvature}}};
+    const auto polynomial = partition_test::take(
+        ExactChartPolynomial::make(terms, partition_test::exact_limits(), chart.input_plan));
+    chart.graph = partition_test::take(
+        PgGraph::prepare({zero, one, zero, polynomial, 1, PgGraphConvention::Version1},
+                         {partition_test::exact_limits(), 64, {}}, chart.input_plan));
+    chart.heights[2] = f.q("3", "2");
+    chart.heights[3] = f.q("3", "2");
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    auto dictionary = partition_test::take(PgCoefficientDictionary::prepare(
+        chart.chart_graph(), {partition_test::exact_limits(), 2000, 20'000'000, 100'000, {}},
+        workspace, chart.input_plan));
+    auto topology = partition_test::take(PgIntegrationPartition::prepare(
+        chart.request(), partition_test::limits(), workspace, chart.input_plan));
+    const auto volumes = partition_test::take(topology.volumes());
+    const auto triangles = partition_test::take(topology.triangles());
+    const auto vertices = partition_test::take(topology.vertices());
+    core::Index volume = -1;
+    std::size_t vertex = 0;
+    for (std::size_t i = 0; i < volumes.size() && volume < 0; ++i) {
+        if (volumes[i].layer != 1)
+            continue;
+        const auto& triangle = triangles[static_cast<std::size_t>(volumes[i].triangle)];
+        for (std::size_t j = 0; j < triangle.vertices.size(); ++j) {
+            if (vertices[static_cast<std::size_t>(triangle.vertices[j])].s.sign() == 0) {
+                volume = static_cast<core::Index>(i);
+                vertex = j;
+                break;
+            }
+        }
+    }
+    REQUIRE(volume >= 0);
+    const std::array rotation{f.q("1"), f.q("0"), f.q("0"), f.q("0"), f.q("1"),
+                              f.q("0"), f.q("0"), f.q("0"), f.q("1")};
+    const std::array<ExactRational, 3> origin;
+    const PgReferenceLimits geometry_limits{
+        partition_test::exact_limits(), 1'000'000, 1'000'000, {}};
+    auto physical = partition_test::take(PgReferenceGeometry::prepare(
+        {std::move(chart.chart_graph()), std::move(dictionary), std::move(topology)},
+        {rotation, origin, two}, geometry_limits, chart.input_plan));
+    const auto depth = f.q("5", "8");
+    const auto reference = partition_test::take(physical.evaluate(
+        PgReferenceVolumePoint{volume, vertex == 1 ? one : zero, vertex == 2 ? one : zero, depth},
+        std::nullopt, geometry_limits, chart.input_plan));
+    CHECK(reference.s.sign() == 0);
+    CHECK(reference.zeta == f.q("1", "2"));
+    CHECK(reference.g == one);
+    const auto young = f.q("10");
+    const auto law = partition_test::take(
+        PgShellElasticLaw::prepare(PgIsotropicElasticity{young, zero}, one, f.limits, f.memory));
+    std::array<PgReferenceScalar, 6> prescribed;
+    prescribed[1].rational = f.q("1", "8");
+    const std::array<ExactRational, 6> error;
+    const std::array fibre{f.q("1"), f.q("0"), f.q("0")};
+    const auto deformation = f.tensor({"1", "0", "0", "0", "2", "0", "0", "0", "1"});
+    const auto recovered = partition_test::take(enclose_pg_shell_material_point(
+        law, {one, prescribed, error}, PgShellProjectedAxes{reference, {fibre, one, zero}},
+        deformation, f.limits, f.memory));
+    // At s=0 and zeta=1/2, H=1+t/2 gives J0,t=(0,2,1/8).
+    // The second material axis is (0,16,1)/sqrt(257). With nu=0,
+    // S=10*(E-(1/8)*a2*a2^T) in the world frame.
+    f.check_encloses(recovered.second_pk_world_pascal[4], f.q("3535", "257"));
+    f.check_encloses(recovered.second_pk_world_pascal[5], f.q("-20", "257"));
+    f.check_encloses(recovered.second_pk_world_pascal[8], f.q("-5", "1028"));
 }
 } // namespace
