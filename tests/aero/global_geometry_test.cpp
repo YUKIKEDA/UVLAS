@@ -215,6 +215,97 @@ TEST_CASE("A retained contact keeps the same checked current geometry and refere
     CHECK(take(retained.face_role(0)).role == s::AeroFaceRole::Bound);
 }
 
+TEST_CASE("Current closed contour bounds qualify exact collocations and owner midpoints",
+          "[UI-D03][UI-D05][UW-D07][N4-03][verification]") {
+    test_geometry::TriangleFixture fixture;
+    for (const auto z : {2U, 5U, 8U})
+        fixture.current[z] = 1.;
+    core::ResourcePlan plan{budget};
+    auto query_work = test_geometry::workspace(plan);
+    auto global_work = workspace(plan);
+    const auto geometry = test_geometry::take(
+        s::prepare_owned_geometry(fixture.input(), test_geometry::limits(), *query_work, plan));
+    const std::array edges{s::EdgeBindingInput{fixture.edges[0].id, s::CanonicalEdge{}},
+                           s::EdgeBindingInput{fixture.edges[1].id, s::CanonicalEdge{}},
+                           s::EdgeBindingInput{fixture.edges[2].id, s::CanonicalEdge{}}};
+    const auto qualify_as = [&](s::AeroFaceRole role, core::ResourcePlan& index_plan) {
+        const std::array roles{s::FaceRoleInput{fixture.faces[0].id, role}};
+        const auto topology = take(
+            s::build_global_topology(geometry, {roles, edges, {}}, limits(), *global_work, plan));
+        const auto contact =
+            take(s::check_global_geometry(topology, geometry, limits(), *global_work, plan));
+        return s::ContourContactIndex::prepare(contact, limits(), *global_work, index_plan);
+    };
+    core::ResourcePlan measured{budget};
+    auto index = take(qualify_as(s::AeroFaceRole::Bound, measured));
+    REQUIRE(index.preparation_steps() > 0);
+    core::ResourcePlan one_byte_short{measured.allocated_bytes() - 1};
+    const auto no_bytes = qualify_as(s::AeroFaceRole::Bound, one_byte_short);
+    REQUIRE_FALSE(no_bytes);
+    CHECK(no_bytes.error().origin.cause.code == core::FailureCode::ResourceExceeded);
+    CHECK(one_byte_short.allocated_bytes() == 0);
+    const auto wake = take(qualify_as(s::AeroFaceRole::Wake, plan));
+    const auto query_for = [&](s::QueryDefinition expression) {
+        return test_geometry::take(s::resolve_query(geometry, {s::QueryId{37}, expression},
+                                                    geometry.context(), test_geometry::limits(),
+                                                    *query_work, plan));
+    };
+    const auto interior = query_for(s::FreePoint{s::FreeSingle{{1, 1, 1}}});
+    const auto qualify = [&](const s::ContourContactIndex& contact, const s::ResolvedQuery& query,
+                             std::optional<s::EdgeId> self = {}, s::GlobalLimits cap = limits(),
+                             std::stop_token stop = {}) {
+        return contact.qualify(query, self, test_geometry::limits(), cap, *query_work, *global_work,
+                               std::move(stop));
+    };
+    const auto used = take(qualify(index, interior));
+    CHECK(used.candidates == 1);
+    auto cap = limits();
+    cap.max_steps = used.steps;
+    CHECK(take(qualify(index, interior, {}, cap)).steps == used.steps);
+    --cap.max_steps;
+    const auto no_steps = qualify(index, interior, {}, cap);
+    REQUIRE_FALSE(no_steps);
+    CHECK(no_steps.error().origin.cause.code == core::FailureCode::ResourceExceeded);
+    const auto unrelated = qualify(wake, interior);
+    REQUIRE_FALSE(unrelated);
+    CHECK(unrelated.error().origin.cause.code == core::FailureCode::GeometryInvalid);
+    CHECK(unrelated.error().origin.problem == s::GeometryProblem{s::QueryId{37}});
+    CHECK(unrelated.error().other_facet == s::FacetId{70});
+
+    const auto above = query_for(
+        s::FreePoint{s::FreeDouble{{1, 1, 1}, {0, 0, std::numeric_limits<double>::denorm_min()}}});
+    CHECK(take(qualify(wake, above)).candidates == 0);
+    const auto previous = query_for(s::FreePoint{s::FreeSingle{{1, 1, 0}}});
+    CHECK(take(qualify(index, previous)).candidates == 0);
+    const auto outside = query_for(s::FreePoint{s::FreeSingle{{2, 3, 1}}});
+    CHECK(take(qualify(wake, outside)).candidates == 1);
+    const auto edge_location = query_for(s::FreePoint{s::FreeSingle{{1.5, 0, 1}}});
+    const auto contact_without_support = qualify(index, edge_location);
+    REQUIRE_FALSE(contact_without_support);
+    CHECK(contact_without_support.error().origin.cause.code == core::FailureCode::GeometryInvalid);
+    const auto midpoint = query_for(s::SourceEdgePoint{s::EdgeId{10}, s::SingleWord{0.5}});
+    CHECK(take(qualify(index, midpoint, s::EdgeId{10})).candidates == 1);
+    const auto pretend_self = qualify(index, midpoint, s::EdgeId{30});
+    REQUIRE_FALSE(pretend_self);
+    CHECK(pretend_self.error().origin.cause.code == core::FailureCode::InvalidInput);
+    const auto wake_self = qualify(wake, midpoint, s::EdgeId{10});
+    REQUIRE_FALSE(wake_self);
+    CHECK(wake_self.error().origin.cause.code == core::FailureCode::Unsupported);
+    // NOLINTNEXTLINE(misc-const-correctness) MSVC's request_stop is non-const.
+    std::stop_source cancelled;
+    cancelled.request_stop();
+    const auto stopped = qualify(index, interior, {}, limits(), cancelled.get_token());
+    REQUIRE_FALSE(stopped);
+    CHECK(stopped.error().origin.cause.code == core::FailureCode::Cancelled);
+
+    const auto again = std::move(index);
+    // NOLINTNEXTLINE(bugprone-use-after-move) The moved-from index must return InvalidInput.
+    const auto moved_from = qualify(index, interior);
+    REQUIRE_FALSE(moved_from);
+    CHECK(moved_from.error().origin.cause.code == core::FailureCode::InvalidInput);
+    CHECK(take(qualify(again, interior)).steps == used.steps);
+}
+
 TEST_CASE("Sparse alias rows reject duplicate unsorted unknown and explicit-zero columns",
           "[UW-D07][UI-D03][N4-02]") {
     test_global_geometry::KinematicsFixture fixture;

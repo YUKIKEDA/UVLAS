@@ -47,14 +47,16 @@ struct DiscreteCollocation {
 };
 
 struct AttachedWakeFront {};
+/// Fixed steady strip. The downstream trace uses the signed attached front column.
+struct SteadyWakeClosure {};
 struct DiscreteWakePanel {
     DiscreteWakePanel(aero::detail::FacetId source,
                       std::variant<AttachedWakeFront, aero::detail::P1StrengthId> left,
-                      aero::detail::P1StrengthId right) noexcept
+                      std::variant<aero::detail::P1StrengthId, SteadyWakeClosure> right) noexcept
         : facet(source), leading(left), trailing(right) {}
     aero::detail::FacetId facet; ///< Either child of the retained wake quadrilateral.
     std::variant<AttachedWakeFront, aero::detail::P1StrengthId> leading;
-    aero::detail::P1StrengthId trailing;
+    std::variant<aero::detail::P1StrengthId, SteadyWakeClosure> trailing;
 };
 
 struct FrozenWakeTrace {

@@ -1212,10 +1212,12 @@ void verify_formal_wing_forecast(const CaseLattice& grid, const FiniteWingMesh& 
     }
     for (std::size_t i = 0; i < span; ++i) {
         const auto panel = take_global(contact.uvlm_quad(mesh.quads[count + i].facets[0], 1000000));
-        REQUIRE(panel.attachment);
-        const auto leading = panel.attachment->coefficient == -1
+        const auto& attachment = panel.attachment;
+        if (!attachment)
+            FAIL("Formal wing wake strip requires a trailing-edge attachment");
+        const auto leading = attachment->coefficient == -1
                                  ? a::P1StrengthId{10000 + i}
-                                 : a::P1StrengthId::bound(panel.attachment->bound_face);
+                                 : a::P1StrengthId::bound(attachment->bound_face);
         const auto trailing = a::P1StrengthId{5000 + i};
         maps.emplace_back(panel.face, std::array{leading, trailing});
         ids.push_back(trailing);
@@ -1226,7 +1228,9 @@ void verify_formal_wing_forecast(const CaseLattice& grid, const FiniteWingMesh& 
     REQUIRE(maps.size() == (128 + 1) * 192);
     constexpr std::uint64_t query_cap = UINT64_C(150000000000);
     const a::P1AssemblyLimits admission{
-        geometry_caps, {ls::EstimateAdmission{8 * 1024 * 1024}, UINT64_C(1000000000)}, query_cap};
+        geometry_caps,
+        {ls::EstimateAdmission{UINT64_C(8) * 1024 * 1024}, UINT64_C(1000000000)},
+        query_cap};
     std::cout << "Formal geometry: points=" << mesh.ids.size() << " facets=" << 2 * maps.size()
               << " preparation_bytes=" << memory.allocated_bytes()
               << " kernel_step_cap=" << a::P1Workspace::maximum_steps() << '\n';
@@ -1247,6 +1251,64 @@ void verify_formal_wing_forecast(const CaseLattice& grid, const FiniteWingMesh& 
                   << " repeated_bytes=" << forecast.repeated_payload_bytes
                   << " metadata_bytes=" << forecast.ordinary.estimated_metadata_bytes << '\n';
     }
+}
+
+void verify_formal_wing_contacts(const CaseLattice& grid, const FiniteWingMesh& mesh,
+                                 const a::OwnedGeometry& geometry,
+                                 const a::GlobalContactState& contact,
+                                 const a::GeometryLimits& geometry_caps,
+                                 a::GlobalLimits contact_caps, a::GeometryWorkspace& geometry_work,
+                                 a::GlobalWorkspace& global_work, core::ResourcePlan& memory) {
+    const auto index =
+        take_global(a::ContourContactIndex::prepare(contact, contact_caps, global_work, memory));
+    const auto query = [&](a::QueryDefinition definition) {
+        return test_geometry::take(a::resolve_query(geometry, {a::QueryId{1}, definition},
+                                                    geometry.context(), geometry_caps,
+                                                    geometry_work, memory));
+    };
+    const auto qualify = [&](const a::ResolvedQuery& resolved, std::optional<a::EdgeId> self) {
+        return index.qualify(resolved, self, geometry_caps, contact_caps, geometry_work,
+                             global_work);
+    };
+    std::uint64_t collocation_candidates = 0, midpoint_candidates = 0;
+    for (const auto& location : grid.collocation)
+        collocation_candidates +=
+            take_global(qualify(query(a::FreePoint{a::FreeSingle{location}}), {})).candidates;
+
+    std::vector<a::EdgeId> midpoint_edges;
+    for (const auto& quad : std::span{mesh.quads}.first(grid.collocation.size()))
+        midpoint_edges.insert(midpoint_edges.end(), quad.edges.begin(), quad.edges.end());
+    std::ranges::sort(midpoint_edges);
+    const auto duplicates = std::ranges::unique(midpoint_edges);
+    midpoint_edges.erase(duplicates.begin(), duplicates.end());
+    for (const auto& trailing : mesh.trailing) {
+        const auto found = std::ranges::lower_bound(midpoint_edges, trailing.edge);
+        REQUIRE(found != midpoint_edges.end());
+        REQUIRE(*found == trailing.edge);
+        midpoint_edges.erase(found);
+    }
+    REQUIRE(midpoint_edges.size() == 49'280);
+    for (const auto edge : midpoint_edges)
+        midpoint_candidates +=
+            take_global(qualify(query(a::SourceEdgePoint{edge, a::SingleWord{0.5}}), edge))
+                .candidates;
+
+    // The reference closed boxes used the exported Binary64 input vertices and
+    // a one-ulp enclosing interval for each exact midpoint's coordinates.
+    CHECK(collocation_candidates == 238'380);
+    CHECK(midpoint_candidates >= 98'112);
+    CHECK(midpoint_candidates <= 663'240);
+    const auto on_vertex = qualify(query(a::FreePoint{a::FreeSingle{grid.vertices.front()}}), {});
+    REQUIRE_FALSE(on_vertex);
+    CHECK(on_vertex.error().origin.cause.code == core::FailureCode::GeometryInvalid);
+    const auto diagonal = mesh.quads.front().diagonal;
+    const auto wrong_self =
+        qualify(query(a::SourceEdgePoint{diagonal, a::SingleWord{0.5}}), diagonal);
+    REQUIRE_FALSE(wrong_self);
+    CHECK(wrong_self.error().origin.cause.code == core::FailureCode::Unsupported);
+    std::cout << "Formal contour contact: collocation_candidates=" << collocation_candidates
+              << " midpoint_candidates=" << midpoint_candidates
+              << " refit_steps=" << index.preparation_steps() << '\n';
 }
 #endif
 
@@ -1323,6 +1385,8 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
     if (m == 128) {
         verify_formal_wing_forecast(grid, mesh, geometry, contact, geometry_caps, ny,
                                     *geometry_work, memory);
+        verify_formal_wing_contacts(grid, mesh, geometry, contact, geometry_caps, contact_caps,
+                                    *geometry_work, *global, memory);
         return;
     }
 #endif

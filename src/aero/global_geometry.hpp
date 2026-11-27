@@ -57,7 +57,7 @@ struct GlobalLimits {
 /// A global failure retains its first entity and, for contacts, the second facet.
 struct GlobalGeometryFailure {
     OwnedGeometryFailure origin;        ///< Original cause, details, entity and context.
-    std::optional<FacetId> other_facet; ///< Second facet in a rejected unordered pair.
+    std::optional<FacetId> other_facet; ///< Counterpart facet in a rejected contact.
 };
 /// A complete owning qualification or its preserved diagnostic; no partial success.
 template <class T>
@@ -354,6 +354,48 @@ private:
     explicit GlobalWorkspace(core::PlannedBuffer<GlobalScratch>) noexcept;
     core::PlannedBuffer<GlobalScratch> scratch_;
     std::atomic_flag busy_ = ATOMIC_FLAG_INIT;
+};
+
+namespace global_detail {
+struct Node;
+}
+
+/// Work for one closed-contour point qualification, excluding index preparation.
+struct ContourContactWork {
+    std::uint64_t steps{};
+    std::uint64_t candidates{};
+};
+
+/// Immutable current bounds tied to the exact snapshot qualified for finite-facet contact.
+/// Each caller supplies its own arithmetic workspaces.
+class ContourContactIndex {
+public:
+    ContourContactIndex(ContourContactIndex&&) noexcept;
+    ContourContactIndex& operator=(ContourContactIndex&&) noexcept;
+    ContourContactIndex(const ContourContactIndex&) = delete;
+    ContourContactIndex& operator=(const ContourContactIndex&) = delete;
+    ~ContourContactIndex();
+
+    /// Prepare once per current geometry. Payload and refit work use the supplied limits.
+    [[nodiscard]] static GlobalResult<ContourContactIndex> prepare(const GlobalContactState&,
+                                                                   GlobalLimits, GlobalWorkspace&,
+                                                                   core::ResourcePlan&,
+                                                                   std::stop_token = {}) noexcept;
+    [[nodiscard]] std::uint64_t preparation_steps() const noexcept;
+
+    /// Check a free collocation or the midpoint of a canonical non-TE bound edge.
+    /// The midpoint caller must exclude that edge's own contour contribution.
+    [[nodiscard]] GlobalResult<ContourContactWork>
+    qualify(const ResolvedQuery&, std::optional<EdgeId> self, const GeometryLimits&, GlobalLimits,
+            GeometryWorkspace&, GlobalWorkspace&, std::stop_token = {}) const noexcept;
+
+private:
+    friend class GlobalEngine;
+    ContourContactIndex(GlobalContactState&&, core::PlannedBuffer<global_detail::Node>&&,
+                        std::uint64_t) noexcept;
+    GlobalContactState contact_;
+    core::PlannedBuffer<global_detail::Node> nodes_;
+    std::uint64_t preparation_steps_;
 };
 /// Own global topology and the explicit TE transfer, without changing the source snapshot.
 [[nodiscard]] GlobalResult<GlobalTopology>

@@ -956,7 +956,13 @@ struct NonpenetrationBuilder {
             reject(*invalid);
         const auto geometry_owner = require(input.contact.geometry());
         const auto& geometry = geometry_owner.get();
-        if (!input.wake.empty() && geometry.context().diagnostics.parent != input.history.parent)
+        const bool steady_closure =
+            !input.wake.empty() &&
+            std::holds_alternative<SteadyWakeClosure>(input.wake.front().trailing);
+        if (steady_closure && !input.history.columns.empty())
+            reject(core::FailureCode::InvalidInput);
+        if (!steady_closure && !input.wake.empty() &&
+            geometry.context().diagnostics.parent != input.history.parent)
             reject(core::FailureCode::StaleGeneration);
 
         const auto counts = require(geometry.counts());
@@ -1048,8 +1054,11 @@ struct NonpenetrationBuilder {
             const auto panel = require(input.contact.uvlm_quad(row.facet, remaining(work), stop));
             account(work, panel.used_steps);
             const auto* previous = std::get_if<a::P1StrengthId>(&row.leading);
+            const auto* downstream = std::get_if<a::P1StrengthId>(&row.trailing);
             if (panel.role != a::AeroFaceRole::Wake ||
-                panel.attachment.has_value() == (previous != nullptr))
+                panel.attachment.has_value() == (previous != nullptr) ||
+                steady_closure != (downstream == nullptr) ||
+                (steady_closure && previous != nullptr))
                 reject(core::FailureCode::InvalidInput);
             auto leading = a::P1StrengthId{0};
             if (previous != nullptr) {
@@ -1078,8 +1087,9 @@ struct NonpenetrationBuilder {
                     leading = a::P1StrengthId::bound(entry.bound_face);
                 }
             }
+            const auto trailing = downstream != nullptr ? history(*downstream) : leading;
             maps.values()[bound_count + i] =
-                a::P1FaceStrengths{panel.face, std::array{leading, history(row.trailing)}};
+                a::P1FaceStrengths{panel.face, std::array{leading, trailing}};
         }
         if (attached != attachments.size())
             reject(core::FailureCode::InvalidInput);
