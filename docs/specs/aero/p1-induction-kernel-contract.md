@@ -165,6 +165,8 @@ $$
 
 である。nearの各分岐は選ぶ一方のcostの最大を取り、未評価の枝を実課金しない。固定208点の各基底/xyzの加算もaccumulationに展開する。計画のsum/product/byte/indexを全てcheckedに計算する。
 
+束縛輪郭では共有の入力準備、π、輪郭命令列、全成分の出力認定を積み、遠方の求積と対数用の定数は予約しない。輪郭命令列の上限は、各辺の分岐の大きい方を三辺分積む。共有作用は、後流側と束縛輪郭側の三角形を数え、それぞれの冷間上限を使って仕事を予約する。
+
 結果は126成分と診断/owner headerをPlannedBuffer<P1Storage>(1)で所有し、packet ownerは共有保持する。一回の累積owned payloadはworkspace準備分（必要時）と結果の実sizeof。準備済みworkspaceの評価中にscratchを追加確保しない。結果予約とleaseを構築前に確立し、失敗した自身の予約だけを戻す。max_stepsは全callのchecked累積上限で、不足は既存FailureCode::ResourceExceeded。各求積点・級数項・bit候補前に取消と残量を検査する。admissionは時間/RSSの証明ではない。
 固定1024bit backendはallocatorを持たない。既存32768bit演算の外部scratchはpacketと同じforecastを別計上し、同時積を重ねない。owner/control block、allocator overhead、RSSの証明は持たないため、EstimateAdmissionとRequireProvenBoundを区別し、後者に十分な証明がなければUnsupported。
 

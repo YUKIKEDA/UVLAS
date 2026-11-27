@@ -575,16 +575,18 @@ class SharedP1Engine {
             }
         };
         finite_outer();
+        std::size_t bound_facets = 0;
         for (const auto& record : geometry.facets.values()) {
             scan.step();
             const auto face = geometry.faces.values()[static_cast<std::size_t>(record.face)].id;
             const auto row =
                 locate(faces, face, [](const P1FaceStrengths& f) { return f.face.value(); }, scan);
             const auto& columns = faces[row].columns;
+            const bool bound = std::holds_alternative<P0BoundColumn>(columns);
             if (std::holds_alternative<QuadOrigin>(record.origin) !=
-                (std::holds_alternative<std::array<P1StrengthId, 2>>(columns) ||
-                 std::holds_alternative<P0BoundColumn>(columns)))
+                (std::holds_alternative<std::array<P1StrengthId, 2>>(columns) || bound))
                 throw ArithmeticFailure{invalid};
+            bound_facets += static_cast<std::size_t>(bound);
         }
         const auto n = geometry.facets.size();
         const auto e = product(n, 3);
@@ -616,11 +618,14 @@ class SharedP1Engine {
         result.preflight_steps = scan.used;
         // A caller may allow much more work than any local expression executes.
         // Reserve the ceiling the local evaluator actually enforces.
-        const auto kernel_steps = n == 0 ? 0 : P1Workspace::maximum_steps();
-        (void)checked_limit(kernel_steps, limits.kernel.max_steps);
+        const auto bound_steps = bound_facets == 0 ? 0 : P1Workspace::maximum_bound_steps();
+        const auto wake_steps = bound_facets == n ? 0 : P1Workspace::maximum_steps();
+        (void)checked_limit(std::max(bound_steps, wake_steps), limits.kernel.max_steps);
+        const auto kernel_steps =
+            sum(product(bound_facets, bound_steps), product(n - bound_facets, wake_steps));
         const auto packet_steps = local_packet_step_ceiling(n, limits.geometry);
         result.reserved_steps =
-            sum(result.preflight_steps, sum(metadata, product(n, sum(packet_steps, kernel_steps))));
+            sum(result.preflight_steps, sum(metadata, sum(product(n, packet_steps), kernel_steps)));
         (void)checked_limit(result.reserved_steps, limits.steps);
         return result;
     }
