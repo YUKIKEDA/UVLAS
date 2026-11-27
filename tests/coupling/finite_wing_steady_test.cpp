@@ -1598,22 +1598,27 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                                                     trial,
                                                     stamp,
                                                     p::RequestedSide::Automatic};
-        const auto loads = take(
-            cf::solve_discrete_circulation_loads(input, write_loads, std::move(flow), caps, request,
-                                                 *geometry_work, shared, *local, *kernel, memory));
-        if (count == 8 && sample == 1) {
+        auto selected = request;
+        selected.certified_closed_contour = count == 8 && sample == 0;
+        const auto loads = take(cf::solve_discrete_circulation_loads(
+            input, write_loads, std::move(flow), caps, selected, *geometry_work, shared, *local,
+            *kernel, memory));
+        if (count == 8) {
             core::ResourcePlan replay_memory{UINT64_C(2000000000)};
             const auto retained_contact = take_global(contact.retain_checked(replay_memory));
             const auto contact_bytes = replay_memory.allocated_bytes();
             const cf::DiscreteNonpenetrationInput replay_input{
                 retained_contact, rows, wake, input.history, trial, stamp, input.flow_side};
             const auto evidence = take(cf::verify_discrete_circulation_row_replay(
-                replay_input, loads.primal(), caps, request, shared, *local, *kernel,
+                replay_input, loads.primal(), caps, selected, shared, *local, *kernel,
                 replay_memory));
             CHECK(evidence.rows == count);
             CHECK(evidence.coefficients == count * count);
             CHECK(evidence.replay_row_bytes > 0);
-            CHECK(evidence.reference_dense_bytes == evidence.replay_row_bytes * count);
+            if (selected.certified_closed_contour)
+                CHECK(evidence.reference_dense_bytes == 0);
+            else
+                CHECK(evidence.reference_dense_bytes == evidence.replay_row_bytes * count);
             CHECK(evidence.allocated_bytes == replay_memory.allocated_bytes() - contact_bytes);
             CHECK(evidence.used_steps > 0);
             std::cout << "Native coefficient replay, row bytes=" << evidence.replay_row_bytes
@@ -1623,12 +1628,12 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
 
             core::ResourcePlan insufficient{0};
             const auto denied = cf::verify_discrete_circulation_row_replay(
-                input, loads.primal(), caps, request, shared, *local, *kernel, insufficient);
+                input, loads.primal(), caps, selected, shared, *local, *kernel, insufficient);
             if (denied)
                 FAIL("The row replay must admit its payload before assembly");
             CHECK(denied.error().code == core::FailureCode::ResourceExceeded);
             CHECK(insufficient.allocated_bytes() == 0);
-            auto changed = request;
+            auto changed = selected;
             changed.rhs_generation = core::RhsGeneration{9};
             const auto stale = cf::verify_discrete_circulation_row_replay(
                 input, loads.primal(), caps, changed, shared, *local, *kernel, insufficient);
@@ -1636,6 +1641,17 @@ void run_refined_drag(const nlohmann::json& wing, const nlohmann::json& polar,
                 FAIL("A different RHS generation must not qualify a replay");
             CHECK(stale.error().code == core::FailureCode::StaleGeneration);
             CHECK(insufficient.allocated_bytes() == 0);
+            if (selected.certified_closed_contour) {
+                auto too_tight = selected;
+                too_tight.matrix_absolute = 0;
+                auto unconsumed = project_flow();
+                const auto unprojectable = cf::solve_discrete_circulation(
+                    input, std::move(unconsumed), caps, too_tight, shared, *local, *kernel, memory);
+                REQUIRE_FALSE(unprojectable);
+                CHECK(unprojectable.error().code == core::FailureCode::PrecisionUnresolved);
+                // NOLINTNEXTLINE(bugprone-use-after-move) A failed solve must not consume the flow.
+                CHECK(unconsumed.source().jet.active());
+            }
         }
         const auto tolerance = rational_word(2e-10);
         for (std::size_t k = 0; k < count; ++k) {

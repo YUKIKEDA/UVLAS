@@ -1,5 +1,6 @@
 #include "discrete_nonpenetration.hpp"
 
+#include "aero/closed_contour.hpp"
 #include "aero/local_geometry_bounds_private.hpp"
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
@@ -11,6 +12,7 @@
 #include <bit>
 #include <cmath>
 #include <limits>
+#include <numeric>
 #include <uvlas/numerics/dense_solve.hpp>
 
 namespace uvlas::coupling::detail {
@@ -29,6 +31,7 @@ struct NativeCirculationRows {
     };
     std::optional<a::GlobalContactState> contact;
     std::optional<DiscreteNonpenetrationLimits> limits;
+    std::optional<a::ClosedContour> contour;
     a::P1ActionStamp stamp{};
     core::PlannedBuffer<Row> rows;
     core::PlannedBuffer<a::P1FaceStrengths> maps;
@@ -442,6 +445,61 @@ double project_binary64(const p::Interval& source, double budget, a::LocalRootSc
     return value;
 }
 
+double contour_endpoint(const p::Bound& bound, bool upper) {
+    const auto proposed = std::scalbn(bound.mantissa.convert_to<double>(), bound.power);
+    const auto enclosed = [&](double value) {
+        const auto comparison = p::compare(checked_word(value).lower, bound);
+        return upper ? comparison >= 0 : comparison <= 0;
+    };
+    if (!std::isfinite(proposed))
+        reject(core::FailureCode::PrecisionUnresolved);
+    if (enclosed(proposed))
+        return proposed;
+    const auto infinity = std::numeric_limits<double>::infinity();
+    const auto outward = std::nextafter(proposed, upper ? infinity : -infinity);
+    if (!std::isfinite(outward) || !enclosed(outward))
+        reject(core::FailureCode::PrecisionUnresolved);
+    return outward;
+}
+
+a::ContourInterval contour_bounds(const p::Interval& value) {
+    return {contour_endpoint(value.lower, false), contour_endpoint(value.upper, true)};
+}
+
+a::ContourVector contour_bounds(const Vector& value) {
+    return {contour_bounds(value[0]), contour_bounds(value[1]), contour_bounds(value[2])};
+}
+
+Vector import_contour(const a::ContourVector& value) {
+    const auto interval = [](a::ContourInterval v) -> p::Interval {
+        return {checked_word(v.lower).lower, checked_word(v.upper).upper};
+    };
+    return {interval(value[0]), interval(value[1]), interval(value[2])};
+}
+
+a::ContourInterval add_contour(a::ContourInterval a, a::ContourInterval b) {
+    if (a.lower == 0. && a.upper == 0.)
+        return b;
+    if (b.lower == 0. && b.upper == 0.)
+        return a;
+    const auto infinity = std::numeric_limits<double>::infinity();
+    return {std::nextafter(a.lower + b.lower, -infinity),
+            std::nextafter(a.upper + b.upper, infinity)};
+}
+
+double project_contour(a::ContourInterval interval, double budget) {
+    if (!std::isfinite(interval.lower) || !std::isfinite(interval.upper))
+        reject(core::FailureCode::PrecisionUnresolved);
+    const auto center = std::midpoint(interval.lower, interval.upper);
+    if (interval.lower == interval.upper)
+        return center;
+    const auto radius = std::nextafter(std::max(center - interval.lower, interval.upper - center),
+                                       std::numeric_limits<double>::infinity());
+    if (radius > budget)
+        reject(core::FailureCode::PrecisionUnresolved);
+    return center;
+}
+
 Vector native_velocity(const Vector& relative, const a::P1ActionValue& induced, p::Work& work) {
     Vector total{};
     for (std::size_t axis = 0; axis < total.size(); ++axis)
@@ -642,6 +700,7 @@ struct LoadEdge {
     a::EdgeId edge{0};
     std::array<a::PointId, 2> endpoints{a::PointId{0}, a::PointId{0}};
     p::Interval strength{};
+    std::uint64_t occurrences{};
 };
 struct NodalLoad {
     std::uint64_t point = 0;
@@ -797,6 +856,21 @@ a::ScalarWords retained_word(const numerics::PrecisionBuffer<double>& retained, 
     if (two == nullptr)
         reject(core::FailureCode::PrecisionUnsupported);
     return a::DoubleWord{two->hi.values()[i], two->lo.values()[i]};
+}
+
+bool same_double(double first, double second) noexcept {
+    return std::bit_cast<std::uint64_t>(first) == std::bit_cast<std::uint64_t>(second);
+}
+
+bool same_words(const a::ScalarWords& first, const a::ScalarWords& second) noexcept {
+    if (const auto* one = std::get_if<a::SingleWord>(&first)) {
+        const auto* other = std::get_if<a::SingleWord>(&second);
+        return other != nullptr && same_double(one->value, other->value);
+    }
+    const auto* two = std::get_if<a::DoubleWord>(&first);
+    const auto* other = std::get_if<a::DoubleWord>(&second);
+    return two != nullptr && other != nullptr && same_double(two->high, other->high) &&
+           same_double(two->low, other->low);
 }
 
 class NativeResidualCheck {
@@ -1565,6 +1639,152 @@ struct NonpenetrationBuilder {
         return false;
     }
 
+    struct ContourSession {
+        std::unique_ptr<a::GeometryWorkspace> geometry;
+        std::unique_ptr<a::GlobalWorkspace> contact;
+        a::ClosedContourWorkspace values;
+    };
+
+    static a::GlobalLimits contour_limits(const DiscreteNonpenetrationLimits& limits,
+                                          const p::Work& work) {
+        return {std::min(limits.induction.steps, remaining(work)),
+                limits.induction.kernel.external_memory};
+    }
+
+    static ContourSession contour_session(const a::ClosedContour& contour,
+                                          const DiscreteNonpenetrationLimits& limits,
+                                          core::ResourcePlan& memory) {
+        return {
+            require(a::GeometryWorkspace::create(memory)),
+            require(a::GlobalWorkspace::create(memory, limits.induction.kernel.external_memory)),
+            require(contour.workspace(memory))};
+    }
+
+    static core::PlannedBuffer<a::ContourInterval>
+    contour_strengths(const Assembly& assembly, core::ResourcePlan& memory, p::Work& work) {
+        auto result = allocate<a::ContourInterval>(memory, assembly.values.size());
+        for (std::size_t i = 0; i < result.size(); ++i) {
+            work.step();
+            result.values()[i] = contour_bounds(import(assembly.values.values()[i].real, work));
+        }
+        return result;
+    }
+
+    static Vector apply_contour(const a::ClosedContour& contour, ContourSession& session,
+                                const a::ResolvedQuery& query, std::optional<a::EdgeId> self,
+                                std::span<const a::ContourInterval> strengths,
+                                const DiscreteNonpenetrationLimits& limits, p::Work& work) {
+        const auto value = require(contour.apply(query, self, strengths, limits.induction.geometry,
+                                                 contour_limits(limits, work), *session.geometry,
+                                                 *session.contact, session.values, work.stop));
+        account(work, value.second);
+        return import_contour(value.first);
+    }
+
+    static void project_contour_row(const a::ClosedContour& contour, ContourSession& session,
+                                    const a::ResolvedQuery& query, const Vector& normal,
+                                    const NativeCirculationRows& owner,
+                                    std::span<a::ContourInterval> native,
+                                    std::span<a::ContourInterval> result,
+                                    const DiscreteNonpenetrationLimits& limits, p::Work& work) {
+        account(work, require(contour.project(query, contour_bounds(normal), native,
+                                              limits.induction.geometry,
+                                              contour_limits(limits, work), *session.geometry,
+                                              *session.contact, session.values, work.stop)));
+        account(work, result.size());
+        std::ranges::fill(result, a::ContourInterval{});
+        for (std::size_t i = 0; i < native.size(); ++i) {
+            work.step();
+            const auto& transfer = owner.transfer.values()[i];
+            if (!transfer)
+                reject(core::FailureCode::InvalidInput);
+            auto& column = result[transfer->column];
+            const auto v = native[i];
+            column =
+                add_contour(column, transfer->reverse ? a::ContourInterval{-v.upper, -v.lower} : v);
+        }
+    }
+
+    static PrimalCirculationData solve_contour(const DiscreteNonpenetrationInput& input,
+                                               const ProjectedCaseUniformFlow& flow,
+                                               const DiscreteNonpenetrationLimits& limits,
+                                               const DiscreteCirculationRequest& request,
+                                               Assembly& assembly, numerics::DenseReal matrix,
+                                               numerics::DenseReal rhs, core::ResourcePlan& memory,
+                                               p::Work& work) {
+        const auto bound = std::span<const PanelRow>{assembly.bound.values()};
+        const auto order = bound.size();
+        auto operator_rows = retain_operator(input, assembly, limits, memory, work);
+        auto& owner = operator_rows.values().front();
+        {
+            auto workspace = require(
+                a::GlobalWorkspace::create(memory, limits.induction.kernel.external_memory));
+            owner.contour.emplace(require(a::ClosedContour::prepare(
+                input.contact, owner.maps.values(), owner.ids.values(),
+                {remaining(work), limits.induction.kernel.external_memory}, *workspace, memory,
+                work.stop)));
+        }
+        if (!owner.contour)
+            reject(core::FailureCode::InvalidInput);
+        auto& contour = *owner.contour;
+        account(work, contour.preparation_steps());
+        auto session = contour_session(contour, limits, memory);
+        auto data = allocate<CirculationRowData>(memory, order);
+        auto results = allocate<std::optional<CirculationResidualRow>>(memory, order);
+        auto native = allocate<a::ContourInterval>(memory, owner.ids.size());
+        auto projected = allocate<a::ContourInterval>(memory, order);
+        const auto& geometry = require(input.contact.geometry()).get();
+        const auto ambient = ambient_velocity(flow, work);
+        a::LocalRootScratch rounding;
+        for (std::size_t row = 0; row < order; ++row) {
+            const auto& item = bound[row];
+            const auto& input_row = input.collocations[item.caller];
+            auto& record = data.values()[row];
+            record.normal = qualify_normal(geometry, item.panel, input_row, work);
+            owner.rows.values()[row].normal = record.normal;
+            record.relative = difference(ambient, import(input_row.velocity, work), work);
+            record.rhs = p::negate(dot(record.normal, record.relative, work), work);
+            rhs.values()[row] = project_binary64(record.rhs, request.rhs_absolute, rounding, work);
+            project_contour_row(contour, session, input_row.query, record.normal, owner,
+                                native.values(), projected.values(), limits, work);
+            for (std::size_t column = 0; column < order; ++column) {
+                work.step();
+                matrix.values()[column * order + row] =
+                    project_contour(projected.values()[column], request.matrix_absolute);
+            }
+        }
+        auto solution = solve_projected(matrix, std::move(rhs), request, memory, work);
+        matrix = {};
+        for (std::size_t i = 0; i < owner.transfer.size(); ++i) {
+            work.step();
+            const auto& transfer = owner.transfer.values()[i];
+            if (!transfer)
+                reject(core::FailureCode::InvalidInput);
+            const auto value = retained_word(solution.values(), transfer->column);
+            assembly.values.values()[i].real = transfer->reverse ? negative(value) : value;
+        }
+        const auto strengths = contour_strengths(assembly, memory, work);
+        NativeResidualCheck check{request};
+        for (std::size_t row = 0; row < order; ++row) {
+            const auto& item = bound[row];
+            const auto& record = data.values()[row];
+            const auto velocity =
+                apply_contour(contour, session, input.collocations[item.caller].query, {},
+                              strengths.values(), limits, work);
+            const auto original =
+                dot(record.normal, add_vectors(record.relative, velocity, work), work);
+            check.add(original, record.rhs, row, work);
+            results.values()[row].emplace(CirculationResidualRow{
+                item.panel.face,
+                a::enclose_p1_value(original, limits.induction_accuracy.representation, rounding),
+                false});
+        }
+        check.finish();
+        work.step();
+        return {std::move(solution), std::move(results), std::move(operator_rows),
+                require(input.contact.reference_topology()), work.used};
+    }
+
     static PrimalCirculationData solve_data(
         const DiscreteNonpenetrationInput& input, const ProjectedCaseUniformFlow* flow,
         const DiscreteNonpenetrationLimits& limits, const DiscreteCirculationRequest& request,
@@ -1589,6 +1809,17 @@ struct NonpenetrationBuilder {
             match_flow(input, *flow, work);
         }
         auto assembly = assemble(input, limits, memory, work, true);
+        if (request.certified_closed_contour) {
+            if (flow == nullptr || known != nullptr || direction != nullptr ||
+                pullback != nullptr || order == 0 || input.wake.empty() ||
+                !std::holds_alternative<SteadyWakeClosure>(input.wake.front().trailing))
+                reject(core::FailureCode::Unsupported);
+            auto result = solve_contour(input, *flow, limits, request, assembly, std::move(matrix),
+                                        std::move(rhs), memory, work);
+            if (retained_assembly != nullptr)
+                retained_assembly->emplace(std::move(assembly));
+            return result;
+        }
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
         auto data = allocate<CirculationRowData>(memory, order);
         auto results = allocate<std::optional<CirculationResidualRow>>(memory, order);
@@ -1782,6 +2013,36 @@ struct NonpenetrationBuilder {
         match_flow(input, retained.flow_, work);
 
         const auto initial_bytes = memory.allocated_bytes();
+        const bool has_contour = retained.operator_rows_.size() == 1 &&
+                                 retained.operator_rows_.values().front().contour.has_value();
+        if (has_contour != request.certified_closed_contour)
+            reject(core::FailureCode::StaleGeneration);
+        if (has_contour) {
+            const auto replay = solve_data(input, &retained.flow_, limits, request, shared, local,
+                                           kernel, memory, work, nullptr, {});
+            for (std::size_t i = 0; i < order; ++i) {
+                work.step();
+                const auto original = require(retained.row(i));
+                const auto& row = replay.rows.values()[i];
+                if (!row || original.face != row->face || original.includes_wake_quadrature ||
+                    row->includes_wake_quadrature ||
+                    !same_words(retained_word(replay.solution.values(), i),
+                                retained_word(retained.solution_.values(), i)) ||
+                    original.original_residual.exponent() != row->original_residual.exponent() ||
+                    !same_double(original.original_residual.radius(),
+                                 row->original_residual.radius()) ||
+                    !same_words(original.original_residual.center(),
+                                row->original_residual.center()))
+                    reject(core::FailureCode::PrecisionUnresolved);
+            }
+            const auto native = retained.operator_rows_.values().front().ids.size();
+            return {order,
+                    order * order,
+                    multiply_budget(sum_budget(order, native), sizeof(a::ContourInterval)),
+                    0,
+                    memory.allocated_bytes() - initial_bytes,
+                    work.used};
+        }
         auto [matrix, rhs] = dense_inputs(order, memory);
         auto assembly = assemble(input, limits, memory, work, true);
         // The quadratic interval comparison is confined to this explicit witness.
@@ -1857,19 +2118,6 @@ struct NonpenetrationBuilder {
 
         auto solution = solve_projected(matrix, std::move(rhs), request, memory, work);
         matrix = {};
-        const auto same_double = [](double first, double second) {
-            return std::bit_cast<std::uint64_t>(first) == std::bit_cast<std::uint64_t>(second);
-        };
-        const auto same_words = [&](const a::ScalarWords& first, const a::ScalarWords& second) {
-            if (const auto* one = std::get_if<a::SingleWord>(&first)) {
-                const auto* other = std::get_if<a::SingleWord>(&second);
-                return other != nullptr && same_double(one->value, other->value);
-            }
-            const auto* two = std::get_if<a::DoubleWord>(&first);
-            const auto* other = std::get_if<a::DoubleWord>(&second);
-            return two != nullptr && other != nullptr && same_double(two->high, other->high) &&
-                   same_double(two->low, other->low);
-        };
         for (std::size_t i = 0; i < order; ++i) {
             work.step();
             if (!same_words(retained_word(solution.values(), i),
@@ -2205,6 +2453,7 @@ struct NonpenetrationBuilder {
         std::size_t emitted = 0;
         for (std::size_t i = 0; i < occurrences.size();) {
             work.step();
+            const auto start = i;
             const auto owner = occurrences[i];
             p::Interval strength{}, d_strength{};
             bool exterior = false;
@@ -2226,7 +2475,7 @@ struct NonpenetrationBuilder {
                 if (emitted == velocities.size() || velocities[emitted].edge != owner.edge)
                     reject(core::FailureCode::InvalidInput);
                 (void)import(velocities[emitted].velocity, work);
-                edges[emitted] = {owner.edge, owner.endpoints, strength};
+                edges[emitted] = {owner.edge, owner.endpoints, strength, i - start};
                 if (direction != nullptr)
                     direction->strength.values()[emitted] = d_strength;
                 ++emitted;
@@ -2614,6 +2863,9 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::InvalidInput);
         }
 
+        if (request.certified_closed_contour && (direction != nullptr || tangent != nullptr ||
+                                                 pullback != nullptr || stencil != nullptr))
+            reject(core::FailureCode::Unsupported);
         std::optional<Assembly> retained;
         core::PlannedBuffer<p::Interval> forcing;
         if (tangent != nullptr)
@@ -2687,6 +2939,19 @@ struct NonpenetrationBuilder {
         const auto ambient = flow != nullptr ? ambient_velocity(*flow, work) : Vector{};
         a::BoundWakeFacetStorage midpoint_storage{memory};
         std::optional<std::uint64_t> midpoint_reuse_steps;
+        const a::ClosedContour* contour = nullptr;
+        const auto saved_operators = primal.operator_rows.values();
+        if (!saved_operators.empty()) {
+            const auto& prepared = saved_operators.front().contour;
+            if (prepared)
+                contour = &*prepared;
+        }
+        std::optional<ContourSession> contour_midpoints;
+        core::PlannedBuffer<a::ContourInterval> midpoint_strengths;
+        if (contour != nullptr) {
+            contour_midpoints.emplace(contour_session(*contour, limits, memory));
+            midpoint_strengths = contour_strengths(assembly, memory, work);
+        }
         for (std::size_t i = 0; i < edges.size(); ++i) {
             work.step();
             const auto& edge = edges.values()[i];
@@ -2703,55 +2968,71 @@ struct NonpenetrationBuilder {
                 geometry.context(), query_limits, geometry_work, memory, stop));
             account(work, query.used_steps());
             const a::P1ActionSource source{input.contact, query, input.trial_stamp};
-            auto action_limits = limits.induction;
-            action_limits.steps = std::min(action_limits.steps, remaining(work));
-            if (i == 0 && edges.size() > 1) {
-                const auto plan = require(a::forecast_bound_wake_midpoint_serial_induction(
-                    source, assembly.maps.values(), assembly.ids.values(), action_limits, stop));
-                account(work, plan.ordinary.preflight_steps);
+            std::optional<a::SharedP1Action> action;
+            std::optional<a::P1ActionValue> induced;
+            auto excluded = edge.occurrences;
+            bool quadrature = false;
+            const auto effective_induction = [&]() -> Vector {
+                if (contour != nullptr && contour_midpoints)
+                    return apply_contour(*contour, *contour_midpoints, query, edge.edge,
+                                         midpoint_strengths.values(), limits, work);
+                auto action_limits = limits.induction;
                 action_limits.steps = std::min(action_limits.steps, remaining(work));
-                if (plan.reusable && plan.initial_payload_bytes <= plan.ordinary.payload_bytes &&
-                    plan.repeated_payload_bytes < plan.ordinary.payload_bytes &&
-                    plan.repeated_reserved_steps <= action_limits.steps)
-                    midpoint_reuse_steps = plan.repeated_reserved_steps;
-            }
-            const auto action =
-                require(midpoint_reuse_steps && *midpoint_reuse_steps <= action_limits.steps
-                            ? a::prepare_bound_wake_midpoint_induction(
-                                  source, edge.edge, assembly.maps.values(), assembly.ids.values(),
-                                  limits.geometry_accuracy, limits.induction_accuracy,
-                                  action_limits, shared, local, kernel, midpoint_storage, stop)
-                            : a::prepare_bound_wake_midpoint_induction(
-                                  source, edge.edge, assembly.maps.values(), assembly.ids.values(),
-                                  limits.geometry_accuracy, limits.induction_accuracy,
-                                  action_limits, shared, local, kernel, memory, stop));
-            const auto report = require(action.report());
-            account(work, report.used_steps);
-            std::optional<a::P1ActionDirection> variation;
-            if (direction != nullptr) {
-                if (i == 0) {
-                    if (action.point_count() != direction->input.points.size())
-                        reject(core::FailureCode::InvalidInput);
-                    for (std::size_t point = 0; point < action.point_count(); ++point) {
-                        work.step();
-                        if (require(action.point(point)) != direction->input.points[point])
-                            reject(core::FailureCode::InvalidInput);
-                    }
+                if (i == 0 && edges.size() > 1) {
+                    const auto plan = require(a::forecast_bound_wake_midpoint_serial_induction(
+                        source, assembly.maps.values(), assembly.ids.values(), action_limits,
+                        stop));
+                    account(work, plan.ordinary.preflight_steps);
+                    action_limits.steps = std::min(action_limits.steps, remaining(work));
+                    if (plan.reusable &&
+                        plan.initial_payload_bytes <= plan.ordinary.payload_bytes &&
+                        plan.repeated_payload_bytes < plan.ordinary.payload_bytes &&
+                        plan.repeated_reserved_steps <= action_limits.steps)
+                        midpoint_reuse_steps = plan.repeated_reserved_steps;
                 }
-                variation.emplace(a::P1ActionDirection{direction->input.displacements,
-                                                       assembly.directions.values(), std::nullopt,
-                                                       a::SingleWord{0}});
-            }
-            const auto induced = require(
-                a::apply_shared_p1(action, source, assembly.values.values(), variation,
-                                   std::min(limits.action_steps, remaining(work)), shared, stop));
-            account(work, induced.used_steps());
+                auto& full = action.emplace(require(
+                    midpoint_reuse_steps && *midpoint_reuse_steps <= action_limits.steps
+                        ? a::prepare_bound_wake_midpoint_induction(
+                              source, edge.edge, assembly.maps.values(), assembly.ids.values(),
+                              limits.geometry_accuracy, limits.induction_accuracy, action_limits,
+                              shared, local, kernel, midpoint_storage, stop)
+                        : a::prepare_bound_wake_midpoint_induction(
+                              source, edge.edge, assembly.maps.values(), assembly.ids.values(),
+                              limits.geometry_accuracy, limits.induction_accuracy, action_limits,
+                              shared, local, kernel, memory, stop)));
+                const auto report = require(full.report());
+                account(work, report.used_steps);
+                excluded = report.excluded_bound_occurrences;
+                quadrature = report.far_facets != 0;
+                std::optional<a::P1ActionDirection> variation;
+                if (direction != nullptr) {
+                    if (i == 0) {
+                        if (full.point_count() != direction->input.points.size())
+                            reject(core::FailureCode::InvalidInput);
+                        for (std::size_t point = 0; point < full.point_count(); ++point) {
+                            work.step();
+                            if (require(full.point(point)) != direction->input.points[point])
+                                reject(core::FailureCode::InvalidInput);
+                        }
+                    }
+                    variation.emplace(a::P1ActionDirection{direction->input.displacements,
+                                                           assembly.directions.values(),
+                                                           std::nullopt, a::SingleWord{0}});
+                }
+                const auto& value = induced.emplace(require(a::apply_shared_p1(
+                    full, source, assembly.values.values(), variation,
+                    std::min(limits.action_steps, remaining(work)), shared, stop)));
+                account(work, value.used_steps());
+                return {import(value.velocity()[0].real, work),
+                        import(value.velocity()[1].real, work),
+                        import(value.velocity()[2].real, work)};
+            }();
             std::optional<KnownRowData> midpoint;
             if (known != nullptr)
                 midpoint.emplace(evaluate_known_row(geometry, query, known->source, memory, work));
             const auto relative = difference(midpoint ? midpoint->velocity : ambient,
                                              import(loads.edges[i].velocity, work), work);
-            const auto effective = native_velocity(relative, induced, work);
+            const auto effective = add_vectors(relative, effective_induction, work);
             const auto edge_vector = difference(b_pos, a_pos, work);
             const auto velocity_cross_edge = cross(effective, edge_vector, work);
             const auto factor = p::multiply(density, edge.strength, work);
@@ -2787,6 +3068,8 @@ struct NonpenetrationBuilder {
                 }
             }
             if (direction != nullptr) {
+                if (!induced)
+                    reject(core::FailureCode::InvalidInput);
                 const auto da = point_direction(*direction, edge.endpoints[0], work);
                 const auto db = point_direction(*direction, edge.endpoints[1], work);
                 const auto dx = scale_vector(add_vectors(da, db, work), half, work);
@@ -2798,7 +3081,7 @@ struct NonpenetrationBuilder {
                 const auto d_relative =
                     difference(d_ambient, import(direction->input.edges[i].velocity, work), work);
                 const auto d_effective =
-                    add_vectors(d_relative, induction_direction(induced, work), work);
+                    add_vectors(d_relative, induction_direction(*induced, work), work);
                 const auto d_cross = add_vectors(cross(d_effective, edge_vector, work),
                                                  cross(effective, d_edge, work), work);
                 const auto d_factor = p::multiply(density, direction->strength.values()[i], work);
@@ -2810,8 +3093,10 @@ struct NonpenetrationBuilder {
                     DiscreteLoadSampleDirection{finish(dx), finish(df)});
             }
             if (pullback != nullptr) {
+                if (!action)
+                    reject(core::FailureCode::InvalidInput);
                 if (i == 0)
-                    init_midpoint_pullback(*pullback, action, memory, work);
+                    init_midpoint_pullback(*pullback, *action, memory, work);
                 const auto dual =
                     load_sample_covector(*pullback, pullback->input.edges[i], vertex_loads,
                                          edge.endpoints, center, force, origin, half, work);
@@ -2836,16 +3121,15 @@ struct NonpenetrationBuilder {
                 accumulate_vector(pullback->ambient, velocity_dual, work);
                 pullback->edges.values()[i].emplace(LoadEdgeVelocityCovector{
                     edge.edge, finish(scale_vector(velocity_dual, p::integer(-1), work))});
-                scatter_midpoint_induction(*pullback, action, source, assembly, velocity_dual,
+                scatter_midpoint_induction(*pullback, *action, source, assembly, velocity_dual,
                                            limits, shared, memory, work);
             }
             if (midpoint)
                 midpoints[i] = std::move(midpoint->jet);
             totals.add(center, force, origin, work);
             distribute_load(vertex_loads, edge.endpoints, force, half, work);
-            edge_loads.values()[i].emplace(
-                DiscreteCirculatoryLoad{edge.edge, edge.endpoints, finish(center), finish(force),
-                                        report.excluded_bound_occurrences, report.far_facets != 0});
+            edge_loads.values()[i].emplace(DiscreteCirculatoryLoad{
+                edge.edge, edge.endpoints, finish(center), finish(force), excluded, quadrature});
         }
         for (std::size_t i = 0; i < order; ++i) {
             const auto factor =
