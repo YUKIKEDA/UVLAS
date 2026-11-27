@@ -1,0 +1,37 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im03-circulation-row-workspace",
+  "ids": ["V-AERO", "UW-D01", "UW-D07", "N4-02"],
+  "package": "IM-03",
+  "issue": 19,
+  "date": "2026-11-27",
+  "source_commit": "b014607c6c2add52827a50f82057c94537f6250c",
+  "comparison_base": "f23d409c5d0470c605a92cf06c5776dfac7aec81",
+  "scope": "凍結有限翼で循環の求解と元残差、接線・転置の行再生を照合し、作業領域の累積確保の差を測る。",
+  "gcc14_release": {
+    "compiler": "GCC 14.2.0",
+    "targeted_ctests_passed": 6,
+    "reference_fw_v01_m2n4_cumulative_bytes": 50507686,
+    "fw_v01_m2n4_cumulative_bytes": 32814614,
+    "fw_v02_m2n4_cumulative_bytes": 32839402,
+    "fw_v01_m4n8_cumulative_bytes": 355958700,
+    "m2n4_assertions_per_shape": 573,
+    "m4n8_assertions_per_shape": 1647,
+    "strength_transpose_mutation_detected_endpoints": 18
+  },
+  "windows_release": {
+    "compiler": "MSVC 19.52",
+    "json_parser_object_toolchain": "MSVC 14.51",
+    "targeted_ctests_passed": 5,
+    "fw_v01_m2n4_cumulative_bytes": 32396734,
+    "fw_v02_m2n4_cumulative_bytes": 32421522
+  },
+  "fixture_git_blob_sha256": {
+    "tests/aero/fixtures/finite-wing-drag-refinement-v1.json": "29b7cf5fd5301a0b4ebfc684e81b9cf70a90fa7305f34451a88e9da5cbd15878",
+    "tests/aero/fixtures/finite-wing-case-v1.json": "0fa3597ffecbddba915652af463b5475a98e32a625d0cba2c3ab5b56093c6e01"
+  },
+  "immutable": {
+    "rd/aero/finite-wing/records/drag-common-limit-assessment-policy.md": "f573ce4f677f175161aca26c1e26ad678b9e88e58f798cdff9c0dbb517a38ea0"
+  },
+  "evidence": ["docs/verification/IM-03/circulation-row-workspace.md"]
+}
