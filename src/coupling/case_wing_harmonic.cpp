@@ -4,8 +4,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <memory_resource>
-#include <vector>
+#include <type_traits>
 
 namespace uvlas::coupling::detail {
 struct CaseWingHarmonicPreparation {
@@ -44,21 +45,29 @@ public:
         : storage_(allocate<std::byte>(
               partition_add(partition_mul(count, sizeof(T)), alignof(T) - 1), m)),
           arena_(storage_.values().data(), storage_.size(), std::pmr::null_memory_resource()),
-          values_(&arena_) {
-        values_.reserve(count);
+          capacity_(count) {
+        static_assert(std::is_trivially_destructible_v<T>);
+        // The planned arena covers one array, with no debug iterator allocation.
+        if (count != 0)
+            slots_ = std::pmr::polymorphic_allocator<T>{&arena_}.allocate(count);
     }
 
     void add(const T& value) {
-        values_.push_back(value);
+        if (size_ == capacity_)
+            partition_fail(InvalidInput);
+        std::construct_at(slots_ + size_, value);
+        ++size_;
     }
     [[nodiscard]] std::span<const T> values() const noexcept {
-        return values_;
+        return {slots_, size_};
     }
 
 private:
     core::PlannedBuffer<std::byte> storage_;
     std::pmr::monotonic_buffer_resource arena_;
-    std::pmr::vector<T> values_;
+    std::size_t capacity_;
+    T* slots_ = nullptr;
+    std::size_t size_ = 0;
 };
 
 template <class Record, class Variant>
