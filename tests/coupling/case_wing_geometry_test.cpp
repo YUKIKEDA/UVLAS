@@ -526,6 +526,142 @@ TEST_CASE("Prepared rigid Case geometry binds exact stage and prescribed point v
     reject(run.prepare(source, end, limits()), StaleGeneration);
 }
 
+TEST_CASE("Four Case wing clock stages share a checked reference topology and trailing rows",
+          "[GEO-01][AE-02][AE-07][UW-D03][verification][negative]") {
+    auto input = tokens::root("aerodynamic_prescribed_transient");
+    input.field("analysis")
+        .set("intervals",
+             tokens::parse(R"([{"start":0,"end":0.75,"step":0.25,"restart":"initial"}])"));
+    auto& model = input.field("model");
+    auto fixed_graph = model.field("geometry").elements.front();
+    fixed_graph.set("id", tokens::string("2"));
+    fixed_graph.field("frame").set("origin", tokens::parse("[0,3,0]"));
+    model.field("geometry").elements.push_back(std::move(fixed_graph));
+    auto fixed_surface = model.field("aero_surfaces").elements.front();
+    fixed_surface.set("id", tokens::string("2"));
+    fixed_surface.set("geometry", tokens::string("2"));
+    fixed_surface.set("attachment", tokens::parse(R"({"kind":"fixed_reference"})"));
+    model.field("aero_surfaces").elements.push_back(std::move(fixed_surface));
+    const auto source = read(input.wire());
+    Run run;
+    const auto initial_context = run.context;
+    const c::CaseFlowClockQuery start{stamp, 0, 0, p::RequestedSide::Right};
+    const auto anchor = take(run.prepare(source, start, limits(), core::Precision::TwoWord));
+    const auto anchor_topology = take(take(anchor.global()).get().reference_topology());
+    REQUIRE(anchor.trailing_bands().size() == 2);
+    const auto prepare_at = [&](const c::CaseWingGeometry& wing, const io::SiCase& typed,
+                                c::CaseFlowClockQuery address, const c::CaseWingLimits& caps) {
+        return wing.evaluate_stage(typed, run.context, address,
+                                   projection(core::Precision::TwoWord), caps, *run.geometry,
+                                   *run.global, run.motion, run.memory);
+    };
+    const auto check = [&](const c::CaseWingGeometry& wing, c::CaseFlowClockQuery address) {
+        const auto& contact = take(wing.global()).get();
+        CHECK(take(contact.reference_topology()).same_owner(anchor_topology));
+        REQUIRE(wing.validate_for(source, run.context, address));
+        REQUIRE(wing.points().size() == 8);
+        REQUIRE(wing.cells().size() == 2);
+        REQUIRE(wing.trailing_bands().size() == 2);
+        const double time = static_cast<double>(address.step) / 4;
+        for (const auto& vertex : wing.points()) {
+            const auto moving = vertex.surface == 1;
+            const double base_x = vertex.chord == 0 ? .25 : 1.0;
+            const double base_y = static_cast<double>(vertex.span) + (moving ? 0. : 3.);
+            compare(vertex.reference, {base_x, base_y, 0}, 0);
+            compare(vertex.position, {base_x + (moving ? time * time * time : 0), base_y, 0}, 0);
+            compare(vertex.velocity, {moving ? 3 * time * time : 0, 0, 0}, 0);
+        }
+        for (std::size_t i = 0; i < wing.cells().size(); ++i) {
+            const auto& cell = wing.cells()[i];
+            const bool moving = cell.surface == 1;
+            compare(cell.position, {.75 + (moving ? time * time * time : 0), moving ? .5 : 3.5, 0},
+                    0);
+            compare(cell.velocity, {moving ? 3 * time * time : 0, 0, 0}, 0);
+            compare(cell.normal, {0, 0, 1}, 0);
+            REQUIRE(cell.collocation);
+            CHECK(cell.collocation->context() == run.context);
+            CHECK(cell.facets == anchor.cells()[i].facets);
+            const auto row = take(wing.collocation(i));
+            CHECK(row.facet == cell.facets[0]);
+            CHECK(&row.query == &*cell.collocation);
+            CHECK(cell.face == anchor.cells()[i].face);
+            const auto& current = wing.trailing_bands()[i].transfer;
+            const auto& retained = anchor.trailing_bands()[i].transfer;
+            CHECK(current.edge == retained.edge);
+            CHECK(current.bound_face == cell.face);
+            CHECK(current.bound_face == retained.bound_face);
+            CHECK(current.coefficient == retained.coefficient);
+            CHECK(current.wake_sign == retained.wake_sign);
+        }
+    };
+    check(anchor, start);
+    std::optional<c::CaseWingGeometry> previous;
+    for (std::uint64_t i = 1; i < 4; ++i) {
+        run.context.time = static_cast<double>(i) / 4;
+        run.context.current = core::GeometryGeneration{initial_context.current.value() + i};
+        const c::CaseFlowClockQuery address{
+            stamp, 0, i, i == 3 ? p::RequestedSide::Left : p::RequestedSide::Automatic};
+        auto current = take(prepare_at(previous ? *previous : anchor, source, address, limits()));
+        check(current, address);
+        previous.emplace(std::move(current));
+    }
+    const c::CaseFlowClockQuery end{stamp, 0, 3, p::RequestedSide::Left};
+    const auto independent = take(run.prepare(source, end, limits(), core::Precision::TwoWord));
+    CHECK_FALSE(
+        take(take(independent.global()).get().reference_topology()).same_owner(anchor_topology));
+    auto changed_stamp = end;
+    changed_stamp.stamp = {p::PchipIssuerId{99}, p::PchipInputGeneration{6}};
+    reject(prepare_at(anchor, source, changed_stamp, limits()), StaleGeneration);
+    auto changed_case = input;
+    changed_case.field("flow").field("uniform").set("value", tokens::parse("[2,0,0]"));
+    reject(prepare_at(anchor, read(changed_case.wire()), end, limits()), StaleGeneration);
+    const c::CaseWingStraightWake closure{{128, 0, 0}};
+    const auto with_closure = take(c::CaseWingGeometry::prepare(
+        source, initial_context, start, projection(core::Precision::TwoWord), limits(),
+        *run.geometry, *run.global, run.motion, run.memory, nullptr, closure));
+    REQUIRE(with_closure.wake_bands().size() == 2);
+    c::CaseWingDiagnostic diagnostic;
+    const auto staged_closure = with_closure.evaluate_stage(
+        source, run.context, end, projection(core::Precision::TwoWord), limits(), *run.geometry,
+        *run.global, run.motion, run.memory, &diagnostic);
+    reject(staged_closure, Unsupported);
+    CHECK(diagnostic.phase == c::CaseWingPhase::TrailingEdge);
+    REQUIRE(with_closure.validate_for(source, initial_context, start));
+    const auto harmonic_source = read(frozen(0, 2, 8));
+    const auto harmonic = take(c::CaseWingGeometry::prepare(
+        harmonic_source, initial_context, {}, projection(core::Precision::Binary64), limits(),
+        *run.geometry, *run.global, run.motion, run.memory, nullptr, closure));
+    REQUIRE_FALSE(harmonic.wake_bands().empty());
+    reject(prepare_at(harmonic, harmonic_source, end, limits()), Unsupported);
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    reject(prepare_at(anchor, source, end, limits(stop.get_token())), Cancelled);
+    run.context.current = initial_context.current;
+    reject(prepare_at(anchor, source, end, limits()), StaleGeneration);
+    run.context.current = core::GeometryGeneration{initial_context.current.value() + 3};
+    run.context.reference = a::ReferenceGeometryGeneration{initial_context.reference.value() + 1};
+    reject(prepare_at(anchor, source, end, limits()), StaleGeneration);
+    REQUIRE(anchor.validate_for(source, initial_context, start));
+    CHECK(take(take(anchor.global()).get().reference_topology()).same_owner(anchor_topology));
+
+    // The translation crosses the other wing during staging, although the
+    // two reference lattices at x=[1/4,1] and [11/8,17/8] are disjoint.
+    auto crossing = input;
+    crossing.field("model")
+        .field("geometry")
+        .elements[1]
+        .field("frame")
+        .set("origin", tokens::parse("[1.125,0,0]"));
+    const auto crossing_source = read(crossing.wire());
+    run.context = initial_context;
+    const auto before_crossing =
+        take(run.prepare(crossing_source, start, limits(), core::Precision::TwoWord));
+    run.context.time = .75;
+    run.context.current = core::GeometryGeneration{initial_context.current.value() + 3};
+    reject(prepare_at(before_crossing, crossing_source, end, limits()), GeometryInvalid);
+    REQUIRE(before_crossing.validate_for(crossing_source, initial_context, start));
+}
+
 TEST_CASE("A shared seam requires velocity agreement as well as position agreement",
           "[GEO-01][AE-07][UW-D03][verification][negative]") {
     auto input = tokens::root("aerodynamic_prescribed_transient");

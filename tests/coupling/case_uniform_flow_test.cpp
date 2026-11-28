@@ -27,6 +27,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <numbers>
 #include <source_location>
 #include <uvlas/core/instrumentation.hpp>
 #include <uvlas/structure/pg_flat_gram.hpp>
@@ -4635,6 +4636,110 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
                core::FailureCode::StaleGeneration);
     }
 
+    auto ramp_case = source_case;
+    // Equal secants make the PCHIP exactly a(t)=1+2(t-1) on this clock.
+    ramp_case.field("flow").field("gust").set("amplitude", parse(R"({
+            "kind":"pchip","times":[1,1.25,1.5],"values":[[1],[1.5],[2]],
+            "outside":{"kind":"reject"}
+        })"));
+    constexpr io::SourceId ramp_id{483};
+    const auto ramp_si = materialize(ramp_case, ramp_id);
+    core::ResourcePlan ramp_memory{1024ULL * 1024 * 1024};
+    const auto ramp_grid = take(cf::prepare_case_reference_clock(
+        ramp_si, stamp, transport_clock_limits, 1000000, ramp_memory));
+    const cf::WakeTransportClock ramp_clock{ramp_grid, ramp_grid, destination};
+    const auto ramp = take(
+        cf::prepare_case_known_flow(ramp_si, stamp, {}, flow_workspace, gust_limits, ramp_memory));
+    const auto ramp_flow_at = [&](const Number& time_at, p::RequestedSide side) {
+        return cf::DiscreteKnownFlowInput{ramp,
+                                          ramp,
+                                          {stamp, time_at.view(), side},
+                                          flow.projection,
+                                          flow.flow_limits,
+                                          flow.coordinate_limits,
+                                          *geometry_work,
+                                          flow_workspace};
+    };
+    const auto ramp_origin_flow = ramp_flow_at(start_time, p::RequestedSide::Right);
+    const auto ramp_parent_flow = ramp_flow_at(previous_time, p::RequestedSide::Automatic);
+    const auto ramp_current_flow = ramp_flow_at(time, p::RequestedSide::Automatic);
+    const cf::WakeTransportClock ramp_first{ramp_grid, ramp_grid, first_interval.destination};
+    const auto ramp_birth = take(cf::evaluate_first_free_wake_transport(
+        ramp_first, {previous_source, ramp_parent_flow, departing, {}},
+        {start_source, ramp_origin_flow, origins, {}}, release.epoch, classified, {}, growth_limits,
+        cap_velocity, shared, *local, *kernel, ramp_memory));
+    const cf::WakeMaterialSnapshot ramp_preceding{older, birth_origins, &ramp_birth};
+    constexpr double parent_shift = .25, trial_shift = -.125;
+    const std::array<cf::NonpenetrationVector, 7> parent_positions{zero, zero, zero, zero,
+                                                                   zero, zero, zero};
+    const std::array<cf::NonpenetrationVector, 9> trial_positions{zero, zero, zero, zero, zero,
+                                                                  zero, zero, zero, zero};
+    const std::array fixed_strengths{cf::FrozenWakeTrace{old_id, a::SingleWord{0}}};
+    const cf::DiscreteFreeWakeDirection ramp_parent_direction{
+        points,          parent_positions, fixed_strengths, zero, a::SingleWord{parent_shift},
+        a::SingleWord{0}};
+    const cf::DiscreteFreeWakeDirection ramp_trial_direction{
+        extended_direction_points,  trial_positions, {}, zero,
+        a::SingleWord{trial_shift}, a::SingleWord{0}};
+    auto held_gamma = parent_gamma;
+    held_gamma[0].circulation_direction = a::SingleWord{0};
+    auto held_parent = parent_strength;
+    held_parent.collocations = held_gamma;
+    const cf::FreeWakeTrialEndpoint ramp_parent{
+        {held_parent, growth_points}, ramp_parent_flow, &ramp_parent_direction};
+    const cf::FreeWakeTrialEndpoint ramp_trial{
+        {with_owned_history, extended_points}, ramp_current_flow, &ramp_trial_direction};
+    const std::array<cf::NonpenetrationVector, 2> stationary_history{zero, zero};
+    const auto solve_ramp = [&](const cf::FreeWakeTrialEndpoint& selected_parent,
+                                const cf::WakeMaterialSnapshot& initial) {
+        return cf::evaluate_free_wake_trial(ramp_si, ramp_clock, selected_parent, ramp_trial,
+                                            {&initial, {stationary_history, stationary_history}},
+                                            next_epoch, trial_seeds, trial_limits, shared, *local,
+                                            *kernel, ramp_memory);
+    };
+    reject(solve_ramp(ramp_parent, preceding), core::FailureCode::StaleGeneration);
+    const auto ramp_step = take(solve_ramp(ramp_parent, ramp_preceding));
+    REQUIRE(ramp_step.trapezoid);
+    REQUIRE(ramp_step.bdf2);
+    REQUIRE(ramp_step.trapezoid->size() == 2);
+    REQUIRE(ramp_step.bdf2->size() == 2);
+
+    constexpr double pi = std::numbers::pi;
+    // Known component only: the induction and history directions are held fixed.
+    // Parent x=1 at t=9/8, release x=2 and retained x=3 at t=5/4.
+    const auto departure_slope = 2. * std::sin(pi / 16.) - (5. * pi / 8.) * std::cos(pi / 16.);
+    constexpr double release_slope = 2., retained_slope = 3. * pi / 4.;
+    const auto release_jvp = -(departure_slope * parent_shift + release_slope * trial_shift) / 2.;
+    constexpr auto retained_jvp = -retained_slope * trial_shift;
+    WorkEnclosure ramp_forward, ramp_reverse;
+    for (std::size_t i = 0; i < 2; ++i) {
+        const auto born_row = take(ramp_step.trapezoid->row(i));
+        const auto kept_row = take(ramp_step.bdf2->row(i));
+        REQUIRE(born_row.direction);
+        REQUIRE(kept_row.direction);
+        near(center((*born_row.direction)[2]), release_jvp);
+        near(center((*kept_row.direction)[2]), retained_jvp);
+        ramp_forward.add(*born_row.direction, trial_seeds[2 * i + 1]);
+        ramp_forward.add(*kept_row.direction, trial_seeds[2 * i]);
+    }
+    const auto endpoint_time = [&](const cf::DiscreteFreeWakeVelocity& velocity, double truth,
+                                   double time_shift) {
+        const auto dual = take(velocity.field_dual()).flow_time;
+        near(center(dual), truth);
+        ramp_reverse.add(dual, a::SingleWord{time_shift});
+    };
+    endpoint_time(take(ramp_step.trapezoid->parent_free_velocity()).get(),
+                  (3. / 16.) * departure_slope, parent_shift);
+    endpoint_time(take(ramp_step.trapezoid->free_velocity()).get(), (3. / 16.) * release_slope,
+                  trial_shift);
+    endpoint_time(take(ramp_step.bdf2->free_velocity()).get(), -(5. / 8.) * retained_slope,
+                  trial_shift);
+    CHECK(abs(ramp_forward.value - ramp_reverse.value) <=
+          ramp_forward.radius + ramp_reverse.radius + rational_word(1e-15));
+    const cf::FreeWakeTrialEndpoint foreign_ramp_parent{
+        {held_parent, growth_points}, previous_flow, &ramp_parent_direction};
+    reject(solve_ramp(foreign_ramp_parent, ramp_preceding), core::FailureCode::StaleGeneration);
+
     reject(cf::evaluate_free_wake_trial(wake_si, transport_clock, parent_trial, current_trial, {},
                                         next_epoch, trial_seeds, trial_limits, shared, *local,
                                         *kernel, trial_memory),
@@ -5109,6 +5214,12 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
             "intervals",
             parse(
                 R"([{"start":0,"end":0.1,"step":0.1,"restart":"initial"},{"start":0.1,"end":1,"step":0.1,"restart":"event"}])"));
+    input.field("flow").set("uniform", parse(R"({"kind":"constant","value":[0,0,0]})"));
+    input.field("flow").set("gust", parse(R"({
+        "kind":"sine","amplitude":{"kind":"constant","value":[2]},"direction":[0,0,1],
+        "wavevector":[180,0,0],"angular_frequency":360,"phase":0,
+        "origin":[0,0,0],"time_origin":0
+    })"));
     auto& motion =
         input.field("model").field("aero_surfaces").elements[0].field("attachment").field("motion");
     motion.set("origin", parse(R"({"origin":[0,0,0],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
@@ -5312,6 +5423,93 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     const auto value = take(result.row(0)).residual;
     const auto center = sum_words(value.center()) * two_power(value.exponent());
     near(center, -angular_rate / 2);
+
+    const auto provider = prepare_gust(input, io::SourceId{79}, flow_workspace, memory);
+    cf::DiscreteKnownFlowInput known{provider,
+                                     provider,
+                                     {stamp, exact_instant.view(), side},
+                                     gust_projection(core::Precision::TwoWord, abs_budget),
+                                     gust_limits,
+                                     geometry_caps,
+                                     *geometry_work,
+                                     flow_workspace};
+    const std::array scales{1.};
+    const std::array<ls::UnitDimensions, 1> gamma_units{{{2, 0, -1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 1> speed_units{{{1, 0, -1, 0, 0, 0, 0}}};
+    const auto linear_context = circulation_context(geometry.context());
+    const auto request = circulation_request(
+        {scales, scales, gamma_units, speed_units, linear_context}, 1, ls::Norm::L2);
+    auto tangent_request = request;
+    tangent_request.rhs_generation = core::RhsGeneration{30};
+    tangent_request.retained_generation = core::NumericalGeneration{31};
+    const auto solve_known = [&](const cf::KnownCirculationDerivative& derivative) {
+        core::ResourcePlan trial_memory{128ULL * 1024 * 1024};
+        return cf::solve_discrete_known_circulation(view, known, derivative, residual_limits,
+                                                    request, shared, *local, *kernel, trial_memory);
+    };
+
+    // The rigid transform leaves the regularized ring's normal influence unchanged.
+    // Integrate each unit segment in the flat reference plane, at (3/4, 1/2).
+    const auto edge = [](double along, double distance) {
+        const auto transverse_sq = distance * distance + .125 * .125;
+        const auto from_first = along / std::sqrt(along * along + transverse_sq);
+        const auto remaining = 1. - along;
+        const auto from_last = remaining / std::sqrt(remaining * remaining + transverse_sq);
+        return -distance * (from_first + from_last) / (4. * std::numbers::pi * transverse_sq);
+    };
+    const auto influence = edge(.5, .75) + edge(.5, .25) + 2. * edge(.75, .5);
+    const auto phase = .65 * std::numbers::pi; // pi * x - 2 pi * t, x=0.85 and t=0.1.
+    const auto expected = (angular_rate / 2. - std::sin(phase)) / influence;
+
+    constexpr double translation = .125, time_shift = .125;
+    const auto dx = coordinates(translation, 0, 0);
+    const auto zero_vector = coordinates(0, 0, 0);
+    const std::array position_direction{dx, dx, dx, dx, zero_vector};
+    const std::array site_direction{cf::CirculationCollocationDirection{
+        fixture.faces[0].id, std::nullopt, {zero_vector, zero_vector}, zero_vector}};
+    const cf::DiscreteCirculationDirection direction{std::span{ids}.first<5>(), position_direction,
+                                                     site_direction, zero_vector};
+    const auto differential = take(solve_known(
+        cf::KnownCirculationTangent{direction, a::SingleWord{time_shift}, tangent_request}));
+    near(solution_word(take(differential.solution()).get(), 0), expected);
+    const auto& tangent = take(differential.linearization()).get();
+    const auto expected_direction =
+        -std::cos(phase) * std::numbers::pi * (translation - 2. * time_shift) / influence;
+    near(solution_word(tangent.solution(), 0), expected_direction);
+    residual_small(take(differential.row(0)).original_residual, rational_word(1e-13));
+    residual_small(take(tangent.row(0)).original_residual, rational_word(1e-13));
+    const std::array<ls::UnitDimensions, 1> dual_speed{{{-1, 0, 1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 1> dual_gamma{{{-2, 0, 1, 0, 0, 0, 0}}};
+    auto dual_context = linear_context;
+    dual_context.cache.matrix = core::NumericalGeneration{32};
+    dual_context.cache.scales = core::ScaleGeneration{33};
+    dual_context.unknown_layout = core::ScopeId{34};
+    dual_context.residual_layout = core::ScopeId{35};
+    auto transpose = circulation_request({scales, scales, dual_speed, dual_gamma, dual_context}, 1,
+                                         ls::Norm::L2);
+    transpose.rhs_generation = core::RhsGeneration{36};
+    transpose.retained_generation = core::NumericalGeneration{37};
+    const std::array seed{cf::CirculationLinearRhs{fixture.faces[0].id, a::SingleWord{.5}}};
+    const auto reverse = take(solve_known(cf::KnownCirculationAdjoint{seed, transpose}));
+    const auto word_center = [](const a::ScaledEnclosure& enclosure) {
+        return sum_words(enclosure.center()) * two_power(enclosure.exponent());
+    };
+    const auto time_dual = word_center(take(reverse.flow_time_dual()));
+    near(time_dual, std::cos(phase) * std::numbers::pi / influence);
+    Rat total_position_dual = 0;
+    for (std::size_t i = 0; i < moving.size(); ++i) {
+        const auto point = take(reverse.point(i));
+        CHECK(point.point == moving[i]);
+        total_position_dual += word_center(point.position[0]);
+    }
+    near(total_position_dual, -.5 * std::cos(phase) * std::numbers::pi / influence);
+    const auto transpose_work =
+        total_position_dual * rational_word(translation) + time_dual * rational_word(time_shift);
+    CHECK(abs(transpose_work - solution_word(tangent.solution(), 0) / 2) < tol);
+    CHECK_FALSE(take(reverse.collocation(0)).free_query.has_value());
+    CHECK(take(differential.flow(0)).get().requested_side() == side);
+    known.time.side = p::RequestedSide::Right;
+    reject(solve_known(std::monostate{}), core::FailureCode::StaleGeneration);
 
     const std::array<double, 18> zero_low{};
     auto wide_original = original;

@@ -1135,6 +1135,9 @@ public:
     linearization() const& noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
     linearization() const&& = delete;
+    /// Case and immutable reference topology from the actual historical solve.
+    [[nodiscard]] core::Result<io::SchemaIdentity> case_identity() const noexcept;
+    [[nodiscard]] core::Result<aero::detail::PreparedTopologyOwner> source() const noexcept;
     [[nodiscard]] core::Result<CirculationResidualRow> row(std::size_t) const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
     flow(std::size_t) const& noexcept;
@@ -1199,6 +1202,9 @@ public:
     [[nodiscard]] std::size_t original_count() const noexcept;
     [[nodiscard]] core::Result<DiscreteOriginalLoadContribution>
     original(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t bdf2_rate_count() const noexcept;
+    /// Retained D_h Gamma in the same physical face order and precision as the load evaluation.
+    [[nodiscard]] core::Result<RetainedBdf2Rate> bdf2_rate(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_force() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_moment() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> moment_origin() const noexcept;
@@ -1228,7 +1234,9 @@ private:
 };
 
 /// One nominal circulation solve, then fixed-chart loads and the selected implicit action.
-/// Circulation rate and midpoint wing velocity remain explicit independent inputs.
+/// The rates can be independent inputs or a qualified fixed-BDF2 history. In the latter
+/// case the implicit JVP/VJP differentiates the current solve with the past values held fixed.
+/// Midpoint wing velocity remains an explicit independent input.
 [[nodiscard]] core::Result<DiscreteKnownLoads>
 solve_discrete_known_loads(const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
                            const DiscreteKnownFlowInput&, const KnownLoadDerivative&,

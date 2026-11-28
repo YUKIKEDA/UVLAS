@@ -104,6 +104,17 @@ public:
             aero::detail::pchip::CurveWorkspace&, core::ResourcePlan&,
             CaseWingDiagnostic* = nullptr, std::optional<CaseWingStraightWake> = {}) noexcept;
 
+    /// Evaluate a transient Case stage against this Case's immutable reference
+    /// topology. Requalify contacts, point kinematics and collocation, retaining
+    /// the same topology owner and trailing-edge transfer across stages.
+    /// A finite straight-wake anchor returns Unsupported.
+    [[nodiscard]] core::Result<CaseWingGeometry>
+    evaluate_stage(const io::SiCase&, const aero::detail::GeometryContext&, CaseFlowClockQuery,
+                   const CaseWingProjection&, const CaseWingLimits&,
+                   aero::detail::GeometryWorkspace&, aero::detail::GlobalWorkspace&,
+                   aero::detail::pchip::CurveWorkspace&, core::ResourcePlan&,
+                   CaseWingDiagnostic* = nullptr) const noexcept;
+
     [[nodiscard]] core::Result<void> validate_for(const io::SiCase&,
                                                   const aero::detail::GeometryContext&,
                                                   std::optional<CaseFlowClockQuery>) const noexcept;

@@ -498,6 +498,14 @@ core::Result<PreparedTopologyOwner> GlobalContactState::reference_topology() con
     return PreparedTopologyOwner{state.front().topology};
 }
 
+GlobalResult<GlobalTopology> GlobalContactState::retain_reference_topology() const noexcept {
+    const auto state = data_.values();
+    if (state.empty() || !state.front().topology || !state.front().topology->geometry)
+        return std::unexpected(failure(core::FailureCode::InvalidInput, context_));
+    const auto& reference = state.front().topology;
+    return GlobalTopology{reference, reference->geometry->context()};
+}
+
 GlobalResult<UvlmQuad> GlobalContactState::uvlm_quad(FacetId id, std::uint64_t max_steps,
                                                      const std::stop_token& stop) const noexcept {
     return guarded(context_, [&]() -> GlobalResult<UvlmQuad> {

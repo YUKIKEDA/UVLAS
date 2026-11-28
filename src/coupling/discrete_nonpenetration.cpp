@@ -1014,6 +1014,7 @@ struct KnownLoadRun {
 
 struct KnownCirculationRun {
     std::optional<PrimalCirculationData> primal;
+    std::optional<io::SchemaIdentity> case_identity;
     std::optional<DiscreteCirculationLinearization> linearization;
     core::PlannedBuffer<KnownRowData> known;
     core::PlannedBuffer<std::optional<CirculationForcingRow>> forcing;
@@ -3339,6 +3340,7 @@ struct NonpenetrationBuilder {
             result.uniform.emplace(enclose_vector(pullback->flow, representation, rounding, work));
             result.time.emplace(a::enclose_p1_value(pullback->flow_time, representation, rounding));
         }
+        result.case_identity = require(flow.source.case_identity());
         result.primal.emplace(std::move(primal));
         work.step();
         return DiscreteKnownCirculation{std::move(output)};
@@ -3756,7 +3758,7 @@ struct NonpenetrationBuilder {
         const auto* stencil = loads.fixed_bdf2;
         if (loads.rates.size() != (stencil == nullptr ? order : 0))
             reject(core::FailureCode::InvalidInput);
-        if (stencil != nullptr && (flow == nullptr || (direction != nullptr && tangent == nullptr)))
+        if (stencil != nullptr && direction != nullptr && tangent == nullptr)
             reject(core::FailureCode::Unsupported);
         const auto maximum = static_cast<std::uint64_t>(std::numeric_limits<core::Index>::max());
         if (order > maximum / 6)
@@ -3776,9 +3778,16 @@ struct NonpenetrationBuilder {
         const auto origin = import(loads.moment_origin, work);
         const auto snapshot = require(input.contact.geometry());
         const auto& geometry = snapshot.get();
-        if (stencil != nullptr && flow != nullptr)
-            stencil->bind(require(input.contact.reference_topology()), *flow,
-                          request.retained_generation, order, work);
+        if (stencil != nullptr) {
+            const auto topology = require(input.contact.reference_topology());
+            if (flow != nullptr)
+                stencil->bind(topology, *flow, request.retained_generation, order, work);
+            else if (known != nullptr)
+                stencil->bind(topology, known->source, input.history.parent,
+                              request.retained_generation, order, work);
+            else
+                reject(core::FailureCode::Unsupported);
+        }
         const auto radius = import(require(geometry.core_radius()), work);
         if (!loads.edges.empty() && p::compare(radius.lower, {}) <= 0)
             reject(core::FailureCode::GeometryInvalid);
@@ -4592,6 +4601,7 @@ struct NonpenetrationBuilder {
         account(admission, computed.steps);
         admission.step();
         result.steps = admission.used;
+        circulation.case_identity = require(flow.source.case_identity());
         circulation.primal.emplace(std::move(computed.primal));
         result.circulation.emplace(DiscreteKnownCirculation{std::move(nominal)});
         result.values.emplace(std::move(computed.values));
@@ -5413,6 +5423,20 @@ DiscreteKnownCirculation::linearization() const& noexcept {
         return std::unexpected(absent());
     return std::cref(*result);
 }
+core::Result<io::SchemaIdentity> DiscreteKnownCirculation::case_identity() const noexcept {
+    const auto records = data_.values();
+    if (records.empty() || !records.front().case_identity)
+        return std::unexpected(absent());
+    return *records.front().case_identity;
+}
+
+core::Result<a::PreparedTopologyOwner> DiscreteKnownCirculation::source() const noexcept {
+    const auto records = data_.values();
+    if (records.empty() || !records.front().primal)
+        return std::unexpected(absent());
+    return records.front().primal->source;
+}
+
 core::Result<CirculationResidualRow> DiscreteKnownCirculation::row(std::size_t i) const noexcept {
     const auto records = data_.values();
     if (records.empty())
@@ -5577,6 +5601,20 @@ DiscreteKnownLoads::original(std::size_t i) const noexcept {
     if (!values || i >= values->original_count)
         return std::unexpected(absent());
     return known_load_item(values->original, i);
+}
+
+std::size_t DiscreteKnownLoads::bdf2_rate_count() const noexcept {
+    const auto records = data_.values();
+    if (records.empty() || !records.front().values)
+        return 0;
+    return records.front().values->bdf2_rates.size();
+}
+
+core::Result<RetainedBdf2Rate> DiscreteKnownLoads::bdf2_rate(std::size_t i) const noexcept {
+    const auto records = data_.values();
+    if (records.empty() || !records.front().values)
+        return std::unexpected(absent());
+    return known_load_item(records.front().values->bdf2_rates, i);
 }
 
 core::Result<DiscreteNoncirculatoryLoad> DiscreteKnownLoads::facet(std::size_t i) const noexcept {
