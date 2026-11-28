@@ -129,8 +129,31 @@ struct DiscreteNonpenetrationLimits {
 /// and is validated against the retained geometry and forcing at y=0.
 using HarmonicReflectionPair = std::array<aero::detail::PhysicalFaceId, 2>;
 
+class CaseWingGeometry;
+struct CaseWingHarmonicPreparation;
+
+/// Bind the Case-owned endpoint and a caller-budgeted projection of its exact velocity.
+class CaseHarmonicWake {
+public:
+    [[nodiscard]] const CaseWingGeometry& geometry() const noexcept {
+        return geometry_.get();
+    }
+    [[nodiscard]] const std::array<io::SiEnclosure, 3>& velocity() const& noexcept {
+        return velocity_;
+    }
+    [[nodiscard]] const std::array<io::SiEnclosure, 3>& velocity() const&& = delete;
+
+private:
+    friend struct CaseWingHarmonicPreparation;
+    CaseHarmonicWake(const CaseWingGeometry& geometry, std::array<io::SiEnclosure, 3> velocity)
+        : geometry_(geometry), velocity_(std::move(velocity)) {}
+
+    std::reference_wrapper<const CaseWingGeometry> geometry_;
+    std::array<io::SiEnclosure, 3> velocity_;
+};
+
 struct StraightWakeHarmonicInput {
-    NonpenetrationVector convection_velocity;
+    std::variant<NonpenetrationVector, CaseHarmonicWake> convection_velocity;
     std::span<const double> age_panel_starts_seconds;
     double angular_frequency;
     std::uint64_t maximum_samples;

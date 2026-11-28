@@ -7,6 +7,7 @@
 #include "aero/query_coordinates_private.hpp"
 #include "case_component_precision_private.hpp"
 #include "case_dyadic_words_private.hpp"
+#include "case_wing_geometry.hpp"
 #include "fixed_bdf2_circulation.hpp"
 
 #include <algorithm>
@@ -127,6 +128,18 @@ p::Interval import(const io::SiEnclosure& value, p::Work& work) {
             return enclose(import(center, work), word.radius, p::exponent(word.exponent2), work);
         },
         value);
+}
+p::Interval harmonic_velocity_component(const StraightWakeHarmonicInput& phase, std::size_t axis,
+                                        p::Work& work) {
+    if (const auto* wake = std::get_if<CaseHarmonicWake>(&phase.convection_velocity))
+        return import(wake->velocity()[axis], work);
+    return import(std::get<NonpenetrationVector>(phase.convection_velocity)[axis], work);
+}
+
+Vector harmonic_velocity(const StraightWakeHarmonicInput& phase, p::Work& work) {
+    return {harmonic_velocity_component(phase, 0, work),
+            harmonic_velocity_component(phase, 1, work),
+            harmonic_velocity_component(phase, 2, work)};
 }
 Vector cross(const Vector& a, const Vector& b, p::Work& work) {
     Vector result{};
@@ -1765,7 +1778,15 @@ struct NonpenetrationBuilder {
             reject(core::FailureCode::InvalidInput);
         const auto& stop = work.stop;
         const auto& geometry = require(input.contact.geometry()).get();
-        const auto velocity = import(phase.convection_velocity, work);
+        const auto* binding = std::get_if<CaseHarmonicWake>(&phase.convection_velocity);
+        const auto case_wake = binding ? binding->geometry().straight_wake() : std::nullopt;
+        const auto case_bands =
+            binding ? binding->geometry().wake_bands() : std::span<const CaseWingWakeBand>{};
+        if (binding &&
+            (!case_wake || &require(binding->geometry().global()).get() != &input.contact ||
+             case_bands.size() != input.wake.size()))
+            reject(core::FailureCode::StaleGeneration);
+        const auto velocity = harmonic_velocity(phase, work);
         const auto component = std::ranges::find_if(velocity, [](const p::Interval& value) {
             return p::compare(value.lower, {}) > 0 || p::compare(value.upper, {}) < 0;
         });
@@ -1797,25 +1818,38 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::GeometryInvalid);
             const auto& attached = *panel.attachment;
             const auto first = point(panel.corners[0]), second = point(panel.corners[1]);
-            const auto left = difference(point(panel.corners[3]), first, work);
-            const auto right = difference(point(panel.corners[2]), second, work);
-            if (b == 0)
-                common_translation = left;
-            for (std::size_t j = 0; j < left.size(); ++j) {
-                equal(left[j], common_translation[j]);
-                equal(right[j], common_translation[j]);
+            if (case_wake) {
+                const auto& bound = case_bands[b];
+                if (bound.facet != input.wake[b].facet || bound.trailing_edge != attached.edge ||
+                    bound.bound_face != attached.bound_face ||
+                    panel.corners != std::array{bound.front[0], bound.front[1], bound.terminal[1],
+                                                bound.terminal[0]})
+                    reject(core::FailureCode::StaleGeneration);
+            } else {
+                const auto left = difference(point(panel.corners[3]), first, work);
+                const auto right = difference(point(panel.corners[2]), second, work);
+                if (b == 0)
+                    common_translation = left;
+                for (std::size_t j = 0; j < left.size(); ++j) {
+                    equal(left[j], common_translation[j]);
+                    equal(right[j], common_translation[j]);
+                }
             }
             bands.values()[b] = {{attached.edge, attached.bound_face},
                                  contour_bounds(first),
                                  contour_bounds(second),
                                  attached.coefficient};
         }
-        for (std::size_t j = 0; j < common_translation.size(); ++j) {
-            if (j != axis)
-                equal(p::multiply(common_translation[j], *component, work),
-                      p::multiply(common_translation[axis], velocity[j], work));
-        }
-        const auto end_age = p::divide(common_translation[axis], *component, work);
+        const auto end_age = [&] {
+            if (case_wake)
+                return import(case_wake->duration_seconds, work);
+            for (std::size_t j = 0; j < common_translation.size(); ++j) {
+                if (j != axis)
+                    equal(p::multiply(common_translation[j], *component, work),
+                          p::multiply(common_translation[axis], velocity[j], work));
+            }
+            return p::divide(common_translation[axis], *component, work);
+        }();
         require_positive(end_age);
         auto quadrature = require(a::prepare_straight_wake_age_quadrature(
             geometry.context(), phase.age_panel_starts_seconds, contour_bounds(end_age),
@@ -1985,7 +2019,7 @@ struct NonpenetrationBuilder {
         if (p::compare(density.lower, {}) <= 0)
             reject(core::FailureCode::InvalidInput);
         const auto origin = import(loads.moment_origin, work);
-        const auto flow = import(phase.convection_velocity, work);
+        const auto flow = harmonic_velocity(phase, work);
         const auto half = p::divide(p::integer(1), p::integer(2), work);
         const auto third = p::divide(p::integer(1), p::integer(3), work);
         const auto rate = p::multiply(density, checked_word(phase.angular_frequency), work);
@@ -2151,7 +2185,7 @@ struct NonpenetrationBuilder {
         const auto exactly_equal = [](const p::Interval& x, const p::Interval& y) {
             return p::compare(x.lower, y.upper) == 0 && p::compare(x.upper, y.lower) == 0;
         };
-        if (!exactly_equal(import(phase.convection_velocity[1], work), {}))
+        if (!exactly_equal(harmonic_velocity_component(phase, 1, work), {}))
             reject(Code::InvalidInput);
         const auto reflected = [&](Vector x) {
             x[1] = p::negate(x[1], work);

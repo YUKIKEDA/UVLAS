@@ -887,7 +887,7 @@ void verify_rotated_shared_edge(const c::CaseWingGeometry& prepared,
 }
 
 void run_harmonic(const Json& reference, std::array<int, 3> selected, bool controls,
-                  bool rotated_shared = false) {
+                  bool rotated_shared = false, bool decimal_wake = false) {
     CAPTURE(selected);
     const auto found = std::ranges::find_if(
         reference.at("records"), [&](const auto& record) { return record.at("case") == selected; });
@@ -904,15 +904,82 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
         }
         source_bytes = tilted.wire();
     }
+    if (decimal_wake) {
+        auto decimal = tokens::parse(source_bytes);
+        auto& flow = decimal.field("flow");
+        flow.field("uniform").set("value", tokens::parse("[1,0,0]"));
+        flow.field("reference").set("speed", tokens::parse("1"));
+        auto& analysis = decimal.field("analysis");
+        analysis.field("speed").set("value", tokens::parse("1"));
+        auto& wake = analysis.field("wake");
+        wake.field("convection").field("velocity").set("value", tokens::parse("[1,0,0]"));
+        wake.field("retention").set("duration", tokens::parse("0.1"));
+        wake.field("retention").set("distance", tokens::parse("0.1"));
+        source_bytes = decimal.wire();
+    }
     const auto source = read(source_bytes);
     Run run;
     auto caps = limits();
     caps.geometry.max_steps = 4'000'000;
-    const c::CaseWingStraightWake terminal{{128, 0, 0}};
+    const c::CaseWingStraightWake terminal{};
     const auto prepared = take(c::CaseWingGeometry::prepare(
         source, run.context, {}, projection(core::Precision::Binary64), caps, *run.geometry,
         *run.global, run.motion, run.memory, nullptr, terminal));
     REQUIRE(prepared.wake_bands().size() == 2 * n);
+    if (decimal_wake) {
+        using Rational = structure::ExactRational;
+        const auto own = [&](std::string_view numerator, std::string_view denominator) {
+            return take(Rational::from_integer_pair(numerator, denominator, exact(), run.memory));
+        };
+        const auto wake = prepared.straight_wake();
+        REQUIRE(wake);
+        const auto tenth = own("1", "10");
+        const auto rounded = take(Rational::from_binary64(0.1, exact(), run.memory));
+        CHECK(wake->displacement_metres[0] == tenth);
+        CHECK_FALSE(wake->displacement_metres[0] == rounded);
+        CHECK(wake->displacement_metres[1].sign() == 0);
+        CHECK(wake->velocity_metres_per_second[0] == own("1", "1"));
+        const auto owned_geometry = take(prepared.global()).get().geometry();
+        REQUIRE(owned_geometry);
+        const auto& owned = owned_geometry->get();
+        const auto retained_x = [&](a::PointId id) {
+            const auto words = owned.point_words(id, a::Configuration::Current);
+            REQUIRE(words);
+            const auto as_rational = [&](double word) {
+                return take(Rational::from_binary64(word, exact(), run.memory));
+            };
+            if (const auto* single = std::get_if<a::SingleWord>(&(*words)[0]))
+                return as_rational(single->value);
+            const auto pair = std::get<a::DoubleWord>((*words)[0]);
+            return take(as_rational(pair.high).add(as_rational(pair.low), exact(), run.memory));
+        };
+        const auto root_x = own("3", "2"), physical_end = own("8", "5");
+        unsigned root_ends = 0;
+        for (const auto& band : prepared.wake_bands()) {
+            for (std::size_t i = 0; i < band.front.size(); ++i) {
+                if (retained_x(band.front[i]) != root_x)
+                    continue;
+                const auto terminal_x = retained_x(band.terminal[i]);
+                const auto error = take(terminal_x.subtract(physical_end, exact(), run.memory));
+                CHECK(error.sign() != 0);
+                const auto bound = own("1", "17592186044416"); // Declared position budget 2^-44 m.
+                const auto negative = take(Rational{}.subtract(bound, exact(), run.memory));
+                CHECK(take(error.compare(negative, exact(), run.memory)) >= 0);
+                CHECK(take(error.compare(bound, exact(), run.memory)) <= 0);
+                ++root_ends;
+            }
+        }
+        CHECK(root_ends > 0);
+
+        // Even a different decimal that rounds to the same binary64 must fail.
+        const std::array asserted{own("100000000000000000001", "1000000000000000000000"),
+                                  Rational{}, Rational{}};
+        reject(c::CaseWingGeometry::prepare(
+                   source, run.context, {}, projection(core::Precision::Binary64), caps,
+                   *run.geometry, *run.global, run.motion, run.memory, nullptr,
+                   c::CaseWingStraightWake{std::span<const Rational, 3>{asserted}}),
+               StaleGeneration);
+    }
     const auto count = prepared.cells().size();
     REQUIRE(count == 2 * m * n);
     auto ages = ref.at("panel_starts_seconds").get<std::vector<double>>();
@@ -921,7 +988,9 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
         ages[i] = ages[2 * i];
     ages.resize(ages.size() / 2);
     const auto omega = reference.at("omega_rad_s").get<double>();
-    const auto speed = reference.at("velocity_m_s").at(0).get<double>();
+    const double speed = decimal_wake ? 1.0 : reference.at("velocity_m_s").at(0).get<double>();
+    if (decimal_wake)
+        ages = {0.0, 0.025, 0.05, 0.075};
     std::vector<std::size_t> order;
     std::array<std::vector<c::HarmonicCirculationRhs>, 4> drive;
     std::array<long double, 4> rhs_squared{};
@@ -936,7 +1005,7 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
                 i / 2 != w ? Complex{}
                            : (i % 2 == 0 ? Complex{0., omega * nz}
                                          : Complex{-speed * nz, -omega * (x - pitch_axis) * nz});
-            if (!rotated_shared) {
+            if (!rotated_shared && !decimal_wake) {
                 const auto expected = complex_value(ref.at("rhs").at(order.back()).at(i));
                 CHECK(std::abs(value - expected) < 1e-12L);
             }
@@ -1006,11 +1075,15 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
         auto reordered = input;
         reordered.drives[0] = wrong_rows;
         reject(solve(source, prepared, reordered), InvalidInput);
-        const c::CaseWingStraightWake wrong_terminal{{127, 0, 0}};
-        const auto wrong_te = take(c::CaseWingGeometry::prepare(
-            source, run.context, {}, projection(core::Precision::Binary64), caps, *run.geometry,
-            *run.global, run.motion, run.memory, nullptr, wrong_terminal));
-        reject(solve(source, wrong_te, input), StaleGeneration);
+        using Rational = structure::ExactRational;
+        const std::array other_endpoint{
+            take(Rational::from_integer_pair("127", "1", exact(), run.memory)), Rational{},
+            Rational{}};
+        reject(c::CaseWingGeometry::prepare(
+                   source, run.context, {}, projection(core::Precision::Binary64), caps,
+                   *run.geometry, *run.global, run.motion, run.memory, nullptr,
+                   c::CaseWingStraightWake{std::span<const Rational, 3>{other_endpoint}}),
+               StaleGeneration);
     }
     const auto result = take(solve(source, prepared, input));
     const auto& solved = result.solved;
@@ -1023,6 +1096,21 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
     REQUIRE(solved.original_coefficients.size() == count * count);
     REQUIRE(solved.physical_values().shape().rows == static_cast<core::Index>(count));
     REQUIRE(solved.physical_values().shape().columns == 4);
+    if (decimal_wake) {
+        for (std::size_t drive_index = 0; drive_index < drive.size(); ++drive_index) {
+            long double residual = 0;
+            for (std::size_t i = 0; i < count; ++i) {
+                const auto& row = solved.residual.values()[drive_index * count + i];
+                REQUIRE(row);
+                CHECK(row->face == prepared.cells()[i].face);
+                residual +=
+                    std::norm(Complex{std::abs(center(row->real)) + radius(row->real),
+                                      std::abs(center(row->imaginary)) + radius(row->imaginary)});
+            }
+            CHECK(std::sqrt(residual / rhs_squared[drive_index]) < 1e-11L);
+        }
+        return;
+    }
     const auto& circulation =
         std::get<numerics::TwoWord<std::complex<double>>>(solved.physical_values().storage());
     long double dropped = 0, coefficient_scale = 0, max_row = 0;
@@ -1120,6 +1208,11 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
 TEST_CASE("Typed two-wing Case solves all four finite-core harmonic drives",
           "[PHY-02][UW-D05][UW-D06][V-MULTI][verification]") {
     run_harmonic(harmonic_reference(UVLAS_VMULTI_SMALL_FIXTURE), {0, 2, 8}, true);
+}
+
+TEST_CASE("Typed finite harmonic wake keeps the exact decimal Case endpoint",
+          "[PHY-02][UW-D05][UW-D06][V-MULTI][verification][negative]") {
+    run_harmonic(harmonic_reference(UVLAS_VMULTI_SMALL_FIXTURE), {0, 2, 8}, false, false, true);
 }
 
 TEST_CASE("A tilted shared edge carries opposite nonzero original harmonic forces",

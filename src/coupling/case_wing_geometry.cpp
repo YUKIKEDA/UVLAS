@@ -29,11 +29,16 @@ std::size_t size(std::uint64_t count) {
 constexpr auto operation = core::Operation::PrepareModel;
 using XYZ = std::array<Rational, 3>;
 
+struct StraightWake {
+    XYZ displacement, velocity;
+    io::SiEnclosure duration;
+};
+
 struct Owner {
     std::optional<io::SchemaIdentity> source;
     std::optional<a::GeometryContext> context;
     std::optional<CaseFlowClockQuery> address;
-    std::optional<CaseWingStraightWake> wake;
+    std::optional<StraightWake> wake;
     core::PlannedBuffer<CaseWingWakeBand> wake_bands;
     core::PlannedBuffer<std::size_t> terminal_anchor;
     si::SiRationalWords instant;
@@ -133,6 +138,60 @@ struct Projector {
         return result;
     }
 };
+
+template <class Record, class Variant>
+Record select(const Variant& value) {
+    if (const auto* record = std::get_if<Record>(&value))
+        return *record;
+    partition_fail(Unsupported);
+}
+
+template <class Field>
+Rational number(const io::SiCase& source, Field field, Math& m) {
+    m.charge();
+    const auto recipe = partition_take(source.quantity(field)).recipe;
+    if (recipe.pi_power != 0)
+        partition_fail(InvalidInput);
+    return partition_take(io::materialize_rational(recipe, m.leaf_limits, m.plan));
+}
+
+XYZ constant_velocity(const io::SiCase& source, const s::TimeSeriesConstant& series, Math& m) {
+    return {number(source, partition_take(series.value.at(0)), m),
+            number(source, partition_take(series.value.at(1)), m),
+            number(source, partition_take(series.value.at(2)), m)};
+}
+
+StraightWake prepare_straight_wake(const io::SiCase& source, const s::Case& root,
+                                   const s::WakeActive& wake, const CaseWingStraightWake& request,
+                                   Projector& project, Math& m) {
+    const auto convection = select<s::ConvectionPrescribed>(wake.convection.record());
+    const auto retention = select<s::RetentionWindow>(wake.retention.record());
+    const auto flow = select<s::FlowKnown>(root.flow.record());
+    (void)select<s::GustNone>(flow.gust.record());
+    auto velocity =
+        constant_velocity(source, select<s::TimeSeriesConstant>(convection.velocity.record()), m);
+    if (velocity !=
+        constant_velocity(source, select<s::TimeSeriesConstant>(flow.uniform.record()), m))
+        partition_fail(Unsupported);
+    const auto duration = number(source, retention.duration, m);
+    const auto distance = number(source, retention.distance, m);
+    if (duration.sign() <= 0 || distance.sign() <= 0)
+        partition_fail(InvalidInput);
+    XYZ advance;
+    Rational squared;
+    for (std::size_t axis = 0; axis < advance.size(); ++axis) {
+        advance[axis] = m.mul(duration, velocity[axis]);
+        if (request.expected_displacement_metres &&
+            (*request.expected_displacement_metres)[axis] != advance[axis])
+            partition_fail(StaleGeneration);
+        squared = m.add(squared, m.square(advance[axis]));
+    }
+    if (squared != m.square(distance))
+        partition_fail(InvalidInput);
+    auto duration_projection =
+        project.apply(duration, project.request.time, core::Precision::TwoWord, m);
+    return {std::move(advance), std::move(velocity), std::move(duration_projection)};
+}
 
 double unscale(double word, std::int64_t exponent) {
     if (word == 0)
@@ -442,18 +501,6 @@ WakeCounts count_wake(const Owner& owner, std::span<std::size_t> point_owners,
     return count;
 }
 
-Rational exact_word(double word, Math& m) {
-    m.charge();
-    return partition_take(Rational::from_binary64(word, m.leaf_limits, m.plan));
-}
-
-Rational exact_word(a::ScalarWords words, Math& m) {
-    if (const auto* one = std::get_if<a::SingleWord>(&words))
-        return exact_word(one->value, m);
-    const auto two = std::get<a::DoubleWord>(words);
-    return m.add(exact_word(two.high, m), exact_word(two.low, m));
-}
-
 class Mesh {
 public:
     Mesh(const MeshCounts& count, core::Precision format, Math& m)
@@ -583,14 +630,7 @@ public:
 
     void extend(const MeshCounts& bound, std::span<const std::size_t> terminal, Owner& owner,
                 Projector& projection, Math& m) {
-        const auto& displacement = owner.wake->displacement_metres;
-        const XYZ delta{exact_word(displacement[0], m), exact_word(displacement[1], m),
-                        exact_word(displacement[2], m)};
-        if (std::ranges::all_of(delta, [](const auto& x) { return x.sign() == 0; }))
-            partition_fail(InvalidInput);
-        static constexpr std::array<std::uint32_t, 1> word{1};
-        constexpr p::RationalView one{1, word, word}, zero{0, {}, word};
-        const CaseFlowComponentBudget exact{one, zero, zero};
+        const auto& delta = owner.wake->displacement;
         const auto terminal_id = [&](std::size_t anchor) {
             return point_id(size(bound.points) + terminal[anchor] - 1);
         };
@@ -612,19 +652,30 @@ public:
                                          a::CanonicalPoint{}};
             owner.terminal_anchor.values()[terminal[i] - 1] = i;
             const auto& source = owner.points.values()[i];
-            const auto translate = [&](const auto& values, std::span<double> high,
-                                       std::span<double> low) {
-                for (std::size_t axis = 0; axis < delta.size(); ++axis) {
-                    const auto value = m.add(exact_word(retained(values[axis]), m), delta[axis]);
-                    const auto projected =
-                        retained(projection.apply(value, exact, core::Precision::TwoWord, m));
-                    const auto pair = std::get<a::DoubleWord>(projected);
-                    high[3 * index + axis] = pair.high;
-                    low[3 * index + axis] = pair.low;
-                }
-            };
-            translate(source.reference, ref_high_.values(), ref_low_.values());
-            translate(source.position, cur_high_.values(), cur_low_.values());
+            const auto patch = std::ranges::find_if(owner.patches.values(), [&](const Patch& p) {
+                m.visit(1);
+                return p.chart->surface_id == source.surface;
+            });
+            if (patch == owner.patches.values().end())
+                partition_fail(StaleGeneration);
+            const auto front = patch->chart->graph.evaluate_chart(source.chart, m, false);
+            for (std::size_t axis = 0; axis < delta.size(); ++axis) {
+                // A transverse coordinate does not move, so its already qualified
+                // front representation remains valid at the end of the wake.
+                const auto projected = [&]() -> a::ScalarWords {
+                    if (delta[axis].sign() == 0)
+                        return retained(source.position[axis]);
+                    const auto value = m.add(front.position[axis], delta[axis]);
+                    return retained(projection.apply(value, projection.request.position[axis],
+                                                     core::Precision::TwoWord, m));
+                }();
+                const auto pair = std::holds_alternative<a::DoubleWord>(projected)
+                                      ? std::get<a::DoubleWord>(projected)
+                                      : a::DoubleWord{std::get<a::SingleWord>(projected).value, 0};
+                const auto slot = 3 * index + axis;
+                ref_high_.values()[slot] = cur_high_.values()[slot] = pair.high;
+                ref_low_.values()[slot] = cur_low_.values()[slot] = pair.low;
+            }
             edge(stream_edge(i), point_id(i), id);
         }
         for (std::size_t i = 0; i < owner.band_count; ++i) {
@@ -818,12 +869,17 @@ struct Build {
         result.source = partition_take(schema.identity());
         result.context = context;
         result.address = address;
-        result.wake = straight;
         diagnostic.phase = CaseWingPhase::Clock;
         const auto time = stage(source, context, address, transient, limits, m);
         result.instant =
             partition_take(si::copy_rational_words(time.instant, plan, m.limits.cancellation));
         Projector projector{projection, projection.exact.steps};
+        if (straight) {
+            if (transient)
+                partition_fail(Unsupported);
+            m.admit();
+            result.wake.emplace(prepare_straight_wake(source, root, wake, *straight, projector, m));
+        }
         if (std::get<a::SingleWord>(retained(projector.apply(time.instant, projection.time,
                                                              core::Precision::Binary64, m)))
                 .value != context.time)
@@ -840,6 +896,9 @@ struct Build {
         for (std::size_t i = 0; i < patches.size(); ++i) {
             m.visit(1);
             const auto surface = partition_take(surfaces.at(partition_index(i))).record();
+            if (straight &&
+                !std::holds_alternative<s::AeroAttachmentFixed>(surface.attachment.record()))
+                partition_fail(Unsupported);
             auto& patch = patches[i];
             const auto id = surface.geometry.unsigned_value();
             diagnostic = {};
@@ -853,8 +912,9 @@ struct Build {
         diagnostic = {};
         diagnostic.phase = CaseWingPhase::Geometry;
         counts.admit(limits.geometry.counts);
+        m.leaf_limits = limits.chart.algebra;
         m.admit(partition_add(
-            pg::reference_live_rationals,
+            pg::reference_live_rationals + (straight ? 6 : 0),
             partition_add(partition_mul(2, counts.points), partition_mul(2, counts.cells))));
         result.points = allocate<CaseWingPoint>(m, counts.points);
         result.cells = allocate<CaseWingCell>(m, counts.cells);
@@ -1086,8 +1146,11 @@ std::span<const CaseWingTrailingBand> CaseWingGeometry::trailing_bands() const& 
                : std::span<const CaseWingTrailingBand>{};
 }
 
-std::optional<CaseWingStraightWake> CaseWingGeometry::straight_wake() const noexcept {
-    return owner_.size() == 1 ? owner_.values().front().wake : std::nullopt;
+std::optional<CaseWingStraightWakeView> CaseWingGeometry::straight_wake() const& noexcept {
+    if (owner_.size() != 1 || !owner_.values().front().wake)
+        return std::nullopt;
+    const auto& wake = *owner_.values().front().wake;
+    return CaseWingStraightWakeView{wake.displacement, wake.velocity, wake.duration};
 }
 
 std::span<const CaseWingWakeBand> CaseWingGeometry::wake_bands() const& noexcept {

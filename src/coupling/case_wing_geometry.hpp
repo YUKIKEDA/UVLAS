@@ -65,10 +65,15 @@ struct CaseWingTrailingBand {
     std::array<wing_chart::Rational, 2> original_parameters; ///< Boundary line ordinal + fraction.
 };
 
-/// Optional finite straight closure for a harmonic verification of this Case.
+/// Request a finite straight closure from the Case, optionally asserting its exact advance.
 struct CaseWingStraightWake {
-    std::array<double, 3> displacement_metres;
-    bool operator==(const CaseWingStraightWake&) const = default;
+    std::optional<std::span<const wing_chart::Rational, 3>> expected_displacement_metres;
+};
+
+struct CaseWingStraightWakeView {
+    const std::array<wing_chart::Rational, 3>& displacement_metres;
+    const std::array<wing_chart::Rational, 3>& velocity_metres_per_second;
+    const io::SiEnclosure& duration_seconds;
 };
 
 struct CaseWingWakeBand {
@@ -123,7 +128,8 @@ public:
     [[nodiscard]] std::span<const CaseWingCell> cells() const&& = delete;
     [[nodiscard]] std::span<const CaseWingTrailingBand> trailing_bands() const& noexcept;
     [[nodiscard]] std::span<const CaseWingTrailingBand> trailing_bands() const&& = delete;
-    [[nodiscard]] std::optional<CaseWingStraightWake> straight_wake() const noexcept;
+    [[nodiscard]] std::optional<CaseWingStraightWakeView> straight_wake() const& noexcept;
+    [[nodiscard]] std::optional<CaseWingStraightWakeView> straight_wake() const&& = delete;
     [[nodiscard]] std::span<const CaseWingWakeBand> wake_bands() const& noexcept;
     [[nodiscard]] std::span<const CaseWingWakeBand> wake_bands() const&& = delete;
     [[nodiscard]] core::Result<std::reference_wrapper<const aero::detail::GlobalContactState>>

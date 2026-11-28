@@ -8,6 +8,13 @@
 #include <vector>
 
 namespace uvlas::coupling::detail {
+struct CaseWingHarmonicPreparation {
+    static CaseHarmonicWake bind(const CaseWingGeometry& owner,
+                                 std::array<io::SiEnclosure, 3> velocity) {
+        return CaseHarmonicWake{owner, std::move(velocity)};
+    }
+};
+
 namespace {
 namespace a = aero::detail;
 namespace p = a::pchip;
@@ -95,7 +102,7 @@ struct Projection {
     const CaseWingHarmonicProjection& policy;
     std::uint64_t remaining;
 
-    a::ScalarWords scalar(const Exact& value, const CaseFlowComponentBudget& budget, Math& m) {
+    io::SiEnclosure apply(const Exact& value, const CaseFlowComponentBudget& budget, Math& m) {
         const auto encode = [](p::RationalView word) -> si::SiRationalWordsView {
             return {word.sign, word.numerator, word.denominator};
         };
@@ -106,9 +113,14 @@ struct Projection {
             policy.representation, {policy.limits.input_integer_bits, remaining},
             m.limits.cancellation, {}));
         remaining -= measured.used_steps;
-        if (const auto* single = std::get_if<io::ScaledBinary64>(&measured.value))
+        return measured.value;
+    }
+
+    a::ScalarWords scalar(const Exact& value, const CaseFlowComponentBudget& budget, Math& m) {
+        const auto measured = apply(value, budget, m);
+        if (const auto* single = std::get_if<io::ScaledBinary64>(&measured))
             return a::SingleWord{unscale(single->center, single->exponent2)};
-        const auto pair = std::get<io::ScaledTwoWord>(measured.value);
+        const auto pair = std::get<io::ScaledTwoWord>(measured);
         return a::DoubleWord{unscale(pair.high, pair.exponent2), unscale(pair.low, pair.exponent2)};
     }
 
@@ -169,36 +181,14 @@ run(const io::SiCase& source, const CaseWingGeometry& wing, const a::GeometryCon
     Math m{exact, memory};
     m.cancel();
     partition_take(wing.validate_for(source, context, {}));
-    if (!wing.straight_wake() || wing.wake_bands().size() != wing.trailing_bands().size() ||
+    const auto wake = wing.straight_wake();
+    if (!wake || wing.wake_bands().size() != wing.trailing_bands().size() ||
         wing.wake_bands().empty())
         partition_fail(StaleGeneration);
     m.admit();
     const auto model = partition_take(partition_take(source.source_case()).get().root());
-    const auto analysis = select<s::AnalysisStatic>(model.analysis.record());
-    const auto wake = select<s::WakeActive>(analysis.wake.record());
-    const auto convection = select<s::ConvectionPrescribed>(wake.convection.record());
-    const auto retention = select<s::RetentionWindow>(wake.retention.record());
     const auto flow = select<s::FlowKnown>(model.flow.record());
-    (void)select<s::GustNone>(flow.gust.record());
-    const auto ambient = select<s::TimeSeriesConstant>(flow.uniform.record());
-    const auto transport = select<s::TimeSeriesConstant>(convection.velocity.record());
-    const auto velocity = vector(source, ambient.value, m);
-    if (velocity != vector(source, transport.value, m))
-        partition_fail(Unsupported);
-    const auto duration = number(source, retention.duration, m);
-    const auto distance = number(source, retention.distance, m);
-    const auto terminal = *wing.straight_wake();
-    Exact squared;
-    for (std::size_t axis = 0; axis < velocity.size(); ++axis) {
-        const auto advance = m.mul(duration, velocity[axis]);
-        const auto given = partition_take(
-            Exact::from_binary64(terminal.displacement_metres[axis], m.leaf_limits, memory));
-        if (given != advance)
-            partition_fail(StaleGeneration);
-        squared = m.add(squared, m.square(advance));
-    }
-    if (squared != m.square(distance))
-        partition_fail(InvalidInput);
+    const auto& velocity = wake->velocity_metres_per_second;
     const auto origin = vector(source, flow.reference.record().moment_origin, m);
     const std::array groups{group(source, model, request.observations[0], origin, m),
                             group(source, model, request.observations[1], origin, m)};
@@ -242,8 +232,12 @@ run(const io::SiCase& source, const CaseWingGeometry& wing, const a::GeometryCon
         p::RequestedSide::Automatic};
     Projection put{projection, projection.limits.steps};
     const StraightWakeHarmonicInput phase{
-        put.vector(velocity, projection.velocity, m), request.age_panel_starts_seconds,
-        request.omega_radians_per_second, request.maximum_age_samples};
+        CaseWingHarmonicPreparation::bind(wing,
+                                          {put.apply(velocity[0], projection.velocity[0], m),
+                                           put.apply(velocity[1], projection.velocity[1], m),
+                                           put.apply(velocity[2], projection.velocity[2], m)}),
+        request.age_panel_starts_seconds, request.omega_radians_per_second,
+        request.maximum_age_samples};
     const HarmonicLoadInput load{put.scalar(number(source, flow.density, m), projection.density, m),
                                  put.vector(origin, projection.origin, m)};
     auto solved = partition_take(
