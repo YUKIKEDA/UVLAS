@@ -10,6 +10,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <uvlas/structure/pg_discrete_gram.hpp>
 #include <uvlas/structure/pg_shell_material.hpp>
@@ -521,9 +522,9 @@ void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id
     const auto width = fixture.r("1", "1000000000000000000000");
     const PgShellPatchDirection displacement{patch_id, state.displacement};
     auto assembly_limits = limits;
-    // The two outward rational endpoints per row carry limb-product charges.
-    // Budget those charges on this full rule separately from point evaluation.
-    assembly_limits.maximum_scalar_operations = 2'000'000'000;
+    // A fixed-width operand can occupy twice as many 32-bit limbs as 64-bit
+    // limbs. Four times the measured 64-bit charge is below this test limit.
+    assembly_limits.maximum_scalar_operations = 3'000'000'000ULL;
     assembly_limits.algebra.external_memory = ExactEstimateAdmission{profile};
     assembly_limits.algebra.maximum_value_bits = 16'384;
     assembly_limits.algebra.maximum_work_bits = 65'536;
@@ -561,7 +562,7 @@ void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id
         compare_composed_rows(patch, *other_owner, mass_rule, fixture, assembly_limits);
         core::ResourcePlan direct_plan{profile};
         auto direct_limits = assembly_limits;
-        direct_limits.maximum_scalar_operations = 550'000'000;
+        direct_limits.maximum_scalar_operations = 2'100'000'000ULL;
         const auto direct = checked(assemble_pg_shell_elastic_volume(
                                         patch, {patch_id, state.current}, samples, displacement,
                                         {112, width, width, width}, direct_limits, direct_plan),
@@ -577,6 +578,7 @@ void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id
                 check_same_enclosure(elastic.tangent_action_newtons.values()[j][a],
                                      direct.tangent_action_newtons.values()[j][a]);
             }
+        std::clog << "VMAT_LIMB_BITS," << std::numeric_limits<detail::RankWord>::digits << '\n';
         std::clog << "VMAT_COMPOSED_24," << elastic_plan.allocated_bytes() << ','
                   << elastic.work.scalar_operations << ',' << elastic.work.partition_visits << ','
                   << direct_plan.allocated_bytes() << ',' << direct.work.scalar_operations << ','

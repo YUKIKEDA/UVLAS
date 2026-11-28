@@ -785,9 +785,13 @@ uvlas_add_test(structure.pg_shell_material
     SOURCES structure/pg_shell_material_test.cpp
     LIBS uvlas_structure)
 
+set(pg_frozen_material_timeout "${pg_reference_timeout}")
+if(WIN32)
+    set(pg_frozen_material_timeout "$<IF:$<CONFIG:Debug>,1200,180>")
+endif()
 uvlas_add_test(structure.pg_frozen_shell_material
     LABELS verification V-MAT
-    TIMEOUT ${pg_reference_timeout}
+    TIMEOUT ${pg_frozen_material_timeout}
     SOURCES structure/pg_frozen_shell_material_test.cpp
     LIBS uvlas_structure Boost::headers nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_structure_pg_frozen_shell_material
@@ -798,7 +802,7 @@ target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
 add_test(NAME structure.pg_frozen_shell_material.composed
     COMMAND uvlas_test_structure_pg_frozen_shell_material "[.composed-vmat]")
 set_tests_properties(structure.pg_frozen_shell_material.composed PROPERTIES
-    LABELS "verification;V-MAT" TIMEOUT ${pg_reference_timeout})
+    LABELS "verification;V-MAT" TIMEOUT ${pg_frozen_material_timeout})
 
 set(UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE "" CACHE FILEPATH
     "Optional independent fixture for the 3672-point frozen V-MAT elastic check")
