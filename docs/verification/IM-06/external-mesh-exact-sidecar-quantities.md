@@ -29,3 +29,15 @@ ctest --preset linux-release -R '^io[.](external_shell_cross_format|external_cas
 ```
 
 隔離した複製で、`external_pg_regional_thickness.cpp` の一定厚さ比較を `!= 0` から `< 0` に変えた。Case の厚さが外部指定を上回るときの拒否が消え、Gmsh と Nastran の両方の拒否アサーションが失敗した。同じ厚さ検査を含む最終版は 67 アサーションが通過した。
+
+## Debug の CTest 登録
+
+既存の `io.external_shell_cross_format` は、変更前の PR #382 の Linux Debug と、この変更を追加した PR #387 の Windows Debug で、60 秒の上限に達した。
+厳密比較は `io.external_shell_cross_format.exact_sidecar` として独立に実行する。二つの CTest の上限を Debug で300秒、Release で60秒とする。
+分離後の Ubuntu 24.04.5、GCC 14.2.0 Release で、既存2ケースの1,795アサーション、厳密比較の67アサーションを含む対象5件が通過した。
+同じ環境の Debug では、既存試験が39.95秒、厳密比較が0.81秒で通過した。アサーション数は Release と一致した。
+
+```bash
+ctest --preset linux-release -R '^io[.](external_shell_cross_format([.]exact_sidecar)?|external_case_chart|external_pg_regional_thickness|reference_input)$'
+ctest --preset linux-debug -R '^io[.]external_shell_cross_format([.]exact_sidecar)?$'
+```

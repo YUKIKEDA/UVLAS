@@ -534,9 +534,9 @@ TEST_CASE("One planar Case has the same measured Shell through Nastran and Gmsh"
     CHECK(fixture::take(fixture::take(n_again.at(0)).get().reference().identity()) == identity);
 }
 
-TEST_CASE(
-    "Both authenticated mesh formats reject exact thickness and material differences",
-    "[FD-03][MAT-D05][IO4-01][IO4-03][IO4-04][R-05][V-USE][integration][verification][negative]") {
+TEST_CASE("Both authenticated mesh formats reject exact thickness and material differences",
+          "[.exact-sidecar][FD-03][MAT-D05][IO4-01][IO4-03][IO4-04][R-05][V-USE][integration]["
+          "verification][negative]") {
     constexpr std::string_view length = "0.00254";
     constexpr std::string_view shifted = "0.00254000000000000000000000000001";
     constexpr std::string_view young = "200000.0";
