@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <compare>
 #include <complex>
 #include <filesystem>
 #include <fstream>
@@ -1050,8 +1051,8 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
                 CHECK(error.sign() != 0);
                 const auto bound = own("1", "17592186044416"); // Declared position budget 2^-44 m.
                 const auto negative = take(Rational{}.subtract(bound, exact(), run.memory));
-                CHECK(take(error.compare(negative, exact(), run.memory)) >= 0);
-                CHECK(take(error.compare(bound, exact(), run.memory)) <= 0);
+                CHECK(std::is_gteq(take(error.compare(negative, exact(), run.memory))));
+                CHECK(std::is_lteq(take(error.compare(bound, exact(), run.memory))));
                 ++root_ends;
             }
         }
