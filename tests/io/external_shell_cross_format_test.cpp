@@ -2,12 +2,14 @@
 #include "coupling/case_external_pg.hpp"
 #include "coupling/case_external_pg_chart.hpp"
 #include "coupling/case_nastran_static_point_support.hpp"
+#include "coupling/case_pg_shell_material.hpp"
 #include "reference_file_test_fixture.hpp"
 #include "reference_resolution.hpp"
 #include "source_digest.hpp"
 
 #include <catch2/generators/catch_generators.hpp>
 
+#include <compare>
 #include <source_location>
 #include <stdexcept>
 
@@ -1108,7 +1110,8 @@ $EndElements
 }
 
 TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
-          "[FD-03][IO4-03][R-05][integration][verification][negative]") {
+          "[FD-03][FD-12][IO4-03][MAT-D08][MAT-D10][V-MAT][V-RECOVER][R-05][integration]["
+          "verification][negative]") {
     using Code = core::FailureCode;
     using Reason = coupling::CaseNastranPointSupportFailure;
     enum class Trial : std::uint8_t {
@@ -1279,6 +1282,34 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     high_shell.set("geometry", fixture::string("6"));
     high_shell.field("layers").elements.front().set("id", fixture::string("2"));
     pair_model.field("shells").elements.push_back(std::move(high_shell));
+    pair_model.field("shells").elements.front().field("layers").elements.front().set(
+        "initial_green", fixture::json(R"({
+          "kind":"expression",
+          "expression":{
+            "domain":{"kind":"reference","coordinates":"chart","lower":[0,0,-1],"upper":[1,1,1]},
+            "nodes":[{"op":"constant","value":0.125,"dimensions":[0,0,0,0]},
+                     {"op":"constant","value":0,"dimensions":[0,0,0,0]}],
+            "outputs":[0,1,1,1,1,1]
+          },
+          "error":[0,0,0,0,0,0]
+        })"));
+    auto& laminate = pair_model.field("shells").elements.front().field("layers").elements;
+    auto top_layer = laminate.front();
+    top_layer.set("id", fixture::string("3"));
+    top_layer.set(
+        "interval",
+        fixture::json(
+            R"([{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}])"));
+    top_layer.set(
+        "axis",
+        fixture::json(
+            R"({"kind":"explicit","columns":{"kind":"constant","value":[0,-1,0,1,0,0,0,0,1]}})"));
+    top_layer.set("initial_green", fixture::json(R"({"kind":"constant","value":[0,0,0,0,0,0]})"));
+    laminate.front().set(
+        "interval",
+        fixture::json(
+            R"([{"numerator":"-1","denominator":"1"},{"numerator":"0","denominator":"1"}])"));
+    laminate.push_back(std::move(top_layer));
     auto high_support = pair_model.field("supports").elements.front();
     high_support.set("id", fixture::string("2"));
     high_support.field("target").field("target").set("id", fixture::string("2"));
@@ -1304,6 +1335,170 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     };
     CHECK(fixture::take(assemble(lower, lower_patch)).prescribed_metres[2] == oracle.r("5"));
     CHECK(fixture::take(assemble(upper, upper_patch)).prescribed_metres[2] == oracle.r("9"));
+    const auto& volume_patch = lower_patch.patch();
+    const auto volume_id = fixture::take(volume_patch.info()).identity;
+    const auto* volume_basis = fixture::take(volume_patch.conditioning().reference_basis());
+    const auto volume_partition = fixture::take(volume_basis->source());
+    const auto volume_count = fixture::take(volume_partition.partition.volumes()).size();
+    std::vector<PgOwnedDiscreteVolumePoint> volume_rule;
+    for (std::size_t j = 0; j < volume_count; ++j)
+        volume_rule.push_back({static_cast<core::Index>(j), oracle.r("1", "3"), oracle.r("1", "3"),
+                               oracle.r("1", "2"), oracle.r("1", "2")});
+    auto shell_volume = fixture::take(coupling::CasePgShellVolume::prepare(
+        pair_case, lower_patch, volume_rule, pair_limits.patch, plan));
+    // The prepared volume owns its rule. Assemble after releasing the input.
+    volume_rule.clear();
+    const auto q0 = volume_patch.reference_coordinates();
+    std::vector<PgCartesianExactPosition> stretched(q0.size()), stretch(q0.size());
+    const auto two = oracle.r("2");
+    for (std::size_t j = 0; j < q0.size(); ++j) {
+        stretch[j][0] = fixture::take(q0[j][0].clone(arithmetic.algebra, plan));
+        stretched[j][0] = fixture::take(q0[j][0].multiply(two, arithmetic.algebra, plan));
+        for (std::size_t a = 1; a < 3; ++a)
+            stretched[j][a] = fixture::take(q0[j][a].clone(arithmetic.algebra, plan));
+    }
+    const auto width = oracle.r("1", "100000000000000000000");
+    const PgShellVolumeResolution resolution{96, width, width, width};
+    const auto action = fixture::take(shell_volume.elastic(
+        lower_patch, {volume_id, stretched}, PgShellPatchDirection{volume_id, stretch}, resolution,
+        pair_limits.patch, plan));
+    const auto energy = oracle.r("265", "1024");
+    CHECK(std::is_lteq(
+        fixture::take(action.energy_joules.lower.compare(energy, arithmetic.algebra, plan))));
+    CHECK(std::is_gteq(
+        fixture::take(action.energy_joules.upper.compare(energy, arithmetic.algebra, plan))));
+    CHECK(action.tangent_action_newtons.size() == q0.size());
+    const auto work_encloses = [&](std::span<const PgShellCartesianEnclosure> force,
+                                   std::span<const PgCartesianExactPosition> direction,
+                                   const ExactRational& expected) {
+        const auto& exact = arithmetic.algebra;
+        ExactRational lo, hi;
+        REQUIRE(force.size() == direction.size());
+        for (std::size_t j = 0; j < force.size(); ++j) {
+            for (std::size_t i = 0; i < 3; ++i) {
+                const auto& d = direction[j][i];
+                const auto& bounds = force[j][i];
+                const bool negative = d.sign() < 0;
+                const auto a =
+                    fixture::take(d.multiply(negative ? bounds.upper : bounds.lower, exact, plan));
+                const auto b =
+                    fixture::take(d.multiply(negative ? bounds.lower : bounds.upper, exact, plan));
+                lo = fixture::take(lo.add(a, exact, plan));
+                hi = fixture::take(hi.add(b, exact, plan));
+            }
+        }
+        CHECK(std::is_lteq(fixture::take(lo.compare(expected, exact, plan))));
+        CHECK(std::is_gteq(fixture::take(hi.compare(expected, exact, plan))));
+    };
+    // Each layer occupies 1/8 m³ with F11=2, E=1 and nu=0.
+    // The elastic E11 values are 11/8 below the interface and 3/2 above it.
+    work_encloses(action.internal_force_newtons.values(), stretch, oracle.r("23", "32"));
+    work_encloses(action.tangent_action_newtons.values(), stretch, oracle.r("87", "64"));
+    const auto third = oracle.r("1", "3");
+    const auto interface_stress = fixture::take(shell_volume.recover_interface(
+        pair_case, lower_patch, {volume_id, stretched},
+        {0, core::LayerId{1}, core::LayerId{3}, third, third}, pair_limits.patch, plan));
+    REQUIRE(interface_stress.lower.layer == core::LayerId{1});
+    REQUIRE(interface_stress.upper.layer == core::LayerId{3});
+    CHECK(interface_stress.lower.face != interface_stress.upper.face);
+    CHECK(interface_stress.lower.outward == PgPartitionFaceSide::Upper);
+    CHECK(interface_stress.upper.outward == PgPartitionFaceSide::Lower);
+    CHECK(interface_stress.lower.zeta.sign() == 0);
+    CHECK(interface_stress.upper.zeta.sign() == 0);
+    REQUIRE(interface_stress.lower.g == oracle.r("1"));
+    REQUIRE(interface_stress.upper.g == oracle.r("1"));
+    const auto encloses = [&](const PgMaterialEnclosure& value, const ExactRational& expected) {
+        CHECK(std::is_lteq(fixture::take(value.lower.compare(expected, arithmetic.algebra, plan))));
+        CHECK(std::is_gteq(fixture::take(value.upper.compare(expected, arithmetic.algebra, plan))));
+    };
+    const auto physical = [&](const PgReferenceScalar& value) {
+        return fixture::take(value.rational.add(value.radical, arithmetic.algebra, plan));
+    };
+    for (std::size_t j = 0; j < 3; ++j) {
+        CHECK(physical(interface_stress.lower.reference_position_metres[j]) ==
+              physical(interface_stress.upper.reference_position_metres[j]));
+        CHECK(interface_stress.lower.current_position_metres[j].lower ==
+              interface_stress.upper.current_position_metres[j].lower);
+        CHECK(interface_stress.lower.current_position_metres[j].upper ==
+              interface_stress.upper.current_position_metres[j].upper);
+    }
+    CHECK(physical(interface_stress.lower.outward_area_vector_metres_squared[2]).sign() > 0);
+    CHECK(physical(interface_stress.upper.outward_area_vector_metres_squared[2]).sign() < 0);
+    CHECK(physical(interface_stress.lower.reference_position_metres[2]) == oracle.r("5"));
+    encloses(interface_stress.lower.stress.second_pk_world_pascal[0], oracle.r("11", "8"));
+    encloses(interface_stress.upper.stress.second_pk_world_pascal[0], oracle.r("3", "2"));
+    encloses(interface_stress.lower.stress.cauchy_world_pascal[0], oracle.r("11", "4"));
+    encloses(interface_stress.upper.stress.cauchy_world_pascal[0], oracle.r("3"));
+    CHECK(interface_stress.lower.stress.reference_axes[0].lower == oracle.r("1"));
+    CHECK(interface_stress.upper.stress.reference_axes[3].lower == oracle.r("1"));
+    core::ResourcePlan rejected_interface_plan{0};
+    const auto reversed_interface =
+        shell_volume.recover_interface(pair_case, lower_patch, {volume_id, stretched},
+                                       {0, core::LayerId{3}, core::LayerId{1}, third, third},
+                                       pair_limits.patch, rejected_interface_plan);
+    REQUIRE_FALSE(reversed_interface);
+    CHECK(reversed_interface.error().code == Code::InvalidInput);
+    CHECK(rejected_interface_plan.allocated_bytes() == 0);
+
+    const auto& exact = arithmetic.algebra;
+    const auto one = oracle.r("1"), five = oracle.r("5");
+    // The through-thickness field Z-5 is constant in the triangle coordinates.
+    for (std::size_t j = 0; j < q0.size(); ++j) {
+        stretch[j][0] = {};
+        const auto middle =
+            fixture::take(volume_patch.translation()[j].multiply(five, exact, plan));
+        stretch[j][2] = fixture::take(q0[j][2].subtract(middle, exact, plan));
+    }
+    constexpr std::string_view scale = "1000000000000000000000000000000000000000000";
+    const auto outer = oracle.r("69431844202973712388026755553595247452137", scale);
+    const auto inner = oracle.r("330009478207571867598667120448377656399712", scale);
+    using PointWeight = std::pair<ExactRational, ExactRational>;
+    // Four-point Gauss nodes and weights rounded at 42 decimal places.
+    const std::array<PointWeight, 4> gauss{
+        {{fixture::take(outer.clone(exact, plan)),
+          oracle.r("173927422568726928686531974610999703617674", scale)},
+         {fixture::take(inner.clone(exact, plan)),
+          oracle.r("326072577431273071313468025389000296382326", scale)},
+         {fixture::take(one.subtract(inner, exact, plan)),
+          oracle.r("326072577431273071313468025389000296382326", scale)},
+         {fixture::take(one.subtract(outer, exact, plan)),
+          oracle.r("173927422568726928686531974610999703617674", scale)}}};
+    const std::array<PointWeight, 7> seven{{{oracle.r("0"), oracle.r("41", "840")},
+                                            {oracle.r("1", "6"), oracle.r("216", "840")},
+                                            {oracle.r("1", "3"), oracle.r("27", "840")},
+                                            {oracle.r("1", "2"), oracle.r("272", "840")},
+                                            {oracle.r("2", "3"), oracle.r("27", "840")},
+                                            {oracle.r("5", "6"), oracle.r("216", "840")},
+                                            {oracle.r("1"), oracle.r("41", "840")}}};
+    const auto mass_for_rule = [&](std::span<const PointWeight> depth_rule) {
+        std::vector<PgOwnedDiscreteVolumePoint> mass_rule;
+        for (std::size_t j = 0; j < volume_count; ++j) {
+            for (const auto& [z, w] : depth_rule) {
+                mass_rule.push_back(
+                    {static_cast<core::Index>(j), fixture::take(third.clone(exact, plan)),
+                     fixture::take(third.clone(exact, plan)), fixture::take(z.clone(exact, plan)),
+                     fixture::take(w.multiply(half, exact, plan))});
+            }
+        }
+        const PgShellMassResolution mass_resolution{96, width, width};
+        const auto mass =
+            fixture::take(shell_volume.mass(lower_patch, mass_rule, {volume_id, stretch},
+                                            mass_resolution, pair_limits.patch, plan));
+        const auto quarter_mass = oracle.r("1", "4");
+        CHECK(std::is_lteq(fixture::take(mass.mass_kg.lower.compare(quarter_mass, exact, plan))));
+        CHECK(std::is_gteq(fixture::take(mass.mass_kg.upper.compare(quarter_mass, exact, plan))));
+        // Integral of (Z-5)² over [2,3] × [3,4] × [5-1/8,5+1/8].
+        work_encloses(mass.action_kg_metres.values(), stretch, oracle.r("1", "768"));
+    };
+    mass_for_rule(gauss);
+    mass_for_rule(seven);
+    core::ResourcePlan no_allocation{0};
+    const auto swapped_volume =
+        shell_volume.elastic(upper_patch, {volume_id, stretched}, std::nullopt, resolution,
+                             pair_limits.patch, no_allocation);
+    REQUIRE_FALSE(swapped_volume);
+    CHECK(swapped_volume.error().code == Code::StaleGeneration);
+    CHECK(no_allocation.allocated_bytes() == 0);
     const auto before_swap = plan.allocated_bytes();
     const auto reject_swap = [&](const auto& point, const auto& wrong_patch) {
         const auto swapped = assemble(point, wrong_patch);
@@ -1583,4 +1778,120 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     REQUIRE(terms[1].motion);
     CHECK(terms[1].motion.transform([](const auto& field) { return field.byte; }) ==
           native.find("-0.0"));
+}
+
+TEST_CASE("Shell material fields follow the owned quadrature points and interface sides",
+          "[FD-12][MAT-D10][V-MAT][V-RECOVER][integration][verification][negative]") {
+    auto config = fixture::root("structural_static");
+    auto& model = config.field("model");
+    auto& geometry = model.field("geometry").elements.front();
+    geometry.field("frame").set("origin", fixture::json("[2,3,5]"));
+    geometry.field("frame").set("rotation", fixture::json("[[0,0,1],[1,0,0],[0,1,0]]"));
+    geometry.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
+    auto& supports = model.field("supports").elements;
+    supports.clear();
+    supports.push_back(fixture::fragment("Support.constraint"));
+    auto& layers = model.field("shells").elements.front().field("layers").elements;
+    layers.front().set("axis", fixture::fragment("Axis.explicit"));
+    auto upper = layers.front();
+    upper.set("id", fixture::string("2"));
+    layers.front().set(
+        "interval",
+        fixture::json(
+            R"([{"numerator":"-1","denominator":"1"},{"numerator":"0","denominator":"1"}])"));
+    upper.set("interval",
+              fixture::json(
+                  R"([{"numerator":"0","denominator":"1"},{"numerator":"1","denominator":"1"}])"));
+    layers.front().set("initial_green", fixture::json(R"({
+        "kind":"polynomial","coordinates":"material","origin":[0,0,0],"lengths":[1,1,1],
+        "components":[[{"powers":[0,0,0],"coefficient":0.125},
+                       {"powers":[0,0,1],"coefficient":0.5}],[],[],[],[],[]],
+        "error":[0,0,0,0,0,0]
+    })"));
+    upper.set("initial_green", fixture::json(R"({
+        "kind":"expression",
+        "expression":{
+          "domain":{"kind":"reference","coordinates":"material","lower":[0,0,-0.125],"upper":[1,1,0.125]},
+          "nodes":[{"op":"variable","axis":2},
+                   {"op":"constant","value":0.5,"dimensions":[-1,0,0,0]},
+                   {"op":"multiply","first":0,"second":1},
+                   {"op":"constant","value":0.25,"dimensions":[0,0,0,0]},
+                   {"op":"add","first":2,"second":3},
+                   {"op":"constant","value":0,"dimensions":[0,0,0,0]}],
+          "outputs":[4,5,5,5,5,5]
+        },
+        "error":[0,0,0,0,0,0]
+    })"));
+    layers.push_back(std::move(upper));
+
+    core::ResourcePlan plan{fixture::budget};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const PgReferenceLimits arithmetic{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const coupling::CasePgReferenceLimits preparation{
+        {arithmetic.algebra, 4, {}},
+        {arithmetic.algebra, 2000, 20'000'000, 100'000, {}},
+        partition_test::limits(),
+        arithmetic,
+        100'000,
+        {}};
+    const RectangleOracle oracle{arithmetic, plan};
+    const auto sixth = oracle.r("1", "6"), third = oracle.r("1", "3");
+    std::array<ExactRational, 6> positions;
+    std::array<PgLineQuadratureNode, 6> plane{{{positions[0], sixth},
+                                               {positions[1], sixth},
+                                               {positions[2], sixth},
+                                               {positions[3], sixth},
+                                               {positions[4], sixth},
+                                               {positions[5], sixth}}};
+    for (std::size_t i = 0; i < positions.size(); ++i)
+        positions[i] = oracle.r(std::to_string(2 * i + 1), "12");
+    const auto quarter = oracle.r("1", "4"), half = oracle.r("1", "2"), last = oracle.r("3", "4");
+    const std::array depth{PgLineQuadratureNode{quarter, third}, PgLineQuadratureNode{half, third},
+                           PgLineQuadratureNode{last, third}};
+    const std::array rules{
+        coupling::CasePgRuleBinding{1, PgVolumeProductRule{plane, plane, depth}}};
+    const auto si = convert(fixture::checked(config), arithmetic.algebra, plan);
+    const auto limits = chart_preparation(preparation, 1, 1);
+    const auto owner = fixture::take(
+        coupling::prepare_case_component_pg_chart(si, rules, limits, workspace, plan));
+    const auto shell = fixture::take(owner.point_patch(0));
+    const auto& patch = shell.patch();
+    const auto id = fixture::take(patch.info()).identity;
+    const auto basis = fixture::take(patch.conditioning().reference_basis());
+    const auto source = fixture::take(basis->source());
+    const auto volumes = fixture::take(source.partition.volumes());
+    const PgShellPatchState state{id, patch.reference_coordinates()};
+    const auto width = oracle.r("1", "100000000000000000000");
+    const PgShellVolumeResolution resolution{96, width, width, width};
+    const auto check = [&](const PgMaterialEnclosure& value, const ExactRational& expected) {
+        CHECK(std::is_lteq(fixture::take(value.lower.compare(expected, arithmetic.algebra, plan))));
+        CHECK(std::is_gteq(fixture::take(value.upper.compare(expected, arithmetic.algebra, plan))));
+    };
+
+    // Local z is ζ/8, and maps to world x under this non-symmetric frame.
+    // Near/far layer depths give E0,xx of (5,7)/64 and (17,19)/64, respectively.
+    // Each layer has volume 1/8 and E=1, ν=0. The energies use E0,xx²/2 at rest.
+    for (const bool exchange_depths : {false, true}) {
+        CAPTURE(exchange_depths);
+        std::vector<PgOwnedDiscreteVolumePoint> samples;
+        for (std::size_t volume = 0; volume < volumes.size(); ++volume) {
+            samples.push_back({static_cast<core::Index>(volume), oracle.r("1", "3"),
+                               oracle.r("1", "3"), oracle.r(exchange_depths ? "3" : "1", "4"),
+                               oracle.r("1", "8")});
+            samples.push_back({static_cast<core::Index>(volume), oracle.r("1", "3"),
+                               oracle.r("1", "3"), oracle.r(exchange_depths ? "1" : "3", "4"),
+                               oracle.r("3", "8")});
+        }
+        const auto prepared = fixture::take(
+            coupling::CasePgShellVolume::prepare(si, shell, samples, limits.patch, plan));
+        const auto action = fixture::take(
+            prepared.elastic(shell, state, std::nullopt, resolution, limits.patch, plan));
+        check(action.energy_joules, oracle.r(exchange_depths ? "169" : "193", "32768"));
+
+        const auto interface = fixture::take(prepared.recover_interface(
+            si, shell, state, {0, core::LayerId{1}, core::LayerId{2}, third, third}, limits.patch,
+            plan));
+        check(interface.lower.stress.second_pk_world_pascal[0], oracle.r("-1", "8"));
+        check(interface.upper.stress.second_pk_world_pascal[0], oracle.r("-1", "4"));
+    }
 }
