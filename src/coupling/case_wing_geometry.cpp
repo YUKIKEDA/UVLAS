@@ -544,7 +544,8 @@ public:
 
     void publish(Owner& owner, a::ScalarWords core_radius, const CaseWingLimits& limits,
                  Projector& projection, a::GeometryWorkspace& geometry_work,
-                 a::GlobalWorkspace& global_work, Math& m, CaseWingDiagnostic& diagnostic) {
+                 a::GlobalWorkspace& global_work, Math& m, CaseWingDiagnostic& diagnostic,
+                 const a::GlobalTopology* topology) {
         const auto position = [](std::span<const double> high,
                                  std::span<const double> low) -> a::PositionView {
             if (low.empty())
@@ -569,14 +570,18 @@ public:
         const auto geometry = take_aero(
             a::prepare_owned_geometry(input, limits.geometry, geometry_work, m.plan, stop),
             diagnostic);
-        const auto topology =
-            take_aero(a::build_global_topology(geometry,
-                                               {roles_.values(), owners_.values(),
-                                                trailing_.values().first(owner.band_count)},
-                                               limits.global, global_work, m.plan, stop),
-                      diagnostic);
+        std::optional<a::GlobalTopology> built;
+        if (topology == nullptr) {
+            built.emplace(
+                take_aero(a::build_global_topology(geometry,
+                                                   {roles_.values(), owners_.values(),
+                                                    trailing_.values().first(owner.band_count)},
+                                                   limits.global, global_work, m.plan, stop),
+                          diagnostic));
+            topology = &*built;
+        }
         auto global = take_aero(
-            a::check_global_geometry(topology, geometry, limits.global, global_work, m.plan, stop),
+            a::check_global_geometry(*topology, geometry, limits.global, global_work, m.plan, stop),
             diagnostic);
         const a::SingleWord zero{0.0};
         Inputs<a::PointKinematicsInput> velocities{
@@ -597,7 +602,7 @@ public:
             diagnostic);
         // Edges and band drafts are emitted in increasing original edge order.
         diagnostic.phase = CaseWingPhase::TrailingEdge;
-        const auto rows = topology.trailing_edges();
+        const auto rows = topology->trailing_edges();
         if (rows.size() != owner.band_count)
             partition_fail(GeometryInvalid);
         for (std::size_t i = 0; i < rows.size(); ++i) {
@@ -675,10 +680,22 @@ struct Build {
                                 const CaseWingProjection& projection, const CaseWingLimits& limits,
                                 a::GeometryWorkspace& geometry_work,
                                 a::GlobalWorkspace& global_work, p::CurveWorkspace& curve,
-                                core::ResourcePlan& plan, CaseWingDiagnostic& diagnostic) {
+                                core::ResourcePlan& plan, CaseWingDiagnostic& diagnostic,
+                                const Owner* anchor) {
         Math m{limits.chart, plan};
         m.cancel();
         const auto& schema = partition_take(source.source_case()).get();
+        const auto identity = partition_take(schema.identity());
+        std::optional<a::GlobalTopology> topology;
+        if (anchor != nullptr) {
+            diagnostic.phase = CaseWingPhase::Clock;
+            if (!anchor->source || !same_source(*anchor->source, identity) || !anchor->address ||
+                !address || anchor->address->stamp != address->stamp || !anchor->global ||
+                (anchor->context->current == context.current &&
+                 !same_address(anchor->address, address)))
+                partition_fail(StaleGeneration);
+            topology.emplace(take_aero(anchor->global->retain_reference_topology(), diagnostic));
+        }
         const auto root = partition_take(schema.root());
         const auto analysis = root.analysis.record();
         const bool transient = std::holds_alternative<s::AnalysisTransient>(analysis);
@@ -696,7 +713,7 @@ struct Build {
             analysis);
         auto carrier = allocate<Owner>(m, 1);
         auto& result = carrier.values().front();
-        result.source = partition_take(schema.identity());
+        result.source = identity;
         result.context = context;
         result.address = address;
         diagnostic.phase = CaseWingPhase::Clock;
@@ -803,11 +820,36 @@ struct Build {
         for (const auto& patch : patches)
             mesh.connect(patch, result, edge_owners.values(), internal.values(), m);
         mesh.publish(result, retained(projected), limits, projector, geometry_work, global_work, m,
-                     diagnostic);
+                     diagnostic, topology ? &*topology : nullptr);
         m.cancel();
         return CaseWingGeometry{std::move(carrier)};
     }
 };
+core::Result<CaseWingGeometry>
+prepare(const io::SiCase& source, const aero::detail::GeometryContext& context,
+        std::optional<CaseFlowClockQuery> address, const CaseWingProjection& projection,
+        const CaseWingLimits& limits, aero::detail::GeometryWorkspace& geometry,
+        aero::detail::GlobalWorkspace& global, aero::detail::pchip::CurveWorkspace& curve,
+        core::ResourcePlan& plan, CaseWingDiagnostic* diagnostic, const Owner* anchor) noexcept {
+    CaseWingDiagnostic location;
+    auto result = core::guard_entry(
+        wing_geometry::operation, core::FailureCode::PrecisionUnresolved, context.diagnostics,
+        [&]() -> core::Result<CaseWingGeometry> {
+            try {
+                return Build::run(source, context, address, projection, limits, geometry, global,
+                                  curve, plan, location, anchor);
+            } catch (const structure::detail::PartitionAbort& rejected) {
+                auto inner = rejected.failure;
+                inner.operation = wing_geometry::operation;
+                if (!inner.details.component && location.surface)
+                    inner.details.component = core::ComponentId{*location.surface};
+                return std::unexpected(inner);
+            }
+        });
+    if (diagnostic)
+        *diagnostic = result ? CaseWingDiagnostic{} : location;
+    return result;
+}
 } // namespace wing_geometry
 
 CaseWingGeometry::CaseWingGeometry(core::PlannedBuffer<wing_geometry::Owner> owner) noexcept
@@ -822,24 +864,26 @@ core::Result<CaseWingGeometry> CaseWingGeometry::prepare(
     const CaseWingLimits& limits, aero::detail::GeometryWorkspace& geometry,
     aero::detail::GlobalWorkspace& global, aero::detail::pchip::CurveWorkspace& curve,
     core::ResourcePlan& plan, CaseWingDiagnostic* diagnostic) noexcept {
-    CaseWingDiagnostic location;
-    auto result = core::guard_entry(
-        wing_geometry::operation, core::FailureCode::PrecisionUnresolved, context.diagnostics,
-        [&]() -> core::Result<CaseWingGeometry> {
-            try {
-                return wing_geometry::Build::run(source, context, address, projection, limits,
-                                                 geometry, global, curve, plan, location);
-            } catch (const structure::detail::PartitionAbort& rejected) {
-                auto inner = rejected.failure;
-                inner.operation = wing_geometry::operation;
-                if (!inner.details.component && location.surface)
-                    inner.details.component = core::ComponentId{*location.surface};
-                return std::unexpected(inner);
-            }
-        });
-    if (diagnostic)
-        *diagnostic = result ? CaseWingDiagnostic{} : location;
-    return result;
+    return wing_geometry::prepare(source, context, address, projection, limits, geometry, global,
+                                  curve, plan, diagnostic, nullptr);
+}
+
+core::Result<CaseWingGeometry> CaseWingGeometry::evaluate_stage(
+    const io::SiCase& source, const aero::detail::GeometryContext& context,
+    CaseFlowClockQuery address, const CaseWingProjection& projection, const CaseWingLimits& limits,
+    aero::detail::GeometryWorkspace& geometry, aero::detail::GlobalWorkspace& global,
+    aero::detail::pchip::CurveWorkspace& curve, core::ResourcePlan& plan,
+    CaseWingDiagnostic* diagnostic) const noexcept {
+    if (owner_.size() != 1) {
+        if (diagnostic)
+            *diagnostic = {};
+        const auto code = limits.chart.cancellation.stop_requested()
+                              ? core::FailureCode::Cancelled
+                              : core::FailureCode::StaleGeneration;
+        return std::unexpected(core::Failure{code, wing_geometry::operation, context.diagnostics});
+    }
+    return wing_geometry::prepare(source, context, address, projection, limits, geometry, global,
+                                  curve, plan, diagnostic, &owner_.values().front());
 }
 
 core::Result<void>
