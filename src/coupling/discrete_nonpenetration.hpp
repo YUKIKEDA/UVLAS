@@ -1,8 +1,9 @@
 #pragma once
 
-#include "aero/p1_shared_action.hpp"
+#include "aero/closed_contour.hpp"
 #include "case_known_flow.hpp"
 
+#include <complex>
 #include <uvlas/numerics/linear_solve.hpp>
 
 namespace uvlas::coupling::detail {
@@ -111,6 +112,43 @@ struct DiscreteNonpenetrationLimits {
     std::uint64_t steps;
 };
 
+/// Pairs cover every bound row exactly once. Each pair uses the same circulation
+/// and is validated against the retained geometry and forcing at y=0.
+using HarmonicReflectionPair = std::array<aero::detail::PhysicalFaceId, 2>;
+
+struct StraightWakeHarmonicInput {
+    NonpenetrationVector convection_velocity;
+    std::span<const double> age_panel_starts_seconds;
+    double angular_frequency;
+    std::uint64_t maximum_samples;
+    std::span<const HarmonicReflectionPair> reflection_pairs{};
+};
+
+struct HarmonicWakeColumn {
+    aero::detail::EdgeId edge{0};
+    aero::detail::PhysicalFaceId bound_face{
+        0}; ///< Owner of the circulation multiplying this column.
+};
+
+struct HarmonicWakeRow {
+    aero::detail::PhysicalFaceId face{0};
+};
+
+/// Own the finite complex correction to the steady contour. Columns are in
+/// canonical TE edge order. Coefficients are column-major, with rows in
+/// ascending physical bound face order and the TE transfer sign applied.
+struct DiscreteHarmonicWakeUpdate {
+    aero::detail::GeometryContext geometry;
+    core::PlannedBuffer<HarmonicWakeRow> rows;
+    core::PlannedBuffer<HarmonicWakeColumn> columns;
+    core::PlannedBuffer<aero::detail::StraightWakeColumnUpdate> coefficients;
+    std::uint64_t used_steps;
+};
+
+[[nodiscard]] core::Result<DiscreteHarmonicWakeUpdate> assemble_discrete_harmonic_wake(
+    const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+    const DiscreteNonpenetrationLimits&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
 struct DiscreteNonpenetrationRow {
     aero::detail::PhysicalFaceId face{0};
     aero::detail::ScaledEnclosure residual;           ///< m/s, including the original affine terms.
@@ -193,6 +231,66 @@ struct DiscreteCirculationRequest {
     /// Each parallel range receives its own share of the remaining step budget.
     std::size_t contour_workers{1};
 };
+
+struct HarmonicCirculationRhs {
+    aero::detail::PhysicalFaceId face{0};
+    aero::detail::ScalarWords real;
+    aero::detail::ScalarWords imaginary;
+};
+
+struct HarmonicCirculationResidual {
+    aero::detail::PhysicalFaceId face;
+    aero::detail::ScaledEnclosure real;
+    aero::detail::ScaledEnclosure imaginary;
+};
+
+using DiscreteLoadVector = std::array<aero::detail::ScaledEnclosure, 3>;
+
+struct HarmonicLoadInput {
+    aero::detail::ScalarWords density;
+    NonpenetrationVector moment_origin;
+};
+
+struct HarmonicLoadTotals {
+    DiscreteLoadVector force_real, force_imaginary;
+    DiscreteLoadVector moment_real, moment_imaginary;
+};
+
+struct DiscreteHarmonicCirculation {
+    aero::detail::GeometryContext geometry;
+    numerics::linear::Solution<std::complex<double>> solution;
+    core::PlannedBuffer<std::optional<HarmonicCirculationResidual>> residual;
+    std::optional<HarmonicLoadTotals> loads;
+    std::uint64_t used_steps;
+    /// Full-order words after reflection expansion; the algebraic certificate
+    /// above describes the condensed system when this buffer is present.
+    std::optional<numerics::PrecisionBuffer<std::complex<double>>> expanded;
+
+    [[nodiscard]] const numerics::PrecisionBuffer<std::complex<double>>&
+    physical_values() const& noexcept {
+        return expanded ? *expanded : solution.values();
+    }
+    const numerics::PrecisionBuffer<std::complex<double>>& physical_values() const&& = delete;
+};
+
+/// Solve the finite straight-wake system A0 + W(omega) E^T with a real A0
+/// and a complex update. Right-hand sides are normal speeds in increasing
+/// physical bound face order. Reevaluate the original complex residual from
+/// the steady contour, the finite update enclosures and both solution words.
+[[nodiscard]] core::Result<DiscreteHarmonicCirculation> solve_discrete_harmonic_circulation(
+    const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+    std::span<const HarmonicCirculationRhs>, const DiscreteNonpenetrationLimits&,
+    const DiscreteCirculationRequest&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
+
+/// Evaluate the linear harmonic loads from the same certified circulation.
+/// The convection velocity supplies the steady ambient edge velocity. Rates
+/// are i*omega*Gamma, with moment arm measured from the supplied origin.
+[[nodiscard]] core::Result<DiscreteHarmonicCirculation>
+solve_discrete_harmonic_loads(const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+                              std::span<const HarmonicCirculationRhs>, const HarmonicLoadInput&,
+                              const DiscreteNonpenetrationLimits&,
+                              const DiscreteCirculationRequest&, core::ResourcePlan&,
+                              const std::stop_token& = {}) noexcept;
 
 struct CirculationResidualRow {
     aero::detail::PhysicalFaceId face{0};
@@ -471,8 +569,6 @@ private:
     const DiscreteCirculationRequest& primal, const DiscreteCirculationRequest& transpose,
     aero::detail::SharedP1Workspace&, aero::detail::LocalPacketWorkspace&,
     aero::detail::P1Workspace&, core::ResourcePlan&, const std::stop_token& = {}) noexcept;
-
-using DiscreteLoadVector = std::array<aero::detail::ScaledEnclosure, 3>;
 
 struct EdgeMidpointVelocity {
     EdgeMidpointVelocity(aero::detail::EdgeId id, const NonpenetrationVector& v) noexcept
