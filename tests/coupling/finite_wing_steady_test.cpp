@@ -1653,10 +1653,14 @@ void verify_harmonic_grid(const CaseLattice& grid, const FiniteWingMesh& mesh,
             CAPTURE(condensed);
             request.contour_workers = condensed ? 2 : 1;
             auto selected = phase;
-            if (condensed)
+            auto capacity = request;
+            if (condensed) {
                 selected.reflection_pairs = reflected;
+                capacity.solver_limits.maximum_order = static_cast<core::Index>(count / 2);
+                capacity.solver_limits.maximum_update_rank = span / 2;
+            }
             const auto result = take(cf::solve_discrete_harmonic_loads(
-                input, selected, forcing, loading, action_limits, request, plan));
+                input, selected, forcing, loading, action_limits, capacity, plan));
             REQUIRE(result.loads);
             CHECK(result.expanded.has_value() == condensed);
             CHECK(result.physical_values().shape().rows == static_cast<core::Index>(count));
@@ -1684,6 +1688,27 @@ void verify_harmonic_grid(const CaseLattice& grid, const FiniteWingMesh& mesh,
         if (heave && sample.at("k").get<double>() == .05) {
             auto selected = phase;
             selected.reflection_pairs = reflected;
+            auto capacity = request;
+            capacity.solver_limits.maximum_order = static_cast<core::Index>(count / 2);
+            capacity.solver_limits.maximum_update_rank = span / 2;
+            auto too_few_rows = capacity;
+            --too_few_rows.solver_limits.maximum_order;
+            const auto order_rejected = cf::solve_discrete_harmonic_circulation(
+                input, selected, forcing, action_limits, too_few_rows, plan);
+            REQUIRE_FALSE(order_rejected);
+            CHECK(order_rejected.error().code == core::FailureCode::ResourceExceeded);
+            auto too_few_columns = capacity;
+            --too_few_columns.solver_limits.maximum_update_rank;
+            const auto rank_rejected = cf::solve_discrete_harmonic_circulation(
+                input, selected, forcing, action_limits, too_few_columns, plan);
+            REQUIRE_FALSE(rank_rejected);
+            CHECK(rank_rejected.error().code == core::FailureCode::ResourceExceeded);
+            auto incomplete_scales = capacity;
+            incomplete_scales.scales.unknown = incomplete_scales.scales.unknown.first(count / 2);
+            const auto scales_rejected = cf::solve_discrete_harmonic_circulation(
+                input, selected, forcing, action_limits, incomplete_scales, plan);
+            REQUIRE_FALSE(scales_rejected);
+            CHECK(scales_rejected.error().code == core::FailureCode::InvalidInput);
             forcing[0].real = a::SingleWord{1.};
             const auto asymmetric = cf::solve_discrete_harmonic_circulation(
                 input, selected, forcing, action_limits, request, plan);
