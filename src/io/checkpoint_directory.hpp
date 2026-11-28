@@ -2,10 +2,9 @@
 
 #include "checkpoint_manifest.hpp"
 #include "checkpoint_publication.hpp"
-#include "reference_file_snapshot.hpp"
+#include "reference_input.hpp"
 
 #include <filesystem>
-#include <uvlas/io/case_schema.hpp>
 
 namespace uvlas::io::detail {
 
@@ -13,6 +12,7 @@ struct LoadedCheckpointDirectory {
     std::uint64_t number;
     CheckpointManifest manifest;
     CheckpointPayloadSet payloads;
+    ReferenceFileSnapshot manifest_file;
 };
 
 struct CheckpointDiscoveryLimits {
@@ -43,15 +43,35 @@ read_checkpoint_directory(const std::filesystem::path&, SourceId, const Checkpoi
                           core::ResourcePlan&, const std::stop_token&,
                           std::optional<SourceDigest> manifest_digest = {}) noexcept;
 
-/// Verify the envelope pinned by an existing Case's restart declaration. The caller supplies the
-/// resolved path of that declaration and independently prepared context fingerprints. This returns
-/// the verified container for a later state decoder; compatibility policy and state checks are
-/// separate.
-[[nodiscard]] core::Result<LoadedCheckpointDirectory>
-read_case_checkpoint_directory(const SchemaCase&, const std::filesystem::path& resolved_directory,
-                               SourceId manifest_source, const CheckpointFingerprints&,
-                               const CheckpointManifestLimits&, CheckpointDirectoryLimits,
-                               core::ResourcePlan&, const std::stop_token&) noexcept;
+struct CaseCheckpointDirectoryLimits {
+    ReferencePathLimits path;
+    CheckpointDirectoryLimits container;
+};
+
+enum class CaseCheckpointDirectoryStage : std::uint8_t {
+    Restart,
+    Path,
+    Open,
+    ManifestDigest,
+    Envelope,
+};
+
+struct CaseCheckpointDirectoryDiagnostic {
+    std::optional<CaseCheckpointDirectoryStage> stage;
+    std::optional<ReferencePathDiagnostic> path;
+    std::optional<ManifestOpenDiagnostic> open;
+
+    [[nodiscard]] std::string_view pointer() const noexcept;
+};
+
+/// Open only the canonical checkpoint named by the Case under its acquired root.
+/// Authenticate the original manifest bytes before parsing or opening payloads.
+/// The caller supplies expected fingerprints from the receiving context. The
+/// resulting envelope is independent of the root handle and of the source files.
+[[nodiscard]] core::Result<LoadedCheckpointDirectory> read_case_checkpoint_directory(
+    const ReferenceInput&, SourceId manifest_source, const CheckpointFingerprints&,
+    const CheckpointManifestLimits&, CaseCheckpointDirectoryLimits, core::ResourcePlan&,
+    const std::stop_token&, CaseCheckpointDirectoryDiagnostic* = nullptr) noexcept;
 
 /// Enumerate the caller-selected parent under explicit quotas. Consider only canonical
 /// numbered names, greatest first. Ignore corrupt/incompatible candidates and stop on

@@ -10,7 +10,7 @@
 |---|---|---:|---:|---:|
 | API-01 | [product-requirements.md:38](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | API-02 | [product-requirements.md:39](../requirements/product-requirements.md) | 0 | 0 | 0 |
-| BC-01 | [product-requirements.md:26](../requirements/product-requirements.md) | 2 | 0 | 0 |
+| BC-01 | [product-requirements.md:26](../requirements/product-requirements.md) | 3 | 1 | 0 |
 | DIST-01 | [product-requirements.md:45](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | DIST-02 | [product-requirements.md:46](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | ENV-01 | [product-requirements.md:40](../requirements/product-requirements.md) | 0 | 0 | 0 |
@@ -19,7 +19,7 @@
 | IO-01 | [product-requirements.md:33](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | IO-02 | [product-requirements.md:34](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | IO-03 | [product-requirements.md:35](../requirements/product-requirements.md) | 0 | 0 | 0 |
-| LOAD-01 | [product-requirements.md:30](../requirements/product-requirements.md) | 0 | 0 | 0 |
+| LOAD-01 | [product-requirements.md:30](../requirements/product-requirements.md) | 1 | 1 | 0 |
 | MAT-01 | [product-requirements.md:24](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | MAT-02 | [product-requirements.md:25](../requirements/product-requirements.md) | 0 | 0 | 0 |
 | OUT-01 | [product-requirements.md:31](../requirements/product-requirements.md) | 0 | 0 | 0 |
@@ -93,10 +93,10 @@
 | FD-02 | [case-schema-fields.md:18](../specs/foundation/case-schema-fields.md) | 6 | 6 | 0 |
 | FD-03 | [case-schema-fields.md:46](../specs/foundation/case-schema-fields.md) | 14 | 23 | 0 |
 | FD-04 | [case-schema-fields.md:63](../specs/foundation/case-schema-fields.md) | 0 | 1 | 1 |
-| FD-05 | [case-schema-fields.md:83](../specs/foundation/case-schema-fields.md) | 3 | 5 | 0 |
+| FD-05 | [case-schema-fields.md:83](../specs/foundation/case-schema-fields.md) | 6 | 6 | 1 |
 | FD-06 | [case-schema-fields.md:108](../specs/foundation/case-schema-fields.md) | 16 | 7 | 1 |
 | FD-07 | [case-schema-fields.md:136](../specs/foundation/case-schema-fields.md) | 4 | 5 | 0 |
-| FD-08 | [case-schema-fields.md:161](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-08 | [case-schema-fields.md:161](../specs/foundation/case-schema-fields.md) | 3 | 0 | 0 |
 | FD-09 | [case-schema-fields.md:184](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-10 | [case-schema-fields.md:233](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-11 | [case-schema-fields.md:321](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
@@ -106,7 +106,7 @@
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 80 | 35 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 39 | 21 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 17 | 7 | 0 |
-| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 22 | 7 | 0 |
+| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 24 | 7 | 0 |
 | IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 1 | 8 | 0 |
 | J1-D01 | [j1-discrete-equilibrium-and-chart-contract.md:5](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 2 | 3 | 0 |
 | J1-D02 | [j1-discrete-equilibrium-and-chart-contract.md:10](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
@@ -209,7 +209,7 @@
 | V-BEAM | [practical-acceptance-plan.md:32](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-J1 | [practical-acceptance-plan.md:38](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-JOINT | [practical-acceptance-plan.md:33](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
-| V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
+| V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 3 | 1 | 0 |
 | V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 20 | 0 | 0 |
 | V-MULTI | [practical-acceptance-plan.md:37](../requirements/practical-acceptance-plan.md) | 8 | 5 | 0 |
 | V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 17 | 12 | 0 |
@@ -229,7 +229,7 @@
 |---|---|---:|---:|---:|
 | IM-00 | [design-decisions.md:4](../specs/design-decisions.md) | 0 | 0 | 0 |
 | IM-01 | [implementation-start-review.md:40](../plans/implementation-start-review.md) | 0 | 0 | 0 |
-| IM-02 | [implementation-start-review.md:41](../plans/implementation-start-review.md) | 0 | 0 | 0 |
+| IM-02 | [implementation-start-review.md:41](../plans/implementation-start-review.md) | 0 | 1 | 0 |
 | IM-03 | [implementation-start-review.md:42](../plans/implementation-start-review.md) | 0 | 16 | 0 |
 | IM-04 | [implementation-start-review.md:43](../plans/implementation-start-review.md) | 0 | 0 | 0 |
 | IM-05 | [implementation-start-review.md:44](../plans/implementation-start-review.md) | 0 | 0 | 0 |

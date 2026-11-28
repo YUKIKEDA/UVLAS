@@ -2,6 +2,8 @@
 
 #include "windows_reference_root.hpp"
 
+#include "windows_checkpoint_query.hpp"
+
 #include <algorithm>
 #include <bit>
 #include <limits>
@@ -46,8 +48,9 @@ void WindowsHandleCloser::operator()(void* handle) const noexcept {
     static_cast<void>(CloseHandle(handle));
 }
 
-WindowsReferenceRoot::WindowsReferenceRoot(WindowsHandle directory) noexcept
-    : directory_(std::move(directory)) {}
+WindowsReferenceRoot::WindowsReferenceRoot(WindowsHandle directory,
+                                           core::PlannedBuffer<WindowsHandle> parents) noexcept
+    : parents_(std::move(parents)), directory_(std::move(directory)) {}
 
 core::Result<WindowsReferenceRoot>
 WindowsReferenceRoot::open(const std::filesystem::path& directory,
@@ -87,8 +90,9 @@ WindowsReferenceRoot::open(const std::filesystem::path& directory,
     return WindowsReferenceRoot{std::move(held)};
 }
 
-core::Result<WindowsReferenceFile> WindowsReferenceRoot::open_file(
-    const NormalizedReferencePath& path, core::ResourcePlan& plan, const std::stop_token& stop,
+core::Result<WindowsReferenceRoot::RelativeEntry> WindowsReferenceRoot::open_relative(
+    const NormalizedReferencePath& path, bool directory, core::ResourcePlan& plan,
+    const std::stop_token& stop,
     std::optional<WindowsReferenceOpenDiagnostic>* diagnostic) const noexcept {
     if (diagnostic != nullptr) {
         diagnostic->reset();
@@ -168,8 +172,9 @@ core::Result<WindowsReferenceFile> WindowsReferenceRoot::open_file(
         }
 
         // One component and one held directory per lookup. The exclusion of FILE_SHARE_DELETE
-        // applies to each directory all the way through the file reader's lifetime.
+        // applies to each directory for the lifetime of the returned entry.
         const bool is_parent = index < parents->size();
+        const bool expects_directory = is_parent || directory;
         const auto bytes = static_cast<USHORT>(static_cast<std::size_t>(units) * sizeof(wchar_t));
         UNICODE_STRING native{bytes, bytes, name->values().data()};
         OBJECT_ATTRIBUTES attributes{sizeof(OBJECT_ATTRIBUTES),
@@ -181,7 +186,7 @@ core::Result<WindowsReferenceFile> WindowsReferenceRoot::open_file(
         IO_STATUS_BLOCK status_block{};
         HANDLE raw = nullptr;
         const auto status =
-            NtCreateFile(&raw, is_parent ? directory_access : file_access, &attributes,
+            NtCreateFile(&raw, expects_directory ? directory_access : file_access, &attributes,
                          &status_block, nullptr, 0, read_share, FILE_OPEN,
                          FILE_OPEN_REPARSE_POINT | FILE_SYNCHRONOUS_IO_NONALERT, nullptr, 0);
         WindowsHandle entry{status >= 0 ? raw : nullptr};
@@ -197,9 +202,13 @@ core::Result<WindowsReferenceFile> WindowsReferenceRoot::open_file(
                 error == ERROR_CALL_NOT_IMPLEMENTED) {
                 return fail_component(Reason::Open, offset, core::FailureCode::Unsupported);
             }
+            if (error == ERROR_TOO_MANY_OPEN_FILES ||
+                windows_checkpoint_query_failure(error) == core::FailureCode::ResourceExceeded) {
+                return fail_component(Reason::Open, offset, core::FailureCode::ResourceExceeded);
+            }
             return fail_component(Reason::Open, offset);
         }
-        const auto reason = wrong_kind(entry.get(), is_parent);
+        const auto reason = wrong_kind(entry.get(), expects_directory);
         if (stop.stop_requested()) {
             return fail(core::FailureCode::Cancelled);
         }
@@ -207,13 +216,33 @@ core::Result<WindowsReferenceFile> WindowsReferenceRoot::open_file(
             return fail_component(*reason, offset);
         }
         if (!is_parent) {
-            return WindowsReferenceFile{std::move(*parents), std::move(entry)};
+            return RelativeEntry{std::move(*parents), std::move(entry)};
         }
         parent = entry.get();
         parents->values()[index] = std::move(entry);
         ++index;
     }
     return fail(core::FailureCode::InvalidInput);
+}
+
+core::Result<WindowsReferenceFile> WindowsReferenceRoot::open_file(
+    const NormalizedReferencePath& path, core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<WindowsReferenceOpenDiagnostic>* diagnostic) const noexcept {
+    auto entry = open_relative(path, false, plan, stop, diagnostic);
+    if (!entry) {
+        return std::unexpected(entry.error());
+    }
+    return WindowsReferenceFile{std::move(entry->parents), std::move(entry->handle)};
+}
+
+core::Result<WindowsReferenceRoot> WindowsReferenceRoot::open_directory(
+    const NormalizedReferencePath& path, core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<WindowsReferenceOpenDiagnostic>* diagnostic) const noexcept {
+    auto entry = open_relative(path, true, plan, stop, diagnostic);
+    if (!entry) {
+        return std::unexpected(entry.error());
+    }
+    return WindowsReferenceRoot{std::move(entry->handle), std::move(entry->parents)};
 }
 
 WindowsReferenceFile::WindowsReferenceFile(core::PlannedBuffer<WindowsHandle> parents,

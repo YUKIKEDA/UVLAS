@@ -26,6 +26,8 @@
 
 PGの共通分割では、片を作る各段の予測に[辺出現と資源予測の追加規約](../specs/structure/pg-partition-incidence-budget-contract.md)を適用する。
 
+平面シェルの静的 Case で使う構造求積、元力、線探索と反力は[平衡の追加規約](../specs/structure/pg-flat-static-equilibrium-contract.md)を使う。
+
 ## 優先的に探す回帰
 
 1. PGの参照係数と全3D材料・一定シェル質量・全位置トレースを、別の要素／応力仮定へ無断で変えていないか。接続後の許容空間を検査する。
