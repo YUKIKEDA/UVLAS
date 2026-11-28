@@ -380,7 +380,11 @@ TEST_CASE("Case edge tractions integrate the original PG columns over all side l
                            pg::PgLineQuadratureNode{one, sixth}};
     const EdgeRule edge{a};
     const CasePgLateralTractionRule rule{edge.rule, depth};
-    const CasePgLateralTractionLimits limits{a.limits, 2, 6, 2, 25, 792};
+    auto work = a.limits;
+    // Include conditioned reference evaluation and outward arithmetic for all 792 points.
+    work.maximum_scalar_operations = 300'000'000;
+    work.maximum_partition_visits = 100'000'000;
+    const CasePgLateralTractionLimits limits{work, 2, 6, 2, 25, 792};
     CasePgLateralTractionDiagnostic diagnostic;
     auto prepared = CasePgLateralTraction::prepare(si, bound, rule, limits, a.memory, &diagnostic);
     REQUIRE(prepared);
@@ -389,6 +393,10 @@ TEST_CASE("Case edge tractions integrate the original PG columns over all side l
     const auto width = a.own(tolerance);
     const CasePgLateralTractionAccuracy accuracy{160, width};
     const auto force = prepared->evaluate(bound, 4.25, accuracy, limits, a.memory, &diagnostic);
+    INFO("action status " << (force ? 0 : static_cast<unsigned>(force.error().code)) << ", load "
+                          << diagnostic.load.value_or(0) << ", face "
+                          << diagnostic.face.value_or(-1) << ", allocations "
+                          << a.memory.allocated_bytes());
     REQUIRE(force);
     CHECK(force->patch == fixture::take(bound.patch().info()).identity);
     CHECK(force->shell == numerics::PatchId{1});
