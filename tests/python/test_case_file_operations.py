@@ -173,26 +173,34 @@ class CaseFileOperations(unittest.TestCase):
                 data = (fixture / filename).read_bytes()
                 (root / filename).write_bytes(data)
                 return {
-                    "source_id": source, "path": filename,
-                    "sha256": hashlib.sha256(data).hexdigest(), "role": role,
+                    "source_id": source,
+                    "path": filename,
+                    "sha256": hashlib.sha256(data).hexdigest(),
+                    "role": role,
                 }
 
             geometries = {
                 "parametric": None,
                 "gmsh": {
-                    "kind": "gmsh", "id": "2",
+                    "kind": "gmsh",
+                    "id": "2",
                     "mesh": acquisition("plate.msh", "1", "gmsh-msh4.1-ascii"),
                     "sidecar": acquisition("plate-gmsh.json", "2", "gmsh-sidecar"),
                     "reference": {
-                        "kind": "fit", "degree": 1, "distance_budget": 1e-12,
-                        "normal_budget": 1e-12, "conversion_observations": ["1"],
+                        "kind": "fit",
+                        "degree": 1,
+                        "distance_budget": 1e-12,
+                        "normal_budget": 1e-12,
+                        "conversion_observations": ["1"],
                     },
                 },
                 "nastran": {
-                    "kind": "nastran", "id": "3",
+                    "kind": "nastran",
+                    "id": "3",
                     "deck": acquisition("plate.bdf", "1", "nastran-deck"),
                     "sidecar": acquisition("plate-nastran.json", "2", "nastran-sidecar"),
-                    "dialect": "msc-2022.1", "mode": "structural-extraction",
+                    "dialect": "msc-2022.1",
+                    "mode": "structural-extraction",
                     "excluded_cards": [],
                 },
             }
@@ -211,7 +219,9 @@ class CaseFileOperations(unittest.TestCase):
                     if external is not None:
                         case["model"]["geometry"].append(external)
                     reference = read_reference(reference_bytes)
-                    reference["condition_sha256"] = condition_digest(read_reference(json_bytes(case)))
+                    reference["condition_sha256"] = condition_digest(
+                        read_reference(json_bytes(case))
+                    )
                     reference["observations"].reverse()
                     for observation in reference["observations"]:
                         observation["components"].reverse()
@@ -233,11 +243,14 @@ class CaseFileOperations(unittest.TestCase):
                     self.assertTrue(uvlas.case_from_dict(case, reference_root=root).ok)
                     reference_path.write_bytes(reference_path.read_bytes() + b" ")
                     self.assert_failure(
-                        uvlas.case_from_dict(case, reference_root=root), uvlas.FailureCode.InvalidInput
+                        uvlas.case_from_dict(case, reference_root=root),
+                        uvlas.FailureCode.InvalidInput,
                     )
                     self.assertIn(b"SHA-256 mismatch", cli("validate", path).stderr)
 
-                    reference["condition_sha256"] = condition_digest(read_reference(json_bytes(case)))
+                    reference["condition_sha256"] = condition_digest(
+                        read_reference(json_bytes(case))
+                    )
                     point = reference["observations"][1]
                     reaction = reference["observations"][0]
                     self.assertEqual(point["id"], "1")
@@ -261,7 +274,9 @@ class CaseFileOperations(unittest.TestCase):
                             original = fields[field]
                             fields[field] = value
                             publish(case, reference)
-                            self.assert_failure(uvlas.load_case(path), uvlas.FailureCode.InvalidInput)
+                            self.assert_failure(
+                                uvlas.load_case(path), uvlas.FailureCode.InvalidInput
+                            )
                             output = cli("validate", path)
                             self.assertEqual(output.returncode, 2, output.stderr)
                             self.assertIn(diagnostics, output.stderr)
@@ -278,13 +293,17 @@ class CaseFileOperations(unittest.TestCase):
             ):
                 source = row["comparison"]["reference"]["source"]
                 name = f"reference-{index}.json"
-                data = expected_dictionary_source({
-                    "schema": template["schema"], "condition_sha256": condition,
-                    "observations": [record],
-                }).encode("utf-8")
+                data = expected_dictionary_source(
+                    {
+                        "schema": template["schema"],
+                        "condition_sha256": condition,
+                        "observations": [record],
+                    }
+                ).encode("utf-8")
                 (root / name).write_bytes(data)
-                source.update(path=name, source_id=str(11 + index),
-                              sha256=hashlib.sha256(data).hexdigest())
+                source.update(
+                    path=name, source_id=str(11 + index), sha256=hashlib.sha256(data).hexdigest()
+                )
             path.write_bytes(json_bytes(case))
             self.assertTrue(uvlas.load_case(path).ok)
             self.assertEqual(cli("validate", path).returncode, 0)
@@ -293,9 +312,9 @@ class CaseFileOperations(unittest.TestCase):
             record["observations"][0]["observation"]["origin_m"][0] = Decimal(5)
             data = expected_dictionary_source(record).encode("utf-8")
             second.write_bytes(data)
-            case["observations"][1]["comparison"]["reference"]["source"]["sha256"] = (
-                hashlib.sha256(data).hexdigest()
-            )
+            case["observations"][1]["comparison"]["reference"]["source"]["sha256"] = hashlib.sha256(
+                data
+            ).hexdigest()
             path.write_bytes(json_bytes(case))
             rejected = cli("validate", path)
             self.assertEqual(rejected.returncode, 2, rejected.stderr)
