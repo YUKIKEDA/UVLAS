@@ -14,6 +14,8 @@
 
 [#17](https://github.com/YUKIKEDA/UVLAS/issues/17) は固定疎チャートまで実装した。複数の指定支持を実際のケースから組み立て、R-02の全厚位置差を実空間で照合した。V-PGの参照と拘束を検証し、IM-02への引継ぎ審査を通過した。
 
+IM-02 と R-05 では、この参照パッチを使って Case の辺面力を[全層・全厚の側面へ組み立てる](../specs/structure/pg-case-lateral-traction-contract.md)。
+
 | 段階 | 状態 | 到達点と残作業 |
 |---|---|---|
 | 厳密代数 | 完了 | 有理数・疎多項式の準備。 [#91](https://github.com/YUKIKEDA/UVLAS/pull/91) |
