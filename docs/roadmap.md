@@ -2,7 +2,7 @@
 
 作業の順序と状態の正本。行が持つのはID、種類、題、Issue、状態だけで、完了条件はIssueに書く。行の追加と削除はGrillの後に行う。「今」を書き換えるのは、その行を終えるPRだけ。
 
-**今**：IM02-0の開始審査と、IM03-0・IM06-0の実装
+**今**：IM02-0・IM03-0・IM06-0の実装
 
 [実装中の3パッケージの進捗と残作業](plans/active-package-progress.md)で、完了段階数、レビュー中の成果、終了審査までの全工程を確認できる。
 
@@ -83,7 +83,7 @@ flowchart LR
 | ID | 種類 | 題 | Issue | 状態 |
 |---|---|---|---|---|
 | IM01-0 | Feat | IM-01 PG参照係数・疎拘束 | #17 | Done |
-| IM02-0 | Feat | IM-02 構造全体 | #18 | Grill後に分解 |
+| IM02-0 | Feat | IM-02 構造全体 | #18 | In progress |
 | IM03-0 | Feat | IM-03 UVLM | #19 | In progress |
 | IM04-0 | Feat | IM-04 強連成・再開 | #20 | Grill後に分解 |
 | IM05-0 | Feat | IM-05 安定性・探索 | #21 | Grill後に分解 |

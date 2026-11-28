@@ -122,6 +122,8 @@ public:
 
 private:
     friend class PgPreparedPatch;
+    friend struct detail::PgConditionedVolumeRow;
+    friend class detail::PgComposedBasis;
     [[nodiscard]] core::PlannedBuffer<ExactRational>
     materialize_required(detail::ReferenceArithmetic&, PgRankRequiredColumn) const;
     void append_basis_identity(detail::ReferenceArithmetic&, detail::ReferenceHash&) const;
