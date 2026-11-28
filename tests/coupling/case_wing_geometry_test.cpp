@@ -1,16 +1,22 @@
 #include "aero/geometry_snapshot_fixture.hpp"
 #include "coupling/case_wing_geometry.hpp"
+#include "coupling/case_wing_harmonic.hpp"
 #include "io/case_schema_test_adapter.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
 #include <cmath>
+#include <complex>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <iterator>
+#include <map>
 #include <numbers>
 #include <ranges>
+#include <set>
+#include <tuple>
 
 namespace {
 using namespace uvlas;
@@ -617,3 +623,520 @@ TEST_CASE("A matched internal trailing boundary is canonical but releases no wak
     CHECK(result.trailing_bands().empty());
     CHECK(take(result.global()).get().trailing_edge_count() == 0);
 }
+
+namespace {
+using Json = nlohmann::json;
+using Complex = std::complex<long double>;
+using Position = std::array<double, 3>;
+using ComplexVector = std::array<Complex, 3>;
+namespace ls = numerics::linear;
+
+ls::Context harmonic_context(const a::GeometryContext& geometry) {
+    REQUIRE(geometry.diagnostics.trial);
+    return {{geometry.fingerprint, geometry.model, geometry.current, core::ChartGeneration{1},
+             core::SparsityGeneration{2}, core::NumericalGeneration{3}, core::ScaleGeneration{4},
+             geometry.precision, core::Precision::Binary64, core::WakePolicyGeneration{5},
+             core::TimeIntervalGeneration{6}, core::BackendGeneration{7}},
+            *geometry.diagnostics.trial,
+            core::ScopeId{8},
+            core::ScopeId{9},
+            geometry.time};
+}
+
+Complex complex_value(const Json& value) {
+    REQUIRE(value.size() == 2);
+    return {value[0].get<long double>(), value[1].get<long double>()};
+}
+
+long double center(const a::ScaledEnclosure& value) {
+    const auto words = value.center();
+    if (const auto* single = std::get_if<a::SingleWord>(&words))
+        return std::ldexp(static_cast<long double>(single->value), value.exponent());
+    const auto pair = std::get<a::DoubleWord>(words);
+    return std::ldexp(static_cast<long double>(pair.high) + pair.low, value.exponent());
+}
+
+long double radius(const a::ScaledEnclosure& value) {
+    return std::ldexp(static_cast<long double>(value.radius()), value.exponent());
+}
+
+ComplexVector loads(const c::DiscreteLoadVector& real, const c::DiscreteLoadVector& imag) {
+    ComplexVector result;
+    for (std::size_t i = 0; i < result.size(); ++i)
+        result[i] = {center(real[i]), center(imag[i])};
+    return result;
+}
+
+template <class A, class B>
+auto cross(const std::array<A, 3>& a, const std::array<B, 3>& b) {
+    return std::array{a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
+                      a[0] * b[1] - a[1] * b[0]};
+}
+
+Position subtract(const Position& a, const Position& b) {
+    return {a[0] - b[0], a[1] - b[1], a[2] - b[2]};
+}
+
+void add(ComplexVector& to, const ComplexVector& from) {
+    for (std::size_t i = 0; i < to.size(); ++i)
+        to[i] += from[i];
+}
+
+void compare_load(const ComplexVector& actual, const ComplexVector& expected) {
+    long double difference = 0, scale = 0;
+    for (std::size_t i = 0; i < actual.size(); ++i) {
+        difference += std::norm(actual[i] - expected[i]);
+        scale += std::norm(expected[i]);
+    }
+    REQUIRE(scale > 0);
+    CHECK(std::sqrt(difference / scale) < 1e-9L);
+}
+
+Json harmonic_reference(const char* name) {
+    std::ifstream input{name, std::ios::binary};
+    REQUIRE(input);
+    const auto result = Json::parse(input);
+    REQUIRE(result.at("schema") == "uvlas.vmulti-harmonic-positive-core-companion/1");
+    REQUIRE(result.at("core_radius_m") == 1e-5);
+    REQUIRE(result.at("wake_length_m") == 128.);
+    return result;
+}
+
+std::size_t reference_index(const c::CaseWingCell& cell, std::size_t m, std::size_t n) {
+    const auto side = static_cast<std::size_t>(cell.surface - 1);
+    return side / 2 * m * n + static_cast<std::size_t>(cell.chord) * n + side % 2 * (n / 2) +
+           static_cast<std::size_t>(cell.span);
+}
+
+std::vector<Position> independent_points(const c::CaseWingGeometry& wing, const Json& record,
+                                         std::size_t n) {
+    std::vector<Position> result;
+    result.reserve(wing.points().size());
+    for (const auto& vertex : wing.points()) {
+        const auto side = static_cast<std::size_t>(vertex.surface - 1);
+        const auto span = side % 2 * (n / 2) + static_cast<std::size_t>(vertex.span);
+        result.push_back(
+            record.at("vertices_m").at(side / 2).at(vertex.chord).at(span).get<Position>());
+    }
+    return result;
+}
+
+void verify_original_loads(const c::CaseWingGeometry& wing, const c::HarmonicLoadBreakdown& loads_,
+                           const Json& record, const Json& shared, std::size_t drive, std::size_t m,
+                           std::size_t n) {
+    const auto points = independent_points(wing, record, n);
+    const auto density = shared.at("density_kg_m3").get<long double>();
+    const auto omega = shared.at("omega_rad_s").get<long double>();
+    const auto flow = shared.at("velocity_m_s").get<std::array<long double, 3>>();
+    const auto origin = shared.at("moment_origin_m").get<Position>();
+    const auto& contact = take(wing.global()).get();
+    const auto retained = contact.geometry();
+    REQUIRE(retained);
+    const auto& geometry = retained->get();
+    std::array<ComplexVector, 2> force{}, moment{};
+    std::vector<std::size_t> area_count(wing.cells().size()), edge_count(wing.cells().size());
+    std::set<std::tuple<a::PhysicalFaceId, a::FacetId, a::PointId, std::optional<a::EdgeId>>> seen;
+    const auto point = [&](a::PointId id) -> const Position& {
+        return points.at(static_cast<std::size_t>(id.value() - 1));
+    };
+    const auto vector = [](const Position& value) {
+        return std::array<long double, 3>{value[0], value[1], value[2]};
+    };
+    constexpr ComplexVector shift{Complex{.33L, .08L}, Complex{-.18L, .06L}, Complex{.25L, -.03L}};
+    constexpr ComplexVector rotation{Complex{.02L, .1L}, Complex{.05L, -.03L},
+                                     Complex{-.12L, .03L}};
+    std::array<Complex, 2> work{};
+    for (const auto& maybe : loads_.original.values().first(loads_.original_count)) {
+        REQUIRE(maybe);
+        const auto& term = *maybe;
+        const auto row = static_cast<std::size_t>(term.face.value() - 1);
+        const auto& cell = wing.cells()[row];
+        const auto w = static_cast<std::size_t>((cell.surface - 1) / 2);
+        REQUIRE(term.original_surface == cell.surface);
+        REQUIRE((term.facet == cell.facets[0] || term.facet == cell.facets[1]));
+        const auto canonical_facet = test_geometry::take(geometry.facet_points(term.facet));
+        REQUIRE(seen.emplace(term.face, term.facet, term.point, term.canonical_edge).second);
+        const auto width = n / 2 + 1;
+        const auto patch = static_cast<std::size_t>(cell.surface - 1);
+        const auto corner_ordinal = patch * (m + 1) * width + cell.chord * width + cell.span + 1;
+        const std::array corners{a::PointId{corner_ordinal}, a::PointId{corner_ordinal + 1},
+                                 a::PointId{corner_ordinal + width + 1},
+                                 a::PointId{corner_ordinal + width}};
+        const auto facet = term.facet == cell.facets[0]
+                               ? std::array{corners[0], corners[2], corners[1]}
+                               : std::array{corners[0], corners[3], corners[2]};
+        const auto owner = [&](a::PointId id) {
+            return wing.points()[static_cast<std::size_t>(id.value() - 1)].canonical;
+        };
+        CHECK(canonical_facet == std::array{owner(facet[0]), owner(facet[1]), owner(facet[2])});
+        CHECK(term.canonical == owner(term.point));
+        CHECK(std::ranges::find(facet, term.point) != facet.end());
+        const auto gamma =
+            complex_value(record.at("gamma").at(reference_index(cell, m, n)).at(drive));
+        ComplexVector expected{};
+        if (term.canonical_edge) {
+            ++edge_count[row];
+            const auto edge = contact.uvlm_load_edge(*term.canonical_edge, capacity);
+            REQUIRE(edge);
+            CHECK_FALSE(edge->trailing);
+            const auto vertex =
+                wing.points()[static_cast<std::size_t>(term.point.value() - 1)].canonical;
+            CHECK((edge->endpoints[0] == vertex || edge->endpoints[1] == vertex));
+            std::optional<std::size_t> side;
+            for (std::size_t i = 0; i < facet.size(); ++i) {
+                const auto raw = test_geometry::take(geometry.facet_edges(term.facet))[i];
+                const auto bound_edge = contact.uvlm_load_edge(raw, capacity);
+                REQUIRE(bound_edge);
+                if (bound_edge->edge == *term.canonical_edge)
+                    side = i;
+            }
+            REQUIRE(side);
+            const auto first = facet[*side], last = facet[(*side + 1) % 3];
+            const auto first_owner =
+                wing.points()[static_cast<std::size_t>(first.value() - 1)].canonical;
+            CHECK(term.edge_sign == (first_owner == edge->endpoints[0] ? -1 : 1));
+            const auto direction = cross(flow, vector(subtract(point(first), point(last))));
+            for (std::size_t i = 0; i < 3; ++i)
+                expected[i] = density * gamma * direction[i] / 2.L;
+        } else {
+            ++area_count[row];
+            CHECK(term.edge_sign == 0);
+            const auto direction = cross(vector(subtract(point(facet[1]), point(facet[0]))),
+                                         vector(subtract(point(facet[2]), point(facet[0]))));
+            for (std::size_t i = 0; i < 3; ++i)
+                expected[i] = Complex{0, density * omega} * gamma * direction[i] / 6.L;
+        }
+        const auto actual = loads(term.force_real, term.force_imaginary);
+        long double scale = 0;
+        for (std::size_t i = 0; i < actual.size(); ++i)
+            scale += std::norm(complex_value(record.at("dual").at(w).at(i).at(drive)));
+        REQUIRE(scale > 0);
+        for (std::size_t i = 0; i < actual.size(); ++i)
+            CHECK(std::abs(actual[i] - expected[i]) < 1e-9L * std::sqrt(scale));
+        const auto arm = vector(subtract(point(term.point), origin));
+        add(force[w], actual);
+        add(moment[w], cross(arm, actual));
+        const auto angular = cross(rotation, arm);
+        for (std::size_t i = 0; i < actual.size(); ++i)
+            work[w] += actual[i] * std::conj(shift[i] + angular[i]);
+    }
+    for (std::size_t i = 0; i < wing.cells().size(); ++i) {
+        CHECK(area_count[i] == 6);
+        CHECK(edge_count[i] == (wing.cells()[i].chord + 1 == m ? 6 : 8));
+    }
+    for (std::size_t w = 0; w < force.size(); ++w) {
+        const auto& group = *loads_.groups.values()[w];
+        compare_load(force[w], loads(group.totals.force_real, group.totals.force_imaginary));
+        compare_load(moment[w], loads(group.totals.moment_real, group.totals.moment_imaginary));
+        Complex virtual_work{};
+        long double scale = 0;
+        for (std::size_t i = 0; i < 3; ++i) {
+            const auto f = complex_value(record.at("dual").at(w).at(i).at(drive));
+            const auto mm = complex_value(record.at("dual").at(w).at(i + 3).at(drive));
+            virtual_work += f * std::conj(shift[i]) + mm * std::conj(rotation[i]);
+            scale += std::norm(f * shift[i]) + std::norm(mm * rotation[i]);
+        }
+        CHECK(std::abs(work[w] - virtual_work) < 1e-9L * std::sqrt(scale));
+    }
+    add(force[0], force[1]);
+    add(moment[0], moment[1]);
+    compare_load(force[0], loads(loads_.total.force_real, loads_.total.force_imaginary));
+    compare_load(moment[0], loads(loads_.total.moment_real, loads_.total.moment_imaginary));
+}
+
+void verify_rotated_shared_edge(const c::CaseWingGeometry& prepared,
+                                const c::DiscreteHarmonicCirculation& solved) {
+    const auto& result = *solved.drive_loads.values().front();
+    const auto& global = take(prepared.global()).get();
+    using Key = std::pair<a::EdgeId, a::PointId>;
+    struct Pair {
+        std::array<ComplexVector, 2> origin;
+        std::array<int, 2> sign{};
+        std::array<unsigned, 2> count{};
+    };
+    std::map<Key, Pair> matching;
+    for (const auto& maybe : result.original.values().first(result.original_count)) {
+        REQUIRE(maybe);
+        const auto& term = *maybe;
+        if (!term.canonical_edge || term.original_surface > 2)
+            continue;
+        const auto point =
+            prepared.points()[static_cast<std::size_t>(term.point.value() - 1)].canonical;
+        auto& pair = matching[{*term.canonical_edge, point}];
+        const auto side = static_cast<std::size_t>(term.original_surface - 1);
+        add(pair.origin[side], loads(term.force_real, term.force_imaginary));
+        pair.sign[side] += term.edge_sign;
+        ++pair.count[side];
+    }
+    unsigned cancelling = 0;
+    for (const auto& [key, pair] : matching) {
+        if (pair.count != std::array{1U, 1U})
+            continue;
+        const auto edge = global.uvlm_load_edge(key.first, capacity);
+        REQUIRE(edge);
+        CHECK_FALSE(edge->trailing);
+        CHECK(pair.sign[0] == -pair.sign[1]);
+        const auto& first = pair.origin[0];
+        const auto& second = pair.origin[1];
+        const auto scale = std::abs(first[1]);
+        REQUIRE(scale > 1e-3L);
+        CHECK(std::abs(first[1] + second[1]) < 1e-9L * scale);
+        ++cancelling;
+    }
+    CHECK(cancelling == 4);
+}
+
+void run_harmonic(const Json& reference, std::array<int, 3> selected, bool controls,
+                  bool rotated_shared = false) {
+    CAPTURE(selected);
+    const auto found = std::ranges::find_if(
+        reference.at("records"), [&](const auto& record) { return record.at("case") == selected; });
+    REQUIRE(found != reference.at("records").end());
+    const auto& ref = *found;
+    const auto [dihedral, chord, span] = selected;
+    const auto m = static_cast<std::size_t>(chord), n = static_cast<std::size_t>(span);
+    auto source_bytes = frozen(dihedral, chord, span);
+    if (rotated_shared) {
+        auto tilted = tokens::parse(source_bytes);
+        for (std::size_t i = 0; i < 2; ++i) {
+            auto& frame = graph(tilted, i).field("frame");
+            frame.set("rotation", tokens::parse("[[0.6,0,0.8],[0,1,0],[-0.8,0,0.6]]"));
+        }
+        source_bytes = tilted.wire();
+    }
+    const auto source = read(source_bytes);
+    Run run;
+    auto caps = limits();
+    caps.geometry.max_steps = 4'000'000;
+    const c::CaseWingStraightWake terminal{{128, 0, 0}};
+    const auto prepared = take(c::CaseWingGeometry::prepare(
+        source, run.context, {}, projection(core::Precision::Binary64), caps, *run.geometry,
+        *run.global, run.motion, run.memory, nullptr, terminal));
+    REQUIRE(prepared.wake_bands().size() == 2 * n);
+    const auto count = prepared.cells().size();
+    REQUIRE(count == 2 * m * n);
+    auto ages = ref.at("panel_starts_seconds").get<std::vector<double>>();
+    // Use two Gauss16 panels per base interval. The recorded Gauss48 reference has four.
+    for (std::size_t i = 1; i < ages.size() / 2; ++i)
+        ages[i] = ages[2 * i];
+    ages.resize(ages.size() / 2);
+    const auto omega = reference.at("omega_rad_s").get<double>();
+    const auto speed = reference.at("velocity_m_s").at(0).get<double>();
+    std::vector<std::size_t> order;
+    std::array<std::vector<c::HarmonicCirculationRhs>, 4> drive;
+    std::array<long double, 4> rhs_squared{};
+    for (const auto& cell : prepared.cells()) {
+        order.push_back(reference_index(cell, m, n));
+        const auto w = static_cast<std::size_t>((cell.surface - 1) / 2);
+        const auto nz = word(cell.normal[2]);
+        const auto x = word(cell.position[0]);
+        const double pitch_axis = w == 0 ? .375 : 5.25;
+        for (std::size_t i = 0; i < drive.size(); ++i) {
+            const auto value =
+                i / 2 != w ? Complex{}
+                           : (i % 2 == 0 ? Complex{0., omega * nz}
+                                         : Complex{-speed * nz, -omega * (x - pitch_axis) * nz});
+            if (!rotated_shared) {
+                const auto expected = complex_value(ref.at("rhs").at(order.back()).at(i));
+                CHECK(std::abs(value - expected) < 1e-12L);
+            }
+            rhs_squared[i] += std::norm(value);
+            drive[i].push_back({cell.face, a::SingleWord{static_cast<double>(value.real())},
+                                a::SingleWord{static_cast<double>(value.imag())}});
+        }
+    }
+    const auto& contact = take(prepared.global()).get();
+    for (const auto& band : prepared.wake_bands()) {
+        const auto patch = contact.uvlm_quad(band.facet, capacity);
+        REQUIRE(patch);
+        REQUIRE(patch->attachment);
+        CHECK(patch->attachment->edge == band.trailing_edge);
+        CHECK(patch->attachment->bound_face == band.bound_face);
+        CHECK(patch->corners ==
+              std::array{band.front[0], band.front[1], band.terminal[1], band.terminal[0]});
+    }
+    const std::vector<double> scales(count, 20.);
+    const std::vector<ls::UnitDimensions> gamma_units(count, {2, 0, -1, 0, 0, 0, 0});
+    const std::vector<ls::UnitDimensions> velocity_units(count, {1, 0, -1, 0, 0, 0, 0});
+    const double min_rhs = static_cast<double>(std::sqrt(*std::ranges::min_element(rhs_squared)));
+    c::DiscreteCirculationRequest solving{
+        {scales, scales, gamma_units, velocity_units, harmonic_context(run.context)},
+        {static_cast<core::Index>(count), 4, static_cast<core::Index>(2 * n), 5, metadata},
+        {ls::Norm::L2, 1e-12, 0., 1e-12, core::ObservationId{20}, core::ObservationId{21}},
+        core::RhsGeneration{3},
+        core::NumericalGeneration{4},
+        6e-9,
+        1e-13,
+        .99e-11 * min_rhs / 20.0,
+        0.};
+    solving.certified_closed_contour = true;
+    solving.contour_workers = 2;
+    const c::DiscreteNonpenetrationLimits action{
+        {core::Precision::TwoWord, 1e-12},
+        {core::Precision::TwoWord, 1e-12, 1e-12},
+        {caps.geometry,
+         {numerics::linear::EstimateAdmission{65536}, 1000000000},
+         UINT64_C(150000000000)},
+        UINT64_C(150000000000),
+        UINT64_C(70000000000000)};
+    const c::CaseWingHarmonicRequest input{{{c::CaseWingHarmonicGroup{1, 2}, {3, 4}}},
+                                           {drive[0], drive[1], drive[2], drive[3]},
+                                           omega,
+                                           ages,
+                                           16 * ages.size()};
+    const auto budget = projection(core::Precision::TwoWord);
+    const c::CaseWingHarmonicProjection loading{
+        budget.representation, budget.exact, budget.position[0], budget.velocity, budget.position};
+    const auto solve = [&](const io::SiCase& c, const c::CaseWingGeometry& geometry,
+                           const c::CaseWingHarmonicRequest& request) {
+        return c::solve_case_wing_harmonic(c, geometry, run.context, request, loading, caps.chart,
+                                           action, solving, run.memory);
+    };
+    if (controls) {
+        auto wrong = tokens::parse(source_bytes);
+        auto& wake = wrong.field("analysis").field("wake");
+        wake.set("core_radius", tokens::parse("0.00002"));
+        auto newer = read(wrong.wire());
+        reject(solve(newer, prepared, input), StaleGeneration);
+        auto observed = input;
+        observed.observations[0].moment_observation = 4;
+        reject(solve(source, prepared, observed), InvalidInput);
+        auto wrong_rows = drive[0];
+        std::swap(wrong_rows[0].face, wrong_rows[n / 2].face);
+        auto reordered = input;
+        reordered.drives[0] = wrong_rows;
+        reject(solve(source, prepared, reordered), InvalidInput);
+        const c::CaseWingStraightWake wrong_terminal{{127, 0, 0}};
+        const auto wrong_te = take(c::CaseWingGeometry::prepare(
+            source, run.context, {}, projection(core::Precision::Binary64), caps, *run.geometry,
+            *run.global, run.motion, run.memory, nullptr, wrong_terminal));
+        reject(solve(source, wrong_te, input), StaleGeneration);
+    }
+    const auto result = take(solve(source, prepared, input));
+    const auto& solved = result.solved;
+    REQUIRE(solved.drive_loads.size() == 4);
+    if (rotated_shared) {
+        verify_rotated_shared_edge(prepared, solved);
+        return;
+    }
+    REQUIRE(solved.residual.size() == count * 4);
+    REQUIRE(solved.original_coefficients.size() == count * count);
+    REQUIRE(solved.physical_values().shape().rows == static_cast<core::Index>(count));
+    REQUIRE(solved.physical_values().shape().columns == 4);
+    const auto& circulation =
+        std::get<numerics::TwoWord<std::complex<double>>>(solved.physical_values().storage());
+    long double dropped = 0, coefficient_scale = 0, max_row = 0;
+    Json metrics{{"case", selected}, {"drives", Json::array()}};
+    for (std::size_t i = 0; i < count; ++i) {
+        long double diff = 0, scale = 0;
+        for (std::size_t j = 0; j < count; ++j) {
+            const auto expected = complex_value(ref.at("A").at(order[i]).at(order[j]));
+            const auto& actual = solved.original_coefficients.values()[i * count + j];
+            const auto error = [](const a::ContourInterval& bounds, long double expectation) {
+                return std::max(std::abs(bounds.lower - expectation),
+                                std::abs(bounds.upper - expectation));
+            };
+            diff += std::norm(Complex{error(actual.real, expected.real()),
+                                      error(actual.imaginary, expected.imag())});
+            scale += std::norm(expected);
+            if (order[i] / (m * n) != order[j] / (m * n))
+                dropped += std::norm(expected);
+        }
+        REQUIRE(scale > 0);
+        const auto row_error = std::sqrt(diff / scale);
+        CHECK(row_error < 1e-9L);
+        max_row = std::max(max_row, row_error);
+        coefficient_scale += scale;
+    }
+    // A solver omitting the other wing's action would fail the same matrix criterion.
+    const auto omitted = std::sqrt(dropped / coefficient_scale);
+    CHECK(omitted > 1e-9L);
+    metrics["max_coefficient_row_relative"] = max_row;
+    metrics["omitted_other_wing_relative"] = omitted;
+    for (std::size_t drive_index = 0; drive_index < 4; ++drive_index) {
+        CAPTURE(drive_index);
+        long double diff = 0, scale = 0, residual = 0;
+        for (std::size_t i = 0; i < count; ++i) {
+            const auto row = drive_index * count + i;
+            const auto expected = complex_value(ref.at("gamma").at(order[i]).at(drive_index));
+            const Complex actual =
+                Complex{circulation.hi.values()[row]} + Complex{circulation.lo.values()[row]};
+            diff += std::norm(actual - expected);
+            scale += std::norm(expected);
+            const auto& value = solved.residual.values()[row];
+            REQUIRE(value);
+            CHECK(value->face == prepared.cells()[i].face);
+            residual +=
+                std::norm(Complex{std::abs(center(value->real)) + radius(value->real),
+                                  std::abs(center(value->imaginary)) + radius(value->imaginary)});
+        }
+        const auto circulation_relative = std::sqrt(diff / scale);
+        const auto original_relative = std::sqrt(residual / rhs_squared[drive_index]);
+        CHECK(circulation_relative < 1e-9L);
+        CHECK(original_relative < 1e-11L);
+        Json drive_record{{"circulation_relative", circulation_relative},
+                          {"all_rows_residual_relative", original_relative},
+                          {"wing_loads", Json::array()}};
+        const auto& load = solved.drive_loads.values()[drive_index];
+        REQUIRE(load);
+        REQUIRE(load->groups.size() == 2);
+        for (std::size_t wing = 0; wing < 2; ++wing) {
+            const auto& got = load->groups.values()[wing];
+            REQUIRE(got);
+            CHECK(got->id == wing);
+            ComplexVector force{}, moment{};
+            for (std::size_t i = 0; i < 3; ++i) {
+                force[i] = complex_value(ref.at("dual").at(wing).at(i).at(drive_index));
+                moment[i] = complex_value(ref.at("dual").at(wing).at(i + 3).at(drive_index));
+            }
+            const auto compare = [&](const auto& real, const auto& imaginary,
+                                     const ComplexVector& expectation) {
+                long double numerator = 0, denominator = 0;
+                const auto value = loads(real, imaginary);
+                for (std::size_t i = 0; i < value.size(); ++i) {
+                    numerator += std::norm(Complex{
+                        std::abs(value[i].real() - expectation[i].real()) + radius(real[i]),
+                        std::abs(value[i].imag() - expectation[i].imag()) + radius(imaginary[i])});
+                    denominator += std::norm(expectation[i]);
+                }
+                REQUIRE(denominator > 0);
+                const auto relative = std::sqrt(numerator / denominator);
+                CHECK(relative < 1e-9L);
+                return relative;
+            };
+            drive_record["wing_loads"].push_back(
+                {{"force_relative",
+                  compare(got->totals.force_real, got->totals.force_imaginary, force)},
+                 {"moment_relative",
+                  compare(got->totals.moment_real, got->totals.moment_imaginary, moment)}});
+        }
+        verify_original_loads(prepared, *load, ref, reference, drive_index, m, n);
+        metrics["drives"].push_back(std::move(drive_record));
+    }
+    std::cout << "V-MULTI " << metrics.dump() << '\n';
+}
+} // namespace
+
+TEST_CASE("Typed two-wing Case solves all four finite-core harmonic drives",
+          "[PHY-02][UW-D05][UW-D06][V-MULTI][verification]") {
+    run_harmonic(harmonic_reference(UVLAS_VMULTI_SMALL_FIXTURE), {0, 2, 8}, true);
+}
+
+TEST_CASE("A tilted shared edge carries opposite nonzero original harmonic forces",
+          "[PHY-02][UW-D05][UW-D06][V-MULTI][verification]") {
+    run_harmonic(harmonic_reference(UVLAS_VMULTI_SMALL_FIXTURE), {0, 2, 8}, false, true);
+}
+
+#ifdef UVLAS_VMULTI_FORMAL_FIXTURE
+#define UVLAS_VMULTI_TEST(D, M, N)                                                                 \
+    TEST_CASE("Typed V-MULTI d" #D "/m" #M "/n" #N,                                                \
+              "[.vmulti-harmonic][d" #D "m" #M "n" #N "][V-MULTI][verification]") {                \
+        run_harmonic(harmonic_reference(UVLAS_VMULTI_FORMAL_FIXTURE), {D, M, N}, false);           \
+    }
+UVLAS_VMULTI_TEST(0, 4, 16)
+UVLAS_VMULTI_TEST(0, 8, 32)
+UVLAS_VMULTI_TEST(5, 2, 8)
+UVLAS_VMULTI_TEST(5, 4, 16)
+UVLAS_VMULTI_TEST(5, 8, 32)
+#undef UVLAS_VMULTI_TEST
+#endif

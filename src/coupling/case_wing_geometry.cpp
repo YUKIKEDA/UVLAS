@@ -33,6 +33,9 @@ struct Owner {
     std::optional<io::SchemaIdentity> source;
     std::optional<a::GeometryContext> context;
     std::optional<CaseFlowClockQuery> address;
+    std::optional<CaseWingStraightWake> wake;
+    core::PlannedBuffer<CaseWingWakeBand> wake_bands;
+    core::PlannedBuffer<std::size_t> terminal_anchor;
     si::SiRationalWords instant;
     core::PlannedBuffer<Patch> patches;
     core::PlannedBuffer<CaseWingPoint> points;
@@ -415,6 +418,42 @@ struct MeshCounts {
     }
 };
 
+struct WakeCounts {
+    std::uint64_t vertices{}, bands{};
+};
+
+WakeCounts count_wake(const Owner& owner, std::span<std::size_t> point_owners,
+                      std::span<const bool> internal, std::span<std::size_t> terminal, Math& m) {
+    WakeCounts count;
+    for (const auto& patch : owner.patches.values())
+        for (std::size_t j = 0; j < patch.n(); ++j) {
+            m.visit(1);
+            if (internal[patch.span_edge(patch.m(), j)])
+                continue;
+            ++count.bands;
+            for (const auto end : {j, j + 1}) {
+                auto& index = terminal[root(point_owners, patch.point(patch.m(), end), m)];
+                if (index == 0)
+                    index = size(++count.vertices);
+            }
+        }
+    if (count.bands == 0)
+        partition_fail(GeometryInvalid);
+    return count;
+}
+
+Rational exact_word(double word, Math& m) {
+    m.charge();
+    return partition_take(Rational::from_binary64(word, m.leaf_limits, m.plan));
+}
+
+Rational exact_word(a::ScalarWords words, Math& m) {
+    if (const auto* one = std::get_if<a::SingleWord>(&words))
+        return exact_word(one->value, m);
+    const auto two = std::get<a::DoubleWord>(words);
+    return m.add(exact_word(two.high, m), exact_word(two.low, m));
+}
+
 class Mesh {
 public:
     Mesh(const MeshCounts& count, core::Precision format, Math& m)
@@ -542,6 +581,82 @@ public:
         }
     }
 
+    void extend(const MeshCounts& bound, std::span<const std::size_t> terminal, Owner& owner,
+                Projector& projection, Math& m) {
+        const auto& displacement = owner.wake->displacement_metres;
+        const XYZ delta{exact_word(displacement[0], m), exact_word(displacement[1], m),
+                        exact_word(displacement[2], m)};
+        if (std::ranges::all_of(delta, [](const auto& x) { return x.sign() == 0; }))
+            partition_fail(InvalidInput);
+        static constexpr std::array<std::uint32_t, 1> word{1};
+        constexpr p::RationalView one{1, word, word}, zero{0, {}, word};
+        const CaseFlowComponentBudget exact{one, zero, zero};
+        const auto terminal_id = [&](std::size_t anchor) {
+            return point_id(size(bound.points) + terminal[anchor] - 1);
+        };
+        const auto stream_edge = [&](std::size_t anchor) {
+            return edge_id(size(bound.edges) + terminal[anchor] - 1);
+        };
+        const auto edge = [&](a::EdgeId id, a::PointId first, a::PointId last) {
+            edges_.values()[size(id.value() - 1)] = {id, {first, last}};
+            owners_.values()[size(id.value() - 1)] = {id, a::CanonicalEdge{}};
+        };
+        for (std::size_t i = 0; i < terminal.size(); ++i) {
+            m.visit(1);
+            if (terminal[i] == 0)
+                continue;
+            const auto id = terminal_id(i);
+            const auto index = size(id.value() - 1);
+            points_.values()[index] = id;
+            bindings_.values()[index] = {a::ReferenceMapId{id.value()}, owner.context->mapping,
+                                         a::CanonicalPoint{}};
+            owner.terminal_anchor.values()[terminal[i] - 1] = i;
+            const auto& source = owner.points.values()[i];
+            const auto translate = [&](const auto& values, std::span<double> high,
+                                       std::span<double> low) {
+                for (std::size_t axis = 0; axis < delta.size(); ++axis) {
+                    const auto value = m.add(exact_word(retained(values[axis]), m), delta[axis]);
+                    const auto projected =
+                        retained(projection.apply(value, exact, core::Precision::TwoWord, m));
+                    const auto pair = std::get<a::DoubleWord>(projected);
+                    high[3 * index + axis] = pair.high;
+                    low[3 * index + axis] = pair.low;
+                }
+            };
+            translate(source.reference, ref_high_.values(), ref_low_.values());
+            translate(source.position, cur_high_.values(), cur_low_.values());
+            edge(stream_edge(i), point_id(i), id);
+        }
+        for (std::size_t i = 0; i < owner.band_count; ++i) {
+            m.visit(1);
+            const auto front = trailing_.values()[i];
+            const auto& band = owner.bands.values()[i];
+            const auto canonical = [&](a::PointId id) {
+                return size(owner.points.values()[size(id.value() - 1)].canonical.value() - 1);
+            };
+            const auto p0 = canonical(front.points[0]), p1 = canonical(front.points[1]);
+            const auto end0 = terminal_id(p0), end1 = terminal_id(p1);
+            const auto tip_edge = edge_id(size(bound.edges) + owner.terminal_anchor.size() + 2 * i);
+            const auto diagonal = edge_id(size(tip_edge.value()));
+            edge(tip_edge, end0, end1);
+            edge(diagonal, front.points[0], end1);
+            const auto row = size(bound.cells) + i;
+            const auto face = a::PhysicalFaceId{row + 1};
+            const auto facet = a::FacetId{2 * row + 1};
+            const auto bound_band =
+                faces_.values()[size(band.transfer.bound_face.value() - 1)].band;
+            faces_.values()[row] = {face, bound_band};
+            roles_.values()[row] = {face, a::AeroFaceRole::Wake};
+            quads_.values()[row] = {face,
+                                    {front.points[0], front.points[1], end1, end0},
+                                    {front.edge, stream_edge(p1), tip_edge, stream_edge(p0)},
+                                    diagonal,
+                                    {facet, a::FacetId{2 * row + 2}}};
+            owner.wake_bands.values()[i] = {
+                front.edge, band.transfer.bound_face, face, facet, front.points, {end0, end1}};
+        }
+    }
+
     void publish(Owner& owner, a::ScalarWords core_radius, const CaseWingLimits& limits,
                  Projector& projection, a::GeometryWorkspace& geometry_work,
                  a::GlobalWorkspace& global_work, Math& m, CaseWingDiagnostic& diagnostic) {
@@ -580,11 +695,14 @@ public:
             diagnostic);
         const a::SingleWord zero{0.0};
         Inputs<a::PointKinematicsInput> velocities{
-            m, owner.points.size(), {a::PointId{0}, {}, {zero, zero, zero}}};
-        for (std::size_t i = 0; i < owner.points.size(); ++i) {
+            m, points_.values().size(), {a::PointId{0}, {}, {zero, zero, zero}}};
+        for (std::size_t i = 0; i < velocities.values().size(); ++i) {
             m.visit(1);
-            const auto& point = owner.points.values()[i];
-            velocities.values()[i] = {point.original,
+            const auto anchor = i < owner.points.size()
+                                    ? i
+                                    : owner.terminal_anchor.values()[i - owner.points.size()];
+            const auto& point = owner.points.values()[anchor];
+            velocities.values()[i] = {point_id(i),
                                       {},
                                       {retained(point.velocity[0]), retained(point.velocity[1]),
                                        retained(point.velocity[2])}};
@@ -675,7 +793,8 @@ struct Build {
                                 const CaseWingProjection& projection, const CaseWingLimits& limits,
                                 a::GeometryWorkspace& geometry_work,
                                 a::GlobalWorkspace& global_work, p::CurveWorkspace& curve,
-                                core::ResourcePlan& plan, CaseWingDiagnostic& diagnostic) {
+                                core::ResourcePlan& plan, CaseWingDiagnostic& diagnostic,
+                                std::optional<CaseWingStraightWake> straight) {
         Math m{limits.chart, plan};
         m.cancel();
         const auto& schema = partition_take(source.source_case()).get();
@@ -699,6 +818,7 @@ struct Build {
         result.source = partition_take(schema.identity());
         result.context = context;
         result.address = address;
+        result.wake = straight;
         diagnostic.phase = CaseWingPhase::Clock;
         const auto time = stage(source, context, address, transient, limits, m);
         result.instant =
@@ -798,10 +918,27 @@ struct Build {
         const auto projected =
             projector.apply(radius, projection.core_radius, projection.representation, m);
         diagnostic.phase = CaseWingPhase::Geometry;
-        Mesh mesh{counts, projection.representation, m};
+        auto totals = counts;
+        auto terminal = allocate<std::size_t>(m, straight ? counts.points : 0);
+        if (straight) {
+            const auto wake_counts =
+                count_wake(result, point_owners.values(), internal.values(), terminal.values(), m);
+            totals.points = partition_add(totals.points, wake_counts.vertices);
+            totals.cells = partition_add(totals.cells, wake_counts.bands);
+            totals.edges =
+                partition_add(totals.edges, partition_add(wake_counts.vertices,
+                                                          partition_mul(2, wake_counts.bands)));
+            totals.admit(limits.geometry.counts);
+            (void)partition_index(partition_mul(2, totals.cells));
+            result.wake_bands = allocate<CaseWingWakeBand>(m, wake_counts.bands);
+            result.terminal_anchor = allocate<std::size_t>(m, wake_counts.vertices);
+        }
+        Mesh mesh{totals, straight ? core::Precision::TwoWord : projection.representation, m};
         mesh.place_points(result, point_owners.values(), m);
         for (const auto& patch : patches)
             mesh.connect(patch, result, edge_owners.values(), internal.values(), m);
+        if (straight)
+            mesh.extend(counts, terminal.values(), result, projector, m);
         mesh.publish(result, retained(projected), limits, projector, geometry_work, global_work, m,
                      diagnostic);
         m.cancel();
@@ -821,14 +958,15 @@ core::Result<CaseWingGeometry> CaseWingGeometry::prepare(
     std::optional<CaseFlowClockQuery> address, const CaseWingProjection& projection,
     const CaseWingLimits& limits, aero::detail::GeometryWorkspace& geometry,
     aero::detail::GlobalWorkspace& global, aero::detail::pchip::CurveWorkspace& curve,
-    core::ResourcePlan& plan, CaseWingDiagnostic* diagnostic) noexcept {
+    core::ResourcePlan& plan, CaseWingDiagnostic* diagnostic,
+    std::optional<CaseWingStraightWake> straight) noexcept {
     CaseWingDiagnostic location;
     auto result = core::guard_entry(
         wing_geometry::operation, core::FailureCode::PrecisionUnresolved, context.diagnostics,
         [&]() -> core::Result<CaseWingGeometry> {
             try {
                 return wing_geometry::Build::run(source, context, address, projection, limits,
-                                                 geometry, global, curve, plan, location);
+                                                 geometry, global, curve, plan, location, straight);
             } catch (const structure::detail::PartitionAbort& rejected) {
                 auto inner = rejected.failure;
                 inner.operation = wing_geometry::operation;
@@ -907,6 +1045,36 @@ std::span<const CaseWingPoint> CaseWingGeometry::points() const& noexcept {
                               : std::span<const CaseWingPoint>{};
 }
 
+core::Result<DiscreteCollocation> CaseWingGeometry::collocation(std::size_t i) const& noexcept {
+    return core::guard_entry(
+        wing_geometry::operation, core::FailureCode::PrecisionUnresolved, {},
+        [&]() -> core::Result<DiscreteCollocation> {
+            try {
+                const auto rows = cells();
+                if (i >= rows.size())
+                    wing_geometry::partition_fail(core::FailureCode::InvalidInput);
+                const auto& row = rows[i];
+                if (!row.collocation)
+                    wing_geometry::partition_fail(core::FailureCode::StaleGeneration);
+                const auto words = [](const auto& values) -> NonpenetrationVector {
+                    using wing_geometry::retained;
+                    return {retained(values[0]), retained(values[1]), retained(values[2])};
+                };
+                auto span = words(row.span_tangent);
+                if (row.reversed)
+                    wing_geometry::reverse_tangent(span);
+                return DiscreteCollocation{row.facets[0],
+                                           *row.collocation,
+                                           {words(row.chord_tangent), span},
+                                           words(row.velocity),
+                                           aero::detail::SingleWord{0.0},
+                                           aero::detail::SingleWord{0.0}};
+            } catch (const structure::detail::PartitionAbort& error) {
+                return std::unexpected(error.failure);
+            }
+        });
+}
+
 std::span<const CaseWingCell> CaseWingGeometry::cells() const& noexcept {
     return owner_.size() == 1 ? owner_.values().front().cells.values()
                               : std::span<const CaseWingCell>{};
@@ -916,6 +1084,15 @@ std::span<const CaseWingTrailingBand> CaseWingGeometry::trailing_bands() const& 
     return owner_.size() == 1
                ? owner_.values().front().bands.values().first(owner_.values().front().band_count)
                : std::span<const CaseWingTrailingBand>{};
+}
+
+std::optional<CaseWingStraightWake> CaseWingGeometry::straight_wake() const noexcept {
+    return owner_.size() == 1 ? owner_.values().front().wake : std::nullopt;
+}
+
+std::span<const CaseWingWakeBand> CaseWingGeometry::wake_bands() const& noexcept {
+    return owner_.size() == 1 ? owner_.values().front().wake_bands.values()
+                              : std::span<const CaseWingWakeBand>{};
 }
 
 core::Result<std::reference_wrapper<const aero::detail::GlobalContactState>>

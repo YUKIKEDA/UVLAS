@@ -1265,5 +1265,32 @@ uvlas_add_test(coupling.case_wing_geometry
     LIBS uvlas_coupling nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_coupling_case_wing_geometry PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+set(vmulti_small "${PROJECT_SOURCE_DIR}/tests/aero/fixtures/vmulti-harmonic-d0-m2-n8-v1.json")
+file(SHA256 "${vmulti_small}" vmulti_small_sha)
+if(NOT vmulti_small_sha STREQUAL "5f9b8603a48de1548c8a2e56145cbf5f51ca80772f9f2dd1d1808f080a040790")
+    message(FATAL_ERROR "V-MULTI small finite-core fixture differs from its recorded SHA-256")
+endif()
 target_compile_definitions(uvlas_test_coupling_case_wing_geometry PRIVATE
-    UVLAS_WING_EDGE_CASES="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/wing-edge-pairing-v1")
+    UVLAS_WING_EDGE_CASES="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/wing-edge-pairing-v1"
+    UVLAS_VMULTI_SMALL_FIXTURE="${vmulti_small}")
+set(UVLAS_VMULTI_FORMAL_FIXTURE "" CACHE FILEPATH "Independent finite-core V-MULTI six-grid fixture")
+if(UVLAS_VMULTI_FORMAL_FIXTURE)
+    get_filename_component(vmulti_fixture "${UVLAS_VMULTI_FORMAL_FIXTURE}"
+        ABSOLUTE BASE_DIR "${PROJECT_SOURCE_DIR}")
+    if(NOT EXISTS "${vmulti_fixture}")
+        message(FATAL_ERROR "V-MULTI harmonic fixture not found: ${vmulti_fixture}")
+    endif()
+    file(SHA256 "${vmulti_fixture}" vmulti_formal_sha)
+    if(NOT vmulti_formal_sha STREQUAL "a0d44fd777be6a42909bdad846b068e0766930fff523dec95adf0eb4e211346f")
+        message(FATAL_ERROR "V-MULTI formal finite-core fixture differs from its recorded SHA-256")
+    endif()
+    target_compile_definitions(uvlas_test_coupling_case_wing_geometry PRIVATE
+        UVLAS_VMULTI_FORMAL_FIXTURE="${vmulti_fixture}")
+    foreach(condition IN ITEMS d0m4n16 d0m8n32 d5m2n8 d5m4n16 d5m8n32)
+        set(name coupling.vmulti_harmonic.${condition})
+        add_test(NAME ${name} COMMAND uvlas_test_coupling_case_wing_geometry
+            "[${condition}][.vmulti-harmonic]")
+        set_tests_properties(${name} PROPERTIES LABELS "V-MULTI;verification"
+            TIMEOUT 14400 RUN_SERIAL TRUE)
+    endforeach()
+endif()

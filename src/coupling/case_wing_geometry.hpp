@@ -65,6 +65,21 @@ struct CaseWingTrailingBand {
     std::array<wing_chart::Rational, 2> original_parameters; ///< Boundary line ordinal + fraction.
 };
 
+/// Optional finite straight closure for a harmonic verification of this Case.
+struct CaseWingStraightWake {
+    std::array<double, 3> displacement_metres;
+    bool operator==(const CaseWingStraightWake&) const = default;
+};
+
+struct CaseWingWakeBand {
+    aero::detail::EdgeId trailing_edge{0};
+    aero::detail::PhysicalFaceId bound_face{0}, wake_face{0};
+    aero::detail::FacetId facet{0};
+    std::array<aero::detail::PointId, 2> front{aero::detail::PointId{0}, aero::detail::PointId{0}};
+    std::array<aero::detail::PointId, 2> terminal{aero::detail::PointId{0},
+                                                  aero::detail::PointId{0}};
+};
+
 namespace wing_geometry {
 struct Owner;
 struct Build;
@@ -87,7 +102,7 @@ public:
             std::optional<CaseFlowClockQuery>, const CaseWingProjection&, const CaseWingLimits&,
             aero::detail::GeometryWorkspace&, aero::detail::GlobalWorkspace&,
             aero::detail::pchip::CurveWorkspace&, core::ResourcePlan&,
-            CaseWingDiagnostic* = nullptr) noexcept;
+            CaseWingDiagnostic* = nullptr, std::optional<CaseWingStraightWake> = {}) noexcept;
 
     [[nodiscard]] core::Result<void> validate_for(const io::SiCase&,
                                                   const aero::detail::GeometryContext&,
@@ -102,10 +117,15 @@ public:
     [[nodiscard]] std::span<const CaseWingSharing> sharing() const&& = delete;
     [[nodiscard]] std::span<const CaseWingPoint> points() const& noexcept;
     [[nodiscard]] std::span<const CaseWingPoint> points() const&& = delete;
+    [[nodiscard]] core::Result<DiscreteCollocation> collocation(std::size_t) const& noexcept;
+    [[nodiscard]] core::Result<DiscreteCollocation> collocation(std::size_t) const&& = delete;
     [[nodiscard]] std::span<const CaseWingCell> cells() const& noexcept;
     [[nodiscard]] std::span<const CaseWingCell> cells() const&& = delete;
     [[nodiscard]] std::span<const CaseWingTrailingBand> trailing_bands() const& noexcept;
     [[nodiscard]] std::span<const CaseWingTrailingBand> trailing_bands() const&& = delete;
+    [[nodiscard]] std::optional<CaseWingStraightWake> straight_wake() const noexcept;
+    [[nodiscard]] std::span<const CaseWingWakeBand> wake_bands() const& noexcept;
+    [[nodiscard]] std::span<const CaseWingWakeBand> wake_bands() const&& = delete;
     [[nodiscard]] core::Result<std::reference_wrapper<const aero::detail::GlobalContactState>>
     global() const& noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const aero::detail::GlobalContactState>>

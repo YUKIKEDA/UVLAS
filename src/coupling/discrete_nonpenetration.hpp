@@ -269,6 +269,42 @@ struct HarmonicLoadTotals {
     DiscreteLoadVector moment_real, moment_imaginary;
 };
 
+struct HarmonicLoadSource {
+    aero::detail::PhysicalFaceId face{0};
+    std::uint64_t original_surface{}, group{};
+};
+
+struct HarmonicLoadGroup {
+    std::uint64_t id{};
+    HarmonicLoadTotals totals;
+};
+
+/// One force on an original bound facet vertex, before reduction to geometric aliases.
+struct HarmonicOriginalLoad {
+    std::uint64_t original_surface{};
+    aero::detail::PhysicalFaceId face{0};
+    aero::detail::FacetId facet{0};
+    aero::detail::PointId point{0}; ///< Original point, including aliases from this source facet.
+    aero::detail::PointId canonical{0};
+    std::optional<aero::detail::EdgeId> canonical_edge;
+    std::int8_t edge_sign{}; ///< Zero for the area term; otherwise the signed D2 incidence.
+    DiscreteLoadVector force_real, force_imaginary;
+};
+
+struct HarmonicLoadBreakdown {
+    HarmonicLoadTotals total;
+    core::PlannedBuffer<std::optional<HarmonicLoadGroup>> groups;
+    core::PlannedBuffer<std::optional<HarmonicOriginalLoad>> original;
+    std::size_t original_count{};
+};
+
+struct HarmonicBatchInput {
+    /// All columns have the same physical bound-face order.
+    std::span<const std::span<const HarmonicCirculationRhs>> drives;
+    HarmonicLoadInput loading;
+    std::span<const HarmonicLoadSource> sources;
+};
+
 struct DiscreteHarmonicCirculation {
     aero::detail::GeometryContext geometry;
     numerics::linear::Solution<std::complex<double>> solution;
@@ -278,6 +314,9 @@ struct DiscreteHarmonicCirculation {
     /// Full-order words after reflection expansion; the algebraic certificate
     /// above describes the condensed system when this buffer is present.
     std::optional<numerics::PrecisionBuffer<std::complex<double>>> expanded;
+    core::PlannedBuffer<std::optional<HarmonicLoadBreakdown>> drive_loads;
+    /// Full original verification matrix in row-major order; empty in the single-drive entry.
+    core::PlannedBuffer<aero::detail::StraightWakeColumnUpdate> original_coefficients;
 
     [[nodiscard]] const numerics::PrecisionBuffer<std::complex<double>>&
     physical_values() const& noexcept {
@@ -302,6 +341,14 @@ struct DiscreteHarmonicCirculation {
 solve_discrete_harmonic_loads(const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
                               std::span<const HarmonicCirculationRhs>, const HarmonicLoadInput&,
                               const DiscreteNonpenetrationLimits&,
+                              const DiscreteCirculationRequest&, core::ResourcePlan&,
+                              const std::stop_token& = {}) noexcept;
+
+/// Assemble and factor once for all drives. Retain original rows and loads grouped by the
+/// independently supplied source table. Residuals are column-major (drive, original face).
+[[nodiscard]] core::Result<DiscreteHarmonicCirculation>
+solve_discrete_harmonic_batch(const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+                              const HarmonicBatchInput&, const DiscreteNonpenetrationLimits&,
                               const DiscreteCirculationRequest&, core::ResourcePlan&,
                               const std::stop_token& = {}) noexcept;
 
