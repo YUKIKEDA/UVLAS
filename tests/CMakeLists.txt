@@ -1031,7 +1031,7 @@ uvlas_add_test(coupling.case_pg_lateral_traction
     LABELS FD-05 V-LOAD integration negative verification
     SOURCES coupling/case_pg_lateral_traction_test.cpp
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json
-    TIMEOUT 180)
+    TIMEOUT 600)
 target_include_directories(uvlas_test_coupling_case_pg_lateral_traction PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 

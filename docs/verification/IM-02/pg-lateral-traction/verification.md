@@ -42,3 +42,9 @@ Shell 自身の荷重を宣言順に読み、同じ Shell を対象とする静�
 cmake --build --preset linux-release --parallel 1 --target uvlas_test_coupling_case_pg_lateral_traction
 ctest --preset linux-release -R '^coupling\.case_pg_lateral_traction$'
 ```
+
+Ubuntu 24.04.5 LTS の GCC 14.2.0 Release で3ケース、8,260件の検査が通った。
+元列を含む矩形の包絡幅は各観測の SI 単位で $10^{-18}$ 以下だった。
+隔離した製品の変異では、辺の向き判定を反転すると側面座標の検査が落ちた。
+参照面積測度を1に置き換えると、曲面の合力の独立包絡に対する検査が落ちた。
+[実行結果と来歴](result.json)
