@@ -15,7 +15,7 @@ TEST_CASE("Adopted field inventory independently fixes names types and required 
     using namespace uvlas;
     const auto records = io::detail::schema_records();
     const auto types = io::detail::schema_types();
-    CHECK(records.size() == 194);
+    CHECK(records.size() == 196);
     std::size_t actual_members = 0;
     for (const auto& record : records)
         actual_members += record.fields.size();

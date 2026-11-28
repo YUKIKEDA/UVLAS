@@ -166,8 +166,11 @@ struct Builder {
             for (std::size_t axis = 0; axis < axes; ++axis)
                 reference[axis] = case_components::rational(
                     point.world_metres[axis], limits.maximum_interval_input_bits, work);
-            const auto mapped =
-                motion::map_reference_point(reference, frame.origin, frame.rotation, rigid, work);
+            const auto mapped = point.kind == CaseMotionReferenceKind::Tangent
+                                    ? motion::map_reference_vector(reference, frame.rotation,
+                                                                   rigid.rotation, {}, work)
+                                    : motion::map_reference_point(reference, frame.origin,
+                                                                  frame.rotation, rigid, work);
             std::size_t index = 0;
             for (std::size_t order = 0; order < orders; ++order)
                 for (const auto& component : mapped) {

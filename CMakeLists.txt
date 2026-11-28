@@ -61,7 +61,7 @@ uvlas_configure_target(uvlas_numerics)
 target_include_directories(uvlas_numerics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(uvlas_numerics PUBLIC uvlas_core PRIVATE uvlas::eigen Spectra::Spectra Boost::headers Boost::hash2 Threads::Threads)
 
-# Exact reference algebra is a preparation component, separate from physical kernels.
+# Reference algebra, structural material and physical actions.
 set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_graph.cpp
     src/structure/pg_coefficients.cpp src/structure/pg_integration_partition.cpp
     src/structure/pg_reference_geometry.cpp src/structure/pg_rank_preparation.cpp
@@ -70,7 +70,8 @@ set(UVLAS_STRUCTURE_SOURCES src/structure/exact_polynomial.cpp src/structure/pg_
     src/structure/pg_full_trace.cpp src/structure/pg_global_constraints.cpp
     src/structure/pg_sparse_chart.cpp src/structure/pg_chart_candidate.cpp
     src/structure/pg_support_history.cpp src/structure/pg_rigid_support_rows.cpp
-    src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp)
+    src/structure/pg_volume_mass_reference.cpp src/structure/pg_volume_position.cpp
+    src/structure/pg_shell_material.cpp)
 find_package(Threads REQUIRED)
 add_library(uvlas_structure STATIC ${UVLAS_STRUCTURE_SOURCES})
 uvlas_configure_target(uvlas_structure)
@@ -160,6 +161,8 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
                          src/coupling/pg_aero_attachment.cpp
                          src/coupling/case_reference_graph.cpp
                          src/coupling/case_material_chart.cpp
+                         src/coupling/case_pg_shell_material.cpp
+                         src/coupling/case_pg_lateral_traction.cpp
                          src/coupling/case_material_reference.cpp
                          src/coupling/case_material_rows.cpp
                          src/coupling/case_material_original_layout.cpp
@@ -170,6 +173,9 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
     src/coupling/wake_strength_transition.cpp
     src/coupling/case_known_flow.cpp
     src/coupling/case_aero_attachment.cpp
+    src/coupling/case_wing_chart.cpp
+    src/coupling/case_wing_geometry.cpp
+    src/coupling/case_wing_sharing.cpp
     src/coupling/case_motion.cpp src/coupling/case_pg_support_motion.cpp
     src/coupling/case_external_pg.cpp
     src/coupling/case_pg_chart.cpp

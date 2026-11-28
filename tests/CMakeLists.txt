@@ -780,6 +780,46 @@ foreach(series IN ITEMS r4-reference r5-integrals r5-sides)
         LABELS "property;verification;V-PG" TIMEOUT ${pg_reference_timeout})
 endforeach()
 
+uvlas_add_test(structure.pg_shell_material
+    LABELS unit negative verification V-MAT
+    SOURCES structure/pg_shell_material_test.cpp
+    LIBS uvlas_structure)
+
+set(pg_frozen_material_timeout "${pg_reference_timeout}")
+if(WIN32)
+    set(pg_frozen_material_timeout "$<IF:$<CONFIG:Debug>,1200,180>")
+endif()
+uvlas_add_test(structure.pg_frozen_shell_material
+    LABELS verification V-MAT
+    TIMEOUT ${pg_frozen_material_timeout}
+    SOURCES structure/pg_frozen_shell_material_test.cpp
+    LIBS uvlas_structure Boost::headers nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_structure_pg_frozen_shell_material
+    PRIVATE "${PROJECT_SOURCE_DIR}/src/structure")
+target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
+    UVLAS_PG_FROZEN_MATERIAL_PROBES="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-probes-v1.json"
+    UVLAS_PG_FROZEN_MATERIAL_TRANSFER="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-transfer-v1.json")
+add_test(NAME structure.pg_frozen_shell_material.composed
+    COMMAND uvlas_test_structure_pg_frozen_shell_material "[.composed-vmat]")
+set_tests_properties(structure.pg_frozen_shell_material.composed PROPERTIES
+    LABELS "verification;V-MAT" TIMEOUT ${pg_frozen_material_timeout})
+
+set(UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE "" CACHE FILEPATH
+    "Optional independent fixture for the 3672-point frozen V-MAT elastic check")
+if(UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE)
+    get_filename_component(formal_vmat_fixture "${UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE}"
+        ABSOLUTE BASE_DIR "${PROJECT_SOURCE_DIR}")
+    if(NOT EXISTS "${formal_vmat_fixture}")
+        message(FATAL_ERROR "Formal V-MAT fixture not found: ${formal_vmat_fixture}")
+    endif()
+    target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
+        UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE="${formal_vmat_fixture}")
+    add_test(NAME structure.pg_frozen_shell_material.high_elastic
+        COMMAND uvlas_test_structure_pg_frozen_shell_material "[.high-elastic]")
+    set_tests_properties(structure.pg_frozen_shell_material.high_elastic PROPERTIES
+        LABELS "verification;V-MAT" TIMEOUT 14400 RUN_SERIAL ON)
+endif()
+
 uvlas_add_test(structure.pg_conditioning
     LABELS property negative verification V-PG
     TIMEOUT 180
@@ -979,6 +1019,21 @@ uvlas_add_test(aero.uniform_flow
     SOURCES aero/uniform_flow_test.cpp
     LIBS uvlas_aero)
 target_include_directories(uvlas_test_aero_uniform_flow PRIVATE "${PROJECT_SOURCE_DIR}/src")
+
+uvlas_add_test(coupling.case_pg_shell_material
+    LABELS V-MAT integration negative verification
+    SOURCES coupling/case_pg_shell_material_test.cpp
+    LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_pg_shell_material PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(coupling.case_pg_lateral_traction
+    LABELS FD-05 V-LOAD integration negative verification
+    SOURCES coupling/case_pg_lateral_traction_test.cpp
+    LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json
+    TIMEOUT 600)
+target_include_directories(uvlas_test_coupling_case_pg_lateral_traction PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 
 uvlas_add_test(coupling.case_uniform_flow
     LABELS V-AERO property negative verification
@@ -1269,3 +1324,12 @@ uvlas_add_test(io.nastran_number_fields
     SOURCES io/nastran_number_fields_test.cpp
     LIBS uvlas_io)
 target_include_directories(uvlas_test_io_nastran_number_fields PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(coupling.case_wing_geometry
+    LABELS V-AERO V-MULTI verification negative
+    SOURCES coupling/case_wing_geometry_test.cpp
+    LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_wing_geometry PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+target_compile_definitions(uvlas_test_coupling_case_wing_geometry PRIVATE
+    UVLAS_WING_EDGE_CASES="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/wing-edge-pairing-v1")

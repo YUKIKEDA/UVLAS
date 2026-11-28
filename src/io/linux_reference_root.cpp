@@ -93,10 +93,10 @@ core::Result<LinuxReferenceRoot> LinuxReferenceRoot::open(const std::filesystem:
     return LinuxReferenceRoot{std::move(*root)};
 }
 
-core::Result<LinuxReferenceFile>
-LinuxReferenceRoot::open_file(const NormalizedReferencePath& path, core::ResourcePlan& plan,
-                              const std::stop_token& stop,
-                              std::optional<LinuxReferenceOpenReason>* diagnostic) const noexcept {
+core::Result<LinuxReferenceHandle> LinuxReferenceRoot::open_relative(
+    const NormalizedReferencePath& path, bool directory, core::ResourcePlan& plan,
+    const std::stop_token& stop,
+    std::optional<LinuxReferenceOpenReason>* diagnostic) const noexcept {
     if (diagnostic != nullptr) {
         diagnostic->reset();
     }
@@ -120,9 +120,18 @@ LinuxReferenceRoot::open_file(const NormalizedReferencePath& path, core::Resourc
     native_path[relative.size()] = '\0';
 
     // Nonblocking open keeps an unexpected FIFO from waiting for a writer before fstat.
-    constexpr open_how how{O_RDONLY | O_CLOEXEC | O_NONBLOCK | O_NOCTTY, 0,
-                           RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS};
-    auto file = open_path(directory_.get(), native_path.data(), how, stop, diagnostic);
+    const open_how how{
+        static_cast<std::uint64_t>(directory ? O_PATH | O_DIRECTORY | O_CLOEXEC
+                                             : O_RDONLY | O_CLOEXEC | O_NONBLOCK | O_NOCTTY),
+        0, RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS};
+    return open_path(directory_.get(), native_path.data(), how, stop, diagnostic);
+}
+
+core::Result<LinuxReferenceFile>
+LinuxReferenceRoot::open_file(const NormalizedReferencePath& path, core::ResourcePlan& plan,
+                              const std::stop_token& stop,
+                              std::optional<LinuxReferenceOpenReason>* diagnostic) const noexcept {
+    auto file = open_relative(path, false, plan, stop, diagnostic);
     if (!file) {
         return std::unexpected(file.error());
     }
@@ -138,6 +147,16 @@ LinuxReferenceRoot::open_file(const NormalizedReferencePath& path, core::Resourc
         return fail(core::FailureCode::InvalidInput);
     }
     return LinuxReferenceFile{std::move(*file)};
+}
+
+core::Result<LinuxReferenceRoot> LinuxReferenceRoot::open_directory(
+    const NormalizedReferencePath& path, core::ResourcePlan& plan, const std::stop_token& stop,
+    std::optional<LinuxReferenceOpenReason>* diagnostic) const noexcept {
+    auto directory = open_relative(path, true, plan, stop, diagnostic);
+    if (!directory) {
+        return std::unexpected(directory.error());
+    }
+    return LinuxReferenceRoot{std::move(*directory)};
 }
 
 LinuxReferenceFile::LinuxReferenceFile(LinuxReferenceHandle file) noexcept

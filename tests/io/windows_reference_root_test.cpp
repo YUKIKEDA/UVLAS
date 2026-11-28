@@ -1,6 +1,7 @@
 #ifdef _WIN32
 
 #include "windows_reference_root.hpp"
+#include "windows_reference_test_fixture.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -12,7 +13,6 @@
 #include <string>
 #include <string_view>
 #include <windows.h>
-#include <winioctl.h>
 
 namespace {
 
@@ -34,8 +34,6 @@ struct Tree {
         REQUIRE(fs::create_directory(directory));
     }
     ~Tree() {
-        // Unlink the junction itself before removing the exclusively created fixture tree.
-        static_cast<void>(RemoveDirectoryW((directory / L"junction").c_str()));
         std::error_code error;
         fs::remove_all(directory, error);
     }
@@ -57,37 +55,6 @@ void check_delete_sharing(const fs::path& path) {
     const auto error = raw == INVALID_HANDLE_VALUE ? GetLastError() : ERROR_SUCCESS;
     const WindowsHandle handle{raw == INVALID_HANDLE_VALUE ? nullptr : raw};
     CHECK(error == ERROR_SHARING_VIOLATION);
-}
-
-void create_junction(const fs::path& junction, const fs::path& target) {
-    REQUIRE(fs::create_directory(junction));
-    const auto raw =
-        CreateFileW(junction.c_str(), GENERIC_WRITE, 0, nullptr, OPEN_EXISTING,
-                    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, nullptr);
-    REQUIRE(raw != INVALID_HANDLE_VALUE);
-    const WindowsHandle handle{raw};
-    // FSCTL_SET_REPARSE_POINT mount-point wire format. It also works on CI hosts where
-    // creating symbolic links requires a privilege the test account does not have.
-    struct MountPoint {
-        DWORD tag = IO_REPARSE_TAG_MOUNT_POINT;
-        WORD data_bytes = 0;
-        WORD reserved = 0;
-        WORD substitute_offset = 0;
-        WORD substitute_bytes = 0;
-        WORD print_offset = 0;
-        WORD print_bytes = 0;
-        std::array<wchar_t, 1024> text{};
-    } buffer;
-    static_assert(offsetof(MountPoint, text) == 16);
-    const auto native = L"\\??\\" + target.native();
-    REQUIRE(native.size() + 2 <= buffer.text.size());
-    std::ranges::copy(native, buffer.text.begin());
-    buffer.substitute_bytes = static_cast<WORD>(native.size() * sizeof(wchar_t));
-    buffer.print_offset = static_cast<WORD>((native.size() + 1) * sizeof(wchar_t));
-    buffer.data_bytes = static_cast<WORD>(8 + (native.size() + 2) * sizeof(wchar_t));
-    DWORD returned = 0;
-    REQUIRE(DeviceIoControl(handle.get(), FSCTL_SET_REPARSE_POINT, &buffer, 8U + buffer.data_bytes,
-                            nullptr, 0, &returned, nullptr));
 }
 
 [[nodiscard]] auto normalized(std::string_view path, core::ResourcePlan& plan) {
@@ -168,7 +135,8 @@ TEST_CASE("Windows reference lookup refuses reparse points and pins intermediate
     const auto inner = outer / L"inner";
     REQUIRE(fs::create_directories(inner));
     write_file(inner / L"data.bin", "abc");
-    create_junction(tree.directory / L"junction", inner);
+    const uvlas::test::windows_reference_fixture::Junction junction{tree.directory / L"junction",
+                                                                    inner};
     const auto root = WindowsReferenceRoot::open(tree.directory, {});
     REQUIRE(root.has_value());
     check_delete_sharing(tree.directory);
@@ -202,6 +170,14 @@ TEST_CASE("Windows reference lookup refuses reparse points and pins intermediate
         const auto error = renamed ? ERROR_SUCCESS : GetLastError();
         CHECK_FALSE(renamed);
         CHECK(error == ERROR_SHARING_VIOLATION);
+    }
+    {
+        const auto nested = normalized("outer/inner", plan);
+        REQUIRE(nested);
+        const auto directory = root->open_directory(*nested, plan, {});
+        REQUIRE(directory);
+        check_delete_sharing(outer);
+        check_delete_sharing(inner);
     }
     REQUIRE(MoveFileExW(outer.c_str(), moved.c_str(), 0));
 }

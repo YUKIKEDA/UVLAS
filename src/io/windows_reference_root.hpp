@@ -62,9 +62,25 @@ public:
               const std::stop_token& stop,
               std::optional<WindowsReferenceOpenDiagnostic>* diagnostic = nullptr) const noexcept;
 
+    [[nodiscard]] core::Result<WindowsReferenceRoot> open_directory(
+        const NormalizedReferencePath&, core::ResourcePlan&, const std::stop_token&,
+        std::optional<WindowsReferenceOpenDiagnostic>* diagnostic = nullptr) const noexcept;
+
 private:
+    struct RelativeEntry {
+        core::PlannedBuffer<WindowsHandle> parents;
+        WindowsHandle handle;
+    };
+
+    [[nodiscard]] core::Result<RelativeEntry>
+    open_relative(const NormalizedReferencePath&, bool directory, core::ResourcePlan&,
+                  const std::stop_token&,
+                  std::optional<WindowsReferenceOpenDiagnostic>*) const noexcept;
+
     friend struct CheckpointDirectoryReader;
-    explicit WindowsReferenceRoot(WindowsHandle directory) noexcept;
+    explicit WindowsReferenceRoot(WindowsHandle directory,
+                                  core::PlannedBuffer<WindowsHandle> parents = {}) noexcept;
+    core::PlannedBuffer<WindowsHandle> parents_;
     WindowsHandle directory_;
 };
 

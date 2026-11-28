@@ -1,7 +1,8 @@
 # Case から指定されたチェックポイントの照合
 
 [FD-08](../../specs/foundation/case-schema-fields.md#fd-08-初期状態と再開要求) の `Restart.manifest_sha256` を、[IO4-06](../../specs/foundation/io-execution-adoption-specification.md#io4-06-checkpoint) の指定ディレクトリ読戻しにつないだ。
-内部入口は、型付き Case、呼出し側で解決した宣言のディレクトリ、マニフェストに割り当てた SourceId、準備側から渡された七つの指紋を受け取る。
+この記録の内部入口は、型付き Case、呼出し側で解決した宣言のディレクトリ、マニフェストに割り当てた SourceId、準備側から渡された七つの指紋を受け取った。
+現在の Case 入力は、取得時の読取り根を使う[相対取得の入口](case-checkpoint-relative-root.md)へ渡す。
 同じハンドルで取得した `manifest.json` の SHA-256 を宣言と照合してから、JSON を読んで指紋・チャンクを照合する。
 一致した全チャンクを独立して所有する。
 
@@ -32,6 +33,7 @@ Windows の読込み成功は認定済みの STL で別に確認する。
 ## 接続に必要な条件
 
 Case の `Restart.directory` は非空の UTF-8 文字列として採用済みである。
-この入口では、呼出し側が用意したパスを受け取る。
-ファイル Case と辞書 Case それぞれの相対パスの基準、準備済みモデルからの七指紋の導出、[J1 の受理済み状態と探索履歴](../../specs/coupled/coupled-state-search-contract.md)をチャンクへ割り当てる規則は、実行・再開を接続する側で確定が要る。
+この時点では呼出し側が用意したパスを受け取っていた。
+ファイル Case と辞書 Case の相対パスは[後続の契約](../../specs/foundation/case-checkpoint-compatibility-contract.md)に従う。
+準備済みモデルからの七指紋の導出と、[J1 の受理済み状態と探索履歴](../../specs/coupled/coupled-state-search-contract.md)をチャンクへ割り当てる規則は、実行・再開を接続する側で確定する。
 同一環境での bitwise 一致と異環境の観測予算は、物理状態を復元する側で検証する。

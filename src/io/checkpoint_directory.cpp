@@ -265,21 +265,25 @@ read_payload(const NativeRoot& root, const CheckpointManifestEntry& entry, Refer
 
 struct CheckpointDirectoryReader {
     [[nodiscard]] static LoadedCheckpointDirectory
-    read(const std::filesystem::path& directory, SourceId source,
+    read(const NativeRoot& root, std::uint64_t number, SourceId source,
          const CheckpointFingerprints& expected, const CheckpointManifestLimits& limits,
          CheckpointDirectoryLimits files, core::ResourcePlan& plan, const std::stop_token& stop,
-         const std::optional<SourceDigest>& manifest_digest) {
+         const std::optional<SourceDigest>& manifest_digest,
+         CaseCheckpointDirectoryDiagnostic* diagnostic = nullptr) {
         if (stop.stop_requested())
-            throw core::Failure{core::FailureCode::Cancelled, recover, {}};
-        const auto number = checked(checkpoint_number(directory));
-        const auto root = checked(NativeRoot::open(directory, stop));
+            reject(cancelled);
+        if (diagnostic)
+            diagnostic->stage = CaseCheckpointDirectoryStage::Envelope;
         auto manifest_handle = checked_file("manifest.json", root, plan, stop);
-        const auto snapshot = checked(read_manifest_file(
+        auto snapshot = checked(read_manifest_file(
             manifest_handle, bound_size(files.file, limits.json.maximum_source_bytes), plan, stop,
             nullptr));
         const auto original = checked(snapshot.view());
-        if (manifest_digest && original.digest != *manifest_digest)
-            throw core::Failure{corrupt, recover, {}};
+        if (manifest_digest && original.digest != *manifest_digest) {
+            if (diagnostic)
+                diagnostic->stage = CaseCheckpointDirectoryStage::ManifestDigest;
+            reject(corrupt);
+        }
         auto manifest =
             checked(CheckpointManifest::read(original.bytes, source, expected, limits, plan, stop));
         DirectoryEntries entries{manifest, files.maximum_entries, stop};
@@ -297,7 +301,8 @@ struct CheckpointDirectoryReader {
         }
         if (stop.stop_requested())
             throw core::Failure{core::FailureCode::Cancelled, recover, {}};
-        return {number, std::move(manifest), CheckpointPayloadSet{std::move(chunks)}};
+        return {number, std::move(manifest), CheckpointPayloadSet{std::move(chunks)},
+                std::move(snapshot)};
     }
 };
 
@@ -339,31 +344,106 @@ read_checkpoint_directory(const std::filesystem::path& directory, SourceId sourc
     return core::guard_entry(
         recover, corrupt, {}, [&]() -> core::Result<LoadedCheckpointDirectory> {
             try {
-                return CheckpointDirectoryReader::read(directory, source, expected, limits, files,
-                                                       plan, stop, manifest_digest);
+                if (stop.stop_requested())
+                    reject(cancelled);
+                const auto number = checked(checkpoint_number(directory));
+                const auto root = checked(NativeRoot::open(directory, stop));
+                return CheckpointDirectoryReader::read(root, number, source, expected, limits,
+                                                       files, plan, stop, manifest_digest);
             } catch (const core::Failure& failure) {
                 return std::unexpected(failure);
             }
         });
 }
 
+std::string_view CaseCheckpointDirectoryDiagnostic::pointer() const noexcept {
+    if (!stage)
+        return {};
+    switch (*stage) {
+    case CaseCheckpointDirectoryStage::Restart:
+        return "/restart";
+    case CaseCheckpointDirectoryStage::ManifestDigest:
+        return "/restart/manifest_sha256";
+    case CaseCheckpointDirectoryStage::Path:
+    case CaseCheckpointDirectoryStage::Open:
+    case CaseCheckpointDirectoryStage::Envelope:
+        return "/restart/directory";
+    }
+    return {};
+}
+
 core::Result<LoadedCheckpointDirectory> read_case_checkpoint_directory(
-    const SchemaCase& input, const std::filesystem::path& resolved_directory,
-    SourceId manifest_source, const CheckpointFingerprints& expected,
-    const CheckpointManifestLimits& limits, CheckpointDirectoryLimits files,
-    core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
-    if (stop.stop_requested())
+    const ReferenceInput& input, SourceId manifest_source, const CheckpointFingerprints& expected,
+    const CheckpointManifestLimits& limits, CaseCheckpointDirectoryLimits files,
+    core::ResourcePlan& plan, const std::stop_token& stop,
+    CaseCheckpointDirectoryDiagnostic* diagnostic) noexcept {
+    using Stage = CaseCheckpointDirectoryStage;
+    const auto mark = [diagnostic](Stage stage) {
+        if (diagnostic)
+            diagnostic->stage = stage;
+    };
+    const auto clear = [diagnostic] {
+        if (diagnostic)
+            *diagnostic = {};
+    };
+    clear();
+    auto result =
+        core::guard_entry(recover, corrupt, {}, [&]() -> core::Result<LoadedCheckpointDirectory> {
+            try {
+                constexpr auto invalid = core::FailureCode::InvalidInput;
+                if (stop.stop_requested())
+                    reject(cancelled);
+                mark(Stage::Restart);
+                const auto acquired = input.view();
+                if (!acquired)
+                    reject(invalid);
+                const auto model = acquired->schema.root();
+                if (!model || !model->restart)
+                    reject(invalid);
+                const auto restart = model->restart->record();
+                mark(Stage::ManifestDigest);
+                const auto digest = decode_source_digest(restart.manifest_sha256.text());
+                if (!digest)
+                    reject(invalid);
+
+                mark(Stage::Path);
+                if (!acquired->root)
+                    reject(invalid);
+                const auto path =
+                    normalize_reference_path(restart.directory.text(), files.path, plan, stop,
+                                             diagnostic ? &diagnostic->path : nullptr);
+                if (!path) {
+                    auto failure = path.error();
+                    failure.operation = recover;
+                    throw failure;
+                }
+                const auto normalized = path->text();
+                const auto slash = normalized.rfind('/');
+                const auto leaf =
+                    slash == normalized.npos ? normalized : normalized.substr(slash + 1);
+                const auto number = parse_checkpoint_directory_name(leaf);
+                if (!number) {
+                    if (diagnostic)
+                        diagnostic->path.emplace(ReferencePathReason::InvalidPath, std::nullopt);
+                    reject(invalid);
+                }
+                mark(Stage::Open);
+                const auto directory = checked(acquired->root->open_directory(
+                    *path, plan, stop, diagnostic ? &diagnostic->open : nullptr));
+                return CheckpointDirectoryReader::read(directory, *number, manifest_source,
+                                                       expected, limits, files.container, plan,
+                                                       stop, digest, diagnostic);
+            } catch (const core::Failure& failure) {
+                return std::unexpected(failure);
+            }
+        });
+    if (stop.stop_requested()) {
+        clear();
         return std::unexpected(core::Failure{cancelled, recover, {}});
-    const auto root = input.root();
-    if (!root)
-        return std::unexpected(root.error());
-    if (!root->restart)
-        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, recover, {}});
-    const auto digest = decode_source_digest(root->restart->record().manifest_sha256.text());
-    if (!digest)
-        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, recover, {}});
-    return read_checkpoint_directory(resolved_directory, manifest_source, expected, limits, files,
-                                     plan, stop, digest);
+    }
+    if (result || result.error().code == cancelled)
+        clear();
+    return result;
 }
 
 core::Result<LoadedCheckpointDirectory>

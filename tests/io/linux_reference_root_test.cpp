@@ -147,6 +147,36 @@ TEST_CASE("Linux reference lookup stays anchored after the original root path is
     }
 }
 
+TEST_CASE("Linux selected directory survives replacement of its original pathname",
+          "[IO4-06][FD-08][verification][property]") {
+    const Tree tree;
+    const auto leaf = tree.directory / "outer" / "checkpoint-1";
+    const auto moved = tree.directory / "held";
+    REQUIRE(fs::create_directories(leaf));
+    write_file(leaf / "manifest.json", "abc");
+    const auto root = LinuxReferenceRoot::open(tree.directory, {});
+    REQUIRE(root);
+    core::ResourcePlan plan{4096};
+    const auto path = path_for("outer/checkpoint-1", plan);
+    REQUIRE(path);
+    const auto selected = root->open_directory(*path, plan, {});
+    REQUIRE(selected);
+    check_one_cloexec(leaf);
+
+    fs::rename(leaf, moved);
+    REQUIRE(fs::create_directory(leaf));
+    write_file(leaf / "manifest.json", "decoy");
+    const auto manifest = path_for("manifest.json", plan);
+    REQUIRE(manifest);
+    auto opened = selected->open_file(*manifest, plan, {});
+    REQUIRE(opened);
+    const auto snapshot = read_manifest_file(*opened, {3, 4, 2, 3}, plan, {}, nullptr);
+    REQUIRE(snapshot);
+    const auto view = snapshot->view();
+    REQUIRE(view);
+    CHECK(view->digest == abc_digest);
+}
+
 TEST_CASE("Linux reference lookup rejects symlinks and closes rejected native descriptors",
           "[IO4-01][verification][negative]") {
     const Tree tree;
