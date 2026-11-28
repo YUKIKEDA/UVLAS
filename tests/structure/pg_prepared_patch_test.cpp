@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <uvlas/structure/pg_flat_gram.hpp>
 #include <uvlas/structure/pg_prepared_patch.hpp>
+#include <uvlas/structure/pg_shell_material.hpp>
 
 namespace {
 using namespace uvlas;
@@ -13,7 +14,7 @@ using namespace pg_conditioning_test;
 } // namespace
 
 TEST_CASE("PG prepared patch reconstructs fixed physical position and translation",
-          "[SH-D02][SH-D03][N4-03][N4-06][N4-08][verification]") {
+          "[SH-D02][SH-D03][MAT-D08][MAT-D10][N4-03][N4-06][N4-08][V-MAT][verification]") {
     Fixture f;
     for (auto& h : f.heights)
         h = f.r("2");
@@ -77,6 +78,31 @@ TEST_CASE("PG prepared patch reconstructs fixed physical position and translatio
         return (1 - q(u) - q(v)) * q(a) + q(u) * q(b) + q(v) * q(c);
     };
     const auto flat = [](const PgReferenceScalar& x) -> Q { return q(x.rational) + q(x.radical); };
+    const auto as_rational = [&](const Q& value) {
+        return f.r(numerator(value).str(), denominator(value).str());
+    };
+    // This affine field deliberately mixes world x and y, with a separate
+    // constant translation represented by the protected constant mode.
+    std::vector<PgCartesianExactPosition> current(patch.reference_coordinates().size());
+    std::vector<PgCartesianExactPosition> stretch(current.size()), rigid_shift(current.size());
+    for (std::size_t j = 0; j < current.size(); ++j) {
+        const auto& xyz = patch.reference_coordinates()[j];
+        const auto shift = q(patch.translation()[j]);
+        current[j] = {as_rational(2 * q(xyz[0]) + q(xyz[1]) + 3 * shift),
+                      as_rational(q(xyz[1]) - 4 * shift), as_rational(q(xyz[2]) + 5 * shift)};
+        stretch[j][0] = as_rational(q(xyz[0]));
+        rigid_shift[j][0] = as_rational(shift);
+    }
+    const PgShellPatchState affine_state{recorded.identity, current};
+    const PgShellPatchState reference_state{recorded.identity, patch.reference_coordinates()};
+    const auto one = f.r("1"), zero = f.r("0"), young = f.r("10");
+    const auto law =
+        take(PgShellElasticLaw::prepare(PgIsotropicElasticity{young, zero}, one, caps, setup));
+    const std::array<PgReferenceScalar, 6> initial;
+    const std::array<ExactRational, 6> error;
+    const PgInitialGreenEnclosure strain{one, initial, error};
+    const std::array fibre{f.r("0"), f.r("1"), f.r("0")};
+    const PgShellPointAxes axes = PgShellProjectedFibre{fibre, one, zero};
     for (std::size_t p = 0; p < queries.size(); ++p) {
         CAPTURE(p);
         const auto triangle = p == 0 ? volumes.front().triangle : faces.front().triangle;
@@ -117,7 +143,169 @@ TEST_CASE("PG prepared patch reconstructs fixed physical position and translatio
             for (std::size_t j = 0; j < expected.size(); ++j)
                 CHECK(derivative[j][a] == (j == a ? 1 : 0));
         }
+        core::ResourcePlan assembly{profile};
+        auto state =
+            take(enclose_pg_shell_patch_point(patch, affine_state, queries[p], caps, assembly));
+        CHECK(state.patch == recorded.identity);
+        CHECK(state.reference.layer == layer.id);
+        CHECK(state.shapes.size() == row.size());
+        CHECK(state.work.allocated_owned_payload_bytes == assembly.allocated_bytes());
+        const std::array<Q, 3> moved{2 * expected[0] + expected[1] + 3, expected[1] - 4,
+                                     expected[2] + 5};
+        for (std::size_t a = 0; a < moved.size(); ++a) {
+            CHECK(q(state.current_position_metres[a].lower) == moved[a]);
+            CHECK(q(state.current_position_metres[a].upper) == moved[a]);
+        }
+        const std::array affine_gradient{2, 1, 0, 0, 1, 0, 0, 0, 1};
+        for (std::size_t k = 0; k < affine_gradient.size(); ++k) {
+            CHECK(q(state.deformation_gradient[k].lower) == affine_gradient[k]);
+            CHECK(q(state.deformation_gradient[k].upper) == affine_gradient[k]);
+        }
+        const auto material =
+            take(enclose_pg_shell_material_point(law, strain, axes, state, caps, assembly));
+        const auto encloses = [&](const PgMaterialEnclosure& bound, const Q& target) {
+            CHECK(q(bound.lower) <= target);
+            CHECK(q(bound.upper) >= target);
+            CHECK(q(bound.upper) - q(bound.lower) < Q("1/100000000000000000000000000"));
+        };
+        CHECK(q(material.determinant.lower) == 2);
+        encloses(material.material.energy_joules_per_cubic_metre, Q("45/2"));
+        encloses(material.second_pk_world_pascal[0], Q("15"));
+        encloses(material.first_pk_world_pascal[0], Q("40"));
+        encloses(material.cauchy_world_pascal[0], Q("105/2"));
+        // Vary F11 at fixed F12=1. Analytic differentiation of P for
+        // E_Y=10 and nu=0 gives dP11=60, dP12=20, dP21=5, dP22=0.
+        const auto action = take(linearize_pg_shell_material_point(
+            law, strain, axes, state, {recorded.identity, stretch}, caps, assembly));
+        encloses(action.first_pk_direction_pascal[0], Q("60"));
+        encloses(action.first_pk_direction_pascal[1], Q("20"));
+        encloses(action.first_pk_direction_pascal[3], Q("5"));
+        encloses(action.first_pk_direction_pascal[4], Q("0"));
+        const auto translation_action = take(linearize_pg_shell_material_point(
+            law, strain, axes, state, {recorded.identity, rigid_shift}, caps, assembly));
+        for (const auto& component : translation_action.first_pk_direction_pascal) {
+            CHECK(component.lower.sign() == 0);
+            CHECK(component.upper.sign() == 0);
+        }
+        auto wrong_direction = PgShellPatchDirection{recorded.identity, stretch};
+        wrong_direction.patch.bytes[0] ^= std::byte{1};
+        check_failure(linearize_pg_shell_material_point(law, strain, axes, state, wrong_direction,
+                                                        caps, none),
+                      core::FailureCode::StaleGeneration);
+
+        auto rest =
+            take(enclose_pg_shell_patch_point(patch, reference_state, queries[p], caps, assembly));
+        const auto rest_material =
+            take(enclose_pg_shell_material_point(law, strain, axes, rest, caps, assembly));
+        CHECK(rest_material.material.energy_joules_per_cubic_metre.upper.sign() == 0);
+        CHECK(rest_material.cauchy_world_pascal[0].lower.sign() == 0);
     }
+
+    auto stale = affine_state;
+    stale.patch.bytes[0] ^= std::byte{1};
+    check_failure(enclose_pg_shell_patch_point(patch, stale, queries[0], caps, none),
+                  core::FailureCode::StaleGeneration);
+    auto incomplete = affine_state;
+    incomplete.coordinates_metres = incomplete.coordinates_metres.first(1);
+    check_failure(enclose_pg_shell_patch_point(patch, incomplete, queries[0], caps, none),
+                  core::FailureCode::InvalidInput);
+    CHECK(none.allocated_bytes() == 0);
+
+    const auto young_upper = f.r("20");
+    const auto upper_law = take(
+        PgShellElasticLaw::prepare(PgIsotropicElasticity{young_upper, zero}, one, caps, setup));
+    const auto third = f.r("1", "3"), half = f.r("1", "2");
+    std::vector<PgShellVolumeSample> samples;
+    for (std::size_t i = 0; i < volumes.size(); ++i) {
+        const auto ordinal = static_cast<std::size_t>(volumes[i].layer);
+        samples.push_back(
+            {{PgReferenceVolumePoint{static_cast<core::Index>(i), third, third, half}, half},
+             layers[ordinal].id,
+             ordinal == 0 ? law : upper_law,
+             strain,
+             axes});
+    }
+    const auto volume_width = f.r("1", "10000000000000000000000");
+    const PgShellVolumeResolution resolution{96, volume_width, volume_width, volume_width};
+    core::ResourcePlan volume_plan{profile};
+    auto volume_action = assemble_pg_shell_elastic_volume(
+        patch, affine_state, samples, PgShellPatchDirection{recorded.identity, stretch}, resolution,
+        caps, volume_plan);
+    REQUIRE(volume_action);
+    CHECK(volume_action->patch == recorded.identity);
+    CHECK(volume_action->work.allocated_owned_payload_bytes == volume_plan.allocated_bytes());
+    const auto work_against = [&](std::span<const PgShellCartesianEnclosure> coefficients,
+                                  std::span<const PgCartesianExactPosition> direction) {
+        std::array<Q, 2> work{};
+        REQUIRE(coefficients.size() == direction.size());
+        for (std::size_t j = 0; j < coefficients.size(); ++j) {
+            for (std::size_t i = 0; i < coefficients[j].size(); ++i) {
+                const auto d = q(direction[j][i]);
+                const Q a = d * q(coefficients[j][i].lower);
+                const Q b = d * q(coefficients[j][i].upper);
+                work[0] += std::min(a, b);
+                work[1] += std::max(a, b);
+            }
+        }
+        return work;
+    };
+    const auto contains = [](const std::array<Q, 2>& enclosure, const Q& expected_value) {
+        CHECK(enclosure[0] <= expected_value);
+        CHECK(enclosure[1] >= expected_value);
+        CHECK(enclosure[1] - enclosure[0] < Q("1/1000000000000000000000"));
+    };
+    // Physical volumes are 8/3 and 16/3 m³. With moduli in ratio 1:2,
+    // the equivalent first-layer weight is 40/3 m³. The affine field
+    // keeps W=45/2, P11=40 and dP11=60 constant in that first layer.
+    contains({q(volume_action->energy_joules.lower), q(volume_action->energy_joules.upper)},
+             Q("300"));
+    contains(work_against(volume_action->internal_force_newtons.values(), stretch), Q("1600/3"));
+    contains(work_against(volume_action->tangent_action_newtons.values(), stretch), Q("800"));
+    contains(work_against(volume_action->internal_force_newtons.values(), rigid_shift), Q{});
+    auto wrong_layer = samples;
+    wrong_layer.front().layer = core::LayerId{99};
+    check_failure(assemble_pg_shell_elastic_volume(patch, affine_state, wrong_layer, std::nullopt,
+                                                   resolution, caps, none),
+                  core::FailureCode::InvalidInput);
+    CHECK(none.allocated_bytes() == 0);
+    auto coarse = resolution;
+    coarse.fractional_bits = 0;
+    check_failure(assemble_pg_shell_elastic_volume(patch, affine_state, samples, std::nullopt,
+                                                   coarse, caps, volume_plan),
+                  core::FailureCode::PrecisionUnresolved);
+
+    const auto three = f.r("3"), one_twelfth = f.r("1", "12"), one_third = f.r("1", "3");
+    const std::array<PgShellLayerDensity, 2> density{{{layers[0].id, one}, {layers[1].id, three}}};
+    std::vector<PgDiscreteVolumePoint> mass_rule;
+    for (const auto& sample : samples) {
+        const auto v_index = sample.quadrature.point.volume;
+        // In the unit depth variable Simpson integrates the squared affine
+        // field exactly. The factors include the unit triangle weight 1/2.
+        mass_rule.push_back({{v_index, third, third, zero}, one_twelfth});
+        mass_rule.push_back({{v_index, third, third, half}, one_third});
+        mass_rule.push_back({{v_index, third, third, one}, one_twelfth});
+    }
+    const PgShellMassResolution mass_resolution{96, volume_width, volume_width};
+    const auto inertia =
+        take(apply_pg_shell_consistent_mass(patch, mass_rule, density, {recorded.identity, stretch},
+                                            mass_resolution, caps, volume_plan));
+    // At this flat patch X_world,x=1+zeta and dV=4 ds dt dzeta.
+    // Integrate rho, rho*X_world,x and rho*X_world,x² over x in [0,2/3]
+    // at rho=1 and over [2/3,2] at rho=3.
+    contains({q(inertia.mass_kg.lower), q(inertia.mass_kg.upper)}, Q("56/3"));
+    contains(work_against(inertia.action_kg_metres.values(), rigid_shift), Q("200/9"));
+    contains(work_against(inertia.action_kg_metres.values(), stretch), Q("2528/81"));
+    const auto rigid_mass = take(
+        apply_pg_shell_consistent_mass(patch, mass_rule, density, {recorded.identity, rigid_shift},
+                                       mass_resolution, caps, volume_plan));
+    contains(work_against(rigid_mass.action_kg_metres.values(), stretch), Q("200/9"));
+    contains(work_against(rigid_mass.action_kg_metres.values(), rigid_shift), Q("56/3"));
+    const auto last_volume_omitted = std::span{mass_rule}.first(mass_rule.size() - 3);
+    check_failure(apply_pg_shell_consistent_mass(patch, last_volume_omitted, density,
+                                                 {recorded.identity, stretch}, mass_resolution,
+                                                 caps, none),
+                  core::FailureCode::InvalidInput);
+    CHECK(none.allocated_bytes() == 0);
 
     const auto interior = std::ranges::find_if(
         faces, [&](const auto& face) { return face.side != faces.front().side; });
