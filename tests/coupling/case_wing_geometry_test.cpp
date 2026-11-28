@@ -3,6 +3,7 @@
 #include "coupling/case_wing_harmonic.hpp"
 #include "io/case_schema_test_adapter.hpp"
 
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
@@ -524,6 +525,91 @@ TEST_CASE("Prepared rigid Case geometry binds exact stage and prescribed point v
     reject(run.prepare(source, {}, limits()), StaleGeneration);
     run.context.time = 0;
     reject(run.prepare(source, end, limits()), StaleGeneration);
+}
+
+TEST_CASE("Case wing normal budgets include fixed and prescribed tangent projection error",
+          "[GEO-01][AE-02][AE-07][UW-D03][verification][negative]") {
+    using Decimal = boost::multiprecision::cpp_dec_float_50;
+    constexpr std::array<std::uint32_t, 1> numerator{5};
+    constexpr std::array<std::uint32_t, 2> rejecting_denominator{0, 1U << 24U}; // 5 * 2^-56
+    constexpr std::array<std::uint32_t, 2> accepting_denominator{0, 1U << 20U}; // 2^-52
+    const p::RationalView tight_normal{1, numerator, rejecting_denominator};
+    const Decimal budget{0x1.4p-54};
+    const Decimal slope = 1 + Decimal{0x1p-54};
+    const Decimal original = -slope / sqrt(Decimal{1} + slope * slope);
+    const Decimal retained = -1 / sqrt(Decimal{2});
+    // The production projection truncates toward zero; 0x...bcc is the
+    // largest binary64 magnitude below 1 / sqrt(2).
+    constexpr double rounded = -0x1.6a09e667f3bccp-1;
+    REQUIRE(abs(Decimal{rounded} - retained) < budget);
+    REQUIRE(abs(Decimal{rounded} - original) > budget);
+
+    for (const bool prescribed : {false, true}) {
+        DYNAMIC_SECTION((prescribed ? "prescribed span tangent" : "fixed chord tangent")) {
+            auto input = tokens::root(prescribed ? "aerodynamic_prescribed_transient"
+                                                 : "aerodynamic_steady");
+            std::optional<c::CaseFlowClockQuery> address;
+            Run run;
+            if (prescribed) {
+                input.field("units").set("angle", tokens::string("deg"));
+                auto& motion = surface(input).field("attachment").field("motion");
+                motion.set("rotation_vector",
+                           tokens::parse(R"({"kind":"constant","value":[90,0,0]})"));
+                run.context.time = 1;
+                address.emplace(stamp, 0, 1, p::RequestedSide::Left);
+            }
+
+            auto& geometry = graph(input);
+            const auto powers = prescribed ? "[0,1]" : "[1,0]";
+            geometry.set("degree", tokens::parse(powers));
+            auto term = tokens::parse("[{}]");
+            term.elements.front().set("powers", tokens::parse(powers));
+            term.elements.front().set("coefficient", rational("1"));
+            geometry.set("coefficients", std::move(term));
+            const auto axis = prescribed ? 2U : 0U;
+            auto tight = projection(core::Precision::Binary64);
+            tight.normal[axis].absolute = tight_normal;
+            const auto prepare = [&](const io::SiCase& source,
+                                     const c::CaseWingProjection& selected,
+                                     c::CaseWingDiagnostic* failure = nullptr) {
+                return c::CaseWingGeometry::prepare(source, run.context, address, selected,
+                                                    limits(), *run.geometry, *run.global,
+                                                    run.motion, run.memory, failure);
+            };
+            {
+                const auto exact_case = read(input.wire());
+                const auto accepted = take(prepare(exact_case, tight));
+                REQUIRE(accepted.cells().size() == 1);
+                CHECK(word(accepted.cells()[0].normal[axis]) == rounded);
+            }
+
+            // The chord slope (fixed) or span slope (prescribed) is 1 + 2^-54.
+            // Binary64 drops the perturbation; the prescribed rotation maps n_y to n_z.
+            geometry.field("coefficients")
+                .elements[0]
+                .set("coefficient", rational("18014398509481985", "18014398509481984"));
+            const auto perturbed_case = read(input.wire());
+            {
+                auto accepting = tight;
+                accepting.normal[axis].absolute = {1, unit_word, accepting_denominator};
+                const auto accepted = take(prepare(perturbed_case, accepting));
+                REQUIRE(accepted.cells().size() == 1);
+                const auto& cell = accepted.cells()[0];
+                const auto& tangent = prescribed ? cell.span_tangent : cell.chord_tangent;
+                CHECK(word(tangent[prescribed ? 1U : 2U]) == (prescribed ? -1 : 1));
+                const auto normal = std::get<io::ScaledBinary64>(cell.normal[axis]);
+                const Decimal error = abs(Decimal{word(cell.normal[axis])} - original);
+                CHECK(error <=
+                      Decimal{std::ldexp(normal.radius, static_cast<int>(normal.exponent2))});
+            }
+            c::CaseWingDiagnostic failure;
+            reject(prepare(perturbed_case, tight, &failure), PrecisionUnresolved);
+            CHECK(failure.phase == c::CaseWingPhase::Collocation);
+            CHECK(failure.surface == 1);
+            CHECK(failure.chord == 0);
+            CHECK(failure.span == 0);
+        }
+    }
 }
 
 TEST_CASE("A shared seam requires velocity agreement as well as position agreement",
