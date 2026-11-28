@@ -2,6 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <compare>
 #include <uvlas/structure/pg_shell_material.hpp>
 
 namespace {
@@ -43,14 +44,14 @@ struct Fixture {
         const auto high = actual.upper.compare(expected, limits.algebra, memory);
         REQUIRE(low);
         REQUIRE(high);
-        CHECK(*low <= 0);
-        CHECK(*high >= 0);
+        CHECK(std::is_lteq(*low));
+        CHECK(std::is_gteq(*high));
         const auto width = actual.upper.subtract(actual.lower, limits.algebra, memory);
         REQUIRE(width);
         const auto bounded =
             width->compare(q("1", "100000000000000000000000000"), limits.algebra, memory);
         REQUIRE(bounded);
-        CHECK(*bounded < 0);
+        CHECK(std::is_lt(*bounded));
     }
 };
 
@@ -252,15 +253,15 @@ TEST_CASE("Shell material bounds retain independent radicals and initial field e
     REQUIRE(lower_square);
     REQUIRE(upper_square);
     const auto expected_square = f.q("3", "2048");
-    CHECK(compare(*lower_square, expected_square) > 0);
-    CHECK(compare(*upper_square, expected_square) < 0);
+    CHECK(std::is_gt(compare(*lower_square, expected_square)));
+    CHECK(std::is_lt(compare(*upper_square, expected_square)));
     const auto width = shear.upper.subtract(shear.lower, f.limits.algebra, f.memory);
     REQUIRE(width);
-    CHECK(compare(*width, f.q("1", "100000000000000000000000000000")) < 0);
+    CHECK(std::is_lt(compare(*width, f.q("1", "100000000000000000000000000000"))));
     const auto& energy = evaluated->energy_joules_per_cubic_metre;
     const auto expected_energy = f.q("3", "128");
-    CHECK(compare(energy.lower, expected_energy) < 0);
-    CHECK(compare(energy.upper, expected_energy) > 0);
+    CHECK(std::is_lt(compare(energy.lower, expected_energy)));
+    CHECK(std::is_gt(compare(energy.upper, expected_energy)));
 
     initial[0] = {f.q("-49", "100"), {}};
     uncertainty[0] = f.q("1", "50");

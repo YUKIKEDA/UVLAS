@@ -94,6 +94,8 @@ Ubuntu 24.04.5 の GCC 14.2.0 Release で、固定幅の有理数を外向きに
 隔離した試験で呼出し側が指定する作業幅の検査を外すと、分母257 bitの対照で範囲外の値を受理し、拒否のアサーションが失敗した。
 同じ構成の `structure.pg_shell_material`、`structure.pg_frozen_shell_material`、`structure.pg_discrete_gram`、`coupling.case_pg_shell_material` も通過した。凍結24点の比較と Case の材料作用への接続を含む。
 `structure.pg_prepared_patch`、`io.external_shell_cross_format`、`io.external_case_chart` の3件が通過した。異なる層・パッチの引渡しと資源不足を拒否した。認証済み外部参照の拘束チャートを直接定義の Case と照合し、型付きの二層 Case から材料作用と界面両側の回復を確認した。
+Windows Debug の初回ビルドでは、Catch2 が `std::strong_ordering` と整数0の比較を分解する箇所で MSVC の `C7595` が発生した。
+該当する26箇所を標準ライブラリの比較関数に替え、同じ条件を検査する Ubuntu Release の対象5件が通過した。
 
 正式試験の初回は、スカラー演算の上限を5,000億に設定し、8,048.21秒で `ResourceExceeded` を返した。
 失敗時の累積所有確保は25,122,895,240 B、プロセスの最大常駐量は435,176 KiBだった。

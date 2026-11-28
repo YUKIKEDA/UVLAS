@@ -9,6 +9,7 @@
 
 #include <catch2/generators/catch_generators.hpp>
 
+#include <compare>
 #include <source_location>
 #include <stdexcept>
 
@@ -1362,8 +1363,10 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         lower_patch, {volume_id, stretched}, PgShellPatchDirection{volume_id, stretch}, resolution,
         pair_limits.patch, plan));
     const auto energy = oracle.r("265", "1024");
-    CHECK(fixture::take(action.energy_joules.lower.compare(energy, arithmetic.algebra, plan)) <= 0);
-    CHECK(fixture::take(action.energy_joules.upper.compare(energy, arithmetic.algebra, plan)) >= 0);
+    CHECK(std::is_lteq(
+        fixture::take(action.energy_joules.lower.compare(energy, arithmetic.algebra, plan))));
+    CHECK(std::is_gteq(
+        fixture::take(action.energy_joules.upper.compare(energy, arithmetic.algebra, plan))));
     CHECK(action.tangent_action_newtons.size() == q0.size());
     const auto work_encloses = [&](std::span<const PgShellCartesianEnclosure> force,
                                    std::span<const PgCartesianExactPosition> direction,
@@ -1384,8 +1387,8 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
                 hi = fixture::take(hi.add(b, exact, plan));
             }
         }
-        CHECK(fixture::take(lo.compare(expected, exact, plan)) <= 0);
-        CHECK(fixture::take(hi.compare(expected, exact, plan)) >= 0);
+        CHECK(std::is_lteq(fixture::take(lo.compare(expected, exact, plan))));
+        CHECK(std::is_gteq(fixture::take(hi.compare(expected, exact, plan))));
     };
     // Each layer occupies 1/8 m³ with F11=2, E=1 and nu=0.
     // The elastic E11 values are 11/8 below the interface and 3/2 above it.
@@ -1405,8 +1408,8 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     REQUIRE(interface_stress.lower.g == oracle.r("1"));
     REQUIRE(interface_stress.upper.g == oracle.r("1"));
     const auto encloses = [&](const PgMaterialEnclosure& value, const ExactRational& expected) {
-        CHECK(fixture::take(value.lower.compare(expected, arithmetic.algebra, plan)) <= 0);
-        CHECK(fixture::take(value.upper.compare(expected, arithmetic.algebra, plan)) >= 0);
+        CHECK(std::is_lteq(fixture::take(value.lower.compare(expected, arithmetic.algebra, plan))));
+        CHECK(std::is_gteq(fixture::take(value.upper.compare(expected, arithmetic.algebra, plan))));
     };
     const auto physical = [&](const PgReferenceScalar& value) {
         return fixture::take(value.rational.add(value.radical, arithmetic.algebra, plan));
@@ -1482,8 +1485,8 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
             fixture::take(shell_volume.mass(lower_patch, mass_rule, {volume_id, stretch},
                                             mass_resolution, pair_limits.patch, plan));
         const auto quarter_mass = oracle.r("1", "4");
-        CHECK(fixture::take(mass.mass_kg.lower.compare(quarter_mass, exact, plan)) <= 0);
-        CHECK(fixture::take(mass.mass_kg.upper.compare(quarter_mass, exact, plan)) >= 0);
+        CHECK(std::is_lteq(fixture::take(mass.mass_kg.lower.compare(quarter_mass, exact, plan))));
+        CHECK(std::is_gteq(fixture::take(mass.mass_kg.upper.compare(quarter_mass, exact, plan))));
         // Integral of (Z-5)² over [2,3] × [3,4] × [5-1/8,5+1/8].
         work_encloses(mass.action_kg_metres.values(), stretch, oracle.r("1", "768"));
     };

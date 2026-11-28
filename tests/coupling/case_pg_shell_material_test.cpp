@@ -3,6 +3,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <compare>
+
 namespace {
 using namespace uvlas;
 using namespace uvlas::coupling::detail;
@@ -211,8 +213,8 @@ TEST_CASE("The Case shell binds ordered layer fields to reusable SI elastic laws
             fixture::take(component->lower.multiply(component->lower, limits.algebra, memory));
         const auto high_squared =
             fixture::take(component->upper.multiply(component->upper, limits.algebra, memory));
-        CHECK(fixture::take(low_squared.compare(half, limits.algebra, memory)) <= 0);
-        CHECK(fixture::take(high_squared.compare(half, limits.algebra, memory)) >= 0);
+        CHECK(std::is_lteq(fixture::take(low_squared.compare(half, limits.algebra, memory))));
+        CHECK(std::is_gteq(fixture::take(high_squared.compare(half, limits.algebra, memory))));
     }
 
     for (const bool use_world : {false, true}) {
@@ -305,27 +307,28 @@ TEST_CASE("Fixed shell expressions certify their domain and preserve analytical 
             value.rational.subtract(sampled.declared_error[i], limits.algebra, memory));
         const auto hi =
             fixture::take(value.rational.add(sampled.declared_error[i], limits.algebra, memory));
-        CHECK(fixture::take(lo.compare(expected, limits.algebra, memory)) <= 0);
-        CHECK(fixture::take(hi.compare(expected, limits.algebra, memory)) >= 0);
+        CHECK(std::is_lteq(fixture::take(lo.compare(expected, limits.algebra, memory))));
+        CHECK(std::is_gteq(fixture::take(hi.compare(expected, limits.algebra, memory))));
     };
     contains(0, q("3", "8"));
     for (std::size_t i = 1; i < 6; ++i)
         contains(i, q("0"));
-    REQUIRE(fixture::take(
-                sampled.declared_error[0].compare(q("1", "1000"), limits.algebra, memory)) >= 0);
-    CHECK(fixture::take(
-              sampled.declared_error[0].compare(q("11", "10000"), limits.algebra, memory)) < 0);
+    REQUIRE(std::is_gteq(
+        fixture::take(sampled.declared_error[0].compare(q("1", "1000"), limits.algebra, memory))));
+    CHECK(std::is_lt(fixture::take(
+        sampled.declared_error[0].compare(q("11", "10000"), limits.algebra, memory))));
     const auto limit = q("1", "100000000000000000000");
-    CHECK(fixture::take(sampled.declared_error[1].compare(limit, limits.algebra, memory)) < 0);
+    CHECK(std::is_lt(
+        fixture::take(sampled.declared_error[1].compare(limit, limits.algebra, memory))));
     const auto orientation = fixture::take(shell.sample_axes(source, 0, point, limits, memory));
     const auto& rotation = std::get<CasePgProjectedAxisValue>(orientation.value);
     CHECK(rotation.cosine.lower.sign() <= 0);
     CHECK(rotation.cosine.upper.sign() >= 0);
     const auto cosine_width = fixture::take(
         rotation.cosine.upper.subtract(rotation.cosine.lower, limits.algebra, memory));
-    CHECK(fixture::take(cosine_width.compare(limit, limits.algebra, memory)) < 0);
-    CHECK(fixture::take(rotation.sine.lower.compare(one, limits.algebra, memory)) <= 0);
-    CHECK(fixture::take(rotation.sine.upper.compare(one, limits.algebra, memory)) >= 0);
+    CHECK(std::is_lt(fixture::take(cosine_width.compare(limit, limits.algebra, memory))));
+    CHECK(std::is_lteq(fixture::take(rotation.sine.lower.compare(one, limits.algebra, memory))));
+    CHECK(std::is_gteq(fixture::take(rotation.sine.upper.compare(one, limits.algebra, memory))));
     const std::array outside{q("5", "4"), q("0"), q("0")};
     const auto rejected =
         shell.sample_initial_green(source, 0, {outside, origin, origin, one}, limits, memory);
