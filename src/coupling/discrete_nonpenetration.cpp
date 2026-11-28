@@ -7,6 +7,7 @@
 #include "aero/query_coordinates_private.hpp"
 #include "case_component_precision_private.hpp"
 #include "case_dyadic_words_private.hpp"
+#include "case_wing_geometry.hpp"
 #include "fixed_bdf2_circulation.hpp"
 
 #include <algorithm>
@@ -127,6 +128,18 @@ p::Interval import(const io::SiEnclosure& value, p::Work& work) {
             return enclose(import(center, work), word.radius, p::exponent(word.exponent2), work);
         },
         value);
+}
+p::Interval harmonic_velocity_component(const StraightWakeHarmonicInput& phase, std::size_t axis,
+                                        p::Work& work) {
+    if (const auto* wake = std::get_if<CaseHarmonicWake>(&phase.convection_velocity))
+        return import(wake->velocity()[axis], work);
+    return import(std::get<NonpenetrationVector>(phase.convection_velocity)[axis], work);
+}
+
+Vector harmonic_velocity(const StraightWakeHarmonicInput& phase, p::Work& work) {
+    return {harmonic_velocity_component(phase, 0, work),
+            harmonic_velocity_component(phase, 1, work),
+            harmonic_velocity_component(phase, 2, work)};
 }
 Vector cross(const Vector& a, const Vector& b, p::Work& work) {
     Vector result{};
@@ -307,14 +320,15 @@ void match_circulation_geometry(const DiscreteCirculationRequest& request,
         reject(core::FailureCode::StaleGeneration);
 }
 
-void validate_circulation(const DiscreteCirculationRequest& request, std::size_t order,
-                          p::Work& work, bool transposed = false) {
+void validate_circulation_input(const DiscreteCirculationRequest& request, std::size_t order,
+                                std::optional<std::size_t> solve_order, p::Work& work,
+                                bool transposed = false) {
     if (request.scales.context.cache.representation != core::Precision::Binary64)
         reject(core::FailureCode::PrecisionUnsupported);
     if (request.solver_limits.maximum_order < 0 || request.solver_limits.maximum_rhs_columns < 0)
         reject(core::FailureCode::InvalidInput);
-    if (std::cmp_greater(order, request.solver_limits.maximum_order) ||
-        request.solver_limits.maximum_rhs_columns < 1)
+    if (request.solver_limits.maximum_rhs_columns < 1 ||
+        (solve_order && std::cmp_greater(*solve_order, request.solver_limits.maximum_order)))
         reject(core::FailureCode::ResourceExceeded);
     if (request.scales.unknown.size() != order || request.scales.residual.size() != order ||
         request.scales.unknown_units.size() != order ||
@@ -345,6 +359,11 @@ void validate_circulation(const DiscreteCirculationRequest& request, std::size_t
             scales.unknown_units[i] != unknown_units || scales.residual_units[i] != residual_units)
             reject(core::FailureCode::InvalidInput);
     }
+}
+
+void validate_circulation(const DiscreteCirculationRequest& request, std::size_t order,
+                          p::Work& work, bool transposed = false) {
+    validate_circulation_input(request, order, order, work, transposed);
 }
 
 template <class Scalar>
@@ -936,35 +955,42 @@ private:
 
 core::Result<CaseWingNormalProjection>
 project_case_wing_normal(const a::OwnedGeometry& geometry, std::span<const a::FacetId, 2> facets,
-                         const ExplicitCollocationTangents& tangents,
+                         const std::array<io::SiEnclosure, 3>& chord,
+                         const std::array<io::SiEnclosure, 3>& span, bool reversed,
                          core::Precision representation,
                          const std::array<CaseFlowComponentBudget, 3>& budgets,
                          CaseFlowProjectionLimits limits, std::stop_token stop) noexcept {
     constexpr auto operation = core::Operation::PrepareModel;
-    return core::guard_entry(
-        operation, core::FailureCode::PrecisionUnresolved, {},
-        [&]() -> core::Result<CaseWingNormalProjection> {
-            try {
-                p::Work work{0, limits.steps, stop};
-                work.step();
-                if (!a::p1_environment_supported())
-                    reject(core::FailureCode::PrecisionUnsupported);
-                const auto normal = qualify_normal(
-                    geometry, facets, {import(tangents[0], work), import(tangents[1], work)}, work);
-                a::LocalRootScratch scratch;
-                CaseWingNormalProjection result;
-                for (std::size_t axis = 0; axis < normal.size(); ++axis)
-                    result.unit[axis] =
-                        case_components::project(normal[axis], budgets[axis], representation,
-                                                 limits.input_integer_bits, scratch, work);
-                result.used_steps = work.used;
-                return result;
-            } catch (const p::ArithmeticFailure& failure) {
-                return std::unexpected(core::Failure{failure.code, operation});
-            } catch (const core::Failure& failure) {
-                return std::unexpected(failure);
-            }
-        });
+    return core::guard_entry(operation, core::FailureCode::PrecisionUnresolved, {},
+                             [&]() -> core::Result<CaseWingNormalProjection> {
+                                 try {
+                                     p::Work work{0, limits.steps, stop};
+                                     work.step();
+                                     if (!a::p1_environment_supported())
+                                         reject(core::FailureCode::PrecisionUnsupported);
+                                     std::array<Vector, 2> tangents;
+                                     for (std::size_t axis = 0; axis < chord.size(); ++axis) {
+                                         tangents[0][axis] = import(chord[axis], work);
+                                         tangents[1][axis] = import(span[axis], work);
+                                         if (reversed)
+                                             tangents[1][axis] = p::negate(tangents[1][axis], work);
+                                     }
+                                     const auto normal =
+                                         qualify_normal(geometry, facets, tangents, work);
+                                     a::LocalRootScratch scratch;
+                                     CaseWingNormalProjection result;
+                                     for (std::size_t axis = 0; axis < normal.size(); ++axis)
+                                         result.unit[axis] = case_components::project(
+                                             normal[axis], budgets[axis], representation,
+                                             limits.input_integer_bits, scratch, work);
+                                     result.used_steps = work.used;
+                                     return result;
+                                 } catch (const p::ArithmeticFailure& failure) {
+                                     return std::unexpected(core::Failure{failure.code, operation});
+                                 } catch (const core::Failure& failure) {
+                                     return std::unexpected(failure);
+                                 }
+                             });
 }
 
 struct LoadValues {
@@ -1766,7 +1792,15 @@ struct NonpenetrationBuilder {
             reject(core::FailureCode::InvalidInput);
         const auto& stop = work.stop;
         const auto& geometry = require(input.contact.geometry()).get();
-        const auto velocity = import(phase.convection_velocity, work);
+        const auto* binding = std::get_if<CaseHarmonicWake>(&phase.convection_velocity);
+        const auto case_wake = binding ? binding->geometry().straight_wake() : std::nullopt;
+        const auto case_bands =
+            binding ? binding->geometry().wake_bands() : std::span<const CaseWingWakeBand>{};
+        if (binding &&
+            (!case_wake || &require(binding->geometry().global()).get() != &input.contact ||
+             case_bands.size() != input.wake.size()))
+            reject(core::FailureCode::StaleGeneration);
+        const auto velocity = harmonic_velocity(phase, work);
         const auto component = std::ranges::find_if(velocity, [](const p::Interval& value) {
             return p::compare(value.lower, {}) > 0 || p::compare(value.upper, {}) < 0;
         });
@@ -1798,25 +1832,38 @@ struct NonpenetrationBuilder {
                 reject(core::FailureCode::GeometryInvalid);
             const auto& attached = *panel.attachment;
             const auto first = point(panel.corners[0]), second = point(panel.corners[1]);
-            const auto left = difference(point(panel.corners[3]), first, work);
-            const auto right = difference(point(panel.corners[2]), second, work);
-            if (b == 0)
-                common_translation = left;
-            for (std::size_t j = 0; j < left.size(); ++j) {
-                equal(left[j], common_translation[j]);
-                equal(right[j], common_translation[j]);
+            if (case_wake) {
+                const auto& bound = case_bands[b];
+                if (bound.facet != input.wake[b].facet || bound.trailing_edge != attached.edge ||
+                    bound.bound_face != attached.bound_face ||
+                    panel.corners != std::array{bound.front[0], bound.front[1], bound.terminal[1],
+                                                bound.terminal[0]})
+                    reject(core::FailureCode::StaleGeneration);
+            } else {
+                const auto left = difference(point(panel.corners[3]), first, work);
+                const auto right = difference(point(panel.corners[2]), second, work);
+                if (b == 0)
+                    common_translation = left;
+                for (std::size_t j = 0; j < left.size(); ++j) {
+                    equal(left[j], common_translation[j]);
+                    equal(right[j], common_translation[j]);
+                }
             }
             bands.values()[b] = {{attached.edge, attached.bound_face},
                                  contour_bounds(first),
                                  contour_bounds(second),
                                  attached.coefficient};
         }
-        for (std::size_t j = 0; j < common_translation.size(); ++j) {
-            if (j != axis)
-                equal(p::multiply(common_translation[j], *component, work),
-                      p::multiply(common_translation[axis], velocity[j], work));
-        }
-        const auto end_age = p::divide(common_translation[axis], *component, work);
+        const auto end_age = [&] {
+            if (case_wake)
+                return import(case_wake->duration_seconds, work);
+            for (std::size_t j = 0; j < common_translation.size(); ++j) {
+                if (j != axis)
+                    equal(p::multiply(common_translation[j], *component, work),
+                          p::multiply(common_translation[axis], velocity[j], work));
+            }
+            return p::divide(common_translation[axis], *component, work);
+        }();
         require_positive(end_age);
         auto quadrature = require(a::prepare_straight_wake_age_quadrature(
             geometry.context(), phase.age_panel_starts_seconds, contour_bounds(end_age),
@@ -1986,7 +2033,7 @@ struct NonpenetrationBuilder {
         if (p::compare(density.lower, {}) <= 0)
             reject(core::FailureCode::InvalidInput);
         const auto origin = import(loads.moment_origin, work);
-        const auto flow = import(phase.convection_velocity, work);
+        const auto flow = harmonic_velocity(phase, work);
         const auto half = p::divide(p::integer(1), p::integer(2), work);
         const auto third = p::divide(p::integer(1), p::integer(3), work);
         const auto rate = p::multiply(density, checked_word(phase.angular_frequency), work);
@@ -2152,7 +2199,7 @@ struct NonpenetrationBuilder {
         const auto exactly_equal = [](const p::Interval& x, const p::Interval& y) {
             return p::compare(x.lower, y.upper) == 0 && p::compare(x.upper, y.lower) == 0;
         };
-        if (!exactly_equal(import(phase.convection_velocity[1], work), {}))
+        if (!exactly_equal(harmonic_velocity_component(phase, 1, work), {}))
             reject(Code::InvalidInput);
         const auto reflected = [&](Vector x) {
             x[1] = p::negate(x[1], work);
@@ -2262,11 +2309,12 @@ struct NonpenetrationBuilder {
             request.contour_workers == 0 || request.contour_workers > max_contour_workers ||
             request.solver_limits.maximum_update_rank < 0 || input.wake.empty())
             reject(Code::InvalidInput);
-        validate_circulation(request, order, work);
+        const bool condensed = !phase.reflection_pairs.empty();
+        validate_circulation_input(request, order, condensed ? std::nullopt : std::optional{order},
+                                   work);
         const auto drive_count = drives.size();
         const auto batch = !sources.empty();
-        if (batch &&
-            (sources.size() != order || !phase.reflection_pairs.empty() || loads == nullptr))
+        if (batch && (sources.size() != order || condensed || loads == nullptr))
             reject(Code::InvalidInput);
         if (std::cmp_greater(drive_count, request.solver_limits.maximum_rhs_columns))
             reject(Code::ResourceExceeded);
@@ -2274,7 +2322,8 @@ struct NonpenetrationBuilder {
         for (const auto drive : drives)
             if (drive.size() != order)
                 reject(Code::InvalidInput);
-        if (std::cmp_greater(input.wake.size(), request.solver_limits.maximum_update_rank))
+        if (!condensed &&
+            std::cmp_greater(input.wake.size(), request.solver_limits.maximum_update_rank))
             reject(Code::ResourceExceeded);
         const auto assembly = assemble(input, limits, memory, work, true);
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
@@ -2287,13 +2336,15 @@ struct NonpenetrationBuilder {
                 reject(Code::StaleGeneration);
         }
         std::optional<ReflectionLayout> reflection;
-        if (!phase.reflection_pairs.empty()) {
+        if (condensed) {
             if (drive_count != 1)
                 reject(Code::InvalidInput);
             reflection.emplace(qualify_reflection(input, phase, drives.front(), request, limits,
                                                   bound, geometry, memory, work));
         }
         const auto solve_order = reflection ? reflection->rows.size() : order;
+        if (reflection && std::cmp_greater(solve_order, request.solver_limits.maximum_order))
+            reject(Code::ResourceExceeded);
         const auto representative = [&](std::size_t i) {
             return reflection ? reflection->rows.values()[i].first : i;
         };
@@ -2326,6 +2377,8 @@ struct NonpenetrationBuilder {
                 if (source == representative(reduced))
                     ++solve_rank;
             }
+            if (std::cmp_greater(solve_rank, request.solver_limits.maximum_update_rank))
+                reject(Code::ResourceExceeded);
         }
         const auto n = static_cast<core::Index>(solve_order);
         const auto k = static_cast<core::Index>(solve_rank);

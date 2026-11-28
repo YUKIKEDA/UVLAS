@@ -15,13 +15,12 @@ struct CaseWingNormalProjection {
     std::uint64_t used_steps{};
 };
 
-/// Qualify one retained collocation frame against both child facets.
-[[nodiscard]] core::Result<CaseWingNormalProjection>
-project_case_wing_normal(const aero::detail::OwnedGeometry&,
-                         std::span<const aero::detail::FacetId, 2>,
-                         const ExplicitCollocationTangents&, core::Precision,
-                         const std::array<CaseFlowComponentBudget, 3>&, CaseFlowProjectionLimits,
-                         std::stop_token) noexcept;
+/// Enclose the oriented Case chart normal and qualify it against both retained child facets.
+[[nodiscard]] core::Result<CaseWingNormalProjection> project_case_wing_normal(
+    const aero::detail::OwnedGeometry&, std::span<const aero::detail::FacetId, 2>,
+    const std::array<io::SiEnclosure, 3>& chord, const std::array<io::SiEnclosure, 3>& span,
+    bool reversed, core::Precision, const std::array<CaseFlowComponentBudget, 3>&,
+    CaseFlowProjectionLimits, std::stop_token) noexcept;
 
 /// Retained current coordinates of an oriented facet. The tangents are the
 /// exact differences 1-0 and 2-0, evaluated without intermediate projection.
@@ -129,8 +128,31 @@ struct DiscreteNonpenetrationLimits {
 /// and is validated against the retained geometry and forcing at y=0.
 using HarmonicReflectionPair = std::array<aero::detail::PhysicalFaceId, 2>;
 
+class CaseWingGeometry;
+struct CaseWingHarmonicPreparation;
+
+/// Bind the Case-owned endpoint and a caller-budgeted projection of its exact velocity.
+class CaseHarmonicWake {
+public:
+    [[nodiscard]] const CaseWingGeometry& geometry() const noexcept {
+        return geometry_.get();
+    }
+    [[nodiscard]] const std::array<io::SiEnclosure, 3>& velocity() const& noexcept {
+        return velocity_;
+    }
+    [[nodiscard]] const std::array<io::SiEnclosure, 3>& velocity() const&& = delete;
+
+private:
+    friend struct CaseWingHarmonicPreparation;
+    CaseHarmonicWake(const CaseWingGeometry& geometry, std::array<io::SiEnclosure, 3> velocity)
+        : geometry_(geometry), velocity_(std::move(velocity)) {}
+
+    std::reference_wrapper<const CaseWingGeometry> geometry_;
+    std::array<io::SiEnclosure, 3> velocity_;
+};
+
 struct StraightWakeHarmonicInput {
-    NonpenetrationVector convection_velocity;
+    std::variant<NonpenetrationVector, CaseHarmonicWake> convection_velocity;
     std::span<const double> age_panel_starts_seconds;
     double angular_frequency;
     std::uint64_t maximum_samples;
