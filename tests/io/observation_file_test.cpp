@@ -216,7 +216,7 @@ TEST_CASE("Observation graph publishes only after both sources succeed",
     constexpr RootInventoryLimits inventory{
         {{1U << 20, 1U << 20, 128, 1U << 20}, 8, 128}, 2, 2U << 20, 2U << 20, 256, 2U << 20, 8};
     constexpr DependencyWalkLimits walk{2, 2, 1, 10'000, 128};
-    ObservationLeafResults observations;
+    ObservationLeafResults published_references;
     RootSnapshotDiagnostic acquisition;
     LeafReferenceDiagnostic diagnostic;
     const auto resolve = [&](const std::stop_token& stop = {}) {
@@ -227,8 +227,10 @@ TEST_CASE("Observation graph publishes only after both sources succeed",
             {{},
              {},
              {},
-             ObservationLeafContext{
-                 {1U << 20, 1U << 20}, {json_limits, exact_limits, 10'000'000}, 2, &observations}},
+             ObservationLeafContext{{1U << 20, 1U << 20},
+                                    {json_limits, exact_limits, 10'000'000},
+                                    2,
+                                    &published_references}},
             plan, stop, &acquisition, &diagnostic);
     };
 
@@ -237,13 +239,13 @@ TEST_CASE("Observation graph publishes only after both sources succeed",
     REQUIRE_FALSE(rejected);
     REQUIRE(acquisition.location);
     CHECK(acquisition.location->source == SourceId{11});
-    CHECK(observations.populated == 0);
-    CHECK(observations.files.size() == 0);
+    CHECK(published_references.populated == 0);
+    CHECK(published_references.files.size() == 0);
 
     files::write_file(tree.root / names[1], payload[1]);
     REQUIRE(resolve());
-    REQUIRE(observations.populated == 2);
-    const auto* const published = observations.files.values().data();
+    REQUIRE(published_references.populated == 2);
+    const auto* const published = published_references.files.values().data();
     REQUIRE(published[0]);
     REQUIRE(published[1]);
     CHECK(published[0]->source.source == SourceId{10});
@@ -251,21 +253,21 @@ TEST_CASE("Observation graph publishes only after both sources succeed",
 
     files::write_file(tree.root / names[1], payload[1] + " ");
     REQUIRE_FALSE(resolve());
-    CHECK(observations.populated == 2);
-    CHECK(observations.files.values().data() == published);
+    CHECK(published_references.populated == 2);
+    CHECK(published_references.files.values().data() == published);
 
     std::stop_source stopped;
     stopped.request_stop();
     const auto cancelled = resolve(stopped.get_token());
     REQUIRE_FALSE(cancelled);
     CHECK(cancelled.error().code == core::FailureCode::Cancelled);
-    CHECK(observations.populated == 2);
-    CHECK(observations.files.values().data() == published);
+    CHECK(published_references.populated == 2);
+    CHECK(published_references.files.values().data() == published);
 
     files::write_file(tree.root / names[1], payload[1]);
     REQUIRE(resolve());
-    REQUIRE(observations.populated == 2);
-    CHECK(observations.files.values()[0]->source.source == SourceId{10});
-    CHECK(observations.files.values()[1]->source.source == SourceId{11});
+    REQUIRE(published_references.populated == 2);
+    CHECK(published_references.files.values()[0]->source.source == SourceId{10});
+    CHECK(published_references.files.values()[1]->source.source == SourceId{11});
 }
 #endif
