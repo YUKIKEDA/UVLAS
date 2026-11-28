@@ -692,12 +692,14 @@ void compare_load(const ComplexVector& actual, const ComplexVector& expected) {
     CHECK(std::sqrt(difference / scale) < 1e-9L);
 }
 
-Json harmonic_reference(const char* name) {
+enum class HarmonicCore { Baseline, Small };
+
+Json harmonic_reference(const char* name, HarmonicCore core = HarmonicCore::Baseline) {
     std::ifstream input{name, std::ios::binary};
     REQUIRE(input);
     const auto result = Json::parse(input);
     REQUIRE(result.at("schema") == "uvlas.vmulti-harmonic-positive-core-companion/1");
-    REQUIRE(result.at("core_radius_m") == 1e-5);
+    REQUIRE(result.at("core_radius_m") == (core == HarmonicCore::Small ? 1e-7 : 1e-5));
     REQUIRE(result.at("wake_length_m") == 128.);
     return result;
 }
@@ -887,7 +889,7 @@ void verify_rotated_shared_edge(const c::CaseWingGeometry& prepared,
 }
 
 void run_harmonic(const Json& reference, std::array<int, 3> selected, bool controls,
-                  bool rotated_shared = false) {
+                  bool rotated_shared = false, HarmonicCore core = HarmonicCore::Baseline) {
     CAPTURE(selected);
     const auto found = std::ranges::find_if(
         reference.at("records"), [&](const auto& record) { return record.at("case") == selected; });
@@ -896,6 +898,13 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
     const auto [dihedral, chord, span] = selected;
     const auto m = static_cast<std::size_t>(chord), n = static_cast<std::size_t>(span);
     auto source_bytes = frozen(dihedral, chord, span);
+    if (core == HarmonicCore::Small) {
+        constexpr std::string_view baseline = R"("core_radius":0.00001)";
+        const auto at = source_bytes.find(baseline);
+        REQUIRE(at != std::string::npos);
+        REQUIRE(source_bytes.find(baseline, at + baseline.size()) == std::string::npos);
+        source_bytes.replace(at, baseline.size(), R"("core_radius":1e-7)");
+    }
     if (rotated_shared) {
         auto tilted = tokens::parse(source_bytes);
         for (std::size_t i = 0; i < 2; ++i) {
@@ -1139,4 +1148,22 @@ UVLAS_VMULTI_TEST(5, 2, 8)
 UVLAS_VMULTI_TEST(5, 4, 16)
 UVLAS_VMULTI_TEST(5, 8, 32)
 #undef UVLAS_VMULTI_TEST
+#endif
+
+#ifdef UVLAS_VMULTI_SMALL_CORE_FIXTURES
+#define UVLAS_VMULTI_SMALL_CORE_TEST(D, M, N)                                                      \
+    TEST_CASE("Typed V-MULTI small core d" #D "/m" #M "/n" #N,                                     \
+              "[.vmulti-small-core][d" #D "-m" #M "-n" #N "][V-MULTI][verification]") {            \
+        const auto path = std::filesystem::path{UVLAS_VMULTI_SMALL_CORE_FIXTURES} /                \
+                          "d" #D "-m" #M "-n" #N "-reference.json";                                \
+        run_harmonic(harmonic_reference(path.string().c_str(), HarmonicCore::Small), {D, M, N},    \
+                     false, false, HarmonicCore::Small);                                           \
+    }
+UVLAS_VMULTI_SMALL_CORE_TEST(0, 2, 8)
+UVLAS_VMULTI_SMALL_CORE_TEST(0, 4, 16)
+UVLAS_VMULTI_SMALL_CORE_TEST(0, 8, 32)
+UVLAS_VMULTI_SMALL_CORE_TEST(5, 2, 8)
+UVLAS_VMULTI_SMALL_CORE_TEST(5, 4, 16)
+UVLAS_VMULTI_SMALL_CORE_TEST(5, 8, 32)
+#undef UVLAS_VMULTI_SMALL_CORE_TEST
 #endif

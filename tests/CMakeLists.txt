@@ -1349,3 +1349,46 @@ if(UVLAS_VMULTI_FORMAL_FIXTURE)
             TIMEOUT 14400 RUN_SERIAL TRUE)
     endforeach()
 endif()
+
+set(UVLAS_VMULTI_SMALL_CORE_FIXTURES "" CACHE PATH "Independent V-MULTI fixtures at a positive 1e-7 m core")
+if(UVLAS_VMULTI_SMALL_CORE_FIXTURES)
+    get_filename_component(vmulti_core_dir "${UVLAS_VMULTI_SMALL_CORE_FIXTURES}"
+        ABSOLUTE BASE_DIR "${PROJECT_SOURCE_DIR}")
+    target_compile_definitions(uvlas_test_coupling_case_wing_geometry PRIVATE
+        UVLAS_VMULTI_SMALL_CORE_FIXTURES="${vmulti_core_dir}")
+
+    function(uvlas_add_vmulti_small_core_test condition frozen_sha reference_sha)
+        set(frozen "${PROJECT_SOURCE_DIR}/tests/aero/fixtures/wing-edge-pairing-v1/${condition}.json")
+        set(reference "${vmulti_core_dir}/${condition}-reference.json")
+        file(SHA256 "${frozen}" actual_frozen_sha)
+        file(SHA256 "${reference}" actual_reference_sha)
+        if(NOT actual_frozen_sha STREQUAL frozen_sha OR NOT actual_reference_sha STREQUAL reference_sha)
+            message(FATAL_ERROR "V-MULTI small-core Case or reference digest differs for ${condition}")
+        endif()
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${frozen}" "${reference}")
+        set(name coupling.vmulti_small_core.${condition})
+        add_test(NAME "${name}" COMMAND uvlas_test_coupling_case_wing_geometry
+            "[${condition}][.vmulti-small-core]")
+        set_tests_properties("${name}" PROPERTIES LABELS "V-MULTI;verification"
+            TIMEOUT 14400 RUN_SERIAL TRUE)
+    endfunction()
+
+    uvlas_add_vmulti_small_core_test(d0-m2-n8
+        3c1b172e594b47f781bdff7cb74b55270e3311bc76c35e8241f6f555e1c669ec
+        f8ec7567b41a718383b12d8f3109af4ae1a0b2c14a506fa7ffc03ef362bc6d73)
+    uvlas_add_vmulti_small_core_test(d0-m4-n16
+        b7dabb8177107ee975d1c5cb5a1f1e9fabb02dbc7b0f2f7d9d8a8a34466df81d
+        dee885c6c1ecda5eb7d6c011be7b0c1b8e2a2bb92a9cdfaaec300a701e80bdf4)
+    uvlas_add_vmulti_small_core_test(d0-m8-n32
+        f6e9000507c674ea88c3106cb80d3833b96816c0e63d6ccf01aaeee6f4456af5
+        4c0da70712f42230357c5805f2bc441f878835ab311db08612e52d361436b19b)
+    uvlas_add_vmulti_small_core_test(d5-m2-n8
+        a96dddf14e8e3bc54beffe9f05b26df570e773682837b3d4c9990b17186e3819
+        529872a78e8f529659a580f2023f8f0cc507bcc29fc87a060d533087a57135ac)
+    uvlas_add_vmulti_small_core_test(d5-m4-n16
+        ca69ce26c62e848dfb0d80e5c23cc4d7cbda2a5b8e834adcafc2455ef1a9d96e
+        cd637ce1b2c9b04c4fcd13ab0d8b8cd46a6a309a31c76618173e2aa37d53967c)
+    uvlas_add_vmulti_small_core_test(d5-m8-n32
+        4cc3106d19eead36d6ac8080741f0223549aa91162595ea3f6c3c19fabaae926
+        517ec8b908a49a4d0f57f7206ef4a443bb3fb4fc77913e80bdcaac2962c8acbb)
+endif()

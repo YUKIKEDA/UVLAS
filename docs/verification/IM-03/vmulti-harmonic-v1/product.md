@@ -57,3 +57,23 @@ ctest --preset linux-release --output-on-failure -V \
 ```
 
 対象は有限直線後流の幾何、元係数、循環と元荷重の照合。理想核に対する物理誤差の配分と自由後流の判定は、親パッケージ IM03-0 の受入で扱う。
+
+## コア半径を縮めた対照
+
+既存の六条件で、Case のコア半径だけを $10^{-7}$ m に変えた。上反角5°・M8/N32 では $10^{-6}$ m も調べた。幾何、後流長、年齢区間、四つの駆動と観測の尺度は同じである。試行に用いる有限核の参照は、それぞれ同じ半径の独立 Gauss48 から得た。
+
+GCC 14.2 Release で、$10^{-7}$ m の元係数行の相対差は最大 $1.950\times10^{-13}$、全元行の相対 $L_2$ 残差は最大 $5.602\times10^{-13}$ だった。理想核を同じ離散幾何で評価したときの最大係数行差は $1.592\times10^{-10}$。上反角5°・M8/N32 の $10^{-6}$ m では、同じ有限核の元係数行差が $1.948\times10^{-13}$、元残差が $5.611\times10^{-13}$、理想核との最大係数行差が $1.592\times10^{-8}$ だった。理想核との差はこの幾何と後流長での比較値であり、実務用の半径や独立理想参照に対する誤差配分は IM03-0 の受入で決める。
+
+六条件の対照は製品の版 `c7e4959f37ebf50d64033498a7becd95cb46aeb6` で実行した。そこで記録した結果 JSON の SHA-256 は `0034a4145ef7066d74f88fbab7b84b9b65e3b71465e24a396205dc4dce2fe840` と `3616b7c3aac056b31e8258f3c718c339be60d086e9ad3554e4786ccd79ed3a16`。以下の CTest は $10^{-7}$ m の六条件を登録する。元の Case と同じ有限核の参照ファイルを条件ごとの SHA-256 で照合してから、試験内で Case のコア半径の入力トークンだけを置き換える。元係数、循環、全元行残差と翼別の力・モーメントには既存の比較幅を使う。
+
+先の手順で生成した `all-six.json` から、[小コアの参照生成器](small_core_reference.py) で六つの参照を作る。保存された $10^{-5}$ m 参照の幾何、年齢区間と四右辺を引き継ぎ、$10^{-7}$ m での同じ離散系の係数と荷重を独立に計算する。
+
+上反角0°・M2/N8 では別ディレクトリで生成した参照が保存済みのバイト列と一致した。新しい CTest 入口で同じ条件を実行し、35,197 検査が通過した。四駆動の全元行残差、循環、翼別荷重と最大係数行差は保存済みの値と一致した。参照ファイルに空白1バイトを追加すると構成が失敗した。
+
+```bash
+OPENBLAS_NUM_THREADS=1 python3 -B docs/verification/IM-03/vmulti-harmonic-v1/small_core_reference.py \
+  --companion out/vmulti-harmonic/all-six.json --output-dir out/vmulti-small-core
+cmake --preset linux-release -DUVLAS_VMULTI_SMALL_CORE_FIXTURES=out/vmulti-small-core
+cmake --build --preset linux-release --target uvlas_test_coupling_case_wing_geometry
+ctest --preset linux-release --output-on-failure -j1 -R '^coupling[.]vmulti_small_core[.]'
+```
