@@ -320,14 +320,15 @@ void match_circulation_geometry(const DiscreteCirculationRequest& request,
         reject(core::FailureCode::StaleGeneration);
 }
 
-void validate_circulation(const DiscreteCirculationRequest& request, std::size_t order,
-                          p::Work& work, bool transposed = false) {
+void validate_circulation_input(const DiscreteCirculationRequest& request, std::size_t order,
+                                std::optional<std::size_t> solve_order, p::Work& work,
+                                bool transposed = false) {
     if (request.scales.context.cache.representation != core::Precision::Binary64)
         reject(core::FailureCode::PrecisionUnsupported);
     if (request.solver_limits.maximum_order < 0 || request.solver_limits.maximum_rhs_columns < 0)
         reject(core::FailureCode::InvalidInput);
-    if (std::cmp_greater(order, request.solver_limits.maximum_order) ||
-        request.solver_limits.maximum_rhs_columns < 1)
+    if (request.solver_limits.maximum_rhs_columns < 1 ||
+        (solve_order && std::cmp_greater(*solve_order, request.solver_limits.maximum_order)))
         reject(core::FailureCode::ResourceExceeded);
     if (request.scales.unknown.size() != order || request.scales.residual.size() != order ||
         request.scales.unknown_units.size() != order ||
@@ -358,6 +359,11 @@ void validate_circulation(const DiscreteCirculationRequest& request, std::size_t
             scales.unknown_units[i] != unknown_units || scales.residual_units[i] != residual_units)
             reject(core::FailureCode::InvalidInput);
     }
+}
+
+void validate_circulation(const DiscreteCirculationRequest& request, std::size_t order,
+                          p::Work& work, bool transposed = false) {
+    validate_circulation_input(request, order, order, work, transposed);
 }
 
 template <class Scalar>
@@ -2302,11 +2308,12 @@ struct NonpenetrationBuilder {
             request.contour_workers == 0 || request.contour_workers > max_contour_workers ||
             request.solver_limits.maximum_update_rank < 0 || input.wake.empty())
             reject(Code::InvalidInput);
-        validate_circulation(request, order, work);
+        const bool condensed = !phase.reflection_pairs.empty();
+        validate_circulation_input(request, order, condensed ? std::nullopt : std::optional{order},
+                                   work);
         const auto drive_count = drives.size();
         const auto batch = !sources.empty();
-        if (batch &&
-            (sources.size() != order || !phase.reflection_pairs.empty() || loads == nullptr))
+        if (batch && (sources.size() != order || condensed || loads == nullptr))
             reject(Code::InvalidInput);
         if (std::cmp_greater(drive_count, request.solver_limits.maximum_rhs_columns))
             reject(Code::ResourceExceeded);
@@ -2314,7 +2321,8 @@ struct NonpenetrationBuilder {
         for (const auto drive : drives)
             if (drive.size() != order)
                 reject(Code::InvalidInput);
-        if (std::cmp_greater(input.wake.size(), request.solver_limits.maximum_update_rank))
+        if (!condensed &&
+            std::cmp_greater(input.wake.size(), request.solver_limits.maximum_update_rank))
             reject(Code::ResourceExceeded);
         const auto assembly = assemble(input, limits, memory, work, true);
         const auto bound = std::span<const PanelRow>{assembly.bound.values()};
@@ -2327,13 +2335,15 @@ struct NonpenetrationBuilder {
                 reject(Code::StaleGeneration);
         }
         std::optional<ReflectionLayout> reflection;
-        if (!phase.reflection_pairs.empty()) {
+        if (condensed) {
             if (drive_count != 1)
                 reject(Code::InvalidInput);
             reflection.emplace(qualify_reflection(input, phase, drives.front(), request, limits,
                                                   bound, geometry, memory, work));
         }
         const auto solve_order = reflection ? reflection->rows.size() : order;
+        if (reflection && std::cmp_greater(solve_order, request.solver_limits.maximum_order))
+            reject(Code::ResourceExceeded);
         const auto representative = [&](std::size_t i) {
             return reflection ? reflection->rows.values()[i].first : i;
         };
@@ -2366,6 +2376,8 @@ struct NonpenetrationBuilder {
                 if (source == representative(reduced))
                     ++solve_rank;
             }
+            if (std::cmp_greater(solve_rank, request.solver_limits.maximum_update_rank))
+                reject(Code::ResourceExceeded);
         }
         const auto n = static_cast<core::Index>(solve_order);
         const auto k = static_cast<core::Index>(solve_rank);

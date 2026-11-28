@@ -220,6 +220,18 @@ XYZ tangent(const CaseReferenceSurfaceSample& graph, const Point& chart, Math& m
     return result;
 }
 
+void reverse_tangent(NonpenetrationVector& tangent) {
+    for (auto& component : tangent) {
+        if (auto* single = std::get_if<a::SingleWord>(&component)) {
+            single->value = -single->value;
+        } else {
+            auto& pair = std::get<a::DoubleWord>(component);
+            pair.high = -pair.high;
+            pair.low = -pair.low;
+        }
+    }
+}
+
 s::GeometrySurfaceGraph find_graph(const s::Model& model, std::uint64_t id, Math& m) {
     for (std::size_t i = 0; i < model.geometry.size(); ++i) {
         m.visit(1);
