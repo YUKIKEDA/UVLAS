@@ -91,15 +91,18 @@ struct Arithmetic {
 
     core::Result<CaseComponentPgChart> chart(const io::SiCase& input, bool different_rule = false) {
         const auto sixth = own(Q{1, 6}), third = own(Q{1, 3});
+        // Keep reflection symmetry so the radial triangle rule retains its first moment.
+        const auto first_weight = own(different_rule ? Q{1, 8} : Q{1, 6});
+        const auto second_weight = own(different_rule ? Q{5, 24} : Q{1, 6});
         std::array<pg::ExactRational, 6> positions;
-        const std::array<pg::PgLineQuadratureNode, 6> plane{{{positions[0], sixth},
-                                                             {positions[1], sixth},
+        const std::array<pg::PgLineQuadratureNode, 6> plane{{{positions[0], first_weight},
+                                                             {positions[1], second_weight},
                                                              {positions[2], sixth},
                                                              {positions[3], sixth},
-                                                             {positions[4], sixth},
-                                                             {positions[5], sixth}}};
+                                                             {positions[4], second_weight},
+                                                             {positions[5], first_weight}}};
         for (std::size_t i = 0; i < positions.size(); ++i)
-            positions[i] = own(different_rule ? Q{2 * i + 1, 13} : Q{2 * i + 1, 12});
+            positions[i] = own(Q{2 * i + 1, 12});
         const auto quarter = own(Q{1, 4}), half = own(Q{1, 2}), upper = own(Q{3, 4});
         const std::array depth{pg::PgLineQuadratureNode{quarter, third},
                                pg::PgLineQuadratureNode{half, third},
@@ -367,7 +370,7 @@ void check_action(const CasePgLateralTractionForce& force, const pg::PgPreparedP
 }
 
 TEST_CASE("Case edge tractions integrate the original PG columns over all side layers",
-          "[FD-05][BC-01][LOAD-01][V-LOAD][integration][verification][negative]") {
+          "[FD-05][BC-01][LOAD-01][V-LOAD][integration][verification]") {
     Arithmetic a;
     const auto input = rectangle();
     const auto si = a.si(input);
@@ -402,6 +405,26 @@ TEST_CASE("Case edge tractions integrate the original PG columns over all side l
     CHECK(force->shell == numerics::PatchId{1});
     CHECK_FALSE(diagnostic.load);
     check_action(*force, bound.patch(), a);
+}
+
+TEST_CASE("Case edge traction rejects invalid rules and foreign owners",
+          "[FD-05][V-LOAD][integration][verification][negative]") {
+    Arithmetic a;
+    const auto input = rectangle();
+    const auto si = a.si(input);
+    const auto owner = fixture::take(a.chart(si));
+    const auto bound = fixture::take(owner.point_patch(0));
+    const auto zero = a.own(0), half = a.own(Q{1, 2}), one = a.own(1);
+    const auto sixth = a.own(Q{1, 6}), third = a.own(Q{1, 3}), width = a.own(tolerance);
+    const std::array nodes{pg::PgLineQuadratureNode{third, one}};
+    const CasePgLateralTractionRule rule{nodes, nodes};
+    const CasePgLateralTractionLimits limits{a.limits, 2, 6, 2, 2, 12};
+    const CasePgLateralTractionAccuracy accuracy{160, width};
+    CasePgLateralTractionDiagnostic diagnostic;
+    auto prepared = fixture::take(
+        CasePgLateralTraction::prepare(si, bound, rule, limits, a.memory, &diagnostic));
+    REQUIRE(prepared.points().size() == 12);
+    CHECK(exact(prepared.points().front().face_along) == Q{2, 3});
 
     const auto exhausted = [&](const CasePgLateralTractionLimits& capped) {
         const auto failed = CasePgLateralTraction::prepare(si, bound, rule, capped, a.memory);
@@ -437,36 +460,43 @@ TEST_CASE("Case edge tractions integrate the original PG columns over all side l
     core::ResourcePlan tiny{0};
     check_failure(CasePgLateralTraction::prepare(si, bound, rule, limits, tiny),
                   Code::ResourceExceeded);
-    check_failure(prepared->evaluate(bound, 0, accuracy, limits, tiny), Code::ResourceExceeded);
+    check_failure(prepared.evaluate(bound, 0, accuracy, limits, tiny), Code::ResourceExceeded);
     const auto stopped = partition_test::requested_stop_token();
     auto cancelled = limits;
     cancelled.reference.cancellation = stopped;
     check_failure(CasePgLateralTraction::prepare(si, bound, rule, cancelled, a.memory),
                   Code::Cancelled);
-    check_failure(prepared->evaluate(bound, 0, accuracy, cancelled, a.memory), Code::Cancelled);
-    check_failure(prepared->evaluate(bound, std::numeric_limits<double>::infinity(), accuracy,
-                                     limits, a.memory),
+    check_failure(prepared.evaluate(bound, 0, accuracy, cancelled, a.memory), Code::Cancelled);
+    check_failure(prepared.evaluate(bound, std::numeric_limits<double>::infinity(), accuracy,
+                                    limits, a.memory),
                   Code::Nonfinite);
-    check_failure(prepared->evaluate(bound, std::numeric_limits<double>::quiet_NaN(), accuracy,
-                                     limits, a.memory),
+    check_failure(prepared.evaluate(bound, std::numeric_limits<double>::quiet_NaN(), accuracy,
+                                    limits, a.memory),
                   Code::Nonfinite);
-    check_failure(prepared->evaluate(bound, 0, {32768, width}, limits, a.memory),
+    check_failure(prepared.evaluate(bound, 0, {32768, width}, limits, a.memory),
                   Code::PrecisionUnsupported);
 
+    auto malformed_rule_limits = limits;
+    malformed_rule_limits.maximum_rule_nodes = 3;
     for (const std::array invalid :
          {std::array{pg::PgLineQuadratureNode{half, one}, pg::PgLineQuadratureNode{zero, one}},
           std::array{pg::PgLineQuadratureNode{half, half}, pg::PgLineQuadratureNode{half, half}},
           std::array{pg::PgLineQuadratureNode{zero, zero}, pg::PgLineQuadratureNode{one, one}},
           std::array{pg::PgLineQuadratureNode{zero, half}, pg::PgLineQuadratureNode{one, sixth}}})
-        check_failure(CasePgLateralTraction::prepare(si, bound, {invalid, depth}, limits, a.memory),
+        check_failure(CasePgLateralTraction::prepare(si, bound, {invalid, nodes},
+                                                     malformed_rule_limits, a.memory),
                       Code::InvalidInput);
-    check_failure(CasePgLateralTraction::prepare(si, bound, {{}, depth}, limits, a.memory),
+    check_failure(CasePgLateralTraction::prepare(si, bound, {{}, nodes}, limits, a.memory),
                   Code::InvalidInput);
 
-    const auto changed_basis = fixture::take(a.chart(si, true));
-    const auto changed_bound = fixture::take(changed_basis.point_patch(0));
+    const auto changed_basis = a.chart(si, true);
+    INFO("changed basis status " << (changed_basis
+                                         ? 0
+                                         : static_cast<unsigned>(changed_basis.error().code)));
+    REQUIRE(changed_basis);
+    const auto changed_bound = fixture::take(changed_basis->point_patch(0));
     CHECK(changed_bound.patch().translation().size() == bound.patch().translation().size());
-    check_failure(prepared->evaluate(changed_bound, 0, accuracy, limits, a.memory),
+    check_failure(prepared.evaluate(changed_bound, 0, accuracy, limits, a.memory),
                   Code::StaleGeneration);
 
     auto foreign_input = input;
@@ -479,9 +509,10 @@ TEST_CASE("Case edge tractions integrate the original PG columns over all side l
     const auto foreign_si = a.si(foreign_input);
     check_failure(CasePgLateralTraction::prepare(foreign_si, bound, rule, limits, a.memory),
                   Code::StaleGeneration);
-    const auto foreign_owner = fixture::take(a.chart(foreign_si));
-    const auto foreign_bound = fixture::take(foreign_owner.point_patch(0));
-    check_failure(prepared->evaluate(foreign_bound, 0, accuracy, limits, a.memory),
+    const auto foreign_owner = a.chart(foreign_si);
+    REQUIRE(foreign_owner);
+    const auto foreign_bound = fixture::take(foreign_owner->point_patch(0));
+    check_failure(prepared.evaluate(foreign_bound, 0, accuracy, limits, a.memory),
                   Code::StaleGeneration);
     check_failure(CasePgLateralTraction::prepare(foreign_si, foreign_bound, rule, limits, a.memory,
                                                  &diagnostic),
@@ -507,27 +538,21 @@ TEST_CASE("Case edge tractions integrate the original PG columns over all side l
         check_failure(a.chart(a.si(bad_case)), Code::GeometryInvalid);
     }
 
-    const auto third = a.own(Q{1, 3});
-    const std::array asymmetric{pg::PgLineQuadratureNode{third, one}};
-    const auto narrow = fixture::take(
-        CasePgLateralTraction::prepare(si, bound, {asymmetric, asymmetric}, limits, a.memory));
-    REQUIRE(narrow.points().size() == 12);
-    CHECK(exact(narrow.points().front().face_along) == Q{2, 3});
-    check_failure(narrow.evaluate(bound, 0, {0, zero}, limits, a.memory),
+    check_failure(prepared.evaluate(bound, 0, {0, zero}, limits, a.memory),
                   Code::PrecisionUnresolved);
     capped = limits;
-    capped.reference.maximum_partition_visits = force->newtons.size();
-    check_failure(narrow.evaluate(bound, 0, accuracy, capped, a.memory, &diagnostic),
+    capped.reference.maximum_partition_visits = bound.patch().translation().size();
+    check_failure(prepared.evaluate(bound, 0, accuracy, capped, a.memory, &diagnostic),
                   Code::ResourceExceeded);
     CHECK(diagnostic.load == 31);
     CHECK(diagnostic.layer == core::LayerId{11});
-    REQUIRE(narrow.evaluate(bound, -0.75, accuracy, limits, a.memory));
+    REQUIRE(prepared.evaluate(bound, -0.75, accuracy, limits, a.memory));
 
     // The original accepted preparation remains readable after each rejected attempt.
-    CHECK(prepared->points().size() == 792);
-    const auto saved = std::move(*prepared);
-    check_failure(prepared->evaluate(bound, 0, accuracy, limits, a.memory), Code::StaleGeneration);
-    CHECK(saved.points().size() == 792);
+    CHECK(prepared.points().size() == 12);
+    const auto saved = std::move(prepared);
+    check_failure(prepared.evaluate(bound, 0, accuracy, limits, a.memory), Code::StaleGeneration);
+    CHECK(saved.points().size() == 12);
 }
 
 TEST_CASE("Case edge tractions enclose a curved reference finite rule with an irrational area",

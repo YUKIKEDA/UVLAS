@@ -93,7 +93,7 @@
 | FD-02 | [case-schema-fields.md:18](../specs/foundation/case-schema-fields.md) | 6 | 6 | 0 |
 | FD-03 | [case-schema-fields.md:46](../specs/foundation/case-schema-fields.md) | 14 | 23 | 0 |
 | FD-04 | [case-schema-fields.md:63](../specs/foundation/case-schema-fields.md) | 0 | 1 | 1 |
-| FD-05 | [case-schema-fields.md:83](../specs/foundation/case-schema-fields.md) | 5 | 5 | 1 |
+| FD-05 | [case-schema-fields.md:83](../specs/foundation/case-schema-fields.md) | 6 | 5 | 1 |
 | FD-06 | [case-schema-fields.md:108](../specs/foundation/case-schema-fields.md) | 16 | 7 | 1 |
 | FD-07 | [case-schema-fields.md:134](../specs/foundation/case-schema-fields.md) | 4 | 5 | 0 |
 | FD-08 | [case-schema-fields.md:159](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
@@ -209,7 +209,7 @@
 | V-BEAM | [practical-acceptance-plan.md:32](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-J1 | [practical-acceptance-plan.md:38](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-JOINT | [practical-acceptance-plan.md:33](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
-| V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 2 | 0 | 0 |
+| V-LOAD | [practical-acceptance-plan.md:34](../requirements/practical-acceptance-plan.md) | 3 | 0 | 0 |
 | V-MAT | [practical-acceptance-plan.md:31](../requirements/practical-acceptance-plan.md) | 20 | 0 | 0 |
 | V-MULTI | [practical-acceptance-plan.md:37](../requirements/practical-acceptance-plan.md) | 4 | 4 | 0 |
 | V-PG | [practical-acceptance-plan.md:30](../requirements/practical-acceptance-plan.md) | 17 | 12 | 0 |
