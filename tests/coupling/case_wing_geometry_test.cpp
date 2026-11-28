@@ -4,6 +4,7 @@
 #include "io/case_schema_test_adapter.hpp"
 
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <algorithm>
@@ -933,6 +934,62 @@ Json harmonic_reference(const char* name, HarmonicCore core = HarmonicCore::Base
     return result;
 }
 
+Json ideal_harmonic_loads(std::array<int, 3> selected, const Json& finite) {
+    std::ifstream input{UVLAS_VMULTI_IDEAL_OBSERVATIONS, std::ios::binary};
+    REQUIRE(input);
+    const auto reference = Json::parse(input);
+    REQUIRE(reference.at("schema") == "uvlas.vmulti-harmonic-ideal-observations/1");
+    for (const auto* key : {"wake_length_m", "omega_rad_s", "velocity_m_s", "density_kg_m3",
+                            "moment_origin_m", "motions"})
+        REQUIRE(reference.at(key) == finite.at(key));
+    REQUIRE(reference.at("quantities") == Json::array({"Fz", "My"}));
+    const auto& cases = reference.at("records");
+    const auto record = std::ranges::find_if(
+        cases, [&](const auto& entry) { return entry.at("case") == selected; });
+    REQUIRE(record != cases.end());
+    return record->at("loads");
+}
+
+long double compare_ideal_harmonic_load(const a::ScaledEnclosure& real,
+                                        const a::ScaledEnclosure& imaginary, const Json& frozen) {
+    using boost::multiprecision::cpp_int;
+    using boost::multiprecision::cpp_rational;
+    const auto exact_error = [](const a::ScaledEnclosure& enclosure, const cpp_rational& target) {
+        const auto words = enclosure.center();
+        const cpp_rational retained = std::visit(
+            [](const auto& word) -> cpp_rational {
+                if constexpr (std::is_same_v<std::decay_t<decltype(word)>, a::SingleWord>)
+                    return cpp_rational{word.value};
+                else
+                    return cpp_rational{word.high} + cpp_rational{word.low};
+            },
+            words);
+        const auto exponent = enclosure.exponent();
+        REQUIRE(exponent >= -2200);
+        REQUIRE(exponent <= 2200);
+        const cpp_int factor = cpp_int{1} << static_cast<unsigned>(std::abs(exponent));
+        const cpp_rational scale = exponent < 0 ? cpp_rational{1} / factor : cpp_rational{factor};
+        return cpp_rational{abs(retained * scale - target) +
+                            cpp_rational{enclosure.radius()} * scale};
+    };
+
+    // The extractor round-trips the original binary64 words through JSON.
+    const auto expected = frozen.get<std::array<double, 2>>();
+    REQUIRE(std::isfinite(expected[0]));
+    REQUIRE(std::isfinite(expected[1]));
+    const cpp_rational re{expected[0]}, im{expected[1]};
+    const cpp_rational norm_squared = re * re + im * im;
+    REQUIRE(norm_squared > 0);
+    const auto dr = exact_error(real, re);
+    const auto di = exact_error(imaginary, im);
+    const cpp_rational relative_squared = (dr * dr + di * di) / norm_squared;
+    // A5-01 supplies the total 1% amplitude and 0.6 degree phase ceilings.
+    // A disk of relative radius 1% implies both (asin(0.01) < 0.6 degrees).
+    // This comparison covers the matched frozen grid and wake only.
+    CHECK(relative_squared <= cpp_rational{1} / 10000);
+    return std::sqrt(relative_squared.convert_to<long double>());
+}
+
 std::size_t reference_index(const c::CaseWingCell& cell, std::size_t m, std::size_t n) {
     const auto side = static_cast<std::size_t>(cell.surface - 1);
     return side / 2 * m * n + static_cast<std::size_t>(cell.chord) * n + side % 2 * (n / 2) +
@@ -1353,6 +1410,7 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
     const auto& circulation =
         std::get<numerics::TwoWord<std::complex<double>>>(solved.physical_values().storage());
     long double dropped = 0, coefficient_scale = 0, max_row = 0;
+    const auto ideal = ideal_harmonic_loads(selected, reference);
     Json metrics{{"case", selected}, {"drives", Json::array()}};
     for (std::size_t i = 0; i < count; ++i) {
         long double diff = 0, scale = 0;
@@ -1435,7 +1493,15 @@ void run_harmonic(const Json& reference, std::array<int, 3> selected, bool contr
                 {{"force_relative",
                   compare(got->totals.force_real, got->totals.force_imaginary, force)},
                  {"moment_relative",
-                  compare(got->totals.moment_real, got->totals.moment_imaginary, moment)}});
+                  compare(got->totals.moment_real, got->totals.moment_imaginary, moment)},
+                 {"ideal_fz_relative",
+                  compare_ideal_harmonic_load(got->totals.force_real[2],
+                                              got->totals.force_imaginary[2],
+                                              ideal.at(wing).at(0).at(drive_index))},
+                 {"ideal_my_relative",
+                  compare_ideal_harmonic_load(got->totals.moment_real[1],
+                                              got->totals.moment_imaginary[1],
+                                              ideal.at(wing).at(1).at(drive_index))}});
         }
         verify_original_loads(prepared, *load, ref, reference, drive_index, m, n);
         metrics["drives"].push_back(std::move(drive_record));

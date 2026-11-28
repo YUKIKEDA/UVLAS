@@ -83,3 +83,24 @@ ctest --preset linux-release --output-on-failure -j1 -R '^coupling[.]vmulti_smal
 Ubuntu の GCC 14.2.0 Release で、通常コア $10^{-5}$ m と小コア $10^{-7}$ m を各6条件で照合した。全行を再評価した元残差の相対 $L_2$ 上限は、通常コアで最大 $5.607\times 10^{-13}$、小コアで最大 $5.602\times 10^{-13}$ だった。係数行と循環、翼別の力・モーメントは、同じ有限核の独立参照に対して既定の相対許容差 $10^{-9}$ を満たした。
 
 通常コアの最小格子を含む翼幾何、単翼 M2/N4、既知流れ、BDF2 荷重と、残りの調和格子および小コアの試験を合わせて15件が通過した。初回は翼幾何だけが失敗し、過渡 Case での閉端の準備を拒否するよう試験を修正して再実行した。修正は時刻更新の試験入力に限り、他の14件の結果を再利用した。
+
+## 凍結理想核の荷重を製品試験から照合する
+
+同じ有限格子、後流長、基準流れで、独立理想核の鉛直力 $F_z$ とピッチングモーメント $M_y$ を比較する。原点は両翼とも世界座標 $(0.375,0,0)$ m とする。通常コアと小コアの各6条件で、四つの駆動と両翼の計96観測を照合する。
+
+[抽出器](ideal_observations.py) は、凍結原本の tar と各ケースの NPZ の SHA-256 を既存の独立参照と同じ方法で検査する。各翼の荷重配列から $F_z,M_y$ をその順に抜き、四つの駆動について実部・虚部の Binary64 値を保持する。[試験用 JSON](../../../../tests/aero/fixtures/vmulti-harmonic-ideal-v1.json) の SHA-256 は `847cc69595dfddd66f4acb445f74c13f1bdc8f5423ac867e18241b603b580115`。構成時に照合し、製品試験では格子の条件、後流長、流速、密度、周波数、モーメント原点と駆動順を合わせる。
+
+製品の複素荷重は保持値と包含半径から読み、凍結値との差の上限を有理数で評価する。凍結値の複素絶対値で割った上限が 1% 以下であることを確かめる。複素平面でこの円板に収まれば、振幅の差は 1% 以下で、位相差は $\arcsin(0.01)$ 以下となる。これは A5-01 の位相の全予算 0.6° を下回る。この照合で評価するのは、指定された有限格子・後流長で凍結理想核の値との差までである。格子と後流長の変化、参照の不確かさを含む総予算は別の証拠を必要とする。
+
+Python 3.12 と NumPy 2.3.5 で、既存の参照 tar を使って別ディレクトリに再生成する。通常コアと小コアの6条件を登録する構成は前節までと共通である。
+
+```bash
+python3 -B docs/verification/IM-03/vmulti-harmonic-v1/ideal_observations.py \
+  --root . --bundle out/vmulti-harmonic/uvlas-rd-evidence-2026-11-part02.tar \
+  --output out/vmulti-harmonic/ideal-observations-replay.json
+cmp out/vmulti-harmonic/ideal-observations-replay.json tests/aero/fixtures/vmulti-harmonic-ideal-v1.json
+ctest --preset linux-release -V \
+  -R '^coupling[.](case_wing_geometry|vmulti_(small_core|harmonic)[.].*)$'
+```
+
+Ubuntu GCC 14.2.0 Release の対象 CTest 12 件が通過した。複素相対差上限の最大は、通常コアで $5.658\times10^{-8}$、小コアで $5.926\times10^{-12}$ だった。両方で、上反角 5° の M8/N32、尾翼ピッチ時の主翼 $M_y$ が最大だった。最小格子の主翼 $M_y$ を符号反転した対照は荷重照合で失敗し、参照に空白を 1 バイト加えた対照は構成時に拒否された。別ディレクトリで再生成した JSON は登録したバイト列と一致した。

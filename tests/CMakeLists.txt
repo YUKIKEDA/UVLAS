@@ -1336,7 +1336,14 @@ file(SHA256 "${vmulti_small}" vmulti_small_sha)
 if(NOT vmulti_small_sha STREQUAL "5f9b8603a48de1548c8a2e56145cbf5f51ca80772f9f2dd1d1808f080a040790")
     message(FATAL_ERROR "V-MULTI small finite-core fixture differs from its recorded SHA-256")
 endif()
+set(vmulti_ideal "${PROJECT_SOURCE_DIR}/tests/aero/fixtures/vmulti-harmonic-ideal-v1.json")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${vmulti_ideal}")
+file(SHA256 "${vmulti_ideal}" vmulti_ideal_sha)
+if(NOT vmulti_ideal_sha STREQUAL "847cc69595dfddd66f4acb445f74c13f1bdc8f5423ac867e18241b603b580115")
+    message(FATAL_ERROR "V-MULTI ideal observations differ from their recorded SHA-256")
+endif()
 target_compile_definitions(uvlas_test_coupling_case_wing_geometry PRIVATE
+    UVLAS_VMULTI_IDEAL_OBSERVATIONS="${vmulti_ideal}"
     UVLAS_WING_EDGE_CASES="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/wing-edge-pairing-v1"
     UVLAS_VMULTI_SMALL_FIXTURE="${vmulti_small}")
 set(UVLAS_VMULTI_FORMAL_FIXTURE "" CACHE FILEPATH "Independent finite-core V-MULTI six-grid fixture")
