@@ -45,6 +45,14 @@ GCC 14 Releaseで凍結試験2件の2,551アサーションと既存の材料作
 
 凍結171列の実係数を独立に合成すると、非零項数は34,050から160,528へ増えた。合成後の共通分母と分子の幅は最大285 bit、313 bitだった。4セルの各16点で、各列の $R$、$P$、$C$ とその面内微分を独立な有理積和と照合した98,496成分は、零を含めてすべて一致した。
 
+凍結24点の同じ試行について、直接経路と合成基底経路のエネルギー、内力全列、接線作用全列の有理な区間端点が一致した。
+Ubuntu 24.04.5、GCC 14.2.0 Release で37,318アサーションを確認した。この比較には参照行と合成基底の所有検査も含まれる。
+
+| 弾性作用の経路 | 累積所有確保 [B] | 作業量 | 分割訪問 |
+| --- | ---: | ---: | ---: |
+| 直接 | 895,667,872 | 511,941,279 | 678,186 |
+| 合成基底 | 189,631,072 | 678,514,358 | 125,769 |
+
 ## 凍結した高次則との比較
 
 凍結時の体積積分は、4背景セルの各軸45点と、3層の深さ各7点を合わせた170,100点を使う。凍結変位と同じ材料則でその点列を独立に再計算し、アーカイブに保存した内力仕事、接線と質量の縮約値を相対 $10^{-8}$ で照合した。表はその再計算を基準とする。面内点数は各軸、深さ点数は各層に対する数である。 [凍結時の求積と組立](../../../../rd/structure/material/experiments/check_material_shell_integration_v2.py) · [収束の再計算](convergence.py)
@@ -72,15 +80,18 @@ GCC 14 Releaseで、この1,944点を製品の整合質量入口へ渡した。�
 ```text
 uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -X utf8 docs/verification/IM-02/pg-frozen-material-probes/oracle.py out/pg-frozen-material-probes-replay.json
 ctest --test-dir <build> --output-on-failure -R "^structure[.]pg_frozen_shell_material$"
+ctest --test-dir <build> --output-on-failure -R "^structure[.]pg_frozen_shell_material[.]composed$"
 <build>/tests/uvlas_test_structure_pg_frozen_shell_material "[.fixture]" > out/pg-frozen-material-basis.txt
 uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/transfer.py out/pg-frozen-material-basis.txt out/pg-frozen-material-state.json
 uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.txt --with python-flint==0.8.0 python -B -X utf8 docs/verification/IM-02/pg-frozen-material-probes/convergence.py out/pg-frozen-material-basis.txt --mass-rule-output out/vmat-high-rule.json
 ```
 
 3,672点の弾性試験では、面内と厚さ方向の座標を小数部28 bit、重みを44 bitに丸める。独立再計算で、丸め後のエネルギー、内力仕事、接線仕事の凍結則からの相対差は、それぞれ $2.33\times10^{-9}$、$2.27\times10^{-9}$、$2.15\times10^{-9}$ だった。製品試験は3層各1,224点を読み、3観測の包絡全体をそれぞれの凍結則の値の相対 $10^{-8}$ で検査する。組立には48 GiBの累積所有確保枠を使う。
+製品試験に渡した点列の SHA-256 は `8e4054f426c3a0fa6810f64fb7a3462d6b1a34efad602a4aadbf7889242336e7` である。
 
 Ubuntu 24.04.5 の GCC 14.2.0 Release で、固定幅の有理数を外向きに丸める試験を実行した。分母が257 bitと9,001 bitの入力について、正負それぞれの上下端点と、作業幅を1 bit下げた場合の拒否を調べた。14アサーションが通過した。
 同じ構成の `structure.pg_shell_material`、`structure.pg_frozen_shell_material`、`structure.pg_discrete_gram`、`coupling.case_pg_shell_material` も通過した。凍結24点の比較と Case の材料作用への接続を含む。
+`structure.pg_prepared_patch`、`io.external_shell_cross_format`、`io.external_case_chart` では、異なる層・パッチの引渡しと資源不足の拒否、認証済み外部参照から作った Case の作用を照合した。対象3件が通過した。
 
 正式試験の初回は、スカラー演算の上限を5,000億に設定し、8,048.21秒で `ResourceExceeded` を返した。
 失敗時の累積所有確保は25,122,895,240 B、プロセスの最大常駐量は435,176 KiBだった。

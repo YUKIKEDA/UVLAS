@@ -789,6 +789,10 @@ target_include_directories(uvlas_test_structure_pg_frozen_shell_material
 target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
     UVLAS_PG_FROZEN_MATERIAL_PROBES="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-probes-v1.json"
     UVLAS_PG_FROZEN_MATERIAL_TRANSFER="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-transfer-v1.json")
+add_test(NAME structure.pg_frozen_shell_material.composed
+    COMMAND uvlas_test_structure_pg_frozen_shell_material "[.composed-vmat]")
+set_tests_properties(structure.pg_frozen_shell_material.composed PROPERTIES
+    LABELS "verification;V-MAT" TIMEOUT ${pg_reference_timeout})
 
 set(UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE "" CACHE FILEPATH
     "Optional independent fixture for the 3672-point frozen V-MAT elastic check")
