@@ -1,14 +1,18 @@
 #include "case_schema_test_adapter.hpp"
 #include "checkpoint_directory.hpp"
 #include "checkpoint_directory_name.hpp"
+#include "checkpoint_test_fixture.hpp"
+#include "reference_file_test_fixture.hpp"
 
 #ifdef _WIN32
 #include "windows_checkpoint_query.hpp"
+#include "windows_reference_test_fixture.hpp"
 #endif
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -21,6 +25,8 @@ namespace {
 namespace cp = uvlas::io::detail;
 namespace core = uvlas::core;
 namespace fs = std::filesystem;
+namespace fixture = uvlas::test::checkpoint_fixture;
+namespace reference = uvlas::test::reference_file_fixture;
 
 class TestDirectory {
 public:
@@ -226,100 +232,269 @@ TEST_CASE("Checkpoint directories round-trip typed data and discover the latest 
     }
 }
 
-TEST_CASE("A Case restart pins the exact checkpoint manifest before reading chunks",
-          "[IO4-06][IO4-07][negative]") {
+constexpr cp::CaseCheckpointDirectoryLimits case_files{{256, 128, 8}, files};
+
+[[nodiscard]] std::string case_wire(std::string_view path, std::string_view digest) {
     using namespace uvlas::test::schema_adapter;
-    constexpr std::string_view original =
-        "9a2b121a467ad1651f3f02b8a35884ddcb3afa6b77b9c4f80089f05e7be34647";
-    constexpr std::string_view with_space =
-        "33ebefe08a223ea66fb60d0014e98e4057e6c4f8dd772df16aa12d73be3536fa";
-    const TestDirectory dir;
-    const auto checkpoint = dir.path() / "checkpoint-12";
-    core::ResourcePlan plan{12'000'000};
-    auto context = cp::CheckpointFingerprints{};
-    context.version.bytes[0] = std::byte{0xa7};
-    const std::array words{std::uint64_t{42}};
-    const auto chunk = take(cp::CheckpointChunk::encode({}, std::span<const std::uint64_t>{words},
-                                                        limits.chunk, plan, {}));
-    const std::array chunks{cp::NamedCheckpointChunk{"first", chunk}};
-    REQUIRE(cp::save_checkpoint_directory(dir.path(), 12, chunks, context, limits, publication,
-                                          plan, {}));
+    auto wire_case = root("coupled_flutter");
+    if (!digest.empty()) {
+        auto restart = fragment("Restart");
+        restart.set("directory", string(path));
+        restart.set("manifest_sha256", string(digest));
+        wire_case.set("restart", std::move(restart));
+    }
+    return wire_case.wire();
+}
 
-    const auto case_with_digest = [&](std::string_view hash) {
-        auto wire_case = root("coupled_flutter");
-        if (!hash.empty()) {
-            auto restart = fragment("Restart");
-            restart.set("directory", string("checkpoint-12"));
-            restart.set("manifest_sha256", string(hash));
-            wire_case.set("restart", std::move(restart));
-        }
-        const auto wire = wire_case.wire();
-        const uvlas::io::InputLimits syntax{1'000'000,
-                                            256,
-                                            100'000,
-                                            100'000,
-                                            1'000'000,
-                                            1'000'000,
-                                            1'000'000,
-                                            {uvlas::io::ParserAllocationMode::EstimateAdmission,
-                                             std::numeric_limits<std::uint64_t>::max()}};
-        std::array<std::uint64_t, static_cast<std::size_t>(uvlas::io::SchemaQuota::Count)> quotas{};
-        quotas.fill(1'000'000);
-        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::TypedBytes)] = 64ULL * 1024 * 1024;
-        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::ScratchBytes)] =
-            16ULL * 1024 * 1024;
-        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::Work)] = 1000000000;
-        quotas[static_cast<std::size_t>(uvlas::io::SchemaQuota::ExactDigits)] = 4096;
-        core::ResourcePlan schema_plan{128ULL * 1024 * 1024};
-        std::optional<uvlas::io::InputDiagnostic> diagnostic;
-        auto document =
-            take(uvlas::io::read_input_document(std::as_bytes(std::span{wire.data(), wire.size()}),
-                                                input, syntax, schema_plan, diagnostic));
-        return take(uvlas::io::validate_case_schema(document, uvlas::io::SchemaLimits{quotas},
-                                                    schema_plan, nullptr));
+void write_independent_checkpoint(const fs::path& directory) {
+    const auto write_bytes = [&](const char* name, const auto& bytes) {
+        const auto data = reinterpret_cast<const char*>(bytes.data());
+        reference::write_file(directory / name, {data, bytes.size()});
     };
-    const auto declared = case_with_digest(original);
-    const auto accepted = take(cp::read_case_checkpoint_directory(
-        declared, checkpoint, input, context, limits, files, plan, {}));
-    CHECK(accepted.number == 12);
+    REQUIRE(fs::create_directories(directory));
+    reference::write_file(directory / "manifest.json", fixture::manifest);
+    write_bytes("chunk-velocity.bin", fixture::one);
+    write_bytes("chunk-node_id.bin", fixture::forty_two);
+}
 
-    // Whitespace preserves the entire parsed manifest but changes the declared source digest.
-    std::ofstream modify(checkpoint / "manifest.json", std::ios::binary | std::ios::app);
-    REQUIRE(modify.is_open());
-    modify.put(' ');
-    modify.close();
-    REQUIRE(modify.good());
-    REQUIRE(cp::read_checkpoint_directory(checkpoint, input, context, limits, files, plan, {}));
-    auto no_enumeration = files;
-    no_enumeration.maximum_entries = 0;
-    const auto rejected = cp::read_case_checkpoint_directory(declared, checkpoint, input, context,
-                                                             limits, no_enumeration, plan, {});
+[[nodiscard]] cp::ReferenceInput acquired_case(const fs::path& parent, std::string_view filename,
+                                               std::string_view wire, bool from_file) {
+    core::ResourcePlan plan{128ULL * 1024 * 1024};
+    if (from_file) {
+        reference::write_file(parent / filename, wire);
+        return take(cp::ReferenceInput::from_file(parent, filename, input,
+                                                  reference::manifest_limits, reference::limits(),
+                                                  plan, {}, nullptr));
+    }
+    return take(cp::ReferenceInput::from_memory(reference::bytes_of(wire), input,
+                                                take(cp::ReadRoot::open(parent, {})),
+                                                reference::limits(), plan, {}, nullptr));
+}
+
+class RestoreWorkingDirectory {
+public:
+    RestoreWorkingDirectory() : previous_(fs::current_path()) {}
+    RestoreWorkingDirectory(const RestoreWorkingDirectory&) = delete;
+    RestoreWorkingDirectory& operator=(const RestoreWorkingDirectory&) = delete;
+    ~RestoreWorkingDirectory() {
+        std::error_code ignored;
+        fs::current_path(previous_, ignored);
+    }
+
+private:
+    fs::path previous_;
+};
+
+TEST_CASE("Case restart selects the owned relative directory from file or memory",
+          "[FD-08][IO4-06][IO4-07][integration][negative][verification]") {
+    const bool from_file = GENERATE(false, true);
+    CAPTURE(from_file);
+    const TestDirectory dir;
+    const RestoreWorkingDirectory working_directory;
+    const auto initial_root = dir.path() / "case-root";
+    const auto decoy = dir.path() / "different-cwd";
+    const auto owner_case =
+        case_wire(R"(runs\discard/.././checkpoint-12)", fixture::manifest_sha256);
+    write_independent_checkpoint(initial_root / "runs" / "checkpoint-12");
+    write_independent_checkpoint(initial_root / "runs" / "checkpoint-13");
+    REQUIRE(fs::create_directories(decoy / "case-root" / "runs" / "checkpoint-12"));
+    REQUIRE(fs::create_directories(decoy / "runs" / "checkpoint-12"));
+    reference::write_file(decoy / "case-root" / "runs" / "checkpoint-12" / "manifest.json", "{}");
+    reference::write_file(decoy / "runs" / "checkpoint-12" / "manifest.json", "{}");
+    core::ResourcePlan plan{12'000'000};
+
+    fs::current_path(dir.path());
+    const auto declared = acquired_case("case-root", "original.json", owner_case, from_file);
+    fs::current_path(decoy);
+    // Linux retains the original inode across rename. Windows roots instead deny delete sharing.
+    auto active = initial_root;
+#ifdef __linux__
+    const auto relocated = dir.path() / "relocated-root";
+    fs::rename(initial_root, relocated);
+    REQUIRE(fs::create_directories(initial_root / "runs" / "checkpoint-12"));
+    reference::write_file(initial_root / "runs" / "checkpoint-12" / "manifest.json", "{}");
+    active = relocated;
+#endif
+    const auto checkpoint = active / "runs" / "checkpoint-12";
+    cp::CaseCheckpointDirectoryDiagnostic diagnostic;
+    const auto accepted = take(cp::read_case_checkpoint_directory(
+        declared, input, fixture::fingerprints, limits, case_files, plan, {}, &diagnostic));
+    CHECK(accepted.number == 12);
+    CHECK(diagnostic.pointer().empty());
+    const auto original_view = accepted.manifest_file.view();
+    REQUIRE(original_view);
+    CHECK(std::ranges::equal(original_view->bytes, reference::bytes_of(fixture::manifest)));
+
+    // Whitespace preserves the parsed manifest but must fail the source digest before JSON and
+    // enumeration limits get a chance to reject the envelope.
+    reference::write_file(checkpoint / "manifest.json", std::string{fixture::manifest} + ' ');
+    REQUIRE(cp::read_checkpoint_directory(checkpoint, input, fixture::fingerprints, limits, files,
+                                          plan, {}));
+    auto no_enumeration = case_files;
+    no_enumeration.container.maximum_entries = 0;
+    const auto rejected = cp::read_case_checkpoint_directory(
+        declared, input, fixture::fingerprints, limits, no_enumeration, plan, {}, &diagnostic);
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == core::FailureCode::CheckpointCorrupt);
     CHECK(rejected.error().operation == core::Operation::Recover);
-    const auto updated = case_with_digest(with_space);
-    const auto bounded = cp::read_case_checkpoint_directory(updated, checkpoint, input, context,
-                                                            limits, no_enumeration, plan, {});
+    CHECK(diagnostic.pointer() == "/restart/manifest_sha256");
+
+    const auto updated = acquired_case(
+        active, "updated.json",
+        case_wire("runs/checkpoint-12", fixture::manifest_sha256_with_space), from_file);
+    auto no_parse = limits;
+    no_parse.json.maximum_nodes = 1;
+    const auto pre_parse = cp::read_case_checkpoint_directory(
+        declared, input, fixture::fingerprints, no_parse, case_files, plan, {}, &diagnostic);
+    REQUIRE_FALSE(pre_parse);
+    CHECK(pre_parse.error().code == core::FailureCode::CheckpointCorrupt);
+    CHECK(diagnostic.pointer() == "/restart/manifest_sha256");
+    const auto parser_limit = cp::read_case_checkpoint_directory(
+        updated, input, fixture::fingerprints, no_parse, case_files, plan, {}, &diagnostic);
+    REQUIRE_FALSE(parser_limit);
+    CHECK(parser_limit.error().code == core::FailureCode::ResourceExceeded);
+    CHECK(diagnostic.stage == cp::CaseCheckpointDirectoryStage::Envelope);
+
+    const auto bounded = cp::read_case_checkpoint_directory(
+        updated, input, fixture::fingerprints, limits, no_enumeration, plan, {}, &diagnostic);
     REQUIRE_FALSE(bounded);
     CHECK(bounded.error().code == core::FailureCode::ResourceExceeded);
     const auto matching = take(cp::read_case_checkpoint_directory(
-        updated, checkpoint, input, context, limits, files, plan, {}));
+        updated, input, fixture::fingerprints, limits, case_files, plan, {}));
     CHECK(matching.number == 12);
 
+    auto context = fixture::fingerprints;
     context.material.bytes[0] = std::byte{1};
-    const auto incompatible = cp::read_case_checkpoint_directory(updated, checkpoint, input,
-                                                                 context, limits, files, plan, {});
+    const auto incompatible =
+        cp::read_case_checkpoint_directory(updated, input, context, limits, case_files, plan, {});
     REQUIRE_FALSE(incompatible);
     CHECK(incompatible.error().code == core::FailureCode::CheckpointIncompatible);
+
+    REQUIRE(fs::remove(checkpoint / "chunk-node_id.bin"));
+    const auto missing = cp::read_case_checkpoint_directory(updated, input, fixture::fingerprints,
+                                                            limits, case_files, plan, {});
+    REQUIRE_FALSE(missing);
+    CHECK(missing.error().code == core::FailureCode::CheckpointCorrupt);
+    // No retry chooses the intact newer checkpoint. The last verified result owns its bytes.
     const auto previous = take(take(accepted.payloads.at(0)).get().decode(plan, {}));
     CHECK(std::get<core::PlannedBuffer<std::uint64_t>>(previous).values().front() == 42);
+    const auto retained_view = accepted.manifest_file.view();
+    REQUIRE(retained_view);
+    CHECK(std::ranges::equal(retained_view->bytes, reference::bytes_of(fixture::manifest)));
+}
 
-    const auto missing = case_with_digest({});
+TEST_CASE("Case restart rejects invalid relative paths and enforces bounded acquisition",
+          "[FD-08][IO4-06][integration][negative][verification]") {
+    using Code = core::FailureCode;
+    using Stage = cp::CaseCheckpointDirectoryStage;
+
+    const TestDirectory dir;
+    const auto parent = dir.path() / "root";
+    REQUIRE(fs::create_directory(parent));
+    write_independent_checkpoint(parent / "runs" / "checkpoint-12");
+    reference::write_file(parent / "regular", "");
+    reference::write_file(parent / "checkpoint-16", "");
+
+    core::ResourcePlan plan{128ULL * 1024 * 1024};
+    cp::CaseCheckpointDirectoryDiagnostic diagnostic;
+    const auto acquire = [&](std::string_view path) {
+        return acquired_case(parent, "", case_wire(path, fixture::manifest_sha256), false);
+    };
+    const auto expect = [&](const cp::ReferenceInput& declared,
+                            cp::CaseCheckpointDirectoryLimits caps, Code code, Stage stage) {
+        const auto result = cp::read_case_checkpoint_directory(
+            declared, input, fixture::fingerprints, limits, caps, plan, {}, &diagnostic);
+        REQUIRE_FALSE(result);
+        CHECK(result.error().code == code);
+        CHECK(result.error().operation == core::Operation::Recover);
+        CHECK(diagnostic.stage == stage);
+    };
+
+    for (std::string_view path :
+         {"/checkpoint-12", R"(X:checkpoint-12)", R"(X:\checkpoint-12)",
+          R"(\\network\share\checkpoint-12)", "run:stream/checkpoint-12", "../checkpoint-12",
+          "runs/../../checkpoint-12", "runs/checkpoint-12/", "runs/..", "runs/checkpoint-012",
+          "runs/checkpoint-18446744073709551616", "runs/latest"}) {
+        CAPTURE(path);
+        expect(acquire(path), case_files, Code::InvalidInput, Stage::Path);
+        CHECK(diagnostic.pointer() == "/restart/directory");
+        CHECK(diagnostic.path);
+    }
+    for (std::string_view path : {"missing/checkpoint-12", "regular/checkpoint-12", "checkpoint-16",
+                                  "runs/checkpoint-99"}) {
+        CAPTURE(path);
+        expect(acquire(path), case_files, Code::CheckpointCorrupt, Stage::Open);
+        CHECK(diagnostic.pointer() == "/restart/directory");
+        CHECK(diagnostic.open);
+    }
+#ifdef _WIN32
+    using uvlas::test::windows_reference_fixture::Junction;
+    const Junction link{parent / "link", parent / "runs"};
+    const Junction leaf{parent / "checkpoint-12", parent / "runs" / "checkpoint-12"};
+#elif defined(__linux__)
+    fs::create_directory_symlink(parent / "runs", parent / "link");
+    fs::create_directory_symlink(parent / "runs" / "checkpoint-12", parent / "checkpoint-12");
+#endif
+    for (std::string_view path : {"link/checkpoint-12", "checkpoint-12"}) {
+        CAPTURE(path);
+        expect(acquire(path), case_files, Code::CheckpointCorrupt, Stage::Open);
+        REQUIRE(diagnostic.open);
+#ifdef _WIN32
+        CHECK(diagnostic.open->reason == cp::WindowsReferenceOpenReason::Reparse);
+        CHECK(diagnostic.open->normalized_offset == 0);
+#elif defined(__linux__)
+        CHECK(*diagnostic.open == cp::LinuxReferenceOpenReason::Link);
+#endif
+    }
+
+    const auto declared = acquire("runs//./checkpoint-12");
+    auto caps = case_files;
+    caps.path.input_bytes = 20;
+    expect(declared, caps, Code::ResourceExceeded, Stage::Path);
+    REQUIRE(diagnostic.path);
+    CHECK(diagnostic.path->reason == cp::ReferencePathReason::InputBytes);
+    caps = case_files;
+    caps.path.normalized_bytes = 17;
+    expect(declared, caps, Code::ResourceExceeded, Stage::Path);
+    REQUIRE(diagnostic.path);
+    CHECK(diagnostic.path->reason == cp::ReferencePathReason::NormalizedBytes);
+    caps = case_files;
+    caps.path.normalized_components = 1;
+    expect(declared, caps, Code::ResourceExceeded, Stage::Path);
+    REQUIRE(diagnostic.path);
+    CHECK(diagnostic.path->reason == cp::ReferencePathReason::NormalizedDepth);
+    REQUIRE(cp::read_case_checkpoint_directory(declared, input, fixture::fingerprints, limits,
+                                               {{21, 18, 2}, files}, plan, {}));
+
+    core::ResourcePlan small_plan{18}; // Just the normalized bytes, no native scratch.
+    const auto small = cp::read_case_checkpoint_directory(
+        declared, input, fixture::fingerprints, limits, case_files, small_plan, {}, &diagnostic);
+    REQUIRE_FALSE(small);
+    CHECK(small.error().code == Code::ResourceExceeded);
+    CHECK(small.error().operation == core::Operation::Recover);
+    CHECK(diagnostic.stage == Stage::Open);
+
+    const auto absent = acquired_case(parent, "", case_wire("", ""), false);
+    expect(absent, case_files, Code::InvalidInput, Stage::Restart);
+    const auto no_root_wire = case_wire("runs/checkpoint-12", fixture::manifest_sha256);
+    const auto no_root =
+        take(cp::ReferenceInput::from_memory(reference::bytes_of(no_root_wire), input, std::nullopt,
+                                             reference::limits(), plan, {}, nullptr));
+    expect(no_root, case_files, Code::InvalidInput, Stage::Path);
+    CHECK(diagnostic.pointer() == "/restart/directory");
+
+    std::stop_source cancellation;
+    REQUIRE(cancellation.request_stop());
     core::ResourcePlan no_io{0};
-    const auto absent = cp::read_case_checkpoint_directory(missing, checkpoint, input, context,
-                                                           limits, files, no_io, {});
-    REQUIRE_FALSE(absent);
-    CHECK(absent.error().code == core::FailureCode::InvalidInput);
+    const auto stopped = cp::read_case_checkpoint_directory(declared, input, fixture::fingerprints,
+                                                            limits, case_files, no_io,
+                                                            cancellation.get_token(), &diagnostic);
+    REQUIRE_FALSE(stopped);
+    CHECK(stopped.error().code == Code::Cancelled);
+    CHECK(stopped.error().operation == core::Operation::Recover);
+    CHECK(diagnostic.pointer().empty());
+    CHECK_FALSE(diagnostic.path);
+    CHECK_FALSE(diagnostic.open);
 }
 
 #ifdef __linux__

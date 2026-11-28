@@ -62,7 +62,15 @@ public:
               const std::stop_token& stop,
               std::optional<LinuxReferenceOpenReason>* diagnostic = nullptr) const noexcept;
 
+    [[nodiscard]] core::Result<LinuxReferenceRoot>
+    open_directory(const NormalizedReferencePath&, core::ResourcePlan&, const std::stop_token&,
+                   std::optional<LinuxReferenceOpenReason>* diagnostic = nullptr) const noexcept;
+
 private:
+    [[nodiscard]] core::Result<LinuxReferenceHandle>
+    open_relative(const NormalizedReferencePath&, bool directory, core::ResourcePlan&,
+                  const std::stop_token&, std::optional<LinuxReferenceOpenReason>*) const noexcept;
+
     friend struct CheckpointDirectoryReader;
     explicit LinuxReferenceRoot(LinuxReferenceHandle directory) noexcept;
     LinuxReferenceHandle directory_;

@@ -2,6 +2,7 @@
 
 #include "reference_declarations_fixture.hpp"
 #include "reference_input.hpp"
+#include "reference_root_plan.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
