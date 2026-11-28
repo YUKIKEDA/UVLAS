@@ -46,7 +46,8 @@ GCC 14 Releaseで凍結試験2件の2,551アサーションと既存の材料作
 凍結171列の実係数を独立に合成すると、非零項数は34,050から160,528へ増えた。合成後の共通分母と分子の幅は最大285 bit、313 bitだった。4セルの各16点で、各列の $R$、$P$、$C$ とその面内微分を独立な有理積和と照合した98,496成分は、零を含めてすべて一致した。
 
 凍結24点の同じ試行について、直接経路と合成基底経路のエネルギー、内力全列、接線作用全列の有理な区間端点が一致した。
-Ubuntu 24.04.5、GCC 14.2.0 Release で37,318アサーションを確認した。この比較には参照行と合成基底の所有検査も含まれる。
+同じ試行を確保枠0で評価すると `ResourceExceeded` を返した。参照の識別子と全係数、試行の現在係数と変位係数が一致することを確認し、同じ入力を通常の枠で再実行して独立参照と照合した。
+Ubuntu 24.04.5、GCC 14.2.0 Release で37,325アサーションを確認した。この比較には参照行と合成基底の所有検査も含まれる。
 
 | 弾性作用の経路 | 累積所有確保 [B] | 作業量 | 分割訪問 |
 | --- | ---: | ---: | ---: |
@@ -90,8 +91,9 @@ uv run --python 3.12 --no-project --with-requirements rd/requirements-reference.
 製品試験に渡した点列の SHA-256 は `8e4054f426c3a0fa6810f64fb7a3462d6b1a34efad602a4aadbf7889242336e7` である。
 
 Ubuntu 24.04.5 の GCC 14.2.0 Release で、固定幅の有理数を外向きに丸める試験を実行した。分母が257 bitと9,001 bitの入力について、正負それぞれの上下端点と、作業幅を1 bit下げた場合の拒否を調べた。14アサーションが通過した。
+隔離した試験で呼出し側が指定する作業幅の検査を外すと、分母257 bitの対照で範囲外の値を受理し、拒否のアサーションが失敗した。
 同じ構成の `structure.pg_shell_material`、`structure.pg_frozen_shell_material`、`structure.pg_discrete_gram`、`coupling.case_pg_shell_material` も通過した。凍結24点の比較と Case の材料作用への接続を含む。
-`structure.pg_prepared_patch`、`io.external_shell_cross_format`、`io.external_case_chart` では、異なる層・パッチの引渡しと資源不足の拒否、認証済み外部参照から作った Case の作用を照合した。対象3件が通過した。
+`structure.pg_prepared_patch`、`io.external_shell_cross_format`、`io.external_case_chart` の3件が通過した。異なる層・パッチの引渡しと資源不足を拒否した。認証済み外部参照の拘束チャートを直接定義の Case と照合し、型付きの二層 Case から材料作用と界面両側の回復を確認した。
 
 正式試験の初回は、スカラー演算の上限を5,000億に設定し、8,048.21秒で `ResourceExceeded` を返した。
 失敗時の累積所有確保は25,122,895,240 B、プロセスの最大常駐量は435,176 KiBだった。

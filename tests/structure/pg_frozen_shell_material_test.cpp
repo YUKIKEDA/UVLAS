@@ -527,10 +527,34 @@ void check_volume(const PgPreparedPatch& patch, PgPreparedPatchIdentity patch_id
     assembly_limits.algebra.external_memory = ExactEstimateAdmission{profile};
     assembly_limits.algebra.maximum_value_bits = 16'384;
     assembly_limits.algebra.maximum_work_bits = 65'536;
+    const PgShellPatchState current{patch_id, state.current};
+    const PgShellVolumeResolution resolution{112, width, width, width,
+                                             PgShellReferencePath::Composed};
+    if (other_owner) {
+        const auto snapshot = [](std::span<const PgCartesianExactPosition> coordinates) {
+            std::vector<Q> exact;
+            for (const auto& position : coordinates)
+                for (const auto& component : position)
+                    exact.push_back(q(component));
+            return exact;
+        };
+        const auto reference_before = snapshot(patch.reference_coordinates());
+        const auto current_before = snapshot(state.current);
+        const auto direction_before = snapshot(state.displacement);
+        core::ResourcePlan no_storage{0};
+        const auto rejected = assemble_pg_shell_elastic_volume(
+            patch, current, samples, displacement, resolution, assembly_limits, no_storage);
+        REQUIRE_FALSE(rejected);
+        CHECK(rejected.error().code == core::FailureCode::ResourceExceeded);
+        CHECK(no_storage.allocated_bytes() == 0);
+        CHECK(take(patch.info()).identity == patch_id);
+        CHECK(snapshot(patch.reference_coordinates()) == reference_before);
+        CHECK(snapshot(state.current) == current_before);
+        CHECK(snapshot(state.displacement) == direction_before);
+    }
     core::ResourcePlan elastic_plan{profile};
     auto elastic_action = assemble_pg_shell_elastic_volume(
-        patch, {patch_id, state.current}, samples, displacement,
-        {112, width, width, width, PgShellReferencePath::Composed}, assembly_limits, elastic_plan);
+        patch, current, samples, displacement, resolution, assembly_limits, elastic_plan);
     CAPTURE(elastic_plan.allocated_bytes());
     const auto elastic = checked(std::move(elastic_action), "frozen trial elastic assembly");
     if (other_owner) {
