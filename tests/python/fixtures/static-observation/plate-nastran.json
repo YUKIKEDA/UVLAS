@@ -1,7 +1,7 @@
 {
   "beams": [],
   "generator": "R-05 analytic rectangular plate",
-  "geometry": "3",
+  "geometry": "1",
   "joints": [],
   "masses": [],
   "materials": [
@@ -62,7 +62,10 @@
       "shell": "1"
     }
   ],
-  "supports": [],
+  "supports": [
+    {"set": "31", "grid": "10", "components": [1, 2, 3], "support": "1"},
+    {"set": "31", "grid": "20", "components": [1, 2, 3], "support": "1"}
+  ],
   "units": {
     "angle": "deg",
     "length": "mm",

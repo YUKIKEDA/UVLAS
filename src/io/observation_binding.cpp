@@ -139,7 +139,7 @@ struct Binding {
     }
 
     template <class Observation>
-    void match(const Observation& observation) {
+    void match(const Observation& observation, core::Index index) {
         step();
         const auto comparison = observation.comparison.record();
         const auto reference = comparison.reference.record();
@@ -151,6 +151,7 @@ struct Binding {
             return;
 
         diagnostic.observation = core::ObservationId{observation.id.unsigned_value()};
+        diagnostic.case_index = index;
         require(source.role.text() == "observation-reference");
         require(decode_source_digest(source.sha256.text()) == file.source_sha256);
         if constexpr (std::is_same_v<Observation, schema::ObservationPoint> ||
@@ -182,7 +183,7 @@ bind_observation_file(const SchemaCase& source, const ObservationFile& file,
                       std::optional<ObservationBindingDiagnostic>& diagnostic) noexcept {
     diagnostic.reset();
     return core::guard_entry(operation, Code::InvalidInput, {}, [&]() -> core::Result<void> {
-        ObservationBindingDiagnostic current{file.source, {}, {}};
+        ObservationBindingDiagnostic current{file.source, {}, {}, {}};
         try {
             require(!stop.stop_requested(), Code::Cancelled);
             const auto identity = take(source.identity());
@@ -210,9 +211,10 @@ bind_observation_file(const SchemaCase& source, const ObservationFile& file,
             try {
                 for (core::Index i = 0; std::cmp_less(i, root.observations.size()); ++i) {
                     binding.diagnostic.observation.reset();
+                    binding.diagnostic.case_index.reset();
                     binding.diagnostic.input_node.reset();
                     const auto observation = take(root.observations.at(i)).record();
-                    std::visit([&](const auto& value) { binding.match(value); }, observation);
+                    std::visit([&](const auto& value) { binding.match(value, i); }, observation);
                 }
                 binding.step();
                 require(binding.bound == file.records.size());

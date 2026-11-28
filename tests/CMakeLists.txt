@@ -55,10 +55,11 @@ target_include_directories(uvlas_test_io_visualization_series PRIVATE "${PROJECT
 uvlas_add_test(io.observation_file
     LABELS FD-09 V-USE verification negative
     SOURCES io/observation_file_test.cpp
-    LIBS uvlas_io)
+    LIBS uvlas_io nlohmann_json::nlohmann_json)
 target_include_directories(uvlas_test_io_observation_file PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
 target_compile_definitions(uvlas_test_io_observation_file PRIVATE
-    UVLAS_STATIC_OBSERVATION_FILE="${PROJECT_SOURCE_DIR}/docs/verification/IM-06/parametric-observations.json")
+    UVLAS_STATIC_OBSERVATION_FILE="${PROJECT_SOURCE_DIR}/docs/verification/IM-06/parametric-observations.json"
+    UVLAS_STATIC_OBSERVATION_CASE="${PROJECT_SOURCE_DIR}/docs/verification/IM-06/static-observation-case.json")
 
 uvlas_add_test(io.input_scalar
     LABELS unit property negative verification

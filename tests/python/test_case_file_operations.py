@@ -183,7 +183,7 @@ class CaseFileOperations(unittest.TestCase):
                 "parametric": None,
                 "gmsh": {
                     "kind": "gmsh",
-                    "id": "2",
+                    "id": "1",
                     "mesh": acquisition("plate.msh", "1", "gmsh-msh4.1-ascii"),
                     "sidecar": acquisition("plate-gmsh.json", "2", "gmsh-sidecar"),
                     "reference": {
@@ -196,7 +196,7 @@ class CaseFileOperations(unittest.TestCase):
                 },
                 "nastran": {
                     "kind": "nastran",
-                    "id": "3",
+                    "id": "1",
                     "deck": acquisition("plate.bdf", "1", "nastran-deck"),
                     "sidecar": acquisition("plate-nastran.json", "2", "nastran-sidecar"),
                     "dialect": "msc-2022.1",
@@ -217,7 +217,20 @@ class CaseFileOperations(unittest.TestCase):
                 with self.subTest(route=route):
                     case = json.loads(case_bytes)
                     if external is not None:
-                        case["model"]["geometry"].append(external)
+                        case["model"]["geometry"] = [external]
+                        model = case["model"]
+                        shell = model["shells"][0]
+                        self.assertEqual(shell["geometry"], external["id"])
+                        self.assertEqual(model["supports"][0]["region"]["geometry"], external["id"])
+                        self.assertEqual(shell["loads"][0]["region"]["geometry"], external["id"])
+                        mapping = json.loads((root / external["sidecar"]["path"]).read_bytes())
+                        self.assertEqual(mapping["geometry"], external["id"])
+                        self.assertEqual(mapping["shells"][0]["shell"], shell["id"])
+                        self.assertTrue(mapping["supports"])
+                        self.assertEqual(
+                            {support["support"] for support in mapping["supports"]},
+                            {model["supports"][0]["id"]},
+                        )
                     reference = read_reference(reference_bytes)
                     reference["condition_sha256"] = condition_digest(
                         read_reference(json_bytes(case))
@@ -279,7 +292,15 @@ class CaseFileOperations(unittest.TestCase):
                             )
                             output = cli("validate", path)
                             self.assertEqual(output.returncode, 2, output.stderr)
-                            self.assertIn(diagnostics, output.stderr)
+                            if fields is reaction["observation"]:
+                                self.assertIn(
+                                    b"/observations/1/comparison/reference/source", output.stderr
+                                )
+                                self.assertNotIn(diagnostics, output.stderr)
+                                # Root, schema, condition, observations, then the reaction.
+                                self.assertRegex(output.stderr, rb"\breference node 4\b")
+                            else:
+                                self.assertIn(diagnostics, output.stderr)
                             fields[field] = original
                     reference["schema"] = "uvlas.observation-reference/2"
                     publish(case, reference)

@@ -25,7 +25,7 @@ struct ObservationLeafContext {
     ObservationConditionLimits condition;
     ObservationFileLimits file;
     std::uint64_t maximum_files;
-    ObservationLeafResults* result;
+    ObservationLeafResults* result; ///< Replaced only after the whole graph succeeds.
 };
 
 struct LeafFormatLimits {

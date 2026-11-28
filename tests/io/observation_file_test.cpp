@@ -1,4 +1,6 @@
 #include "observation_file.hpp"
+#include "reference_file_test_fixture.hpp"
+#include "reference_resolution.hpp"
 #include "source_digest.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -167,3 +169,103 @@ TEST_CASE("Static observation file bounds aggregate work and retains exact owned
     CHECK(read_observation_file(source, parent, *condition, observations, fresh, plan, {},
                                 diagnostic));
 }
+
+#if defined(__linux__) || defined(_WIN32)
+TEST_CASE("Observation graph publishes only after both sources succeed",
+          "[FD-09][V-USE][verification][negative]") {
+    namespace files = uvlas::test::reference_file_fixture;
+    namespace fixture = uvlas::test::declaration_fixture;
+
+    const auto read = [](const char* path) {
+        std::ifstream file{path, std::ios::binary};
+        REQUIRE(file);
+        return fixture::json(std::string{std::istreambuf_iterator<char>{file}, {}});
+    };
+    auto manifest = read(UVLAS_STATIC_OBSERVATION_CASE);
+    const auto shared = read(UVLAS_STATIC_OBSERVATION_FILE);
+    auto& declarations = manifest.field("observations").elements;
+    const auto& records = shared.field("observations").elements;
+    REQUIRE(declarations.size() == 2);
+    REQUIRE(records.size() == 2);
+    const files::Tree tree;
+    const std::array names{"point.json", "reaction.json"};
+    std::array<std::string, 2> payload;
+    for (std::size_t i = 0; i < names.size(); ++i) {
+        auto separated = shared;
+        separated.field("observations").elements = {records[i]};
+        payload[i] = separated.wire();
+        const auto digest = source_digest(files::bytes_of(payload[i]));
+        constexpr std::string_view digits = "0123456789abcdef";
+        std::string hex;
+        for (const auto byte : digest.bytes) {
+            const auto x = std::to_integer<unsigned>(byte);
+            hex.push_back(digits[x >> 4U]);
+            hex.push_back(digits[x & 15U]);
+        }
+        auto& source = declarations[i].field("comparison").field("reference").field("source");
+        source.set("source_id", fixture::string(std::to_string(10 + i)));
+        files::declare_path(source, names[i], hex);
+        files::write_file(tree.root / names[i], payload[i]);
+    }
+    files::write_file(tree.root / "case.json", manifest.wire());
+    core::ResourcePlan input_plan{fixture::budget};
+    const auto input = fixture::take(
+        ReferenceInput::from_file(tree.root, "case.json", SourceId{1}, files::manifest_limits,
+                                  files::limits(), input_plan, {}, nullptr));
+
+    constexpr RootInventoryLimits inventory{
+        {{1U << 20, 1U << 20, 128, 1U << 20}, 8, 128}, 2, 2U << 20, 2U << 20, 256, 2U << 20, 8};
+    constexpr DependencyWalkLimits walk{2, 2, 1, 10'000, 128};
+    ObservationLeafResults observations;
+    RootSnapshotDiagnostic acquisition;
+    LeafReferenceDiagnostic diagnostic;
+    const auto resolve = [&](const std::stop_token& stop = {}) {
+        auto prepared = files::prepare(input);
+        core::ResourcePlan plan{fixture::budget};
+        return resolve_leaf_references(
+            input, std::move(prepared), inventory, walk,
+            {{},
+             {},
+             {},
+             ObservationLeafContext{
+                 {1U << 20, 1U << 20}, {json_limits, exact_limits, 10'000'000}, 2, &observations}},
+            plan, stop, &acquisition, &diagnostic);
+    };
+
+    files::write_file(tree.root / names[1], payload[1] + " ");
+    const auto rejected = resolve();
+    REQUIRE_FALSE(rejected);
+    REQUIRE(acquisition.location);
+    CHECK(acquisition.location->source == SourceId{11});
+    CHECK(observations.populated == 0);
+    CHECK(observations.files.size() == 0);
+
+    files::write_file(tree.root / names[1], payload[1]);
+    REQUIRE(resolve());
+    REQUIRE(observations.populated == 2);
+    const auto* const published = observations.files.values().data();
+    REQUIRE(published[0]);
+    REQUIRE(published[1]);
+    CHECK(published[0]->source.source == SourceId{10});
+    CHECK(published[1]->source.source == SourceId{11});
+
+    files::write_file(tree.root / names[1], payload[1] + " ");
+    REQUIRE_FALSE(resolve());
+    CHECK(observations.populated == 2);
+    CHECK(observations.files.values().data() == published);
+
+    std::stop_source stopped;
+    stopped.request_stop();
+    const auto cancelled = resolve(stopped.get_token());
+    REQUIRE_FALSE(cancelled);
+    CHECK(cancelled.error().code == core::FailureCode::Cancelled);
+    CHECK(observations.populated == 2);
+    CHECK(observations.files.values().data() == published);
+
+    files::write_file(tree.root / names[1], payload[1]);
+    REQUIRE(resolve());
+    REQUIRE(observations.populated == 2);
+    CHECK(observations.files.values()[0]->source.source == SourceId{10});
+    CHECK(observations.files.values()[1]->source.source == SourceId{11});
+}
+#endif

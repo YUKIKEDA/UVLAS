@@ -7,6 +7,7 @@ namespace uvlas::io::detail {
 struct ObservationBindingDiagnostic {
     RootSnapshotLocation declaration;
     std::optional<core::ObservationId> observation;
+    std::optional<core::Index> case_index;
     std::optional<InputNodeOrdinal> input_node;
 };
 

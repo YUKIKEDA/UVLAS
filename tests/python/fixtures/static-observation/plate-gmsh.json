@@ -1,5 +1,5 @@
 {
-  "geometry": "2",
+  "geometry": "1",
   "joints": [],
   "length": "mm",
   "schema": "uvlas.gmsh-sidecar/1",
@@ -69,5 +69,5 @@
       "shell": "1"
     }
   ],
-  "supports": []
+  "supports": [{"physical": {"dimension": 1, "tag": 8}, "support": "1"}]
 }

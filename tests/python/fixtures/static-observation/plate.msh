@@ -2,7 +2,8 @@ $MeshFormat
 4.1 0 8
 $EndMeshFormat
 $Entities
-0 0 1 0
+0 1 1 0
+18 1000 2000 3000 1000 4000 3000 1 8 0
 17 1000 2000 3000 1000 4000 5000 1 7 0
 $EndEntities
 $Nodes
@@ -15,7 +16,9 @@ $Nodes
 1000 2000 5000
 $EndNodes
 $Elements
-1 1 701 701
+2 2 700 701
+1 18 1 1
+700 10 20
 2 17 3 1
 701 10 20 40 99
 $EndElements

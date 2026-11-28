@@ -3,6 +3,8 @@
 #include "utf8.hpp"
 
 #include <algorithm>
+#include <array>
+#include <charconv>
 #include <limits>
 #include <type_traits>
 #include <utility>
@@ -31,6 +33,11 @@ void describe(LeafReferenceDiagnostic& diagnostic, RootSnapshotLocation location
     }
 }
 
+std::optional<InputNodeView> member(const InputNodeView& parent, std::string_view key) noexcept {
+    const auto object = parent.object();
+    return object ? object->find(key) : std::nullopt;
+}
+
 class LeafInspector final : public ReferenceDependencyExtractor {
 public:
     LeafInspector(const ReferenceInput& input, LeafFormatLimits limits, std::uint64_t pointer_limit,
@@ -42,6 +49,10 @@ public:
           plan_(plan),
           stop_(stop),
           diagnostic_(diagnostic) {}
+
+    [[nodiscard]] ObservationLeafResults take_observations() noexcept {
+        return std::move(observations_);
+    }
 
     [[nodiscard]] core::Result<ExtractedReferenceDependencies>
     extract(const AcquiredRootSnapshot& snapshot) noexcept override {
@@ -138,6 +149,9 @@ private:
                         observation->record());
                     if (!selected) {
                         outside_static_contract = true;
+                        if (diagnostic_)
+                            describe_observation(snapshot.location, i,
+                                                 LeafReferenceFailure::UnsupportedRole);
                         return fail(Code::Unsupported);
                     }
                 }
@@ -168,25 +182,30 @@ private:
                     bind_observation_file(view->schema, *parsed, zero, options.file.exact,
                                           options.file.maximum_work, plan_, stop_, binding_error);
                 if (!bound) {
-                    if (diagnostic_ && binding_error)
+                    if (diagnostic_ && binding_error) {
                         diagnostic_->format_node = binding_error->input_node;
+                        if (binding_error->case_index)
+                            describe_observation(snapshot.location, *binding_error->case_index,
+                                                 LeafReferenceFailure::Observation);
+                    }
                     return std::unexpected(bound.error());
                 }
                 if (stop_.stop_requested())
                     return fail(Code::Cancelled);
-                auto& owned = *options.result;
-                if (owned.files.size() == 0) {
+                if (!options.result)
+                    return ExtractedReferenceDependencies{};
+                if (observations_.files.size() == 0) {
                     if (!std::in_range<core::Index>(options.maximum_files))
                         return fail(Code::ResourceExceeded);
                     auto allocated = plan_.allocate<std::optional<ObservationFile>>(
                         static_cast<core::Index>(options.maximum_files), operation);
                     if (!allocated)
                         return std::unexpected(allocated.error());
-                    owned.files = std::move(*allocated);
+                    observations_.files = std::move(*allocated);
                 }
-                if (owned.populated >= owned.files.size())
+                if (observations_.populated >= observations_.files.size())
                     return fail(Code::ResourceExceeded);
-                owned.files.values()[owned.populated++].emplace(std::move(*parsed));
+                observations_.files.values()[observations_.populated++].emplace(std::move(*parsed));
                 return ExtractedReferenceDependencies{};
             });
         if (!result)
@@ -194,6 +213,43 @@ private:
                           outside_static_contract ? LeafReferenceFailure::UnsupportedRole
                                                   : LeafReferenceFailure::Observation);
         return result;
+    }
+
+    void describe_observation(RootSnapshotLocation location, core::Index index,
+                              LeafReferenceFailure reason) noexcept {
+        const auto root = input_.condition_root();
+        if (!root)
+            return;
+        const auto observations = member(*root, "observations");
+        if (!observations)
+            return;
+        const auto rows = observations->array();
+        if (!rows)
+            return;
+        const auto row = rows->at(index);
+        if (!row)
+            return;
+        auto source = member(*row, "comparison");
+        for (const std::string_view key : {"reference", "source"}) {
+            if (!source)
+                return;
+            source = member(*source, key);
+        }
+        if (!source)
+            return;
+
+        constexpr std::string_view prefix = "/observations/";
+        constexpr std::string_view suffix = "/comparison/reference/source";
+        std::array<char, prefix.size() + 20 + suffix.size()> pointer;
+        auto* const digit = std::ranges::copy(prefix, pointer.begin()).out;
+        const auto [end, error] = std::to_chars(digit, digit + 20, index);
+        if (error != std::errc{})
+            return;
+        const auto* const finish = std::ranges::copy(suffix, end).out;
+        location.declaration_node = static_cast<std::uint64_t>(source->ordinal().value());
+        describe(*diagnostic_, location,
+                 {pointer.data(), static_cast<std::size_t>(finish - pointer.data())}, reason,
+                 pointer_limit_, plan_);
     }
 
     [[nodiscard]] core::Result<ExtractedReferenceDependencies>
@@ -260,7 +316,7 @@ private:
     [[nodiscard]] core::Result<ExtractedReferenceDependencies>
     reject(core::Failure error, const AcquiredRootSnapshot& file,
            LeafReferenceFailure reason) noexcept {
-        if (diagnostic_ && error.code != Code::Cancelled) {
+        if (diagnostic_ && !diagnostic_->location && error.code != Code::Cancelled) {
             describe(*diagnostic_, file.location, file.pointer(), reason, pointer_limit_, plan_);
         }
         if (stop_.stop_requested() || error.code == Code::Cancelled) {
@@ -273,6 +329,7 @@ private:
     }
 
     const ReferenceInput& input_;
+    ObservationLeafResults observations_;
     std::optional<SourceDigest> condition_;
     LeafFormatLimits limits_;
     std::uint64_t pointer_limit_;
@@ -1040,8 +1097,15 @@ resolve_leaf_references(const ReferenceInput& input, PreparedRootReferences&& pr
     LeafInspector inspector{input, formats, limits.diagnostic_bytes, plan, stop, diagnostic};
     const auto report = prepared.report();
     const auto path_bytes = report ? report->normalized_path_bytes : 0;
-    return resolve_reference_graph(input, std::move(prepared), {intake, limits, path_bytes, {}},
-                                   inspector, plan, stop, acquisition, diagnostic);
+    auto graph =
+        resolve_reference_graph(input, std::move(prepared), {intake, limits, path_bytes, {}},
+                                inspector, plan, stop, acquisition, diagnostic);
+    if (graph && formats.observation && formats.observation->result) {
+        if (stop.stop_requested())
+            return fail(Code::Cancelled);
+        *formats.observation->result = inspector.take_observations();
+    }
+    return graph;
 }
 
 core::Result<NastranBulkDeck>
