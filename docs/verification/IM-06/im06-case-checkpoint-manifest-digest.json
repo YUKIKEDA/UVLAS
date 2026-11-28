@@ -1,0 +1,76 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-case-checkpoint-manifest-digest",
+  "ids": [
+    "IO4-06",
+    "IO4-07"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-28",
+  "source_commit": "d5a5cc3c4f9d935707352ef5d3131cb5bc0f4c78",
+  "claimed_state": "型付きCaseのRestartから元manifestのSHA-256を照合して、コンテナの指定読戻しを行う。",
+  "linux": {
+    "compiler": "GCC 14.2.1",
+    "configuration": "Release",
+    "runtime": "AlmaLinux 8.10 glibc 2.28 on WSL2",
+    "reused_base": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+    "case_directory": {
+      "cases": 4,
+      "assertions": 136
+    },
+    "manifest": {
+      "cases": 4,
+      "assertions": 112
+    },
+    "publication_unchanged": {
+      "cases": 6,
+      "assertions": 92
+    },
+    "digest_guard_removal": {
+      "exit": 42,
+      "failed_assertions": 1,
+      "actual": "ResourceExceeded",
+      "required": "CheckpointCorrupt"
+    }
+  },
+  "expected_raw_manifest_sha256": {
+    "original": "9a2b121a467ad1651f3f02b8a35884ddcb3afa6b77b9c4f80089f05e7be34647",
+    "trailing_space": "33ebefe08a223ea66fb60d0014e98e4057e6c4f8dd772df16aa12d73be3536fa"
+  },
+  "windows": {
+    "compiler": "MSVC 19.52.37029.0",
+    "configuration": "Release",
+    "stl_version": 145,
+    "observed_stl_update": 202609,
+    "required_stl_update_in_product": 202604,
+    "publication": "passed",
+    "directory_and_manifest": "unsupported parser memory model",
+    "direct_parser_failure": "UnsupportedMemoryModel"
+  },
+  "source_sha256": {
+    "src/io/checkpoint_directory.cpp": "392ae2d0695249699034fe3b23fe2608425f9f1efc5a524eca98d0d7c593f803",
+    "src/io/checkpoint_directory.hpp": "f315f8fb81806365974007e7b13afe74dca239590ff8a5e2c5801d3f13168e22",
+    "tests/io/checkpoint_directory_test.cpp": "2e3cc6b40df034c4fc1124bff717ea826913fefd18d40bd7e6bb8d9eb144a4c7",
+    "src/io/checkpoint_manifest.cpp": "aa81b2376821fccc5391e2cf8b22023d8a7a12ed19ed0870ec351c8ba2e008b0",
+    "src/io/source_digest.hpp": "fcb77f59a618c7fb721c0df75740eb0389177fc065f56a6aad53383e981fd71c"
+  },
+  "evidence": [
+    {
+      "path": "case-checkpoint-manifest-digest/linux.log",
+      "sha256": "fc40001e84a11a3d161189aac72da3ae6517533197fc03ff1df46193cf1c2737"
+    },
+    {
+      "path": "case-checkpoint-manifest-digest/mutation.log",
+      "sha256": "9ff749cd63c3d0ee32ffc699ee853150bac8df6c5d8762c17b15e13f04adf1f8"
+    },
+    {
+      "path": "case-checkpoint-manifest-digest/windows-parser-probe.log",
+      "sha256": "0c12b6b3d8d7b5814379d7822f0a6bc79ff64bed63f61607dd383da438231e04"
+    },
+    {
+      "path": "case-checkpoint-manifest-digest/windows.log",
+      "sha256": "94169f202fe5814df91cfc7f09c07796183bb758ba209cf89521f43ff19e8726"
+    }
+  ]
+}

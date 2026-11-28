@@ -1,6 +1,7 @@
 #include "checkpoint_manifest.hpp"
 
 #include "json_object_reader.hpp"
+#include "source_digest.hpp"
 
 #include <algorithm>
 #include <charconv>
@@ -130,15 +131,9 @@ template <class T, class Call>
 }
 
 [[nodiscard]] SourceDigest read_digest(std::string_view text, const Scope& scope) {
-    SourceDigest result{};
-    scope.require(text.size() == result.bytes.size() * 2, corrupt);
-    for (std::size_t i = 0; i < result.bytes.size(); ++i) {
-        const auto high = hex_digits.find(text[i * 2]);
-        const auto low = hex_digits.find(text[i * 2 + 1]);
-        scope.require(high != hex_digits.npos && low != hex_digits.npos, corrupt);
-        result.bytes[i] = static_cast<std::byte>((high << 4) | low);
-    }
-    return result;
+    if (const auto result = decode_source_digest(text))
+        return *result;
+    scope.fail(corrupt);
 }
 
 [[nodiscard]] std::string_view text_field(const InputObjectView& object, std::string_view key,

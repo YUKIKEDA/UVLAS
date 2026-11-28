@@ -5,6 +5,7 @@
 #include "reference_file_snapshot.hpp"
 
 #include <filesystem>
+#include <uvlas/io/case_schema.hpp>
 
 namespace uvlas::io::detail {
 
@@ -35,10 +36,22 @@ save_checkpoint_directory(const std::filesystem::path& parent, std::uint64_t num
 
 /// Read a selected completed checkpoint on Windows or Linux. The last path component
 /// must be its canonical checkpoint number. Every child is opened under one root handle.
+/// A supplied manifest digest pins the exact original bytes before parsing or reading chunks.
 [[nodiscard]] core::Result<LoadedCheckpointDirectory>
 read_checkpoint_directory(const std::filesystem::path&, SourceId, const CheckpointFingerprints&,
                           const CheckpointManifestLimits&, CheckpointDirectoryLimits,
-                          core::ResourcePlan&, const std::stop_token&) noexcept;
+                          core::ResourcePlan&, const std::stop_token&,
+                          std::optional<SourceDigest> manifest_digest = {}) noexcept;
+
+/// Verify the envelope pinned by an existing Case's restart declaration. The caller supplies the
+/// resolved path of that declaration and independently prepared context fingerprints. This returns
+/// the verified container for a later state decoder; compatibility policy and state checks are
+/// separate.
+[[nodiscard]] core::Result<LoadedCheckpointDirectory>
+read_case_checkpoint_directory(const SchemaCase&, const std::filesystem::path& resolved_directory,
+                               SourceId manifest_source, const CheckpointFingerprints&,
+                               const CheckpointManifestLimits&, CheckpointDirectoryLimits,
+                               core::ResourcePlan&, const std::stop_token&) noexcept;
 
 /// Enumerate the caller-selected parent under explicit quotas. Consider only canonical
 /// numbered names, greatest first. Ignore corrupt/incompatible candidates and stop on

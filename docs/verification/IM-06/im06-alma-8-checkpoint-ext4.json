@@ -1,0 +1,146 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-alma-8-checkpoint-ext4",
+  "ids": [
+    "IO4-06",
+    "IO4-07",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-28",
+  "source_commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+  "compared_checkpoint_sources_at": "fb945dfd08582cc2e1e30f538b2a3f3476e827ad",
+  "claimed_state": "署名済みAlmaLinux 8.10カーネルの独立ext4で確定保存、中断状態の拒否、指定・最新の型付き読戻しを確認した。",
+  "build": {
+    "compiler": "GNU 14.2.1 (Red Hat 14.2.1-11)",
+    "configuration": "Release",
+    "files_sha256": {
+      "/mnt/recovery.cpp": "aa6f5b81826911915d72c2fafbd7b2c69ea15e22ed1afe4540f430863ce20b59",
+      "bin/recovery_probe": "d6e0b2d818fc7bdf3b0773b1416dffaacab1bc87874843092d6d2883a1b35054",
+      "/mnt/buildarea/source/tests/io/checkpoint_directory_test.cpp": "e3b254adea07660ffb4f84548d7e553cd981253d5748a9188f375b0aa5c3b970",
+      "/mnt/buildarea/source/tests/io/checkpoint_publication_test.cpp": "982651b8c363d10ad51b180ba3d5d392174c6554e8e3f801ece0f1b7112d0dea",
+      "/mnt/buildarea/catch2/catch-main.o": "cac0dc417d55515486e094331130791238d79045cc9f00e4fce4a0d5c813dd63",
+      "/mnt/buildarea/build/libuvlas_io.a": "9e3888f48ef895712cb25addb7fa20f77884d70b62872da13d54fcf1677cc284",
+      "/mnt/buildarea/build/libuvlas_core.a": "5d1ef2c15a4aafabdae30efb6420ce18ad22e530ed9376aa28ed9e746ec453c3",
+      "/mnt/buildarea/build/libuvlas_numerics.a": "eb26f52dab21c2bc9f10e6276504399bd535c9cbfde33671d91305c64885746e",
+      "bin/checkpoint_directory": "e006b2dad2a53f9f477771424fc4e2d6a754b4f58284ed6b4054f4fcc8ba30c6",
+      "bin/checkpoint_publication": "90e0c4cbaa0296b3e0351d3e4341f9987e3ce8ae089951c215b33486ded04d80"
+    }
+  },
+  "runtime": {
+    "kernel": "4.18.0-553.189.1.el8_10.x86_64",
+    "kernel_sha256": "6c68c16ecb83e4884b10e3cb5b9f9814cdff9127264a1ec32e7edfc910565a69",
+    "kernel_rpm_sha256": "e266435f6d3b65cd94010fb2d2660d51b292634ad55ab0741bc8de08b3d13ecf",
+    "qemu": "6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.31), TCG, x86_64, no network",
+    "boot_files_sha256": {
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/initramfs.cpio.gz": "8d4caafd77ffd4786d8fb3c56373fd3f6cabfeea150ce2912b00f7de6166430b",
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/init": "f6ee6fa71e17b036caf675a5726f82ba6b3206629c1c613a9684b86f52470f06",
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/ext4.ko": "8b258fbf5c4747b3a4f3ec09d80c9b424f6fa6dff4c3d82b769d32a640d561d6",
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/jbd2.ko": "020559fb7c9522e067550eaa5fe61a86a63596998a888623fe3519f8d3de507a",
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/libcrc32c.ko": "198fb70f5bc72515d349a01b9bc92c8f8da1fbaa9d69977b20a444370507cc67",
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/mbcache.ko": "e759436576abf5b9eba137ea338391f81bd75d85bb84b965e275a379d579fe33",
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-checkpoint/guest/modules/virtio_blk.ko": "2b87bb4fe056b035e009340eae458b7f380575a57e8fb19731bba2192be56d88",
+      "/var/tmp/uvlas-runtime-260.XA9rRx/r06-alma-boot/kernel/lib/modules/4.18.0-553.189.1.el8_10.x86_64/vmlinuz": "6c68c16ecb83e4884b10e3cb5b9f9814cdff9127264a1ec32e7edfc910565a69",
+      "/tests/checkpoint_directory": "e006b2dad2a53f9f477771424fc4e2d6a754b4f58284ed6b4054f4fcc8ba30c6",
+      "/tests/checkpoint_publication": "90e0c4cbaa0296b3e0351d3e4341f9987e3ce8ae089951c215b33486ded04d80",
+      "/tests/recovery_probe": "d6e0b2d818fc7bdf3b0773b1416dffaacab1bc87874843092d6d2883a1b35054",
+      "/lib64/libc.so.6": "867aee8b9dc11ef71edf63c8300105d9e7a2df3ca4235c9528f8685de64161ea",
+      "/lib64/libstdc++.so.6": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134"
+    }
+  },
+  "filesystem": {
+    "format": "ext4",
+    "device": "/dev/vda",
+    "mount": "/save",
+    "mount_options": [
+      "rw",
+      "relatime"
+    ],
+    "capacity_bytes": 134217728,
+    "uuid": "83c9ac18-9b7e-410b-bf0b-fd6837f49d08",
+    "features": [
+      "has_journal",
+      "ext_attr",
+      "resize_inode",
+      "dir_index",
+      "filetype",
+      "extent",
+      "64bit",
+      "flex_bg",
+      "sparse_super",
+      "large_file",
+      "huge_file",
+      "dir_nlink",
+      "extra_isize",
+      "metadata_csum"
+    ],
+    "tools": "e2fsprogs 1.46.5",
+    "fresh_image_sha256": "70d190a4ada805684670bf0df4e8fd8f241847ce5dae33ed72be3d9608f31b80",
+    "after_guest_unmount_sha256": "8a262eb23894aab34ae223795a0ba838ad2a731edf0e5e87a531df26f28d55fb",
+    "e2fsck_read_only_exit": 0
+  },
+  "results": {
+    "checkpoint_directory": {
+      "cases": 3,
+      "assertions": 120
+    },
+    "checkpoint_publication": {
+      "cases": 6,
+      "assertions": 92
+    },
+    "interruption": {
+      "signal": "SIGXFSZ",
+      "staged_bytes": [
+        8,
+        12
+      ],
+      "staged_manifest": false,
+      "canonical_name_visible": false,
+      "explicit_failure": "CheckpointCorrupt",
+      "latest": 12,
+      "decoded": [
+        42
+      ]
+    },
+    "retry": {
+      "latest": 13,
+      "decoded": [
+        42,
+        100,
+        200
+      ],
+      "duplicate_number_accepted": false
+    },
+    "independent_image_read": {
+      "complete_chunk_digests_confirmed": 3,
+      "staging_prefix_matches": true
+    }
+  },
+  "evidence": [
+    {
+      "path": "alma-8-checkpoint-ext4/build.log",
+      "sha256": "8ba852052bfe3cc54d1a48efc4a16ac4e0ff49a958dd535e5f8fe6052cca4acd"
+    },
+    {
+      "path": "alma-8-checkpoint-ext4/boot.log",
+      "sha256": "8565cd218696e9cdb0524e16021f3ce7cb27ada743115058179ff6f306d65524"
+    },
+    {
+      "path": "alma-8-checkpoint-ext4/disk.log",
+      "sha256": "82f8f96bd6a649872d7f82e7b8b24a5687eb7fa23e2f8c111099bf0fe682e74d"
+    },
+    {
+      "path": "alma-8-checkpoint-ext4/init.sh",
+      "sha256": "f6ee6fa71e17b036caf675a5726f82ba6b3206629c1c613a9684b86f52470f06"
+    },
+    {
+      "path": "alma-8-checkpoint-ext4/checkpoint-recovery-probe.cpp",
+      "sha256": "aa6f5b81826911915d72c2fafbd7b2c69ea15e22ed1afe4540f430863ce20b59"
+    },
+    {
+      "path": "alma-8-checkpoint-ext4/check-disk.py",
+      "sha256": "773a854a524fc2268a5b6b242c96c0c58cead757e135b5136c93d30161f0ba44"
+    }
+  ]
+}

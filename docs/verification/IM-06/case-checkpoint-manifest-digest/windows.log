@@ -1,0 +1,354 @@
+Internal ctest changing into directory: C:/Users/yuuuu/.codex/worktrees/uvlas-im00-9/UVLAS/out/r06-alma-kernel/case-restart-msvc-exact
+Test project C:/Users/yuuuu/.codex/worktrees/uvlas-im00-9/UVLAS/out/r06-alma-kernel/case-restart-msvc-exact
+    Start 22: io.checkpoint_manifest
+1/3 Test #22: io.checkpoint_manifest ...........***Failed    0.09 sec
+Randomness seeded to: 4142430924
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uvlas_test_io_checkpoint_manifest.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Checkpoint recovery validates every named payload before publishing a set
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(191)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(191): FAILED:
+due to unexpected exception with message:
+  Expected a checkpoint result
+
+-------------------------------------------------------------------------------
+Checkpoint manifests validate an independent payload set and retain its words
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(80)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(80): FAILED:
+due to unexpected exception with message:
+  Expected a checkpoint result
+
+-------------------------------------------------------------------------------
+Checkpoint manifest writing is canonical and honors output limits
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(230)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(245): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Expected a checkpoint result
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 16
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 16
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 16
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 16
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == 15
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == '\f'
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == '\f'
+
+-------------------------------------------------------------------------------
+A checkpoint manifest rejects incompatible products and corrupt declarations
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_manifest_test.cpp(186): FAILED:
+  CHECK( result.error().code == code )
+with expansion:
+  1 == '\f'
+
+===============================================================================
+test cases:  4 |  0 passed |  4 failed
+assertions: 71 | 50 passed | 21 failed
+
+
+    Start 24: io.checkpoint_publication
+2/3 Test #24: io.checkpoint_publication ........   Passed    0.20 sec
+    Start 25: io.checkpoint_directory
+3/3 Test #25: io.checkpoint_directory ..........***Failed    0.53 sec
+Randomness seeded to: 3360239591
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+uvlas_test_io_checkpoint_directory.exe is a Catch2 v3.16.1 host application.
+Run with -? for options
+
+-------------------------------------------------------------------------------
+Checkpoint directories round-trip typed data and discover the latest valid
+number
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(170): FAILED:
+  CHECK( corrupt.error().code == core::FailureCode::CheckpointCorrupt )
+with expansion:
+  1 == 15
+with message:
+  newest := 0
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(185): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Expected a checkpoint result
+
+-------------------------------------------------------------------------------
+Checkpoint directories round-trip typed data and discover the latest valid
+number
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(156): FAILED:
+  CHECK( incompatible.error().code == core::FailureCode::CheckpointIncompatible )
+with expansion:
+  1 == 16
+with message:
+  newest := 1
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(185): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Expected a checkpoint result
+
+-------------------------------------------------------------------------------
+Checkpoint directories round-trip typed data and discover the latest valid
+number
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(116)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(178): FAILED:
+  CHECK( corrupted.error().code == core::FailureCode::CheckpointCorrupt )
+with expansion:
+  1 == 15
+with message:
+  newest := 2
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(185): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Expected a checkpoint result
+
+-------------------------------------------------------------------------------
+Latest checkpoint lookup stops if a candidate exhausts its enumeration limit
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(89)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(107): FAILED:
+  REQUIRE( cp::read_checkpoint_directory(root.path() / "checkpoint-1", input, context, limits, entry_cap, plan, {}) )
+with expansion:
+  {?}
+
+-------------------------------------------------------------------------------
+A Case restart pins the exact checkpoint manifest before reading chunks
+-------------------------------------------------------------------------------
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(230)
+...............................................................................
+
+C:\Users\yuuuu\.codex\worktrees\uvlas-im00-9\UVLAS\tests\io\checkpoint_directory_test.cpp(246): FAILED:
+  {Unknown expression after the reported line}
+due to unexpected exception with message:
+  Expected a checkpoint result
+
+===============================================================================
+test cases:  4 |  1 passed | 3 failed
+assertions: 44 | 36 passed | 8 failed
+
+
+
+33% tests passed, 2 tests failed out of 3
+
+Label Time Summary:
+integration     =   0.73 sec*proc (2 tests)
+negative        =   0.82 sec*proc (3 tests)
+property        =   0.09 sec*proc (1 test)
+unit            =   0.09 sec*proc (1 test)
+verification    =   0.82 sec*proc (3 tests)
+
+Total Test time (real) =   0.88 sec
+
+The following tests FAILED:
+	 22 - io.checkpoint_manifest (Failed)
+	 25 - io.checkpoint_directory (Failed)
+Errors while running CTest

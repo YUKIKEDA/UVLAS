@@ -1,6 +1,7 @@
 #include "checkpoint_directory.hpp"
 
 #include "checkpoint_directory_name.hpp"
+#include "source_digest.hpp"
 
 #if defined(_WIN32)
 #include "windows_checkpoint_query.hpp"
@@ -266,7 +267,8 @@ struct CheckpointDirectoryReader {
     [[nodiscard]] static LoadedCheckpointDirectory
     read(const std::filesystem::path& directory, SourceId source,
          const CheckpointFingerprints& expected, const CheckpointManifestLimits& limits,
-         CheckpointDirectoryLimits files, core::ResourcePlan& plan, const std::stop_token& stop) {
+         CheckpointDirectoryLimits files, core::ResourcePlan& plan, const std::stop_token& stop,
+         const std::optional<SourceDigest>& manifest_digest) {
         if (stop.stop_requested())
             throw core::Failure{core::FailureCode::Cancelled, recover, {}};
         const auto number = checked(checkpoint_number(directory));
@@ -276,6 +278,8 @@ struct CheckpointDirectoryReader {
             manifest_handle, bound_size(files.file, limits.json.maximum_source_bytes), plan, stop,
             nullptr));
         const auto original = checked(snapshot.view());
+        if (manifest_digest && original.digest != *manifest_digest)
+            throw core::Failure{corrupt, recover, {}};
         auto manifest =
             checked(CheckpointManifest::read(original.bytes, source, expected, limits, plan, stop));
         DirectoryEntries entries{manifest, files.maximum_entries, stop};
@@ -330,16 +334,36 @@ core::Result<LoadedCheckpointDirectory>
 read_checkpoint_directory(const std::filesystem::path& directory, SourceId source,
                           const CheckpointFingerprints& expected,
                           const CheckpointManifestLimits& limits, CheckpointDirectoryLimits files,
-                          core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
-    return core::guard_entry(recover, corrupt, {},
-                             [&]() -> core::Result<LoadedCheckpointDirectory> {
-                                 try {
-                                     return CheckpointDirectoryReader::read(
-                                         directory, source, expected, limits, files, plan, stop);
-                                 } catch (const core::Failure& failure) {
-                                     return std::unexpected(failure);
-                                 }
-                             });
+                          core::ResourcePlan& plan, const std::stop_token& stop,
+                          std::optional<SourceDigest> manifest_digest) noexcept {
+    return core::guard_entry(
+        recover, corrupt, {}, [&]() -> core::Result<LoadedCheckpointDirectory> {
+            try {
+                return CheckpointDirectoryReader::read(directory, source, expected, limits, files,
+                                                       plan, stop, manifest_digest);
+            } catch (const core::Failure& failure) {
+                return std::unexpected(failure);
+            }
+        });
+}
+
+core::Result<LoadedCheckpointDirectory> read_case_checkpoint_directory(
+    const SchemaCase& input, const std::filesystem::path& resolved_directory,
+    SourceId manifest_source, const CheckpointFingerprints& expected,
+    const CheckpointManifestLimits& limits, CheckpointDirectoryLimits files,
+    core::ResourcePlan& plan, const std::stop_token& stop) noexcept {
+    if (stop.stop_requested())
+        return std::unexpected(core::Failure{cancelled, recover, {}});
+    const auto root = input.root();
+    if (!root)
+        return std::unexpected(root.error());
+    if (!root->restart)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, recover, {}});
+    const auto digest = decode_source_digest(root->restart->record().manifest_sha256.text());
+    if (!digest)
+        return std::unexpected(core::Failure{core::FailureCode::InvalidInput, recover, {}});
+    return read_checkpoint_directory(resolved_directory, manifest_source, expected, limits, files,
+                                     plan, stop, digest);
 }
 
 core::Result<LoadedCheckpointDirectory>

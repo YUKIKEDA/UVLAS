@@ -1,0 +1,96 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-linux-parser-input-qualification",
+  "ids": [
+    "IO4-01",
+    "IO4-07",
+    "R-06"
+  ],
+  "package": "IM-06",
+  "issue": 22,
+  "date": "2026-11-28",
+  "source_commit": "bef6126f486152e50dadbdbefa435714766ca04a",
+  "claimed_state": "固定GNU Makeビルドの実ヘッダーを照合し、同じ移設CLIと拡張で例外提供元と事前指定外部Caseを続けて検査する。",
+  "candidate_source_commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+  "candidate_runtime": {
+    "os": "AlmaLinux 8.10",
+    "libc": [
+      "glibc",
+      "2.28"
+    ],
+    "kernel_release": "6.18.58.1-microsoft-standard-WSL2",
+    "cpython": "3.12.16",
+    "compiler": "GNU 14.2.1"
+  },
+  "runs": {
+    "fixed_build": {
+      "dependency_file": {
+        "path": "buildarea/build/CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o.d",
+        "sha256": "b438a37c99df20fc3d9ff8cdfd54bcaa53773515aa28962b0923817e02005996"
+      },
+      "parser_object": {
+        "path": "buildarea/build/CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o",
+        "sha256": "e8bbeee73673db3597b7629f24e8ceabfc40eab1f62cf767a88de8c8e9d3764e"
+      },
+      "artifact_hashes": {
+        "cli": "bb9c2ccb8c2b42bcf15770334ce1b58d69932a55b726baf2b731cfc0c4be6944",
+        "extension": "8488cc1f93ded36d819091544dbefdb25e036371768aa7159fc5fa310f702ffc"
+      },
+      "header_sha256": {
+        "basic_string.tcc": "7c8e15840577ec46af320cb89ee5898efdb08301ce05d3739f414797c31c417f",
+        "stl_bvector.h": "d17336c83d5b5f17fcfab5712e091446995ccfb65351bd0798baccdd41e00b8d",
+        "stl_vector.h": "466fdab9756343b1fca4c36cb5105db50654fbf9f32166ce0cde5e369901fe26",
+        "vector.tcc": "852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68"
+      },
+      "cli_and_extension_exception_runtime": {
+        "cli": {
+          "file": "libstdc++.so.6.0.25",
+          "sha256": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134"
+        },
+        "extension": {
+          "file": "libstdc++.so.6.0.25",
+          "sha256": "d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134"
+        },
+        "symbol": "std::runtime_error(char const*)@GLIBCXX_3.4.21"
+      },
+      "external_case": {
+        "case_sha256": "741e954d7cdbf8882f9f8876efbeed287e304403d284de5a0e3e2bbef90c298b",
+        "cli": "accepted",
+        "python_file": "accepted"
+      },
+      "producer_manifest_sha256": "2ddd32581a917c8b64a165228be930759648d044b6e7b2a5cbf3b477426fa0c8",
+      "raw_audit_result_sha256": "9601e353b0ed42b027962274c2b0c7c7bef27ebfd77694e219b4aadc2dc854d1"
+    },
+    "alternate_header_rebuild": {
+      "dependency_file": {
+        "path": "buildarea-header-negative/CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o.d",
+        "sha256": "8e8efbdc8741efaf3901c4e61c8bb4fdc3ea766d04d1f305a4cf62121e6f4a72"
+      },
+      "parser_object": {
+        "path": "buildarea-header-negative/CMakeFiles/uvlas_io.dir/src/io/input_document.cpp.o",
+        "sha256": "e8bbeee73673db3597b7629f24e8ceabfc40eab1f62cf767a88de8c8e9d3764e"
+      },
+      "artifact_hashes": {
+        "cli": "bb9c2ccb8c2b42bcf15770334ce1b58d69932a55b726baf2b731cfc0c4be6944",
+        "extension": "8488cc1f93ded36d819091544dbefdb25e036371768aa7159fc5fa310f702ffc"
+      },
+      "glibcxx_header_date": 20250110,
+      "observed_vector_tcc_sha256": "dc5dad860d9f9add7ccbbea1e67f315c6f0f74d6398ccdd6459391a976cd0dc2",
+      "expected_vector_tcc_sha256": "852a357119ffc407a2d940c4e97b71b7e20b0c879e5af9e04a5405d1ba2e7d68",
+      "producer_manifest_sha256": "2ddd32581a917c8b64a165228be930759648d044b6e7b2a5cbf3b477426fa0c8",
+      "audit_exit": 1,
+      "success_report_emitted": false,
+      "raw_build_and_audit_log_sha256": "4a2701a2129ec0f8d2b44ac582882104449e612cc3b283628b14867506d40cf4"
+    }
+  },
+  "checks": {
+    "expected_header_mismatch_exit": 1,
+    "expected_case_digest_mismatch_exit": 1,
+    "existing_runtime_only_audit_passed": true
+  },
+  "artifacts": {
+    "tools/qa/runtime_artifact_audit.py": "7f2843291561aff539af8fd1e53779ab091de4b71dc7eece29ff411da4f1ae99",
+    "docs/build.md": "ad771fa780a82adee420ac35bf0cedffaa3fcf8912291f6cfbb63b9f633adb77",
+    "docs/verification/IM-06/linux-parser-input-qualification.md": "5cfa81acfb5e4349cc47779fd60828244ee3a657d7c203e2ddcb905358b7e005"
+  }
+}

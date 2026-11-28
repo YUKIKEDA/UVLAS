@@ -5,9 +5,11 @@
 #include "io/nastran_lumped_mass_geometry.hpp"
 #include "io/nastran_rigid_attachment.hpp"
 
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <span>
+#include <utility>
 #include <variant>
 
 namespace uvlas::coupling::detail {
@@ -119,7 +121,16 @@ private:
 
 using CaseNastranMassId = io::detail::MeshCaseId<io::SchemaNamespace::Mass>;
 
-enum class CaseNastranParticleFailure : std::uint8_t { Source, Selection, Kind, Mass, Position };
+enum class CaseNastranParticleFailure : std::uint8_t {
+    Source,
+    Selection,
+    Kind,
+    Mass,
+    Position,
+    Frame,
+    Centre,
+    Inertia,
+};
 
 struct CaseNastranParticleDiagnostic {
     CaseNastranParticleFailure reason = CaseNastranParticleFailure::Source;
@@ -127,7 +138,7 @@ struct CaseNastranParticleDiagnostic {
     std::optional<io::detail::NastranBulkPosition> field;
 };
 
-struct CaseNastranParticleMass {
+struct CaseNastranMassAttachment {
     io::detail::RootSnapshotLocation deck, sidecar;
     io::SourceDigest deck_digest, sidecar_digest;
     io::detail::NastranSidecarElementBinding<io::SchemaNamespace::Mass> binding;
@@ -138,6 +149,15 @@ struct CaseNastranParticleMass {
     structure::ExactRational mass_kg;
 };
 
+using CaseNastranParticleMass = CaseNastranMassAttachment;
+
+struct CaseNastranRigidMass {
+    CaseNastranMassAttachment attachment;
+    std::array<structure::ExactRational, 3> centre_metres;
+    // Centroidal tensor in basic axes, lower triangle in row order.
+    std::array<structure::ExactRational, 6> centre_inertia_kg_m2;
+};
+
 // A particle requires one authenticated CONM2, zero lever and centre inertia, and
 // the same original shell GRID at the Case material point on the midsurface.
 [[nodiscard]] core::Result<CaseNastranParticleMass>
@@ -145,5 +165,40 @@ certify_case_nastran_particle_mass(const io::SiCase&, const CaseNastranReference
                                    CaseNastranMassId, const structure::PgReferenceLimits&,
                                    core::ResourcePlan&,
                                    CaseNastranParticleDiagnostic* = nullptr) noexcept;
+
+/// Compare the same shell GRID, the centre p + R c and the centroidal tensor
+/// R I_c R^T in basic coordinates, using an authenticated rigid CONM2.
+[[nodiscard]] core::Result<CaseNastranRigidMass>
+certify_case_nastran_rigid_mass(const io::SiCase&, const CaseNastranReferenceInputs&,
+                                CaseNastranMassId, const structure::PgReferenceLimits&,
+                                core::ResourcePlan&,
+                                CaseNastranParticleDiagnostic* = nullptr) noexcept;
+
+struct CaseNastranMassSetDiagnostic {
+    CaseNastranCardSelection declaration;
+    CaseNastranParticleDiagnostic comparison;
+};
+
+/// Case-equivalent masses in sidecar declaration order. Each slot owns its
+/// qualified physical values and provenance. A failure publishes no slots.
+class CaseNastranMassSet {
+public:
+    using Mass = std::variant<CaseNastranParticleMass, CaseNastranRigidMass>;
+
+    [[nodiscard]] static core::Result<CaseNastranMassSet>
+    certify(const io::SiCase&, const CaseNastranReferenceInputs&,
+            const structure::PgReferenceLimits&, core::ResourcePlan&,
+            std::optional<CaseNastranMassSetDiagnostic>* = nullptr) noexcept;
+
+    [[nodiscard]] std::span<const std::optional<Mass>> masses() const& noexcept {
+        return masses_.values();
+    }
+    [[nodiscard]] std::span<const std::optional<Mass>> masses() const&& = delete;
+
+private:
+    explicit CaseNastranMassSet(core::PlannedBuffer<std::optional<Mass>>&& masses) noexcept
+        : masses_(std::move(masses)) {}
+    core::PlannedBuffer<std::optional<Mass>> masses_;
+};
 
 } // namespace uvlas::coupling::detail

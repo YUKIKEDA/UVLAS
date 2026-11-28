@@ -534,6 +534,209 @@ TEST_CASE("One planar Case has the same measured Shell through Nastran and Gmsh"
     CHECK(fixture::take(fixture::take(n_again.at(0)).get().reference().identity()) == identity);
 }
 
+TEST_CASE("Both authenticated mesh formats reject exact thickness and material differences",
+          "[.exact-sidecar][FD-03][MAT-D05][IO4-01][IO4-03][IO4-04][R-05][V-USE][integration]["
+          "verification][negative]") {
+    constexpr std::string_view length = "0.00254";
+    constexpr std::string_view shifted = "0.00254000000000000000000000000001";
+    constexpr std::string_view young = "200000.0";
+    constexpr std::string_view shifted_young = "200000.00000000001";
+    static_assert(0.00254 == 0.00254000000000000000000000000001);
+    static_assert(200000.0 == 200000.00000000001);
+
+    const auto thickness_values = [&](std::string_view last) {
+        return fixture::json("[0.00254,0.00254,0.00254," + std::string{last} + "]");
+    };
+    auto config = fixture::root("coupled_transient");
+    auto& model = config.field("model");
+    auto& pg = model.field("geometry").elements.front();
+    pg.field("frame").set("origin", fixture::json("[1,2,3]"));
+    pg.field("frame").set("rotation", fixture::json("[[0,0,1],[1,0,0],[0,1,0]]"));
+    pg.set("reference_length", fixture::json("2"));
+    pg.field("thickness").set("values", thickness_values(length));
+    auto& materials = model.field("materials").elements;
+    materials.front().set("young", fixture::json("200000000000"));
+    materials.front().set("poisson", fixture::json("0.25"));
+    materials.front().set("density", fixture::json("7850"));
+    auto alternate = materials.front();
+    alternate.set("id", fixture::string("2"));
+    materials.push_back(std::move(alternate));
+    model.field("shells")
+        .elements.front()
+        .field("layers")
+        .elements.front()
+        .field("axis")
+        .field("direction")
+        .set("value", fixture::json("[0,1,0]"));
+
+    const auto millimetre_deck = [](std::string_view modulus) {
+        return std::string{"GRID,10,,1000.0,2000.0,3000.0\nGRID,20,,1000.0,4000.0,3000.0\n"
+                           "GRID,40,,1000.0,4000.0,5000.0\nGRID,99,,1000.0,2000.0,5000.0\n"
+                           "CQUAD4,701,90,10,20,40,99,0.0\nPSHELL,90,6,2.54\nMAT1,6,"} +
+               std::string{modulus} + ",80000.0,.25,7.85D-9\n";
+    };
+    const auto gmsh_map = [](std::string_view id, std::string_view material) {
+        auto sidecar = native_sidecar(true, false, id);
+        auto& shell = sidecar["shells"].at(0);
+        shell["full_thickness"] = 2.54;
+        shell["material_layers"].at(0)["material"] = material;
+        return sidecar.dump();
+    };
+    const auto nastran_map = [](std::string_view id) {
+        auto sidecar = native_sidecar(false, false, id);
+        sidecar["units"]["length"] = "mm";
+        sidecar["units"]["mass"] = "t";
+        return sidecar.dump();
+    };
+    const files::Tree tree;
+    write_external(model, tree, true, 2, 1, mesh, gmsh_map("2", "1"));
+    write_external(model, tree, false, 3, 3, millimetre_deck(young), nastran_map("3"));
+    write_external(model, tree, true, 4, 5, mesh, gmsh_map("4", "2"));
+    const auto shifted_deck = millimetre_deck(shifted_young);
+    write_external(model, tree, false, 5, 7, shifted_deck, nastran_map("5"));
+
+    core::ResourcePlan plan{fixture::budget};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const auto limits = make_binding_limits();
+    const PgReferenceLimits pg_limits{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const coupling::CasePgReferenceLimits preparation{
+        {pg_limits.algebra, 4, {}},
+        {pg_limits.algebra, 2000, 20'000'000, 100'000, {}},
+        partition_test::limits(),
+        pg_limits,
+        100'000,
+        {}};
+    const rd::ExternalSidecarPgLimits match{{pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
+    std::optional<rd::MeshSidecarDiagnostic> binding_diag;
+    const auto bind = [&](const auto& schema, const auto& graph, unsigned id) {
+        return rd::bind_external_mesh_sidecar(schema, graph, rd::MeshGeometryId{id}, limits, plan,
+                                              {}, &binding_diag);
+    };
+    const auto prepare_gmsh = [&](const auto& si, const auto& binding, auto& diagnostic) {
+        return coupling::CaseGmshPgSet::prepare(si, binding, preparation, match, {1, 1, 200'000},
+                                                workspace, plan, &diagnostic);
+    };
+    const auto prepare_nastran = [&](const auto& si, const auto& binding, const auto& cards,
+                                     auto& diagnostic) {
+        return coupling::CaseNastranPlanarPgSet::prepare(si, binding, cards, preparation, match,
+                                                         {1, 1, 1}, workspace, plan, &diagnostic);
+    };
+
+    const auto graph = read_graph(tree, config, plan);
+    const auto schema = fixture::checked(config);
+    const auto si = convert(schema, pg_limits.algebra, plan);
+    const auto parent = fixture::take(schema.identity());
+    const auto gmsh = fixture::take(bind(schema, graph, 2));
+    const auto nastran = fixture::take(bind(schema, graph, 3));
+    const auto cards = quantities(graph, parent, io::SourceId{3}, limits, plan);
+    coupling::CaseGmshPgSetDiagnostic gmsh_diag;
+    coupling::CaseNastranPgSetDiagnostic nastran_diag;
+    const auto good_gmsh = fixture::take(prepare_gmsh(si, gmsh, gmsh_diag));
+    const auto good_nastran = fixture::take(prepare_nastran(si, nastran, cards, nastran_diag));
+    const auto& g = fixture::take(good_gmsh.at(0)).get();
+    const auto& n = fixture::take(good_nastran.at(0)).get();
+    const auto identity = fixture::take(g.reference().identity());
+    CHECK(fixture::take(n.reference().identity()) == identity);
+
+    // Independently, (254/100) * (1/1000) m = 127/50000 m.
+    const auto metres =
+        fixture::take(ExactRational::from_integer_pair("127", "50000", pg_limits.algebra, plan));
+    for (const auto* report : {&required_evidence(g.match().thickness),
+                               &required_evidence(n.match().planar.thickness_regions)}) {
+        CHECK(report->pg == identity);
+        REQUIRE(report->matches.size() == 1);
+        CHECK(std::get<ExactRational>(report->matches.values().front().value_metres) == metres);
+    }
+
+    const auto g_material = bind(schema, graph, 4);
+    REQUIRE_FALSE(g_material);
+    CHECK(g_material.error().code == core::FailureCode::InvalidInput);
+    CHECK(g_material.error().operation == core::Operation::PrepareModel);
+    const auto& material_diagnostic = required_evidence(binding_diag);
+    CHECK(material_diagnostic.reason == rd::MeshSidecarFailure::CaseReference);
+    CHECK(material_diagnostic.target_namespace == io::SchemaNamespace::Shell);
+    CHECK(material_diagnostic.target == 1);
+    CHECK(material_diagnostic.physical == rd::GmshKey{2, 7});
+    CHECK(required_evidence(material_diagnostic.source).source == io::SourceId{6});
+    CHECK(material_diagnostic.node);
+    const auto n_material = fixture::take(bind(schema, graph, 5));
+    const auto bad_cards = quantities(graph, parent, io::SourceId{7}, limits, plan);
+    const auto n_material_failure = prepare_nastran(si, n_material, bad_cards, nastran_diag);
+    REQUIRE_FALSE(n_material_failure);
+    CHECK(n_material_failure.error().code == core::FailureCode::InvalidInput);
+    CHECK(n_material_failure.error().operation == core::Operation::PrepareModel);
+    const auto& young_mismatch = required_evidence(nastran_diag.member.planar.quantity);
+    CHECK(young_mismatch.quantity == rd::ImportedQuantityField::Young1);
+    CHECK(required_evidence(young_mismatch.card_position).byte == shifted_deck.find(shifted_young));
+
+    // Reacquire an otherwise identical Case from the same source and sidecar bytes.
+    auto different_case = config;
+    different_case.field("model")
+        .field("geometry")
+        .elements.front()
+        .field("thickness")
+        .set("values", thickness_values(shifted));
+    const auto different_graph = read_graph(tree, different_case, plan);
+    const auto different_schema = fixture::checked(different_case);
+    const auto different_si = convert(different_schema, pg_limits.algebra, plan);
+    const auto different_parent = fixture::take(different_schema.identity());
+    const auto different_gmsh = fixture::take(bind(different_schema, different_graph, 2));
+    const auto different_nastran = fixture::take(bind(different_schema, different_graph, 3));
+    CHECK(different_gmsh.sidecar().digest() == gmsh.sidecar().digest());
+    CHECK(different_nastran.sidecar().digest() == nastran.sidecar().digest());
+    const auto different_cards =
+        quantities(different_graph, different_parent, io::SourceId{3}, limits, plan);
+    const auto g_failure = prepare_gmsh(different_si, different_gmsh, gmsh_diag);
+    const auto n_failure =
+        prepare_nastran(different_si, different_nastran, different_cards, nastran_diag);
+    CHECK_FALSE(g_failure.has_value());
+    CHECK_FALSE(n_failure.has_value());
+    REQUIRE((!g_failure && !n_failure));
+    CHECK(g_failure.error().code == core::FailureCode::InvalidInput);
+    CHECK(g_failure.error().operation == core::Operation::PrepareModel);
+    CHECK(n_failure.error().code == core::FailureCode::InvalidInput);
+    CHECK(n_failure.error().operation == core::Operation::PrepareModel);
+    const auto& g_difference = required_evidence(gmsh_diag.member.regional_thickness);
+    const auto& n_difference = required_evidence(nastran_diag.member.planar.regional_thickness);
+    for (const auto* difference : {&g_difference, &n_difference}) {
+        CHECK(difference->reason == rd::ExternalPgThicknessFailure::Difference);
+        CHECK(difference->element == 701);
+        CHECK(difference->case_triangle == 1);
+        CHECK(difference->overlap_vertex);
+    }
+    const auto& group = std::get<rd::GmshSidecar>(different_gmsh.sidecar().payload());
+    CHECK(g_difference.sidecar_node == group.shells.values().front().full_thickness_node);
+    CHECK(g_difference.sidecar_node);
+    CHECK(n_difference.property == rd::NastranPropertyId{90});
+    CHECK(required_evidence(n_difference.field).byte == millimetre_deck(young).find("2.54"));
+
+    auto unknown_face_case = config;
+    auto unknown_face_map = nlohmann::json::parse(nastran_map("3"));
+    unknown_face_map["shells"].at(0)["element"] = "999";
+    const auto map_bytes = unknown_face_map.dump();
+    auto& map_ref =
+        unknown_face_case.field("model").field("geometry").elements.at(2).field("sidecar");
+    files::declare_path(map_ref, "unknown-face.json", hex_digest(map_bytes));
+    files::write_file(tree.root / "unknown-face.json", map_bytes);
+    const auto unknown_face_graph = read_graph(tree, unknown_face_case, plan);
+    const auto unknown_face_schema = fixture::checked(unknown_face_case);
+    const auto unknown_face = bind(unknown_face_schema, unknown_face_graph, 3);
+    REQUIRE_FALSE(unknown_face);
+    CHECK(unknown_face.error().code == core::FailureCode::InvalidInput);
+    CHECK(unknown_face.error().operation == core::Operation::PrepareModel);
+    const auto& unknown_face_diagnostic = required_evidence(binding_diag);
+    CHECK(unknown_face_diagnostic.reason == rd::MeshSidecarFailure::Selection);
+    CHECK(unknown_face_diagnostic.element == 999);
+    CHECK(required_evidence(unknown_face_diagnostic.source).source == io::SourceId{4});
+    CHECK(unknown_face_diagnostic.node);
+    CHECK_FALSE(unknown_face_diagnostic.byte);
+
+    const auto g_again = fixture::take(prepare_gmsh(si, gmsh, gmsh_diag));
+    const auto n_again = fixture::take(prepare_nastran(si, nastran, cards, nastran_diag));
+    CHECK(fixture::take(fixture::take(g_again.at(0)).get().reference().identity()) == identity);
+    CHECK(fixture::take(fixture::take(n_again.at(0)).get().reference().identity()) == identity);
+}
+
 TEST_CASE(
     "Authenticated external reference owners enter the same full-depth Case chart",
     "[.external-case-chart][FD-03][IO4-03][IO4-04][R-05][V-USE][V-PG][integration][negative]") {
@@ -923,8 +1126,8 @@ TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
     auto& model = config.field("model");
     auto& pg = model.field("geometry").elements.front();
     pg.field("thickness").set("values", fixture::json("[0.25,0.25,0.25,0.25]"));
-    if (trial == Trial::Offset)
-        pg.field("frame").set("origin", fixture::json("[0,0,0.125]"));
+    pg.field("frame").set("origin",
+                          fixture::json(trial == Trial::Offset ? "[2,3,5.125]" : "[2,3,5]"));
     auto support = fixture::fragment("Support.constraint");
     support.set("components",
                 fixture::json(trial == Trial::DifferentComponents ? "[0,2]" : "[1,2]"));
@@ -933,10 +1136,10 @@ TEST_CASE("An original SPCADD point support agrees with the same Case Shell",
     auto& supports = model.field("supports").elements;
     supports.clear();
     supports.push_back(std::move(support));
-    std::string native{R"BDF(GRID,10,,0.0,0.0,0.0,12
-GRID,20,,1.0,0.0,0.0
-GRID,40,,1.0,1.0,0.0
-GRID,99,,0.0,1.0,0.0
+    std::string native{R"BDF(GRID,10,,2.0,3.0,5.0,12
+GRID,20,,3.0,3.0,5.0
+GRID,40,,3.0,4.0,5.0
+GRID,99,,2.0,4.0,5.0
 CORD2R,12,,0.0,0.0,0.0,0.0,0.0,1.0
 ,0.0,1.0,0.0
 CQUAD4,701,90,10,20,40,99,0.0)BDF"};
@@ -985,10 +1188,40 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
             si, bound, *prepared, rd::NastranSupportSetId{61}, rd::NastranGridId{10}, limits, plan,
             &diagnostic);
     };
+    const RectangleOracle oracle{arithmetic, plan};
+    const auto plane_weight = oracle.r("1", "6");
+    const auto depth_weight = oracle.r("1", "3");
+    std::array<ExactRational, 6> positions;
+    std::vector<PgLineQuadratureNode> plane;
+    plane.reserve(positions.size());
+    for (std::size_t i = 0; i < positions.size(); ++i) {
+        positions[i] = oracle.r(std::to_string(2 * i + 1), "12");
+        plane.push_back({positions[i], plane_weight});
+    }
+    const auto quarter = oracle.r("1", "4"), half = oracle.r("1", "2"), last = oracle.r("3", "4");
+    const std::array depth{PgLineQuadratureNode{quarter, depth_weight},
+                           PgLineQuadratureNode{half, depth_weight},
+                           PgLineQuadratureNode{last, depth_weight}};
+    const std::array rules{
+        coupling::CasePgRuleBinding{1, PgVolumeProductRule{plane, plane, depth}}};
+    const auto chart_limits = chart_preparation(preparation, 1, 1);
+    const coupling::CaseNastranPointPgChartLimits entry_limits{
+        {chart_limits, qualification, {1, 1, 1}}, {arithmetic, 2}, 1};
+    coupling::CaseNastranPointPgChartDiagnostic entry_diagnostic;
+    auto entry = coupling::prepare_case_nastran_pg_chart(si, bound, cards, rules, entry_limits,
+                                                         workspace, plan, {}, &entry_diagnostic);
     if (trial != Trial::Match) {
         const auto rejected = certify({arithmetic, 2});
         REQUIRE_FALSE(rejected);
         CHECK(rejected.error().code == Code::InvalidInput);
+        REQUIRE_FALSE(entry);
+        CHECK(entry.error().code == Code::InvalidInput);
+        REQUIRE(entry_diagnostic.support);
+        CHECK(entry_diagnostic.support.transform(
+                  [](const auto& problem) { return problem.grid; }) == rd::NastranGridId{10});
+        CHECK(entry_diagnostic.support.transform([](const auto& problem) {
+            return problem.reason;
+        }) == diagnostic.transform([](const auto& problem) { return problem.reason; }));
         if (const auto& problem = diagnostic) {
             CHECK(problem->set == rd::NastranSupportSetId{61});
             CHECK(problem->grid == rd::NastranGridId{10});
@@ -1015,6 +1248,111 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
         CHECK(fixture::take(shell.reference().identity()) == patch);
         return;
     }
+    REQUIRE(entry);
+    CHECK_FALSE(entry_diagnostic.support);
+    REQUIRE(entry->supports.size() == 1);
+    REQUIRE(entry->shells.size() == 1);
+    REQUIRE(entry->structural.patch_count() == 1);
+    const auto& entry_support = required_evidence(entry->supports.values()[0]);
+    const auto* entry_patch = fixture::take(entry->structural.patch(0));
+    CHECK(entry_support.mapping.grid == rd::NastranGridId{10});
+    CHECK(entry_support.patch == fixture::take(entry_patch->info()).geometry);
+    CHECK(entry_support.world_components == 6U);
+    auto manual_input = config;
+    manual_input.field("model").field("geometry").elements.pop_back();
+    const auto manual_case = convert(fixture::checked(manual_input), arithmetic.algebra, plan);
+    const auto manual = fixture::take(coupling::prepare_case_component_pg_chart(
+        manual_case, rules, chart_limits, workspace, plan));
+    CHECK(fixture::take(manual.chart().identity()) ==
+          fixture::take(entry->structural.chart().identity()));
+    CHECK(std::ranges::equal(manual.chart().free_columns(),
+                             entry->structural.chart().free_columns()));
+
+    auto pair_input = manual_input;
+    auto& pair_model = pair_input.field("model");
+    auto high_geometry = pair_model.field("geometry").elements.front();
+    high_geometry.set("id", fixture::string("6"));
+    high_geometry.field("frame").set("origin", fixture::json("[2,3,9]"));
+    pair_model.field("geometry").elements.push_back(std::move(high_geometry));
+    auto high_shell = pair_model.field("shells").elements.front();
+    high_shell.set("id", fixture::string("2"));
+    high_shell.set("geometry", fixture::string("6"));
+    high_shell.field("layers").elements.front().set("id", fixture::string("2"));
+    pair_model.field("shells").elements.push_back(std::move(high_shell));
+    auto high_support = pair_model.field("supports").elements.front();
+    high_support.set("id", fixture::string("2"));
+    high_support.field("target").field("target").set("id", fixture::string("2"));
+    pair_model.field("supports").elements.push_back(std::move(high_support));
+    const auto pair_case = convert(fixture::checked(pair_input), arithmetic.algebra, plan);
+    const std::array pair_rules{rules.front(),
+                                coupling::CasePgRuleBinding{2, rules.front().quadrature}};
+    const auto pair_limits = chart_preparation(preparation, 2, 2);
+    const auto pair_chart = fixture::take(coupling::prepare_case_component_pg_chart(
+        pair_case, pair_rules, pair_limits, workspace, plan));
+    const auto pair_source = fixture::take(pair_case.source_case());
+    const auto pair_model_record = fixture::take(pair_source.get().root()).model.record();
+    const auto condition = [&](core::Index index) {
+        return std::get<io::schema::SupportConstraint>(
+            fixture::take(pair_model_record.supports.at(index)).record());
+    };
+    const auto lower = condition(0), upper = condition(1);
+    const auto lower_patch = fixture::take(pair_chart.point_patch(0));
+    const auto upper_patch = fixture::take(pair_chart.point_patch(1));
+    const auto assemble = [&](const auto& point, const auto& bound_patch) {
+        return coupling::assemble_case_static_pg_point_row(pair_case, point, bound_patch,
+                                                           pair_limits.patch, plan);
+    };
+    CHECK(fixture::take(assemble(lower, lower_patch)).prescribed_metres[2] == oracle.r("5"));
+    CHECK(fixture::take(assemble(upper, upper_patch)).prescribed_metres[2] == oracle.r("9"));
+    const auto before_swap = plan.allocated_bytes();
+    const auto reject_swap = [&](const auto& point, const auto& wrong_patch) {
+        const auto swapped = assemble(point, wrong_patch);
+        REQUIRE_FALSE(swapped);
+        CHECK(swapped.error().code == Code::InvalidInput);
+    };
+    reject_swap(lower, upper_patch);
+    reject_swap(upper, lower_patch);
+    CHECK(plan.allocated_bytes() == before_swap);
+
+    auto mixed_input = manual_input;
+    auto edge = fixture::fragment("Support.trace_constraint");
+    edge.set("id", fixture::json("\"2\""));
+    edge.field("region").set("boundary", fixture::json("1"));
+    mixed_input.field("model").field("supports").elements.push_back(std::move(edge));
+    auto mixed_limits = entry_limits;
+    mixed_limits.base.chart.constraints.maximum_sources = 2;
+    const auto mixed_manual = fixture::take(coupling::prepare_case_component_pg_chart(
+        convert(fixture::checked(mixed_input), arithmetic.algebra, plan), rules,
+        mixed_limits.base.chart, workspace, plan));
+    const auto mixed_graph = [&] {
+        const files::Tree tree;
+        write_external(mixed_input.field("model"), tree, false, 2, 1, native, mapping.dump());
+        return read_graph(tree, mixed_input, plan);
+    }();
+    const auto mixed_schema = fixture::checked(mixed_input);
+    const auto mixed_bound = fixture::take(rd::bind_external_mesh_sidecar(
+        mixed_schema, mixed_graph, rd::MeshGeometryId{2}, binding_limits, plan, {}));
+    const auto mixed_cards = quantities(mixed_graph, fixture::take(mixed_schema.identity()),
+                                        io::SourceId{1}, binding_limits, plan);
+    const auto mixed = fixture::take(coupling::prepare_case_nastran_pg_chart(
+        convert(mixed_schema, arithmetic.algebra, plan), mixed_bound, mixed_cards, rules,
+        mixed_limits, workspace, plan));
+    const auto& mixed_chart = mixed.structural.chart();
+    CHECK(fixture::take(mixed_chart.identity()) == fixture::take(mixed_manual.chart().identity()));
+    const auto mixed_sources = mixed_chart.original().sources();
+    REQUIRE(mixed_sources.size() == 2);
+    CHECK(mixed_sources[0].id == PgConstraintId{2});
+    CHECK(mixed_sources[0].world_components == 7U);
+    CHECK(mixed_sources[1].id == PgConstraintId{1});
+    CHECK(mixed_sources[1].world_components == 6U);
+    auto no_support_capacity = entry_limits;
+    no_support_capacity.maximum_support_mappings = 0;
+    core::ResourcePlan empty{0};
+    const auto denied = coupling::prepare_case_nastran_pg_chart(
+        si, bound, cards, rules, no_support_capacity, workspace, empty, {}, &entry_diagnostic);
+    REQUIRE_FALSE(denied);
+    CHECK(denied.error().code == Code::ResourceExceeded);
+    CHECK(empty.allocated_bytes() == 0);
     auto cancelled_limits = arithmetic;
     // MSVC implements request_stop() as a non-const member.
     // NOLINTNEXTLINE(misc-const-correctness)
@@ -1055,6 +1393,182 @@ CQUAD4,701,90,10,20,40,99,0.0)BDF"};
     CHECK(result->mapping.component_bits == 5U); // Native x,z.
     CHECK(result->world_components == 6U);       // World y,z from the declared CORD2R.
     CHECK(result->element == 701);
+    CHECK(result->chart.s.sign() == 0);
+    CHECK(result->chart.t.sign() == 0);
+    const auto coordinate = [&](std::string_view word) {
+        return fixture::take(ExactRational::from_decimal(word, arithmetic.algebra, plan));
+    };
+    CHECK(result->world_metres[0] == coordinate("2"));
+    CHECK(result->world_metres[1] == coordinate("3"));
+    CHECK(result->world_metres[2] == coordinate("5"));
+
+    // Prepare the reference basis without the point constraint. The exact
+    // point row must attach to this same physical reference and basis order.
+    auto reference_input = config;
+    reference_input.field("model").field("supports").elements[0] =
+        fixture::fragment("Support.trace_constraint");
+    const auto reference_case =
+        convert(fixture::checked(reference_input), arithmetic.algebra, plan);
+    const auto reference_chart = fixture::take(
+        coupling::prepare_case_pg_chart(reference_case, rules, chart_limits, workspace, plan));
+    const auto* conditioned = fixture::take(reference_chart.patch(0));
+    REQUIRE(conditioned != nullptr);
+    const auto point_row = fixture::take(coupling::assemble_case_nastran_static_point_row(
+        *result, *conditioned, chart_limits.patch, plan));
+    CHECK(point_row.basis == fixture::take(conditioned->info()).identity);
+    CHECK(point_row.world_components == 6U);
+    REQUIRE(point_row.terms.size() != 0);
+    const auto translation = conditioned->translation();
+    ExactRational response;
+    for (const auto& term : point_row.terms.values()) {
+        const auto j = static_cast<std::size_t>(term.column);
+        REQUIRE(j < translation.size());
+        const auto contribution = fixture::take(
+            term.coefficient.multiply(translation[j], chart_limits.patch.algebra, plan));
+        response = fixture::take(response.add(contribution, chart_limits.patch.algebra, plan));
+    }
+    CHECK(response == coordinate("1"));
+    CHECK(point_row.prescribed_metres[1] == coordinate("3"));
+    CHECK(point_row.prescribed_metres[2] == coordinate("5"));
+    const std::array patch_bindings{
+        PgConstraintPatchBinding{uvlas::numerics::PatchId{1}, *conditioned}};
+    const std::array point_bindings{PgConstraintPointBinding{
+        PgConstraintId{point_row.support.value()}, point_row.basis, 0, point_row.world_components,
+        point_row.terms.values(), point_row.prescribed_metres}};
+    auto global_limits = chart_limits.constraints;
+    global_limits.maximum_sources = 2;
+    auto original = fixture::take(PgGlobalConstraints::prepare(patch_bindings, {}, point_bindings,
+                                                               global_limits, workspace, plan));
+    CHECK_FALSE(fixture::take(original.info()).common_cartesian);
+    REQUIRE(original.sources().size() == 1);
+    CHECK(original.sources()[0].world_components == 6U);
+    CHECK(original.original_rows()[0].source_overlap == -1);
+    const auto residual =
+        fixture::take(original.residual({original.layout(), conditioned->reference_coordinates()},
+                                        chart_limits.patch, workspace, plan));
+    REQUIRE(residual.size() == 1);
+    for (const auto& axis : residual.values()[0])
+        CHECK(axis.sign() == 0);
+
+    std::vector<PgCartesianExactPosition> horizontal_motion(translation.size());
+    for (std::size_t j = 0; j < translation.size(); ++j)
+        horizontal_motion[j][0] =
+            fixture::take(translation[j].clone(chart_limits.patch.algebra, plan));
+    const auto applied = fixture::take(original.apply({original.layout(), horizontal_motion},
+                                                      chart_limits.patch, workspace, plan));
+    for (const auto& axis : applied.values()[0])
+        CHECK(axis.sign() == 0);
+    const std::array<PgCartesianExactPosition, 1> dual{
+        PgCartesianExactPosition{coordinate("17"), coordinate("2"), coordinate("-3")}};
+    const auto reaction =
+        fixture::take(original.transpose(dual, chart_limits.patch, workspace, plan));
+    for (const auto& coefficient : reaction.values())
+        CHECK(coefficient[0].sign() == 0);
+    for (const auto& term : point_row.terms.values()) {
+        const auto& coefficient = reaction.values()[static_cast<std::size_t>(term.column)];
+        CHECK(coefficient[1] == fixture::take(term.coefficient.multiply(
+                                    dual[0][1], chart_limits.patch.algebra, plan)));
+        CHECK(coefficient[2] == fixture::take(term.coefficient.multiply(
+                                    dual[0][2], chart_limits.patch.algebra, plan)));
+    }
+    const std::array duplicate{point_bindings[0], point_bindings[0]};
+    const auto duplicate_support =
+        PgGlobalConstraints::prepare(patch_bindings, {}, duplicate, global_limits, workspace, plan);
+    REQUIRE_FALSE(duplicate_support);
+    CHECK(duplicate_support.error().code == Code::InvalidInput);
+    const auto unusable_legacy =
+        PgSparseChart::prepare(std::move(original), chart_limits.chart, workspace, plan);
+    REQUIRE_FALSE(unusable_legacy);
+    CHECK(unusable_legacy.error().code == Code::Unsupported);
+    // NOLINTNEXTLINE(bugprone-use-after-move): rejected preparation preserves the original owner.
+    REQUIRE(original.info());
+    const auto direct_chart = fixture::take(
+        PgComponentSparseChart::prepare(std::move(original), chart_limits.chart, workspace, plan));
+    const auto& component_chart = entry->structural.chart();
+    CHECK(fixture::take(direct_chart.identity()) == fixture::take(component_chart.identity()));
+    const auto component_report = fixture::take(component_chart.preparation());
+    CHECK(component_report.factors == 1);
+    CHECK(component_report.scalar_rank == 2);
+    const auto chart_id = fixture::take(component_chart.identity());
+    const auto free_columns = component_chart.free_columns();
+    const auto all_coordinates = conditioned->reference_coordinates();
+    REQUIRE(free_columns.size() == 3 * all_coordinates.size() - 2);
+    std::vector<ExactRational> reference_free, motion_free;
+    reference_free.reserve(free_columns.size());
+    motion_free.reserve(free_columns.size());
+    for (const auto index : free_columns) {
+        const auto flat = static_cast<std::size_t>(index);
+        reference_free.push_back(fixture::take(
+            all_coordinates[flat / 3][flat % 3].clone(chart_limits.patch.algebra, plan)));
+        motion_free.push_back(fixture::take(
+            horizontal_motion[flat / 3][flat % 3].clone(chart_limits.patch.algebra, plan)));
+    }
+    const auto lifted = fixture::take(
+        component_chart.lift({chart_id, reference_free}, chart_limits.patch, workspace, plan));
+    const auto manual_lift = fixture::take(
+        manual.chart().lift({chart_id, reference_free}, chart_limits.patch, workspace, plan));
+    const auto tangent = fixture::take(
+        component_chart.tangent({chart_id, motion_free}, chart_limits.patch, workspace, plan));
+    for (std::size_t j = 0; j < all_coordinates.size(); ++j) {
+        CHECK(lifted.values()[j] == all_coordinates[j]);
+        CHECK(manual_lift.values()[j] == lifted.values()[j]);
+        CHECK(tangent.values()[j] == horizontal_motion[j]);
+    }
+    std::vector<PgCartesianExactPosition> force(all_coordinates.size());
+    for (auto& cartesian_force : force)
+        cartesian_force = {coordinate("1"), coordinate("2"), coordinate("-3")};
+    const auto pulled = fixture::take(
+        component_chart.transpose({chart_id, force}, chart_limits.patch, workspace, plan));
+    REQUIRE(pulled.original_multipliers.size() == 1);
+    CHECK(pulled.original_multipliers.values()[0][0].sign() == 0);
+    const auto constrained = fixture::take(component_chart.original().transpose(
+        pulled.original_multipliers.values(), chart_limits.patch, workspace, plan));
+    std::size_t free_at = 0;
+    ExactRational original_work, reduced_work;
+    for (std::size_t flat = 0; flat < 3 * force.size(); ++flat) {
+        const auto column = flat / 3;
+        const auto axis = flat % 3;
+        const auto add_product = [&](const ExactRational& sum, const ExactRational& a,
+                                     const ExactRational& b) {
+            const auto product = fixture::take(a.multiply(b, chart_limits.patch.algebra, plan));
+            return fixture::take(sum.add(product, chart_limits.patch.algebra, plan));
+        };
+        original_work =
+            add_product(original_work, force[column][axis], tangent.values()[column][axis]);
+        auto recovered = fixture::take(
+            constrained.values()[column][axis].clone(chart_limits.patch.algebra, plan));
+        if (free_at < free_columns.size() &&
+            free_columns[free_at] == static_cast<core::Index>(flat)) {
+            const auto& reduced_force = pulled.independent_force.values()[free_at];
+            recovered =
+                fixture::take(recovered.add(reduced_force, chart_limits.patch.algebra, plan));
+            reduced_work = add_product(reduced_work, reduced_force, motion_free[free_at]);
+            ++free_at;
+        }
+        CHECK(recovered == force[column][axis]);
+    }
+    CHECK(free_at == free_columns.size());
+    CHECK(original_work == reduced_work);
+    const auto conflicting_position =
+        PgCartesianExactPosition{coordinate("2"), coordinate("4"), coordinate("5")};
+    const std::array conflict{
+        point_bindings[0],
+        PgConstraintPointBinding{PgConstraintId{2}, point_row.basis, 0, point_row.world_components,
+                                 point_row.terms.values(), conflicting_position}};
+    auto overconstrained = fixture::take(
+        PgGlobalConstraints::prepare(patch_bindings, {}, conflict, global_limits, workspace, plan));
+    const auto refused = PgComponentSparseChart::prepare(std::move(overconstrained),
+                                                         chart_limits.chart, workspace, plan);
+    REQUIRE_FALSE(refused);
+    CHECK(refused.error().code == Code::InvalidInput);
+    // NOLINTNEXTLINE(bugprone-use-after-move): rejected preparation preserves the original owner.
+    REQUIRE(overconstrained.info());
+    auto limited_row = chart_limits.patch;
+    limited_row.maximum_partition_visits = 0;
+    const auto exhausted =
+        coupling::assemble_case_nastran_static_point_row(*result, *conditioned, limited_row, plan);
+    REQUIRE_FALSE(exhausted);
+    CHECK(exhausted.error().code == Code::ResourceExceeded);
     CHECK(result->cd == rd::NastranCoordinateId{12});
     CHECK(result->grid_field.byte == native.find("10"));
     const auto terms = result->terms.values();

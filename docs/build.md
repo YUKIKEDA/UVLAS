@@ -161,6 +161,10 @@ MSH 4.1 ASCII は節とタグを検査し、Nastran の単一ファイル Bulk D
 
 ReleaseのCLI、CPython拡張、ライセンスを一つの場所へ配置し、ビルド先と異なる場所で実行できる。CPython 3.12と実行環境向けNumPy wheelを用意し、[構成・作成・移設の手順](verification/IM-06/private-runtime-image-producer-review.md)に従う。検証には新規venvを使う。
 
+Linux/glibc の配布候補を監査する場合は、[既存のランタイム監査](verification/IM-06/runtime-artifact-audit.md)の呼び出しに `--linux-exception-provider-sha256 <候補環境で認定したSHA-256>` を加える。NumPy だけを導入した新規仮想環境を使う。構文不正の同じ JSON を移設 CLI と Python 拡張に渡し、実際に選ばれた例外コンストラクターの共有ライブラリーを二つのプロセスで照合する。照合に失敗した場合は監査結果を返さない。期待値は実行前に配布候補の台帳で固定する。これはその環境でのロード先の検査であり、ヘッダーと確保モデルの認定には対応するソースと確保回帰が要る。[Linux の配布候補と実行時条件](verification/IM-06/linux-release-runtime-qualification.md)
+
+Linux の配布候補について元のビルドから外部参照までを通して確認する場合は、同じ監査に `--linux-parser-build <CMakeのReleaseビルド先>`、`--linux-parser-header <名前> <SHA-256>`、`--linux-external-case <事前に用意したCase>`、`--linux-external-case-sha256 <SHA-256>` も指定する。ヘッダーは `stl_vector.h`、`vector.tcc`、`stl_bvector.h`、`basic_string.tcc` の四つを個別に指定する。使うのはリンク済みの元ディレクトリと、読み取り専用に保ったビルド用ヘッダーである。Ninja では記録済みの依存データベースから、Unix Makefiles ではコンパイル時の依存ファイルから、入力文書のオブジェクトに対応するヘッダーを特定する。Ninja のレコードはオブジェクトに対して有効であることを確認する。ヘッダーの SHA-256 を照合し、移設後に同じ Case を受理できることを確かめる。実行時 COW 文字列の根拠は、例外ライブラリーの照合と確保試験で確認する。
+
 ## 疎求解の対象検証
 
 `numerics.sparse_spd` は外向きSPD bound、`numerics.sparse_triangular` は抽出・両置換・非重複span、`numerics.sparse_solve` は元CSCの求解と認定、`numerics.sparse_allocation` は準備済み三角kernelのC++/Eigen確保を検査する。`numerics.sparse_capacity` は10万未知数の合成三重対角で、準備・求解時間とprocess lifetime peak RSSを出す。容量試験を実務graphの性能やメモリprofileの認定に転用しない。

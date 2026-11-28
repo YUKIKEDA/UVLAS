@@ -1,0 +1,38 @@
+Linux ponta 6.18.58.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Tue Oct 27 00:24:11 UTC 2026 x86_64 GNU/Linux
+bb9c2ccb8c2b42bcf15770334ce1b58d69932a55b726baf2b731cfc0c4be6944  /runtime/uvlas
+8488cc1f93ded36d819091544dbefdb25e036371768aa7159fc5fa310f702ffc  /work/qualified-tested/venv/lib/python3.12/site-packages/_uvlas.cpython-312-x86_64-linux-gnu.so
+867aee8b9dc11ef71edf63c8300105d9e7a2df3ca4235c9528f8685de64161ea  /usr/lib64/libc-2.28.so
+d94de1bf72691756040c221c29e7f6250543383446be754955d8008cc3d9e134  /usr/lib64/libstdc++.so.6.0.25
+741e954d7cdbf8882f9f8876efbeed287e304403d284de5a0e3e2bbef90c298b  /case/external case.json
+a02d07c9e93ce20900ae3bfe42475348f4d7eea178e9e1ea69017a2ea50c9ffa  /case/wing.bdf
+9543d355442833d70f8a49fd512a114dfa1d279b1f70e0923c74ff30a165a037  /case/wing.msh
+c0c7ba785b4a304f7f2d2c2c34b37ea97d6985c19e820eac00108a654a18c02e  /case/gmsh.json
+97056a41d580a5e44465c322234a8d024730476c8e772671d84c5b86f83eb2d9  /case/nastran.json
+{
+  "schema": "uvlas.build-info/1",
+  "version": "0.1.0-dev",
+  "commit": "a13bce0b1622b420a4b0a0083a0b8f3d9d70de66",
+  "uncommitted_changes": false,
+  "compiler": "GNU 14.2.1",
+  "platform": "Linux x86_64",
+  "configuration": "Release",
+  "floating_point": "-ffp-contract=off -fno-fast-math",
+  "instruction_set": "sse2",
+  "platform_key": "linux-x64-gnu14.2-sse2",
+  "dependencies": {
+    "eigen": "5.0.1",
+    "spectra": "1.2.0",
+    "boost": "1.92.0",
+    "nlohmann_json": "3.12.0"
+  },
+  "dependency_repairs": {"nlohmann_json_sax_allocation": 1}
+}
+cli_build_info_exit=0
+Case validation succeeded.
+cli_validate_exit=0
+native root openat2_return=3 errno=0
+native child openat2_return=4 errno=0
+python_file=True failure=None code=None
+python_dict=True failure=None code=None
+UVLAS_PYTHON_COMPLETE
+python_exit=0
