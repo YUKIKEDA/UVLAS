@@ -119,8 +119,6 @@ struct CasePgInterfacePoint {
     core::LayerId lower_layer, upper_layer;
     const structure::ExactRational& u;
     const structure::ExactRational& v;
-    const structure::PgReferenceVector* lower_material_metres{};
-    const structure::PgReferenceVector* upper_material_metres{};
 };
 
 struct CasePgLayerStress {
@@ -143,12 +141,10 @@ struct CasePgInterfaceStress {
 /// Own the rule and sampled fixed Case fields for one authenticated shell.
 class CasePgShellVolume {
 public:
-    /// When used by a field, supply material coordinates in the rule's order.
-    /// Chart and world coordinates come from the owning reference geometry.
+    /// Every field coordinate comes from the owning reference point and frame.
     [[nodiscard]] static core::Result<CasePgShellVolume>
     prepare(const io::SiCase&, const CaseStaticPgPointPatch&,
             std::span<const structure::PgOwnedDiscreteVolumePoint>,
-            std::span<const structure::PgReferenceVector> material_metres,
             const structure::PgReferenceLimits&, core::ResourcePlan&) noexcept;
 
     [[nodiscard]] core::Result<structure::PgShellElasticVolumeAction>
