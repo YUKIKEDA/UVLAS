@@ -27,6 +27,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <numbers>
 #include <source_location>
 #include <uvlas/core/instrumentation.hpp>
 #include <uvlas/structure/pg_flat_gram.hpp>
@@ -5109,6 +5110,12 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
             "intervals",
             parse(
                 R"([{"start":0,"end":0.1,"step":0.1,"restart":"initial"},{"start":0.1,"end":1,"step":0.1,"restart":"event"}])"));
+    input.field("flow").set("uniform", parse(R"({"kind":"constant","value":[0,0,0]})"));
+    input.field("flow").set("gust", parse(R"({
+        "kind":"sine","amplitude":{"kind":"constant","value":[2]},"direction":[0,0,1],
+        "wavevector":[180,0,0],"angular_frequency":360,"phase":0,
+        "origin":[0,0,0],"time_origin":0
+    })"));
     auto& motion =
         input.field("model").field("aero_surfaces").elements[0].field("attachment").field("motion");
     motion.set("origin", parse(R"({"origin":[0,0,0],"rotation":[[1,0,0],[0,1,0],[0,0,1]]})"));
@@ -5312,6 +5319,93 @@ TEST_CASE("Prescribed aero attachment feeds one pose and velocity into discrete 
     const auto value = take(result.row(0)).residual;
     const auto center = sum_words(value.center()) * two_power(value.exponent());
     near(center, -angular_rate / 2);
+
+    const auto provider = prepare_gust(input, io::SourceId{79}, flow_workspace, memory);
+    cf::DiscreteKnownFlowInput known{provider,
+                                     provider,
+                                     {stamp, exact_instant.view(), side},
+                                     gust_projection(core::Precision::TwoWord, abs_budget),
+                                     gust_limits,
+                                     geometry_caps,
+                                     *geometry_work,
+                                     flow_workspace};
+    const std::array scales{1.};
+    const std::array<ls::UnitDimensions, 1> gamma_units{{{2, 0, -1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 1> speed_units{{{1, 0, -1, 0, 0, 0, 0}}};
+    const auto linear_context = circulation_context(geometry.context());
+    const auto request = circulation_request(
+        {scales, scales, gamma_units, speed_units, linear_context}, 1, ls::Norm::L2);
+    auto tangent_request = request;
+    tangent_request.rhs_generation = core::RhsGeneration{30};
+    tangent_request.retained_generation = core::NumericalGeneration{31};
+    const auto solve_known = [&](const cf::KnownCirculationDerivative& derivative) {
+        core::ResourcePlan trial_memory{128ULL * 1024 * 1024};
+        return cf::solve_discrete_known_circulation(view, known, derivative, residual_limits,
+                                                    request, shared, *local, *kernel, trial_memory);
+    };
+
+    // The rigid transform leaves the regularized ring's normal influence unchanged.
+    // Integrate each unit segment in the flat reference plane, at (3/4, 1/2).
+    const auto edge = [](double along, double distance) {
+        const auto transverse_sq = distance * distance + .125 * .125;
+        const auto from_first = along / std::sqrt(along * along + transverse_sq);
+        const auto remaining = 1. - along;
+        const auto from_last = remaining / std::sqrt(remaining * remaining + transverse_sq);
+        return -distance * (from_first + from_last) / (4. * std::numbers::pi * transverse_sq);
+    };
+    const auto influence = edge(.5, .75) + edge(.5, .25) + 2. * edge(.75, .5);
+    const auto phase = .65 * std::numbers::pi; // pi * x - 2 pi * t, x=0.85 and t=0.1.
+    const auto expected = (angular_rate / 2. - std::sin(phase)) / influence;
+
+    constexpr double translation = .125, time_shift = .125;
+    const auto dx = coordinates(translation, 0, 0);
+    const auto zero_vector = coordinates(0, 0, 0);
+    const std::array position_direction{dx, dx, dx, dx, zero_vector};
+    const std::array site_direction{cf::CirculationCollocationDirection{
+        fixture.faces[0].id, std::nullopt, {zero_vector, zero_vector}, zero_vector}};
+    const cf::DiscreteCirculationDirection direction{std::span{ids}.first<5>(), position_direction,
+                                                     site_direction, zero_vector};
+    const auto differential = take(solve_known(
+        cf::KnownCirculationTangent{direction, a::SingleWord{time_shift}, tangent_request}));
+    near(solution_word(take(differential.solution()).get(), 0), expected);
+    const auto& tangent = take(differential.linearization()).get();
+    const auto expected_direction =
+        -std::cos(phase) * std::numbers::pi * (translation - 2. * time_shift) / influence;
+    near(solution_word(tangent.solution(), 0), expected_direction);
+    residual_small(take(differential.row(0)).original_residual, rational_word(1e-13));
+    residual_small(take(tangent.row(0)).original_residual, rational_word(1e-13));
+    const std::array<ls::UnitDimensions, 1> dual_speed{{{-1, 0, 1, 0, 0, 0, 0}}};
+    const std::array<ls::UnitDimensions, 1> dual_gamma{{{-2, 0, 1, 0, 0, 0, 0}}};
+    auto dual_context = linear_context;
+    dual_context.cache.matrix = core::NumericalGeneration{32};
+    dual_context.cache.scales = core::ScaleGeneration{33};
+    dual_context.unknown_layout = core::ScopeId{34};
+    dual_context.residual_layout = core::ScopeId{35};
+    auto transpose = circulation_request({scales, scales, dual_speed, dual_gamma, dual_context}, 1,
+                                         ls::Norm::L2);
+    transpose.rhs_generation = core::RhsGeneration{36};
+    transpose.retained_generation = core::NumericalGeneration{37};
+    const std::array seed{cf::CirculationLinearRhs{fixture.faces[0].id, a::SingleWord{.5}}};
+    const auto reverse = take(solve_known(cf::KnownCirculationAdjoint{seed, transpose}));
+    const auto word_center = [](const a::ScaledEnclosure& enclosure) {
+        return sum_words(enclosure.center()) * two_power(enclosure.exponent());
+    };
+    const auto time_dual = word_center(take(reverse.flow_time_dual()));
+    near(time_dual, std::cos(phase) * std::numbers::pi / influence);
+    Rat total_position_dual = 0;
+    for (std::size_t i = 0; i < moving.size(); ++i) {
+        const auto point = take(reverse.point(i));
+        CHECK(point.point == moving[i]);
+        total_position_dual += word_center(point.position[0]);
+    }
+    near(total_position_dual, -.5 * std::cos(phase) * std::numbers::pi / influence);
+    const auto transpose_work =
+        total_position_dual * rational_word(translation) + time_dual * rational_word(time_shift);
+    CHECK(abs(transpose_work - solution_word(tangent.solution(), 0) / 2) < tol);
+    CHECK_FALSE(take(reverse.collocation(0)).free_query.has_value());
+    CHECK(take(differential.flow(0)).get().requested_side() == side);
+    known.time.side = p::RequestedSide::Right;
+    reject(solve_known(std::monostate{}), core::FailureCode::StaleGeneration);
 
     const std::array<double, 18> zero_low{};
     auto wide_original = original;
