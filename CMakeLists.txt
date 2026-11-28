@@ -170,6 +170,9 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
     src/coupling/wake_strength_transition.cpp
     src/coupling/case_known_flow.cpp
     src/coupling/case_aero_attachment.cpp
+    src/coupling/case_wing_chart.cpp
+    src/coupling/case_wing_geometry.cpp
+    src/coupling/case_wing_sharing.cpp
     src/coupling/case_motion.cpp src/coupling/case_pg_support_motion.cpp
     src/coupling/case_external_pg.cpp
     src/coupling/case_pg_chart.cpp

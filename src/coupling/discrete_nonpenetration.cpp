@@ -5,6 +5,7 @@
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_kernel.hpp"
 #include "aero/query_coordinates_private.hpp"
+#include "case_component_precision_private.hpp"
 #include "case_dyadic_words_private.hpp"
 #include "fixed_bdf2_circulation.hpp"
 
@@ -162,13 +163,13 @@ void require_positive(const p::Interval& interval) {
     if (p::compare(interval.lower, {}) <= 0)
         reject(core::FailureCode::PrecisionUnresolved);
 }
-Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel,
-                      const DiscreteCollocation& input, p::Work& work) {
-    const auto [tx, ty] = import_collocation_tangents(input, work);
+Vector qualify_normal(const a::OwnedGeometry& geometry, std::span<const a::FacetId> facets,
+                      const std::array<Vector, 2>& tangents, p::Work& work) {
+    const auto& [tx, ty] = tangents;
     auto normal = cross(tx, ty, work);
     const auto length2 = dot(normal, normal, work);
     require_positive(length2);
-    for (auto facet : panel.facets) {
+    for (const auto facet : facets) {
         const auto ids = require(geometry.facet_points(facet));
         const auto x0 =
             import(require(geometry.point_words(ids[0], a::Configuration::Current)), work);
@@ -185,6 +186,11 @@ Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel
     for (auto& coordinate : normal)
         coordinate = p::divide(coordinate, length, work);
     return normal;
+}
+
+Vector qualify_normal(const a::OwnedGeometry& geometry, const a::UvlmQuad& panel,
+                      const DiscreteCollocation& input, p::Work& work) {
+    return qualify_normal(geometry, panel.facets, import_collocation_tangents(input, work), work);
 }
 
 // The geometry context presently holds a binary64 time. Compare the exact
@@ -927,6 +933,39 @@ private:
 };
 
 } // namespace
+
+core::Result<CaseWingNormalProjection>
+project_case_wing_normal(const a::OwnedGeometry& geometry, std::span<const a::FacetId, 2> facets,
+                         const ExplicitCollocationTangents& tangents,
+                         core::Precision representation,
+                         const std::array<CaseFlowComponentBudget, 3>& budgets,
+                         CaseFlowProjectionLimits limits, std::stop_token stop) noexcept {
+    constexpr auto operation = core::Operation::PrepareModel;
+    return core::guard_entry(
+        operation, core::FailureCode::PrecisionUnresolved, {},
+        [&]() -> core::Result<CaseWingNormalProjection> {
+            try {
+                p::Work work{0, limits.steps, stop};
+                work.step();
+                if (!a::p1_environment_supported())
+                    reject(core::FailureCode::PrecisionUnsupported);
+                const auto normal = qualify_normal(
+                    geometry, facets, {import(tangents[0], work), import(tangents[1], work)}, work);
+                a::LocalRootScratch scratch;
+                CaseWingNormalProjection result;
+                for (std::size_t axis = 0; axis < normal.size(); ++axis)
+                    result.unit[axis] =
+                        case_components::project(normal[axis], budgets[axis], representation,
+                                                 limits.input_integer_bits, scratch, work);
+                result.used_steps = work.used;
+                return result;
+            } catch (const p::ArithmeticFailure& failure) {
+                return std::unexpected(core::Failure{failure.code, operation});
+            } catch (const core::Failure& failure) {
+                return std::unexpected(failure);
+            }
+        });
+}
 
 struct LoadValues {
     core::PlannedBuffer<std::optional<DiscreteCirculatoryLoad>> edges;

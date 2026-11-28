@@ -1258,3 +1258,12 @@ uvlas_add_test(io.nastran_number_fields
     SOURCES io/nastran_number_fields_test.cpp
     LIBS uvlas_io)
 target_include_directories(uvlas_test_io_nastran_number_fields PRIVATE "${PROJECT_SOURCE_DIR}/src/io")
+
+uvlas_add_test(coupling.case_wing_geometry
+    LABELS V-AERO V-MULTI verification negative
+    SOURCES coupling/case_wing_geometry_test.cpp
+    LIBS uvlas_coupling nlohmann_json::nlohmann_json)
+target_include_directories(uvlas_test_coupling_case_wing_geometry PRIVATE
+    "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/tests")
+target_compile_definitions(uvlas_test_coupling_case_wing_geometry PRIVATE
+    UVLAS_WING_EDGE_CASES="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/wing-edge-pairing-v1")

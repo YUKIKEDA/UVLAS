@@ -20,10 +20,13 @@ struct CaseMotionLimits {
     std::uint64_t maximum_interval_work{};
 };
 
+enum class CaseMotionReferenceKind : std::uint8_t { Position, Tangent };
+
 struct CaseMotionReferencePoint {
     std::array<aero::detail::pchip::RationalView, 3> world_metres;
     /// Three world components per requested derivative order.
     std::span<const CaseFlowComponentBudget> components;
+    CaseMotionReferenceKind kind = CaseMotionReferenceKind::Position;
 };
 
 struct CaseMotionProjection {
