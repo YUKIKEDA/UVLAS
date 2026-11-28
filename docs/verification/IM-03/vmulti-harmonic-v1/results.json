@@ -1,0 +1,508 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "vmulti-harmonic-finite-core-v1",
+  "ids": [
+    "IM-03",
+    "PHY-02",
+    "UW-D05",
+    "UW-D06",
+    "V-MULTI"
+  ],
+  "package": "IM-03",
+  "base_commit": "cdd6abd3fca48bdd635fce5f0938396ba306c64f",
+  "scope": "Finite positive-core straight-wake harmonic verification from a fixed typed Case.",
+  "provenance": {
+    "compiler": "GCC 14.2.0 (Ubuntu 14.2.0-4ubuntu2~24.04.1), x86_64 Release",
+    "independent_fixture_generator": "Python 3.12.3, NumPy 2.3.5, OPENBLAS_NUM_THREADS=1",
+    "evidence_bundle_sha256": "9404de04c6d33bb2195fcf4b82582c16864907ac3d5fd5031b9ef1b02ee6639f",
+    "all_six_fixture_sha256": "a0d44fd777be6a42909bdad846b068e0766930fff523dec95adf0eb4e211346f",
+    "small_fixture_regeneration_sha256": "5f9b8603a48de1548c8a2e56145cbf5f51ca80772f9f2dd1d1808f080a040790",
+    "independent_sources": {
+      "rd/aero/multi-surface/records/multiple-surface-harmonic-refined-result.json": "72427831e87dd0a25f98ebccd2d0e3dac6f3bcbeb3ffa4c7181f6ba5a5b537bf",
+      "rd/aero/multi-surface/records/multiple-surface-harmonic-result.json": "824c8c956d72abcb76710aa97e86fe7f1cf5bbc2f8c254bf7a3aabec0151da20",
+      "rd/aero/multi-surface/records/multiple-surface-harmonic-protocol.md": "e50d31db6dca90d30b11df6014fd3e53674073557138f93b55187dd3723285df",
+      "rd/aero/multi-surface/records/multiple-surface-harmonic-quadrature-extension.md": "91cf81eefd7e73e3d0b5863b46372992995bb970e81543ed210dc16ee949f44f",
+      "rd/aero/multi-surface/experiments/run_multiple_surface_harmonic.py": "5c2815bc91a897a5ed4b82605aed29e7d06411a1b0d85d1e92f6de33827456a9"
+    },
+    "core_radius_m": 1e-05,
+    "wake_terminal_m": 128.0,
+    "omega_rad_s": 7.179487179487181
+  },
+  "requirements": {
+    "coefficient_row_relative_l2": 1e-09,
+    "circulation_relative_l2": 1e-09,
+    "wing_force_relative_l2": 1e-09,
+    "wing_moment_relative_l2": 1e-09,
+    "all_original_rows_relative_l2": 1e-11
+  },
+  "verification": {
+    "ctest_passed": 7,
+    "assertions": 2148501,
+    "drive_order": [
+      "main-heave",
+      "main-pitch",
+      "tail-heave",
+      "tail-pitch"
+    ],
+    "wing_order": [
+      "main",
+      "tail"
+    ],
+    "commands": [
+      "ctest --preset linux-release --output-on-failure -V -R '^(coupling[.](case_wing_geometry|vmulti_harmonic[.].*|finite_wing_steady.fw_v01))$'"
+    ],
+    "controls": [
+      "missing cross-wing operator blocks",
+      "foreign Case core and ownership",
+      "wrong original force or moment membership",
+      "wrong original face order",
+      "wrong terminal displacement",
+      "nonzero opposite shared-edge forces",
+      "original alias identity and conjugate vertex work"
+    ]
+  },
+  "sources": {
+    "src/coupling/case_wing_geometry.cpp": "8b76cd8c675335494a8531e634076baab61ce01f579923eb833b1b66b4642863",
+    "src/coupling/case_wing_harmonic.cpp": "653214ecd2c9032ecdfeca8b179d7e77a492a6742d3695e9c2bf8d96527637d7",
+    "src/coupling/discrete_nonpenetration.cpp": "a8bf5204f088d3873916e210b7fb6638a64aece01a99f08a2ca3174959635774",
+    "tests/coupling/case_wing_geometry_test.cpp": "4756d9a3a84d164b27bed59e8f41eba32793a42e5ebc9ba2c2651ea0c61a54a1",
+    "docs/verification/IM-03/vmulti-harmonic-v1/reference.py": "86a5226879f6a39e93dbc285d1ece4ba80023b37ad453f120ea0061f62f6c332"
+  },
+  "artifacts": {
+    "tests/aero/fixtures/vmulti-harmonic-d0-m2-n8-v1.json": "5f9b8603a48de1548c8a2e56145cbf5f51ca80772f9f2dd1d1808f080a040790"
+  },
+  "records": [
+    {
+      "case": [
+        0,
+        2,
+        8
+      ],
+      "drives": [
+        {
+          "all_rows_residual_relative": 1.3304184086693388e-13,
+          "circulation_relative": 3.6699659638683655e-15,
+          "wing_loads": [
+            {
+              "force_relative": 2.301587103445728e-16,
+              "moment_relative": 3.747593121250749e-15
+            },
+            {
+              "force_relative": 3.60709580331251e-16,
+              "moment_relative": 5.367201222341739e-16
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 1.265569156919545e-13,
+          "circulation_relative": 3.5279873922494468e-15,
+          "wing_loads": [
+            {
+              "force_relative": 3.75018610411923e-16,
+              "moment_relative": 3.56235047947451e-15
+            },
+            {
+              "force_relative": 8.774223714205068e-16,
+              "moment_relative": 1.015861733344804e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 5.0088293105031095e-14,
+          "circulation_relative": 6.714146654058592e-15,
+          "wing_loads": [
+            {
+              "force_relative": 4.151501729400933e-16,
+              "moment_relative": 1.9124699255139386e-15
+            },
+            {
+              "force_relative": 7.025863810816863e-16,
+              "moment_relative": 6.667382172797055e-16
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 4.8645021870890215e-14,
+          "circulation_relative": 6.679925925134794e-15,
+          "wing_loads": [
+            {
+              "force_relative": 1.633021230892622e-16,
+              "moment_relative": 1.3211431658174011e-15
+            },
+            {
+              "force_relative": 4.498334942954403e-16,
+              "moment_relative": 6.7199903905409725e-16
+            }
+          ]
+        }
+      ],
+      "max_coefficient_row_relative": 2.2076834136625216e-14,
+      "omitted_other_wing_relative": 0.0805118857035992,
+      "case_fixture_sha256": "3c1b172e594b47f781bdff7cb74b55270e3311bc76c35e8241f6f555e1c669ec",
+      "frozen_reference_sha256": "732e62688232270fb3477a60d1544273d7a5583bb45c657da4a42c074697eb30",
+      "product_age_panels": 60,
+      "physical_rows": 32,
+      "coefficient_rows_checked": 32
+    },
+    {
+      "case": [
+        0,
+        4,
+        16
+      ],
+      "drives": [
+        {
+          "all_rows_residual_relative": 2.247162003775591e-13,
+          "circulation_relative": 6.916619743145542e-15,
+          "wing_loads": [
+            {
+              "force_relative": 9.948134187361356e-17,
+              "moment_relative": 4.176479668555232e-15
+            },
+            {
+              "force_relative": 1.0875532482666662e-15,
+              "moment_relative": 1.1141169471068905e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 2.0697317699163404e-13,
+          "circulation_relative": 6.859861001838485e-15,
+          "wing_loads": [
+            {
+              "force_relative": 3.775540202288029e-16,
+              "moment_relative": 3.589745612698138e-15
+            },
+            {
+              "force_relative": 1.4797125650457682e-15,
+              "moment_relative": 1.5738242692268096e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 1.2591694769766377e-13,
+          "circulation_relative": 8.432514192560351e-15,
+          "wing_loads": [
+            {
+              "force_relative": 1.1343708541832915e-15,
+              "moment_relative": 1.5097899517773935e-14
+            },
+            {
+              "force_relative": 2.2213598222513348e-15,
+              "moment_relative": 1.7438974427871143e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 1.240483533455051e-13,
+          "circulation_relative": 8.385762698117144e-15,
+          "wing_loads": [
+            {
+              "force_relative": 9.72199354675921e-16,
+              "moment_relative": 1.5149015107391716e-14
+            },
+            {
+              "force_relative": 9.305204120965439e-16,
+              "moment_relative": 1.2673562754110717e-15
+            }
+          ]
+        }
+      ],
+      "max_coefficient_row_relative": 4.6089321493905413e-14,
+      "omitted_other_wing_relative": 0.02870164424813327,
+      "case_fixture_sha256": "b7dabb8177107ee975d1c5cb5a1f1e9fabb02dbc7b0f2f7d9d8a8a34466df81d",
+      "frozen_reference_sha256": "6ced3cdea736d776c0de62c20fd161d129b306f3a8474f44acdbd39a77444a86",
+      "product_age_panels": 62,
+      "physical_rows": 128,
+      "coefficient_rows_checked": 128
+    },
+    {
+      "case": [
+        0,
+        8,
+        32
+      ],
+      "drives": [
+        {
+          "all_rows_residual_relative": 4.984966560264542e-13,
+          "circulation_relative": 1.822450045763228e-14,
+          "wing_loads": [
+            {
+              "force_relative": 5.995859661161432e-16,
+              "moment_relative": 1.4916531943477145e-14
+            },
+            {
+              "force_relative": 1.562123054235669e-15,
+              "moment_relative": 5.031421172319563e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 4.628202645719686e-13,
+          "circulation_relative": 1.7576264877104312e-14,
+          "wing_loads": [
+            {
+              "force_relative": 7.367431323765074e-16,
+              "moment_relative": 1.371993075297076e-14
+            },
+            {
+              "force_relative": 3.112755249482643e-15,
+              "moment_relative": 5.2731663191738e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 3.3334751590823794e-13,
+          "circulation_relative": 2.0347710214354465e-14,
+          "wing_loads": [
+            {
+              "force_relative": 1.5171172826019246e-15,
+              "moment_relative": 1.6654837187265274e-14
+            },
+            {
+              "force_relative": 1.0659830968022759e-15,
+              "moment_relative": 1.5986712115463579e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 3.306867643721296e-13,
+          "circulation_relative": 2.0461195543295424e-14,
+          "wing_loads": [
+            {
+              "force_relative": 1.5181249572951778e-15,
+              "moment_relative": 1.7261884101638144e-14
+            },
+            {
+              "force_relative": 1.2835141027601248e-15,
+              "moment_relative": 1.7382239729298112e-15
+            }
+          ]
+        }
+      ],
+      "max_coefficient_row_relative": 1.949887126957771e-13,
+      "omitted_other_wing_relative": 0.007866286952601503,
+      "case_fixture_sha256": "f6e9000507c674ea88c3106cb80d3833b96816c0e63d6ccf01aaeee6f4456af5",
+      "frozen_reference_sha256": "c051e7f1481b75767c49c4ff261a4a733acc61a1615b56a46f21532fedfc6a52",
+      "product_age_panels": 68,
+      "physical_rows": 512,
+      "coefficient_rows_checked": 512
+    },
+    {
+      "case": [
+        5,
+        2,
+        8
+      ],
+      "drives": [
+        {
+          "all_rows_residual_relative": 1.6918230085273032e-13,
+          "circulation_relative": 9.972553319038762e-15,
+          "wing_loads": [
+            {
+              "force_relative": 5.943993718367087e-16,
+              "moment_relative": 3.781944609760689e-15
+            },
+            {
+              "force_relative": 3.5269662221568443e-14,
+              "moment_relative": 3.566105534269918e-14
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 1.6246736270402576e-13,
+          "circulation_relative": 9.73359911687621e-15,
+          "wing_loads": [
+            {
+              "force_relative": 3.5303316932048676e-16,
+              "moment_relative": 3.9183350289011465e-15
+            },
+            {
+              "force_relative": 3.4876649032933014e-14,
+              "moment_relative": 3.529444556688716e-14
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 5.0530159086000754e-14,
+          "circulation_relative": 6.796308490238121e-15,
+          "wing_loads": [
+            {
+              "force_relative": 1.7838629605046048e-15,
+              "moment_relative": 2.806668713727828e-15
+            },
+            {
+              "force_relative": 1.085315280534595e-15,
+              "moment_relative": 1.5182783483341516e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 4.8970738421000403e-14,
+          "circulation_relative": 6.789765430300331e-15,
+          "wing_loads": [
+            {
+              "force_relative": 1.3798336900186644e-15,
+              "moment_relative": 2.2682604539808826e-15
+            },
+            {
+              "force_relative": 9.266117669790903e-16,
+              "moment_relative": 1.2499653335150324e-15
+            }
+          ]
+        }
+      ],
+      "max_coefficient_row_relative": 3.439212272458127e-14,
+      "omitted_other_wing_relative": 0.10244637120216493,
+      "case_fixture_sha256": "a96dddf14e8e3bc54beffe9f05b26df570e773682837b3d4c9990b17186e3819",
+      "frozen_reference_sha256": "4b7481e951e74d517f4a95304fa7d969816ce9ca27edfa3a2433a5f89b445595",
+      "product_age_panels": 60,
+      "physical_rows": 32,
+      "coefficient_rows_checked": 32
+    },
+    {
+      "case": [
+        5,
+        4,
+        16
+      ],
+      "drives": [
+        {
+          "all_rows_residual_relative": 2.6755402239917624e-13,
+          "circulation_relative": 1.0667495301853553e-14,
+          "wing_loads": [
+            {
+              "force_relative": 4.655895959973469e-16,
+              "moment_relative": 5.188445048856717e-15
+            },
+            {
+              "force_relative": 1.772547121453231e-15,
+              "moment_relative": 2.2065155872498646e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 2.4713003566186745e-13,
+          "circulation_relative": 1.0765989647881363e-14,
+          "wing_loads": [
+            {
+              "force_relative": 8.672936126224017e-16,
+              "moment_relative": 3.732289329775882e-15
+            },
+            {
+              "force_relative": 1.9027086376538543e-15,
+              "moment_relative": 2.4390943972688306e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 1.2631886309613503e-13,
+          "circulation_relative": 8.423996059516373e-15,
+          "wing_loads": [
+            {
+              "force_relative": 7.473085059796071e-16,
+              "moment_relative": 1.478457035948735e-14
+            },
+            {
+              "force_relative": 1.1803362271796752e-15,
+              "moment_relative": 1.0982964822747e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 1.2395245226160297e-13,
+          "circulation_relative": 8.511104500413044e-15,
+          "wing_loads": [
+            {
+              "force_relative": 5.359025391097279e-16,
+              "moment_relative": 1.4720314857822936e-14
+            },
+            {
+              "force_relative": 9.579545029590751e-16,
+              "moment_relative": 5.511355242803698e-16
+            }
+          ]
+        }
+      ],
+      "max_coefficient_row_relative": 4.6728071147613357e-14,
+      "omitted_other_wing_relative": 0.04027986769347424,
+      "case_fixture_sha256": "ca69ce26c62e848dfb0d80e5c23cc4d7cbda2a5b8e834adcafc2455ef1a9d96e",
+      "frozen_reference_sha256": "739a226f7a971d70ccc0964a313cb9178e3614a6d879c4f4d137976f809b91e6",
+      "product_age_panels": 62,
+      "physical_rows": 128,
+      "coefficient_rows_checked": 128
+    },
+    {
+      "case": [
+        5,
+        8,
+        32
+      ],
+      "drives": [
+        {
+          "all_rows_residual_relative": 5.606760956556396e-13,
+          "circulation_relative": 1.8792542902599724e-14,
+          "wing_loads": [
+            {
+              "force_relative": 1.5316312496055762e-15,
+              "moment_relative": 1.3823621530665612e-14
+            },
+            {
+              "force_relative": 1.2917826821374843e-15,
+              "moment_relative": 4.210081265892114e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 5.210419238258457e-13,
+          "circulation_relative": 1.857642174992901e-14,
+          "wing_loads": [
+            {
+              "force_relative": 1.580585389338935e-15,
+              "moment_relative": 1.315521494981214e-14
+            },
+            {
+              "force_relative": 3.945834189150434e-15,
+              "moment_relative": 6.282411244399545e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 3.359421838608715e-13,
+          "circulation_relative": 2.0473228442050694e-14,
+          "wing_loads": [
+            {
+              "force_relative": 2.4238519744057094e-15,
+              "moment_relative": 1.5429329180561383e-14
+            },
+            {
+              "force_relative": 1.1981614634886924e-15,
+              "moment_relative": 1.639843356502692e-15
+            }
+          ]
+        },
+        {
+          "all_rows_residual_relative": 3.3334045400914407e-13,
+          "circulation_relative": 2.0423898280851034e-14,
+          "wing_loads": [
+            {
+              "force_relative": 2.8268296872893085e-15,
+              "moment_relative": 1.5547682216733745e-14
+            },
+            {
+              "force_relative": 8.345106753648112e-16,
+              "moment_relative": 1.4709737868770993e-15
+            }
+          ]
+        }
+      ],
+      "max_coefficient_row_relative": 1.9498630077138143e-13,
+      "omitted_other_wing_relative": 0.011635918269041293,
+      "case_fixture_sha256": "4cc3106d19eead36d6ac8080741f0223549aa91162595ea3f6c3c19fabaae926",
+      "frozen_reference_sha256": "53a0c55ade7e5d819df9b0646bb239ac6f6746f95f49af1694a257c18eb6e78f",
+      "product_age_panels": 68,
+      "physical_rows": 512,
+      "coefficient_rows_checked": 512
+    }
+  ]
+}

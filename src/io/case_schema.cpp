@@ -1052,7 +1052,8 @@ core::Result<SchemaIdentity> SchemaCase::identity() const noexcept {
     const auto source = source_identity();
     if (!source)
         return std::unexpected(source.error());
-    return SchemaIdentity{*source, 1, 1};
+    // uvlas.case/1 keeps its wire major while edge_pairing adds an optional typed record.
+    return SchemaIdentity{*source, 2, 2};
 }
 core::Result<SchemaMemoryReport> SchemaCase::memory_report() const noexcept {
     if (data_.size() == 0)

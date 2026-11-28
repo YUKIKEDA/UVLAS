@@ -10,6 +10,18 @@ namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
 using ExplicitCollocationTangents = std::array<NonpenetrationVector, 2>;
 
+struct CaseWingNormalProjection {
+    std::array<io::SiEnclosure, 3> unit;
+    std::uint64_t used_steps{};
+};
+
+/// Enclose the oriented Case chart normal and qualify it against both retained child facets.
+[[nodiscard]] core::Result<CaseWingNormalProjection> project_case_wing_normal(
+    const aero::detail::OwnedGeometry&, std::span<const aero::detail::FacetId, 2>,
+    const std::array<io::SiEnclosure, 3>& chord, const std::array<io::SiEnclosure, 3>& span,
+    bool reversed, core::Precision, const std::array<CaseFlowComponentBudget, 3>&,
+    CaseFlowProjectionLimits, std::stop_token) noexcept;
+
 /// Retained current coordinates of an oriented facet. The tangents are the
 /// exact differences 1-0 and 2-0, evaluated without intermediate projection.
 struct RoundedFacetTangents {
@@ -116,8 +128,31 @@ struct DiscreteNonpenetrationLimits {
 /// and is validated against the retained geometry and forcing at y=0.
 using HarmonicReflectionPair = std::array<aero::detail::PhysicalFaceId, 2>;
 
+class CaseWingGeometry;
+struct CaseWingHarmonicPreparation;
+
+/// Bind the Case-owned endpoint and a caller-budgeted projection of its exact velocity.
+class CaseHarmonicWake {
+public:
+    [[nodiscard]] const CaseWingGeometry& geometry() const noexcept {
+        return geometry_.get();
+    }
+    [[nodiscard]] const std::array<io::SiEnclosure, 3>& velocity() const& noexcept {
+        return velocity_;
+    }
+    [[nodiscard]] const std::array<io::SiEnclosure, 3>& velocity() const&& = delete;
+
+private:
+    friend struct CaseWingHarmonicPreparation;
+    CaseHarmonicWake(const CaseWingGeometry& geometry, std::array<io::SiEnclosure, 3> velocity)
+        : geometry_(geometry), velocity_(std::move(velocity)) {}
+
+    std::reference_wrapper<const CaseWingGeometry> geometry_;
+    std::array<io::SiEnclosure, 3> velocity_;
+};
+
 struct StraightWakeHarmonicInput {
-    NonpenetrationVector convection_velocity;
+    std::variant<NonpenetrationVector, CaseHarmonicWake> convection_velocity;
     std::span<const double> age_panel_starts_seconds;
     double angular_frequency;
     std::uint64_t maximum_samples;
@@ -256,6 +291,42 @@ struct HarmonicLoadTotals {
     DiscreteLoadVector moment_real, moment_imaginary;
 };
 
+struct HarmonicLoadSource {
+    aero::detail::PhysicalFaceId face{0};
+    std::uint64_t original_surface{}, group{};
+};
+
+struct HarmonicLoadGroup {
+    std::uint64_t id{};
+    HarmonicLoadTotals totals;
+};
+
+/// One force on an original bound facet vertex, before reduction to geometric aliases.
+struct HarmonicOriginalLoad {
+    std::uint64_t original_surface{};
+    aero::detail::PhysicalFaceId face{0};
+    aero::detail::FacetId facet{0};
+    aero::detail::PointId point{0}; ///< Original point, including aliases from this source facet.
+    aero::detail::PointId canonical{0};
+    std::optional<aero::detail::EdgeId> canonical_edge;
+    std::int8_t edge_sign{}; ///< Zero for the area term; otherwise the signed D2 incidence.
+    DiscreteLoadVector force_real, force_imaginary;
+};
+
+struct HarmonicLoadBreakdown {
+    HarmonicLoadTotals total;
+    core::PlannedBuffer<std::optional<HarmonicLoadGroup>> groups;
+    core::PlannedBuffer<std::optional<HarmonicOriginalLoad>> original;
+    std::size_t original_count{};
+};
+
+struct HarmonicBatchInput {
+    /// All columns have the same physical bound-face order.
+    std::span<const std::span<const HarmonicCirculationRhs>> drives;
+    HarmonicLoadInput loading;
+    std::span<const HarmonicLoadSource> sources;
+};
+
 struct DiscreteHarmonicCirculation {
     aero::detail::GeometryContext geometry;
     numerics::linear::Solution<std::complex<double>> solution;
@@ -265,6 +336,9 @@ struct DiscreteHarmonicCirculation {
     /// Full-order words after reflection expansion; the algebraic certificate
     /// above describes the condensed system when this buffer is present.
     std::optional<numerics::PrecisionBuffer<std::complex<double>>> expanded;
+    core::PlannedBuffer<std::optional<HarmonicLoadBreakdown>> drive_loads;
+    /// Full original verification matrix in row-major order; empty in the single-drive entry.
+    core::PlannedBuffer<aero::detail::StraightWakeColumnUpdate> original_coefficients;
 
     [[nodiscard]] const numerics::PrecisionBuffer<std::complex<double>>&
     physical_values() const& noexcept {
@@ -289,6 +363,14 @@ struct DiscreteHarmonicCirculation {
 solve_discrete_harmonic_loads(const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
                               std::span<const HarmonicCirculationRhs>, const HarmonicLoadInput&,
                               const DiscreteNonpenetrationLimits&,
+                              const DiscreteCirculationRequest&, core::ResourcePlan&,
+                              const std::stop_token& = {}) noexcept;
+
+/// Assemble and factor once for all drives. Retain original rows and loads grouped by the
+/// independently supplied source table. Residuals are column-major (drive, original face).
+[[nodiscard]] core::Result<DiscreteHarmonicCirculation>
+solve_discrete_harmonic_batch(const DiscreteNonpenetrationInput&, const StraightWakeHarmonicInput&,
+                              const HarmonicBatchInput&, const DiscreteNonpenetrationLimits&,
                               const DiscreteCirculationRequest&, core::ResourcePlan&,
                               const std::stop_token& = {}) noexcept;
 
@@ -1075,6 +1157,9 @@ public:
     linearization() const& noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const DiscreteCirculationLinearization>>
     linearization() const&& = delete;
+    /// Case and immutable reference topology from the actual historical solve.
+    [[nodiscard]] core::Result<io::SchemaIdentity> case_identity() const noexcept;
+    [[nodiscard]] core::Result<aero::detail::PreparedTopologyOwner> source() const noexcept;
     [[nodiscard]] core::Result<CirculationResidualRow> row(std::size_t) const noexcept;
     [[nodiscard]] core::Result<std::reference_wrapper<const CaseKnownFlowJet>>
     flow(std::size_t) const& noexcept;
@@ -1139,6 +1224,9 @@ public:
     [[nodiscard]] std::size_t original_count() const noexcept;
     [[nodiscard]] core::Result<DiscreteOriginalLoadContribution>
     original(std::size_t) const noexcept;
+    [[nodiscard]] std::size_t bdf2_rate_count() const noexcept;
+    /// Retained D_h Gamma in the same physical face order and precision as the load evaluation.
+    [[nodiscard]] core::Result<RetainedBdf2Rate> bdf2_rate(std::size_t) const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_force() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> total_moment() const noexcept;
     [[nodiscard]] core::Result<DiscreteLoadVector> moment_origin() const noexcept;
@@ -1168,7 +1256,9 @@ private:
 };
 
 /// One nominal circulation solve, then fixed-chart loads and the selected implicit action.
-/// Circulation rate and midpoint wing velocity remain explicit independent inputs.
+/// The rates can be independent inputs or a qualified fixed-BDF2 history. In the latter
+/// case the implicit JVP/VJP differentiates the current solve with the past values held fixed.
+/// Midpoint wing velocity remains an explicit independent input.
 [[nodiscard]] core::Result<DiscreteKnownLoads>
 solve_discrete_known_loads(const DiscreteNonpenetrationInput&, const DiscreteVectorLoadInput&,
                            const DiscreteKnownFlowInput&, const KnownLoadDerivative&,

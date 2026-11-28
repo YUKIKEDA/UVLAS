@@ -261,7 +261,8 @@ struct Prepared {
     std::optional<CaseUniformFlowReady> ambient, amplitude;
     std::optional<Gust> gust;
     std::optional<PhysicalGust> physical;
-    std::optional<io::SchemaIdentity> free_wake_case;
+    std::optional<io::SchemaIdentity> case_identity;
+    bool free_wake = false;
 };
 
 struct Saved {
@@ -276,19 +277,21 @@ struct Position {
 struct Builder {
     static const Prepared& active(const CaseKnownFlowReady& field) {
         const auto records = field.data_.values();
-        if (records.empty() || !records.front().ambient)
+        if (records.empty() || !records.front().ambient || !records.front().case_identity)
             reject(InvalidInput);
         return records.front();
     }
 
-    static CaseKnownFlowReady
-    publish(CaseUniformFlowReady ambient, std::optional<CaseUniformFlowReady> amplitude,
-            std::optional<Gust> gust, std::optional<io::SchemaIdentity> free_wake_case,
-            std::uint64_t input_bits, core::ResourcePlan& memory, m::Work& work) {
+    static CaseKnownFlowReady publish(CaseUniformFlowReady ambient,
+                                      std::optional<CaseUniformFlowReady> amplitude,
+                                      std::optional<Gust> gust, io::SchemaIdentity identity,
+                                      bool free_wake, std::uint64_t input_bits,
+                                      core::ResourcePlan& memory, m::Work& work) {
         auto physical = qualify(gust, input_bits, work);
         auto record = take(memory.allocate<Prepared>(1, prepare));
-        record.values().front() = {std::move(ambient), std::move(amplitude), std::move(gust),
-                                   std::move(physical), free_wake_case};
+        record.values().front() = {std::move(ambient), std::move(amplitude),
+                                   std::move(gust),    std::move(physical),
+                                   identity,           free_wake};
         work.step();
         return CaseKnownFlowReady{std::move(record)};
     }
@@ -308,16 +311,16 @@ struct Builder {
         const auto& schema = take(source.source_case()).get();
         const auto root = take(schema.root());
         const auto analysis = root.analysis.record();
-        std::optional<io::SchemaIdentity> free_wake_case;
+        bool free_wake = false;
         if (const auto* transient = std::get_if<s::AnalysisTransient>(&analysis)) {
             const auto wake = transient->wake.record();
             if (const auto* active = std::get_if<s::WakeActive>(&wake);
                 active != nullptr &&
                 std::holds_alternative<s::ConvectionFree>(active->convection.record()))
-                free_wake_case = take(schema.identity());
+                free_wake = true;
         }
         return publish(std::move(series.ambient), std::move(series.amplitude), std::move(gust),
-                       free_wake_case, limits.maximum_input_bits, memory, work);
+                       take(schema.identity()), free_wake, limits.maximum_input_bits, memory, work);
     }
 
     static CaseKnownFlowJet run(const CaseKnownFlowReady& requested, const CaseKnownFlowReady& host,
@@ -433,7 +436,8 @@ struct Builder {
         }
         auto gust = clone(field.gust, limits.maximum_input_bits, memory, work);
         return publish(std::move(ambient), std::move(amplitude), std::move(gust),
-                       current.free_wake_case, limits.maximum_input_bits, memory, work);
+                       *current.case_identity, current.free_wake, limits.maximum_input_bits, memory,
+                       work);
     }
 };
 } // namespace known_flow_detail
@@ -445,12 +449,19 @@ CaseKnownFlowReady::CaseKnownFlowReady(CaseKnownFlowReady&&) noexcept = default;
 CaseKnownFlowReady& CaseKnownFlowReady::operator=(CaseKnownFlowReady&&) noexcept = default;
 CaseKnownFlowReady::~CaseKnownFlowReady() = default;
 
+core::Result<io::SchemaIdentity> CaseKnownFlowReady::case_identity() const noexcept {
+    const auto records = data_.values();
+    if (records.empty() || !records.front().case_identity)
+        return std::unexpected(core::Failure{InvalidInput, evaluate});
+    return *records.front().case_identity;
+}
+
 core::Result<io::SchemaIdentity> CaseKnownFlowReady::free_wake_case_identity() const noexcept {
     const auto records = data_.values();
     if (records.empty())
         return std::unexpected(core::Failure{InvalidInput, evaluate});
-    if (const auto& identity = records.front().free_wake_case)
-        return *identity;
+    if (records.front().free_wake)
+        return case_identity();
     return std::unexpected(core::Failure{Unsupported, evaluate});
 }
 

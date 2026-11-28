@@ -479,6 +479,9 @@ enum class FieldType : std::uint16_t {
     T450, // List<MaterialMapTerm>
     T451, // MaterialMapTerm
     T452, // Vec<Rational,3>
+    T453, // EdgePairing
+    T454, // List<EdgePairingKnot>
+    T455, // EdgePairingKnot
 };
 inline constexpr std::array field_kinds{
     FieldKind::Enumeration,   FieldKind::Object,      FieldKind::Object,
@@ -632,6 +635,7 @@ inline constexpr std::array field_kinds{
     FieldKind::ExactQuantity, FieldKind::Object,      FieldKind::Enumeration,
     FieldKind::Object,        FieldKind::Array,       FieldKind::Object,
     FieldKind::Array,         FieldKind::Object,      FieldKind::Array,
+    FieldKind::Object,        FieldKind::Array,       FieldKind::Object,
 };
 inline constexpr std::array field_is_signed{
     false, false, false, false, false, false, false, false, false, false, false, false, false,
@@ -668,7 +672,8 @@ inline constexpr std::array field_is_signed{
     false, false, false, false, false, false, false, false, false, false, false, false, false,
     false, false, false, false, false, false, false, false, false, false, false, false, false,
     false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false,
+    false, false, false, false, false, false, false, false, false, false, false, false, false,
+    false,
 };
 template <FieldType>
 struct Enumeration {
@@ -1460,7 +1465,8 @@ inline constexpr std::array field_elements{
     FieldType::T434, FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T0,
     FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T0,
     FieldType::T0,   FieldType::T0,   FieldType::T0,   FieldType::T449, FieldType::T0,
-    FieldType::T451, FieldType::T0,   FieldType::T62,
+    FieldType::T451, FieldType::T0,   FieldType::T62,  FieldType::T0,   FieldType::T455,
+    FieldType::T0,
 };
 template <FieldType>
 struct RecordAccess;
@@ -2902,7 +2908,8 @@ struct AeroSurface {
                 Field<detail::FieldType::T35> leading_value,
                 Field<detail::FieldType::T35> trailing_value,
                 Field<detail::FieldType::T172> orientation_value,
-                Field<detail::FieldType::T173> sharing_value) noexcept
+                Field<detail::FieldType::T173> sharing_value,
+                std::optional<Field<detail::FieldType::T453>> edge_pairing_value) noexcept
         : id(id_value),
           geometry(geometry_value),
           attachment(attachment_value),
@@ -2911,7 +2918,8 @@ struct AeroSurface {
           leading(leading_value),
           trailing(trailing_value),
           orientation(orientation_value),
-          sharing(sharing_value) {}
+          sharing(sharing_value),
+          edge_pairing(edge_pairing_value) {}
     Field<detail::FieldType::T169> id; ///< Id in the AeroSurface identifier namespace; equal IDs in
                                        ///< other namespaces remain distinct.
     Field<detail::FieldType::T34>
@@ -2927,6 +2935,27 @@ struct AeroSurface {
     Field<detail::FieldType::T172> orientation; ///< Orientation; choose one of positive,reversed.
     Field<detail::FieldType::T173> sharing; ///< Ordered sharing entries; size() and at() expose the
                                             ///< checked sequence without copying.
+    std::optional<Field<detail::FieldType::T453>>
+        edge_pairing; ///< Explicit boundary correspondence.
+};
+/// Exact correspondence at one common span station.
+struct EdgePairingKnot {
+    /// Bind exact rational ordinates in the source case.
+    EdgePairingKnot(Field<detail::FieldType::T62> span_value,
+                    Field<detail::FieldType::T62> leading_value,
+                    Field<detail::FieldType::T62> trailing_value) noexcept
+        : eta(span_value), leading(leading_value), trailing(trailing_value) {}
+    Field<detail::FieldType::T62> eta;     ///< Common dimensionless span station.
+    Field<detail::FieldType::T62> leading; ///< Segment ordinal plus fraction from its source start.
+    Field<detail::FieldType::T62>
+        trailing; ///< Segment ordinal plus fraction from its source start.
+};
+/// Checked explicit pairing declaration owned by the source case.
+struct EdgePairing {
+    /// Preserve the declared sequence for exact physical qualification.
+    explicit EdgePairing(Field<detail::FieldType::T454> knots_value) noexcept
+        : knots(knots_value) {}
+    Field<detail::FieldType::T454> knots; ///< Ordered exact rational correspondence knots.
 };
 /// Checked AeroAttachment fixed payload; all fields retain one immutable case owner.
 struct AeroAttachmentFixed {
@@ -6026,6 +6055,16 @@ struct RecordAccess<FieldType::T449> {
 template <>
 struct RecordAccess<FieldType::T451> {
     using Value = schema::MaterialMapTerm;
+    static Value read(const SchemaData*, std::uint64_t) noexcept;
+};
+template <>
+struct RecordAccess<FieldType::T453> {
+    using Value = schema::EdgePairing;
+    static Value read(const SchemaData*, std::uint64_t) noexcept;
+};
+template <>
+struct RecordAccess<FieldType::T455> {
+    using Value = schema::EdgePairingKnot;
     static Value read(const SchemaData*, std::uint64_t) noexcept;
 };
 } // namespace detail

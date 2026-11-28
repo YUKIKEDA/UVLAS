@@ -167,6 +167,7 @@ public:
 
 private:
     friend class GlobalEngine;
+    friend class GlobalContactState;
     explicit GlobalTopology(std::shared_ptr<const GlobalTopologyData>, GeometryContext) noexcept;
     std::shared_ptr<const GlobalTopologyData> data_;
     GeometryContext context_;
@@ -206,6 +207,9 @@ public:
     [[nodiscard]] GlobalResult<std::reference_wrapper<const OwnedGeometry>>
     geometry() const&& = delete;
     [[nodiscard]] core::Result<PreparedTopologyOwner> reference_topology() const noexcept;
+    /// Share the immutable reference topology for a new contact qualification.
+    /// Each new current snapshot receives its own clearance.
+    [[nodiscard]] GlobalResult<GlobalTopology> retain_reference_topology() const noexcept;
     /// Retain both qualified immutable geometry owners without rechecking contacts.
     /// The plan covers the new owner record. The original work report is retained.
     [[nodiscard]] GlobalResult<GlobalContactState>

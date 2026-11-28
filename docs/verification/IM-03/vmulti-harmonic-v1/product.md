@@ -1,0 +1,106 @@
+# 型付き Case の二翼で有限直線後流の調和応答を照合する
+
+上反角0°・5°と各翼 M2/N8・M4/N16・M8/N32 の六条件を、Ubuntu x86-64 の GCC 14.2.0 Release で照合した。主翼の上下動とピッチ、尾翼の上下動とピッチの四駆動を、各条件で一つの作用と因数分解に渡した。射影前の全係数行、全循環、翼別の力とモーメントは、同じ有限コアの独立参照に対して相対 $10^{-9}$ 以内だった。四駆動すべてで元行の相対 $L_2$ 残差は $10^{-11}$ 未満だった。 [独立問題の規約](../../../../rd/aero/multi-surface/records/multiple-surface-harmonic-protocol.md)・[製品結果](results.json)
+
+## Case の元後縁で独立した二翼の後流を作る
+
+型付き Case の静的基準配置から、Case の前後縁対応を通して元面と渦セルを発行する。有限後流の各帯は、同じ結果が発行した正準後縁から閉端まで延ばす。Case の保持時間と一定移流速度から変位を厳密に求め、準備結果に保持する。Case の後縁座標にこの変位を加え、閉端を位置の精度予算内で射影する。調和求積の終端年齢には、同じ Case の保持時間を外向きに囲った値を使う。翼根の正準頂点は各翼の中で共有する。二翼間に接続辺は作らない。 [Case 前後縁対応](../../../specs/aero/wing-edge-pairing-contract.md)・[大域幾何と後縁転写](../../../specs/aero/global-geometry-te-contract.md)
+
+内部の検証入口 `solve_case_wing_harmonic` は、同じ Case の基準配置、密度、一定の既知流れと移流、後流保持距離・時間を使う。翼別の集計範囲と原点は、Case の力・モーメント観測の組から決める。周波数と四つの複素右辺は検証側が明示する。Case に調和解析タグは追加していない。
+
+基準流速は20 m/s、密度は1.2 kg/m³、コア半径は $10^{-5}$ m、閉端は128 m、短縮周波数は0.2。時間依存は $\operatorname{Re}(\Gamma e^{i\omega t})$ とする。各翼の上下動の右辺は $i\omega n_z$。ピッチの右辺は $-[20+i\omega(x-x_a)]n_z$ で、軸の $x_a$ は主翼0.375 m、尾翼5.25 m。駆動していない翼の右辺は厳密にゼロとした。
+
+## 射影前の全係数行と元頂点の荷重を比較する
+
+独立参照は、翼の物理座標から閉輪郭を直接積分し、製品の係数、後縁転写、荷重を呼ばずに算出した。現在の正のコアを両方式で同じ値にそろえ、製品は基準の年齢区間を二分した Gauss16、参照は四分した Gauss48 を用いた。係数と荷重の比較には、製品の中心と包含半径を含めた。
+
+各係数行は独立参照の当該行の $L_2$ ノルムで正規化する。循環と元行残差は駆動ごとに独立循環または右辺の全行 $L_2$ ノルムで割る。翼別荷重は同じ翼・駆動における独立な力またはモーメントの3成分ノルムを使う。ゼロ成分にもこれらの尺度を用いるため、成分ごとのゼロ除算は生じない。
+
+| 上反角 | 各翼の格子 | 係数行 | 循環 | 元行残差 | 翼別の力 | 翼別のモーメント |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 0° | M2/N8 | 2.21e−14 | 6.72e−15 | 1.34e−13 | 8.78e−16 | 3.75e−15 |
+| 0° | M4/N16 | 4.61e−14 | 8.44e−15 | 2.25e−13 | 2.23e−15 | 1.52e−14 |
+| 0° | M8/N32 | 1.95e−13 | 2.05e−14 | 4.99e−13 | 3.12e−15 | 1.73e−14 |
+| 5° | M2/N8 | 3.44e−14 | 9.98e−15 | 1.70e−13 | 3.53e−14 | 3.57e−14 |
+| 5° | M4/N16 | 4.68e−14 | 1.08e−14 | 2.68e−13 | 1.91e−15 | 1.48e−14 |
+| 5° | M8/N32 | 1.95e−13 | 2.05e−14 | 5.61e−13 | 3.95e−15 | 1.56e−14 |
+
+各欄は六条件の行、駆動、翼について該当する最大値を上に丸めた値。各駆動・各翼の値は [結果JSON](results.json) にある。元面ごとの有向辺寄与と三角形面積項を、元頂点の複素力として保存した。各元面の後縁と対角線の辺荷重が除外されることを確認し、元頂点の仕事を独立な翼別の合力・モーメントと照合した。主翼の両半翼を傾けた対照では、共有根に生じる非零の元面寄与が逆符号で打ち消し合った。
+
+相手翼の誘導ブロックを省いた対照の係数差は、全行列ノルム比で最小でも $7.86\times10^{-3}$ だった。別のコアを宣言した Case、誤った元面順、異なる翼の観測を混ぜた組、異なる閉端の指定を拒否した。保持時間0.1 s・一定流速1 m/sの Case では、変位が厳密に1/10 mとなる閉端で四駆動の調和求解を確認した。同じ binary64 に丸まる別の有理数を閉端として指定すると拒否した。 [製品試験](../../../../tests/coupling/case_wing_geometry_test.cpp)
+
+## 再現
+
+六件の Case は [前後縁対応の検証](../wing-edge-pairing/product.md) と共通のバイト列を読む。元の理想核参照は `rd/evidence-index.json` に記録した `uvlas-rd-evidence-2026-11-part02.tar` から取り出す。生成器は tar 全体、引用元ファイル、六件の個別参照の SHA-256 を照合する。 [独立生成器](reference.py)・[凍結結果](../../../../rd/aero/multi-surface/records/multiple-surface-harmonic-refined-result.json)
+
+| 証拠 | SHA-256 |
+| --- | --- |
+| 凍結した Gauss48 理想核結果の索引 | `72427831e87dd0a25f98ebccd2d0e3dac6f3bcbeb3ffa4c7181f6ba5a5b537bf` |
+| 元参照の tar | `9404de04c6d33bb2195fcf4b82582c16864907ac3d5fd5031b9ef1b02ee6639f` |
+| 有限コア独立生成器 | `86a5226879f6a39e93dbc285d1ece4ba80023b37ad453f120ea0061f62f6c332` |
+| 有限コア独立参照の全六条件 JSON | `a0d44fd777be6a42909bdad846b068e0766930fff523dec95adf0eb4e211346f` |
+| 既定試験用 M2/N8・0° JSON | `5f9b8603a48de1548c8a2e56145cbf5f51ca80772f9f2dd1d1808f080a040790` |
+
+[ビルド手順](../../../build.md) に従い、依存ライブラリとコンパイラを用意する。独立生成器には Python 3.12 と NumPy 2.3.5 を使う。既定試験の1件は、元の tar から別の出力先に再生成し、チェックインしたバイト列と一致した。リポジトリのルートで実行する。
+
+```bash
+mkdir -p out/vmulti-harmonic
+gh release download rd-evidence-2026-11 \
+  --pattern uvlas-rd-evidence-2026-11-part02.tar --dir out/vmulti-harmonic
+OPENBLAS_NUM_THREADS=1 python3 -B docs/verification/IM-03/vmulti-harmonic-v1/reference.py \
+  --root . --bundle out/vmulti-harmonic/uvlas-rd-evidence-2026-11-part02.tar \
+  --output out/vmulti-harmonic/all-six.json --fixture
+cmake --preset linux-release -DUVLAS_VMULTI_FORMAL_FIXTURE=out/vmulti-harmonic/all-six.json
+cmake --build --preset linux-release --target uvlas_test_coupling_case_wing_geometry uvlas_test_coupling_finite_wing_steady_fw_v01
+ctest --preset linux-release --output-on-failure -V \
+  -R '^(coupling[.](case_wing_geometry|vmulti_harmonic[.].*|finite_wing_steady.fw_v01))$'
+```
+
+対象は有限直線後流の幾何、元係数、循環と元荷重の照合。理想核に対する物理誤差の配分と自由後流の判定は、親パッケージ IM03-0 の受入で扱う。
+
+## コア半径を縮めた対照
+
+既存の六条件で、Case のコア半径だけを $10^{-7}$ m に変えた。上反角5°・M8/N32 では $10^{-6}$ m も調べた。幾何、後流長、年齢区間、四つの駆動と観測の尺度は同じである。試行に用いる有限核の参照は、それぞれ同じ半径の独立 Gauss48 から得た。
+
+GCC 14.2 Release で、$10^{-7}$ m の元係数行の相対差は最大 $1.950\times10^{-13}$、全元行の相対 $L_2$ 残差は最大 $5.602\times10^{-13}$ だった。理想核を同じ離散幾何で評価したときの最大係数行差は $1.592\times10^{-10}$。上反角5°・M8/N32 の $10^{-6}$ m では、同じ有限核の元係数行差が $1.948\times10^{-13}$、元残差が $5.611\times10^{-13}$、理想核との最大係数行差が $1.592\times10^{-8}$ だった。理想核との差はこの幾何と後流長での比較値であり、実務用の半径や独立理想参照に対する誤差配分は IM03-0 の受入で決める。
+
+六条件の対照は製品の版 `c7e4959f37ebf50d64033498a7becd95cb46aeb6` で実行した。そこで記録した結果 JSON の SHA-256 は `0034a4145ef7066d74f88fbab7b84b9b65e3b71465e24a396205dc4dce2fe840` と `3616b7c3aac056b31e8258f3c718c339be60d086e9ad3554e4786ccd79ed3a16`。以下の CTest は $10^{-7}$ m の六条件を登録する。元の Case と同じ有限核の参照ファイルを条件ごとの SHA-256 で照合してから、試験内で Case のコア半径の入力トークンだけを置き換える。元係数、循環、全元行残差と翼別の力・モーメントには既存の比較幅を使う。
+
+先の手順で生成した `all-six.json` から、[小コアの参照生成器](small_core_reference.py) で六つの参照を作る。保存された $10^{-5}$ m 参照の幾何、年齢区間と四右辺を引き継ぎ、$10^{-7}$ m での同じ離散系の係数と荷重を独立に計算する。
+
+上反角0°・M2/N8 では別ディレクトリで生成した参照が保存済みのバイト列と一致した。新しい CTest 入口で同じ条件を実行し、35,197 検査が通過した。四駆動の全元行残差、循環、翼別荷重と最大係数行差は保存済みの値と一致した。参照ファイルに空白1バイトを追加すると構成が失敗した。
+
+```bash
+OPENBLAS_NUM_THREADS=1 python3 -B docs/verification/IM-03/vmulti-harmonic-v1/small_core_reference.py \
+  --companion out/vmulti-harmonic/all-six.json --output-dir out/vmulti-small-core
+cmake --preset linux-release -DUVLAS_VMULTI_SMALL_CORE_FIXTURES=out/vmulti-small-core
+cmake --build --preset linux-release --target uvlas_test_coupling_case_wing_geometry
+ctest --preset linux-release --output-on-failure -j1 -R '^coupling[.]vmulti_small_core[.]'
+```
+
+## レビュー修正を取り込んだ後の照合
+
+Ubuntu の GCC 14.2.0 Release で、通常コア $10^{-5}$ m と小コア $10^{-7}$ m を各6条件で照合した。全行を再評価した元残差の相対 $L_2$ 上限は、通常コアで最大 $5.607\times 10^{-13}$、小コアで最大 $5.602\times 10^{-13}$ だった。係数行と循環、翼別の力・モーメントは、同じ有限核の独立参照に対して既定の相対許容差 $10^{-9}$ を満たした。
+
+通常コアの最小格子を含む翼幾何、単翼 M2/N4、既知流れ、BDF2 荷重と、残りの調和格子および小コアの試験を合わせて15件が通過した。初回は翼幾何だけが失敗し、過渡 Case での閉端の準備を拒否するよう試験を修正して再実行した。修正は時刻更新の試験入力に限り、他の14件の結果を再利用した。
+
+## 凍結理想核の荷重を製品試験から照合する
+
+同じ有限格子、後流長、基準流れで、独立理想核の鉛直力 $F_z$ とピッチングモーメント $M_y$ を比較する。原点は両翼とも世界座標 $(0.375,0,0)$ m とする。通常コアと小コアの各6条件で、四つの駆動と両翼の計96観測を照合する。
+
+[抽出器](ideal_observations.py) は、凍結原本の tar と各ケースの NPZ の SHA-256 を既存の独立参照と同じ方法で検査する。各翼の荷重配列から $F_z,M_y$ をその順に抜き、四つの駆動について実部・虚部の Binary64 値を保持する。[試験用 JSON](../../../../tests/aero/fixtures/vmulti-harmonic-ideal-v1.json) の SHA-256 は `847cc69595dfddd66f4acb445f74c13f1bdc8f5423ac867e18241b603b580115`。構成時に照合し、製品試験では格子の条件、後流長、流速、密度、周波数、モーメント原点と駆動順を合わせる。
+
+製品の複素荷重は保持値と包含半径から読み、凍結値との差の上限を有理数で評価する。凍結値の複素絶対値で割った上限が 1% 以下であることを確かめる。複素平面でこの円板に収まれば、振幅の差は 1% 以下で、位相差は $\arcsin(0.01)$ 以下となる。これは A5-01 の位相の全予算 0.6° を下回る。この照合で評価するのは、指定された有限格子・後流長で凍結理想核の値との差までである。格子と後流長の変化、参照の不確かさを含む総予算は別の証拠を必要とする。
+
+Python 3.12 と NumPy 2.3.5 で、既存の参照 tar を使って別ディレクトリに再生成する。通常コアと小コアの6条件を登録する構成は前節までと共通である。
+
+```bash
+python3 -B docs/verification/IM-03/vmulti-harmonic-v1/ideal_observations.py \
+  --root . --bundle out/vmulti-harmonic/uvlas-rd-evidence-2026-11-part02.tar \
+  --output out/vmulti-harmonic/ideal-observations-replay.json
+cmp out/vmulti-harmonic/ideal-observations-replay.json tests/aero/fixtures/vmulti-harmonic-ideal-v1.json
+ctest --preset linux-release -V \
+  -R '^coupling[.](case_wing_geometry|vmulti_(small_core|harmonic)[.].*)$'
+```
+
+Ubuntu GCC 14.2.0 Release の対象 CTest 12 件が通過した。複素相対差上限の最大は、通常コアで $5.658\times10^{-8}$、小コアで $5.926\times10^{-12}$ だった。両方で、上反角 5° の M8/N32、尾翼ピッチ時の主翼 $M_y$ が最大だった。最小格子の主翼 $M_y$ を符号反転した対照は荷重照合で失敗し、参照に空白を 1 バイト加えた対照は構成時に拒否された。別ディレクトリで再生成した JSON は登録したバイト列と一致した。

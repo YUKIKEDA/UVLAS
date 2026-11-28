@@ -1080,6 +1080,15 @@ void generic_record_checks(SemanticCheck& check, std::uint64_t node) {
             check.require(check.size(values) >= 2);
             check.order(values, true);
         }
+        if (const auto map = present("edge_pairing")) {
+            c.current = *map;
+            check.require(check.tag(check.field(node, "attachment")) != "structural");
+        }
+    }
+    if (family == "EdgePairing") {
+        const auto knots = check.field(node, "knots");
+        c.current = knots;
+        check.require(check.size(knots) >= 2);
     }
     if (family == "Flow")
         positive("density");
