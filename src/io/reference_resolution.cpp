@@ -241,7 +241,7 @@ private:
         constexpr std::string_view prefix = "/observations/";
         constexpr std::string_view suffix = "/comparison/reference/source";
         std::array<char, prefix.size() + 20 + suffix.size()> pointer;
-        auto* const digit = std::ranges::copy(prefix, pointer.begin()).out;
+        auto* const digit = std::ranges::copy(prefix, pointer.data()).out;
         const auto [end, error] = std::to_chars(digit, digit + 20, index);
         if (error != std::errc{})
             return;
