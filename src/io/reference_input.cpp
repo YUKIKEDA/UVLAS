@@ -136,6 +136,14 @@ core::Result<ReferenceInputView> ReferenceInput::view() const& noexcept {
     return invalid();
 }
 
+core::Result<InputNodeView> ReferenceInput::condition_root() const& noexcept {
+    if (schema_.data_.size() != 1 || schema_.data_.values()[0].snapshot.size() != 1) {
+        return std::unexpected(
+            core::Failure{core::FailureCode::InvalidInput, core::Operation::PrepareModel});
+    }
+    return InputDocumentFactory::node(&schema_.data_.values()[0].snapshot.values()[0], 0);
+}
+
 core::Result<ReferenceInput> ReferenceInput::from_file(
     const std::filesystem::path& parent, std::string_view filename, SourceId source,
     ManifestLimits manifest_limits, const ReferenceInputLimits& limits, core::ResourcePlan& plan,

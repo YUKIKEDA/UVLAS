@@ -1,0 +1,73 @@
+{
+  "geometry": "1",
+  "joints": [],
+  "length": "mm",
+  "schema": "uvlas.gmsh-sidecar/1",
+  "shells": [
+    {
+      "faces": [
+        {
+          "chart": {
+            "orientation": "same",
+            "vertices": [
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                }
+              ],
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                }
+              ]
+            ]
+          },
+          "element": "701"
+        }
+      ],
+      "full_thickness": 2.54,
+      "material_layers": [
+        {
+          "layer": "1",
+          "material": "1"
+        }
+      ],
+      "physical": {
+        "dimension": 2,
+        "tag": 7
+      },
+      "shell": "1"
+    }
+  ],
+  "supports": [{"physical": {"dimension": 1, "tag": 8}, "support": "1"}]
+}

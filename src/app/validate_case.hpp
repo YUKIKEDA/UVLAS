@@ -18,12 +18,14 @@ struct CaseValidationFailure {
     std::string_view stage;
     std::string location;
     std::optional<std::size_t> byte;
+    std::optional<io::InputNodeOrdinal> reference_node{};
 };
 
 struct ValidatedCase {
     io::detail::ReferenceInput input;
     io::detail::ReferencedCase references;
     io::SchemaIdentity identity;
+    io::detail::ObservationLeafResults observations;
 };
 
 inline constexpr std::size_t case_manifest_max_bytes = std::size_t{8} * 1024 * 1024;

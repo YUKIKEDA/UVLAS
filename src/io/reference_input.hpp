@@ -92,6 +92,9 @@ public:
     [[nodiscard]] core::Result<ReferenceInputView> view() const& noexcept;
     [[nodiscard]] core::Result<ReferenceInputView> view() const&& = delete;
 
+    [[nodiscard]] core::Result<InputNodeView> condition_root() const& noexcept;
+    [[nodiscard]] core::Result<InputNodeView> condition_root() const&& = delete;
+
 private:
     struct FileOrigin {
         ReadRoot root;

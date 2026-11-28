@@ -3,7 +3,10 @@
 #include "utf8.hpp"
 
 #include <algorithm>
+#include <array>
+#include <charconv>
 #include <limits>
+#include <type_traits>
 #include <utility>
 
 namespace uvlas::io::detail {
@@ -30,15 +33,26 @@ void describe(LeafReferenceDiagnostic& diagnostic, RootSnapshotLocation location
     }
 }
 
+std::optional<InputNodeView> member(const InputNodeView& parent, std::string_view key) noexcept {
+    const auto object = parent.object();
+    return object ? object->find(key) : std::nullopt;
+}
+
 class LeafInspector final : public ReferenceDependencyExtractor {
 public:
-    LeafInspector(LeafFormatLimits limits, std::uint64_t pointer_limit, core::ResourcePlan& plan,
-                  const std::stop_token& stop, LeafReferenceDiagnostic* diagnostic) noexcept
-        : limits_(limits),
+    LeafInspector(const ReferenceInput& input, LeafFormatLimits limits, std::uint64_t pointer_limit,
+                  core::ResourcePlan& plan, const std::stop_token& stop,
+                  LeafReferenceDiagnostic* diagnostic) noexcept
+        : input_(input),
+          limits_(limits),
           pointer_limit_(pointer_limit),
           plan_(plan),
           stop_(stop),
           diagnostic_(diagnostic) {}
+
+    [[nodiscard]] ObservationLeafResults take_observations() noexcept {
+        return std::move(observations_);
+    }
 
     [[nodiscard]] core::Result<ExtractedReferenceDependencies>
     extract(const AcquiredRootSnapshot& snapshot) noexcept override {
@@ -47,6 +61,12 @@ public:
             return inspect_gmsh(snapshot);
         case ReferenceRole::NastranDeck:
             return inspect_nastran(snapshot);
+        case ReferenceRole::ObservationReference:
+            if (limits_.observation) {
+                return inspect_observation(snapshot, *limits_.observation);
+            }
+            return reject({Code::Unsupported, operation}, snapshot,
+                          LeafReferenceFailure::UnsupportedRole);
         case ReferenceRole::NastranSidecar:
         case ReferenceRole::GmshSidecar:
             if (auto& limit = limits_.sidecar) {
@@ -61,6 +81,177 @@ public:
     }
 
 private:
+    [[nodiscard]] core::Result<ExtractedReferenceDependencies>
+    inspect_observation(const AcquiredRootSnapshot& snapshot,
+                        ObservationLeafContext& options) noexcept {
+        bool outside_static_contract = false;
+        auto result = core::guard_entry(
+            operation, Code::InvalidInput, {},
+            [&]() -> core::Result<ExtractedReferenceDependencies> {
+                const auto view = input_.view();
+                if (!view)
+                    return std::unexpected(view.error());
+                const auto root = view->schema.root();
+                if (!root)
+                    return std::unexpected(root.error());
+
+                const auto analysis = root->analysis.record();
+                const auto* static_analysis = std::get_if<schema::AnalysisStatic>(&analysis);
+                if (!static_analysis || static_analysis->physics.text() != "structural") {
+                    outside_static_contract = true;
+                    return fail(Code::Unsupported);
+                }
+                if (!std::in_range<core::Index>(root->observations.size()))
+                    return fail(Code::ResourceExceeded);
+                const auto count = static_cast<core::Index>(root->observations.size());
+                auto ids = plan_.allocate<std::uint64_t>(count, operation);
+                if (!ids)
+                    return std::unexpected(ids.error());
+                std::size_t selected_count = 0;
+                for (core::Index i = 0; i != count; ++i) {
+                    if (stop_.stop_requested())
+                        return fail(Code::Cancelled);
+                    if (options.file.maximum_work == 0)
+                        return fail(Code::ResourceExceeded);
+                    --options.file.maximum_work;
+                    const auto observation = root->observations.at(i);
+                    if (!observation)
+                        return std::unexpected(observation.error());
+                    const auto selected = std::visit(
+                        [&](const auto& row) {
+                            using Row = std::remove_cvref_t<decltype(row)>;
+                            const auto comparison = row.comparison.record();
+                            const auto reference = comparison.reference.record();
+                            const auto* file =
+                                std::get_if<schema::ComparisonReferenceFile>(&reference);
+                            if (!file || file->source.record().source_id.unsigned_value() !=
+                                             snapshot.location.source.value())
+                                return true;
+                            if constexpr (std::is_same_v<Row, schema::ObservationPoint> ||
+                                          std::is_same_v<Row, schema::ObservationReaction>) {
+                                const auto basis = row.basis.record();
+                                const auto* world = std::get_if<schema::BasisWorldMaterial>(&basis);
+                                if (!world || world->kind.text() != "world" ||
+                                    comparison.statistic.text() != "instantaneous" ||
+                                    comparison.side.text() != "right")
+                                    return false;
+                                if constexpr (std::is_same_v<Row, schema::ObservationPoint>) {
+                                    if (row.quantity.text() != "displacement" ||
+                                        row.point.record().target.record().kind.text() != "shell")
+                                        return false;
+                                }
+                                ids->values()[selected_count++] = row.id.unsigned_value();
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        },
+                        observation->record());
+                    if (!selected) {
+                        outside_static_contract = true;
+                        if (diagnostic_)
+                            describe_observation(snapshot.location, i,
+                                                 LeafReferenceFailure::UnsupportedRole);
+                        return fail(Code::Unsupported);
+                    }
+                }
+                if (!condition_) {
+                    const auto input_node = input_.condition_root();
+                    if (!input_node)
+                        return std::unexpected(input_node.error());
+                    const auto digest =
+                        observation_condition_digest(*input_node, options.condition, plan_, stop_);
+                    if (!digest)
+                        return std::unexpected(digest.error());
+                    condition_ = *digest;
+                }
+                std::optional<ObservationFileDiagnostic> format_error;
+                auto parsed = read_observation_file(snapshot, snapshot.location.parent, *condition_,
+                                                    ids->values().first(selected_count),
+                                                    options.file, plan_, stop_, format_error);
+                if (!parsed) {
+                    if (diagnostic_ && format_error) {
+                        diagnostic_->format_offset = format_error->byte_offset;
+                        diagnostic_->format_node = format_error->node;
+                    }
+                    return std::unexpected(parsed.error());
+                }
+                std::optional<ObservationBindingDiagnostic> binding_error;
+                const structure::ExactRational zero;
+                const auto bound =
+                    bind_observation_file(view->schema, *parsed, zero, options.file.exact,
+                                          options.file.maximum_work, plan_, stop_, binding_error);
+                if (!bound) {
+                    if (diagnostic_ && binding_error) {
+                        diagnostic_->format_node = binding_error->input_node;
+                        if (binding_error->case_index)
+                            describe_observation(snapshot.location, *binding_error->case_index,
+                                                 LeafReferenceFailure::Observation);
+                    }
+                    return std::unexpected(bound.error());
+                }
+                if (stop_.stop_requested())
+                    return fail(Code::Cancelled);
+                if (!options.result)
+                    return ExtractedReferenceDependencies{};
+                if (observations_.files.size() == 0) {
+                    if (!std::in_range<core::Index>(options.maximum_files))
+                        return fail(Code::ResourceExceeded);
+                    auto allocated = plan_.allocate<std::optional<ObservationFile>>(
+                        static_cast<core::Index>(options.maximum_files), operation);
+                    if (!allocated)
+                        return std::unexpected(allocated.error());
+                    observations_.files = std::move(*allocated);
+                }
+                if (observations_.populated >= observations_.files.size())
+                    return fail(Code::ResourceExceeded);
+                observations_.files.values()[observations_.populated++].emplace(std::move(*parsed));
+                return ExtractedReferenceDependencies{};
+            });
+        if (!result)
+            return reject(result.error(), snapshot,
+                          outside_static_contract ? LeafReferenceFailure::UnsupportedRole
+                                                  : LeafReferenceFailure::Observation);
+        return result;
+    }
+
+    void describe_observation(RootSnapshotLocation location, core::Index index,
+                              LeafReferenceFailure reason) noexcept {
+        const auto root = input_.condition_root();
+        if (!root)
+            return;
+        const auto observations = member(*root, "observations");
+        if (!observations)
+            return;
+        const auto rows = observations->array();
+        if (!rows)
+            return;
+        const auto row = rows->at(index);
+        if (!row)
+            return;
+        auto source = member(*row, "comparison");
+        for (const std::string_view key : {"reference", "source"}) {
+            if (!source)
+                return;
+            source = member(*source, key);
+        }
+        if (!source)
+            return;
+
+        constexpr std::string_view prefix = "/observations/";
+        constexpr std::string_view suffix = "/comparison/reference/source";
+        std::array<char, prefix.size() + 20 + suffix.size()> pointer{};
+        auto* const digit = std::ranges::copy(prefix, pointer.data()).out;
+        const auto [end, error] = std::to_chars(digit, digit + 20, index);
+        if (error != std::errc{})
+            return;
+        const auto* const finish = std::ranges::copy(suffix, end).out;
+        location.declaration_node = static_cast<std::uint64_t>(source->ordinal().value());
+        describe(*diagnostic_, location,
+                 {pointer.data(), static_cast<std::size_t>(finish - pointer.data())}, reason,
+                 pointer_limit_, plan_);
+    }
+
     [[nodiscard]] core::Result<ExtractedReferenceDependencies>
     inspect_gmsh(const AcquiredRootSnapshot& snapshot) noexcept {
         std::size_t offset = 0;
@@ -125,7 +316,7 @@ private:
     [[nodiscard]] core::Result<ExtractedReferenceDependencies>
     reject(core::Failure error, const AcquiredRootSnapshot& file,
            LeafReferenceFailure reason) noexcept {
-        if (diagnostic_ && error.code != Code::Cancelled) {
+        if (diagnostic_ && !diagnostic_->location && error.code != Code::Cancelled) {
             describe(*diagnostic_, file.location, file.pointer(), reason, pointer_limit_, plan_);
         }
         if (stop_.stop_requested() || error.code == Code::Cancelled) {
@@ -137,6 +328,9 @@ private:
         return std::unexpected(error);
     }
 
+    const ReferenceInput& input_;
+    ObservationLeafResults observations_;
+    std::optional<SourceDigest> condition_;
     LeafFormatLimits limits_;
     std::uint64_t pointer_limit_;
     core::ResourcePlan& plan_;
@@ -706,6 +900,7 @@ void LeafReferenceDiagnostic::reset() noexcept {
     reason.reset();
     location.reset();
     format_offset.reset();
+    format_node.reset();
     declaring_source.reset();
     path.reset();
     sidecar.reset();
@@ -899,11 +1094,18 @@ resolve_leaf_references(const ReferenceInput& input, PreparedRootReferences&& pr
                         LeafFormatLimits formats, core::ResourcePlan& plan,
                         const std::stop_token& stop, RootSnapshotDiagnostic* acquisition,
                         LeafReferenceDiagnostic* diagnostic) noexcept {
-    LeafInspector inspector{formats, limits.diagnostic_bytes, plan, stop, diagnostic};
+    LeafInspector inspector{input, formats, limits.diagnostic_bytes, plan, stop, diagnostic};
     const auto report = prepared.report();
     const auto path_bytes = report ? report->normalized_path_bytes : 0;
-    return resolve_reference_graph(input, std::move(prepared), {intake, limits, path_bytes, {}},
-                                   inspector, plan, stop, acquisition, diagnostic);
+    auto graph =
+        resolve_reference_graph(input, std::move(prepared), {intake, limits, path_bytes, {}},
+                                inspector, plan, stop, acquisition, diagnostic);
+    if (graph && formats.observation && formats.observation->result) {
+        if (stop.stop_requested())
+            return fail(Code::Cancelled);
+        *formats.observation->result = inspector.take_observations();
+    }
+    return graph;
 }
 
 core::Result<NastranBulkDeck>
