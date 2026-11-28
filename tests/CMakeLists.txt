@@ -1080,6 +1080,15 @@ foreach(wing_index RANGE 0 1)
     endforeach()
 endforeach()
 set(finite_wing_drag_grids m2n4 m4n8)
+set(UVLAS_FORMAL_HARMONIC_FIXTURE "" CACHE FILEPATH
+    "Optional frozen product-verification input for the three formal harmonic wing grids")
+if(UVLAS_FORMAL_HARMONIC_FIXTURE)
+    get_filename_component(formal_harmonic_fixture "${UVLAS_FORMAL_HARMONIC_FIXTURE}"
+        ABSOLUTE BASE_DIR "${PROJECT_SOURCE_DIR}")
+    if(NOT EXISTS "${formal_harmonic_fixture}")
+        message(FATAL_ERROR "Formal harmonic fixture not found: ${formal_harmonic_fixture}")
+    endif()
+endif()
 set(UVLAS_FORMAL_WING_GEOMETRY "" CACHE FILEPATH
     "Optional independent geometry fixture for the M128/N192 finite-wing checks")
 option(UVLAS_FORMAL_WING_PRODUCT "Run the M128/N192 steady circulation and drag checks" OFF)
@@ -1123,7 +1132,18 @@ foreach(wing_index RANGE 0 1)
             UVLAS_FINITE_WING_POLARS_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-polars-v1.json"
             UVLAS_FINITE_WING_SENSITIVITY_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-wake-core-v1.json"
             UVLAS_FINITE_WING_SPAN_LINES_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-span-lines-v1.json"
-            UVLAS_FINITE_WING_REFINEMENT_FIXTURE="${refinement_fixture}")
+            UVLAS_FINITE_WING_REFINEMENT_FIXTURE="${refinement_fixture}"
+            UVLAS_HARMONIC_M2N4_FIXTURE="${PROJECT_SOURCE_DIR}/tests/aero/fixtures/finite-wing-harmonic-m2n4-v1.json")
+        if(UVLAS_FORMAL_HARMONIC_FIXTURE AND wing_index EQUAL 0 AND grid STREQUAL "m2n4")
+            target_compile_definitions(${target} PRIVATE
+                UVLAS_FORMAL_HARMONIC_FIXTURE="${formal_harmonic_fixture}")
+            foreach(frequency IN ITEMS k005 k020 k080)
+                set(harmonic_test coupling.finite_wing_harmonic.${frequency})
+                add_test(NAME ${harmonic_test} COMMAND ${target} "[${frequency}][.formal-harmonic]")
+                set_tests_properties(${harmonic_test} PROPERTIES LABELS "V-AERO;verification"
+                    RUN_SERIAL TRUE TIMEOUT 18000)
+            endforeach()
+        endif()
         set(drag_timeout 1200)
         if(grid STREQUAL "m4n8")
             # FW-V02 took 1321 seconds with MSVC Debug. Keep the Release limit fixed.

@@ -354,6 +354,10 @@ TEST_CASE("Frozen dictionary numeric leaves share the production SI scalar kerne
     second.set("id", string("2"));
     second.set("geometry", string("2"));
     surfaces.push_back(std::move(second));
+    surfaces.at(1).set(
+        "edge_pairing",
+        parse(
+            R"({"knots":[{"eta":{"numerator":"0","denominator":"1"},"leading":{"numerator":"0","denominator":"1"},"trailing":{"numerator":"0","denominator":"1"}},{"eta":{"numerator":"1","denominator":"1"},"leading":{"numerator":"1","denominator":"1"},"trailing":{"numerator":"1","denominator":"1"}}]})"));
     surfaces[0].set(
         "sharing",
         parse(R"([{"other":"2","own_boundary":0,"other_boundary":0,"orientation":"same"}])"));
@@ -364,8 +368,8 @@ TEST_CASE("Frozen dictionary numeric leaves share the production SI scalar kerne
         CHECK(coverage.fields.contains(std::string{expected.record} + "/" +
                                        std::string{expected.name}));
     }
-    CHECK(coverage.records.size() == 194);
-    CHECK(coverage.fields.size() == 815);
+    CHECK(coverage.records.size() == 196);
+    CHECK(coverage.fields.size() == 820);
     CHECK(coverage.numbers > 0);
     CHECK(coverage.native > 0);
 }

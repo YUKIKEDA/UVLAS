@@ -1,6 +1,8 @@
 #include "closed_contour.hpp"
 
+#include "certified_trigonometry_private.hpp"
 #include "global_geometry_private.hpp"
+#include "p1_quadrature_private.hpp"
 #include "p1_shared_kernel.hpp"
 
 #include <cmath>
@@ -93,6 +95,34 @@ Interval outward(double lower, double upper) {
 Interval operator-(Interval a) {
     return {-a.upper, -a.lower};
 }
+// TwoSum gives the exact rounding error with the qualified Binary64 environment.
+template <bool Up>
+double sum_endpoint(double a, double b) {
+    const auto sum = a + b;
+    if (!std::isfinite(sum))
+        reject(unresolved);
+    const auto b_part = sum - a;
+    const auto error = (a - (sum - b_part)) + (b - b_part);
+    if (!std::isfinite(error))
+        return adjacent<Up>(sum);
+    return (Up ? error > 0. : error < 0.) ? adjacent<Up>(sum) : sum;
+}
+
+Interval tight_difference(Interval a, Interval b) {
+    const Interval result{sum_endpoint<false>(a.lower, -b.upper),
+                          sum_endpoint<true>(a.upper, -b.lower)};
+    if (!valid(result))
+        reject(unresolved);
+    return result;
+}
+
+template <bool Up>
+double half_endpoint(double x) {
+    const auto half = x * .5;
+    const auto restored = half * 2.;
+    return (Up ? restored < x : restored > x) ? adjacent<Up>(half) : half;
+}
+
 Interval operator+(Interval a, Interval b) {
     if (zero(a))
         return b;
@@ -152,6 +182,19 @@ Interval norm2(const Vector& a) {
 Vector cross(const Vector& a, const Vector& b) {
     return {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
 }
+Vector midpoint_cross(const Vector& first, const Vector& second, const Vector& query) {
+    Vector delta{}, relative{};
+    for (std::size_t axis = 0; axis < delta.size(); ++axis) {
+        delta[axis] = tight_difference(second[axis], first[axis]);
+        const Interval half{half_endpoint<false>(delta[axis].lower),
+                            half_endpoint<true>(delta[axis].upper)};
+        relative[axis] = tight_difference(tight_difference(query[axis], first[axis]), half);
+    }
+    // delta × (q − first − delta/2) equals delta × (q − first).
+    // Moving the origin near the projected midpoint avoids subtracting large products.
+    return cross(delta, relative);
+}
+
 Interval from_words(ScalarWords words) {
     if (const auto* single = std::get_if<SingleWord>(&words))
         return {single->value, single->value};
@@ -213,19 +256,66 @@ struct ClosedContourData {
 };
 
 namespace {
+template <class Scalar>
+Scalar same_sign_integral(Scalar s, Scalar t, Scalar first_radius, Scalar second_radius) {
+    return (s + t) / (first_radius * second_radius * (s * second_radius + t * first_radius));
+}
+
 Vector edge_value(const Edge& edge, std::span<const ClosedContourEndpoint> endpoints,
-                  Interval core2) {
+                  Interval core2, const Vector& c) {
     const auto& a = endpoints[edge.vertices[0]];
     const auto& b = endpoints[edge.vertices[1]];
     const auto s = dot(edge.delta, a.relative);
     const auto z = s - edge.length2;
-    const auto c = cross(edge.delta, a.relative);
     const bool same = (s.lower > 0 && z.lower > 0) || (s.upper < 0 && z.upper < 0);
     const auto integral =
-        same ? (s + z) / (a.distance * b.distance * (s * b.distance + z * a.distance))
+        same ? same_sign_integral(s, z, a.distance, b.distance)
              : (s / a.distance - z / b.distance) / (norm2(c) + core2 * edge.length2);
     const auto factor = -integral / four_pi;
     return {c[0] * factor, c[1] * factor, c[2] * factor};
+}
+
+struct AgeDerivative {
+    Interval value, derivative;
+};
+AgeDerivative operator+(AgeDerivative a, AgeDerivative b) {
+    return {a.value + b.value, a.derivative + b.derivative};
+}
+AgeDerivative operator-(AgeDerivative a, AgeDerivative b) {
+    return {a.value - b.value, a.derivative - b.derivative};
+}
+AgeDerivative operator*(AgeDerivative a, AgeDerivative b) {
+    return {a.value * b.value, a.derivative * b.value + a.value * b.derivative};
+}
+AgeDerivative operator/(AgeDerivative a, AgeDerivative b) {
+    const auto quotient = a.value / b.value;
+    return {quotient, (a.derivative - quotient * b.derivative) / b.value};
+}
+
+Interval project_age_derivative(const Vector& delta, Interval length2, const Vector& velocity,
+                                Interval core2, const Vector& first, const Vector& second,
+                                const Vector& normal) {
+    const auto first_radius = root(norm2(first) + core2);
+    const auto second_radius = root(norm2(second) + core2);
+    const auto cross_span = cross(delta, first);
+    const auto cross_derivative = cross(delta, velocity);
+    // This is the query derivative of the forward span edge. It is also the
+    // translation derivative of the oppositely directed downstream edge.
+    const AgeDerivative s{dot(delta, first), dot(delta, velocity)};
+    const AgeDerivative t{s.value - length2, s.derivative};
+    const AgeDerivative a{first_radius, dot(first, velocity) / first_radius};
+    const AgeDerivative b{second_radius, dot(second, velocity) / second_radius};
+    const bool same =
+        (s.value.lower > 0 && t.value.lower > 0) || (s.value.upper < 0 && t.value.upper < 0);
+    const auto integral =
+        same ? same_sign_integral(s, t, a, b)
+             : (s / a - t / b) / AgeDerivative{norm2(cross_span) + core2 * length2,
+                                               Interval{2, 2} * dot(cross_span, cross_derivative)};
+    const AgeDerivative projected{dot(cross_span, normal), dot(cross_derivative, normal)};
+    const auto right =
+        dot(cross(velocity, second), normal) / (square(second_radius) * second_radius);
+    const auto left = dot(cross(velocity, first), normal) / (square(first_radius) * first_radius);
+    return -((projected * integral).derivative + right - left) / four_pi;
 }
 
 template <class Visit>
@@ -233,7 +323,7 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
                        std::optional<EdgeId> self, const GeometryLimits& query_limits,
                        GlobalLimits limits, GeometryWorkspace& geometry_work,
                        GlobalWorkspace& contact_work, std::span<ClosedContourEndpoint> endpoints,
-                       const std::stop_token& stop, Visit visit) {
+                       const std::stop_token& stop, ContourCrossProduct coordinates, Visit visit) {
     Work work{limits.max_steps, 0, stop};
     work.step(0);
     if (!data.contacts || endpoints.size() != data.vertices.size())
@@ -276,7 +366,19 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
         work.step();
         if (edge.first == edge.last || self == edge.id)
             continue;
-        const auto velocity = edge_value(edge, endpoints, data.core2);
+        auto c = cross(edge.delta, endpoints[edge.vertices[0]].relative);
+        if (coordinates == ContourCrossProduct::MidpointRelative) {
+            work.step();
+            const auto midpoint =
+                midpoint_cross(vertices[edge.vertices[0]], vertices[edge.vertices[1]], location);
+            for (std::size_t axis = 0; axis < c.size(); ++axis) {
+                c[axis] = {std::max(c[axis].lower, midpoint[axis].lower),
+                           std::min(c[axis].upper, midpoint[axis].upper)};
+                if (!valid(c[axis]))
+                    reject(unresolved, edge.id);
+            }
+        }
+        const auto velocity = edge_value(edge, endpoints, data.core2, c);
         const auto terms = data.terms.values().subspan(edge.first, edge.last - edge.first);
         work.step(terms.size());
         visit(velocity, terms);
@@ -285,6 +387,129 @@ std::uint64_t evaluate(const ClosedContourData& data, const ResolvedQuery& query
     return work.used;
 }
 } // namespace
+
+AeroResult<StraightWakeAgeQuadrature>
+prepare_straight_wake_age_quadrature(const GeometryContext& context, std::span<const double> starts,
+                                     ContourInterval retained_end, double frequency,
+                                     std::uint64_t maximum_samples, std::uint64_t maximum_steps,
+                                     core::ResourcePlan& plan, std::stop_token stop) noexcept {
+    return guard<StraightWakeAgeQuadrature>(context, [&] {
+        if (stop.stop_requested())
+            reject(core::FailureCode::Cancelled);
+        if (!p1_environment_supported())
+            reject(core::FailureCode::PrecisionUnsupported);
+        if (starts.empty() || starts.front() != 0 || !std::isfinite(frequency) ||
+            !valid(retained_end) || !(retained_end.lower > starts.back()))
+            reject(invalid);
+        constexpr auto order = p1::gauss_16.size();
+        const auto count = times(starts.size(), order);
+        if (count > maximum_samples)
+            reject(exhausted);
+        p1::Work work{0, maximum_steps, stop};
+        try {
+            for (std::size_t i = 1; i < starts.size(); ++i) {
+                work.step();
+                if (!std::isfinite(starts[i]) || starts[i] <= starts[i - 1])
+                    reject(invalid);
+            }
+            std::array<p1::Interval, order> nodes, weights;
+            p1::build_rule(p1::gauss_16, std::span{nodes}, std::span{weights}, work);
+            const auto half_frequency = p1::scale(decode_p1_word(frequency), -1);
+            const auto pi = p1::pi_constant(work);
+            const auto rounded = [](const p1::Bound& value, bool upper) {
+                if (value.mantissa == 0)
+                    return 0.;
+                const auto top = static_cast<std::int64_t>(value.power) + p1::bits(value.mantissa);
+                const auto quantum = p1::exponent(std::max<std::int64_t>(-1074, top - 53));
+                const auto head = p1::at_power(value, quantum, upper);
+                const auto result = std::scalbn(head.convert_to<double>(), quantum);
+                if (!std::isfinite(result))
+                    reject(unresolved);
+                return result;
+            };
+            const auto enclosure = [&](const p1::Interval& value) {
+                return Interval{rounded(value.lower, false), rounded(value.upper, true)};
+            };
+            core::PlannedBuffer<StraightWakeAgeSample> samples;
+            allocate(samples, count, plan, context);
+            std::size_t out = 0;
+            auto left = decode_p1_word(starts.front());
+            for (std::size_t panel = 0; panel < starts.size(); ++panel) {
+                const auto right = panel + 1 < starts.size()
+                                       ? decode_p1_word(starts[panel + 1])
+                                       : p1::Interval{decode_p1_word(retained_end.lower).lower,
+                                                      decode_p1_word(retained_end.upper).upper};
+                const auto width = p1::subtract(right, left, work);
+                for (std::size_t i = 0; i < order; ++i) {
+                    const auto age = p1::add(left, p1::multiply(width, nodes[i], work), work);
+                    const auto q = p1::multiply(width, weights[i], work);
+                    const auto half_phase = p1::multiply(age, half_frequency, work);
+                    const auto phase =
+                        p1::sine_cosine(half_phase, p1::PhaseUnits::Radians, pi, work);
+                    const auto weighted =
+                        p1::negate(p1::scale(p1::multiply(q, phase.sine, work), 1), work);
+                    samples.values()[out++] = {
+                        enclosure(age), enclosure(p1::multiply(weighted, phase.sine, work)),
+                        enclosure(p1::multiply(weighted, phase.cosine, work))};
+                }
+                left = right;
+            }
+            work.step();
+            return StraightWakeAgeQuadrature{std::move(samples), work.used};
+        } catch (const p1::ArithmeticFailure& failure) {
+            reject(failure.code);
+        }
+    });
+}
+
+AeroResult<StraightWakeColumnUpdate> project_straight_wake_column_update(
+    const GeometryContext& context, const ContourVector& first, const ContourVector& second,
+    const ContourVector& velocity, ContourInterval core_radius, const ContourVector& point,
+    const ContourVector& normal, std::span<const StraightWakeAgeSample> samples,
+    std::uint64_t maximum_samples, std::stop_token stop) noexcept {
+    return guard<StraightWakeColumnUpdate>(context, [&] {
+        Work work{maximum_samples, 0, stop};
+        work.step(0);
+        if (!p1_environment_supported())
+            reject(core::FailureCode::PrecisionUnsupported);
+        if (!valid(core_radius) || core_radius.lower <= 0 || samples.empty())
+            reject(invalid);
+        for (const auto* vector : {&first, &second, &velocity, &point, &normal})
+            if (!std::ranges::all_of(*vector, valid))
+                reject(invalid);
+        if (samples.size() > work.remaining())
+            reject(exhausted);
+        const auto delta = difference(second, first);
+        const auto area2 = norm2(cross(delta, velocity));
+        if (area2.upper == 0)
+            reject(invalid);
+        if (area2.lower <= 0)
+            reject(unresolved);
+        const auto length2 = norm2(delta);
+        const auto core2 = square(core_radius);
+        const auto first_offset = difference(point, first);
+        const auto second_offset = difference(point, second);
+        PairwiseSum real, imaginary;
+        for (const auto& sample : samples) {
+            work.step();
+            if (!valid(sample.age_seconds) || sample.age_seconds.lower < 0 ||
+                !valid(sample.real_weight_seconds) || !valid(sample.imaginary_weight_seconds))
+                reject(invalid);
+            if (zero(sample.real_weight_seconds) && zero(sample.imaginary_weight_seconds))
+                continue;
+            const Vector displacement{sample.age_seconds * velocity[0],
+                                      sample.age_seconds * velocity[1],
+                                      sample.age_seconds * velocity[2]};
+            const auto derivative = project_age_derivative(
+                delta, length2, velocity, core2, difference(first_offset, displacement),
+                difference(second_offset, displacement), normal);
+            real.append(derivative * sample.real_weight_seconds);
+            imaginary.append(derivative * sample.imaginary_weight_seconds);
+        }
+        work.step(0);
+        return StraightWakeColumnUpdate{real.sum(), imaginary.sum()};
+    });
+}
 
 ClosedContourWorkspace::ClosedContourWorkspace(
     core::PlannedBuffer<ClosedContourEndpoint>&& endpoints) noexcept
@@ -475,7 +700,7 @@ ClosedContour::project(const ResolvedQuery& query, const ContourVector& normal,
                        std::span<ContourInterval> row, const GeometryLimits& query_limits,
                        GlobalLimits limits, GeometryWorkspace& geometry_work,
                        GlobalWorkspace& contact_work, ClosedContourWorkspace& work,
-                       std::stop_token stop) const noexcept {
+                       std::stop_token stop, ContourCrossProduct coordinates) const noexcept {
     return guard<std::uint64_t>(query.context(), [&] {
         const Lease lease{work.entered_};
         if (data_.size() == 0 || data_.values().front().columns != row.size() ||
@@ -487,14 +712,15 @@ ClosedContour::project(const ResolvedQuery& query, const ContourVector& normal,
             reject(core::FailureCode::Cancelled);
         std::ranges::fill(row, Interval{});
         limits.max_steps -= row.size();
-        const auto used = evaluate(data_.values().front(), query, {}, query_limits, limits,
-                                   geometry_work, contact_work, work.endpoints_.values(), stop,
-                                   [&](const Vector& velocity, std::span<const Term> terms) {
-                                       const auto value = dot(normal, velocity);
-                                       for (const auto& term : terms)
-                                           row[term.column] =
-                                               row[term.column] + (term.sign == 1 ? value : -value);
-                                   });
+        const auto used =
+            evaluate(data_.values().front(), query, {}, query_limits, limits, geometry_work,
+                     contact_work, work.endpoints_.values(), stop, coordinates,
+                     [&](const Vector& velocity, std::span<const Term> terms) {
+                         const auto value = dot(normal, velocity);
+                         for (const auto& term : terms)
+                             row[term.column] =
+                                 row[term.column] + (term.sign == 1 ? value : -value);
+                     });
         return used + row.size();
     });
 }
@@ -504,7 +730,7 @@ ClosedContour::apply(const ResolvedQuery& query, std::optional<EdgeId> self,
                      std::span<const ContourInterval> strengths, const GeometryLimits& query_limits,
                      GlobalLimits limits, GeometryWorkspace& geometry_work,
                      GlobalWorkspace& contact_work, ClosedContourWorkspace& work,
-                     std::stop_token stop) const noexcept {
+                     std::stop_token stop, ContourCrossProduct coordinates) const noexcept {
     return guard<std::pair<ContourVector, std::uint64_t>>(query.context(), [&] {
         const Lease lease{work.entered_};
         if (data_.size() == 0 || data_.values().front().columns != strengths.size())
@@ -517,17 +743,18 @@ ClosedContour::apply(const ResolvedQuery& query, std::optional<EdgeId> self,
         }
         limits.max_steps = input_work.remaining();
         std::array<PairwiseSum, 3> sum{};
-        const auto used = evaluate(data_.values().front(), query, self, query_limits, limits,
-                                   geometry_work, contact_work, work.endpoints_.values(), stop,
-                                   [&](const Vector& velocity, std::span<const Term> terms) {
-                                       Interval weight{};
-                                       for (const auto& term : terms) {
-                                           const auto value = strengths[term.column];
-                                           weight = weight + (term.sign == 1 ? value : -value);
-                                       }
-                                       for (std::size_t axis = 0; axis < sum.size(); ++axis)
-                                           sum[axis].append(weight * velocity[axis]);
-                                   });
+        const auto used =
+            evaluate(data_.values().front(), query, self, query_limits, limits, geometry_work,
+                     contact_work, work.endpoints_.values(), stop, coordinates,
+                     [&](const Vector& velocity, std::span<const Term> terms) {
+                         Interval weight{};
+                         for (const auto& term : terms) {
+                             const auto value = strengths[term.column];
+                             weight = weight + (term.sign == 1 ? value : -value);
+                         }
+                         for (std::size_t axis = 0; axis < sum.size(); ++axis)
+                             sum[axis].append(weight * velocity[axis]);
+                     });
         return std::pair{Vector{sum[0].sum(), sum[1].sum(), sum[2].sum()}, used + input_work.used};
     });
 }
