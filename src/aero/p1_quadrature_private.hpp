@@ -1,19 +1,20 @@
 #pragma once
 #include "p1_gauss_private.hpp"
 #include "p1_interval_private.hpp"
+
+#include <span>
 namespace uvlas::aero::detail::p1 {
 struct QuadratureRule {
     std::array<p1::Interval, 12> nodes, weights;
     std::size_t count = 0;
 };
 template <std::size_t N>
-void build_rule(const std::array<p1::GaussRoot, N>& source, QuadratureRule& out, p1::Work& work) {
-    static_assert(N == 8 || N == 12);
-    out.count = N;
+void build_rule(const std::array<p1::GaussRoot, N>& source, std::span<Interval, N> nodes,
+                std::span<Interval, N> weights, p1::Work& work) {
     for (std::size_t i = 0; i < N; ++i) {
         const Interval u{{Integer{source[i].lower.data()}, -256},
                          {Integer{source[i].upper.data()}, -256}};
-        out.nodes[i] = u;
+        nodes[i] = u;
         const Interval x = subtract(multiply(integer(2), u, work), integer(1), work);
         Interval previous = integer(1), current = x;
         for (unsigned k = 2; k <= N; ++k) {
@@ -27,10 +28,16 @@ void build_rule(const std::array<p1::GaussRoot, N>& source, QuadratureRule& out,
         const Interval derivative =
             divide(multiply(integer(N), subtract(multiply(x, current, work), previous, work), work),
                    subtract(multiply(x, x, work), integer(1), work), work);
-        out.weights[i] = divide(integer(1),
-                                multiply(subtract(integer(1), multiply(x, x, work), work),
-                                         multiply(derivative, derivative, work), work),
-                                work);
+        weights[i] = divide(integer(1),
+                            multiply(subtract(integer(1), multiply(x, x, work), work),
+                                     multiply(derivative, derivative, work), work),
+                            work);
     }
+}
+template <std::size_t N>
+void build_rule(const std::array<p1::GaussRoot, N>& source, QuadratureRule& out, p1::Work& work) {
+    out.count = N;
+    build_rule(source, std::span{out.nodes}.template first<N>(),
+               std::span{out.weights}.template first<N>(), work);
 }
 } // namespace uvlas::aero::detail::p1

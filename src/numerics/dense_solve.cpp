@@ -127,6 +127,20 @@ bool finite(double value) noexcept {
 bool finite(Complex value) noexcept {
     return finite(value.real()) && finite(value.imag());
 }
+bool selects_trailing_columns(const DenseComplex& v) noexcept {
+    const auto [rows, rank, stride] = v.shape();
+    if (rank == 0 || rank > rows)
+        return false;
+    for (Index column = 0; column < rank; ++column) {
+        const auto start = static_cast<std::size_t>(column * stride);
+        for (Index row = 0; row < rows; ++row) {
+            const Complex expected = row == rows - rank + column ? Complex{1.} : Complex{};
+            if (v.values()[start + static_cast<std::size_t>(row)] != expected)
+                return false;
+        }
+    }
+    return true;
+}
 template <StorageScalar Scalar>
 const DenseMatrix<Scalar>& high(const PrecisionBuffer<Scalar>& values) noexcept {
     if (const auto* binary = std::get_if<Binary64<Scalar>>(&values.storage())) {
@@ -320,6 +334,7 @@ struct UpdatedData : CommonData<Complex> {
     ComplexLu schur;
     ConditionDiagnostic schur_diagnostic = NotEvaluated{};
     core::PlannedBuffer<Complex> small_rhs, small_solution;
+    bool trailing_column_selector{};
 };
 } // namespace detail
 namespace {
@@ -505,6 +520,7 @@ Result<UpdatedPrepared> UpdatedPrepared::prepare(const ColumnUpdatedOperator& op
             data->original = std::move(*original);
             data->u = std::move(*u);
             data->v = std::move(*v);
+            data->trailing_column_selector = selects_trailing_columns(data->v);
             const auto arrays = prepare_arrays(*data, n, scales, plan);
             if (!arrays) {
                 return std::unexpected(arrays.error());
@@ -593,16 +609,27 @@ namespace {
 double coefficient(const detail::DenseData& data, Index row, Index col) noexcept {
     return entry(data.original, row, col);
 }
+Complex add_rank_term(Complex value, Complex u, Complex v) noexcept {
+    const double rr = u.real() * v.real(), ii = u.imag() * v.imag();
+    const double ri = u.real() * v.imag(), ir = u.imag() * v.real();
+    return {value.real() + (rr - ii), value.imag() + (ri + ir)};
+}
 Complex coefficient(const detail::UpdatedData& data, Index row, Index col) noexcept {
-    Complex value = entry(data.original, row, col);
-    // This rounded coefficient, in increasing rank order, defines the original operator.
-    for (Index k = 0; k < data.u.shape().columns; ++k) {
-        const Complex u = entry(data.u, row, k), v = entry(data.v, col, k);
-        const double rr = u.real() * v.real(), ii = u.imag() * v.imag();
-        const double ri = u.real() * v.imag(), ir = u.imag() * v.real();
-        const Complex product{rr - ii, ri + ir};
-        value = {value.real() + product.real(), value.imag() + product.imag()};
+    const double base = entry(data.original, row, col);
+    Complex value = base;
+    const Index rank = data.u.shape().columns;
+    // Preserve the signed-zero behavior of the original rank-ordered sum for a -0 base.
+    // Under round-to-nearest, adding a signed zero to any other base or a +0
+    // cancellation leaves it unchanged. The imaginary accumulator starts at +0.
+    if (data.trailing_column_selector && !(base == 0 && std::signbit(base))) {
+        const Index selected = col - (data.original.shape().columns - rank);
+        return selected >= 0 ? add_rank_term(value, entry(data.u, row, selected),
+                                             entry(data.v, col, selected))
+                             : value;
     }
+    // This rounded coefficient, in increasing rank order, defines the original operator.
+    for (Index k = 0; k < rank; ++k)
+        value = add_rank_term(value, entry(data.u, row, k), entry(data.v, col, k));
     return value;
 }
 Result<void> inverse(detail::DenseData& data, std::span<const double> rhs,

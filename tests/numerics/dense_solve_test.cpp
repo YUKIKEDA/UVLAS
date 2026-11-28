@@ -307,6 +307,47 @@ TEST_CASE("Complex rank-two solve uses transpose without conjugation on both RHS
     }
     CHECK(std::holds_alternative<NotEvaluated>(solved->certificate().condition()));
 }
+TEST_CASE("Trailing column selection and a perturbed selector certify their own complex systems",
+          "[verification][N4-05][N4-06]") {
+    Setup f;
+    auto a = matrix(3, 3, std::array{4., -0., 1., 1., 3., -1., -0., 2., 5.}, f.plan);
+    auto u = matrix(3, 2,
+                    std::array{Complex{1, 1}, Complex{-0., 0}, Complex{-1, 2}, Complex{-2, 1},
+                               Complex{1, -1}, Complex{.5, -2}},
+                    f.plan);
+    const std::array expected{Complex{1, 1},  Complex{-2, 3}, Complex{2, -1},
+                              Complex{-1, 2}, Complex{3, 0},  Complex{1, -4}};
+    const std::array exact_rhs{Complex{-6, 12}, Complex{-1, 4},  Complex{8, -18.5},
+                               Complex{4, 20},  Complex{8, -13}, Complex{-9.5, -16}};
+    const std::array perturbed_rhs{Complex{-6, 13},    Complex{-1, 4},  Complex{6.5, -18},
+                                   Complex{2.5, 20.5}, Complex{8, -13}, Complex{-11, -18}};
+    const NoChecks<Complex> evaluator;
+    const Precision<Complex> precision{
+        RetainedPrecision{core::NumericalGeneration{31}}, {}, evaluator};
+    const auto scales = f.scales(3);
+    const auto limits = f.limits(3, 2, 2);
+    for (const bool perturbed : {false, true}) {
+        CAPTURE(perturbed);
+        auto v = matrix(3, 2,
+                        std::array{Complex{perturbed ? .5 : 0.}, Complex{1}, Complex{}, Complex{},
+                                   Complex{}, Complex{1}},
+                        f.plan);
+        auto b = matrix(3, 2, perturbed ? perturbed_rhs : exact_rhs, f.plan);
+        const auto rhs =
+            PrecisionBuffer<Complex>::binary64(std::move(b), core::NumericalGeneration{30});
+        REQUIRE(rhs);
+        const ColumnUpdatedOperator op{a, u, v, context()};
+        auto prepared = UpdatedPrepared::prepare(op, scales, limits, f.plan);
+        REQUIRE(prepared);
+        const auto solved = solve_linear(op, Rhs{*rhs, context(), core::RhsGeneration{40}}, scales,
+                                         precision, f.accuracy(), limits, *prepared, f.plan);
+        REQUIRE(solved);
+        for (std::size_t i = 0; i < expected.size(); ++i) {
+            const auto actual = high(solved->values()).values()[i] + low(solved->values(), i);
+            CHECK(std::abs(actual - expected[i]) < 1e-12);
+        }
+    }
+}
 TEST_CASE("Dense singularity, zero loads and empty order have distinct outcomes",
           "[negative][verification][N4-05][N4-06]") {
     Setup f;

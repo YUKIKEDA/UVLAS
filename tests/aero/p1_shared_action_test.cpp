@@ -1,8 +1,11 @@
+#include "aero/closed_contour.hpp"
 #include "aero/p1_interval_private.hpp"
 #include "aero/p1_shared_action.hpp"
 #include "aero/p1_shared_kernel.hpp"
 #include "geometry_snapshot_fixture.hpp"
 
+#include <boost/math/constants/constants.hpp>
+#include <boost/math/quadrature/gauss.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <nlohmann/json.hpp>
@@ -309,6 +312,178 @@ TEST_CASE("Shared P1 quad action and all derivatives match independent area quad
             duality(value, transpose);
         }
     }
+}
+
+TEST_CASE("Gauss16 wake samples enclose the fixed age rule and complex phase",
+          "[UW-D01][UW-D02][verification][negative]") {
+    const auto context = test_geometry::context();
+    const std::array boundaries{0., .125, .5};
+    const auto make = [&](double frequency, std::uint64_t sample_limit, std::uint64_t work,
+                          core::ResourcePlan& plan) {
+        return p::prepare_straight_wake_age_quadrature(context, std::span{boundaries}.first<2>(),
+                                                       {.5, .5}, frequency, sample_limit, work,
+                                                       plan);
+    };
+    using Gauss = boost::math::quadrature::gauss<Big, 16>;
+    const auto& nodes = Gauss::abscissa();
+    const auto& weights = Gauss::weights();
+    constexpr std::uint64_t sample_count = 32;
+    constexpr auto bytes = sample_count * sizeof(p::StraightWakeAgeSample);
+    const auto encloses = [](p::ContourInterval interval, const Big& target) {
+        CHECK(Big(interval.lower) <= target);
+        CHECK(target <= Big(interval.upper));
+        CHECK(interval.upper - interval.lower < 1e-14);
+    };
+    for (const double frequency : {32., -32., 0., 1e-20}) {
+        CAPTURE(frequency);
+        core::ResourcePlan plan{bytes};
+        const auto result = make(frequency, sample_count, 1'000'000, plan);
+        REQUIRE(result);
+        CHECK(plan.allocated_bytes() == bytes);
+        REQUIRE(result->samples.size() == sample_count);
+        for (std::size_t panel = 0; panel < boundaries.size() - 1; ++panel) {
+            const Big left{boundaries[panel]}, right{boundaries[panel + 1]};
+            const Big scale = (right - left) / 2;
+            const Big midpoint = (left + right) / 2;
+            for (std::size_t i = 0; i < sample_count / 2; ++i) {
+                const auto positive = i >= nodes.size();
+                const auto j = positive ? i - nodes.size() : nodes.size() - 1 - i;
+                const Big age = midpoint + (positive ? nodes[j] : -nodes[j]) * scale;
+                const Big quadrature = scale * weights[j];
+                const Big phase = age * frequency;
+                const auto& sample = result->samples.values()[panel * 16 + i];
+                encloses(sample.age_seconds, age);
+                encloses(sample.real_weight_seconds, quadrature * (cos(phase) - 1));
+                encloses(sample.imaginary_weight_seconds, -quadrature * sin(phase));
+                if (frequency == 0.) {
+                    CHECK(sample.real_weight_seconds.lower == 0);
+                    CHECK(sample.real_weight_seconds.upper == 0);
+                    CHECK(sample.imaginary_weight_seconds.lower == 0);
+                    CHECK(sample.imaginary_weight_seconds.upper == 0);
+                }
+            }
+        }
+        core::ResourcePlan exact{bytes};
+        const auto replay = make(frequency, sample_count, result->interval_steps, exact);
+        REQUIRE(replay);
+        CHECK(replay->interval_steps == result->interval_steps);
+        core::ResourcePlan short_steps{bytes};
+        rejected(make(frequency, sample_count, result->interval_steps - 1, short_steps),
+                 core::FailureCode::ResourceExceeded);
+    }
+    core::ResourcePlan short_samples{bytes};
+    rejected(make(32., sample_count - 1, 1'000'000, short_samples),
+             core::FailureCode::ResourceExceeded);
+    CHECK(short_samples.allocated_bytes() == 0);
+    core::ResourcePlan short_storage{bytes - 1};
+    rejected(make(32., sample_count, 1'000'000, short_storage),
+             core::FailureCode::ResourceExceeded);
+    CHECK(short_storage.allocated_bytes() == 0);
+    const std::array invalid_ages{0., 0.};
+    core::ResourcePlan invalid{bytes};
+    rejected(p::prepare_straight_wake_age_quadrature(context, invalid_ages, {.5, .5}, 32.,
+                                                     sample_count, 1'000'000, invalid),
+             core::FailureCode::InvalidInput);
+    CHECK(invalid.allocated_bytes() == 0);
+}
+
+TEST_CASE("Straight wake age update agrees with the finite-core strip integral",
+          "[UW-D01][UW-D02][UW-D07][UI-D05][verification][negative]") {
+    const auto vector_words = [](const std::array<double, 3>& point) {
+        return p::ContourVector{{{point[0], point[0]}, {point[1], point[1]}, {point[2], point[2]}}};
+    };
+    const auto origin = vector_words({0, -.5, 0});
+    const auto tip = vector_words({.25, .5, .125});
+    const auto velocity = vector_words({2, 0, 0});
+    const auto normal = vector_words({.25, -.5, 1.});
+    constexpr p::ContourInterval radius{.125, .125};
+    const std::array<p::StraightWakeAgeSample, 3> samples{{
+        {{0, 0}, {-.125, -.125}, {-.25, -.25}},
+        {{.125, .125}, {-.5, -.5}, {.125, .125}},
+        {{.75, .75}, {-.25, -.25}, {-.125, -.125}},
+    }};
+    const auto context = test_geometry::context();
+    const auto projection = [&](const auto& first, const auto& second, const auto& flow, auto core,
+                                const auto& point, auto nodes, std::uint64_t work,
+                                std::stop_token stop = {}) {
+        return p::project_straight_wake_column_update(context, first, second, flow, core, point,
+                                                      normal, nodes, work, stop);
+    };
+
+    for (const std::array point : {std::array{-.125, 0., .125}, std::array{-.25, -.75, .0625},
+                                   std::array{8., 32., -16.}, std::array{0., -.5, 0.}}) {
+        CAPTURE(point);
+        const auto projected =
+            projection(origin, tip, velocity, radius, vector_words(point), samples, samples.size());
+        REQUIRE(projected);
+        const auto reversed =
+            projection(tip, origin, velocity, radius, vector_words(point), samples, samples.size());
+        REQUIRE(reversed);
+        std::array<Big, 2> reference{};
+        for (const auto& sample : samples) {
+            const Big age{sample.age_seconds.lower};
+            // Apply the Green-function Hessian over the infinitesimal strip.
+            // dX/ds cross dX/d(age) = (0, 1/4, -2) for this oriented band.
+            const auto density = [&](const Big& s) -> Big {
+                const Big x = Big(point[0]) - s / 4 - 2 * age;
+                const Big y = Big(point[1]) + Big(.5) - s;
+                const Big z = Big(point[2]) - s / 8;
+                const Big r2 = x * x + y * y + z * z;
+                const Big epsilon2 = Big(1) / 64;
+                const Big a2 = r2 + epsilon2;
+                const Big projected_normal = Big(-17) / 8;
+                const Big dot_r = x / 4 - y / 2 + z;
+                const Big area_dot_r = y / 4 - 2 * z;
+                return (projected_normal * (r2 - 2 * epsilon2) - 3 * dot_r * area_dot_r) /
+                       (4 * boost::math::constants::pi<Big>() * a2 * a2 * sqrt(a2));
+            };
+            const auto integrate = [&](unsigned count) {
+                Big total{};
+                for (unsigned i = 0; i < count; ++i)
+                    total += boost::math::quadrature::gauss<Big, 30>::integrate(
+                        density, Big(i) / count, Big(i + 1) / count);
+                return total;
+            };
+            const Big area = integrate(32);
+            REQUIRE(abs(area - integrate(64)) < Big("1e-35"));
+            reference[0] += area * sample.real_weight_seconds.lower;
+            reference[1] += area * sample.imaginary_weight_seconds.lower;
+        }
+        const auto encloses = [](p::ContourInterval interval, const Big& target) {
+            CHECK(Big(interval.lower) <= target);
+            CHECK(target <= Big(interval.upper));
+            CHECK(interval.upper - interval.lower < 1e-10);
+        };
+        encloses(projected->real, reference[0]);
+        encloses(projected->imaginary, reference[1]);
+        encloses(reversed->real, -reference[0]);
+        encloses(reversed->imaginary, -reference[1]);
+    }
+
+    const auto point = vector_words({0, 0, 0});
+    rejected(projection(origin, tip, velocity, radius, point, samples, samples.size() - 1),
+             core::FailureCode::ResourceExceeded);
+    rejected(projection(origin, origin, velocity, radius, point, samples, samples.size()),
+             core::FailureCode::InvalidInput);
+    rejected(
+        projection(origin, tip, velocity, p::ContourInterval{}, point, samples, samples.size()),
+        core::FailureCode::InvalidInput);
+    auto bad = samples;
+    bad[1].age_seconds = {-1, -.5};
+    rejected(projection(origin, tip, velocity, radius, point, bad, bad.size()),
+             core::FailureCode::InvalidInput);
+    const std::array<p::StraightWakeAgeSample, 1> zero{{{{.25, .25}, {}, {}}}};
+    const auto zero_update = projection(origin, tip, velocity, radius, point, zero, zero.size());
+    REQUIRE(zero_update);
+    CHECK(zero_update->real.lower == 0);
+    CHECK(zero_update->real.upper == 0);
+    CHECK(zero_update->imaginary.lower == 0);
+    CHECK(zero_update->imaginary.upper == 0);
+    std::stop_source stop;
+    REQUIRE(stop.request_stop());
+    rejected(
+        projection(origin, tip, velocity, radius, point, samples, samples.size(), stop.get_token()),
+        core::FailureCode::Cancelled);
 }
 
 TEST_CASE("P1 applies real and low-word strengths while retaining distinct equal-valued columns",
