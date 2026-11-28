@@ -54,13 +54,44 @@ ctest --preset linux-release --output-on-failure -R '^io[.](checkpoint_(director
 
 Windows Release では `pwsh tools/dev/msvc.ps1` を通して同等の対象をビルドし、`windows-release` で `linux_reference_root` の代わりに `windows_reference_root` を実行する。
 
+## Ubuntu Release の結果
+
+Ubuntu 24.04.5 LTS、カーネル `7.0.0-44-generic`、GCC 14.2.0 Release で、コードと試験の版 `462f27dd33dcc76b776297acee570e7e156c0adc` をビルドした。
+対象の7 CTest が通過した。Catch2 の44ケース、5,055アサーションを確認した。
+`io.checkpoint_directory` は5ケース、358アサーション。そのうち `[FD-08]` の2ケース、238アサーションで Case の相対取得を確認した。
+`strace` で、Case の根から `runs/checkpoint-12` を取得した記述子が、`manifest.json` と両チャンクを開く起点になっていることを確認した。
+マニフェスト SHA-256 の照合だけを除いたビルドでは、ファイル・メモリーの両経路で JSON または列挙の上限が先に報告され、回帰試験の8アサーションが失敗した。
+
+Windows の試験コードは同じ Case の対照と、保持中の削除共有を確認するネイティブ対照を含む。今回の実行は Linux で行った。
+
 ## AlmaLinux 8.10 カーネルでの照合
 
 [先行の実行環境と同じ署名済みカーネル](alma-8-kernel-runtime.md)を QEMU のネットワークなしゲストで起動した。
 独立のシステムコール試験は、`openat2` に `O_PATH | O_DIRECTORY | O_CLOEXEC` と `RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS` を指定した。
 根を保持した後のディレクトリ置換、途中と終端のリンク・通常ファイル、根外と欠落の拒否を確認した。
-製品試験は、Ubuntu GCC 14.2 Release の実行ファイルと同じユーザー空間ライブラリーをゲストの initramfs に載せ、`[FD-08]` の実取得試験を同じカーネルで実行する。
+独立試験の終了値は0だった。
+製品試験は、Ubuntu GCC 14.2 Release の実行ファイルと同じユーザー空間ライブラリーをゲストの initramfs に載せ、同じカーネルで実施した。
+`4.18.0-553.189.1.el8_10.x86_64` で `[FD-08]` の2ケース、238アサーションが通過し、製品試験の終了値は0だった。
 この照合は、対応するネイティブ取得がこのカーネルで動くことを示す。
 AlmaLinux の glibc 2.28 での配布候補の認定は、[配布物の実行時検証](linux-release-runtime-qualification.md)に従う。
+
+| 受け取ったファイル | SHA-256 |
+| --- | --- |
+| 署名済み RPM から抽出したカーネル | `6c68c16ecb83e4884b10e3cb5b9f9814cdff9127264a1ec32e7edfc910565a69` |
+| 独立システムコール試験の C ソース | `eb6f3d211055a96cc890bfd3479177de71d84ab0e267c4d4cda1c9e22b5023b9` |
+| Ubuntu とゲストで使った製品試験の実行ファイル | `6e42ba314b83f2f0ee2b896f7e9e8ab55e3603d63a50815d6c881f0cbafe8d64` |
+| 製品試験を含む initramfs | `934ac921057b0cadce7f12383e22b0bfa7a1784d51b5b18bdd42ef037814bc2e` |
+| 製品試験のゲストシリアル出力原本 | `5a6eee6b4eb59c9a8b9298825eeef51fa5113234544ce02aaa2fabca268c703a` |
+
+ゲストでは Ubuntu の試験ファイルを `/product-test` に置く。元の ELF インタープリターを同じパスに置き、`ldd` が示す依存ライブラリーを対応する soname で `/runtime` に置く。
+静的 BusyBox の `/init` で procfs と devtmpfs をマウントし、書込み可能な `/work` へ移動して `LD_LIBRARY_PATH=/runtime /product-test '[FD-08]' --colour-mode none` を実行する。
+その終了値を出力してからゲストを停止する。
+QEMU 8.2.2 (Ubuntu Noble) で TCG を使用し、署名済みカーネルと上記の initramfs を次の条件で起動した。
+
+```bash
+qemu-system-x86_64 -accel tcg -machine pc -cpu max -m 768 -smp 1 \
+  -nodefaults -display none -serial stdio -monitor none -nic none -no-reboot \
+  -kernel "$vmlinuz" -initrd "$initramfs" -append 'console=ttyS0 panic=1 rdinit=/init quiet'
+```
 
 準備済み型からの七指紋の導出、復元する環境の認定、J1 と探索の実状態を組み直す処理は、対応する型と復元入口が揃った段階で検証する。
