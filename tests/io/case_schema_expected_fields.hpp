@@ -6,7 +6,7 @@ struct Field {
     std::string_view record, name, spelling;
     bool optional;
 };
-inline constexpr std::array<Field, 815> fields{{
+inline constexpr std::array<Field, 820> fields{{
     {"Case", "schema", "Tag{uvlas.case/1}", false},
     {"Case", "units", "Units", false},
     {"Case", "model", "Model", false},
@@ -312,6 +312,11 @@ inline constexpr std::array<Field, 815> fields{{
     {"AeroSurface", "trailing", "Index", false},
     {"AeroSurface", "orientation", "Tag{positive,reversed}", false},
     {"AeroSurface", "sharing", "List<AeroSharing>", false},
+    {"AeroSurface", "edge_pairing", "EdgePairing", true},
+    {"EdgePairing", "knots", "List<EdgePairingKnot>", false},
+    {"EdgePairingKnot", "eta", "Rational", false},
+    {"EdgePairingKnot", "leading", "Rational", false},
+    {"EdgePairingKnot", "trailing", "Rational", false},
     {"AeroAttachmentFixed", "kind", "Tag{fixed_reference}", false},
     {"AeroAttachmentPrescribed", "kind", "Tag{prescribed_motion}", false},
     {"AeroAttachmentPrescribed", "motion", "Motion", false},

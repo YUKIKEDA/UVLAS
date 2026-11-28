@@ -4,6 +4,10 @@
 #include <uvlas/io/si_case.hpp>
 #include <uvlas/structure/pg_reference_geometry.hpp>
 
+namespace uvlas::structure::detail {
+struct ReferenceArithmetic;
+}
+
 namespace uvlas::coupling::detail {
 
 struct CaseReferenceSurfaceSample {
@@ -33,12 +37,21 @@ public:
             core::ResourcePlan&) noexcept;
 
     [[nodiscard]] core::Result<CaseReferenceSurfaceIdentity> identity() const noexcept;
+    [[nodiscard]] structure::PgReferenceCallInfo preparation_work() const noexcept;
 
     /// Return Cartesian metres and analytic derivatives with respect to chord and span.
     /// Points on the chart polygon boundary use the same polynomial extension as its interior.
     [[nodiscard]] core::Result<CaseReferenceSurfaceSample>
     evaluate(const structure::ExactRational& chord, const structure::ExactRational& span,
              const structure::PgReferenceLimits&, core::ResourcePlan&) const noexcept;
+
+    // For callers that already qualified a chart subdivision and own the arithmetic budget.
+    [[nodiscard]] CaseReferenceSurfaceSample evaluate_chart(const structure::PgPartitionPoint&,
+                                                            structure::detail::ReferenceArithmetic&,
+                                                            bool tangents) const;
+    [[nodiscard]] structure::PgPartitionPoint
+    chart_projection(const std::array<structure::ExactRational, 3>&,
+                     structure::detail::ReferenceArithmetic&) const;
 
 private:
     struct Data;

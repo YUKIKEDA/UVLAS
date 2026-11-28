@@ -9,6 +9,19 @@ namespace uvlas::coupling::detail {
 using NonpenetrationVector = std::array<aero::detail::ScalarWords, 3>;
 using ExplicitCollocationTangents = std::array<NonpenetrationVector, 2>;
 
+struct CaseWingNormalProjection {
+    std::array<io::SiEnclosure, 3> unit;
+    std::uint64_t used_steps{};
+};
+
+/// Qualify one retained collocation frame against both child facets.
+[[nodiscard]] core::Result<CaseWingNormalProjection>
+project_case_wing_normal(const aero::detail::OwnedGeometry&,
+                         std::span<const aero::detail::FacetId, 2>,
+                         const ExplicitCollocationTangents&, core::Precision,
+                         const std::array<CaseFlowComponentBudget, 3>&, CaseFlowProjectionLimits,
+                         std::stop_token) noexcept;
+
 /// Retained current coordinates of an oriented facet. The tangents are the
 /// exact differences 1-0 and 2-0, evaluated without intermediate projection.
 struct RoundedFacetTangents {

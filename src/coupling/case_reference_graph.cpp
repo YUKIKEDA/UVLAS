@@ -159,6 +159,7 @@ struct CaseReferenceSurface::Data {
     std::array<ExactRational, 9> rotation;
     structure::ExactChartPolynomial height;
     core::PlannedBuffer<PgPartitionPoint> domain;
+    structure::PgReferenceCallInfo preparation;
 };
 
 CaseReferenceSurface::CaseReferenceSurface(core::PlannedBuffer<Data> data) noexcept
@@ -221,6 +222,7 @@ CaseReferenceSurface::prepare(const io::SiCase& source, std::uint64_t geometry_i
             }
             validate_domain(m, result.domain.values());
             m.cancel();
+            result.preparation = m.info();
             return CaseReferenceSurface{std::move(data)};
         }
         partition_fail(FailureCode::InvalidInput);
@@ -232,6 +234,11 @@ core::Result<CaseReferenceSurfaceIdentity> CaseReferenceSurface::identity() cons
         return std::unexpected(
             core::Failure{FailureCode::InvalidInput, core::Operation::PrepareModel});
     return data_.values().front().identity;
+}
+
+structure::PgReferenceCallInfo CaseReferenceSurface::preparation_work() const noexcept {
+    return data_.size() == 1 ? data_.values().front().preparation
+                             : structure::PgReferenceCallInfo{};
 }
 
 core::Result<CaseReferenceSurfaceSample>
@@ -249,29 +256,64 @@ CaseReferenceSurface::evaluate(const ExactRational& chord, const ExactRational& 
         const PgPartitionPoint point{m.copy(chord), m.copy(span)};
         if (!contains(m, data.domain.values(), point))
             partition_fail(FailureCode::GeometryInvalid);
-        const std::array<ExactRational, 3> position{
-            m.add(data.x0, m.add(m.mul(data.width, chord), m.mul(data.skew, span))), m.copy(span),
-            pg::polynomial_derivative(m, data.height, {0, 0}, chord, span)};
-        const std::array<ExactRational, 3> chord_tangent{
-            m.copy(data.width), {}, pg::polynomial_derivative(m, data.height, {1, 0}, chord, span)};
-        const std::array<ExactRational, 3> span_tangent{
-            m.copy(data.skew), m.constant("1"),
-            pg::polynomial_derivative(m, data.height, {0, 1}, chord, span)};
-        const auto world = [&](const auto& chart, bool translate) {
-            auto result = pg::physical_rotate(m, data.rotation, chart);
-            for (std::size_t axis = 0; axis < result.size(); ++axis) {
-                result[axis] = m.mul(result[axis], data.length);
-                if (translate)
-                    result[axis] = m.add(result[axis], data.origin[axis]);
-            }
-            return result;
-        };
-        CaseReferenceSurfaceSample result{
-            world(position, true), world(chord_tangent, false), world(span_tangent, false), {}};
+        auto result = evaluate_chart(point, m, true);
         m.cancel();
         result.call_info = m.info();
         return result;
     });
+}
+
+CaseReferenceSurfaceSample CaseReferenceSurface::evaluate_chart(const PgPartitionPoint& point,
+                                                                pg::ReferenceArithmetic& m,
+                                                                bool tangents) const {
+    if (data_.size() != 1)
+        partition_fail(FailureCode::InvalidInput);
+    const auto& data = data_.values().front();
+    const auto& [chord, span] = point;
+    const std::array<ExactRational, 3> position{
+        m.add(data.x0, m.add(m.mul(data.width, chord), m.mul(data.skew, span))), m.copy(span),
+        pg::polynomial_derivative(m, data.height, {0, 0}, chord, span)};
+    const auto world = [&](const auto& chart, bool translate) {
+        auto result = pg::physical_rotate(m, data.rotation, chart);
+        for (std::size_t axis = 0; axis < result.size(); ++axis) {
+            result[axis] = m.mul(result[axis], data.length);
+            if (translate)
+                result[axis] = m.add(result[axis], data.origin[axis]);
+        }
+        return result;
+    };
+    CaseReferenceSurfaceSample result{world(position, true), {}, {}, {}};
+    if (tangents) {
+        result.chord_tangent =
+            world(std::array<ExactRational, 3>{m.copy(data.width),
+                                               {},
+                                               pg::polynomial_derivative(m, data.height, {1, 0},
+                                                                         chord, span)},
+                  false);
+        result.span_tangent =
+            world(std::array<ExactRational, 3>{m.copy(data.skew), m.constant("1"),
+                                               pg::polynomial_derivative(m, data.height, {0, 1},
+                                                                         chord, span)},
+                  false);
+    }
+    return result;
+}
+
+PgPartitionPoint CaseReferenceSurface::chart_projection(const std::array<ExactRational, 3>& world,
+                                                        pg::ReferenceArithmetic& m) const {
+    if (data_.size() != 1)
+        partition_fail(FailureCode::InvalidInput);
+    const auto& data = data_.values().front();
+    std::array<ExactRational, 2> xy;
+    for (std::size_t axis = 0; axis < world.size(); ++axis) {
+        const auto translated = m.sub(world[axis], data.origin[axis]);
+        for (std::size_t local = 0; local < xy.size(); ++local)
+            xy[local] = m.add(xy[local], m.mul(data.rotation[axis * 3 + local], translated));
+    }
+    auto t = m.div(xy[1], data.length);
+    auto s =
+        m.div(m.sub(m.sub(m.div(xy[0], data.length), data.x0), m.mul(data.skew, t)), data.width);
+    return {std::move(s), std::move(t)};
 }
 
 } // namespace uvlas::coupling::detail

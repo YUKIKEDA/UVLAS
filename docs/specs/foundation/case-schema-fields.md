@@ -109,7 +109,9 @@ Nastran/Gmshのsidecar内容は本caseと同じ型辞書の幾何・材料・所
 
 | 型 | key:型 | 条件 |
 |---|---|---|
-| AeroSurface | id:Id<AeroSurface>, geometry:Ref<Geometry>, attachment:AeroAttachment, chord:List<Number>, span:List<Number>, leading:Index, trailing:Index, orientation:Tag{positive,reversed}, sharing:List<AeroSharing> | chord/span各2以上で厳密増加、後縁の物理index範囲検査。quarter/three-quarterを別入力で変更不可 |
+| AeroSurface | id:Id<AeroSurface>, geometry:Ref<Geometry>, attachment:AeroAttachment, chord:List<Number>, span:List<Number>, leading:Index, trailing:Index, orientation:Tag{positive,reversed}, sharing:List<AeroSharing>, edge_pairing?:EdgePairing | chord/span各2以上で厳密増加、後縁の物理index範囲検査。quarter/three-quarterを別入力で変更不可。固定面・指定運動面の格子と対応は[前縁と後縁の対応](../aero/wing-edge-pairing-contract.md)に従う |
+| EdgePairing | knots:List<EdgePairingKnot> | 2件以上。固定面と指定運動面の任意欄。構造追従面は禁止 |
+| EdgePairingKnot | eta:Rational, leading:Rational, trailing:Rational | etaは共通の正規化翼幅位置。leading/trailingは各元境界の線分添字と区間内割合の和。端点・単調性・被覆は物理準備で照合 |
 | AeroAttachment fixed | kind:Tag{fixed_reference} | geometryの不変参照位置を使う。架空シェル不要 |
 | AeroAttachment prescribed | kind:Tag{prescribed_motion}, motion:Motion | 参照geometryに同じSE(3)運動を作用。別の構造支持速度を加算しない |
 | AeroAttachment structural | kind:Tag{structural}, host:Ref<Shell>, material_map?:MaterialMap | 同じ固定材料座標対応のq/vから位置と面速度を求める。省略形式も読めるが、物理準備には必須。motionの重畳keyは禁止。[材料座標対応](../aero/structural-attachment-material-map-contract.md) |

@@ -557,6 +557,11 @@ TEST_CASE("Frozen controls exercise recursive dictionary key kind and fixed shap
         surfaces.at(0).set(
             "sharing",
             parse(R"([{"other":"2","own_boundary":0,"other_boundary":0,"orientation":"same"}])"));
+        surfaces.at(1).set("attachment", parse(R"({"kind":"fixed_reference"})"));
+        surfaces.at(1).set(
+            "edge_pairing",
+            parse(
+                R"({"knots":[{"eta":{"numerator":"0","denominator":"1"},"leading":{"numerator":"0","denominator":"1"},"trailing":{"numerator":"0","denominator":"1"}},{"eta":{"numerator":"1","denominator":"1"},"leading":{"numerator":"1","denominator":"1"},"trailing":{"numerator":"1","denominator":"1"}}]})"));
         const FragmentInput control{root(), std::move(value), "Case", 1, {{0, 0, 0, 0}}};
         expect_fragment(control, true);
         dictionary_series(control, type_named("Case"), control.payload, {}, 1, counts);
@@ -565,8 +570,8 @@ TEST_CASE("Frozen controls exercise recursive dictionary key kind and fixed shap
         INFO("record coverage " << record.name);
         CHECK(counts.records.contains(std::string{record.name}));
     }
-    CHECK(counts.records.size() == 194);
-    CHECK(counts.fields.size() == 815);
+    CHECK(counts.records.size() == 196);
+    CHECK(counts.fields.size() == 820);
     CHECK(counts.fields.size() > 600);
     CHECK(counts.shapes.size() > 20);
 }

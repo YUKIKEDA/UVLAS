@@ -419,7 +419,7 @@ constexpr std::array<FieldDefinition, 5> fields_59{{
     {"spatial", FieldType::T168, false},
     {"multiplier", FieldType::T164, false},
 }};
-constexpr std::array<FieldDefinition, 9> fields_60{{
+constexpr std::array<FieldDefinition, 10> fields_60{{
     {"id", FieldType::T169, false},
     {"geometry", FieldType::T34, false},
     {"attachment", FieldType::T170, false},
@@ -429,6 +429,7 @@ constexpr std::array<FieldDefinition, 9> fields_60{{
     {"trailing", FieldType::T35, false},
     {"orientation", FieldType::T172, false},
     {"sharing", FieldType::T173, false},
+    {"edge_pairing", FieldType::T453, true},
 }};
 constexpr std::array<FieldDefinition, 1> fields_61{{
     {"kind", FieldType::T174, false},
@@ -1206,7 +1207,15 @@ constexpr std::array<FieldDefinition, 2> fields_193{{
     {"powers", FieldType::T63, false},
     {"coefficient", FieldType::T452, false},
 }};
-const std::array<RecordDefinition, 194> records{{
+constexpr std::array<FieldDefinition, 1> fields_194{{
+    {"knots", FieldType::T454, false},
+}};
+constexpr std::array<FieldDefinition, 3> fields_195{{
+    {"eta", FieldType::T62, false},
+    {"leading", FieldType::T62, false},
+    {"trailing", FieldType::T62, false},
+}};
+const std::array<RecordDefinition, 196> records{{
     {"Case", "Case", fields_0, "", ""},
     {"Units", "Units", fields_1, "", ""},
     {"Model", "Model", fields_2, "", ""},
@@ -1403,8 +1412,10 @@ const std::array<RecordDefinition, 194> records{{
     {"MaterialMap", "MaterialMap", fields_191, "", ""},
     {"MaterialMapPiece", "MaterialMapPiece", fields_192, "", ""},
     {"MaterialMapTerm", "MaterialMapTerm", fields_193, "", ""},
+    {"EdgePairing", "EdgePairing", fields_194, "", ""},
+    {"EdgePairingKnot", "EdgePairingKnot", fields_195, "", ""},
 }};
-const std::array<TypeDefinition, 453> type_table{{
+const std::array<TypeDefinition, 456> type_table{{
     {"Tag{uvlas.case/1}", FieldKind::Enumeration, std::nullopt, 0, "",
      SchemaDimension{{0, 0, 0, 0}}, false, 0},
     {"Units", FieldKind::Object, std::nullopt, 0, "Units", SchemaDimension{{0, 0, 0, 0}}, false, 0},
@@ -2276,6 +2287,12 @@ const std::array<TypeDefinition, 453> type_table{{
      SchemaDimension{{0, 0, 0, 0}}, false, 0},
     {"Vec<Rational,3>", FieldKind::Array, FieldType::T62, 3, "", SchemaDimension{{0, 0, 0, 0}},
      false, 0},
+    {"EdgePairing", FieldKind::Object, std::nullopt, 0, "EdgePairing",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"List<EdgePairingKnot>", FieldKind::Array, FieldType::T455, 0, "",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
+    {"EdgePairingKnot", FieldKind::Object, std::nullopt, 0, "EdgePairingKnot",
+     SchemaDimension{{0, 0, 0, 0}}, false, 0},
 }};
 } // namespace
 std::span<const TypeDefinition> schema_types() noexcept {
@@ -2725,6 +2742,10 @@ std::uint64_t schema_record_bytes(SchemaContext& context) {
                                                 sizeof(std::optional<schema::MaterialMapPiece>)));
     total = context.add(total, context.multiply(context.output->record_counts[193],
                                                 sizeof(std::optional<schema::MaterialMapTerm>)));
+    total = context.add(total, context.multiply(context.output->record_counts[194],
+                                                sizeof(std::optional<schema::EdgePairing>)));
+    total = context.add(total, context.multiply(context.output->record_counts[195],
+                                                sizeof(std::optional<schema::EdgePairingKnot>)));
     return total;
 }
 void schema_prepare_records(SchemaContext& context) {
@@ -3164,6 +3185,10 @@ void schema_prepare_records(SchemaContext& context) {
         context.allocate<std::optional<schema::MaterialMapPiece>>(owner.record_counts[192], false);
     owner.records_MaterialMapTerm =
         context.allocate<std::optional<schema::MaterialMapTerm>>(owner.record_counts[193], false);
+    owner.records_EdgePairing =
+        context.allocate<std::optional<schema::EdgePairing>>(owner.record_counts[194], false);
+    owner.records_EdgePairingKnot =
+        context.allocate<std::optional<schema::EdgePairingKnot>>(owner.record_counts[195], false);
 }
 void schema_build_records(SchemaContext& context) {
     auto& owner = *context.output;
@@ -3795,6 +3820,7 @@ void schema_build_records(SchemaContext& context) {
                     SchemaFactory::required_field<FieldType::T35>(context, node, "trailing"),
                     SchemaFactory::required_field<FieldType::T172>(context, node, "orientation"),
                     SchemaFactory::required_field<FieldType::T173>(context, node, "sharing"),
+                    SchemaFactory::optional_field<FieldType::T453>(context, node, "edge_pairing"),
                 });
             break;
         case 61:
@@ -5052,6 +5078,20 @@ void schema_build_records(SchemaContext& context) {
                 .emplace(schema::MaterialMapTerm{
                     SchemaFactory::required_field<FieldType::T63>(context, node, "powers"),
                     SchemaFactory::required_field<FieldType::T452>(context, node, "coefficient"),
+                });
+            break;
+        case 194:
+            owner.records_EdgePairing.values()[static_cast<std::size_t>(typed.record_row)].emplace(
+                schema::EdgePairing{
+                    SchemaFactory::required_field<FieldType::T454>(context, node, "knots"),
+                });
+            break;
+        case 195:
+            owner.records_EdgePairingKnot.values()[static_cast<std::size_t>(typed.record_row)]
+                .emplace(schema::EdgePairingKnot{
+                    SchemaFactory::required_field<FieldType::T62>(context, node, "eta"),
+                    SchemaFactory::required_field<FieldType::T62>(context, node, "leading"),
+                    SchemaFactory::required_field<FieldType::T62>(context, node, "trailing"),
                 });
             break;
         default:
@@ -6518,5 +6558,17 @@ RecordAccess<FieldType::T451>::read(const SchemaData* owner, std::uint64_t node)
     const auto& typed = owner->nodes.values()[static_cast<std::size_t>(node)];
     return ready_record(
         owner->records_MaterialMapTerm.values()[static_cast<std::size_t>(typed.record_row)]);
+}
+RecordAccess<FieldType::T453>::Value
+RecordAccess<FieldType::T453>::read(const SchemaData* owner, std::uint64_t node) noexcept {
+    const auto& typed = owner->nodes.values()[static_cast<std::size_t>(node)];
+    return ready_record(
+        owner->records_EdgePairing.values()[static_cast<std::size_t>(typed.record_row)]);
+}
+RecordAccess<FieldType::T455>::Value
+RecordAccess<FieldType::T455>::read(const SchemaData* owner, std::uint64_t node) noexcept {
+    const auto& typed = owner->nodes.values()[static_cast<std::size_t>(node)];
+    return ready_record(
+        owner->records_EdgePairingKnot.values()[static_cast<std::size_t>(typed.record_row)]);
 }
 } // namespace uvlas::io::detail
