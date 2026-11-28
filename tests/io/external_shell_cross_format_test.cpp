@@ -534,6 +534,209 @@ TEST_CASE("One planar Case has the same measured Shell through Nastran and Gmsh"
     CHECK(fixture::take(fixture::take(n_again.at(0)).get().reference().identity()) == identity);
 }
 
+TEST_CASE("Both authenticated mesh formats reject exact thickness and material differences",
+          "[.exact-sidecar][FD-03][MAT-D05][IO4-01][IO4-03][IO4-04][R-05][V-USE][integration]["
+          "verification][negative]") {
+    constexpr std::string_view length = "0.00254";
+    constexpr std::string_view shifted = "0.00254000000000000000000000000001";
+    constexpr std::string_view young = "200000.0";
+    constexpr std::string_view shifted_young = "200000.00000000001";
+    static_assert(0.00254 == 0.00254000000000000000000000000001);
+    static_assert(200000.0 == 200000.00000000001);
+
+    const auto thickness_values = [&](std::string_view last) {
+        return fixture::json("[0.00254,0.00254,0.00254," + std::string{last} + "]");
+    };
+    auto config = fixture::root("coupled_transient");
+    auto& model = config.field("model");
+    auto& pg = model.field("geometry").elements.front();
+    pg.field("frame").set("origin", fixture::json("[1,2,3]"));
+    pg.field("frame").set("rotation", fixture::json("[[0,0,1],[1,0,0],[0,1,0]]"));
+    pg.set("reference_length", fixture::json("2"));
+    pg.field("thickness").set("values", thickness_values(length));
+    auto& materials = model.field("materials").elements;
+    materials.front().set("young", fixture::json("200000000000"));
+    materials.front().set("poisson", fixture::json("0.25"));
+    materials.front().set("density", fixture::json("7850"));
+    auto alternate = materials.front();
+    alternate.set("id", fixture::string("2"));
+    materials.push_back(std::move(alternate));
+    model.field("shells")
+        .elements.front()
+        .field("layers")
+        .elements.front()
+        .field("axis")
+        .field("direction")
+        .set("value", fixture::json("[0,1,0]"));
+
+    const auto millimetre_deck = [](std::string_view modulus) {
+        return std::string{"GRID,10,,1000.0,2000.0,3000.0\nGRID,20,,1000.0,4000.0,3000.0\n"
+                           "GRID,40,,1000.0,4000.0,5000.0\nGRID,99,,1000.0,2000.0,5000.0\n"
+                           "CQUAD4,701,90,10,20,40,99,0.0\nPSHELL,90,6,2.54\nMAT1,6,"} +
+               std::string{modulus} + ",80000.0,.25,7.85D-9\n";
+    };
+    const auto gmsh_map = [](std::string_view id, std::string_view material) {
+        auto sidecar = native_sidecar(true, false, id);
+        auto& shell = sidecar["shells"].at(0);
+        shell["full_thickness"] = 2.54;
+        shell["material_layers"].at(0)["material"] = material;
+        return sidecar.dump();
+    };
+    const auto nastran_map = [](std::string_view id) {
+        auto sidecar = native_sidecar(false, false, id);
+        sidecar["units"]["length"] = "mm";
+        sidecar["units"]["mass"] = "t";
+        return sidecar.dump();
+    };
+    const files::Tree tree;
+    write_external(model, tree, true, 2, 1, mesh, gmsh_map("2", "1"));
+    write_external(model, tree, false, 3, 3, millimetre_deck(young), nastran_map("3"));
+    write_external(model, tree, true, 4, 5, mesh, gmsh_map("4", "2"));
+    const auto shifted_deck = millimetre_deck(shifted_young);
+    write_external(model, tree, false, 5, 7, shifted_deck, nastran_map("5"));
+
+    core::ResourcePlan plan{fixture::budget};
+    core::Workspace workspace{core::PlannedBuffer<std::byte>{}};
+    const auto limits = make_binding_limits();
+    const PgReferenceLimits pg_limits{partition_test::exact_limits(), 20'000'000, 10'000'000, {}};
+    const coupling::CasePgReferenceLimits preparation{
+        {pg_limits.algebra, 4, {}},
+        {pg_limits.algebra, 2000, 20'000'000, 100'000, {}},
+        partition_test::limits(),
+        pg_limits,
+        100'000,
+        {}};
+    const rd::ExternalSidecarPgLimits match{{pg_limits, 8}, {8, 32, 32, 8, 32'000}, 8, 32'000};
+    std::optional<rd::MeshSidecarDiagnostic> binding_diag;
+    const auto bind = [&](const auto& schema, const auto& graph, unsigned id) {
+        return rd::bind_external_mesh_sidecar(schema, graph, rd::MeshGeometryId{id}, limits, plan,
+                                              {}, &binding_diag);
+    };
+    const auto prepare_gmsh = [&](const auto& si, const auto& binding, auto& diagnostic) {
+        return coupling::CaseGmshPgSet::prepare(si, binding, preparation, match, {1, 1, 200'000},
+                                                workspace, plan, &diagnostic);
+    };
+    const auto prepare_nastran = [&](const auto& si, const auto& binding, const auto& cards,
+                                     auto& diagnostic) {
+        return coupling::CaseNastranPlanarPgSet::prepare(si, binding, cards, preparation, match,
+                                                         {1, 1, 1}, workspace, plan, &diagnostic);
+    };
+
+    const auto graph = read_graph(tree, config, plan);
+    const auto schema = fixture::checked(config);
+    const auto si = convert(schema, pg_limits.algebra, plan);
+    const auto parent = fixture::take(schema.identity());
+    const auto gmsh = fixture::take(bind(schema, graph, 2));
+    const auto nastran = fixture::take(bind(schema, graph, 3));
+    const auto cards = quantities(graph, parent, io::SourceId{3}, limits, plan);
+    coupling::CaseGmshPgSetDiagnostic gmsh_diag;
+    coupling::CaseNastranPgSetDiagnostic nastran_diag;
+    const auto good_gmsh = fixture::take(prepare_gmsh(si, gmsh, gmsh_diag));
+    const auto good_nastran = fixture::take(prepare_nastran(si, nastran, cards, nastran_diag));
+    const auto& g = fixture::take(good_gmsh.at(0)).get();
+    const auto& n = fixture::take(good_nastran.at(0)).get();
+    const auto identity = fixture::take(g.reference().identity());
+    CHECK(fixture::take(n.reference().identity()) == identity);
+
+    // Independently, (254/100) * (1/1000) m = 127/50000 m.
+    const auto metres =
+        fixture::take(ExactRational::from_integer_pair("127", "50000", pg_limits.algebra, plan));
+    for (const auto* report : {&required_evidence(g.match().thickness),
+                               &required_evidence(n.match().planar.thickness_regions)}) {
+        CHECK(report->pg == identity);
+        REQUIRE(report->matches.size() == 1);
+        CHECK(std::get<ExactRational>(report->matches.values().front().value_metres) == metres);
+    }
+
+    const auto g_material = bind(schema, graph, 4);
+    REQUIRE_FALSE(g_material);
+    CHECK(g_material.error().code == core::FailureCode::InvalidInput);
+    CHECK(g_material.error().operation == core::Operation::PrepareModel);
+    const auto& material_diagnostic = required_evidence(binding_diag);
+    CHECK(material_diagnostic.reason == rd::MeshSidecarFailure::CaseReference);
+    CHECK(material_diagnostic.target_namespace == io::SchemaNamespace::Shell);
+    CHECK(material_diagnostic.target == 1);
+    CHECK(material_diagnostic.physical == rd::GmshKey{2, 7});
+    CHECK(required_evidence(material_diagnostic.source).source == io::SourceId{6});
+    CHECK(material_diagnostic.node);
+    const auto n_material = fixture::take(bind(schema, graph, 5));
+    const auto bad_cards = quantities(graph, parent, io::SourceId{7}, limits, plan);
+    const auto n_material_failure = prepare_nastran(si, n_material, bad_cards, nastran_diag);
+    REQUIRE_FALSE(n_material_failure);
+    CHECK(n_material_failure.error().code == core::FailureCode::InvalidInput);
+    CHECK(n_material_failure.error().operation == core::Operation::PrepareModel);
+    const auto& young_mismatch = required_evidence(nastran_diag.member.planar.quantity);
+    CHECK(young_mismatch.quantity == rd::ImportedQuantityField::Young1);
+    CHECK(required_evidence(young_mismatch.card_position).byte == shifted_deck.find(shifted_young));
+
+    // Reacquire an otherwise identical Case from the same source and sidecar bytes.
+    auto different_case = config;
+    different_case.field("model")
+        .field("geometry")
+        .elements.front()
+        .field("thickness")
+        .set("values", thickness_values(shifted));
+    const auto different_graph = read_graph(tree, different_case, plan);
+    const auto different_schema = fixture::checked(different_case);
+    const auto different_si = convert(different_schema, pg_limits.algebra, plan);
+    const auto different_parent = fixture::take(different_schema.identity());
+    const auto different_gmsh = fixture::take(bind(different_schema, different_graph, 2));
+    const auto different_nastran = fixture::take(bind(different_schema, different_graph, 3));
+    CHECK(different_gmsh.sidecar().digest() == gmsh.sidecar().digest());
+    CHECK(different_nastran.sidecar().digest() == nastran.sidecar().digest());
+    const auto different_cards =
+        quantities(different_graph, different_parent, io::SourceId{3}, limits, plan);
+    const auto g_failure = prepare_gmsh(different_si, different_gmsh, gmsh_diag);
+    const auto n_failure =
+        prepare_nastran(different_si, different_nastran, different_cards, nastran_diag);
+    CHECK_FALSE(g_failure.has_value());
+    CHECK_FALSE(n_failure.has_value());
+    REQUIRE((!g_failure && !n_failure));
+    CHECK(g_failure.error().code == core::FailureCode::InvalidInput);
+    CHECK(g_failure.error().operation == core::Operation::PrepareModel);
+    CHECK(n_failure.error().code == core::FailureCode::InvalidInput);
+    CHECK(n_failure.error().operation == core::Operation::PrepareModel);
+    const auto& g_difference = required_evidence(gmsh_diag.member.regional_thickness);
+    const auto& n_difference = required_evidence(nastran_diag.member.planar.regional_thickness);
+    for (const auto* difference : {&g_difference, &n_difference}) {
+        CHECK(difference->reason == rd::ExternalPgThicknessFailure::Difference);
+        CHECK(difference->element == 701);
+        CHECK(difference->case_triangle == 1);
+        CHECK(difference->overlap_vertex);
+    }
+    const auto& group = std::get<rd::GmshSidecar>(different_gmsh.sidecar().payload());
+    CHECK(g_difference.sidecar_node == group.shells.values().front().full_thickness_node);
+    CHECK(g_difference.sidecar_node);
+    CHECK(n_difference.property == rd::NastranPropertyId{90});
+    CHECK(required_evidence(n_difference.field).byte == millimetre_deck(young).find("2.54"));
+
+    auto unknown_face_case = config;
+    auto unknown_face_map = nlohmann::json::parse(nastran_map("3"));
+    unknown_face_map["shells"].at(0)["element"] = "999";
+    const auto map_bytes = unknown_face_map.dump();
+    auto& map_ref =
+        unknown_face_case.field("model").field("geometry").elements.at(2).field("sidecar");
+    files::declare_path(map_ref, "unknown-face.json", hex_digest(map_bytes));
+    files::write_file(tree.root / "unknown-face.json", map_bytes);
+    const auto unknown_face_graph = read_graph(tree, unknown_face_case, plan);
+    const auto unknown_face_schema = fixture::checked(unknown_face_case);
+    const auto unknown_face = bind(unknown_face_schema, unknown_face_graph, 3);
+    REQUIRE_FALSE(unknown_face);
+    CHECK(unknown_face.error().code == core::FailureCode::InvalidInput);
+    CHECK(unknown_face.error().operation == core::Operation::PrepareModel);
+    const auto& unknown_face_diagnostic = required_evidence(binding_diag);
+    CHECK(unknown_face_diagnostic.reason == rd::MeshSidecarFailure::Selection);
+    CHECK(unknown_face_diagnostic.element == 999);
+    CHECK(required_evidence(unknown_face_diagnostic.source).source == io::SourceId{4});
+    CHECK(unknown_face_diagnostic.node);
+    CHECK_FALSE(unknown_face_diagnostic.byte);
+
+    const auto g_again = fixture::take(prepare_gmsh(si, gmsh, gmsh_diag));
+    const auto n_again = fixture::take(prepare_nastran(si, nastran, cards, nastran_diag));
+    CHECK(fixture::take(fixture::take(g_again.at(0)).get().reference().identity()) == identity);
+    CHECK(fixture::take(fixture::take(n_again.at(0)).get().reference().identity()) == identity);
+}
+
 TEST_CASE(
     "Authenticated external reference owners enter the same full-depth Case chart",
     "[.external-case-chart][FD-03][IO4-03][IO4-04][R-05][V-USE][V-PG][integration][negative]") {
