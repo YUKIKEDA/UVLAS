@@ -4,9 +4,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <memory_resource>
 #include <ranges>
-#include <vector>
+#include <type_traits>
 
 namespace uvlas::coupling::detail {
 namespace wing_geometry {
@@ -71,8 +72,15 @@ public:
         : payload_(allocate<std::byte>(
               m, partition_add(partition_mul(count, sizeof(T)), alignof(T) - 1))),
           arena_(payload_.values().data(), payload_.values().size_bytes(),
-                 std::pmr::null_memory_resource()),
-          values_(count, value, &arena_) {}
+                 std::pmr::null_memory_resource()) {
+        static_assert(std::is_trivially_destructible_v<T>);
+        if (count == 0)
+            return;
+        // The planned arena covers one array. Debug vector iterators may need another allocation.
+        auto* storage = std::pmr::polymorphic_allocator<T>{&arena_}.allocate(count);
+        std::uninitialized_fill_n(storage, count, value);
+        values_ = std::span<T>{storage, count};
+    }
 
     [[nodiscard]] std::span<T> values() noexcept {
         return values_;
@@ -81,7 +89,7 @@ public:
 private:
     core::PlannedBuffer<std::byte> payload_;
     std::pmr::monotonic_buffer_resource arena_;
-    std::pmr::vector<T> values_;
+    std::span<T> values_;
 };
 
 bool same_source(io::SchemaIdentity a, io::SchemaIdentity b) noexcept {
