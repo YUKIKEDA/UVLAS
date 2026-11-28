@@ -131,8 +131,9 @@ private:
                                 }
                                 ids->values()[selected_count++] = row.id.unsigned_value();
                                 return true;
+                            } else {
+                                return false;
                             }
-                            return false;
                         },
                         observation->record());
                     if (!selected) {
