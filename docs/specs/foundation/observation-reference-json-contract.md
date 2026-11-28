@@ -55,6 +55,12 @@ $$
 
 手入力の矩形 Case で変位と支持レンチを同じファイルから参照する例を示す。Case の二つの観測が同じ Source ID、パス、元バイト列の SHA-256 を宣言する。Case の `columns` はそれぞれ `["x","y","z"]` と `["Fx","Fy","Fz","Mx","My","Mz"]` とし、対応する不確かさは全て零とする。下記の整形を変えたときは、元バイト列の SHA-256 を再計算する。
 
+入力の [矩形 Case](../../verification/IM-06/static-observation-case.json) と [参照原本](../../verification/IM-06/parametric-observations.json) には、例の条件ハッシュの算出に使う `numerics` を含めた。リポジトリのルートから次を実行すると、Case の投影と参照原本を独立に読み、条件と原本の二つの SHA-256 を照合できる。
+
+```bash
+python3 -B docs/verification/IM-06/check-static-observation-example.py
+```
+
 ```json
 {
   "schema": "uvlas.observation-reference/1",
