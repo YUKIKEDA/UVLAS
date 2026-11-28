@@ -96,7 +96,7 @@
 | FD-05 | [case-schema-fields.md:83](../specs/foundation/case-schema-fields.md) | 3 | 5 | 0 |
 | FD-06 | [case-schema-fields.md:108](../specs/foundation/case-schema-fields.md) | 16 | 7 | 1 |
 | FD-07 | [case-schema-fields.md:134](../specs/foundation/case-schema-fields.md) | 4 | 5 | 0 |
-| FD-08 | [case-schema-fields.md:159](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-08 | [case-schema-fields.md:159](../specs/foundation/case-schema-fields.md) | 3 | 0 | 0 |
 | FD-09 | [case-schema-fields.md:182](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-10 | [case-schema-fields.md:231](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-11 | [case-schema-fields.md:319](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
@@ -106,7 +106,7 @@
 | IO4-03 | [io-execution-adoption-specification.md:35](../specs/foundation/io-execution-adoption-specification.md) | 80 | 35 | 0 |
 | IO4-04 | [io-execution-adoption-specification.md:54](../specs/foundation/io-execution-adoption-specification.md) | 39 | 21 | 0 |
 | IO4-05 | [io-execution-adoption-specification.md:66](../specs/foundation/io-execution-adoption-specification.md) | 17 | 7 | 0 |
-| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 22 | 7 | 0 |
+| IO4-06 | [io-execution-adoption-specification.md:72](../specs/foundation/io-execution-adoption-specification.md) | 24 | 7 | 0 |
 | IO4-07 | [io-execution-adoption-specification.md:82](../specs/foundation/io-execution-adoption-specification.md) | 1 | 8 | 0 |
 | J1-D01 | [j1-discrete-equilibrium-and-chart-contract.md:5](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 2 | 3 | 0 |
 | J1-D02 | [j1-discrete-equilibrium-and-chart-contract.md:10](../specs/coupled/j1-discrete-equilibrium-and-chart-contract.md) | 0 | 0 | 0 |
