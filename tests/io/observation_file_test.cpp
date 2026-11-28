@@ -55,6 +55,11 @@ std::uint64_t external_bytes(const ObservationFileLimits& limits) {
     return std::get<structure::ExactEstimateAdmission>(limits.exact.external_memory).bytes;
 }
 
+std::stop_token requested_stop_token(std::stop_source&& source = {}) {
+    source.request_stop();
+    return source.get_token();
+}
+
 } // namespace
 
 TEST_CASE("Static observation file bounds aggregate work and retains exact owned values",
@@ -158,10 +163,8 @@ TEST_CASE("Static observation file bounds aggregate work and retains exact owned
                                           plan, {}, diagnostic);
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == core::FailureCode::StaleGeneration);
-    std::stop_source cancellation;
-    cancellation.request_stop();
     rejected = read_observation_file(source, parent, *condition, observations, fresh, plan,
-                                     cancellation.get_token(), diagnostic);
+                                     requested_stop_token(), diagnostic);
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == core::FailureCode::Cancelled);
     CHECK(fresh.maximum_work == initial.maximum_work);
@@ -237,8 +240,8 @@ TEST_CASE("Observation graph publishes only after both sources succeed",
     files::write_file(tree.root / names[1], payload[1] + " ");
     const auto rejected = resolve();
     REQUIRE_FALSE(rejected);
-    REQUIRE(acquisition.location);
-    CHECK(acquisition.location->source == SourceId{11});
+    CHECK(acquisition.location.transform([](const auto& location) { return location.source; }) ==
+          SourceId{11});
     CHECK(published_references.populated == 0);
     CHECK(published_references.files.size() == 0);
 
@@ -246,19 +249,16 @@ TEST_CASE("Observation graph publishes only after both sources succeed",
     REQUIRE(resolve());
     REQUIRE(published_references.populated == 2);
     const auto* const published = published_references.files.values().data();
-    REQUIRE(published[0]);
-    REQUIRE(published[1]);
-    CHECK(published[0]->source.source == SourceId{10});
-    CHECK(published[1]->source.source == SourceId{11});
+    const auto source_id = [](const auto& file) { return file.source.source; };
+    CHECK(published[0].transform(source_id) == SourceId{10});
+    CHECK(published[1].transform(source_id) == SourceId{11});
 
     files::write_file(tree.root / names[1], payload[1] + " ");
     REQUIRE_FALSE(resolve());
     CHECK(published_references.populated == 2);
     CHECK(published_references.files.values().data() == published);
 
-    std::stop_source stopped;
-    stopped.request_stop();
-    const auto cancelled = resolve(stopped.get_token());
+    const auto cancelled = resolve(requested_stop_token());
     REQUIRE_FALSE(cancelled);
     CHECK(cancelled.error().code == core::FailureCode::Cancelled);
     CHECK(published_references.populated == 2);
@@ -267,7 +267,7 @@ TEST_CASE("Observation graph publishes only after both sources succeed",
     files::write_file(tree.root / names[1], payload[1]);
     REQUIRE(resolve());
     REQUIRE(published_references.populated == 2);
-    CHECK(published_references.files.values()[0]->source.source == SourceId{10});
-    CHECK(published_references.files.values()[1]->source.source == SourceId{11});
+    CHECK(published_references.files.values()[0].transform(source_id) == SourceId{10});
+    CHECK(published_references.files.values()[1].transform(source_id) == SourceId{11});
 }
 #endif
