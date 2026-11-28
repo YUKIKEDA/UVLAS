@@ -78,16 +78,29 @@ def main():
     if digest != condition(dict(reversed(tuple(case.items())))):
         raise ValueError("Case projection depends on input key order")
     reference_hash = sha256(raw_reference).hexdigest()
-    fields = {row["id"]: [part["name"] for part in row["components"]]
-              for row in reference["observations"]}
+    fields = {}
+    for row in reference["observations"]:
+        observation_id = row["id"]
+        if observation_id in fields:
+            raise ValueError(f"Duplicate reference observation: {observation_id}")
+        components = row["components"]
+        names = {part["name"] for part in components}
+        if len(names) != len(components):
+            raise ValueError(f"Duplicate reference component: {observation_id}")
+        fields[observation_id] = names
     for observation in case["observations"]:
         declared = observation["comparison"]["reference"]
         if declared["source"]["sha256"] != reference_hash:
             raise ValueError("Reference bytes differ from the Case declaration")
         if declared["source"]["path"] != args.reference.name:
             raise ValueError("Reference path differs from the Case declaration")
-        if declared["columns"] != fields.pop(observation["id"]):
-            raise ValueError("Reference columns differ from the Case declaration")
+        observation_id = observation["id"]
+        columns = declared["columns"]
+        names = set(columns)
+        if len(names) != len(columns):
+            raise ValueError(f"Duplicate Case column: {observation_id}")
+        if names != fields.pop(observation_id, None):
+            raise ValueError(f"Reference columns differ from the Case declaration: {observation_id}")
     if fields:
         raise ValueError("The Case did not declare all reference observations")
     print(f"Case condition SHA-256  {digest}")
