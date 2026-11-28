@@ -1,0 +1,119 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im02-pg-case-lateral-traction",
+  "ids": [
+    "IM-02",
+    "FD-05",
+    "BC-01",
+    "LOAD-01",
+    "V-LOAD"
+  ],
+  "issue": 395,
+  "date": "2026-11-28",
+  "claim": "実装が仕様に適合",
+  "source_commit": "90e07dd04d875c29e20c4df41a30cfba8b75e19f",
+  "provenance": {
+    "schema": "uvlas.build-info/1",
+    "version": "0.1.0-dev",
+    "commit": "90e07dd04d875c29e20c4df41a30cfba8b75e19f",
+    "uncommitted_changes": false,
+    "compiler": "GNU 14.2.0",
+    "platform": "Linux x86_64",
+    "configuration": "Release",
+    "floating_point": "-ffp-contract=off -fno-fast-math",
+    "instruction_set": "sse2",
+    "platform_key": "linux-x64-gnu14.2-sse2",
+    "dependencies": {
+      "eigen": "5.0.1",
+      "spectra": "1.2.0",
+      "boost": "1.92.0",
+      "nlohmann_json": "3.12.0"
+    },
+    "dependency_repairs": {
+      "nlohmann_json_sax_allocation": 1
+    }
+  },
+  "os": "Ubuntu 24.04.5 LTS",
+  "commands": [
+    "cmake --build --preset linux-release --parallel 1 --target uvlas_test_coupling_case_pg_lateral_traction uvlas_cli",
+    "out/build/linux-release/uvlas --build-info",
+    "ctest --preset linux-release -V -R '^coupling\\.case_pg_lateral_traction$'"
+  ],
+  "references": [
+    {
+      "id": "cartesian-rectangle-and-edge-rule",
+      "path": "docs/verification/IM-02/pg-lateral-traction/oracle.py",
+      "sha256": "b8143b88b0eef704c16d2a85b44c10cddd33cb667033a7350d5cc0ed2c3c58f4",
+      "hash_of": "Python 3.12.3 の標準出力"
+    },
+    {
+      "id": "original-column-and-curved-area-oracles",
+      "path": "tests/coupling/case_pg_lateral_traction_test.cpp",
+      "sha256": "ebf5a441cc8166b3b8ffbc04e6e7126dbc91f1d192b57aaef2fa5d09a6ac8ae5"
+    }
+  ],
+  "results": {
+    "ctest_passed": 1,
+    "test_cases_passed": 3,
+    "assertions_passed": 8260,
+    "rectangular_points": 792,
+    "curved_points": 6,
+    "absolute_enclosure_width": "1e-18",
+    "width_units": [
+      "N",
+      "N m",
+      "J"
+    ],
+    "tolerance_source": "docs/verification/IM-02/pg-lateral-traction/verification.md",
+    "comparisons": [
+      "矩形の全元列における世界 XYZ のそれぞれの外力",
+      "合力、移動原点回りのモーメント、剛体仕事、軸方向・厚さ方向・端変位の仮想仕事",
+      "曲面の同一有限則に対する合力",
+      "元線分に沿った順序、全層の所有、複数 Load の加算、精度・資源・時刻・取消・所有の拒否"
+    ]
+  },
+  "mutation_control": {
+    "control": {
+      "source_sha256": "25b6120fb50886ca1644d2f0ae00490185e6c9f89be75c4883895575da45b09f",
+      "exit": 0,
+      "log_sha256": "d857cf9e2544e0c0b540408afeb5b9ce1cbcf0790d370735e31183466af1339a"
+    },
+    "reverse": {
+      "source_sha256": "396624527d725f146d2622cc8c84ee6c140cb0621facab29c0ee7016bfeb0ef5",
+      "exit": 42,
+      "log_sha256": "4bef2b94d2ebe9454b3926deb7aa8ccca8e0107afdcf48338334a810d191dfdd",
+      "rejected_by": "元線分に沿う位置を側面座標へ反転する検査"
+    },
+    "measure": {
+      "source_sha256": "7ec269cc256e28ec96700a3fa442dde0480e00b41b9c3acc1a076d4fafa53db3",
+      "exit": 42,
+      "log_sha256": "e3fccc42fbeeaa35f0f7207a119ae81d0fa4cdb01b1dde8d42a3d5632f992fe2",
+      "rejected_by": "Cartesian 曲面の有限則による合力の包絡"
+    }
+  },
+  "raw_log_sha256": {
+    "uvlas-395-clean-build-info.json": "20a31791359c45932a4ed760f06e4bd9b4dfcc5313c7ffd1589b2b0665ed403f",
+    "uvlas-395-clean-ctest.log": "8ef83a2bcc3ddcb375a7f5b7e5bf5c9fe7dab679faeac4184d4162d6e03eb9c8",
+    "uvlas-395-mutation.log": "06ef9e5391c7268ac1aebb2e953f79122a399ca126cf06a7ecc34233c237a730",
+    "uvlas-395-clean-build.log": "84483eca2e91ea2103c5e58a9055146bfb317bd891d3e58f3d03302a54f8075e"
+  },
+  "unverified_scope": [
+    "Windows の製品試験",
+    "平衡・反力・固有対への接続と入力3経路の比較（R-05）",
+    "製品規模の性能と実務受入"
+  ],
+  "sources": {
+    "CMakeLists.txt": "3624d0e2398be87f442d8dbc15a0c6b387a4bbda1aa6a3cce4b659678c0e32c1",
+    "src/coupling/case_pg_lateral_traction.cpp": "25b6120fb50886ca1644d2f0ae00490185e6c9f89be75c4883895575da45b09f",
+    "src/coupling/case_pg_lateral_traction.hpp": "c5e01c3a15b0c7963bb91a88da7a39d41f54759d9f2d5904f0011077405d8892",
+    "tests/coupling/case_pg_lateral_traction_test.cpp": "ebf5a441cc8166b3b8ffbc04e6e7126dbc91f1d192b57aaef2fa5d09a6ac8ae5",
+    "tests/io/case_schema_corpus.hpp": "4c11b85dd26ad513a5a80299bf577967f6062dd98bffb6be23f76f8d3b3ffeaf",
+    "docs/specs/structure/pg-case-lateral-traction-contract.md": "2f26c3f3c9b1f83364bb51820b556330c032f2d5fb25167dad7dbb6fd673be1e",
+    "docs/verification/IM-02/pg-lateral-traction/oracle.py": "dfd2a7e4f1d86a2326115485fca261ed04b2a9b561719e1c17fa76c5ae5f5dfd",
+    "vcpkg.json": "6ff038ce482c210d4f12974ea41175f153ed74a733132cbbda10e38fef90f3be",
+    "vcpkg-configuration.json": "aa225fbf8db7dc84f2cc0960a97a93a64d804c98cf761d8ea5af88bd50ec883e"
+  },
+  "artifacts": {
+    "docs/verification/IM-02/pg-lateral-traction/verification.md": "65516fe53b1cfea032710261581736d1c1bb843eebf28532c84b3ce06cc0d249"
+  }
+}
