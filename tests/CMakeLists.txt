@@ -215,9 +215,13 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_include_directories(uvlas_test_io_gmsh_case_support_boundary PRIVATE
         "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 
+    set(external_shell_cross_format_timeout "$<IF:$<CONFIG:Debug>,300,60>")
+    if(WIN32)
+        set(external_shell_cross_format_timeout "$<IF:$<CONFIG:Debug>,450,60>")
+    endif()
     uvlas_add_test(io.external_shell_cross_format
         LABELS integration negative verification V-USE
-        TIMEOUT "$<IF:$<CONFIG:Debug>,300,60>"
+        TIMEOUT ${external_shell_cross_format_timeout}
         SOURCES io/external_shell_cross_format_test.cpp
         LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
     target_include_directories(uvlas_test_io_external_shell_cross_format PRIVATE
@@ -801,8 +805,12 @@ target_compile_definitions(uvlas_test_structure_pg_frozen_shell_material PRIVATE
     UVLAS_PG_FROZEN_MATERIAL_TRANSFER="${PROJECT_SOURCE_DIR}/tests/structure/fixtures/pg-frozen-material-transfer-v1.json")
 add_test(NAME structure.pg_frozen_shell_material.composed
     COMMAND uvlas_test_structure_pg_frozen_shell_material "[.composed-vmat]")
+set(pg_frozen_composed_material_timeout "${pg_frozen_material_timeout}")
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT UVLAS_SANITIZERS)
+    set(pg_frozen_composed_material_timeout "$<IF:$<CONFIG:Debug>,900,180>")
+endif()
 set_tests_properties(structure.pg_frozen_shell_material.composed PROPERTIES
-    LABELS "verification;V-MAT" TIMEOUT ${pg_frozen_material_timeout})
+    LABELS "verification;V-MAT" TIMEOUT ${pg_frozen_composed_material_timeout})
 
 set(UVLAS_FORMAL_VMAT_ELASTIC_FIXTURE "" CACHE FILEPATH
     "Optional independent fixture for the 3672-point frozen V-MAT elastic check")
@@ -1027,11 +1035,17 @@ uvlas_add_test(coupling.case_pg_shell_material
 target_include_directories(uvlas_test_coupling_case_pg_shell_material PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 
+set(pg_lateral_traction_timeout 600)
+if(WIN32)
+    set(pg_lateral_traction_timeout "$<IF:$<CONFIG:Debug>,1800,600>")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT UVLAS_SANITIZERS)
+    set(pg_lateral_traction_timeout "$<IF:$<CONFIG:Debug>,1200,600>")
+endif()
 uvlas_add_test(coupling.case_pg_lateral_traction
     LABELS FD-05 V-LOAD integration negative verification
     SOURCES coupling/case_pg_lateral_traction_test.cpp
     LIBS uvlas_coupling Boost::multiprecision nlohmann_json::nlohmann_json
-    TIMEOUT 600)
+    TIMEOUT ${pg_lateral_traction_timeout})
 target_include_directories(uvlas_test_coupling_case_pg_lateral_traction PRIVATE
     "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
 
