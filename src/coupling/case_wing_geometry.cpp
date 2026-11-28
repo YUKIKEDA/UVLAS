@@ -158,18 +158,6 @@ XYZ tangent(const CaseReferenceSurfaceSample& graph, const Point& chart, Math& m
     return result;
 }
 
-void reverse_tangent(NonpenetrationVector& tangent) {
-    for (auto& component : tangent) {
-        if (auto* single = std::get_if<a::SingleWord>(&component)) {
-            single->value = -single->value;
-        } else {
-            auto& pair = std::get<a::DoubleWord>(component);
-            pair.high = -pair.high;
-            pair.low = -pair.low;
-        }
-    }
-}
-
 s::GeometrySurfaceGraph find_graph(const s::Model& model, std::uint64_t id, Math& m) {
     for (std::size_t i = 0; i < model.geometry.size(); ++i) {
         m.visit(1);
@@ -622,11 +610,8 @@ public:
             diagnostic.chord = cell.chord;
             diagnostic.span = cell.span;
             diagnostic.strip = cell.strip;
-            auto span = words(cell.span_tangent);
-            if (cell.reversed)
-                reverse_tangent(span);
             const auto normal = partition_take(project_case_wing_normal(
-                geometry, cell.facets, {words(cell.chord_tangent), span},
+                geometry, cell.facets, cell.chord_tangent, cell.span_tangent, cell.reversed,
                 projection.request.representation, projection.request.normal,
                 {projection.request.exact.input_integer_bits, projection.remaining}, stop));
             projection.remaining -= normal.used_steps;

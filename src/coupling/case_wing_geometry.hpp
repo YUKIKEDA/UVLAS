@@ -41,7 +41,8 @@ struct CaseWingCell {
     structure::PgPartitionPoint chart;
     std::array<io::SiEnclosure, 3> position, velocity;
     // Tangents are partial derivatives of the Case chart. Only the unit normal is oriented.
-    std::array<io::SiEnclosure, 3> chord_tangent, span_tangent, normal;
+    std::array<io::SiEnclosure, 3> chord_tangent, span_tangent;
+    std::array<io::SiEnclosure, 3> normal; ///< Includes the Case tangent projection errors.
     std::optional<aero::detail::ResolvedQuery> collocation;
 };
 
