@@ -6,6 +6,7 @@ import copy
 import hashlib
 import importlib
 import json
+import runpy
 import subprocess
 import sys
 import tempfile
@@ -38,6 +39,8 @@ def expected_dictionary_source(value):
         return "{" + ",".join(members) + "}"
     if isinstance(value, list):
         return "[" + ",".join(map(expected_dictionary_source, value)) + "]"
+    if isinstance(value, Decimal):
+        return str(value)
     if isinstance(value, float):
         number = Decimal(value)
         sign, digits, exponent = number.as_tuple()
@@ -150,6 +153,154 @@ class CaseFileOperations(unittest.TestCase):
                         self.assert_failure(other, uvlas.FailureCode.InvalidInput)
                         self.assertEqual(output.returncode, 2, output.stderr)
                         self.assertIn(b"Nastran sidecar format", output.stderr)
+
+    def test_static_observation_references_across_input_routes(self):
+        verification = Path(__file__).resolve().parents[2] / "docs/verification/IM-06"
+        witness = runpy.run_path(str(verification / "check-static-observation-example.py"))
+        read_reference = witness["read_json"]
+        condition_digest = witness["condition"]
+        fixture = Path(__file__).with_name("fixtures") / "static-observation"
+        case_bytes = (verification / "static-observation-case.json").read_bytes()
+        reference_bytes = (verification / "parametric-observations.json").read_bytes()
+        diagnostics = b"/observations/0/comparison/reference/source"
+
+        with tempfile.TemporaryDirectory() as workspace:
+            root = Path(workspace)
+            path = root / "case.json"
+            reference_path = root / "parametric-observations.json"
+
+            def acquisition(filename, source, role):
+                data = (fixture / filename).read_bytes()
+                (root / filename).write_bytes(data)
+                return {
+                    "source_id": source, "path": filename,
+                    "sha256": hashlib.sha256(data).hexdigest(), "role": role,
+                }
+
+            geometries = {
+                "parametric": None,
+                "gmsh": {
+                    "kind": "gmsh", "id": "2",
+                    "mesh": acquisition("plate.msh", "1", "gmsh-msh4.1-ascii"),
+                    "sidecar": acquisition("plate-gmsh.json", "2", "gmsh-sidecar"),
+                    "reference": {
+                        "kind": "fit", "degree": 1, "distance_budget": 1e-12,
+                        "normal_budget": 1e-12, "conversion_observations": ["1"],
+                    },
+                },
+                "nastran": {
+                    "kind": "nastran", "id": "3",
+                    "deck": acquisition("plate.bdf", "1", "nastran-deck"),
+                    "sidecar": acquisition("plate-nastran.json", "2", "nastran-sidecar"),
+                    "dialect": "msc-2022.1", "mode": "structural-extraction",
+                    "excluded_cards": [],
+                },
+            }
+
+            def publish(case, reference):
+                data = expected_dictionary_source(reference).encode("utf-8")
+                reference_path.write_bytes(data)
+                digest = hashlib.sha256(data).hexdigest()
+                for observation in case["observations"]:
+                    observation["comparison"]["reference"]["source"]["sha256"] = digest
+                path.write_bytes(json_bytes(case))
+
+            for route, external in geometries.items():
+                with self.subTest(route=route):
+                    case = json.loads(case_bytes)
+                    if external is not None:
+                        case["model"]["geometry"].append(external)
+                    reference = read_reference(reference_bytes)
+                    reference["condition_sha256"] = condition_digest(read_reference(json_bytes(case)))
+                    reference["observations"].reverse()
+                    for observation in reference["observations"]:
+                        observation["components"].reverse()
+                    publish(case, reference)
+                    output = cli("validate", path)
+                    self.assertEqual(output.returncode, 0, output.stderr)
+                    self.assertTrue(uvlas.load_case(path).ok)
+
+                    dictionary_condition = condition_digest(
+                        read_reference(expected_dictionary_source(case))
+                    )
+                    if dictionary_condition != reference["condition_sha256"]:
+                        self.assert_failure(
+                            uvlas.case_from_dict(case, reference_root=root),
+                            uvlas.FailureCode.InvalidInput,
+                        )
+                    reference["condition_sha256"] = dictionary_condition
+                    publish(case, reference)
+                    self.assertTrue(uvlas.case_from_dict(case, reference_root=root).ok)
+                    reference_path.write_bytes(reference_path.read_bytes() + b" ")
+                    self.assert_failure(
+                        uvlas.case_from_dict(case, reference_root=root), uvlas.FailureCode.InvalidInput
+                    )
+                    self.assertIn(b"SHA-256 mismatch", cli("validate", path).stderr)
+
+                    reference["condition_sha256"] = condition_digest(read_reference(json_bytes(case)))
+                    point = reference["observations"][1]
+                    reaction = reference["observations"][0]
+                    self.assertEqual(point["id"], "1")
+                    self.assertEqual(reaction["id"], "2")
+                    controls = [
+                        (reference, "condition_sha256", "0" * 64),
+                        (point["observation"]["point"], "side", "upper"),
+                        (point["observation"], "basis", {"kind": "material"}),
+                        (point["comparison"], "time_s", 1),
+                        (point["comparison"], "time_side", "left"),
+                        (point, "components", point["components"][1:]),
+                        (point, "components", [*point["components"], point["components"][0]]),
+                        (point["components"][0], "unit", "mm"),
+                        (point["components"][0], "uncertainty", 1),
+                        (point["components"][0], "uncertainty", -1),
+                        (reaction["observation"], "origin_m", [2, 1, 4]),
+                        (reaction["observation"], "support", "999"),
+                    ]
+                    for fields, field, value in controls:
+                        with self.subTest(field=field, value=value):
+                            original = fields[field]
+                            fields[field] = value
+                            publish(case, reference)
+                            self.assert_failure(uvlas.load_case(path), uvlas.FailureCode.InvalidInput)
+                            output = cli("validate", path)
+                            self.assertEqual(output.returncode, 2, output.stderr)
+                            self.assertIn(diagnostics, output.stderr)
+                            fields[field] = original
+                    reference["schema"] = "uvlas.observation-reference/2"
+                    publish(case, reference)
+                    self.assert_failure(uvlas.load_case(path), uvlas.FailureCode.Unsupported)
+
+            case = json.loads(case_bytes)
+            template = read_reference(reference_bytes)
+            condition = condition_digest(read_reference(json_bytes(case)))
+            for index, (row, record) in enumerate(
+                zip(case["observations"], template["observations"], strict=True)
+            ):
+                source = row["comparison"]["reference"]["source"]
+                name = f"reference-{index}.json"
+                data = expected_dictionary_source({
+                    "schema": template["schema"], "condition_sha256": condition,
+                    "observations": [record],
+                }).encode("utf-8")
+                (root / name).write_bytes(data)
+                source.update(path=name, source_id=str(11 + index),
+                              sha256=hashlib.sha256(data).hexdigest())
+            path.write_bytes(json_bytes(case))
+            self.assertTrue(uvlas.load_case(path).ok)
+            self.assertEqual(cli("validate", path).returncode, 0)
+            second = root / "reference-1.json"
+            record = read_reference(second.read_bytes())
+            record["observations"][0]["observation"]["origin_m"][0] = Decimal(5)
+            data = expected_dictionary_source(record).encode("utf-8")
+            second.write_bytes(data)
+            case["observations"][1]["comparison"]["reference"]["source"]["sha256"] = (
+                hashlib.sha256(data).hexdigest()
+            )
+            path.write_bytes(json_bytes(case))
+            rejected = cli("validate", path)
+            self.assertEqual(rejected.returncode, 2, rejected.stderr)
+            self.assertIn(b"/observations/1/comparison/reference/source", rejected.stderr)
+            self.assertIn(b"reference node", rejected.stderr)
 
     def test_dictionary_checks_schema_and_owns_the_copied_input(self):
         case = copy.deepcopy(EXAMPLES["schema_examples"]["structural_static"])

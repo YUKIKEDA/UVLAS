@@ -3,21 +3,43 @@
 #include "external_mesh_sidecar.hpp"
 #include "gmsh_mesh.hpp"
 #include "nastran_bulk.hpp"
+#include "observation_binding.hpp"
+#include "observation_condition.hpp"
 
 namespace uvlas::io::detail {
 
-enum class LeafReferenceFailure : std::uint8_t { UnsupportedRole, Format, Graph, Sidecar };
+enum class LeafReferenceFailure : std::uint8_t {
+    UnsupportedRole,
+    Format,
+    Graph,
+    Sidecar,
+    Observation
+};
+
+struct ObservationLeafResults {
+    core::PlannedBuffer<std::optional<ObservationFile>> files;
+    std::size_t populated = 0;
+};
+
+struct ObservationLeafContext {
+    ObservationConditionLimits condition;
+    ObservationFileLimits file;
+    std::uint64_t maximum_files;
+    ObservationLeafResults* result;
+};
 
 struct LeafFormatLimits {
     GmshLimits gmsh{};
     NastranBulkLimits nastran{};
     std::optional<MeshSidecarLimits> sidecar{};
+    std::optional<ObservationLeafContext> observation{};
 };
 
 struct LeafReferenceDiagnostic {
     std::optional<LeafReferenceFailure> reason;
     std::optional<RootSnapshotLocation> location;
     std::optional<std::size_t> format_offset;
+    std::optional<InputNodeOrdinal> format_node;
     std::optional<SourceId> declaring_source;
     std::optional<ReferencePathDiagnostic> path;
     DependencyWalkDiagnostic walk;

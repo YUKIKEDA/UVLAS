@@ -1,0 +1,72 @@
+{
+  "beams": [],
+  "generator": "R-05 analytic rectangular plate",
+  "geometry": "3",
+  "joints": [],
+  "masses": [],
+  "materials": [
+    {
+      "material": "1",
+      "mid": "6"
+    }
+  ],
+  "schema": "uvlas.nastran-sidecar/1",
+  "shells": [
+    {
+      "chart": {
+        "orientation": "same",
+        "vertices": [
+          [
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          ],
+          [
+            {
+              "denominator": "1",
+              "numerator": "1"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          ],
+          [
+            {
+              "denominator": "1",
+              "numerator": "1"
+            },
+            {
+              "denominator": "1",
+              "numerator": "1"
+            }
+          ],
+          [
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "1",
+              "numerator": "1"
+            }
+          ]
+        ]
+      },
+      "element": "701",
+      "shell": "1"
+    }
+  ],
+  "supports": [],
+  "units": {
+    "angle": "deg",
+    "length": "mm",
+    "mass": "t",
+    "time": "s"
+  }
+}

@@ -102,11 +102,12 @@ int reject(const core::Failure& failure, std::string_view stage, std::string_vie
     return report(FailedResultExit::Input, stage, location);
 }
 
-std::unexpected<CaseValidationFailure> validation_failure(core::Failure failure,
-                                                          std::string_view stage,
-                                                          std::string_view location = {},
-                                                          std::optional<std::size_t> byte = {}) {
-    return std::unexpected(CaseValidationFailure{failure, stage, std::string{location}, byte});
+std::unexpected<CaseValidationFailure>
+validation_failure(core::Failure failure, std::string_view stage, std::string_view location = {},
+                   std::optional<std::size_t> byte = {},
+                   std::optional<io::InputNodeOrdinal> node = {}) {
+    return std::unexpected(
+        CaseValidationFailure{failure, stage, std::string{location}, byte, node});
 }
 
 std::unexpected<CaseValidationFailure> reject_manifest(const core::Failure& failure,
@@ -123,7 +124,8 @@ std::unexpected<CaseValidationFailure> reject_manifest(const core::Failure& fail
 
 std::expected<ReferencedCase, CaseValidationFailure>
 validate_references(const ReferenceInput& input, const ReferenceInputView& view,
-                    core::ResourcePlan& plan, const std::stop_token& stop) {
+                    ObservationLeafResults& observations, core::ResourcePlan& plan,
+                    const std::stop_token& stop) {
     const DeclarationLimits declaration_limits{{maximum_nodes, 128, maximum_references,
                                                 manifest_cap, manifest_cap, 16 * mib, 16 * mib,
                                                 32 * mib, maximum_work, maximum_path}};
@@ -144,6 +146,9 @@ validate_references(const ReferenceInput& input, const ReferenceInputView& view,
         return validation_failure(prepared.error(), "reference paths",
                                   plan_diagnostic.pointer().value_or(""));
     }
+    const auto count = prepared->report();
+    if (!count)
+        return validation_failure(count.error(), "reference paths");
     RootSnapshotDiagnostic snapshot_diagnostic;
     LeafReferenceDiagnostic diagnostic;
     auto closed = resolve_leaf_references(
@@ -161,7 +166,11 @@ validate_references(const ReferenceInput& input, const ReferenceInputView& view,
         {{reference_cap, maximum_nodes, maximum_nodes, 4 * maximum_nodes, maximum_nodes,
           maximum_nodes, maximum_work},
          {reference_cap, 64 * kib, maximum_nodes, maximum_nodes, 8 * maximum_nodes, maximum_work},
-         sidecar_limits()},
+         sidecar_limits(),
+         ObservationLeafContext{{maximum_work, reference_cap},
+                                {sidecar_limits().json, sidecar_limits().exact, maximum_work},
+                                count->unique_sources,
+                                &observations}},
         plan, stop, &snapshot_diagnostic, &diagnostic);
     if (!closed) {
         if (diagnostic.reason == LeafReferenceFailure::UnsupportedRole) {
@@ -183,6 +192,11 @@ validate_references(const ReferenceInput& input, const ReferenceInputView& view,
             return validation_failure(closed.error(),
                                       nastran ? "Nastran sidecar format" : "Gmsh sidecar format",
                                       diagnostic.pointer(), byte);
+        }
+        if (diagnostic.reason == LeafReferenceFailure::Observation) {
+            return validation_failure(closed.error(), "observation reference format",
+                                      diagnostic.pointer(), diagnostic.format_offset,
+                                      diagnostic.format_node);
         }
         if (diagnostic.reason == LeafReferenceFailure::Graph) {
             return validation_failure(closed.error(), "external reference dependency graph",
@@ -215,11 +229,13 @@ validate_case_input(Acquire acquire, const std::stop_token& stop) noexcept {
         if (!identity) {
             return validation_failure(identity.error(), "manifest identity");
         }
-        auto references = validate_references(*input, *view, plan, stop);
+        ObservationLeafResults observations;
+        auto references = validate_references(*input, *view, observations, plan, stop);
         if (!references) {
             return std::unexpected(std::move(references.error()));
         }
-        return ValidatedCase{std::move(*input), std::move(*references), *identity};
+        return ValidatedCase{std::move(*input), std::move(*references), *identity,
+                             std::move(observations)};
     } catch (const std::bad_alloc&) {
         return std::unexpected(CaseValidationFailure{
             {core::FailureCode::ResourceExceeded, core::Operation::PrepareModel},
@@ -286,6 +302,11 @@ int validate_case(const std::filesystem::path& path) {
     const auto result = validate_case_file(path);
     if (!result) {
         const auto& error = result.error();
+        if (error.reference_node && !error.byte) {
+            auto stage = std::string{error.stage} + " at reference node " +
+                         std::to_string(error.reference_node->value());
+            return reject(error.failure, stage, error.location);
+        }
         if (error.byte) {
             auto stage = std::string{error.stage} + " at byte " + std::to_string(*error.byte);
             return reject(error.failure, stage, error.location);

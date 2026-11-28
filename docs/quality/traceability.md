@@ -97,7 +97,7 @@
 | FD-06 | [case-schema-fields.md:108](../specs/foundation/case-schema-fields.md) | 16 | 7 | 1 |
 | FD-07 | [case-schema-fields.md:136](../specs/foundation/case-schema-fields.md) | 5 | 5 | 0 |
 | FD-08 | [case-schema-fields.md:161](../specs/foundation/case-schema-fields.md) | 3 | 0 | 0 |
-| FD-09 | [case-schema-fields.md:184](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
+| FD-09 | [case-schema-fields.md:184](../specs/foundation/case-schema-fields.md) | 1 | 0 | 0 |
 | FD-10 | [case-schema-fields.md:233](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-11 | [case-schema-fields.md:321](../specs/foundation/case-schema-fields.md) | 0 | 0 | 0 |
 | FD-12 | [case-schema-fields.md:335](../specs/foundation/case-schema-fields.md) | 3 | 0 | 0 |
@@ -216,7 +216,7 @@
 | V-RECOVER | [practical-acceptance-plan.md:35](../requirements/practical-acceptance-plan.md) | 2 | 0 | 0 |
 | V-SEARCH | [practical-acceptance-plan.md:39](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | V-STATE | [practical-acceptance-plan.md:40](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
-| V-USE | [practical-acceptance-plan.md:41](../requirements/practical-acceptance-plan.md) | 3 | 4 | 0 |
+| V-USE | [practical-acceptance-plan.md:41](../requirements/practical-acceptance-plan.md) | 4 | 4 | 0 |
 | X-S10-DECAY | [practical-acceptance-plan.md:55](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | X-S10-FLUTTER | [practical-acceptance-plan.md:54](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
 | X-S10-GVT-LE | [practical-acceptance-plan.md:51](../requirements/practical-acceptance-plan.md) | 0 | 0 | 0 |
