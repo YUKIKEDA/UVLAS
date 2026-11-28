@@ -8,6 +8,8 @@ namespace uvlas::structure {
 namespace detail {
 struct BasisReferencePoint;
 struct BasisReferenceSample;
+struct PgConditionedVolumeRow;
+class PgComposedBasis;
 } // namespace detail
 
 /// An owned reference point and one scalar basis column.
@@ -40,6 +42,11 @@ public:
                                                                const PgReferenceLimits&,
                                                                core::ResourcePlan&) const noexcept;
 
+    /// Evaluate the owning physical reference without assembling shape columns.
+    [[nodiscard]] core::Result<PgReferenceValue>
+    evaluate_geometry(const PgReferencePoint&, const PgReferenceLimits&,
+                      core::ResourcePlan&) const noexcept;
+
     [[nodiscard]] core::Result<std::uint64_t> size() const noexcept;
     [[nodiscard]] core::Result<PgReferenceIdentity> reference_identity() const noexcept;
     [[nodiscard]] core::Result<PgReferenceFrame> frame() const& noexcept;
@@ -54,6 +61,8 @@ private:
     friend class PgConditioningCertificate;
     friend class PgFlatGram;
     friend class PgDiscreteGram;
+    friend struct detail::PgConditionedVolumeRow;
+    friend class detail::PgComposedBasis;
     [[nodiscard]] const ExactRational& length_metres() const& noexcept;
     [[nodiscard]] detail::BasisReferencePoint locate(detail::ReferenceArithmetic&,
                                                      const PgReferencePoint&) const;
