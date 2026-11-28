@@ -354,6 +354,7 @@ TEST_CASE("Frozen dictionary numeric leaves share the production SI scalar kerne
     second.set("id", string("2"));
     second.set("geometry", string("2"));
     surfaces.push_back(std::move(second));
+    surfaces.at(1).set("attachment", parse(R"({"kind":"fixed_reference"})"));
     surfaces.at(1).set(
         "edge_pairing",
         parse(
