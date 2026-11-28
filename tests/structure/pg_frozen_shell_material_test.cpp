@@ -10,6 +10,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <uvlas/structure/pg_discrete_gram.hpp>
 #include <uvlas/structure/pg_shell_material.hpp>
 
@@ -157,8 +158,7 @@ ProbeLocation locate_chart(Fixture& fixture, const PgIntegrationPartition& parti
         };
         return {static_cast<core::Index>(i), convert(u), convert(v), convert(depth)};
     }
-    FAIL("Frozen V-MAT point is outside the physical partition");
-    throw std::runtime_error("Missing V-MAT point");
+    throw std::runtime_error("Frozen V-MAT point is outside the physical partition");
 }
 
 ProbeLocation locate(Fixture& fixture, const PgIntegrationPartition& partition, const Json& input,

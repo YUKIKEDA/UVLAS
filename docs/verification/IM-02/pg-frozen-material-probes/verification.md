@@ -96,6 +96,7 @@ Ubuntu 24.04.5 の GCC 14.2.0 Release で、固定幅の有理数を外向きに
 `structure.pg_prepared_patch`、`io.external_shell_cross_format`、`io.external_case_chart` の3件が通過した。異なる層・パッチの引渡しと資源不足を拒否した。認証済み外部参照の拘束チャートを直接定義の Case と照合し、型付きの二層 Case から材料作用と界面両側の回復を確認した。
 Windows Debug の初回ビルドでは、Catch2 が `std::strong_ordering` と整数0の比較を分解する箇所で MSVC の `C7595` が発生した。
 該当する26箇所を標準ライブラリの比較関数に替え、同じ条件を検査する Ubuntu Release の対象5件が通過した。
+次の Windows Debug ビルドでは、参照点が領域外にあるときにテストを中断する文が重なり、MSVC の `C4702` が出た。領域外の診断を一つにまとめ、Ubuntu Release の凍結試験2件を再実行した。3,615および37,325アサーションが通過した。
 
 正式試験の初回は、スカラー演算の上限を5,000億に設定し、8,048.21秒で `ResourceExceeded` を返した。
 失敗時の累積所有確保は25,122,895,240 B、プロセスの最大常駐量は435,176 KiBだった。
