@@ -156,7 +156,7 @@ TEST_CASE("Static observation file bounds aggregate work and retains exact owned
                                           plan, {}, diagnostic);
     REQUIRE_FALSE(rejected);
     CHECK(rejected.error().code == core::FailureCode::StaleGeneration);
-    const std::stop_source cancellation;
+    std::stop_source cancellation;
     cancellation.request_stop();
     rejected = read_observation_file(source, parent, *condition, observations, fresh, plan,
                                      cancellation.get_token(), diagnostic);
