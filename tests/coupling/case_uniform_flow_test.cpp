@@ -4636,6 +4636,110 @@ TEST_CASE("Free wake motion uses all sources at attached and inherited material 
                core::FailureCode::StaleGeneration);
     }
 
+    auto ramp_case = source_case;
+    // Equal secants make the PCHIP exactly a(t)=1+2(t-1) on this clock.
+    ramp_case.field("flow").field("gust").set("amplitude", parse(R"({
+            "kind":"pchip","times":[1,1.25,1.5],"values":[[1],[1.5],[2]],
+            "outside":{"kind":"reject"}
+        })"));
+    constexpr io::SourceId ramp_id{483};
+    const auto ramp_si = materialize(ramp_case, ramp_id);
+    core::ResourcePlan ramp_memory{1024ULL * 1024 * 1024};
+    const auto ramp_grid = take(cf::prepare_case_reference_clock(
+        ramp_si, stamp, transport_clock_limits, 1000000, ramp_memory));
+    const cf::WakeTransportClock ramp_clock{ramp_grid, ramp_grid, destination};
+    const auto ramp = take(
+        cf::prepare_case_known_flow(ramp_si, stamp, {}, flow_workspace, gust_limits, ramp_memory));
+    const auto ramp_flow_at = [&](const Number& time_at, p::RequestedSide side) {
+        return cf::DiscreteKnownFlowInput{ramp,
+                                          ramp,
+                                          {stamp, time_at.view(), side},
+                                          flow.projection,
+                                          flow.flow_limits,
+                                          flow.coordinate_limits,
+                                          *geometry_work,
+                                          flow_workspace};
+    };
+    const auto ramp_origin_flow = ramp_flow_at(start_time, p::RequestedSide::Right);
+    const auto ramp_parent_flow = ramp_flow_at(previous_time, p::RequestedSide::Automatic);
+    const auto ramp_current_flow = ramp_flow_at(time, p::RequestedSide::Automatic);
+    const cf::WakeTransportClock ramp_first{ramp_grid, ramp_grid, first_interval.destination};
+    const auto ramp_birth = take(cf::evaluate_first_free_wake_transport(
+        ramp_first, {previous_source, ramp_parent_flow, departing, {}},
+        {start_source, ramp_origin_flow, origins, {}}, release.epoch, classified, {}, growth_limits,
+        cap_velocity, shared, *local, *kernel, ramp_memory));
+    const cf::WakeMaterialSnapshot ramp_preceding{older, birth_origins, &ramp_birth};
+    constexpr double parent_shift = .25, trial_shift = -.125;
+    const std::array<cf::NonpenetrationVector, 7> parent_positions{zero, zero, zero, zero,
+                                                                   zero, zero, zero};
+    const std::array<cf::NonpenetrationVector, 9> trial_positions{zero, zero, zero, zero, zero,
+                                                                  zero, zero, zero, zero};
+    const std::array fixed_strengths{cf::FrozenWakeTrace{old_id, a::SingleWord{0}}};
+    const cf::DiscreteFreeWakeDirection ramp_parent_direction{
+        points,          parent_positions, fixed_strengths, zero, a::SingleWord{parent_shift},
+        a::SingleWord{0}};
+    const cf::DiscreteFreeWakeDirection ramp_trial_direction{
+        extended_direction_points,  trial_positions, {}, zero,
+        a::SingleWord{trial_shift}, a::SingleWord{0}};
+    auto held_gamma = parent_gamma;
+    held_gamma[0].circulation_direction = a::SingleWord{0};
+    auto held_parent = parent_strength;
+    held_parent.collocations = held_gamma;
+    const cf::FreeWakeTrialEndpoint ramp_parent{
+        {held_parent, growth_points}, ramp_parent_flow, &ramp_parent_direction};
+    const cf::FreeWakeTrialEndpoint ramp_trial{
+        {with_owned_history, extended_points}, ramp_current_flow, &ramp_trial_direction};
+    const std::array<cf::NonpenetrationVector, 2> stationary_history{zero, zero};
+    const auto solve_ramp = [&](const cf::FreeWakeTrialEndpoint& selected_parent,
+                                const cf::WakeMaterialSnapshot& initial) {
+        return cf::evaluate_free_wake_trial(ramp_si, ramp_clock, selected_parent, ramp_trial,
+                                            {&initial, {stationary_history, stationary_history}},
+                                            next_epoch, trial_seeds, trial_limits, shared, *local,
+                                            *kernel, ramp_memory);
+    };
+    reject(solve_ramp(ramp_parent, preceding), core::FailureCode::StaleGeneration);
+    const auto ramp_step = take(solve_ramp(ramp_parent, ramp_preceding));
+    REQUIRE(ramp_step.trapezoid);
+    REQUIRE(ramp_step.bdf2);
+    REQUIRE(ramp_step.trapezoid->size() == 2);
+    REQUIRE(ramp_step.bdf2->size() == 2);
+
+    constexpr double pi = std::numbers::pi;
+    // Known component only: the induction and history directions are held fixed.
+    // Parent x=1 at t=9/8, release x=2 and retained x=3 at t=5/4.
+    const auto departure_slope = 2. * std::sin(pi / 16.) - (5. * pi / 8.) * std::cos(pi / 16.);
+    constexpr double release_slope = 2., retained_slope = 3. * pi / 4.;
+    const auto release_jvp = -(departure_slope * parent_shift + release_slope * trial_shift) / 2.;
+    constexpr auto retained_jvp = -retained_slope * trial_shift;
+    WorkEnclosure ramp_forward, ramp_reverse;
+    for (std::size_t i = 0; i < 2; ++i) {
+        const auto born_row = take(ramp_step.trapezoid->row(i));
+        const auto kept_row = take(ramp_step.bdf2->row(i));
+        REQUIRE(born_row.direction);
+        REQUIRE(kept_row.direction);
+        near(center((*born_row.direction)[2]), release_jvp);
+        near(center((*kept_row.direction)[2]), retained_jvp);
+        ramp_forward.add(*born_row.direction, trial_seeds[2 * i + 1]);
+        ramp_forward.add(*kept_row.direction, trial_seeds[2 * i]);
+    }
+    const auto endpoint_time = [&](const cf::DiscreteFreeWakeVelocity& velocity, double truth,
+                                   double time_shift) {
+        const auto dual = take(velocity.field_dual()).flow_time;
+        near(center(dual), truth);
+        ramp_reverse.add(dual, a::SingleWord{time_shift});
+    };
+    endpoint_time(take(ramp_step.trapezoid->parent_free_velocity()).get(),
+                  (3. / 16.) * departure_slope, parent_shift);
+    endpoint_time(take(ramp_step.trapezoid->free_velocity()).get(), (3. / 16.) * release_slope,
+                  trial_shift);
+    endpoint_time(take(ramp_step.bdf2->free_velocity()).get(), -(5. / 8.) * retained_slope,
+                  trial_shift);
+    CHECK(abs(ramp_forward.value - ramp_reverse.value) <=
+          ramp_forward.radius + ramp_reverse.radius + rational_word(1e-15));
+    const cf::FreeWakeTrialEndpoint foreign_ramp_parent{
+        {held_parent, growth_points}, previous_flow, &ramp_parent_direction};
+    reject(solve_ramp(foreign_ramp_parent, ramp_preceding), core::FailureCode::StaleGeneration);
+
     reject(cf::evaluate_free_wake_trial(wake_si, transport_clock, parent_trial, current_trial, {},
                                         next_epoch, trial_seeds, trial_limits, shared, *local,
                                         *kernel, trial_memory),
