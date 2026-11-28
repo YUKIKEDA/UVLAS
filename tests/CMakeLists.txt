@@ -217,10 +217,16 @@ if(WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     uvlas_add_test(io.external_shell_cross_format
         LABELS integration negative verification V-USE
+        TIMEOUT "$<IF:$<CONFIG:Debug>,300,60>"
         SOURCES io/external_shell_cross_format_test.cpp
         LIBS uvlas_coupling nlohmann_json::nlohmann_json Boost::hash2)
     target_include_directories(uvlas_test_io_external_shell_cross_format PRIVATE
         "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/io")
+    add_test(NAME io.external_shell_cross_format.exact_sidecar
+        COMMAND uvlas_test_io_external_shell_cross_format "[.exact-sidecar]")
+    set_tests_properties(io.external_shell_cross_format.exact_sidecar PROPERTIES
+        LABELS "V-USE;integration;negative;verification"
+        TIMEOUT "$<IF:$<CONFIG:Debug>,300,60>")
     add_test(NAME io.external_case_chart
         COMMAND uvlas_test_io_external_shell_cross_format "[.external-case-chart]")
     set_tests_properties(io.external_case_chart PROPERTIES

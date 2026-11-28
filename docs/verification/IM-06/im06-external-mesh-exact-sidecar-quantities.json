@@ -1,0 +1,30 @@
+{
+  "schema": "uvlas.verification/1",
+  "id": "im06-external-mesh-exact-sidecar-quantities",
+  "ids": [
+    "FD-03",
+    "MAT-D05",
+    "IO4-01",
+    "IO4-03",
+    "IO4-04",
+    "R-05",
+    "V-USE"
+  ],
+  "package": "IM-06",
+  "issue": 333,
+  "date": "2026-11-28",
+  "source_commit": "50d7c911ebef83a26c4a7d71558d964f900c222a",
+  "claimed_state": "認証したGmshとNastranの元ファイルから、同じCaseの厳密な単位換算と厚さ・材料の不一致を確認した。",
+  "checks": {
+    "linux_release_targets_passed": 4,
+    "exact_sidecar_assertions": 67,
+    "cross_format_assertions": 1862,
+    "directional_mutation_format_rejections_failed": 2
+  },
+  "artifacts": {
+    "docs/specs/foundation/external-mesh-sidecar-contract.md": "87477a76848331280956f483c4fd0c14be7957494a0d80ab8d75d30782220b3a",
+    "docs/verification/IM-06/external-mesh-exact-sidecar-quantities.md": "1445b37f39b95dc91584981d91427b9e92e6d4f37dad13d76dbe804ff41a59dc",
+    "src/io/external_pg_regional_thickness.cpp": "4d5e88d5461c47edc4091d1ba5cf23708eb3acfeef3c27bb004967d9d81bae4d",
+    "tests/io/external_shell_cross_format_test.cpp": "2781b3eda8eade3bbd09598cf6b03b26669c03b7661a908a77d6b2976fb83941"
+  }
+}
