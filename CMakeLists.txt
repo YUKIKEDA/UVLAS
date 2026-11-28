@@ -162,6 +162,7 @@ add_library(uvlas_coupling STATIC src/coupling/case_flow_clock.cpp
                          src/coupling/case_reference_graph.cpp
                          src/coupling/case_material_chart.cpp
                          src/coupling/case_pg_shell_material.cpp
+                         src/coupling/case_pg_lateral_traction.cpp
                          src/coupling/case_material_reference.cpp
                          src/coupling/case_material_rows.cpp
                          src/coupling/case_material_original_layout.cpp
