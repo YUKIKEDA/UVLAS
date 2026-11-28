@@ -1,0 +1,62 @@
+#include "pg_frozen_shell_material_test.cpp"
+
+#include <chrono>
+
+namespace {
+TEST_CASE("Frozen V-MAT mass action at 1944 points", "[.high-mass]") {
+    const auto input = Json::parse(std::ifstream{UVLAS_PG_FROZEN_MATERIAL_PROBES});
+    const auto transfer = Json::parse(std::ifstream{UVLAS_PG_FROZEN_MATERIAL_TRANSFER});
+    const auto cubature = Json::parse(std::ifstream{"vmat-high-rule.json"});
+    auto limits = query_limits();
+    limits.maximum_scalar_operations = 500'000'000;
+    limits.maximum_partition_visits = 250'000'000;
+    core::ResourcePlan plan{profile};
+    core::Workspace scratch{core::PlannedBuffer<std::byte>{}};
+    Fixture fixture;
+    const auto& materials = input.at("material_input");
+    const auto patch =
+        prepare_patch(geometry(fixture, input.at("height_coefficients"), materials, limits, plan),
+                      fixture, limits, scratch, plan);
+    const auto state = transferred_state(transfer.at("transfer").at("displacement_metres"), patch,
+                                         fixture, limits, plan);
+    const auto& partition = take(take(patch.conditioning().reference_basis())->source()).partition;
+    const auto layers = take(partition.layers());
+    std::vector<ExactRational> densities;
+    densities.reserve(layers.size());
+    for (const auto& material : materials)
+        densities.push_back(word(material.at("material").at("rho"), limits.algebra, plan));
+    std::vector<PgShellLayerDensity> mass_layers;
+    mass_layers.reserve(layers.size());
+    for (std::size_t i = 0; i < layers.size(); ++i)
+        mass_layers.push_back({layers[i].id, densities[i]});
+    const auto sites = import_volume_rule(cubature.at("points"), partition, fixture);
+    std::vector<PgDiscreteVolumePoint> rule;
+    rule.reserve(sites.size());
+    for (const auto& site : sites)
+        rule.push_back({site.location.point(), site.weight});
+    REQUIRE(rule.size() == 1944);
+    auto assembly_limits = limits;
+    assembly_limits.maximum_scalar_operations = 40'000'000'000ULL;
+    assembly_limits.algebra.maximum_value_bits = 16'384;
+    assembly_limits.algebra.maximum_work_bits = 65'536;
+    assembly_limits.algebra.external_memory = ExactEstimateAdmission{profile};
+    core::ResourcePlan mass_plan{profile};
+    const auto width = fixture.r("1", "1000000000000000000000");
+    const auto id = take(patch.info()).identity;
+    std::clog << "VMAT_MASS_START," << rule.size() << ',' << plan.allocated_bytes() << std::endl;
+    const auto start = std::chrono::steady_clock::now();
+    auto outcome =
+        apply_pg_shell_consistent_mass(patch, rule, mass_layers, {id, state.displacement},
+                                       {112, width, width}, assembly_limits, mass_plan);
+    std::clog << "VMAT_MASS_FINISH," << mass_plan.allocated_bytes() << ','
+              << std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count()
+              << std::endl;
+    const auto mass = checked(std::move(outcome), "high order mass");
+    std::clog << "VMAT_MASS_WORK," << mass.work.scalar_operations << ','
+              << mass.work.partition_visits << std::endl;
+    check_relative_enclosure(q(mass.mass_kg.lower), q(mass.mass_kg.upper),
+                             cubature.at("frozen_mass"));
+    check_action(mass.action_kg_metres.values(), state.displacement,
+                 cubature.at("frozen_mass_work"));
+}
+} // namespace

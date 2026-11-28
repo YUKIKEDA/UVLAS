@@ -434,6 +434,12 @@ core::Result<PgReferenceIdentity> PgReferenceBasis::reference_identity() const n
     return geometry_.identity();
 }
 
+core::Result<PgReferenceValue>
+PgReferenceBasis::evaluate_geometry(const PgReferencePoint& point, const PgReferenceLimits& limits,
+                                    core::ResourcePlan& plan) const noexcept {
+    return geometry_.evaluate(point, std::nullopt, limits, plan);
+}
+
 core::Result<PgReferenceFrame> PgReferenceBasis::frame() const& noexcept {
     return geometry_.frame();
 }
